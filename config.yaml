@@ -25,3 +25,78 @@ subscriptions:
     stage: A
     diff_threshold_pct: 15
   keyword_recall_mode: or
+  intent_profiles:
+    - tag: lpt
+      description: 大语言模型后训练
+      enabled: true
+      paper_sources:
+        - arxiv
+        - biorxiv
+      keywords:
+        - keyword: large language model
+          keyword_cn: 大语言模型
+          query: l
+        - keyword: Reinforcement Learning
+          keyword_cn: 强化学习
+          query: Reinforcement Learning
+        - keyword: llm post train
+          keyword_cn: 大语言模型后训练
+          query: p
+        - keyword: LLM Reinforcement Learning
+          keyword_cn: 大语言模型强化学习
+          query: r
+        - keyword: on-policy distillation
+          keyword_cn: 在策略蒸馏
+          query: o
+        - keyword: reward modeling
+          keyword_cn: 奖励建模
+          query: reward modeling for learning human preferences in reinforcement learning from human feedback
+      intent_queries:
+        - query: innovation
+          query_cn: 创新
+          enabled: true
+          source: manual
+          note: ''
+        - query: math formulation
+          query_cn: 数学公式
+          enabled: true
+          source: manual
+          note: ''
+        - query: Algorithm improvements
+          query_cn: 算法改进
+          enabled: true
+          source: manual
+          note: ''
+        - query: servey
+          query_cn: 综述
+          enabled: true
+          source: manual
+          note: ''
+      updated_at: '2026-06-10T07:15:12.729Z'
+source_backends:
+  arxiv:
+    papers_table: arxiv_papers
+    use_vector_rpc: true
+    vector_rpc: match_arxiv_papers
+    vector_rpc_exact: match_arxiv_papers_exact
+    use_bm25_rpc: true
+    bm25_rpc: match_arxiv_papers_bm25
+    sync_table: arxiv_sync_status
+    sync_success_value: success
+    schema: public
+    kind: supabase
+    enabled: true
+    url: https://lyucdwgefyfbmaiopjbk.supabase.co
+    anon_key: sb_publishable_lX-oi64Uxyd7SIVv3_w2Uw_MTOojeKq
+  biorxiv:
+    papers_table: biorxiv_papers
+    use_vector_rpc: true
+    vector_rpc: match_biorxiv_papers_exact
+    vector_rpc_exact: match_biorxiv_papers_exact
+    use_bm25_rpc: true
+    bm25_rpc: match_biorxiv_papers_bm25
+    schema: public
+    kind: supabase
+    enabled: true
+    url: https://lyucdwgefyfbmaiopjbk.supabase.co
+    anon_key: sb_publishable_lX-oi64Uxyd7SIVv3_w2Uw_MTOojeKq
