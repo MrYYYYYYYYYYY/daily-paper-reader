@@ -1,0 +1,764 @@
+Title: SAW: Stage-Aware Dynamic Weighting for Multi-Objective Reinforcement Learning in Large Language Models
+
+URL Source: https://arxiv.org/pdf/2606.07705v1
+
+Published Time: Tue, 09 Jun 2026 00:07:15 GMT
+
+Number of Pages: 17
+
+Markdown Content:
+# SAW: Stage-Aware Dynamic Weighting for Multi-Objective Reinforcement Learning in Large Language Models 
+
+## Yuchen He 1,∗, Baolong Bi 1,∗, Shenghua Liu 1,†, Huaming Liao 1,†, Yuyao Ge 1
+
+## Bolin Wan 2, Siqian Tong 1, Juan Chen 1, Jiafeng Guo 1, Xueqi Cheng 11Institute of Computing Technology, Chinese Academy of Sciences 
+
+> 2
+
+## University of Electronic Science and Technology of China 
+
+## Abstract 
+
+Although multi-objective reinforcement learn-ing (MORL) is central to aligning large lan-guage models with complex human prefer-ences, the prevailing practice of static weighted summation overlooks a more fundamental phe-nomenon: reward learning is markedly asyn-chronous across objectives . Well-learned di-mensions quickly produce homogeneous, low-variance signals whose residual noise contam-inates the aggregated reward (in GRPO) or occupies a fixed share of the advantage bud-get (in GDPO), interfering with the scarce yet high-value signals carried by under-learned di-mensions. To address this asynchrony, we propose Stage-Aware Dynamic Weighting 
+
+(SAW), a lightweight, algorithm-agnostic dy-namic weighting mechanism. SAW utilizes the coefficient of variation (CV) as a scale-invariant proxy for real-time informativeness, reweighting each dimension’s reward or advan-tage contribution by its relative informative-ness within the batch. Unlike gradient-based methods that require multiple forward and back-ward passes, SAW relies solely on batch-level statistics, introducing nearly negligible com-putational overhead. Experiments on tool-calling and text summarization tasks demon-strate that SAW consistently improves both training efficiency and final performance under both GRPO and GDPO frameworks, confirm-ing it as a general-purpose plug-in for multi-reward LLM alignment. Our code is available at https://github.com/Zhaolutuan/SAW .
+
+## 1 Introduction 
+
+Aligning large language models (LLMs) with hu-man preferences (Christiano et al., 2017; Ouyang et al., 2022; Bai et al., 2022a; Rafailov et al., 2023; Lee et al., 2023; Yuan et al., 2024) increasingly requires optimizing multiple objectives simulta-neously. Modern RL-based alignment pipelines 
+
+> *Equal contribution.
+> †Corresponding authors.
+
+incorporate diverse reward signals spanning cor-rectness and reasoning ability (Guo et al., 2025), efficiency (Team et al., 2025; Liu et al., 2025c; Aggarwal and Welleck, 2025), and safety (Dai et al., 2024; Bai et al., 2022b; Glaese et al., 2022). The prevailing practice aggregates these signals via static weighted summation, holding each reward dimension’s weight fixed throughout training. Yet this seemingly straightforward approach masks a deeper dynamic imbalance that fundamentally lim-its training effectiveness in multi-reward RL. Recent work has begun to expose the limitations of naive reward aggregation schemes. Liu et al. (2026) demonstrate that applying group-wise nor-malization to the summed reward causes distinct reward combinations to collapse into identical ad-vantage values, termed reward collapse , and pro-pose GDPO to resolve this problem by normalizing each reward dimension independently. We identify a more fundamental problem that persists even under GDPO’s improved normaliza-tion: reward learning is asynchronous across objectives . Different reward objectives are mas-tered at different rates as training proceeds. This asynchrony manifests directly in the reward statis-tics: faster-learned dimensions quickly produce homogeneous, low-variance signals whose residual fluctuations behave as noise, while still-learning dimensions remain dispersed and continue to carry rich learning signal. Under static aggregation, this noise from saturated dimensions is mixed into the signal that drives policy updates: in GRPO, the residual noise of saturated dimensions is summed into rsum before group normalization, contaminat-ing the aggregated advantage and biasing the di-rection of every gradient update; in GDPO, where per-dimension advantages are normalized to the same scale, each saturated dimension still occupies a 1/n share of the advantage budget regardless of its information content, similarly biasing the gra-dient direction. In both cases, the effective signal-1      
+
+> arXiv:2606.07705v1 [cs.LG] 5 Jun 2026 Figure 1: Overview of SAW. Given a query, the policy model produces a group of rollouts that are scored by multiple reward functions. Within each batch, the resulting per-dimension reward distributions exhibit different degrees of dispersion: the dimension currently carrying a more informative signal (high CV) is upweighted ( ω1↑), while the one whose batch signal has become more uniform and noise-dominated (low CV) is downweighted ( ω2↓).
+> The contour plot in the Reweight panel is a schematic 2D projection of the high-dimensional optimization landscape :under static weighting, the noise-contaminated gradient Gold steers the policy toward a sub-optimal basin, whereas SAW’s CV-based reweighting yields a corrected gradient Gnew aligned with the true descent direction.
+
+to-noise ratio of the gradient direction degrades over training: scarce yet high-value signals from under-learned dimensions are interfered with by, or forced to compete on equal footing with, residual noise from already-saturated ones. A natural response is to dynamically adjust the reward weights based on the training progress. However, existing dynamic weighting methods from multi-task learning (such as gradient-based approaches (Sener and Koltun, 2018; Yu et al., 2020; Liu et al., 2021; Navon et al., 2022; Chen et al., 2018) that derive weights from per-objective gradient interactions) require multiple additional forward and backward passes per training step. In the LLM setting, where a single forward-backward pass is already expensive, such overhead is pro-hibitive for online RL training at scale. To address this problem, we propose Stage-Aware Dynamic Weighting (SAW; Figure 1), a lightweight, algorithm-agnostic dynamic weight-ing mechanism. SAW utilizes the coefficient of variation (CV), defined as the ratio of the standard deviation to the mean, as a scale-invariant proxy for the real-time informativeness of each reward dimension. A higher CV indicates that, within the current batch, the dimension’s rewards remain dis-persed and carry an informative learning signal; a lower CV indicates that its rewards have become more uniform and the information it provides has diminished. By making weights proportional to each dimension’s CV share, SAW reallocates each dimension’s weight at the reward level (GRPO) or the advantage level (GDPO) according to its rela-tive informativeness. This amplifies the dimension carrying a scarcer, more informative signal while proportionally downweighting the one whose batch signal has become more uniform, using only batch-level mean and standard deviation, with no gradient computation or Pareto front estimation. Overall, our contributions are as follows: • We identify and formalize the asynchrony in how distinct reward objectives are learned in multi-reward RL: under static weighting, the residual fluctuations of saturated dimensions corrupt the aggregated signal that drives the gradient up-date, while scarce, high-value signals from under-learned dimensions are systematically diluted and progressively obscured during training. • We propose Stage-Aware Dynamic Weighting (SAW), a statistics-driven dynamic weighting method that requires only batch-level mean and standard deviation, with no modification to the underlying reward functions or optimizer archi-tecture, and serves as a modular plug-in applica-ble at the reward level with GRPO or the advan-tage level with GDPO. • We evaluate SAW on tool calling (ToolRL, with two model scales: 1.5B and 3B) and Reddit summarization (1.5B) under both GRPO and GDPO, demonstrating consistent improvements across tasks with different reward structures and 2Figure 2: Two failure modes of static-weight aggregation under asynchronous reward learning, on minimal four-rollout examples in [0 , 1] . Both failures share the same root cause: static weights cannot tell collapsed noise from genuine signal. The detailed mechanism is analyzed in §3.2. 
+
+markedly different reward dynamics. 
+
+## 2 Preliminaries 
+
+2.1 Multi-Objective Reinforcement Learning 
+
+In multi-reward RL for LLMs, the training signal comprises n reward functions r1, r 2, . . . , r n, each evaluating a distinct quality dimension of model outputs (e.g., correctness, formatting, safety). Given a question qi and a sampled response oj ,the aggregated training reward is computed as a weighted sum across dimensions: 
+
+r(i,j ) 
+
+> sum
+
+=
+
+> n
+
+X
+
+> k=1
+
+ωk r(i,j ) 
+
+> k
+
+(1) where ωk denotes the weight assigned to the k-th reward dimension. In standard practice, these weights are set statically. A key statistic used extensively throughout this paper is the coefficient of variation (CV). For re-ward dimension k within a single batch of N sam-pled responses, the CV is defined as: 
+
+CV k = σk
+
+μk + δ (2) where σk and μk are the batch-level standard de-viation and mean of rk, respectively, and δ is a small constant for numerical stability. Unlike raw variance, CV normalizes by the mean, making it a 
+
+scale-invariant measure of relative dispersion that enables meaningful comparison across reward di-mensions with different numerical scales. 
+
+2.2 RL Algorithms GRPO. Group Relative Policy Optimization (Shao et al., 2024) eliminates the need for a value model by computing advantages relative to a group of sampled responses. For a given question qi, the behavior policy πθold generates a group of G re-sponses {oj }Gj=1 . The group-relative advantage is computed by normalizing the aggregated reward (Eq. 1) within the same sampled group: 
+
+A(i,j ) 
+
+> sum
+
+= r(i,j ) 
+
+> sum
+
+− mean {r(i, ·) 
+
+> sum
+
+}
+
+std {r(i, ·) 
+
+> sum
+
+} (3) The policy is then updated by maximizing the clipped surrogate objective: 
+
+JGRPO (θ) = E
+
+ 1
+
+G
+
+> G
+
+X
+
+> j=1
+
+1
+
+|oj | 
+
+> |oj|
+
+X
+
+> t=1
+
+min  sj,t A(i,j ) 
+
+> sum
+
+,
+
+clip (sj,t , 1−ϵ, 1+ ϵ) A(i,j )
+
+> sum
+
+
+
+(4) where sj,t = πθ (otj |q,o <t j )    
+
+> πθold (otj|q,o <t j)
+
+is the standard per-token importance sampling ratio. 
+
+GDPO. Recently, Liu et al. (2026) identify that directly applying GRPO’s group-wise normaliza-tion to the summed reward causes reward collapse 
+
+(distinct reward combinations collapse into identi-cal advantage values), and propose GDPO, which normalizes each individual reward dimension inde-pendently before final aggregation: 
+
+A(i,j ) 
+
+> k
+
+= r(i,j ) 
+
+> k
+
+− mean {r(i, ·) 
+
+> k
+
+}
+
+std {r(i, ·) 
+
+> k
+
+} , k = 1 , . . . , n (5) 3Figure 3: Training dynamics under standard GRPO with equal-weighted aggregation on ToolRL. (a) Per-dimension reward trajectories. The correctness reward saturates rapidly while format continues to evolve. (b) 
+
+> Per-dimension CV trajectories. The CV of the correct-ness dimension collapses to near zero early in train-ing, while the format CV remains substantially higher throughout most of training.
+
+A(i,j ) 
+
+> sum
+
+= A(i,j )1 + A(i,j )2 + · · · + A(i,j ) 
+
+> n
+
+(6) followed by an additional batch-wise normalization to stabilize the overall scale: 
+
+ˆA(i,j ) 
+
+> sum
+
+= A(i,j ) 
+
+> sum
+
+− mean {A(·)
+
+> sum
+
+}
+
+std {A(·)
+
+> sum
+
+} + δ (7) 
+
+## 3 Motivation 
+
+To empirically ground the asynchronous reward learning phenomenon described in §1, this section first observes the phenomenon on a real training run (§3.1), then uses a concrete four-rollout example to show how the resulting noise is injected into GRPO and GDPO policy updates respectively (§3.2). 
+
+3.1 Asynchronous Learning across Reward Dimensions 
+
+Figure 3(a) shows the mean reward trajectories for the two reward dimensions. The correctness reward rises sharply in the early stages and plateaus around step 25–30, indicating that the model captures the bulk of this dimension’s gradient signal within a small fraction of training. In contrast, the format reward exhibits a slower, more gradual ascent: it remains near zero while correctness is still rising, only entering its rapid-learning phase after correct-ness has largely saturated, and reaching its own plateau substantially later in training. This divergence in learning speed directly mani-fests in the CV trajectories (Figure 3(b)). The CV of the correctness dimension drops sharply early in training, signaling that within each batch the correctness dimension now carries limited informa-tion and can no longer provide an effective learning signal for the gradient update. Meanwhile, the for-mat CV remains elevated for considerably longer: a high-CV dimension marks a valuable learning signal that the gradient update can leverage to re-inforce the better samples and suppress the worse ones within each batch of rollouts. The CV trajectories establish that, by the boxed region (steps ∼20–35), correctness has approached convergence ( CV → 0) while format remains the only dimension carrying substantial within-batch variability. In §3.2, we analyze the concrete cost this asynchrony imposes on the policy gradient update under static weighting through an exam-ple, which isolates the underlying mechanism and shows that the same root cause produces similar failure modes in GRPO and GDPO. 
+
+3.2 How Asynchrony Injects Noise into the Gradient Update 
+
+Once a reward dimension approaches convergence, its within-batch deviations are stochastic residu-als rather than genuine quality differences. Under static-weight aggregation, these residuals enter the policy update through different channels in GRPO and GDPO, but with the same consequence: the gradient direction computed from the advantage is biased. Figure 2 illustrates both failure modes on minimal four-rollout examples. GRPO directly operates on each rollout’s ab-solute deviation r(j) 
+
+> sum
+
+− rsum . A near-converged dimension’s residual deviation, while small in CV, can match the absolute magnitude of a still-learning dimension’s true signal, particularly when the latter is bounded to a small range. The left panel of Fig-ure 2 illustrates this concretely: dim 1 is saturated near 1.0 (CV ≈ 2% ) while dim 2 is just beginning to differentiate (with reward 0.04 on rollout o1), so the absolute magnitudes of dim 1’s residual noise (±0.03 ) and dim 2’s true signal ( ±0.03 on o1) are comparable. Summing before the group normaliza-tion therefore cancels the signal at o1 (Ao1 =0 ) and elevates the noise-driven o2 to the top rank within the group ( Ao2 =+1 .63 ). GDPO instead independently normalizes each in-dividual dimension to unit-variance z-scores before final aggregation, so each dimension’s contribution 4Method Overall Acc ↑ Non-Live Overall Acc ↑ Live Overall Acc ↑ Multi-Turn Overall Acc ↑                                                        
+
+> Qwen2.5-1.5B-Instruct
+> Base 31.25% 30.92% 48.78% 2.13% GRPO 32.55% 32.81% 50.26% 2.25% GRPO+Gradient 33.41% 33.98% 51.22% 2.50% GRPO+SAW 33.53% 33.10% 52.19% 2.63%
+> GDPO 33.82% 34.29% 51.96% 2.50% GDPO+Gradient 33.93% 33.48% 52.78% 2.75%
+> GDPO+SAW 34.02% 33.98% 52.63% 2.63%
+> Qwen2.5-3B-Instruct
+> Base 34.57% 35.13% 52.19% 4.00% GRPO 36.27% 35.94% 55.29% 4.63% GRPO+Gradient 35.60% 35.75% 54.56% 3.38% GRPO+SAW 36.35% 36.06% 55.22% 4.88%
+> GDPO 35.58% 35.71% 54.03% 4.25% GDPO+Gradient 36.43% 36.31% 55.22% 4.88%
+> GDPO+SAW 36.62% 35.98% 56.40% 4.12%
+
+Table 1: ToolRL accuracy on BFCL-v4 (averaged over 4 evaluation runs). Bold indicates the best result within each model and algorithm family (GRPO-based or GDPO-based). 
+
+depends only on its rank pattern, not its magnitude. A near-converged dimension’s negligible fluctua-tions are thus inflated to z-scores of order ±1, on par with genuine learning signal. The right panel of Figure 2 illustrates this: even when dim 2’s sig-nal is strong enough that GRPO handles the case correctly, per-dimension z-normalization rescales dim 1’s small noise ( ±0.05 ) to ±1.41 , putting it on equal footing with dim 2’s true ±1.73 , and the rank between o1 and o2 flips. 
+
+A unified view. Both failures share the same root cause (static weights cannot distinguish a near-converged dimension’s residual noise from a still-learning one’s genuine signal), differing only in the noise’s entry channel. The same remedy fixes both: weight each dimension’s contribution by its CV, applied at GRPO’s reward level or GDPO’s advantage level. We formalize this next. 
+
+## 4 Methodology: Stage-Aware Dynamic Weighting 
+
+4.1 CV-Based Dynamic Weighting 
+
+As established in §2, the coefficient of variation 
+
+CV k (Eq. 2) provides a scale-invariant measure of within-batch reward dispersion, which §3 shows directly tracks the informativeness of each reward dimension. We compute CV at the batch level rather than per-group, so that statistics average out the noise from individual question difficulty and yield a more stable estimate of the model’s global learning state across reward dimensions. 
+
+Why CV over other dispersion measures. Raw variance or standard deviation cannot be directly compared across reward dimensions with different scales: a dimension defined on a wider numerical range will naturally yield a larger standard devia-tion even when its relative within-batch dispersion is no greater than that of a dimension on a narrower range. CV resolves this by normalizing each di-mension’s dispersion by its own mean, yielding a dimensionless quantity that reflects relative vari-ability. Additionally, CV requires only first and second moments, introducing negligible additional computational overhead per training step. 
+
+4.2 Algorithm Overview 
+
+Given n reward dimensions, we define the base weight for dimension k as its proportional share of total CV within the current batch: 
+
+ω′ 
+
+> k
+
+= CV k
+
+Pnl=1 CV l
+
+(8) For reward-level weighting (GRPO), we use ωk =
+
+ω′ 
+
+> k
+
+directly, since GRPO’s subsequent group-wise normalization (Eq. 3) absorbs any constant scal-ing. For advantage-level weighting (GDPO), we scale by n: ωk = n · ω′
+
+> k
+
+, because each per-reward advantage Ak in GDPO is already normalized to zero-mean unit-variance; without the ×n factor, the aggregated advantage would have a systemati-cally smaller magnitude than the standard GDPO formulation with equal weights. We present the complete SAW procedure in Al-gorithm 1. Because the weights are derived directly 5Figure 4: Training trajectories on ToolRL with Qwen2.5-1.5B-Instruct. SAW accelerates format saturation (the underlearned, high-CV dimension) while leaving correctness convergence essentially unchanged. 
+
+from current batch statistics, SAW adapts to each dimension’s learning state without any auxiliary state across steps or learnable parameters. 
+
+4.3 Integration with GRPO and GDPO 
+
+SAW is designed as a modular plug-in component with two complementary integration modes: 
+
+Mode 1: Reward-level weighting (with GRPO). 
+
+SAW applies dynamic weights directly to the raw rewards before summation: 
+
+r(j) 
+
+> sum
+
+= ω1 r(j)1 + ω2 r(j)2 + · · · + ωn r(j) 
+
+> n
+
+(9) The resulting weighted sum is then processed through GRPO’s standard group-wise normaliza-tion (Eq. 3). Since GRPO normalizes the aggregate, the ×n scaling is unnecessary here; only the rela-tive weight proportions ultimately matter. 
+
+Mode 2: Advantage-level weighting (with GDPO). Each reward is first independently nor-malized (Eq. 5), and then the ×n-scaled dynamic weights are applied to the normalized advantages: 
+
+A(j) 
+
+> sum
+
+= ω1 A(j)1 + ω2 A(j)2
+
++ · · · + ωn A(j)
+
+> n
+
+(10) followed by GDPO’s batch-wise normaliza-tion (Eq. 7). This mode combines GDPO’s information-preserving normalization with SAW’s informativeness-aware weighting, addressing both the reward collapse and the asynchronous reward learning problems simultaneously. 
+
+4.4 Practical Considerations Reward offset. CV is well-defined only when 
+
+μk > 0. For reward dimensions that may take non-positive values, we apply the offset ˜r(j) 
+
+> k
+
+=
+
+r(j) 
+
+> k
+
+− rmin  
+
+> k
+
++ δ before computing CV, using the theoretical minimum rmin  
+
+> k
+
+. The offset rescales each CV but preserves the relative ordering across di-mensions, which is sufficient for SAW’s propor-tional weighting. For learned reward models with-out known bounds, empirical batch minima can alternatively be substituted (see Limitations). 
+
+Numerical stability. The δ term in Eq. 2 prevents division by zero when μk ≈ 0; when all CV values are near zero ( S < δ ), SAW falls back to equal weights. SAW is stateless: weights are computed independently at each step from the current batch statistics, with no cross-step state. 
+
+Compatibility with priority weights. SAW composes with static priority weights αk by sim-ple multiplication: r(j) 
+
+> sum
+
+= P 
+
+> k
+
+ωk αk r(j) 
+
+> k
+
+. Since CV is scale-invariant ( CV( αkrk) = CV( rk)), αk
+
+does not interfere with SAW’s informativeness as-sessment. Practitioners control objective priorities through αk, while SAW independently adjusts al-location by real-time informativeness. 
+
+## 5 Experiments 
+
+5.1 Experimental Setup 
+
+We evaluate SAW on two multi-reward RL tasks with distinct reward structures. Experiments use Qwen2.5-1.5B-Instruct and Qwen2.5-3B-Instruct (Qwen et al., 2025) as base models, trained using the verl framework (Sheng et al., 2025). Detailed hyperparameter configurations for both tasks are provided in Appendix D. 
+
+ToolRL. Following Qian et al. (2026) and Liu et al. (2026), we train the model on a tool-calling task with two reward dimensions: a format reward 
+
+Rformat ∈ { 0, 1} checking structural compliance, and a correctness reward Rcorrect ∈ [−3, 3] evalu-ating tool calls against ground truth. We adopt the 6Algorithm 1 SAW: Stage-Aware Dynamic Weight-ing for Multi-Reward RL 
+
+Require: Batch rewards {r(j) 
+
+> k
+
+}j=1 ,...,N k=1 ,...,n ; stability constant δ; mode ∈ { reward , advantage }
+
+Ensure: Dynamic weights {ωk}nk=1  
+
+> 1:
+
+// Offset non-positive rewards  
+
+> 2:
+
+for k = 1 to n do  
+
+> 3:
+
+˜r(j) 
+
+> k
+
+← r(j) 
+
+> k
+
+− rmin  
+
+> k
+
++ δ, ∀ j 
+
+> 4:
+
+end for  
+
+> 5:
+
+// Compute batch-level CV for each reward  
+
+> 6:
+
+for k = 1 to n do  
+
+> 7:
+
+μk ← mean {˜r(1)  
+
+> k
+
+, . . . , ˜r(N ) 
+
+> k
+
+} 
+
+> 8:
+
+σk ← std {˜r(1)  
+
+> k
+
+, . . . , ˜r(N ) 
+
+> k
+
+} 
+
+> 9:
+
+CV k ← σk / (μk + δ) 
+
+> 10:
+
+end for  
+
+> 11:
+
+// Compute proportional weights  
+
+> 12:
+
+S ← Pnk=1 CV k 
+
+> 13:
+
+if S < δ then  
+
+> 14:
+
+ωk ← 1, ∀ k {Fallback to equal weights}  
+
+> 15:
+
+else  
+
+> 16:
+
+for k = 1 to n do  
+
+> 17:
+
+ωk ← CV k/S  
+
+> 18:
+
+if mode = advantage then  
+
+> 19:
+
+ωk ← ωk × n 
+
+> 20:
+
+end if  
+
+> 21:
+
+end for  
+
+> 22:
+
+end if  
+
+> 23:
+
+return {ωk}nk=1 
+
+same training set as ToolRL, consisting of 4k sam-ples in total: 2k from ToolACE (Liu et al., 2025d), 1k from Hammer (Lin et al., 2024), and 1k from xLAM (Zhang et al., 2025). Each instance contains a user question and its corresponding ground-truth tool calls. We evaluate the trained models on the Berkeley Function Call Leaderboard (BFCL-v4) (Patil et al., 2025), which spans Non-Live (1,150 cases), Live (1,381 cases), and Multi-Turn (800 cases) function-calling subsets; a full breakdown of the included sub-tasks is provided in Appendix E. The evaluation is run 4 times with the per-instance scores averaged across runs. The training prompt format and reward formulations are given in Ap-pendices B and C. 
+
+Reddit TL;DR. We train Qwen2.5-1.5B-Instruct on a summarization task using the Reddit TL;DR dataset ( trl-lib/tldr ; Völske et al., 2017; Sti-ennon et al., 2020), randomly sampling 2,560 for training and 256 for evaluation. We use two rubric-based reward dimensions: quality (0–10) and con-Method Total ↑ Quality ↑ Conc. ↑                       
+
+> (/20) (/10) (/10)
+> Qwen2.5-1.5B-Instruct 14.69 7.34 7.35
+> GRPO 18.20 8.71 9.49 GRPO+Gradient 18.76 +.56 9.11 +.40 9.64 +.15
+> GRPO+SAW 18.80 +.60 9.15 +.44 9.65 +.16
+> GDPO 18.80 9.10 9.70 GDPO+Gradient 18.94 +.14 9.17 +.07 9.77 +.07
+> GDPO+SAW 19.07 +.27 9.35 +.25 9.72 +.02
+
+Table 2: Reddit TL;DR results (2 rewards). Quality and Conciseness (Conc.) are scored 0–10 by a rubric-based LLM judge; Total is their sum. Subscripts denote improvements over the corresponding baseline. 
+
+ciseness (0–10), scored by Gemini-3-flash-preview-nothinking (Team et al., 2023) (temperature 0.1); our rubric design follows recent practice of rubric-based reward modeling for RL (Huang et al., 2025; Gunjal et al., 2025; Bi et al., 2025). The same scoring procedure is applied to both training and evaluation, and the evaluation is run 4 times with the per-instance scores averaged across runs. The training prompt format is provided in Appendix G, and the full scoring rubric template in Appendix H. 
+
+Baselines. We compare the following methods: • Base : The pre-trained model. • GRPO (Shao et al., 2024): Multi-reward GRPO with equal-weight reward summation. • GRPO+Gradient (Lu et al., 2025): GRPO with gradient-based dynamic reward weight-ing. At each training step, per-objective gradi-ents are computed and their pairwise dot prod-ucts form an interaction matrix; weights are updated via exponentiated gradient ascent to favor dimensions whose gradients align with the overall optimization direction. • GRPO+SAW : GRPO with CV-based dy-namic reward weighting (Mode 1). • GDPO (Liu et al., 2026): Decoupled normal-ization with equal-weight advantage summa-tion across reward dimensions. • GDPO+Gradient : GDPO with gradient-based dynamic advantage weighting. • GDPO+SAW : GDPO with CV-based dy-namic advantage weighting (Mode 2). 75.2 Evaluation ToolRL. Table 1 reveals two patterns that hold across both model scales. CV reweighting alone closes most of the gap between GRPO and GDPO, directly supporting the unified noise-injection view of §3.2: since decoupled normalization and CV-based reweighting address the same underlying problem from different angles, a fix at either point recovers most of the loss. SAW also matches or exceeds the gradient-based weighting of Lu et al. (2025) on every aggregate metric at a small fraction of the compute (§5.3), showing that for multi-objective RLHF, CV-based dynamic weighting is both more effective and substantially lighter than gradient-based dynamic weighting. Be-yond aggregate metrics, the training trajectories in Figure 4 make the mechanism concrete: un-der GRPO+SAW, the format reward rises sharply once the correctness reward saturates around step 25–30 and reaches its plateau noticeably earlier than under GRPO or GRPO+Gradient, neither of which manages to accelerate format learning in the post-saturation phase. This directly visualizes the mechanism formalized in §3.2: once one dimen-sion nears convergence, SAW reallocates the opti-mization budget toward the still-learning dimension instead of letting the saturated dimension’s residual noise dominate the gradient direction. Composition with GDPO yields the strongest configuration at both 1.5B and 3B, confirming that the two mecha-nisms are complementary rather than substitutable. 
+
+Reddit TL;DR. Table 2 further supports this pic-ture: both GRPO+SAW and GDPO+SAW achieve the top total score within their respective groups, and introducing SAW improves the scores on both 
+
+the quality and the conciseness dimensions over the corresponding baselines. Unlike the ToolRL set-ting where one dimension (correctness) saturates within the first few dozen steps and SAW’s gain is concentrated on accelerating the still-learning format dimension, both Reddit reward dimensions remain in the active-learning regime throughout training; the improvement from SAW therefore reflects continuous reweighting between two evolv-ing signals rather than a transient catch-up effect, raising the attainable performance ceiling on both reward dimensions. 
+
+5.3 Efficiency Analysis 
+
+SAW and the gradient-based method of Lu et al. (2025) both weight at batch-level per-dimension granularity, but at vastly different cost: the latter requires n extra forward-backward passes per step to form a gradient interaction matrix, O(nP ) in model parameters, whereas SAW needs only batch-level mean and standard deviation, O(nN ) in batch size.                                 
+
+> Method 1.5B (s) +% 3B (s) +%
+> GRPO 69.49 –119.26 –GRPO+Gradient 179.75 +158.7% 344.36 +188.7% GRPO+SAW 70.11 +0.9% 122.43 +2.7% GDPO 71.90 –123.71 –GDPO+Gradient 186.30 +159.1% 356.67 +188.3% GDPO+SAW 73.10 +1.7% 124.82 +0.9%
+> Table 3: Average wall-clock time per training step (sec-onds) on ToolRL across two model scales, with n=2 re-ward dimensions. The +% columns show overhead rel-ative to the corresponding baseline (GRPO or GDPO).
+
+Empirically (Table 3), the gradient-based method incurs 159–189% wall-clock overhead while SAW adds under 3% across all the set-tings, with the absolute gap widening at scale: on Qwen2.5-3B, the gradient-based method requires over 344s per step against 119s for GRPO, whereas SAW adds at most 3.2s. SAW therefore achieves competitive or even superior reward weighting at a fraction of the computational cost, making it prac-tical for large-scale RLHF training. 
+
+## 6 Conclusion 
+
+In multi-objective reinforcement learning for large language models, static weighted summation over-looks a key dynamic challenge: reward learning is asynchronous across objectives, and noise from near-converged dimensions contaminates the gra-dient updates that should be driven by the still-learning ones. We propose Stage-Aware Dynamic Weighting (SAW), a dynamic weighting mecha-nism that addresses this asynchrony by reweighting each dimension’s reward or advantage contribution according to its coefficient of variation. Relying only on batch-level statistics, SAW consistently improves multi-objective optimization across two RL frameworks (GRPO and GDPO) and two task families with markedly different reward dynamics. This suggests that CV-based informativeness is a broadly applicable signal rather than a task-specific heuristic. We hope this work inspires further re-search on informativeness-driven optimization for multi-objective RLHF and on principled weighting mechanisms for aligning LLMs with diverse and evolving human preferences. 8Limitations 
+
+Our method has several limitations. First, the coefficient of variation is not shift-invariant: ap-plying a constant offset to ensure positive means (as required for well-defined CV) compresses the dynamic range of CV values, particularly for re-ward dimensions with large negative lower bounds. In our experiments, where theoretical bounds are known and the offset is consistent, this does not impair the relative ranking of CV across dimen-sions; however, for learned reward models with-out known bounds, alternative strategies such as batch-level empirical minima or min-max normal-ization prior to CV computation may be more ap-propriate and warrant further investigation. Sec-ond, our experiments focus on settings with two reward dimensions; the behavior of SAW with a larger number of objectives (e.g., n ≥ 3) remains to be explored. Third, the batch-level CV compu-tation provides a global estimate of learning state that does not capture per-question variation; explor-ing finer-grained (e.g., group-level) weighting with appropriate smoothing techniques could improve adaptiveness. Finally, while SAW is algorithm-agnostic in principle, we have only empirically val-idated it with GRPO and GDPO; its effectiveness with other RL algorithms (e.g., PPO, REINFORCE variants) requires further study. 
+
+## References 
+
+Pranjal Aggarwal and Sean Welleck. 2025. L1: Controlling how long a reasoning model thinks with reinforcement learning. arXiv preprint arXiv:2503.04697 .Daman Arora and Andrea Zanette. 2026. Training lan-guage models to reason efficiently. Advances in Neural Information Processing Systems , 38:60770– 60808. Yuntao Bai, Andy Jones, Kamal Ndousse, Amanda Askell, Anna Chen, Nova DasSarma, Dawn Drain, Stanislav Fort, Deep Ganguli, Tom Henighan, and 1 others. 2022a. Training a helpful and harmless assistant with reinforcement learning from human feedback. arXiv preprint arXiv:2204.05862 .Yuntao Bai, Saurav Kadavath, Sandipan Kundu, Amanda Askell, Jackson Kernion, Andy Jones, Anna Chen, Anna Goldie, Azalia Mirhoseini, Cameron McKinnon, and 1 others. 2022b. Constitutional ai: Harmlessness from ai feedback. arXiv preprint arXiv:2212.08073 .Baolong Bi, Shenghua Liu, Yiwei Wang, Siqian Tong, Lingrui Mei, Yuyao Ge, Yilong Xu, Jiafeng Guo, and Xueqi Cheng. 2025. Reward and guidance through rubrics: Promoting exploration to improve multi-domain reasoning. arXiv preprint arXiv:2511.12344 .Peter L Chen, Xiaopeng Li, Xi Chen, and Tianyi Lin. 2026. Reward-free alignment for conflicting objec-tives. arXiv preprint arXiv:2602.02495 .Zhao Chen, Vijay Badrinarayanan, Chen-Yu Lee, and Andrew Rabinovich. 2018. GradNorm: Gradient normalization for adaptive loss balancing in deep multitask networks. In International Conference on Machine Learning , pages 794–803. Paul F Christiano, Jan Leike, Tom Brown, Miljan Mar-tic, Shane Legg, and Dario Amodei. 2017. Deep reinforcement learning from human preferences. Ad-vances in neural information processing systems , 30. Juntao Dai, Xuehai Pan, Ruiyang Sun, Jiaming Ji, Xinbo Xu, Mickel Liu, Yizhou Wang, and Yaodong Yang. 2024. Safe rlhf: Safe reinforcement learning from hu-man feedback. In International Conference on Learn-ing Representations , volume 2024, pages 50750– 50777. Amelia Glaese, Nat McAleese, Maja Tr˛ ebacz, John Aslanides, Vlad Firoiu, Timo Ewalds, Maribeth Rauh, Laura Weidinger, Martin Chadwick, Phoebe Thacker, and 1 others. 2022. Improving alignment of dia-logue agents via targeted human judgements. arXiv preprint arXiv:2209.14375 .Anisha Gunjal, Anthony Wang, Elaine Lau, Vaskar Nath, Yunzhong He, Bing Liu, and Sean Hendryx. 2025. Rubrics as rewards: Reinforcement learn-ing beyond verifiable domains. arXiv preprint arXiv:2507.17746 .Daya Guo, Dejian Yang, Haowei Zhang, Junxiao Song, Peiyi Wang, Qihao Zhu, Runxin Xu, Ruoyu Zhang, Shirong Ma, Xiao Bi, and 1 others. 2025. Deepseek-r1: Incentivizing reasoning capability in llms via reinforcement learning. arXiv preprint arXiv:2501.12948 .Qiang He and Setareh Maghsudi. 2025. Pareto multi-objective alignment for language models. In Joint European Conference on Machine Learning and Knowledge Discovery in Databases , pages 257–272. Springer. Zenan Huang, Yihong Zhuang, Guoshan Lu, Zeyu Qin, Haokai Xu, Tianyu Zhao, Ru Peng, Jiaqi Hu, Zhan-ming Shen, Xiaomeng Hu, Xijun Gu, Peiyi Tu, Jiaxin Liu, Wenyu Chen, Yuzhuo Fu, Zhiting Fan, Yanmei Gu, Yuanyuan Wang, Zhengkai Yang, and 2 others. 2025. Reinforcement learning with rubric anchors. 
+
+Preprint , arXiv:2508.12790. Yuki Ichihara, Yuu Jinnai, Tetsuro Morimura, Mitsuki Sakamoto, Ryota Mitsuhashi, and Eiji Uchibe. 2025. Mo-grpo: Mitigating reward hacking of group rela-tive policy optimization on multi-objective problems. 
+
+arXiv preprint arXiv:2509.22047 .
+
+9Yuhang Lai, Siyuan Wang, Shujun Liu, Xuan-Jing Huang, and Zhongyu Wei. 2024. Alarm: Align lan-guage models via hierarchical rewards modeling. In 
+
+Findings of the Association for Computational Lin-guistics: ACL 2024 , pages 7817–7831. Harrison Lee, Samrat Phatale, Hassan Mansoor, Thomas Mesnard, Johan Ferret, Kellie Lu, Colton Bishop, Ethan Hall, Victor Carbune, Abhinav Rastogi, and 1 others. 2023. Rlaif vs. rlhf: Scaling reinforce-ment learning from human feedback with ai feedback. 
+
+arXiv preprint arXiv:2309.00267 .Chengao Li, Hanyu Zhang, Yunkun Xu, Hongyan Xue, Xiang Ao, and Qing He. 2025. Gradient-adaptive policy optimization: Towards multi-objective align-ment of large language models. In Proceedings of the 63rd Annual Meeting of the Association for Compu-tational Linguistics (Volume 1: Long Papers) , pages 11214–11232. Qiqiang Lin, Muning Wen, Qiuying Peng, Guanyu Nie, Junwei Liao, Jun Wang, Xiaoyun Mo, Jiamu Zhou, Cheng Cheng, Yin Zhao, and 1 others. 2024. Hammer: Robust function-calling for on-device lan-guage models via function masking. arXiv preprint arXiv:2410.04587 .Aixin Liu, Aoxue Mei, Bangcai Lin, Bing Xue, Bingx-uan Wang, Bingzheng Xu, Bochao Wu, Bowei Zhang, Chaofan Lin, Chen Dong, and 1 others. 2025a. Deepseek-v3. 2: Pushing the frontier of open large language models. arXiv preprint arXiv:2512.02556 .Bo Liu, Xingchao Liu, Xiaojie Jin, Peter Stone, and Qiang Liu. 2021. Conflict-averse gradient descent for multi-task learning. Advances in neural information processing systems , 34:18878–18890. Shih-Yang Liu, Xin Dong, Ximing Lu, Shizhe Diao, Peter Belcak, Mingjie Liu, Min-Hung Chen, Hongxu Yin, Yu-Chiang Frank Wang, Kwang-Ting Cheng, and 1 others. 2026. Gdpo: Group reward-decoupled normalization policy optimization for multi-reward rl optimization. arXiv preprint arXiv:2601.05242 .Shih-Yang Liu, Xin Dong, Ximing Lu, Shizhe Diao, Mingjie Liu, Min-Hung Chen, Hongxu Yin, Yu-Chiang Frank Wang, Kwang-Ting Cheng, Yejin Choi, and 1 others. 2025b. Dler: Doing length penalty right-incentivizing more intelligence per to-ken via reinforcement learning. arXiv preprint arXiv:2510.15110 .Wei Liu, Ruochen Zhou, Yiyun Deng, Yuzhen Huang, Junteng Liu, Yuntian Deng, Yizhe Zhang, and Junx-ian He. 2025c. Learn to reason efficiently with adap-tive length-based reward shaping. arXiv preprint arXiv:2505.15612 .Weiwen Liu, Xu Huang, Xingshan Zeng, Shuai Yu, Dexun Li, Shuai Wang, Weinan Gan, Zhengying Liu, Yuanqing Yu, Zezhong WANG, and 1 others. 2025d. Toolace: Winning the points of llm function calling. In International Conference on Learning Representa-tions , volume 2025, pages 41359–41381. Zichen Liu, Changyu Chen, Wenjun Li, Penghui Qi, Tianyu Pang, Chao Du, Wee Sun Lee, and Min Lin. 2025e. Understanding r1-zero-like training: A criti-cal perspective. arXiv preprint arXiv:2503.20783 .Yining Lu, Zilong Wang, Shiyang Li, Xin Liu, Chang-long Yu, Qingyu Yin, Zhan Shi, Zixuan Zhang, and Meng Jiang. 2025. Learning to optimize multi-objective alignment through dynamic reward weight-ing. arXiv preprint arXiv:2509.11452 .Haotian Luo, Li Shen, Haiying He, Yibo Wang, Shi-wei Liu, Wei Li, Naiqiang Tan, Xiaochun Cao, and Dacheng Tao. 2025. O1-pruner: Length-harmonizing fine-tuning for o1-like reasoning prun-ing. arXiv preprint arXiv:2501.12570 .Tong Mu, Alec Helyar, Johannes Heidecke, Joshua Achiam, Andrea Vallone, Ian Kivlichan, Molly Lin, Alex Beutel, John Schulman, and Lilian Weng. 2024. Rule based rewards for language model safety. Ad-vances in Neural Information Processing Systems ,37:108877–108901. Aviv Navon, Aviv Shamsian, Idan Achituve, Haggai Maron, Kenji Kawaguchi, Gal Chechik, and Ethan Fetaya. 2022. Multi-task learning as a bargaining game. arXiv preprint arXiv:2202.01017 .Long Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida, Carroll Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, and 1 others. 2022. Training language models to follow in-structions with human feedback. Advances in neural information processing systems , 35:27730–27744. Shishir G Patil, Huanzhi Mao, Fanjia Yan, Charlie Cheng-Jie Ji, Vishnu Suresh, Ion Stoica, and Joseph E Gonzalez. 2025. The berkeley function calling leader-board (bfcl): From tool use to agentic evaluation of large language models. In Forty-second International Conference on Machine Learning .Cheng Qian, Emre Can Acikgoz, Qi He, Hongru Wang, Xiusi Chen, Dilek Hakkani-Tur, Gokhan Tur, and Heng Ji. 2026. Toolrl: Reward is all tool learning needs. Advances in Neural Information Processing Systems , 38:105523–105553. Qwen, :, An Yang, Baosong Yang, Beichen Zhang, Binyuan Hui, Bo Zheng, Bowen Yu, Chengyuan Li, Dayiheng Liu, Fei Huang, Haoran Wei, Huan Lin, Jian Yang, Jianhong Tu, Jianwei Zhang, Jianxin Yang, Jiaxi Yang, Jingren Zhou, and 25 oth-ers. 2025. Qwen2.5 technical report. Preprint ,arXiv:2412.15115. Rafael Rafailov, Archit Sharma, Eric Mitchell, Christo-pher D Manning, Stefano Ermon, and Chelsea Finn. 2023. Direct preference optimization: Your language model is secretly a reward model. Advances in neural information processing systems , 36:53728–53741. Ozan Sener and Vladlen Koltun. 2018. Multi-task learn-ing as multi-objective optimization. Advances in neural information processing systems , 31. 
+
+10 Zhihong Shao, Peiyi Wang, Qihao Zhu, Runxin Xu, Junxiao Song, Xiao Bi, Haowei Zhang, Mingchuan Zhang, YK Li, Yang Wu, and 1 others. 2024. Deepseekmath: Pushing the limits of mathematical reasoning in open language models. arXiv preprint arXiv:2402.03300 .Guangming Sheng, Chi Zhang, Zilingfeng Ye, Xibin Wu, Wang Zhang, Ru Zhang, Yanghua Peng, Haibin Lin, and Chuan Wu. 2025. Hybridflow: A flexible and efficient rlhf framework. In Proceedings of the Twentieth European Conference on Computer Sys-tems , pages 1279–1297. Vaishnavi Shrivastava, Ahmed Awadallah, Vidhisha Bal-achandran, Shivam Garg, Harkirat Behl, and Dimitris Papailiopoulos. 2025. Sample more to think less: Group filtered policy optimization for concise reason-ing. arXiv preprint arXiv:2508.09726 .Nisan Stiennon, Long Ouyang, Jeffrey Wu, Daniel Ziegler, Ryan Lowe, Chelsea Voss, Alec Radford, Dario Amodei, and Paul F Christiano. 2020. Learn-ing to summarize with human feedback. Advances in neural information processing systems , 33:3008– 3021. Gemini Team, Rohan Anil, Sebastian Borgeaud, Jean-Baptiste Alayrac, Jiahui Yu, Radu Soricut, Johan Schalkwyk, Andrew M Dai, Anja Hauth, Katie Mil-lican, and 1 others. 2023. Gemini: a family of highly capable multimodal models. arXiv preprint arXiv:2312.11805 .Kimi Team, Angang Du, Bofei Gao, Bowei Xing, Changjiu Jiang, Cheng Chen, Cheng Li, Chenjun Xiao, Chenzhuang Du, Chonghua Liao, and 1 others. 2025. Kimi k1. 5: Scaling reinforcement learning with llms. arXiv preprint arXiv:2501.12599 .Siqian Tong, Xuan Li, Yiwei Wang, Baolong Bi, Yujun Cai, Shenghua Liu, Yuchen He, and Chengpeng Hao. 2026. Autagent: A reinforcement learning frame-work for tool-augmented audio reasoning. arXiv preprint arXiv:2602.13685 .Michael Völske, Martin Potthast, Shahbaz Syed, and Benno Stein. 2017. Tl; dr: Mining reddit to learn au-tomatic summarization. In Proceedings of the work-shop on new frontiers in summarization , pages 59– 63. Zeqiu Wu, Yushi Hu, Weijia Shi, Nouha Dziri, Alane Suhr, Prithviraj Ammanabrolu, Noah A Smith, Mari Ostendorf, and Hannaneh Hajishirzi. 2023. Fine-grained human feedback gives better rewards for lan-guage model training. Advances in Neural Informa-tion Processing Systems , 36:59008–59033. Jingyang Yi, Jiazheng Wang, and Sida Li. 2026. Short-erbetter: Guiding reasoning models to find optimal inference length for efficient reasoning. Advances in Neural Information Processing Systems , 38:39011– 39043. Qiying Yu, Zheng Zhang, Ruofei Zhu, Yufeng Yuan, Xiaochen Zuo, Yu Yue, Weinan Dai, Tiantian Fan, Gaohong Liu, Lingjun Liu, and 1 others. 2026. Dapo: An open-source llm reinforcement learning system at scale. Advances in Neural Information Processing Systems , 38:113222–113244. Tianhe Yu, Saurabh Kumar, Abhishek Gupta, Sergey Levine, Karol Hausman, and Chelsea Finn. 2020. Gradient surgery for multi-task learning. Advances in neural information processing systems , 33:5824– 5836. Weizhe Yuan, Richard Yuanzhe Pang, Kyunghyun Cho, Xian Li, Sainbayar Sukhbaatar, Jing Xu, and Ja-son Weston. 2024. Self-rewarding language models. 
+
+arXiv preprint arXiv:2401.10020 .Jianguo Zhang, Tian Lan, Ming Zhu, Zuxin Liu, Thai Quoc Hoang, Shirley Kokane, Weiran Yao, Jun-tao Tan, Akshara Prabhakar, Haolin Chen, and 1 oth-ers. 2025. xLAM: A family of large action models to empower ai agent systems. In Proceedings of the 2025 Conference of the Nations of the Americas Chapter of the Association for Computational Lin-guistics: Human Language Technologies (Volume 1: Long Papers) , pages 11583–11597. Chujie Zheng, Shixuan Liu, Mingze Li, Xiong-Hui Chen, Bowen Yu, Chang Gao, Kai Dang, Yuqiong Liu, Rui Men, An Yang, and 1 others. 2025. Group sequence policy optimization. arXiv preprint arXiv:2507.18071 .
+
+11 Appendix A Related Work 
+
+GRPO Variants. Group Relative Policy Opti-mization (Shao et al., 2024) has become the de facto algorithm for LLM reinforcement learning, spurring a family of variants that address its limita-tions from different angles. GRPO and its variants have since been applied across a broad range of tasks, from mathematical reasoning (Shao et al., 2024; Guo et al., 2025) to tool-use and agentic reasoning (Qian et al., 2026; Tong et al., 2026). DAPO (Yu et al., 2026) introduces dynamic sam-pling and decoupled clipping to stabilize training at scale. Dr.GRPO (Liu et al., 2025e) provides a criti-cal analysis of R1-Zero-like training and proposes corrections to GRPO’s variance reduction proper-ties. To improve stability, Group Sequence Policy Optimization (GSPO) (Zheng et al., 2025) defines the importance ratio based on sequence likelihood rather than at the token level, performing sequence-level clipping, rewarding, and optimization. To promote efficient reasoning, Group Filtered Policy Optimization (GFPO) (Shrivastava et al., 2025) ad-dresses length explosion by sampling larger groups per problem during training and filtering responses based on their length and reward-per-token ratio. These works focus on improving the core opti-mization dynamics of single-objective or aggregate-reward RL; our work is complementary, targeting how multiple reward signals are weighted before entering the optimization loop, and is compatible with any GRPO-family algorithm. 
+
+Multi-Objective Reinforcement Learning. 
+
+Multi-objective formulations have been broadly adopted across LLM RL pipelines. At the task level, multi-reward designs have been applied to tool calling (Qian et al., 2026), summarization (Chen et al., 2026), and safety-oriented alignment (Mu et al., 2024; Chen et al., 2026); recent frontier systems also build on this paradigm, with DeepSeek-V3.2 (Liu et al., 2025a) combining rule-based outcome rewards, length penalties, and language-consistency rewards to scale reasoning and agentic capabilities. Another important recent application of multi-reward RL targets 
+
+efficient reasoning , where length-based rewards are paired with outcome rewards to compress chain-of-thought without sacrificing accuracy: O1-Pruner (Luo et al., 2025) and Arora and Zanette (2026) apply normalized length penalties for proportional compression; ShorterBetter (Yi et al., 2026) promotes conciseness by penalizing deviations from the shortest correct response within a sampled group; L1 (Aggarwal and Welleck, 2025) introduces Length-Controlled Policy Optimization to honor a target length budget; Liu et al. (2025c) dynamically adjust the accuracy–length trade-off based on running model performance; and DLER (Liu et al., 2025b) revisits the simplest truncation-based length penalty and shows that, with a carefully designed RL recipe (batch-wise reward normalization, higher clipping, and dynamic sampling), it suffices to achieve state-of-the-art accuracy–length trade-offs. Methodologically, prior work tackles multi-objective trade-offs along three axes. 
+
+Normalization-based approaches isolate per-dimension signal: GDPO (Liu et al., 2026) resolves the reward collapse problem through per-reward decoupled normalization (§2), and MO-GRPO (Ichihara et al., 2025) independently arrives at a similar per-reward variance normaliza-tion strategy. Reward-design approaches reshape how the objectives combine: Safe RLHF (Dai et al., 2024) balances helpfulness and safety via constrained optimization with separate reward and cost models; ALARM (Lai et al., 2024) introduces a hierarchical reward structure that filters aspect rewards by their consistency with a holistic preference signal; and Fine-Grained RLHF (Wu et al., 2023) decomposes feedback into multiple aspect-specific reward models that fire at sentence-and span-level granularity. Pareto-oriented 
+
+approaches recast multi-objective RL as direct Pareto-front navigation: PAMA (He and Maghsudi, 2025) converts multi-objective aggregation into a closed-form convex optimization within the PPO framework to converge to a Pareto-stationary point, while GAPO (Li et al., 2025) adaptively balances policy-gradient directions via multi-gradient descent. In contrast to all of the above, which operate on what signal each dimension contributes, SAW addresses when : it allocates optimization budget across dimensions based on their real-time, batch-level informativeness, and composes orthogonally with these existing mechanisms. 
+
+Dynamic Reward Weighting. The most directly related work is Lu et al. (2025), who propose two dynamic weighting methods for multi-objective RL. Their hypervolume-guided method computes a step-level scalar meta-reward based on Pareto 12 Figure 5: Per-dimension reward trajectories for GDPO-based methods during training on ToolRL with Qwen2.5-1.5B-Instruct. (a) Correctness reward: all three variants converge to similar terminal values. (b) 
+
+> Format reward: GDPO+SAW reaches the saturation plateau earlier than GDPO and GDPO+Gradient, con-sistent with SAW’s tendency to up-weight the high-CV dimension during early training.
+
+front contribution that uniformly scales all reward dimensions; it does not produce per-dimension weights, is not directly comparable to SAW, and we therefore do not include it as a baseline. Their 
+
+gradient-based method computes per-objective gra-dients at each step, forms a gradient interaction matrix via pairwise dot products, and updates per-dimension weights via exponentiated gradient as-cent; its granularity matches SAW (batch-level, per-dimension), but each step requires n additional forward-backward passes, multiplying training cost by (1 + n), and depends on custom distributed gradient-collection infrastructure. By contrast, SAW achieves comparable per-dimension weight-ing using only batch-level mean and standard devia-tion, with negligible overhead and no modification to the training infrastructure. 
+
+> Figure 6: Per-dimension reward trajectories for GRPO-based methods during training on Reddit TL;DR with Qwen2.5-1.5B-Instruct.
+
+## B ToolRL Training Prompt Format 
+
+We follow the same setup as GDPO and ToolRL; the training prompt is given below. System Prompt for ToolRL Training You are a helpful dialogue assistant capable of leveraging tool calls to solve user tasks and provide structured chat responses. 
+
+Available Tools 
+
+In your response, you can use the following tools: {{ Tool List }} 
+
+Steps for Each Turn 
+
+1. Think : Recall relevant context and ana-lyze the current user goal. 2. Decide on Tool Usage : If a tool is needed, specify the tool and its parame-ters. 3. Respond Appropriately : If a response is needed, generate one while maintain-ing consistency across user queries. 13 Figure 7: Per-dimension reward trajectories for GDPO-based methods during training on Reddit TL;DR with Qwen2.5-1.5B-Instruct. 
+
+Output Format 
+
+<think> Your thoughts and reasoning 
+
+</think> <tool_call> {"name": "Tool name", "pa-rameters": {"Parameter name": "Parameter content", "... ...": "... ..."}} {"name": "... ...", "parameters": {"... ...": "... ...", "... ...": "... ..."}} ... 
+
+</tool_call> <response> AI’s final response 
+
+</response> 
+
+Important Notes 
+
+1. You must always include the <think> 
+
+field to outline your reasoning. Pro-vide at least one of <tool_call> or 
+
+<response> . Decide whether to use 
+
+<tool_call> (possibly multiple times), 
+
+<response> , or both. 2. You can invoke multiple tool calls si-multaneously in the <tool_call> fields. Each tool call should be a JSON object 
+
+with a “name” field and a “parameters” field containing a dictionary of parame-ters. If no parameters are needed, leave the “parameters” field an empty dictio-nary. 3. Refer to the previous dialogue records in the history, including the user’s queries, previous <tool_call> , <response> ,and any tool feedback noted as <obs> 
+
+(if exists). 
+
+User Prompt for ToolRL Training 
+
+Dialogue History 
+
+<user> {{ Initial User Input }} </user> <think> Round 1 Model Thought </think> 
+
+{{ Round 1 model output <tool_call> or 
+
+<response> }} 
+
+<obs> Round 1 Observation </obs> 
+
+... ... 
+
+<user> {{ User Input }} </user> 
+
+... ... 
+
+## C Tool Calling Reward Functions 
+
+Format Reward. The format reward Rformat ∈{0, 1} checks whether the model output satisfies the required structure and contains all necessary fields in the correct order: 
+
+Rformat =
+
+(
+
+1, correct structure, 
+
+0, otherwise. (11) 
+
+Correctness Reward. The correctness reward 
+
+Rcorrect ∈ [−3, 3] evaluates the predicted tool calls 
+
+P = {P1, . . . , P m} against the ground-truth calls 
+
+G = {G1, . . . , G n}. It consists of three compo-nents: • Tool Name Matching: 
+
+rname = |NG ∩ NP ||NG ∪ NP | ∈ [0 , 1] , (12) where NG and NP are the sets of tool names from ground-truth and predicted calls, respectively. • Parameter Name Matching: 
+
+rparam = X 
+
+> Gj∈G
+
+|keys( Gj ) ∩ keys( Pj )||keys( Gj ) ∪ keys( Pj )| (13) 
+
+rparam ∈ [0 , |G|], where keys( ·) denotes the pa-rameter names of a call. 14 • Parameter Content Matching: 
+
+rvalue = X 
+
+> Gj∈G
+
+X 
+
+> k∈keys( Gj)
+
+1[PG[k] = PP [k]] 
+
+(14) 
+
+rvalue ∈ [0 , P  
+
+> Gj∈G
+
+|keys( Gj )|], where PG[k]
+
+and PP [k] are the parameter values for the ground-truth and predicted calls. • Total Match Score: 
+
+rmatch = rname + rparam + rvalue (15) where rmatch ∈ [0 , S max ] and 
+
+Smax = 1 + |G| + X 
+
+> Gj∈G
+
+|keys( Gj )|. (16) The final correctness reward is computed by find-ing the optimal matching between P and G to max-imize the total match score: 
+
+Rcorrect = 6 · Rmax 
+
+Smax 
+
+− 3 ∈ [−3, 3] , (17) where Rmax denotes the total match score from the optimal matching. 
+
+## D ToolRL Hyperparameters Setting 
+
+All hyperparameter settings are kept identical to those used in ToolRL (Qian et al., 2026) and GDPO (Liu et al., 2026). The complete training configura-tion is listed in Table 4.                 
+
+> Parameter Value
+> Total Epochs 15 Train Batch Size 512 Mini Batch Size 128 Max Prompt Length 2048 Max Response Length 1024 Learning Rate 1e-6 Group Size ( G)4KL Coefficient 0.001 KL Loss Disabled Gradient Checkpointing Enabled Rollout Engine vLLM Rollout TP Size 1GPU Memory Utilization 0.6 Number of GPUs 4×NVIDIA A100 80GB
+
+Table 4: ToolRL training configuration using the verl framework. All hyperparameter settings follow ToolRL (Qian et al., 2026). 
+
+## E BFCL-v4 Subsets 
+
+We evaluate on the Berkeley Function Call Leader-board v4 (BFCL-v4), which is organized into three top-level categories. Each category contains multi-ple sub-tasks, listed in Table 5; the reported accura-cies in Table 1 are the macro averages over these sub-tasks within each category.         
+
+> Category #Cases Sub-tasks
+> Non-Live 1,150 simple_python ,
+> simple_java ,
+> simple_javascript ,
+> multiple ,
+> parallel ,
+> parallel_multiple
+> Live 1,381 live_simple ,
+> live_multiple ,
+> live_parallel ,
+> live_parallel_multiple
+> Multi-Turn 800 multi_turn_base ,
+> multi_turn_miss_func ,
+> multi_turn_miss_param ,
+> multi_turn_long_context
+
+Table 5: Composition of BFCL-v4 used in our evalua-tion. 
+
+## F ToolRL Training Curves under GDPO 
+
+Figure 5 reports the per-dimension reward trajecto-ries of GDPO, GDPO+Gradient, and GDPO+SAW on ToolRL with Qwen2.5-1.5B-Instruct, comple-menting the GRPO-based curves in Figure 4. All three variants converge to comparable terminal lev-els on both reward dimensions; SAW primarily affects the early-to-mid phase, accelerating format reward saturation while maintaining correctness improvement. This is consistent with the BFCL-v4 results in Table 1, where the gains of SAW over GDPO at convergence are modest because both reward dimensions have largely saturated in this setting; the more substantial gains appear in the non-saturating Reddit TL;DR setting (Table 2). 
+
+## G Reddit TL;DR Training Prompt Format 
+
+The system prompt used during training is shown below, followed by one representative example from the Reddit TL;DR dataset. 15 System Prompt for Reddit TL;DR Training 
+
+You are a professional content editor. Please read the following post and summarize its main message in concise and accurate lan-guage. 
+
+User Prompt for Reddit TL;DR Training 
+
+SUBREDDIT: r/AskReddit TITLE: Java question getting desperate! POST: I am currently enrolled in a “Java 2” Class in college. And my current project is to write a program that can solve mazes using two different methods 1. Depth First Search using a stack and 2. Breadth First Search using a queue. I have depth first search done, and have yet to begin work-ing on breadth first search but i have a few ideas as to how to implement it. My prob-lem is, with the client/driver program that runs all of the classes (contains my main method). I have to scan in text files that con-tain mazes. I have tested my code by scan-ning the mazes and everything is working fine. The trouble comes with the instruc-tor says that he wants to be able to put a directory into the command line (args) and have our program parse the directory and solve each maze in the directory. I did di-rectory.list() and place all of the file names in the directory into an array. But I do not know how to make it so my program can scan those files. The program gets upset be-cause the files are not in the same directory as the code. If anyone can help with this I would forever be in your debt. TL;DR: 
+
+## H Reddit TL;DR LLM-as-Judge Rubric 
+
+We use Gemini-3-flash-preview-nothinking (tem-perature 0.1) as an LLM judge to score generated summaries. Since the Reddit TL;DR dataset in-cludes human-written reference summaries, we pro-vide both the original post and the human reference to the judge, enabling more calibrated scoring. The full scoring prompt is shown below. 
+
+## LLM-as-Judge Scoring Prompt 
+
+# Role 
+
+You are a highly rigorous linguistic auditor. Your task is to perform a comparative eval-uation of a “Model-Generated Summary” against a source text and a reference sum-mary. 
+
+# Evaluation Dimensions ## 1. Quality (Focus: Accuracy & Cover-age) 
+
+Score this dimension based on factual cor-rectness and essential information retention. • 9–10 (Perfect): No hallucinations. Cap-tures all core entities and the main con-flict/conclusion mentioned in the human reference. • 7–8 (Minor Issue): Factual alignment is 100%, but misses one secondary support-ing detail from the human reference. • 5–6 (Major Omission): Misinterprets a secondary detail OR misses the primary “hook”/conclusion of the post. • 3–4 (Severe Error): Contains at least one significant factual hallucination OR fails to address the main subject. • 1–2 (Failure): Completely irrelevant, toxic, or incoherent. 
+
+## 2. Conciseness (Focus: Word Effi-ciency & Redundancy) 
+
+Score this dimension based on the “Information-to-Word Ratio.” • 9–10 (Optimal): Zero filler phrases. Ev-ery word contributes to the meaning. No repetition. • 7–8 (Slightly Wordy): Includes 1–2 un-necessary words or “meta-talk” (e.g., “The user says...”, “In this story...”). • 5–6 (Redundant): Contains repetitive in-formation or excessive adjectives that do not add meaning. • 3–4 (Inefficient): Is longer than the hu-man reference without adding extra useful info, OR 30% of the text is filler. • 1–2 (Bloated): Verbose, contains circular reasoning, or is nearly the same length as the original post. 
+
+# Execution Logic (Chain of Thought) 
+
+1. Identify the “Core Message” from the Human Summary. 16 2. Check if the Model Summary contains this Core Message (Quality). 3. Count “Filler Words”: phrases that can be removed without changing the mean-ing (Conciseness). 4. Penalize hallucinations heavily. 
+
+# Task Input 
+
+[Original Reddit Post]: 
+
+$reddit_text 
+
+[Human-Written Summary (Reference)]: 
+
+$human_summary 
+
+[Model-Generated Summary (To be evalu-ated)]: 
+
+$model_summary 
+
+# Constraints 
+
+1. Output ONLY a valid JSON object. 2. Be clinical and objective. 
+
+# Output Format 
+
+{"quality": { "score": [Integer] }, "conciseness": { "score": [Integer] }}
+
+## I Reddit TL;DR Hyperparameters Setting 
+
+We list below the hyperparameter setting used in our Reddit TL;DR experiments. The complete training configuration is given in Table 6.                 
+
+> Parameter Value
+> Total Epochs 11 Train Batch Size 256 Mini Batch Size 64 Max Prompt Length 2048 Max Response Length 1024 Learning Rate 1e-6 Group Size ( G)4KL Coefficient 0.001 KL Loss Disabled Gradient Checkpointing Enabled Rollout Engine vLLM Rollout TP Size 1GPU Memory Utilization 0.6 Number of GPUs 4×NVIDIA A100 80GB Table 6: Reddit TL;DR training configuration using the verl framework.
+
+## J Reddit TL;DR Training Curves 
+
+The complete training curves for the Reddit TL;DR experiments are shown in Figures 6 and 7. 17

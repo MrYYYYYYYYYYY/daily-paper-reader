@@ -1,0 +1,1102 @@
+Title: ASymPO: Asymmetric-Scale Policy Optimization for Asynchronous LLM Post-Training Without Behavior Information
+
+URL Source: https://arxiv.org/pdf/2606.03070v1
+
+Published Time: Wed, 03 Jun 2026 00:29:14 GMT
+
+Number of Pages: 16
+
+Markdown Content:
+# ASymPO: Asymmetric-Scale Policy Optimization for Asynchronous LLM Post-Training Without Behavior Information 
+
+## Zehua Liu, Yuxuan Yao, Xiaojin Fu, Tao Zhong, Mingxuan Yuan 
+
+## Huawei Technologies 
+
+## liuzehua@connect.hku.hk 
+
+## Abstract 
+
+Asynchronous reinforcement learning can im-prove language-model post-training through-put by decoupling response generation from policy optimization, but stale responses in-troduce distribution drift. Standard behavior-corrected methods control this drift with behavior-policy probabilities, importance ra-tios, or clipping, which requires token-aligned, versioned, and numerically consistent behav-ior log-probabilities across rollout and learner systems. We ask whether asynchronous group-relative RL can instead be stabilized using only current-policy probabilities. We identify a scale-imbalance failure mode: when stale responses are evaluated under the current pol-icy, positive and negative loss terms can appear at different negative log-probability scales, so zero-sum advantages no longer imply balanced loss contributions. We propose Asymmetric-Scale Policy Optimization (ASymPO), which normalizes each response’s token loss by its current average token negative log-probability. ASymPO requires no behavior-policy proba-bilities, restores response-level zero-sum bal-ance, and preserves a nonzero learning signal. We also introduce Scaled Policy Optimization (SPO), a fixed negative-scaling baseline, and evaluate both current-policy-only objectives in asynchronous mathematical reasoning post-training. 
+
+## 1 Introduction 
+
+Reinforcement learning (RL) is increasingly used to improve language models on reward-driven tasks, especially mathematical and reasoning prob-lems where supervised fine-tuning does not directly optimize final success (Ouyang et al., 2022; Shao et al., 2024; Guo et al., 2025). To improve train-ing throughput, modern systems often decouple response generation from policy optimization: roll-out workers sample responses from recent policy snapshots while the learner updates a newer policy (Zeng et al., 2026). This asynchronous design is efficient, but it creates distribution drift between the behavior policy that generated a response and the current policy that trains on it. The standard way to address distribution drift is to use behavior-policy information. PPO-style methods compare πθ with the behavior policy through importance ratios and clipping (Schulman et al., 2017), and related mechanisms are used in large-scale post-training systems (Guo et al., 2025; Ma et al., 2025; Zeng et al., 2026). These cor-rections are principled, but in asynchronous post-training pipelines they make the rollout–learner interface part of the correctness condition. First, each consumed response must carry behavior log-probabilities, or enough information to recompute them, and these quantities must remain aligned with the exact token sequence. Second, the re-sponse must be associated with the correct pol-icy snapshot; otherwise the denominator of the importance ratio no longer corresponds to the be-havior distribution that generated the data. Third, train–inference numerical drift and rollout stale-ness must be controlled, typically through recom-putation, filtering, or scheduling rules, so that the resulting ratios remain meaningful (Team et al., 2025; Noukhovitch et al., 2024; Ma et al., 2025; Zeng et al., 2026). The naive current-policy objective is attractive for this reason, but it is not automatically stable. In group-relative RL, zero-sum advantages do not by themselves guarantee a balanced loss. In our asynchronous RL training pipeline, we observe that positive and negative advantage responses can differ substantially in their current log-probability scales. In particular, a stale negative-advantage response can have a much larger current negative log-probability scale than positive responses, caus-ing the negative side of the loss to dominate and destabilize training. We address this problem by scaling the current-1
+
+> arXiv:2606.03070v1 [cs.LG] 2 Jun 2026
+
+policy loss directly, while keeping the training in-terface restricted to quantities already available on the learner side. The goal is to retain the infrastruc-ture simplicity of current-policy-only training, but prevent a small set of stale negative responses from dominating the update. We first introduce Scaled Policy Optimization (SPO), a simple method that reduces the influence of negative-advantage responses. Its motivation is direct: the instability is often driven by overly strong updates from stale negative samples, so weakening this side of the loss can make training more stable. SPO is simple and empirically useful, but its scaling rule is manually designed and does not adapt to the actual scale of each response. We then propose Asymmetric-Scale Policy Opti-mization (ASymPO), which replaces this manual rule with an adaptive response-level normalization. ASymPO uses the current policy’s own response scale to balance positive and negative loss contri-butions. Responses whose current loss scale is already large are automatically moderated, while the overall update still preserves the direction im-plied by the group-relative advantages. In this way, ASymPO targets the scale imbalance directly with-out introducing behavior-policy probabilities into the infrastructure. This paper makes four contributions. First ,we identify a scale-imbalance failure mode in current-policy-only asynchronous group-relative RL and show how behavior correction avoids it through clipping. Second , we formulate SPO and ASymPO as scaled current-policy objectives, and prove that ASymPO exactly balances response-level positive and negative loss contributions un-der zero-sum advantages. Third , we show that ASymPO can be deployed with a strictly more compact rollout–learner interface than importance-ratio methods (Table 1): it requires neither behav-ior log-probability transport, logit recomputation at training precision, nor policy-version bookkeep-ing. Fourth , we empirically evaluate naive current-policy training, GPG, behavior-corrected GRPO, SPO, and ASymPO on asynchronous mathematical-reasoning post-training across 3 model families. 
+
+## 2 Related Works 
+
+RLHF and preference optimization Reinforce-ment learning from human feedback has been widely used for language-model alignment and post-training (Christiano et al., 2017; Ziegler et al., 2019; Stiennon et al., 2020; Bai et al., 2022; Ouyang et al., 2022). Related preference-optimization methods include direct or reference-free objectives that train from preference data with-out the full classical RLHF pipeline (Rafailov et al., 2023; Ethayarajh et al., 2023; Hong et al., 2024). 
+
+Reasoning-oriented post-training For mathe-matical reasoning and verifiable tasks, prior work has studied outcome supervision, process supervi-sion, rejection fine-tuning, and verifier-based train-ing (Cobbe et al., 2021b; Uesato et al., 2022; Light-man et al., 2023; Yuan et al., 2023). Recent open reasoning models and systems further use RL-style post-training and group-relative objectives for im-proving reasoning behavior (Shao et al., 2024; Guo et al., 2025). 
+
+Policy-gradient methods Policy-gradient meth-ods provide the optimization basis for many RL post-training algorithms, including REINFORCE, actor-critic methods, TRPO, and PPO (Williams, 1992; Sutton et al., 1999; Schulman et al., 2015, 2017). Off-policy and lagged-policy training is commonly handled with importance sampling, clipped ratios, trust regions, or return-correction operators (Munos et al., 2016; Wang et al., 2016; Espeholt et al., 2018). 
+
+Distributed and asynchronous reinforcement learning Distributed RL systems decouple expe-rience generation and policy optimization through many actors, replay buffers, or actor-learner ar-chitectures (Nair et al., 2015; Mnih et al., 2016; Horgan et al., 2018; Espeholt et al., 2018; Kap-turowski et al., 2018). Related large-model train-ing reports discuss PPO-style language-model RL, REINFORCE-style simplifications, asynchronous rollout generation, training-inference discrepancy, and routing replay (Zheng et al., 2023; Ahmadian et al., 2024; Team et al., 2025; Ma et al., 2025; Zeng et al., 2026; Noukhovitch et al., 2024). 
+
+Negative samples in post-training Several post-training methods simplify or modify the treatment of preference labels, unsuccessful responses, or negative samples (Yuan et al., 2023; Rafailov et al., 2023; Ethayarajh et al., 2023; Hong et al., 2024; Ah-madian et al., 2024; Liu et al., 2026). These works are related to broader efforts to make language-model post-training less dependent on dense value estimation or heavy RL-specific infrastructure. 23 Instability in Asynchronous RL 
+
+This section formalizes the instability that ASymPO addresses. In standard policy-gradient objectives, distinguishing the current policy πθ
+
+from the behavior policy πb serves a structural role: all responses in a group share the reference scale of πb, and clipping bounds the per-token ra-tio ρ(θ) = πθ/π b to prevent the current-policy log-probability scale from drifting far from that reference. Together, the shared reference and the clipping bound balance the loss contributions of positive and negative advantage responses. In asyn-chronous training that omits πb and optimizes a current-policy-only loss, this scale control is absent. Positive and negative advantage responses can then enter the loss at inconsistent current-policy scales, breaking the cancellation that the zero-sum advan-tage baseline is designed to provide and causing training instability. 
+
+3.1 Behavior-Corrected Balance 
+
+For a prompt x ∼ D , let the behavior policy πb
+
+sample a group of responses {yg}Gg=1 , where yg =(ag, 1, . . . , a g,m g ). A reward function assigns rg =
+
+r(x, y g), and the group-relative advantage is 
+
+Ag = rg − ˆr, ˆr = 1
+
+G
+
+> G
+
+X
+
+> j=1
+
+rj . (1) Thus PGg=1 Ag = 0 . This zero-sum property is the intended stabilizing signal: positive and negative samples should contribute comparable policy-loss mass in opposite directions. For a policy πμ, define the average token nega-tive log-probability of response yg as 
+
+Sμ,g = − 1
+
+mgmg
+
+X
+
+> i=1
+
+log πμ(ag,i | x, a g,<i ). (2) The response-level log-probability loss balance is measured by 
+
+∆θ =
+
+> G
+
+X
+
+> g=1
+
+AgSθ,g . (3) If ∆θ ≈ 0, then the positive and negative advantage samples have comparable total loss contributions, not merely comparable raw advantages. Traditional behavior-corrected methods compare 
+
+πθ against πb. PPO-style objectives use token-level ratios and clipped ratios 
+
+ρg,i (θ) = πθ(ag,i | x, a g,<i )
+
+πb(ag,i | x, a g,<i ) ,
+
+¯ρg,i (θ) = clip ( ρg,i (θ), 1 − ϵ, 1 + ϵ) .
+
+(4) A response-level clipped loss can be written as 
+
+Lclip (θ) = − 1
+
+G
+
+> G
+
+X
+
+> g=1
+
+1
+
+mgmg
+
+X
+
+> i=1
+
+min  Agρg,i (θ),Ag ¯ρg,i (θ).
+
+(5) The role of clipping is not only to bound the pol-icy ratio, but also to preserve the balance of the loss contributions induced by normalized advan-tages. The following theorem makes this statement explicit. 
+
+Theorem 1 (Scale balance under behavior correc-tion) . Assume PGg=1 Ag = 0 , and let P = {g :
+
+Ag > 0} and N = {g : Ag < 0}. Define 
+
+B = P 
+
+> g∈P
+
+Ag = P 
+
+> g∈N
+
+|Ag|. Suppose the re-sponses are δb-balanced under the behavior policy, meaning that there exists ¯Sb such that 
+
+|Sb,g − ¯Sb| ≤ δb for all g. (6) 
+
+Suppose also that clipping keeps every token ratio used by the update within the trusted range: 
+
+1 − ϵ ≤ ρg,i (θ) ≤ 1 + ϵ for all g, i, (7) 
+
+where 0 < ϵ < 1. Let τϵ = max {log(1 + 
+
+ϵ), − log(1 − ϵ)}. Then 
+
+|∆θ| =
+
+> G
+
+X
+
+> g=1
+
+AgSθ,g ≤ 2B(δb + τϵ). (8) 
+
+Equivalently, the normalized loss 1 
+
+> G
+
+∆θ is close to zero whenever the behavior-policy scale dispersion 
+
+δb and the clipping width ϵ are small. 
+
+Theorem 1 states that behavior correction trans-fers balance from advantages to loss contributions. The group baseline gives P 
+
+> g
+
+Ag = 0 . The be-havior policy supplies a common reference scale for sampled responses through Sb,g . Clipping then prevents Sθ,g from moving far from that reference. As a result, the positive sum P 
+
+> g∈P
+
+AgSθ,g and the negative sum P 
+
+> g∈N
+
+|Ag|Sθ,g remain close, so the policy loss is not dominated by one side of the group. 33.2 Naive Loss Without Behavior Policy 
+
+In many asynchronous implementations, storing or recomputing πb is expensive, so the learner may use a naive current-policy-only loss: 
+
+Lnaive (θ) = 1
+
+G
+
+> G
+
+X
+
+> g=1
+
+AgSθ,g . (9) Let P = {g : Ag > 0} and N = {g : Ag <
+
+0}. Since P 
+
+> g
+
+Ag = 0 , we have P 
+
+> g∈P
+
+Ag =P 
+
+> g∈N
+
+|Ag|, but the loss decomposes as 
+
+Lnaive (θ) = 1
+
+G
+
+ X
+
+> g∈P
+
+AgSθ,g 
+
+− X
+
+> g∈N
+
+|Ag|Sθ,g 
+
+
+
+.
+
+(10) This loss drops the behavior-policy ratios. The behavior-policy scale may still be balanced, be-cause the responses were sampled from πb, but the condition that connects πb to πθ is now absent. Writing 
+
+dg = Sθ,g − Sb,g = − 1
+
+mgmg
+
+X
+
+> i=1
+
+log ρg,i (θ), (11) we obtain 
+
+> G
+
+X
+
+> g=1
+
+AgSθ,g =
+
+> G
+
+X
+
+> g=1
+
+AgSb,g +
+
+> G
+
+X
+
+> g=1
+
+Agdg. (12) The first term is small under the behavior-scale assumption in Theorem 1. The second term is uncontrolled without clipping or behavior-policy correction. If stale negative-advantage responses have much larger current negative log-probability than they had under πb, then dg is large for g ∈ N ,and the negative part of the loss can dominate: 
+
+X
+
+> g∈N
+
+|Ag|Sθ,g ≫ X
+
+> g∈P
+
+AgSθ,g . (13) Thus the naive loss can break the positive-negative cancellation even when the raw advantages sum to zero and the sampled responses are well scaled under πb. The learner may then keep suppressing stale negative samples while receiving too little compensating signal from positive samples, which can destabilize training and lead to collapse. This is why a current-policy-only method still needs an explicit mechanism for balancing positive and neg-ative loss contributions. ASymPO provides such a mechanism by normalizing each response’s current negative log-probability scale, improving stability without requiring access to πb.
+
+## 4 Methodology 
+
+Section 3 shows that a current-policy-only objec-tive can become unstable when positive and nega-tive advantage responses enter the loss at different current-policy scales. We therefore study a general scaled log-probability objective. For a prompt x
+
+and response yg = ( ag, 1, . . . , a g,m g ), let 
+
+pg,i (θ) = πθ(ag,i | x, a g,<i ),Sθ,g = − 1
+
+mgmg
+
+X
+
+> i=1
+
+log pg,i (θ). (14) Given group-relative advantages {Ag}Gg=1 , we con-sider objectives of the form 
+
+LC (θ) = − 1
+
+G
+
+> G
+
+X
+
+> g=1
+
+1
+
+mgmg
+
+X
+
+> i=1
+
+AgCg log pg,i (θ)= 1
+
+G
+
+> G
+
+X
+
+> g=1
+
+AgCgSθ,g .
+
+(15) The central design question is how to choose the co-efficient Cg using only current-policy probabilities. The coefficient should reduce the harmful domi-nance of stale negative samples while preserving the useful learning signal from positive samples. 
+
+4.1 Scaled Policy Optimization 
+
+Scaled Policy Optimization (SPO) is the simplest instance of Eq. (15) . Its motivation is direct: if negative-advantage samples can produce dispropor-tionately harmful updates, then their contribution should be reduced by a fixed coefficient. SPO sets 
+
+CSPO  
+
+> g
+
+=
+
+(
+
+1, Ag ≥ 0,α, Ag < 0, (16) where α ∈ (0 , 1) is a hyperparameter. Equivalently, SPO uses the reweighted advantage ˜Ag = Ag for 
+
+Ag ≥ 0 and ˜Ag = αA g for Ag < 0, giving 
+
+LSPO (θ) = − 1
+
+G
+
+> G
+
+X
+
+> g=1
+
+1
+
+mgmg
+
+X
+
+> i=1
+
+˜Ag log pg,i (θ).
+
+(17) This design keeps the direction of every update unchanged: positive responses are still reinforced, and negative responses are still suppressed. The only change is that negative responses are sup-pressed less aggressively. In our experiments, this fixed scaling substantially improves stability, which 4supports the diagnosis that unbalanced negative loss is a major failure mode. A key limitation of SPO is its reliance on a man-ually chosen α. A fixed coefficient cannot distin-guish mildly stale negatives from those with van-ishing current-policy probabilities, nor does it ac-count for the response-dependent scale variations that drive the instability discussed in Section 3. This motivates an adaptive coefficient that dynam-ically balances loss contributions based on each response’s current scale. 
+
+4.2 Asymmetric-Scale Policy Optimization 
+
+Asymmetric-Scale Policy Optimization (AsymPO) chooses Cg from the current response scale rather than from a fixed sign-dependent rule. Let sg( ·)
+
+denote the stop-gradient operator: it has the same forward value as its argument but is treated as a constant during back-propagation. AsymPO sets 
+
+CAsymPO  
+
+> g
+
+= 1sg( Sθ,g ) (18) and optimizes 
+
+LAsymPO (θ) = 1
+
+G
+
+> G
+
+X
+
+> g=1
+
+Ag
+
+Sθ,g 
+
+sg( Sθ,g ) . (19) Thus every token loss in a response is divided by that response’s own average token negative log-probability. Responses with large current nega-tive log-probability receive smaller coefficients, while responses with small current negative log-probability receive larger coefficients. Unlike SPO, this scaling is not selected by a manually tuned sign rule; it is determined by the current policy’s response-level scale. 
+
+Theorem 2 (Exact response-level loss balance of AsymPO) . Assume Sθ,g > 0 for all g and 
+
+PGg=1 Ag = 0 . Let P = {g : Ag > 0} and 
+
+N = {g : Ag < 0}. Under the AsymPO coefficient 
+
+CAsymPO  
+
+> g
+
+= 1 / sg( Sθ,g ), the forward response-level loss contributions satisfy 
+
+X
+
+> g∈P
+
+Ag
+
+Sθ,g 
+
+sg( Sθ,g ) = X
+
+> g∈P
+
+Ag (20) 
+
+and X
+
+> g∈N
+
+|Ag| Sθ,g 
+
+sg( Sθ,g ) = X
+
+> g∈N
+
+|Ag|. (21) 
+
+Consequently, the signed AsymPO loss is exactly balanced: 
+
+> G
+
+X
+
+> g=1
+
+Ag
+
+Sθ,g 
+
+sg( Sθ,g ) = 0 . (22)                 
+
+> Quantity sent rollout →learner GRPO ASymPO
+> Sampled tokens {ag,i }✓✓
+> Scalar reward rg✓✓
+> Per-token behavior log-prob log πb✓—Policy-version tag ✓—Inference-precision logit recomputation required —
+
+Table 1: What must flow through the rollout–learner interface. ASymPO removes the per-token behavior log-probability channel and the policy-version metadata it depends on, eliminating both lossy transport and train– inference numerical drift. 
+
+Moreover, the back-propagated gradient is 
+
+∇θLAsymPO (θ) = 1
+
+G
+
+> G
+
+X
+
+> g=1
+
+Ag
+
+sg( Sθ,g ) ∇θSθ,g , (23) 
+
+so each response update is normalized by its own current scale. 
+
+Theorem 2 gives the desired property directly. The group baseline balances the raw advantages, and AsymPO makes the response-level loss in-herit this balance by normalizing away the current-policy scale Sθ,g . At the same time, the stop-gradient normalization preserves a nonzero learn-ing signal: the optimizer still increases probabili-ties for positive-advantage responses and decreases probabilities for negative-advantage responses, but the magnitude of each response’s update is mea-sured relative to its own current scale. AsymPO therefore addresses the weakness of SPO. SPO reduces negative samples by a fixed human-designed factor α, which is effective but not adaptive to the actual source of instability. AsymPO instead balances positive and negative loss contributions automatically, using only the cur-rent policy probabilities already required by the naive objective. It does not store, transmit, or re-compute behavior-policy probabilities, making it suitable for asynchronous training while simplify-ing the surrounding infrastructure and directly tar-geting the scale imbalance identified in Section 3. Table 1 makes this concrete by listing the quanti-ties each method must transport through the rollout– learner interface, directly addressing the four infras-tructure costs identified in §1. 
+
+## 5 Experiments 
+
+We evaluate current-policy-only training objec-tives for mathematical reasoning tasks, where re-wards are verifiable and group-relative RL has been widely adopted. The experiments reported in this 5section focus on the SPO and AsymPO. Our ex-periments are designed to answer the following research questions: • At what accuracy cost, if any, does remov-ing the behavior-log-prob channel from the rollout–learner interface come? • Does the automatically balanced method AsymPO perform better than the artificially scaled method SPO? • Compared with other RL algorithms that avoid importance sampling, such as GPG (Chu et al., 2025), do SPO and AsymPO improve performance or stability in asyn-chronous training? 
+
+5.1 Setup Models and Datasets We conduct experiments on Qwen3-1.7B-Base, Qwen3-4B-Base (Yang et al., 2025), and LLaMA-3.2-3B-Instruct to as-sess mathematical reasoning performance across model families. We train on a randomly sampled subset of 4k problems from the MATH training set (Hendrycks et al., 2021). 
+
+Methods For the baseline, we use naive loss ob-jective (9) . We also compare with GRPO, which is a recent importance-sampling-based method that uses behavior-policy probabilities (Guo et al., 2025). For current-policy-only methods, we eval-uate SPO and AsymPO as proposed in Section 4. We also include GPG (Chu et al., 2025), a recent method that avoids importance sampling by using a value-function baseline instead of a group baseline. GPG does not use behavior-policy probabilities, but it also does not have the zero-sum advantage balance that motivates our analysis and methods. Comparing with GPG allows us to test whether the specific scale-balancing mechanism of AsymPO offers benefits beyond the general idea of avoiding importance sampling. 
+
+Implementation Details We implement all RL training with VeRL (Sheng et al., 2024). For asyn-chronous training, we follow the VeRL configu-ration and set ppo mini batch size to 32 , train batch size to 512 , and staleness threshold to 0.5.For each training prompt, we sample 8 rollouts to compute group-relative advantages. For ASymPO and SPO, we modify the VeRL rollout–learner interface to not transmit per-token behavior log-probabilities: the learner receives only sampled tokens and scalar rewards, and recomputes every log-probability under πθ. This mirrors the interface in Table 1 and makes the implementation faithful to the simplification claim of §1; the same VeRL deployment is used for GRPO baselines with the standard behavior-log-prob channel enabled. For each problem, the maximum prompt length is 1024 
+
+tokens and the maximum response length is 4096 
+
+tokens. We use a learning rate of 2×10 −6 and train for an equivalent of 3 epochs for all models. For the SPO, the negative coefficient is set to α = 0 .2,inspired by the work (Liu et al., 2026). Unless otherwise specified, the remaining hyperparame-ters of each RL algorithm follow the default values recommended in the VeRL documentation. 
+
+Evaluation Benchmarks Following prior work on mathematical reasoning, we evaluate on AIME24 (Zhang and Math-AI, 2024), AIME25 (Zhang and Math-AI, 2025), MATH500 (Light-man et al., 2023), AMC23, GSM8K (Cobbe et al., 2021a), and Minerva-Math (Lewkowycz et al., 2022). We use Evalscope (Team, 2024) as the eval-uation framework. For each problem, we sample 
+
+8 rollouts. Accuracy is computed by comparing model responses with ground-truth answers, and we report mean@8 and pass@8 performances. 
+
+5.2 Results 
+
+Figure 1 shows the training reward curves on Qwen3-1.7B-Base as a representative example, Ta-ble 2 reports mean@8 accuracy, and Table 3 reports pass@8 accuracy. The tables summarize the final benchmark results across the three model families. For all three models, the naive loss and GPG col-lapse during training, leaving no meaningful final checkpoint for benchmark evaluation. The training-reward curves in Figure 1 provide a direct view of optimization stability on Qwen3-1.7B-Base. The baseline, corresponding to the naive current-policy loss, and GPG both reach high reward early but collapse late in training, with the reward dropping to a near-zero regime and no meaningful final checkpoint for evaluation. In contrast, GRPO, SPO, and AsymPO maintain sta-ble reward trajectories throughout training. The same collapse pattern for the naive loss and GPG was also observed on LLaMA-3.2-3B-Instruct and Qwen3-4B-Base. These curves show that the fi-nal benchmark scores in Tables 2 and 3 should be interpreted together with training stability: current-policy-only training is not stable by default, but 6Method AIME24 AIME25 MATH500 AMC23 GSM8K Minerva Avg. 
+
+Qwen3-1.7B-Base 
+
+Naive Loss Collapsed during training GPG Collapsed during training GRPO 6.67 4.58 65.87 37.50 81.79 28.26 37.45 
+
+SPO 6.25 4.16 64.85 33.70 83.14 26.33 36.41 AsymPO 7.50 4.16 66.20 33.70 82.87 27.44 36.98 
+
+LLaMA-3.2-3B-Instruct 
+
+Naive Loss Collapsed during training GPG Collapsed during training GRPO 10.00 3.33 49.37 23.37 80.88 18.08 30.84 SPO 8.33 3.33 48.53 20.92 79.56 16.96 29.61 AsymPO 15.42 3.33 49.95 23.91 79.48 18.08 31.70 
+
+Qwen3-4B-Base 
+
+Naive Loss Collapsed during training GPG Collapsed during training GRPO 13.33 11.25 78.72 44.84 90.63 34.33 45.52 
+
+SPO 12.08 8.75 77.45 48.37 91.09 34.93 45.45 AsymPO 12.50 9.16 77.53 44.57 91.15 35.48 45.07   
+
+> Table 2: Mean@8 accuracy on mathematical reasoning benchmarks using 8evaluation rollouts per problem. The average is computed over all six listed benchmarks. The best value within each model block among evaluated methods with final checkpoints is bolded. “Collapsed during training” indicates that the corresponding model-method training run collapsed, leaving no meaningful final checkpoint for evaluation; Figure 1 shows the Qwen3-1.7B-Base case as a representative example.
+
+SPO and AsymPO prevent the collapse observed in the naive objective and in GPG across the evaluated model families. 
+
+RQ1: Cost of dropping behavior-policy proba-bilities. The results show that current-policy-only objectives can be competitive with GRPO when they include explicit scale control, although the relative ranking depends on the model and metric. On Qwen3-1.7B-Base, GRPO obtains the best av-erage score among completed methods, with 37 .45 
+
+mean@8 and 54 .56 pass@8. However, AsymPO is close in mean@8, reaching 36 .98 , and SPO is close in pass@8, reaching 53 .92 . AsymPO also obtains the best mean@8 scores on AIME24 and MATH500, while SPO obtains the best mean@8 score on GSM8K. On LLaMA-3.2-3B-Instruct, AsymPO surpasses GRPO on both aggregate met-rics, improving the mean@8 average from 30 .84 to 
+
+31 .70 and the pass@8 average from 46 .09 to 49 .19 .On Qwen3-4B-Base, GRPO is strongest on the ag-gregate metrics, with 45 .52 mean@8 and 60 .90 
+
+pass@8, but SPO and AsymPO remain close in mean@8, reaching 45 .45 and 45 .07 , respectively. AsymPO also obtains the best Qwen3-4B-Base mean@8 scores on GSM8K and Minerva-Math, and ties GRPO on AIME24 pass@8. Overall, behavior-policy probabilities are not strictly nec-essary for competitive final performance in this setting, but the current-policy-only methods do not uniformly dominate GRPO. 
+
+RQ2: AsymPO versus SPO AsymPO gener-ally improves over the fixed scaling used by SPO on some models, but the advantage is not uni-form. On Qwen3-1.7B-Base, AsymPO improves the mean@8 average from 36 .41 to 36 .98 , with gains on AIME24, MATH500, and Minerva-Math, but SPO has a slightly higher pass@8 average, 
+
+53 .92 versus 53 .17 . On LLaMA-3.2-3B-Instruct, the advantage of AsymPO is clearer: AsymPO improves the mean@8 average from 29 .61 to 
+
+31 .70 and the pass@8 average from 45 .25 to 
+
+49 .19 . It also gives the best pass@8 scores on AIME24, MATH500, and AMC23. On Qwen3-4B-Base, the comparison is mixed: SPO has a 7Figure 1: Training reward curves for asynchronous RL on Qwen3-1.7B-Base, shown as a representative exam-ple. The baseline denotes the naive current-policy loss. The baseline and GPG curves collapse late in training, while GRPO, SPO, and AsymPO maintain stable re-wards. The same collapse behavior for GPG and the naive loss was also observed on LLaMA-3.2-3B-Instruct and Qwen3-4B-Base. 
+
+slightly higher mean@8 average, 45 .45 versus 
+
+45 .07 , while AsymPO has a higher pass@8 av-erage, 58 .87 versus 58 .06 . AsymPO performs best among the current-policy-only methods on Qwen3-4B-Base mean@8 for AIME24, AIME25, MATH500, GSM8K, and Minerva-Math, whereas SPO is stronger on AMC23 mean@8. For Qwen3-4B-Base pass@8, AsymPO’s higher average is driven by AIME24 and AIME25, while SPO is stronger on MATH500, AMC23, GSM8K, and Minerva-Math. These results support the main mo-tivation for AsymPO as an adaptive alternative to a manually chosen negative coefficient, while also showing that the fixed coefficient in SPO remains competitive in some regimes. 
+
+RQ3: Stability compared with other current-policy-only methods The comparison with GPG isolates whether avoiding importance sampling is sufficient by itself. GPG does not require behavior-policy probabilities, but it collapses during train-ing in our asynchronous setting, just as the naive current-policy loss does, across all three evaluated model families. SPO and AsymPO also avoid behavior-policy probabilities, yet both maintain stable training rewards and produce evaluable final checkpoints, including on Qwen3-4B-Base. This difference indicates that the key property is not merely removing importance sampling, but preserv-ing the positive-negative balance of group-relative updates under the current policy. The empirical sta-bility of SPO and AsymPO, together with the col-lapse of GPG and the naive loss, supports the scale-imbalance analysis in Section 3 and the response-level balancing mechanism introduced in Section 4. 
+
+5.3 Ablation Studies 
+
+ASymPO does not introduce any additional tun-ing hyperparameter beyond the standard training configuration. Its response-level coefficient is de-termined directly by the current-policy scale Sθ,g 
+
+through Eq. (19) . Therefore, there is no method-specific hyperparameter ablation for ASymPO. SPO, in contrast, contains the manually cho-sen negative coefficient α. Following RIFT (Liu et al., 2026), we set α = 0 .2 in all experiments. This coefficient has a substantial effect on the re-sulting objective. When α = 1 , SPO reduces to the naive current-policy loss because positive- and negative-advantage responses are weighted iden-tically; as shown above, this objective collapses during training in our setting. When α = 0,negative-advantage responses are removed from the objective, making the update similar to RFT-style positive-only fine-tuning, which gives weak empirical performance because it does not explic-itly suppress low-reward responses. These two end-points illustrate that SPO is sensitive to the choice of α, and that selecting an appropriate value is im-portant for stable and effective training. 
+
+## 6 Conclusions 
+
+This work studied current-policy-only optimization for asynchronous RL, where behavior-policy prob-abilities can correct distribution drift but substan-tially complicate the rollout–learner interface. We identified a loss-scale imbalance that arises when stale responses are evaluated under the current pol-icy: although group-relative advantages sum to zero, positive and negative responses can have dif-ferent current negative log-probability scales, caus-ing one side of the policy loss to dominate. To address this failure mode without behavior-policy probabilities, we introduced two current-policy-only objectives: SPO, which reduces the influence of negative-advantage responses with a fixed coef-ficient, and ASymPO, which adaptively normalizes each response by its own current average token neg-ative log-probability. ASymPO balances response-level positive and negative loss contributions under zero-sum advantages while retaining a meaningful policy-gradient update, providing a simple mech-anism for stabilizing asynchronous group-relative RL when storing or recomputing behavior-policy information is undesirable. 8Limitations 
+
+This work focuses on a specific failure mode of current-policy-only asynchronous RL: the imbal-ance caused by response-level current-policy loss scales. ASymPO is designed to correct this im-balance, but it does not provide a general solution to all forms of distribution drift. In particular, un-like behavior-corrected objectives that explicitly compare πθ with the behavior policy, ASymPO does not bound the policy ratio between generation and training. When the behavior policy is very far from the current policy, current-policy probabilities alone may not contain enough information to fully characterize the off-policy mismatch. The proposed methods also make simplifying design choices. SPO relies on a manually chosen negative scaling coefficient, so its performance can depend on the task, model, reward distribution, and degree of staleness. ASymPO removes this fixed coefficient by normalizing each response with its own current loss scale, but this normalization is still a heuristic transformation of the policy ob-jective rather than a complete trust-region method. Its behavior may depend on how advantages are normalized, how response lengths vary, and how extreme current-policy probabilities appear during training. Our empirical scope is limited to mathemati-cal reasoning tasks with verifiable rewards and group-relative advantages. This setting is impor-tant, but it does not cover broader RLHF settings with learned reward models, multi-turn interaction, tool use, or long-horizon agent tasks. Additional evaluation is needed to determine whether the same scale-imbalance diagnosis and the same normaliza-tion strategy remain effective across larger models, more diverse data mixtures, different rollout stale-ness regimes, and production-scale asynchronous training systems. Future work should study current-policy-only op-timization under stronger theoretical and systems perspectives. On the theoretical side, it would be useful to characterize when response-scale normal-ization approximates behavior correction and when explicit behavior-policy information is unavoidable. On the algorithmic side, promising directions in-clude adaptive variants that combine scale balanc-ing with lightweight drift diagnostics, token-level or response-level safeguards for extreme probabili-ties, and extensions beyond group-relative advan-tages. On the systems side, a more complete evalua-tion should measure not only task accuracy, but also implementation complexity, failure modes, and ro-bustness under realistic asynchronous rollout and training pipelines. 
+
+## References                 
+
+> Arash Ahmadian, Chris Cremer, Matthias Gallé, Marzieh Fadaee, Julia Kreutzer, Olivier Pietquin, Ah-met Üstün, and Sara Hooker. 2024. Back to basics: Revisiting reinforce-style optimization for learning from human feedback in llms. In Proceedings of the 62nd Annual Meeting of the Association for Compu-tational Linguistics (Volume 1: Long Papers) , pages 12248–12267. Yuntao Bai, Andy Jones, Kamal Ndousse, Amanda Askell, Anna Chen, Nova DasSarma, Dawn Drain, Stanislav Fort, Deep Ganguli, Tom Henighan, and 1 others. 2022. Training a helpful and harmless assis-tant with reinforcement learning from human feed-back. arXiv preprint arXiv:2204.05862 .Paul F Christiano, Jan Leike, Tom Brown, Miljan Mar-tic, Shane Legg, and Dario Amodei. 2017. Deep reinforcement learning from human preferences. Ad-vances in neural information processing systems , 30. Xiangxiang Chu, Hailang Huang, Xiao Zhang, Fei Wei, and Yong Wang. 2025. Gpg: A simple and strong reinforcement learning baseline for model reasoning.
+> arXiv preprint arXiv:2504.02546 .Karl Cobbe, Vineet Kosaraju, Mohammad Bavarian, Mark Chen, Heewoo Jun, Lukasz Kaiser, Matthias Plappert, Jerry Tworek, Jacob Hilton, Reiichiro Nakano, Christopher Hesse, and John Schulman. 2021a. Training verifiers to solve math word prob-lems. arXiv preprint arXiv:2110.14168 .Karl Cobbe, Vineet Kosaraju, Mohammad Bavarian, Mark Chen, Heewoo Jun, Lukasz Kaiser, Matthias Plappert, Jerry Tworek, Jacob Hilton, Reiichiro Nakano, and 1 others. 2021b. Training verifiers to solve math word problems. arXiv preprint arXiv:2110.14168 .Lasse Espeholt, Hubert Soyer, Remi Munos, Karen Si-monyan, Vlad Mnih, Tom Ward, Yotam Doron, Vlad Firoiu, Tim Harley, Iain Dunning, and 1 others. 2018. Impala: Scalable distributed deep-rl with importance weighted actor-learner architectures. In International conference on machine learning , pages 1407–1416. PMLR. Kawin Ethayarajh, Winnie Xu, Niklas Muennighoff, Dan Jurafsky, and Douwe Kiela. 2023. Kto: Model alignment as prospect theoretic optimization, 2024.
+> URL https://arxiv. org/abs/2402.01306 , 14. Daya Guo, Dejian Yang, Haowei Zhang, Junxiao Song, Peiyi Wang, Qihao Zhu, Runxin Xu, Ruoyu Zhang, Shirong Ma, Xiao Bi, and 1 others. 2025. Deepseek-r1: Incentivizing reasoning capability in
+
+9llms via reinforcement learning. arXiv preprint arXiv:2501.12948 .Dan Hendrycks, Collin Burns, Saurav Kadavath, Akul Arora, Steven Basart, Eric Tang, Dawn Song, and Jacob Steinhardt. 2021. Measuring mathematical problem solving with the math dataset. NeurIPS .Jiwoo Hong, Noah Lee, and James Thorne. 2024. Orpo: Monolithic preference optimization without refer-ence model. In Proceedings of the 2024 Conference on Empirical Methods in Natural Language Process-ing , pages 11170–11189. Dan Horgan, John Quan, David Budden, Gabriel Barth-Maron, Matteo Hessel, Hado van Hasselt, and David Silver. 2018. Distributed prioritized experience re-play. In International Conference on Learning Rep-resentations .Steven Kapturowski, Georg Ostrovski, John Quan, Remi Munos, and Will Dabney. 2018. Recurrent experi-ence replay in distributed reinforcement learning. In 
+
+International conference on learning representations .Aitor Lewkowycz, Anders Andreassen, David Dohan, Ethan Dyer, Henryk Michalewski, Vinay Ramasesh, Ambrose Slone, Cem Anil, Imanol Schlag, Theo Gutman-Solo, Yuhuai Wu, Behnam Neyshabur, Guy Gur-Ari, and Vedant Misra. 2022. Solving quan-titative reasoning problems with language models. 
+
+Preprint , arXiv:2206.14858. Hunter Lightman, Vineet Kosaraju, Yuri Burda, Harri-son Edwards, Bowen Baker, Teddy Lee, Jan Leike, John Schulman, Ilya Sutskever, and Karl Cobbe. 2023. Let’s verify step by step. In The twelfth inter-national conference on learning representations .Zehua Liu, Shuqi Liu, Tao Zhong, and Mingxuan Yuan. 2026. Rift: Repurposing negative samples via reward-informed fine-tuning. arXiv preprint arXiv:2601.09253 .Wenhan Ma, Hailin Zhang, Liang Zhao, Yifan Song, Yudong Wang, Zhifang Sui, and Fuli Luo. 2025. Stabilizing moe reinforcement learning by align-ing training and inference routers. arXiv preprint arXiv:2510.11370 .Volodymyr Mnih, Adria Puigdomenech Badia, Mehdi Mirza, Alex Graves, Timothy Lillicrap, Tim Harley, David Silver, and Koray Kavukcuoglu. 2016. Asyn-chronous methods for deep reinforcement learning. In International conference on machine learning ,pages 1928–1937. PmLR. Rémi Munos, Tom Stepleton, Anna Harutyunyan, and Marc Bellemare. 2016. Safe and efficient off-policy reinforcement learning. Advances in neural informa-tion processing systems , 29. Arun Nair, Praveen Srinivasan, Sam Blackwell, Cagdas Alcicek, Rory Fearon, Alessandro De Maria, Ve-davyas Panneershelvam, Mustafa Suleyman, Charles Beattie, Stig Petersen, and 1 others. 2015. Massively parallel methods for deep reinforcement learning. 
+
+arXiv preprint arXiv:1507.04296 .Michael Noukhovitch, Shengyi Huang, Sophie Xhon-neux, Arian Hosseini, Rishabh Agarwal, and Aaron Courville. 2024. Asynchronous rlhf: Faster and more efficient off-policy rl for language models. arXiv preprint arXiv:2410.18252 .Long Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida, Carroll Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, and 1 others. 2022. Training language models to follow in-structions with human feedback. Advances in neural information processing systems , 35:27730–27744. Rafael Rafailov, Archit Sharma, Eric Mitchell, Christo-pher D Manning, Stefano Ermon, and Chelsea Finn. 2023. Direct preference optimization: Your language model is secretly a reward model. Advances in neural information processing systems , 36:53728–53741. John Schulman, Sergey Levine, Pieter Abbeel, Michael Jordan, and Philipp Moritz. 2015. Trust region pol-icy optimization. In International conference on ma-chine learning , pages 1889–1897. PMLR. John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, and Oleg Klimov. 2017. Proxi-mal policy optimization algorithms. arXiv preprint arXiv:1707.06347 .Zhihong Shao, Peiyi Wang, Qihao Zhu, Runxin Xu, Junxiao Song, Xiao Bi, Haowei Zhang, Mingchuan Zhang, YK Li, Yang Wu, and 1 others. 2024. Deepseekmath: Pushing the limits of mathematical reasoning in open language models. arXiv preprint arXiv:2402.03300 .Guangming Sheng, Chi Zhang, Zilingfeng Ye, Xibin Wu, Wang Zhang, Ru Zhang, Yanghua Peng, Haibin Lin, and Chuan Wu. 2024. Hybridflow: A flexible and efficient rlhf framework. arXiv preprint arXiv: 2409.19256 .Nisan Stiennon, Long Ouyang, Jeffrey Wu, Daniel Ziegler, Ryan Lowe, Chelsea Voss, Alec Radford, Dario Amodei, and Paul F Christiano. 2020. Learn-ing to summarize with human feedback. Advances in neural information processing systems , 33:3008– 3021. Richard S Sutton, David McAllester, Satinder Singh, and Yishay Mansour. 1999. Policy gradient methods for reinforcement learning with function approxima-tion. Advances in neural information processing systems , 12. Ling Team, Anqi Shen, Baihui Li, Bin Hu, Bin Jing, Cai Chen, Chao Huang, Chao Zhang, Chaokun Yang, Cheng Lin, and 1 others. 2025. Every step evolves: Scaling reinforcement learning for trillion-scale thinking model. arXiv preprint arXiv:2510.18855 .ModelScope Team. 2024. EvalScope: Evaluation frame-work for large models. 
+
+10 Jonathan Uesato, Nate Kushman, Ramana Kumar, Fran-cis Song, Noah Siegel, Lisa Wang, Antonia Creswell, Geoffrey Irving, and Irina Higgins. 2022. Solv-ing math word problems with process-and outcome-based feedback. arXiv preprint arXiv:2211.14275 .Ziyu Wang, Victor Bapst, Nicolas Heess, Volodymyr Mnih, Remi Munos, Koray Kavukcuoglu, and Nando De Freitas. 2016. Sample efficient actor-critic with experience replay. arXiv preprint arXiv:1611.01224 .Ronald J Williams. 1992. Simple statistical gradient-following algorithms for connectionist reinforcement learning. Machine learning , 8(3):229–256. An Yang, Anfeng Li, Baosong Yang, Beichen Zhang, Binyuan Hui, Bo Zheng, Bowen Yu, Chang Gao, Chengen Huang, Chenxu Lv, and 1 others. 2025. Qwen3 technical report. arXiv preprint arXiv:2505.09388 .Qiying Yu, Zheng Zhang, Ruofei Zhu, Yufeng Yuan, Xiaochen Zuo, Yu Yue, Weinan Dai, Tiantian Fan, Gaohong Liu, Lingjun Liu, and 1 others. 2026. Dapo: An open-source llm reinforcement learning system at scale. Advances in Neural Information Processing Systems , 38:113222–113244. Zheng Yuan, Hongyi Yuan, Chengpeng Li, Guanting Dong, Keming Lu, Chuanqi Tan, Chang Zhou, and Jingren Zhou. 2023. Scaling relationship on learning mathematical reasoning with large language models. 
+
+arXiv preprint arXiv:2308.01825 .Aohan Zeng, Xin Lv, Zhenyu Hou, Zhengxiao Du, Qinkai Zheng, Bin Chen, Da Yin, Chendi Ge, Chenghua Huang, Chengxing Xie, and 1 others. 2026. Glm-5: from vibe coding to agentic engineering. 
+
+arXiv preprint arXiv:2602.15763 .Yifan Zhang and Team Math-AI. 2024. American invi-tational mathematics examination (aime) 2024. Yifan Zhang and Team Math-AI. 2025. American invi-tational mathematics examination (aime) 2025. Rui Zheng, Shihan Dou, Songyang Gao, Yuan Hua, Wei Shen, Binghai Wang, Yan Liu, Senjie Jin, Qin Liu, Yuhao Zhou, and 1 others. 2023. Secrets of rlhf in large language models part i: Ppo. arXiv preprint arXiv:2307.04964 .Daniel M Ziegler, Nisan Stiennon, Jeffrey Wu, Tom B Brown, Alec Radford, Dario Amodei, Paul Chris-tiano, and Geoffrey Irving. 2019. Fine-tuning lan-guage models from human preferences. arXiv preprint arXiv:1909.08593 .
+
+11 A Detailed Proofs 
+
+Proof of Theorem 1 . For each response, 
+
+Sθ,g = Sb,g − 1
+
+mgmg
+
+X
+
+> i=1
+
+log ρg,i (θ). (24) The clipping-range assumption implies 
+
+|Sθ,g − Sb,g | ≤ τϵ. (25) Since P 
+
+> g
+
+Ag = 0 , we can subtract the common behavior-policy scale: 
+
+∆θ =
+
+> G
+
+X
+
+> g=1
+
+AgSθ,g =
+
+> G
+
+X
+
+> g=1
+
+Ag
+
+ Sθ,g − ¯Sb
+
+ . (26) Therefore, 
+
+|∆θ| ≤ 
+
+> G
+
+X
+
+> g=1
+
+|Ag|| Sb,g − ¯Sb|
+
++
+
+> G
+
+X
+
+> g=1
+
+|Ag|| Sθ,g − Sb,g |≤ (δb + τϵ)
+
+> G
+
+X
+
+> g=1
+
+|Ag|
+
+= 2 B(δb + τϵ).
+
+(27) 
+
+Proof of Theorem 2. The stop-gradient operator has the same forward value as its argument, so 
+
+Sθ,g / sg( Sθ,g ) = 1 in the forward computation. The two unsigned identities for P and N follow im-mediately. Since P 
+
+> g
+
+Ag = 0 , the signed sum also equals zero. For the gradient, sg( Sθ,g ) is treated as constant, hence 
+
+∇θ
+
+
+
+Ag
+
+Sθ,g 
+
+sg( Sθ,g )
+
+
+
+= Ag
+
+sg( Sθ,g ) ∇θSθ,g . (28) Summing over g and multiplying by 1/G gives the stated gradient. 
+
+## B Additional Properties of ASymPO 
+
+This appendix records several simple consequences of the ASymPO normalization. These results are not needed for defining the method, but they clar-ify how ASymPO differs from the naive current-policy objective and why the difference becomes important when positive and negative responses are evaluated at different current-policy scales. For a fixed prompt group, write Sg = Sθ,g for the current average token negative log-probability of response yg, and assume Sg > 0 for all g. Let 
+
+PGg=1 Ag = 0 , P = {g : Ag > 0}, N = {g :
+
+Ag < 0}, and B = P 
+
+> g∈P
+
+Ag = P 
+
+> g∈N
+
+|Ag|. De-fine the response-level naive loss and the forward ASymPO loss by 
+
+Lnaive = 1
+
+G
+
+> G
+
+X
+
+> g=1
+
+AgSg,LASymPO = 1
+
+G
+
+> G
+
+X
+
+> g=1
+
+Ag
+
+Sg
+
+sg( Sg) .
+
+(29) The stop-gradient operator affects back-propagation but not the forward value, so 
+
+Sg/ sg( Sg) = 1 in the forward computation. 
+
+Theorem 3 (Exact gap between naive loss and ASymPO loss) . Under the assumptions above, 
+
+LASymPO = 0 (30) 
+
+and 
+
+Lnaive − LASymPO = BG
+
+  ¯SP − ¯SN
+
+ , (31) 
+
+where 
+
+¯SP = 1
+
+B
+
+X
+
+> g∈P
+
+AgSg, ¯SN = 1
+
+B
+
+X
+
+> g∈N
+
+|Ag|Sg.
+
+(32) 
+
+Proof. Since Sg/ sg( Sg) = 1 in the forward com-putation and P 
+
+> g
+
+Ag = 0 , we have LASymPO =
+
+> 1
+> G
+
+P 
+
+> g
+
+Ag = 0 . For the naive loss, 
+
+Lnaive = 1
+
+G
+
+X
+
+> g∈P
+
+AgSg − X
+
+> g∈N
+
+|Ag|Sg
+
+
+
+= BG
+
+  ¯SP − ¯SN
+
+ .
+
+(33) Combining the two identities gives the stated gap. Theorem 3 shows that the difference between the naive loss and ASymPO is exactly the signed scale imbalance between positive and negative responses. If the weighted average current scale of negative responses is larger than that of positive responses, then the naive loss is shifted toward the negative side. ASymPO removes this forward imbalance by normalizing each response to a common response-level scale. 12 Theorem 4 (Positive-negative contribution ratio) .
+
+Assume ¯SP > 0 and ¯SN > 0. The ratio between the unsigned negative and positive response-level contributions of the naive loss is 
+
+Rnaive =
+
+P 
+
+> g∈N
+
+|Ag|Sg
+
+P 
+
+> g∈P
+
+AgSg
+
+= ¯SN
+
+¯SP
+
+, (34) 
+
+whereas the corresponding ASymPO ratio is 
+
+RASymPO =
+
+P 
+
+> g∈N
+
+|Ag|Sg/ sg( Sg)
+
+P 
+
+> g∈P
+
+AgSg/ sg( Sg) = 1 . (35) 
+
+Proof. The identity for Rnaive follows by sub-stituting the definitions of ¯SP and ¯SN . For ASymPO, Sg/ sg( Sg) = 1 , so the numerator be-comes P 
+
+> g∈N
+
+|Ag| = B and the denominator be-comes P 
+
+> g∈P
+
+Ag = B.Theorem 4 makes the balancing effect explicit. In the naive loss, the relative influence of nega-tive and positive responses is not determined only by the advantages; it is multiplied by the ratio of their current response scales. If negative responses have larger current scales, then the negative side dominates. ASymPO fixes this ratio at one at the response-loss level, so the group-relative advantage balance is preserved after the loss transformation. 
+
+Theorem 5 (Gap bound under bounded scale dis-persion) . Suppose there exists a scalar ¯S > 0 and a constant δ ≥ 0 such that 
+
+|Sg − ¯S| ≤ δ for all g. (36) 
+
+Then 
+
+|Lnaive − LASymPO | ≤ 2Bδ G . (37) 
+
+Proof. Since LASymPO = 0 and P 
+
+> g
+
+Ag = 0 ,
+
+Lnaive = 1
+
+G
+
+> G
+
+X
+
+> g=1
+
+Ag(Sg − ¯S). (38) Therefore, 
+
+|Lnaive − LASymPO | = |Lnaive |≤ 1
+
+G
+
+> G
+
+X
+
+> g=1
+
+|Ag|| Sg − ¯S|≤ δG
+
+> G
+
+X
+
+> g=1
+
+|Ag|
+
+= 2Bδ G .
+
+(39) Theorem 5 shows that ASymPO remains close to the naive objective when the current response scales are already balanced. The gap grows only with the within-group scale dispersion. Thus ASymPO mainly changes the objective in precisely the regime where the naive loss is unreliable: when responses in the same group have very different current negative log-probability scales. 
+
+Theorem 6 (ASymPO as response-scale normaliza-tion) . For each response g, the forward response-level loss scale induced by ASymPO is independent of Sg:
+
+Ag
+
+Sg
+
+sg( Sg) = |Ag|. (40) 
+
+For the naive loss, the corresponding response-level scale is |Ag|Sg.Proof. The ASymPO identity follows from 
+
+Sg/ sg( Sg) = 1 . The naive response-level con-tribution is AgSg, whose absolute value is |Ag|Sg
+
+because Sg > 0.Theorem 6 states the basic mechanism behind ASymPO. The naive loss allows the current re-sponse scale Sg to multiply the advantage magni-tude. ASymPO removes this multiplier in the for-ward response-level loss, while the stop-gradient denominator still allows gradients to flow through 
+
+Sg. This is why ASymPO can reduce scale-driven dominance without discarding the policy-gradient signal. 
+
+## C Complete ASymPO Algorithm and Empirical Stabilization 
+
+This appendix gives the complete learner-side ASymPO algorithm and discusses practical stabiliz-ers used in empirical implementations. ASymPO is intended for asynchronous group-relative RL where rollout workers may sample responses from a stale behavior policy, but the learner uses only current-policy probabilities. The behavior policy is used to generate text, while its token probabilities are neither stored nor used by the ASymPO update. For a prompt x, let the rollout system pro-duce a group of responses {yg}Gg=1 , where yg =(ag, 1, . . . , a g,m g ). Let rg = r(x, y g) be the reward and define the group-relative advantage 
+
+Ag = rg − 1
+
+G
+
+> G
+
+X
+
+> j=1
+
+rj . (41) 13 Algorithm 1 Scale-Balanced Policy Optimization for one learner update 
+
+Require: Current policy πθ, prompt batch B,group size G, reward function r, learning rate 
+
+η 
+
+> 1:
+
+L ← 0 
+
+> 2:
+
+for all x ∈ B do  
+
+> 3:
+
+Sample or receive responses {yg =(ag, 1, . . . , a g,m g )}Gg=1 from rollout workers  
+
+> 4:
+
+for g = 1 , . . . , G do  
+
+> 5:
+
+rg ← r(x, y g) 
+
+> 6:
+
+end for  
+
+> 7:
+
+ˆr ← G−1 PGj=1 rj 
+
+> 8:
+
+for g = 1 , . . . , G do  
+
+> 9:
+
+Ag ← rg − ˆr 
+
+> 10:
+
+for i = 1 , . . . , m g do  
+
+> 11:
+
+pg,i (θ) ← πθ(ag,i | x, a g,<i ) 
+
+> 12:
+
+end for  
+
+> 13:
+
+Sθ,g ← − m−1
+
+> g
+
+Pmg 
+
+> i=1
+
+log pg,i (θ) 
+
+> 14:
+
+L ← L + |B| −1G−1AgSθ,g / sg( Sθ,g ) 
+
+> 15:
+
+end for  
+
+> 16:
+
+end for  
+
+> 17:
+
+θ ← θ − η∇θL 
+
+> 18:
+
+return updated policy πθ
+
+For the current learner policy πθ, define 
+
+pg,i (θ) = πθ(ag,i | x, a g,<i ),Sθ,g = − 1
+
+mgmg
+
+X
+
+> i=1
+
+log pg,i (θ). (42) ASymPO minimizes 
+
+LASymPO (θ) = 1
+
+G
+
+> G
+
+X
+
+> g=1
+
+Ag
+
+Sθ,g 
+
+sg( Sθ,g ) , (43) where sg( ·) denotes the stop-gradient operator. The forward value of each normalized response scale is one, so the response-level loss inherits the zero-sum balance of the advantages. During back-propagation, however, the denominator is treated as a constant, and the update direction remains the usual policy-gradient direction: positive-advantage responses are reinforced and negative-advantage responses are suppressed. In practice, Eq. (43) is implemented at the to-ken level. While the per-response normalization balances the loss scale across responses, it does not constrain individual token probabilities, which can cause numerical instability in two regimes. For 
+
+Ag < 0, the optimizer is asked to reduce token probabilities; if a token already has pg,i (θ) ≪ 1,the factor ∂(− log p)/∂p = −1/p grows without bound, and that single token can dominate the gradi-ent. For Ag ≥ 0, tokens whose probability already approaches 1 still receive gradient updates push-ing them higher, contributing to overfitting without meaningfully improving the response. A simple stabilizer is to clip each token’s log-probability before it enters the ASymPO reduc-tion, with the clipping direction determined by the sign of the response advantage. Define bounds 
+
+plow , p high ∈ (0 , 1) . For a negative-advantage re-sponse, tokens with probability below plow are already sufficiently suppressed and should not be driven further toward zero. For a positive-advantage response, tokens with probability above 
+
+phigh are already sufficiently reinforced and should not be pushed further toward one. Concretely, 
+
+ˆℓg,i (θ) = 
+
+
+
+clip  log pg,i (θ), −∞ , log phigh 
+
+, Ag ≥ 0,
+
+clip  log pg,i (θ), log plow , +∞, Ag < 0.
+
+(44) The clipped response scale is then 
+
+ˆSθ,g = − 1
+
+mgmg
+
+X
+
+> i=1
+
+ˆℓg,i (θ). (45) Replacing Sθ,g with ˆSθ,g in Eq. (43) gives the sta-bilized objective 
+
+LASymPO -stable (θ) = 1
+
+G
+
+> G
+
+X
+
+> g=1
+
+Ag
+
+ˆSθ,g 
+
+sg( ˆSθ,g ) . (46) The clipping operates differently for the two cases. For Ag ≥ 0, clipping log p from above at log phigh means that once a token’s probability exceeds phigh , its log-probability is capped; the gra-dient through that token is identically zero because the clip sits at the boundary, and the optimizer stops reinforcing it. For Ag < 0, clipping log p
+
+from below at log plow means that once a token’s probability falls below plow , its log-probability is similarly capped and its gradient is zero, shielding the update from the 1/p explosion. In both cases, the token still participates in the response-scale av-erage ˆSθ,g , so the per-response normalization struc-ture of ASymPO is preserved; the only tokens that contribute gradient are those whose probabilities lie inside the unclipped region. This clipping scheme is simpler than the mask-ing heuristic used in earlier ASymPO stabilization 14 experiments. Masking removes confident tokens from both the numerator and denominator of the response scale, which breaks exact per-response balance. Clipping, in contrast, keeps all tokens in the reduction and produces zero gradient naturally at the boundary of the feasible region. The bounds should be chosen conservatively: typical values are plow ∈ [0 .01 , 0.05] and phigh ∈ [0 .95 , 0.99] .Monitoring the fraction of tokens that hit each clip boundary provides a useful diagnostic for whether the bounds are set too aggressively. Other standard safeguards remain compati-ble. The denominator can be floored via 
+
+sg(max { ˆSθ,g , ϵ }) to avoid large multipliers when most tokens in a response are clipped. Global gradi-ent clipping is still recommended, since per-token log-probability clipping bounds the loss scale but does not constrain parameter-space gradients. A lightweight KL or entropy regularizer can be added when further control of policy drift is desired, al-though this reintroduces an explicit regularization target and should be kept conceptually separate from the clipping stabilizer described here. 
+
+## D Supplementary Experiments 
+
+We conduct an additional experiment using DAPO-Math-17K (Yu et al., 2026) as the training-data source. The training set is constructed by randomly sampling 4k examples from DAPO-Math-17K. Un-less otherwise specified, all training and evalua-tion settings follow the main experimental setup in Section 5, including the asynchronous RL con-figuration, rollout count, sequence-length limits, learning rate, training duration, and evaluation pro-tocol. This supplementary experiment is conducted only for Qwen3-1.7B-Base. Table 4 reports the final benchmark results. The overall pattern is consistent with the main experi-ments in Section 5. The naive current-policy loss and GPG again collapse during asynchronous train-ing, while GRPO, SPO, and AsymPO produce sta-ble final checkpoints. This shows that the collapse of unbalanced current-policy training is not spe-cific to the MATH training subset used in the main experiments, and that explicit scale control remains important when the training data source is changed. Among the completed methods, the current-policy-only scaled objectives are competitive with, and in this experiment stronger than, GRPO on the aggregate metrics. For mean@8, AsymPO ob-tains the best average score, improving over GRPO from 37 .18 to 38 .66 and over SPO from 38 .13 to 
+
+38 .66 . Its gains are broad across benchmarks, with the best scores on AIME24, MATH500, AMC23, GSM8K, and Minerva-Math, while GRPO and SPO tie for the best score on AIME25. For pass@8, SPO gives the highest average score, 57 .53 , fol-lowed by AsymPO at 56 .83 and GRPO at 54 .70 .The benchmark-level results are mixed: SPO is strongest on AIME24 and ties GRPO on AIME25, while AsymPO is strongest on MATH500, GSM8K, Minerva-Math, and ties SPO on AMC23. These results reinforce the main conclusion that behavior-policy probabilities are not required for stable and competitive asynchronous RL, but they also show that the relative ranking between SPO and AsymPO can depend on the metric and data source. 15 Method AIME24 AIME25 MATH500 AMC23 GSM8K Minerva Avg. 
+
+Qwen3-1.7B-Base 
+
+Naive Loss Collapsed during training GPG Collapsed during training GRPO 16.67 23.33 85.60 65.22 94.24 42.28 54.56 
+
+SPO 16.67 23.33 84.00 63.04 94.92 41.54 53.92 AsymPO 16.67 23.33 83.60 58.70 94.09 42.65 53.17 
+
+LLaMA-3.2-3B-Instruct 
+
+Naive Loss Collapsed during training GPG Collapsed during training GRPO 23.33 6.67 70.99 47.83 93.56 34.18 46.09 SPO 26.67 7.08 67.39 45.65 92.34 32.35 45.25 AsymPO 33.33 6.67 73.39 54.35 93.48 33.94 49.19 
+
+Qwen3-4B-Base 
+
+Naive Loss Collapsed during training GPG Collapsed during training GRPO 30.00 26.67 90.40 73.91 97.73 46.69 60.90 
+
+SPO 23.33 16.67 89.60 73.91 96.89 47.97 58.06 AsymPO 30.00 20.00 88.60 73.04 96.74 44.85 58.87   
+
+> Table 3: Pass@8 accuracy on mathematical reasoning benchmarks using 8evaluation rollouts per problem. The average is computed over all six listed benchmarks. The best value within each model block among evaluated methods with final checkpoints is bolded. “Collapsed during training” indicates that the corresponding model-method training run collapsed, leaving no meaningful final checkpoint for evaluation; Figure 1 shows the Qwen3-1.7B-Base case as a representative example.
+
+Method AIME24 AIME25 MATH500 AMC23 GSM8K Minerva Avg. 
+
+Mean@8 
+
+Naive Loss Collapsed during training GPG Collapsed during training GRPO 6.25 4.58 63.55 39.37 81.77 27.53 37.18 SPO 8.75 4.58 65 38.75 81.71 30.0 38.13 AsymPO 9.58 3.33 66.92 39.69 81.79 30.65 38.66 
+
+Pass@8 
+
+Naive Loss Collapsed during training GPG Collapsed during training GRPO 16.67 16.67 82.8 65 94.47 52.57 54.7 SPO 30 16.67 84.2 67.5 94.62 52.21 57.53 
+
+AsymPO 26.67 13.33 85.4 67.5 95.15 52.94 56.83 
+
+> Table 4: Mean@8 and Pass@8 accuracy on mathematical reasoning benchmarks for Qwen3-1.7B-Base trained on a randomly sampled 4k subset of DAPO-17K. All other experimental settings follow Section 5.
+
+16

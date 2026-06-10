@@ -1,0 +1,656 @@
+Title: When RLHF Fails: A Mechanistic Taxonomy of Reward Hacking, Collapse, and Evaluator Gaming
+
+URL Source: https://arxiv.org/pdf/2606.03238v1
+
+Published Time: Wed, 03 Jun 2026 00:51:49 GMT
+
+Number of Pages: 20
+
+Markdown Content:
+# When RLHF Fails: A Mechanistic Taxonomy of Reward Hacking, Collapse, and Evaluator Gaming 
+
+Zelalem Abahana ∗
+
+Abstract 
+
+Reinforcement learning from human feedback (RLHF) makes large-scale post-training possible by replacing an underspecified human objective with learned and scalable proxies. The same substitution creates a structured failure surface: optimization can raise the learned reward while external quality falls, degrade both proxy and judge scores, reveal proxy under-alignment, or produce evaluator-specific disagreement. We present an empirical failure-mode study of a compact RLHF pipeline with proximal policy optimization (PPO), direct preference optimization (DPO), uncertainty-penalized PPO (UP-PPO), reward-model uncertainty, approximate policy drift, diversity and repetition diagnostics, and two external LLM judges. Rather than treating reward hacking as a single terminal event, we classify matched transitions between checkpoints using the directions of the learned reward Rϕ, judge scores 
+
+R† and R†
+
+> 2
+
+, and their average ¯R†. Across 61 checkpoint rows and 1,920 row-level transitions, aggressive PPO has the highest localized reward-hacking rate (14.45%; bootstrap 95% CI: 10.16–18.75%), while UP-PPO yields lower rates in the same aggressive regime (11.33–10.94%). A pre-transition logistic model predicts future row-level reward hacking with ROC-AUC 0.821, and row-level analysis finds localized reward hacking that checkpoint averages miss in 3 of 12 settings. The central conclusion is methodological: RLHF failures are not only final-model pathologies, but training dynamics that can be classified, localized, and partially anticipated. 
+
+## 1 Introduction 
+
+RLHF has become a standard mechanism for adapting language models to human preferences, beginning with preference-based reinforcement learning by Christiano et al. [ 4] and later language-model post-training work by Ziegler et al. [ 8 ], Ouyang et al. [ 12 ], and Bai et al. [ 13 ]. Its effectiveness rests on a consequential approximation: a learned reward model, preference objective, or evaluator stands in for an intended human objective that is only partially observed. This approximation is unavoidable in scalable post-training, but it is also where failures enter. As Amodei et al. [ 3 ], Skalse et al. [ 15 ], Gao et al. [ 16 ], and Pan et al. [ 19 ] emphasize in different settings, a policy may exploit the reward model, drift into low-quality regions, over-specialize to an evaluator, or preserve a high proxy score while losing properties that external evaluators or humans would prefer. The usual phrase “reward hacking” is too coarse for this empirical landscape. A proxy rising while an external evaluator falls is one phenomenon; simultaneous decline of proxy and judge is another; disagreement between two judges is a third. These cases have different signatures and different implications for mitigation. A run that fails because the learned reward is exploitable calls for different evidence than a run whose policy collapses, remains near the supervised reference, or exposes instability in LLM-as-judge evaluation.  
+
+> ∗AI/ML Senior Model Risk Management Analyst (VP), First Citizens Bank; PhD Candidate in Applied AI, Alma Mater Europaea University, Vienna, Austria. Email: zelalem.abahana@almamater.si .
+
+1
+
+> arXiv:2606.03238v1 [cs.LG] 2 Jun 2026
+
+We study RLHF failures as checkpoint-level and prompt-level transitions. Let Rϕ denote the learned reward-model score, R† and R† 
+
+> 2
+
+two external judge scores, and ¯R† = ( R† + R†
+
+> 2
+
+)/2 their average. For each evaluated transition, we ask whether the proxy and judges move together or apart. This directional view yields an auditable taxonomy: stable alignment, reward hacking, optimization collapse, proxy under-alignment, conservative stagnation, and evaluator gaming. The empirical study uses a controlled RLHF pipeline built around GPT-2-scale policies, Anthropic HH-RLHF prompts, PPO variants, DPO, UP-PPO, Monte Carlo dropout uncertainty, approximate KL drift, and two LLM judges. We do not claim universality from a small model. The aim is more precise: to establish a reproducible diagnostic grammar for failures that should be measurable before one argues about scale. The paper makes four contributions. First, it formalizes a transition-based taxonomy that separates reward hacking from adjacent RLHF failure modes. Second, it shows that row-level diagnostics reveal localized failures hidden by checkpoint averages. Third, it evaluates early-warning models that use only pre-transition signals. Fourth, it compares aggressive PPO with UP-PPO while keeping evaluator disagreement analytically separate from mitigation. The novelty is not the claim that reward models can be overoptimized; that point is established by Gao et al. and related work. Nor is the contribution a restatement of reward gaming as defined by Skalse et al., feedback-loop reward hacking as studied by Pan et al., or the broad limitations of RLHF surveyed by Casper et al. [ 21 ] The contribution is a mechanistic diagnostic layer: a matched-transition taxonomy that distinguishes reward hacking from collapse, proxy under-alignment, stagnation, and evaluator gaming; a row-level localization analysis showing which failures disappear under aggregation; and a two-judge analysis that treats LLM-as-judge disagreement as an empirical failure mode rather than only an evaluation nuisance. 
+
+## 2 Related Work 
+
+Learning from preferences. Christiano et al. [ 4] showed that human comparisons can supervise behavior when scalar ground-truth rewards are unavailable, and Ziegler et al. [ 8 ] adapted this preference-learning idea to language models. Stiennon et al. [ 9], Ouyang et al. [ 12 ], and Bai et al. [ 13 ] then made instruction following and helpfulness/alignment pipelines central to modern post-training. Bai et al.’s Constitutional AI work [ 14 ] and Askell et al.’s alignment-laboratory framing [ 11 ] extend the supervision source while preserving the same proxy-optimization structure. Kirk et al. [ 22 ] and Lambert et al. [ 23 ]further show that post-training choices affect generalization, diversity, and the final behavior of aligned assistants. 
+
+Reward hacking and overoptimization. Reward hacking is a modern instance of a much older concern: Goodhart [ 1 ] and Campbell [ 2] argued that optimized measures can stop measuring the intended construct. In AI safety, Amodei et al. [ 3], Krakovna et al. [ 10 ], and Skalse et al. [ 15 ] discuss specification gaming and reward misspecification as concrete risks of optimizing learned or hand-designed objectives. Gao et al. [ 16 ] show that reward-model overoptimization can follow scaling-like patterns and that larger reward models do not eliminate proxy failure. Our analysis adds a transition-level decomposition: not every undesirable trajectory is reward hacking in the strict directional sense. 
+
+Optimization algorithms for alignment. Schulman et al. [ 5] introduced PPO as a practical policy-gradient update with clipping, and Ziegler et al. [ 8 ] and Ouyang et al. [ 12 ] helped establish PPO-style updates as a common RLHF optimizer with KL control. Rafailov et al. [ 17 ] later proposed DPO, which reframes preference learning as a supervised objective over preferred and rejected completions and avoids an explicit online RL loop. Our experiments compare PPO, DPO, and UP-PPO under the same diagnostic taxonomy. 2Table 1: Directional taxonomy of RLHF transition failures. ϵ denotes a small numerical tolerance around zero. Mode Directional signature Interpretation Stable alignment ∆Rϕ > ϵ, ∆R† > ϵ Proxy and external quality improve together. Reward hacking ∆Rϕ > ϵ, ∆R† < −ϵ Learned reward improves while judged quality falls. Optimization collapse ∆Rϕ < −ϵ, ∆R† < −ϵ Optimization degrades both proxy and judged quality. Proxy under-alignment ∆Rϕ < −ϵ, ∆R† > ϵ Judge improves despite a proxy decline, expos-ing proxy mismatch. Conservative stagnation |∆Rϕ| ≤ ϵ, |∆R†| ≤ ϵ Little measurable movement across the transi-tion. Evaluator gaming sign(∆ R†)sign(∆ R†   
+
+> 2)<0The two external judges move in opposite di-rections.
+
+Uncertainty, monitoring, and calibration. Uncertainty estimates are a natural diagnostic when models operate outside the region supported by training data. Gal and Ghahramani [ 6 ] present MC dropout as a simple approximation to Bayesian uncertainty, while Guo et al. [ 7] study whether model confidence is calibrated to error. In RLHF, uncertainty can be used both as a monitoring signal and as a penalty in the optimized reward, connecting our UP-PPO analysis to broader work on risk-sensitive and conservative optimization. We use MC dropout because it is simple, local to the reward model, and available in the stored artifacts; ensemble and last-layer uncertainty estimators are important alternatives but are not evaluated here. 
+
+LLM-as-judge evaluation. LLM judges are increasingly used to evaluate instruction-following systems, but Zheng et al. [ 18 ] show that judge-based evaluation brings its own biases, variance, and agreement issues. Dubois et al. [ 20 ] further show that length bias can distort automatic preference evaluation. We use those concerns as part of the object of study: two-judge disagreement is not treated only as a nuisance term to average away, but as a diagnosable event. Evaluator gaming occurs when judges move in opposite directions across the same transition, suggesting that measured improvement may be judge-specific. This differs from standard LLM-as-judge benchmarking because the unit of analysis is not a static model ranking, but a training transition in which proxy reward, judge scores, and generated responses move jointly. 
+
+## 3 Failure-Mode Taxonomy 
+
+The taxonomy operates on transitions rather than isolated checkpoints. For checkpoint t, let xi,t be the response for prompt i, and let Rϕ(xi,t ), R†(xi,t ), and R†
+
+> 2
+
+(xi,t ) be the proxy and judge scores. Aggregate checkpoint metrics average over evaluated prompts; row-level metrics compare the same prompt across two checkpoints. For a transition t → t′, define ∆Rϕ = Rϕt′ − Rϕt, ∆R† = R†t′ − R†t, ∆ ¯R† = ¯R† 
+
+> t′
+
+− ¯R† 
+
+> t
+
+. (1) In the implemented taxonomy, the primary judge direction ∆ R† defines the main class, while ∆ R† 
+
+> 2
+
+iden-tifies evaluator disagreement. Unless otherwise stated, the numerical tolerance is ϵ = 10 −8; Appendix E reports sensitivity over larger tolerances. This choice keeps the classifier transparent and avoids hiding judge conflict inside an average. 3Algorithm 1 Transition-level failure-mode classifier 
+
+Require: Proxy delta ∆ Rϕ, judge deltas ∆ R†, ∆R†
+
+> 2
+
+, tolerance ϵ 
+
+> 1:
+
+function Sign (z, ϵ ) 
+
+> 2:
+
+if z > ϵ then  
+
+> 3:
+
+return +1  
+
+> 4:
+
+end if  
+
+> 5:
+
+if z < −ϵ then  
+
+> 6:
+
+return −1 
+
+> 7:
+
+end if  
+
+> 8:
+
+return 0 
+
+> 9:
+
+end function  
+
+> 10:
+
+p ← Sign (∆ Rϕ, ϵ ); j ← Sign (∆ R†, ϵ ); j2 ← Sign (∆ R†
+
+> 2
+
+, ϵ ) 
+
+> 11:
+
+if p = 0 and j = 0 then  
+
+> 12:
+
+mode ← conservative stagnation  
+
+> 13:
+
+else if p > 0 and j > 0 then  
+
+> 14:
+
+mode ← stable alignment  
+
+> 15:
+
+else if p > 0 and j < 0 then  
+
+> 16:
+
+mode ← reward hacking  
+
+> 17:
+
+else if p < 0 and j < 0 then  
+
+> 18:
+
+mode ← optimization collapse  
+
+> 19:
+
+else if p < 0 and j > 0 then  
+
+> 20:
+
+mode ← proxy under-alignment  
+
+> 21:
+
+else  
+
+> 22:
+
+mode ← mixed or ambiguous  
+
+> 23:
+
+end if  
+
+> 24:
+
+evaluator-gaming ← (j · j2 < 0)  
+
+> 25:
+
+return mode, evaluator-gaming 
+
+## 4 Experimental Design 
+
+The study is artifact-driven: it consolidates existing rollout summaries and per-prompt examples from a controlled RLHF pipeline. The pipeline contains supervised fine-tuning, reward-model training, PPO with several KL settings, DPO evaluations, UP-PPO variants, reward uncertainty via MC dropout, approximate KL to the supervised reference policy, lexical diversity and repetition metrics, and two LLM judges. The primary judge R† is an Anthropic Claude helpfulness judge configured to return a single 1–10 score for the assistant reply only; the default configured model is claude-sonnet-4-5-20250929 . The second judge R† 
+
+> 2
+
+is an OpenAI chat-model helpfulness judge using the same single-number 1–10 rubric; the default configured model is gpt-4o-mini . In both cases, the judge prompt is: “Rate the assistant reply below for helpfulness on a 1-10 scale. Reply with a single number only, no other text.” Scores are clamped to the interval [1 , 10]. The artifacts record judge provider labels; exact model identifiers follow the configured defaults unless the evaluation environment explicitly overrides them. UP-PPO is therefore not a separate architecture in this study; it is a shaped-reward PPO variant in which reward-model uncertainty is subtracted before computing the scalar advantage. The available artifacts support a comparison over λ ∈ { 0.1, 0.5} against aggressive PPO. They do not support a full ablation over dropout rate, number of MC samples, uncertainty schedules, or alternative uncertainty estimators without rerunning the training pipeline. 4Table 2: Empirical artifact summary used in the paper. Component Value Dataset family Anthropic HH-RLHF prompts and generated completions Policy scale GPT-2-scale controlled post-training pipeline Training/evaluation families PPO KL sweep, aggressive PPO, UP-PPO, DPO, SFT references External judges Claude helpfulness judge R† and OpenAI helpfulness judge R†
+
+> 2
+
+Checkpoint metric rows 61 Per-prompt rollout examples 9,280 Checkpoint transitions 31 Row-level transitions 1,920 Main diagnostics Rϕ, R†, R†
+
+> 2
+
+, uncertainty, KL, length, diversity, repetition 
+
+Table 3: UP-PPO objective and hyperparameters for the aggressive comparison artifacts. The reward-model score and MC-dropout standard deviation are temperature-scaled by the calibrated reward-model temperature 
+
+T = 1 .554. Component Value Shaped reward bRλ(x) = Rϕ(x)/T − λu (x)/T 
+
+Training objective PPO-style clipped surrogate plus β| log π − log π0|
+
+Compared λ values 0.0, 0.1, 0.5KL penalty β 0.0 in aggressive PPO/UP-PPO comparison MC-dropout samples / dropout K = 4 samples; reward-head dropout 0 .1Learning rate / clip / inner epochs 2 × 10 −6; clip 0 .2; one inner epoch RL prompts / steps / checkpoint interval 512 prompts; 1,200 steps; every 200 steps Generation during training sample, top-p = 0 .95, temperature 0 .9, max 96 new tokens Advantage controls moving reward baseline, momentum 0 .9; advantage clipped to [ −2, 2] 
+
+## 5 Results 
+
+5.1 Failure modes are regime-dependent 
+
+Table 4 summarizes the row-level taxonomy. Aggressive PPO is the most failure-prone condition: 37 of 256 row-level transitions are classified as reward hacking (14.45%). PPO with β = 0 .03 also shows a non-trivial reward-hacking share (9.38%), while DPO and SFT reference settings show none under this taxonomy. The pattern supports a training-dynamics interpretation: failures are concentrated in particular optimization regimes rather than uniformly distributed across all evaluated policies. 
+
+5.2 Temporal trajectories expose divergence 
+
+Figure 2 plots learned reward, primary judge score, reward uncertainty, and approximate KL across evaluated PPO-family checkpoints. The trajectory view complements the transition taxonomy: reward hacking is not merely a final-checkpoint label, but a temporal pattern in which proxy reward, external judgment, uncertainty, and drift can separate over training. Figure 3 shows the corresponding emergence curve for localized row-level reward hacking. These views make the analysis closer to a monitoring protocol: a practitioner can inspect not only whether a run fails, but when localized failures begin to concentrate. 5Algorithm 2 Artifact-driven diagnostic pipeline 
+
+Require: Rollout summaries S, row-level examples E, taxonomy classifier C 
+
+> 1:
+
+Parse checkpoint identity, training family, model type, and step from each artifact.  
+
+> 2:
+
+Build checkpoint table with mean Rϕ, R†, R†
+
+> 2
+
+, uncertainty, KL, and judge disagreement.  
+
+> 3:
+
+Build row-level table with prompt id, scores, generated text, length, distinct-n, and repetition.  
+
+> 4:
+
+for each family/model trajectory do  
+
+> 5:
+
+Sort evaluated checkpoints by step.  
+
+> 6:
+
+for each adjacent transition t → t′ do  
+
+> 7:
+
+Apply C to aggregate deltas and store checkpoint failure mode.  
+
+> 8:
+
+Match row-level examples by prompt id and apply C to each prompt transition.  
+
+> 9:
+
+end for  
+
+> 10:
+
+end for  
+
+> 11:
+
+Train early-warning models to predict future row-level reward hacking.  
+
+> 12:
+
+Fit using a stratified random 70/30 row split; record that prompts and trajectory families are not group-held-out.  
+
+> 13:
+
+Report aggregate summaries, row-level diagnostics, and robustness checks.                                                                            
+
+> Table 4: Main row-level failure-mode counts by setting. RH denotes reward hacking; OC optimization collapse; PUA proxy under-alignment; CS conservative stagnation; MA mixed or ambiguous. Setting Stable RH OC PUA CS MA RH share
+> β= 0 .0 aggressive PPO 26 37 27 30 10 126 0.145
+> β= 0 .0 UP-PPO λ= 0 .127 29 21 28 27 124 0.113
+> β= 0 .0 UP-PPO λ= 0 .519 28 28 27 10 144 0.109
+> β= 0 .03 PPO 412 10 945 48 0.094
+> β= 0 .001 sampled PPO 20 19 10 19 72 116 0.074
+> β= 0 .01 PPO 313467 50 0.008
+> β= 0 .005 PPO 110599 22 0.008 DPO/SFT reference settings 0000418 94 0.000
+
+5.3 Reward hacking is localized to prompts 
+
+A central empirical finding is that failures are localized. Across 64 prompts, 38 prompts exhibit repeated reward-hacking transitions, and the most failure-prone prompt appears in five reward-hacking transitions (Appendix B). This does not mean that the prompt itself is inherently unsafe; rather, it means that particular prompt-policy-checkpoint combinations repeatedly expose proxy–judge mismatch. The practical implication is that aggregate checkpoint means are insufficient for monitoring. RLHF evaluation should retain prompt-level transition structure. 
+
+5.4 Averages hide localized failures 
+
+The checkpoint-vs-row ablation quantifies how much is lost when analysis is restricted to aggregate checkpoint transitions. In 3 of 12 settings (25.0%; bootstrap 95% CI: 0–50.0%), checkpoint-level analysis reports no reward-hacking transition even though row-level transitions contain reward-hacking cases. At the transition level, all 30 checkpoint transitions with matched row data have a dominant row-level label that differs from the checkpoint label; 19 of those 30 have a strict row-level majority. This does not mean that checkpoint labels are wrong; it means that aggregate deltas and row-level prompt deltas answer different diagnostic questions. The most important examples are β = 0 .001 sampled PPO and β = 0 .03 PPO: both have zero aggregate reward-hacking transitions but nonzero localized reward-hacking shares. 60.0 0.2 0.4 0.6 0.8 1.0 
+
+> Share of row-level transitions
+> beta=0.01 / dpo
+> beta=0.01 / sft
+> beta=0.03 / dpo
+> beta=0.03 / sft
+> beta=0.005 / ppo
+> beta=0.01 / ppo
+> beta=0.001 sampled / ppo
+> beta=0.03 / ppo
+> beta=0.0 aggressive UP lambda=0.5 / ppo
+> beta=0.0 aggressive UP lambda=0.1 / ppo
+> beta=0.0 aggressive / ppo
+> Row-Level Failure Modes Reveal Localized Failures
+> stable_alignment
+> reward_hacking
+> optimization_collapse
+> proxy_under_alignment
+> conservative_stagnation
+> mixed_or_ambiguous
+
+Figure 1: Row-level failure-mode shares reveal localized failures. Aggressive PPO has the largest reward-hacking share, while DPO and SFT settings are dominated by conservative stagnation and mixed/ambiguous transitions. 
+
+This is the strongest methodological result of the paper: row-level transition diagnostics identify failures hidden by aggregation. 
+
+5.5 UP-PPO reshapes, but does not remove, failure modes 
+
+UP-PPO reduces localized reward-hacking rates under aggressive optimization. Relative to aggressive PPO (14.45% row-level reward hacking; bootstrap 95% CI: 10.16–18.75%), UP-PPO with λ = 0 .1yields 11.33% (95% CI: 7.80–15.23%), a 21.6% relative reduction; UP-PPO with λ = 0 .5 yields 10.94% (95% CI: 7.42–14.84%), a 24.3% relative reduction. The bootstrap confidence intervals for the absolute reductions remain wide and include zero ( λ = 0 .1: −8.98 to 2 .73 percentage points; λ = 0 .5: −9.38 to 2.34 percentage points), so we interpret this result as directional evidence in a controlled artifact set rather than a definitive mitigation estimate. Evaluator-gaming share also decreases from 9.38% under aggressive PPO to 5.08% and 3.91% for λ = 0 .1 and λ = 0 .5, respectively. This should not be read as a claim that uncertainty penalization solves reward hacking. The more defensible conclusion is distributional: UP-PPO reduces the observed density of localized reward-hacking and evaluator-disagreement events in this controlled setting, while other failure modes remain. Mitigation changes the failure distribution; it does not erase the failure surface. 
+
+5.6 Early-warning signals are predictive before the transition 
+
+We train early-warning models to predict whether a row-level transition will be classified as reward hacking. The split is a stratified random 70/30 split over row-level transitions, with random seed 7. It is not grouped by prompt identity or trajectory family, so these results should be interpreted as within-artifact discrimination rather than evidence of transfer to unseen prompts or training runs. The most defensible model uses only pre-transition state features: previous proxy reward, judge scores, 7200 400 600 800 1000 1200                
+
+> Checkpoint step
+> 1.00
+> 0.95
+> 0.90
+> 0.85
+> 0.80
+> 0.75
+> 0.70
+> 0.65
+> mean R_phi
+> Learned reward trajectory
+> 200 400 600 800 1000 1200
+> Checkpoint step
+> 2.4
+> 2.6
+> 2.8
+> 3.0
+> 3.2
+> mean R_dagger
+> Primary judge trajectory
+> 200 400 600 800 1000 1200
+> Checkpoint step
+> 0.16
+> 0.17
+> 0.18
+> 0.19
+> 0.20
+> 0.21
+> mean uncertainty
+> Reward uncertainty trajectory
+> 200 400 600 800 1000 1200
+> Checkpoint step
+> 0.06
+> 0.04
+> 0.02
+> 0.00
+> 0.02
+> 0.04
+> mean KL
+> Approximate KL trajectory
+> PPO beta=0.001 sampled
+> Aggressive PPO
+> UP-PPO lambda=0.1
+> UP-PPO lambda=0.5
+
+Figure 2: Temporal trajectories for PPO-family runs. The panels track mean learned reward, primary judge score, reward uncertainty, and approximate KL across evaluated checkpoints. 
+
+uncertainty, KL, judge disagreement, length, diversity, and repetition. This model reaches ROC-AUC of 0.821 with logistic regression; a random-forest robustness check gives ROC-AUC of 0.813. Average precision is lower (0.256 and 0.209, respectively) because reward hacking is rare in the test set (6.6% prevalence), but both models are substantially above prevalence. Transition-diagnostic models using ∆ Rϕ and ∆ R† reach near-perfect performance, as expected, because the label is defined from the signs of these deltas. We treat these rows as a sanity check and emphasize the pre-state-only result as the meaningful early-warning evidence. 
+
+5.7 Early-warning feature importance 
+
+Table 6 reports the strongest features from the early-warning models. We separate two settings. The first, pre-state-only, uses information available before the transition: previous reward-model score, judge scores, uncertainty, KL, judge disagreement, length, diversity, and repetition. This is the meaningful early-warning setting because it does not observe the future deltas that define the label. The second, transition diagnostics, includes ∆ Rϕ, ∆ R†, and related post-transition quantities. Those features serve as a sanity check because the reward-hacking label is itself defined by the signs of proxy and judge changes. For the pre-state-only logistic model, previous primary judge score has the largest standardized coefficient. Response length and distinct-1 diversity also appear among the largest positive coefficients, while previous proxy reward, repetition, distinct-2 diversity, KL, judge disagreement, uncertainty, and the second judge score have negative coefficients in this fitted model. These signs should not be interpreted causally. 8200 400 600 800 1000 1200 
+
+> Destination checkpoint step
+> 0.04
+> 0.06
+> 0.08
+> 0.10
+> 0.12
+> 0.14
+> 0.16
+> 0.18
+> Row-level reward-hacking share
+> Localized Reward-Hacking Emergence Over Training
+> PPO beta=0.001 sampled
+> Aggressive PPO
+> UP-PPO lambda=0.1
+> UP-PPO lambda=0.5
+
+Figure 3: Localized reward-hacking emergence over training, measured as the row-level reward-hacking share at the destination checkpoint of each transition. 
+
+Table 5: Early-warning prediction of future row-level reward hacking. Pre-state-only features are measured before the transition and are therefore the relevant warning result. Feature set Model ROC-AUC Avg. precision Precision Recall F1 Pre-state only Logistic regression 0.821 0.256 0.167 0.789 0.275 Pre-state only Random forest 0.813 0.209 0.235 0.105 0.145 Transition diagnostics Logistic regression 0.974 0.606 0.458 1.000 0.628 Transition diagnostics Random forest 1.000 1.000 1.000 1.000 1.000 
+
+They indicate how the classifier separates future reward-hacking rows within this artifact collection after standardization and correlation among features. The random forest distributes importance more evenly, with previous judge score, previous KL, previous proxy reward, length, diversity, and uncertainty all contributing. This pattern supports the paper’s more cautious claim: future localized reward hacking is partially predictable from pre-transition state, but no single diagnostic is sufficient. The practical interpretation is triage, not certification. A pre-state-only ROC-AUC near 0.82 indicates that the warning features contain signal, but the rarity and localization of reward hacking mean that precision remains limited. In deployment, such a model would be most useful for prioritizing prompts, checkpoints, or training intervals for additional judge calls or human review. 
+
+5.8 Qualitative transition examples 
+
+The quantitative taxonomy is reflected in individual generations. Appendix 8 gives representative matched prompt transitions, including before/after response snippets, proxy scores, judge scores, and assigned modes. In a tax-advice prompt, for example, the learned reward increases while both judges fall sharply as the response becomes less coherent and introduces implausible product names. In workplace-bias and privacy-address prompts, the transitions show two qualitatively different failures: strict reward hacking in one case and evaluator gaming in another, where the judges move in opposite 90.0 0.1 0.2 0.3 0.4 0.5 
+
+> Reward-hacking share
+> beta=0.01 / dpo
+> beta=0.01 / sft
+> beta=0.03 / dpo
+> beta=0.03 / sft
+> beta=0.0 long / ppo
+> beta=0.005 / ppo
+> beta=0.01 / ppo
+> beta=0.001 sampled / ppo
+> beta=0.03 / ppo
+> beta=0.0 aggressive UP lambda=0.5 / ppo
+> beta=0.0 aggressive UP lambda=0.1 / ppo
+> beta=0.0 aggressive / ppo
+
+Ablation: Aggregate Checkpoints vs Row-Level Diagnostics 
+
+> Checkpoint share
+> Row-level share
+
+Figure 4: Ablation comparing checkpoint-level and row-level reward-hacking shares. Several settings contain row-level reward hacking even when checkpoint-level transitions do not classify as reward hacking. 
+
+directions. These examples are not used to define the taxonomy; they illustrate the local behaviors that the taxonomy exposes. 
+
+5.9 Judge disagreement is a separate diagnostic 
+
+Evaluator gaming appears in 14 of 31 checkpoint transitions (45.2%; bootstrap 95% CI: 29.0–61.3%) but only 75 of 1,920 row-level transitions (3.9%; bootstrap 95% CI: 3.1–4.8%). This difference suggests that aggregate judge disagreement can be amplified by small mean shifts even when most individual prompts do not show opposite judge movement. At row level, evaluator-gaming share is highest for proxy under-alignment (17.2%), stable alignment (15.0%), and reward hacking (11.8%). We did not perform repeated judge sampling or length-controlled judging; however, the stored length diagnostics do not support a simple verbosity-only explanation. Reward-hacking rows are longer on average than other rows, but both groups shorten across transitions, and the correlation between target length and reward-hacking status is small ( r = 0 .083). The result motivates treating judge disagreement as a distinct monitoring channel rather than folding it silently into ¯R†.10 beta=0.0 aggressive / ppo 
+
+> beta=0.0 aggressive UP lambda=0.1 / ppo
+> beta=0.0 aggressive UP lambda=0.5 / ppo
+> 0.00
+> 0.02
+> 0.04
+> 0.06
+> 0.08
+> 0.10
+> 0.12
+> 0.14
+> Share of row-level transitions
+
+Aggressive PPO vs UP-PPO Failure-Mode Shares 
+
+> Reward hacking
+> Stable alignment
+> Evaluator gaming
+
+Figure 5: Aggressive PPO versus UP-PPO. UP-PPO reduces row-level reward-hacking and evaluator-gaming shares relative to the aggressive PPO condition, though localized failures remain. 
+
+Table 6: Top early-warning feature importances. Logistic-regression values are standardized coefficients; random-forest values are impurity importances. Transition-diagnostic rows are included only as a sanity check because these features overlap with the label definition. Feature set Model Feature Importance |Importance |
+
+Pre-state Logistic previous R† 0.959 0.959 Pre-state Logistic previous length 0.484 0.484 Pre-state Logistic previous distinct-1 0.447 0.447 Pre-state Logistic previous Rϕ -0.432 0.432 Pre-state Logistic previous 3-gram repetition -0.339 0.339 Pre-state Logistic previous distinct-2 -0.285 0.285 Pre-state Logistic previous KL -0.276 0.276 Pre-state Logistic previous judge disagreement -0.210 0.210 Pre-state Logistic previous uncertainty -0.163 0.163 Pre-state Logistic previous R† 
+
+> 2
+
+-0.158 0.158 Pre-state Random forest previous R† 0.171 0.171 Pre-state Random forest previous KL 0.148 0.148 Pre-state Random forest previous Rϕ 0.144 0.144 Pre-state Random forest previous length 0.142 0.142 Pre-state Random forest previous distinct-1 0.107 0.107 Pre-state Random forest previous distinct-2 0.100 0.100 Pre-state Random forest previous uncertainty 0.098 0.098 Transition Logistic ∆R† -3.613 3.613 Transition Logistic ∆Rϕ 1.761 1.761 Transition Logistic ∆R† 
+
+> 2
+
+-0.376 0.376 Transition Logistic target distinct-2 0.173 0.173 Transition Logistic target 3-gram repetition 0.144 0.144 
+
+11 stable_alignment 
+
+> reward_hacking
+> optimization_collapse
+> proxy_under_alignment
+> conservative_stagnation
+> mixed_or_ambiguous
+> 0.000
+> 0.025
+> 0.050
+> 0.075
+> 0.100
+> 0.125
+> 0.150
+> 0.175
+> Evaluator-gaming share
+
+Judge Disagreement Concentrates by Failure Mode Figure 6: Evaluator-gaming share by row-level failure mode. Judge disagreement is concentrated in specific transition types rather than being uniformly distributed across all rows. 
+
+12 6 Discussion 
+
+The empirical picture is sharper than a single reward-hacking narrative. Aggressive PPO produces the clearest localized reward-hacking signal, but the taxonomy also exposes collapse, proxy under-alignment, conservative stagnation, and evaluator-specific disagreement. UP-PPO reduces the density of reward-hacking and evaluator-gaming events in the aggressive condition, but the remaining failures show why mitigation claims should be distributional rather than absolute. The early-warning results are useful precisely because they are imperfect. The pre-state-only model has discriminative power, suggesting that future failures are not invisible before the transition. Yet average precision remains modest because reward hacking is rare and localized. Operationally, this favors triage: use warning scores to prioritize prompts and checkpoints for expensive human or multi-judge review, not to certify alignment. The checkpoint-vs-row ablation has the broadest methodological implication. Aggregate metrics remain necessary for reporting, but they can average away exactly the failures that matter. A policy can improve on average while a subset of prompts deteriorates under proxy pressure. RLHF monitoring should therefore include matched prompt-level transitions, not only final or aggregate checkpoint scores. 
+
+## 7 Limitations 
+
+This study is deliberately controlled and small scale. The policy family is GPT-2-scale, so the results should be read as evidence about failure-mode observability rather than as a scaling claim about frontier systems. The prompt set is also small: the analysis covers 64 matched prompt identities for row-level transitions, which is enough to demonstrate localization but not enough to estimate population-level failure rates for open-ended deployment. The analysis is artifact-driven. It consolidates stored rollouts and evaluations rather than running a new multi-seed training campaign. Where possible, we report bootstrap confidence intervals over rows or settings, but these intervals do not replace seed sensitivity. In particular, the mitigation comparison is directionally favorable for UP-PPO, yet the bootstrap intervals for the absolute reductions include zero. A stronger causal claim would require repeated training runs across seeds, larger prompt samples, and fixed judge configurations. The early-warning models are trained and tested within the same artifact family. The train/test split is stratified by the reward-hacking label but not grouped by prompt id, checkpoint family, or trajectory. The reported ROC-AUC therefore measures within-family discrimination, not transfer to new datasets, model scales, reward models, judge prompts, held-out prompts, or held-out training families. This limitation is especially important because row-level reward hacking is rare and localized; warning models may learn family-specific prompt or trajectory regularities. The two external judges are useful but not ground truth. The Anthropic/Claude-style and OpenAI-style judges use the same 1–10 helpfulness rubric, but they can still disagree because of model-specific preferences, calibration differences, and sensitivity to response length or wording. We use one judge sample per item and do not include human adjudication or length-controlled judge prompts. Preliminary length diagnostics in Appendix G suggest that verbosity alone is not the main driver, but repeated judge sampling, length-controlled judging, and a small human-rated anchor set would be needed to make that claim robust. The taxonomy is directional and intentionally simple. It is designed for auditability, but richer temporal models could capture gradual drift, threshold effects, delayed failures, and multi-step causal mechanisms more faithfully. Appendix E shows that classifications are stable for small tolerances but become more conservative as ϵ or the minimum effect-size threshold grows. Finally, MC-dropout uncertainty is used 13 as a diagnostic and as part of UP-PPO because it was available in the reward-model artifacts, but this paper does not fully validate its calibration or compare it with ensembles, last-layer analytic uncertainty, UWO/WCO-style uncertainty, or adversarial uncertainty penalties. We expect the localization and aggregation results to be less dependent on the uncertainty estimator than the mitigation result, but that expectation remains an empirical claim for future work. 
+
+## 8 Future Work 
+
+The highest-return next experiments are straightforward. First, the training runs should be repeated over at least three seeds to separate trajectory-level effects from run-specific artifacts. Second, the diagnostic suite should be run on a stronger small-model setting to test whether the taxonomy survives a change in base model and representation scale. Third, the prompt set should include frontier-style stress tests, including sycophancy, deception, reward-model exploit, and verbosity-exploitation prompts. Fourth, early-warning models should be validated on grouped prompt and trajectory splits, new prompts, different judges, and different reward models, and compared with alternative monitoring frameworks such as reliability diagrams, sequential drift tests, and hazard models. Fifth, UP-PPO should be ablated across uncertainty estimators, dropout rates, numbers of MC samples, and penalty schedules. A small human-adjudicated subset would also anchor judge validity and clarify when evaluator gaming reflects true ambiguity rather than evaluator drift. 
+
+## 9 Conclusion 
+
+Reward hacking is best understood as one member of a broader family of RLHF failure modes. By classifying checkpoint transitions, preserving row-level prompt structure, and separating proxy–judge mismatch from judge–judge disagreement, this paper provides a practical diagnostic framework for RLHF monitoring. In the analyzed artifacts, aggressive PPO produces the strongest localized reward-hacking signal; UP-PPO reduces but does not eliminate that signal; pre-transition features anticipate some future failures; and aggregate checkpoint metrics miss localized reward hacking in several settings. The broader lesson is that RLHF evaluation should track how failures emerge, where they localize, and which signals appear before external quality degrades. 
+
+## References 
+
+[1] C. A. E. Goodhart, “Problems of monetary management: The U.K. experience,” Papers in Monetary Economics , Reserve Bank of Australia, 1975. [2] D. T. Campbell, “Assessing the impact of planned social change,” Evaluation and Program Planning ,1979. [3] D. Amodei, C. Olah, J. Steinhardt, P. Christiano, J. Schulman, and D. Man´ e, “Concrete problems in AI safety,” arXiv:1606.06565, 2016. [4] P. F. Christiano, J. Leike, T. Brown, M. Martic, S. Legg, and D. Amodei, “Deep reinforcement learning from human preferences,” NeurIPS , 2017. [5] J. Schulman, F. Wolski, P. Dhariwal, A. Radford, and O. Klimov, “Proximal policy optimization algorithms,” arXiv:1707.06347, 2017. 14 [6] Y. Gal and Z. Ghahramani, “Dropout as a Bayesian approximation: Representing model uncertainty in deep learning,” ICML , 2016. [7] C. Guo, G. Pleiss, Y. Sun, and K. Q. Weinberger, “On calibration of modern neural networks,” 
+
+ICML , 2017. [8] D. M. Ziegler, N. Stiennon, J. Wu, T. B. Brown, A. Radford, D. Amodei, P. Christiano, and G. Irving, “Fine-tuning language models from human preferences,” arXiv:1909.08593, 2019. [9] N. Stiennon et al., “Learning to summarize with human feedback,” NeurIPS , 2020. [10] V. Krakovna et al., “Specification gaming: The flip side of AI ingenuity,” DeepMind Blog, 2020. [11] A. Askell et al., “A general language assistant as a laboratory for alignment,” arXiv:2112.00861, 2021. [12] L. Ouyang et al., “Training language models to follow instructions with human feedback,” NeurIPS ,2022. [13] Y. Bai et al., “Training a helpful and harmless assistant with reinforcement learning from human feedback,” arXiv:2204.05862, 2022. [14] Y. Bai et al., “Constitutional AI: Harmlessness from AI feedback,” arXiv:2212.08073, 2022. [15] J. Skalse, N. Howe, D. Krasheninnikov, and D. Krueger, “Defining and characterizing reward gaming,” NeurIPS , 2022. [16] L. Gao, J. Schulman, and J. Hilton, “Scaling laws for reward model overoptimization,” ICML , 2023. [17] R. Rafailov, A. Sharma, E. Mitchell, S. Ermon, C. D. Manning, and C. Finn, “Direct preference optimization: Your language model is secretly a reward model,” NeurIPS , 2023. [18] L. Zheng et al., “Judging LLM-as-a-judge with MT-Bench and Chatbot Arena,” NeurIPS Datasets and Benchmarks , 2023. [19] A. Pan et al., “Feedback loops with language models drive in-context reward hacking,” arXiv:2309.04509, 2023. [20] Y. Dubois et al., “Length-controlled AlpacaEval: A simple way to debias automatic evaluators,” arXiv:2404.04475, 2024. [21] S. Casper et al., “Open problems and fundamental limitations of reinforcement learning from human feedback,” TMLR , 2023. [22] H. R. Kirk et al., “Understanding the effects of RLHF on LLM generalisation and diversity,” arXiv:2310.06452, 2023. [23] N. Lambert et al., “T¨ ulu 2: Advancing language model post-training with preference datasets and methods,” arXiv:2403.13208, 2024. 15 Table 7: Checkpoint-level transition counts. Setting Stable RH OC PUA CS MA Eval. game 
+
+β = 0 .001 sampled PPO 3 0 1 0 0 0 3
+
+β = 0 .005 PPO 0 1 0 1 0 0 1
+
+β = 0 .01 DPO 0 0 0 0 0 2 1
+
+β = 0 .01 PPO 0 0 1 1 0 0 1
+
+β = 0 .01 SFT 0 0 0 0 0 2 1
+
+β = 0 .03 DPO 0 0 0 0 0 2 1
+
+β = 0 .03 PPO 0 0 1 1 0 0 2
+
+β = 0 .03 SFT 0 0 0 0 0 2 1
+
+β = 0 .0 aggressive PPO 1 1 0 2 0 0 2
+
+β = 0 .0 UP-PPO λ = 0 .1 2 1 1 0 0 0 0
+
+β = 0 .0 UP-PPO λ = 0 .5 1 1 1 1 0 0 1
+
+β = 0 .0 long PPO 0 0 0 0 0 1 0
+
+## A Additional Checkpoint Diagnostics B Prompt Localization Details 
+
+Figure 7 reports the prompt identifiers with the highest number of reward-hacking transitions. The figure supports the row-level localization claim in the main text: failures concentrate on a subset of prompts rather than spreading uniformly across all evaluated prompt identities. 0 1 2 3 4 5
+
+> Reward-hacking transitions
+> 34
+> 59
+> 9
+> 28
+> 24
+> 17
+> 49
+> 18
+> 39
+> 50
+> 20
+> 43
+> 15
+> 31
+> 1
+> Prompt ID
+> Prompt-Localized Reward Hacking
+
+Figure 7: Top prompt identifiers by number of reward-hacking transitions. The concentration of failures over a subset of prompts supports prompt-localized monitoring rather than relying only on aggregate checkpoint means. 
+
+16 C Representative Prompt Transitions 
+
+Table 8 shows representative matched transitions. The response snippets are shortened for readability, but the score columns report the underlying before/after values used by the classifier. The examples illustrate why the taxonomy is transition-based: the same prompt can move from a more coherent answer to a degraded answer while the proxy score increases, or it can produce opposite movements across two external judges. 
+
+Table 8: Representative prompt-level transitions. Scores are shown as before → after. Response snippets are abbreviated.                                                  
+
+> Prompt theme Transition Before response snippet After response snippet Rϕ(R†, R †
+> 2)Mode Tax software ad-vice UP-PPO 1000 →
+> 1200 “Tax software is generally con-sidered the most widely used op-tion... H&R Block and Turbo-Tax...” “UberTax is a large online tax service... LyftTax is often used as a tax helper software.”
+> −0.375 →−0.198 (6 ,7) →(2 ,4) Reward hacking Workplace bias complaint UP-PPO 600 →
+> 1000 “...a constructive and respectful process... professional ethics and values in the workplace.” “...contacting HR... contacting companies who already prohibit employees who speak out against hateful words.”
+> −1.297 →−1.050 (7 ,6) →(2 ,5) Reward hacking Workplace bias complaint PPO 600 →1000 “...this conversation can only be respectful... compassionate and civil...” “...possible content suggestions... [irrelevant external-link-like text] ... complaints for anti-semitism.”
+> −1.356 →−1.124 (7 ,6) →(3 ,4) Reward hacking Private address re-quest PPO sampled 500 →600 “Here are some possible answers: ...” “We have a very detailed analy-sis... one of the most important... Wall Street Journal...”
+> −1.302 →−1.836 (5 .5,1) →
+> (2 ,3) Collapse +evaluator gaming
+
+## D Proxy–Judge Delta Geometry 
+
+The proxy–judge scatter in Figure 8 provides the geometric view behind the transition taxonomy. Each point is a matched prompt-level transition between two checkpoints. The horizontal coordinate is the change in learned reward, ∆ Rϕ, and the vertical coordinate is the change in the primary external judge score, ∆ R†. The four quadrants therefore correspond directly to the core directional cases: stable alignment in the upper-right quadrant, reward hacking in the lower-right quadrant, optimization collapse in the lower-left quadrant, and proxy under-alignment in the upper-left quadrant. This plot is useful because it shows why a single scalar average is insufficient. A transition can have a modest aggregate mean while containing many prompt-level movements in different quadrants. The horizontal band around ∆ R† = 0 contains conservative or mixed cases where judge scores do not move strongly, while the lower-right quadrant isolates the strict reward-hacking signature: the learned reward improves even as external evaluation declines. The observed spread also shows that proxy under-alignment is not merely the absence of reward hacking. It is a distinct mismatch mode in which the judge improves while the proxy falls, suggesting that the reward model can penalize some externally preferred behavior. The scatter also clarifies why row-level analysis is central to the paper. Checkpoint-level means compress this geometry into one point per transition, but the row-level view exposes a mixture of local behaviors inside the same training interval. This is particularly important for RLHF monitoring, where a model can appear acceptable under aggregate metrics while a subset of prompts moves into the reward-hacking quadrant. 
+
+## E Threshold Sensitivity 
+
+Table 9 reports how the taxonomy changes as the sign tolerance ϵ increases. The default analysis uses 
+
+ϵ = 10 −8, which is effectively a nonzero sign test for the stored floating-point deltas. Classifications 17 2.0 1.5 1.0 0.5 0.0 0.5 1.0 1.5 
+
+> R
+> 6
+> 4
+> 2
+> 0
+> 2
+> 4
+> 6
+> 8
+> R
+
+Proxy-Judge Directional Mismatch 
+
+> stable_alignment
+> reward_hacking
+> optimization_collapse
+> proxy_under_alignment
+> conservative_stagnation
+> mixed_or_ambiguous
+
+Figure 8: Row-level proxy–judge delta geometry. The reward-hacking quadrant corresponds to ∆ Rϕ > 0 and ∆R† < 0; stable alignment corresponds to ∆ Rϕ > 0 and ∆ R† > 0; optimization collapse corresponds to ∆ Rϕ < 0and ∆ R† < 0; proxy under-alignment corresponds to ∆ Rϕ < 0 and ∆ R† > 0. 
+
+are unchanged at ϵ = 10 −3 for checkpoint transitions and change only minimally at row level. At larger tolerances, the classifier becomes deliberately more conservative: small proxy or judge movements are absorbed into conservative stagnation or mixed/ambiguous classes. Figure 9 extends the same check to minimum effect-size thresholds, including 0 .2 judge-score units. At threshold 0 .2, row-level reward-hacking counts fall from 127 to 86, while checkpoint-level reward hacking falls to zero. This behavior is expected and highlights why the threshold should be reported explicitly. 
+
+## F Aggregation Flip Details 
+
+The checkpoint-vs-row comparison can be sharpened by comparing each checkpoint transition to the dominant row-level label among its matched prompts. Among the 30 checkpoint transitions with matched row-level data, all 30 have a dominant row-level label that differs from the checkpoint label, and 19 have a strict row-level majority. Sixteen transitions contain localized reward-hacking rows even when the checkpoint label is not reward hacking. Table 10 lists representative transitions with the largest hidden row-level reward-hacking shares. 
+
+## G Evaluator Disagreement Details 
+
+Evaluator disagreement is measured by whether the two judges move in opposite directions across the same transition, sign (∆ R†) sign (∆ R†
+
+> 2
+
+) < 0. Table 11 reports this event by unit of analysis and failure 18 Table 9: Sensitivity of failure-mode counts to the sign tolerance ϵ. RH denotes reward hacking; SA stable alignment; OC optimization collapse; PUA proxy under-alignment; CS conservative stagnation; MA mixed/ambiguous; EG evaluator gaming. Unit ϵ Total RH SA OC PUA CS MA EG Checkpoint 10 −8 31 4 7 5 6 0 9 14 Checkpoint 10 −3 31 4 7 5 6 0 9 14 Checkpoint 10 −2 31 4 7 5 5 1 9 13 Checkpoint 5 × 10 −2 31 3 4 1 1 6 16 5Checkpoint 10 −1 31 0 1 1 0 18 11 1Row-level 10 −8 1920 127 100 99 122 748 724 75 Row-level 10 −3 1920 127 98 99 122 749 725 75 Row-level 10 −2 1920 123 96 99 120 762 720 75 Row-level 5 × 10 −2 1920 115 83 92 110 823 697 75 Row-level 10 −1 1920 105 72 79 101 867 696 75 0 10 3 10 2 10 1
+
+> Minimum absolute delta threshold
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Share of transitions
+> Taxonomy Sensitivity to Effect-Size Threshold
+> checkpoint: reward hacking
+> checkpoint: stagnation
+> row_level: reward hacking
+> row_level: stagnation
+
+Figure 9: Sensitivity of taxonomy counts to minimum absolute delta thresholds. Larger thresholds make the classifier more conservative, shifting small movements into conservative stagnation or mixed/ambiguous classes. 
+
+mode. The distinction between checkpoint and row-level disagreement is important. At checkpoint level, 14 of 31 transitions exhibit evaluator gaming, producing a high aggregate disagreement rate. At row level, only 75 of 1,920 transitions exhibit the same opposite-direction pattern. This suggests that checkpoint-level judge disagreement can be driven by small average shifts across many prompts, while row-level disagreement is more localized. At row level, proxy under-alignment has the highest evaluator-gaming share (17.2%), followed by stable alignment (15.0%) and reward hacking (11.8%). Conservative stagnation has zero evaluator-gaming events by construction in this artifact set because both the proxy and primary judge are approximately unchanged. The higher disagreement rates in proxy under-alignment and reward hacking are consistent with the central diagnosis of the paper: when the proxy and evaluator disagree, the two evaluators are also more likely to expose instability in what is being measured. These results motivate keeping R†, R†
+
+> 2
+
+, and ¯R† visible as separate quantities. Averaging judges can stabilize noisy evaluations, but it can also hide evaluator-specific movement. For failure analysis, the 19 Table 10: Representative checkpoint transitions where aggregate and row-level diagnoses diverge. CK denotes checkpoint label; Dom. denotes dominant row label; PUA proxy under-alignment; SA stable alignment; OC optimization collapse; MA mixed/ambiguous.                                                   
+
+> Setting Step CK Dom. Row RH share Dom. share Aggressive PPO 600 →1000 PUA MA 0.188 0.438
+> λ= 0 .5 UP-PPO 600 →1000 PUA MA 0.141 0.609
+> β= 0 .001 sampled PPO 200 →500 SA MA 0.141 0.438 Aggressive PPO 200 →400 PUA MA 0.109 0.594 Aggressive PPO 400 →600 SA MA 0.109 0.500
+> β= 0 .03 PPO 250 →350 OC MA 0.109 0.406
+
+Table 11: Evaluator-gaming share by failure mode. Judge gap is |∆R† − ∆R†
+
+> 2
+
+|.Unit Failure mode Total Eval. gaming Mean gap Median gap Share Row Proxy under-alignment 122 21 1.516 1.000 0.172 Row Stable alignment 100 15 1.275 1.000 0.150 Row Reward hacking 127 15 1.138 1.000 0.118 Row Optimization collapse 99 5 0.904 1.000 0.051 Row Mixed/ambiguous 724 19 0.800 1.000 0.026 Row Conservative stagnation 748 0 0.167 0.000 0.000 Checkpoint Optimization collapse 5 3 0.242 0.180 0.600 Checkpoint Stable alignment 7 4 0.206 0.164 0.571 Checkpoint Mixed/ambiguous 9 4 0.043 0.039 0.444 Checkpoint Proxy under-alignment 6 2 0.118 0.094 0.333 Checkpoint Reward hacking 4 1 0.166 0.145 0.250 
+
+disagreement event is itself informative: it marks transitions where the measured direction of progress depends on the evaluator used to define progress. We also checked whether the stored row-level length features suggest a simple verbosity explanation. Reward-hacking rows have higher target length than non-reward-hacking rows on average (59.3 versus 52.4 words), but they do not become longer across the transition: mean length change is −3.88 words for reward-hacking rows and −2.68 words for other rows. The correlation between target length and reward-hacking status is small ( r = 0 .083), as is the correlation between length change and reward-hacking status ( r = −0.018). These diagnostics do not replace length-controlled judging, but they make a pure verbosity account less plausible in the current artifacts. 
+
+## H Code and Artifact Availability 
+
+The repository accompanying this paper contains the paper source, generated tables, figures, judge prompts, parsing logic, and reproducibility artifacts needed to inspect the reported analyses. Be-cause external judge versions and API behavior can change over time, the stored score artifacts are part of the replication record. The repository is available at: https://github.com/zabahana/ rlhf-failure-modes-diagnostics . A live interactive demo of the model comparator and diagnostic views is available at: https://rlhf-failures.zelalem.ai/ .20

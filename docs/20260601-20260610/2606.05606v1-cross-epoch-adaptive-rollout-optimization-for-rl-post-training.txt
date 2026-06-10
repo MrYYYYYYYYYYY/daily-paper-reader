@@ -1,0 +1,2094 @@
+Title: Cross-Epoch Adaptive Rollout Optimization for RL Post-Training
+
+URL Source: https://arxiv.org/pdf/2606.05606v1
+
+Published Time: Fri, 05 Jun 2026 00:30:26 GMT
+
+Number of Pages: 24
+
+Markdown Content:
+# Cross-Epoch Adaptive Rollout Optimization for RL Post-Training 
+
+Yiming Zong, Yige Wang, Jiashuo Jiang 
+
+Department of Industrial Engineering & Decision Analytics, Hong Kong University of Science and Technology 
+
+LLM post-training often relies on reinforcement learning methods that sample multiple rollouts per prompt, yet most existing approaches use a fixed rollout budget for every prompt, despite large differences in the training signal different prompts provide. In this paper, we study adaptive rollout allocation under a fixed global budget and formulate the problem as online resource allocation with prompt-level diminishing returns. Our method, CERO , maintains a Beta posterior over each prompt’s success probability and uses the posterior expected Bernoulli variance as a Bayesian estimate of the value of additional rollouts. We use this estimate to construct a concave, saturating utility over cumulative allocations, yielding an objective in which decisions across prompts and epochs are coupled by the global budget. Since the resulting objective is temporally nonseparable, we derive a Fenchel-dual reformulation and update both prompt-level and budget-level dual variables via projected online gradient descent. Under fixed prompt utilities, we prove an O(√K) regret bound against the offline allocation benchmark. Experiments on mathematical-reasoning problems show that CERO consistently outperforms GRPO across multiple open-weight LLMs and benchmarks, demonstrating that adaptive rollout budgeting can improve sample efficiency. 
+
+Key words : Reinforcement Learning, LLM Post-training, Online Resource Allocation, Rollout Optimization 
+
+## 1. Introduction 
+
+Reinforcement learning (RL) post-training has become a central ingredient for improving the rea-soning ability of large language models (LLMs). In widely used algorithms such as GRPO (Shao et al. 2024), each prompt is typically assigned a fixed number of rollouts, which are grouped to construct relative reward signals for policy optimization. While simple and scalable, this uniform allocation strategy ignores substantial heterogeneity across prompts. Some prompts are already solved and yield little reward variation; others are too difficult and provide weak or noisy signals; only a subset of prompts produce useful success–failure variation that can drive meaningful policy updates. As a result, a large fraction of the rollout budget may be spent on prompts with limited marginal value. 
+
+1
+
+> arXiv:2606.05606v1 [cs.LG] 4 Jun 2026 2
+
+Recent rollout-optimization methods address this inefficiency through prompt selection (Yu et al. 2025), within-batch reallocation (Li et al. 2025), or post-generation filtering and pruning. These methods improve training efficiency, but they primarily make local decisions within a batch or after rollouts have already been generated. By contrast, rollout budgeting in RL post-training naturally spans multiple epochs: decisions made early in training affect the remaining budget, the evidence collected for each prompt, and the opportunities for future updates. This motivates a global question: under a fixed rollout budget, how should we allocate rollouts across both prompts and epochs to maximize the utility of collected samples? We formulate this problem as budgeted online optimization with prompt-level diminishing re-turns. An effective allocation rule should favor prompts with high expected learning value, while avoiding excessive sampling of the same prompt as evidence accumulates. To this end, we pro-pose CERO , a cross-epoch online adaptive rollout optimization framework. To the best of our knowledge, CERO is the first rollout-allocation framework for LLM post-training that explicitly optimizes a global rollout budget across epochs rather than only reallocating or filtering rollouts within a batch. 
+
+CERO maintains a Beta posterior over each prompt’s latent success probability and uses the posterior expected Bernoulli reward variance to estimate the value of additional rollouts. This estimate induces a concave, saturating utility over cumulative prompt-level allocations, capturing diminishing returns as more rollouts are assigned to the same prompt. Since this utility depends on cumulative allocations, the resulting objective is temporally non-separable under the global budget. We then derive a Fenchel-dual reformulation of the budgeted allocation problem and obtain an online primal–dual algorithm with prompt-level dual variables and a global budget multiplier. The prompt-level variables estimate the marginal value of additional rollouts, while the global multiplier acts as a dynamic budget price coordinating rollout consumption across epochs. The resulting algorithm is simple to integrate with existing RL post-training pipelines. At each epoch, CERO allocates rollouts to a prompt when its estimated marginal value exceeds the current global budget price, updates the prompt posterior using observed rewards, and refreshes the plug-in value estimate for future epochs. It acts as a drop-in adaptive data-collection layer on top of GRPO-style policy optimization: it changes which prompts receive rollouts and how many rollouts they receive, but leaves the underlying policy-gradient objective unchanged. Our contributions are threefold. First, we formulate adaptive rollout allocation for LLM RL post-training as a cross-epoch fixed-budget online optimization problem with prompt-specific diminishing-return utilities. This formulation explicitly couples rollout decisions across the train-ing horizon through a shared global budget, distinguishing it from prior within-batch selection 3
+
+or post-generation filtering methods. Second, we propose CERO , a Bayesian primal–dual allo-cation algorithm that uses posterior estimates of prompt-level rollout value to guide budgeting across epochs. Third, we provide both theoretical and empirical evidence for the effectiveness of 
+
+CERO : under fixed utilities induced by prompt-level value estimates, we establish an O(√K) re-gret guarantee against the offline allocation benchmark. Experiments on mathematical-reasoning problems demonstrate that CERO outperforms vanilla GRPO across multiple open-weight LLMs and benchmarks. 
+
+1.1. Related Works 
+
+RL Rollout Optimization A surge of research has recently emerged focusing on RL rollout opti-mization. These works predominantly involve modifications to GRPO (Shao et al. 2024) and can be broadly categorized into three perspectives. The first line focuses on online curriculum learning and sample selection, where training examples are prioritized according to their estimated learning value (Mahrooghi et al. 2026, Zhang et al. 2025, Chen et al. 2025, Hu et al. 2025). The second line investigates adaptive rollout budget allocation (Li et al. 2025, Yao et al. 2026), which replace uniform rollout assignment with value-aware resource allocation under a fixed total budget. The third line emphasizes post-rollout filtering or pruning, such as AERO (Zhang et al. 2026), CPPO (Lin et al. 2025), PODS (Xu et al. 2025), and GFPO (Shrivastava et al. 2025), which reduce update cost by rescuing, smoothing, or sub-selecting rollout groups after generation. Overall, prior work suggests that rollout efficiency depends critically on identifying high-value queries and avoiding degenerate all-correct or all-incorrect groups. 
+
+Online Resource Allocation Online resource allocation is a central topic in the online optimization literature and has been applied in many operational settings, including ad assignment (Mehta et al. 2007), revenue management (Talluri and Van Ryzin 2006, Jasin and Kumar 2012, Jiang et al. 2025), online knapsack problems (Arlotto and Gurvich 2019, Jiang and Zhang 2020, Liu et al. 2022), and online packing/covering problems (Buchbinder and Naor 2005, 2006, Feldman et al. 2010). The existing algorithmic literature can be broadly organized according to how it exploits dual information. A dominant class of methods uses dual prices as signals for making online allocation decisions. Within this class, some papers adopt a learn-once strategy: they reserve an initial set of arrivals for estimation, compute a price vector from that sample, and then use the same prices for all future decisions (Devanur and Hayes 2009, Feldman et al. 2010, Molinaro and Ravi 2014, Devanur and Jain 2012, Zong and Jiang 2026). Other papers advocate adaptive updating, where the pricing rule is revised at multiple points over time through repeated re-solving, leading to stronger robustness and improved horizon dependence (Agrawal et al. 2014, Li and Ye 2022, Chen and Wang 2015). In parallel, other works depart from this paradigm by developing primal-oriented algorithms (Kesselheim et al. 2014) or first-order schemes that do not require repeated computation of dual prices (Agrawal and Devanur 2014, Balseiro et al. 2020). 4
+
+## 2. Problem Formulation 
+
+We focus on the LLM post-training stage and study the optimization of rollout allocation. Consider a training procedure with K epochs and a training dataset of M prompts, X = {x1, . . . , x M }. At each epoch k, each prompt xi becomes available once, and the current policy generates multiple rollouts conditioned on xi for policy optimization. A standard approach, such as GRPO, allocates a fixed number N of rollouts to each prompt in each epoch, yielding a total rollout budget B = KM N .In this work, we consider an adaptive rollout allocation strategy. Let 
+
+NX = ( N1, . . . , NM ) ∈ ZM ×K 
+
+> ≥0
+
+, Ni = ( Ni, 1, . . . , N i,K ) ∈ ZK
+
+> ≥0
+
+,
+
+denote the allocation over the entire training procedure, where Ni,k is the number of rollouts assigned to prompt xi at epoch k. The allocation is subject to the global rollout budget 
+
+> K
+
+X
+
+> k=1
+> M
+
+X
+
+> i=1
+
+Ni,k ≤ B. 
+
+For the theoretical formulation, we associate each prompt xi with a fixed score qi that abstracts the expected learning signal obtained from additional rollouts. We refer to qi as the prompt in-formativeness score. The score qi parameterizes the prompt-level utility function and determines how valuable it is to allocate additional rollouts to xi. In our implementation, qi is updated across epochs using a Beta-posterior plug-in rule. Let 
+
+Ui(n) := U (qi, n )denote the utility of assigning n cumulative rollouts to prompt xi. Since qi is fixed in the theoretical formulation, we omit it from the notation and view Ui as a prompt-specific utility function. We will specify informativeness score qi and utility Ui(n) in Section 3. The rollout allocation problem is then formulated as 
+
+OPT (X ) := max  
+
+> {Ni,k }
+> M
+
+X
+
+> i=1
+
+Ui
+
+> K
+
+X
+
+> k=1
+
+Ni,k 
+
+!
+
+s.t. 
+
+> M
+
+X
+
+> i=1
+> K
+
+X
+
+> k=1
+
+Ni,k ≤ B, Ni,k ∈ { 0, 1, . . . , N max }, i ∈ [M ], k ∈ [K].
+
+(1) Here PKk=1 Ni,k is the cumulative number of rollouts assigned to prompt xi and Nmax denotes the maximum number of rollouts that can be assigned to a single prompt in one epoch. Compared with uniform allocation, this formulation allows rollout numbers to vary across prompts and epochs, so that more budget can be assigned to prompts with higher utility while respecting the same total budget. 5
+
+2.1. Problem Reformulation 
+
+The allocation problem in Equation (1) is coupled across epochs because the utility of prompt 
+
+xi depends on its cumulative allocation PKk=1 Ni,k . This temporal coupling makes it difficult to choose the epoch-wise allocations Ni,k in an online manner. We address this difficulty by using a Fenchel-dual representation of each utility function, which linearizes the dependence on cumulative allocations and yields an allocation subproblem that decomposes across epochs. For each prompt xi, define the concave conjugate of Ui as 
+
+U ∗ 
+
+> i
+
+(θ) = inf 
+
+> s≥0
+
+sθ − Ui(s) .
+
+Assuming that Ui is closed, concave and nondecreasing on R+, we have the biconjugate represen-tation 
+
+Ui(s) = inf 
+
+> θ≥0
+
+sθ − U ∗ 
+
+> i
+
+(θ) .
+
+Introducing a Fenchel dual variable θi for each prompt xi, together with a Lagrange multiplier 
+
+μ ≥ 0 for the global rollout budget constraint, we obtain the following dual objective: 
+
+LX (θ, μ ) = Bμ + max  
+
+> {Ni,k ∈{ 0,1,...,N max }}
+
+( MX
+
+> i=1
+
+(θi − μ)
+
+> K
+
+X
+
+> k=1
+
+Ni,k 
+
+)
+
+−
+
+> M
+
+X
+
+> i=1
+
+U ∗ 
+
+> i
+
+(θi).
+
+By weak duality, we know that 
+
+OPT (X ) ≤ inf  
+
+> θ≥0,μ ≥0
+
+LX (θ, μ ).
+
+The key advantage of this reformulation is that the maximization over allocations now decom-poses across epochs. For fixed ( θ, μ ), the allocation term can be written as K identical per-epoch subproblems. Hence, 
+
+LX (θ, μ ) = K L (θ, μ ),
+
+where the per-epoch dual objective is 
+
+L(θ, μ ) = BK μ + max 
+
+> {ni∈{ 0,1,...,N max }}
+
+( MX
+
+> i=1
+
+(θi − μ)ni
+
+)
+
+− 1
+
+K
+
+> M
+
+X
+
+> i=1
+
+U ∗ 
+
+> i
+
+(θi).
+
+Here, ni can be interpreted as the allocation decision for prompt xi in a representative epoch. Equivalently, if ˜Ni := 1
+
+K
+
+> K
+
+X
+
+> k=1
+
+Ni,k ,
+
+then ˜Ni denotes the average number of rollouts assigned to prompt xi across epochs. Thus, the Fenchel-dual reformulation turns the temporally coupled cumulative-utility objective into per-epoch allocation subproblems coordinated by the dual variables ( θ, μ ). 6
+
+## 3. Informativeness and Utility Function Design 
+
+In this section, we specify the prompt informativeness score and the resulting utility function. We write qi for the fixed score used in the theoretical formulation and qk,i for the plug-in posterior score used by the implementation at epoch k.Consider each prompt xi, and let Hki denote the rollout history collected for this prompt up to the beginning of epoch k. We model its latent success probability pi using a Beta posterior: 
+
+pi | H ki ∼ Beta( ak,i , b k,i ).
+
+This posterior serves as a compact Bayesian summary of the current evidence for prompt xi, and provides a principled basis for measuring both the current success probability and the remaining uncertainty. The posterior mean is ˜pk,i := E[pi | H ki ] = ak,i 
+
+ak,i + bk,i 
+
+,
+
+which estimates the current success probability of prompt xi. The posterior variance is 
+
+σ2 
+
+> k,i
+
+:= Var( pi | H ki ) = ak,i bk,i 
+
+(ak,i + bk,i )2(ak,i + bk,i + 1) .
+
+The posterior mean captures the current performance estimate, while the posterior variance char-acterizes the remaining uncertainty in that estimate. Prompts with larger posterior uncertainty may be more informative, but uncertainty alone can overemphasize prompts that are either too easy or too difficult. To capture learnability more directly, we use the posterior expectation of the Bernoulli variance: 
+
+qk,i := E pi(1 − pi) | H ki
+
+ .
+
+Under the Beta posterior, this informativeness score has the closed-form expression 
+
+qk,i = ak,i bk,i 
+
+(ak,i + bk,i )( ak,i + bk,i + 1) .
+
+The term pi(1 − pi) is maximized near pi = 1 /2 and vanishes in the degenerate regimes pi ∈ { 0, 1}.Thus, qk,i measures the extent to which the outcome of prompt i remains sensitive to additional rollouts. A larger value of qk,i indicates that prompt i is still learnable and that further budget spent on this prompt is likely to produce useful training signals. In the regret analysis, we fix qi and analyze the corresponding fixed utility. In the implementation, this fixed score is replaced by the epoch-wise plug-in posterior estimate qk,i . For the fixed-utility formulation, define 
+
+Ui(n) := U (qi, n ) = 1 − exp( −ηq in) = 1 − exp( −cin), ci := ηq i,7
+
+where n is the cumulative number of rollouts assigned to prompt i, and η > 0 is a temperature parameter. Larger values of η make the utility saturate more quickly, placing greater emphasis on early allocations, while smaller values lead to a more gradual increase and weaker diminishing returns. This utility has two useful properties. First, it is increasing in both the cumulative allocation 
+
+n and the informativeness score qi. Second, it is concave in n, which captures diminishing re-turns: early rollouts are typically more informative, while the marginal value of additional rollouts decreases as more samples are collected. Consequently, this utility favors prompts that are both informative and under-explored, while preventing excessive allocation to a single prompt. Substituting this utility into the fixed-budget allocation problem gives 
+
+OPT (X ) := max  
+
+> {Ni,k }
+> M
+
+X
+
+> i=1
+
+"
+
+1 − exp −ηq iKX
+
+> k=1
+
+Ni,k 
+
+!# 
+
+s.t. 
+
+> M
+
+X
+
+> i=1
+> K
+
+X
+
+> k=1
+
+Ni,k ≤ B, 
+
+0 ≤ Ni,k ≤ Nmax , i ∈ [M ], k ∈ [K].
+
+(2) This formulation yields a simple Bayesian mechanism for adaptive rollout allocation: the implemen-tation uses historical rollouts to update posterior statistics qk,i , and then allocates future rollout budget toward prompts whose outcomes are expected to remain informative. 
+
+3.1. Theoretical Motivation 
+
+Our notion of informativeness is motivated by recent analyses of prompt-level learnability in rein-forcement learning with verifiable rewards. Under binary rewards, the policy gap to the entropy-regularized optimum is governed by the variance of the Bernoulli reward distribution (Bae et al. 2026). Let pi denote the pass probability for prompt xi. We define 
+
+Ii := pi(1 − pi), (3) which attains its maximum at pi = 1 /2 and vanishes when pi ∈ { 0, 1}. This design is also consistent with recent findings in difficulty-aware RL for LLMs (Shrivastava et al. 2025, Hu et al. 2025): prompts that are either too easy or too difficult tend to provide limited learning signal, since the model almost always succeeds or fails on them, whereas medium-difficulty prompts induce higher outcome variance and thus yield more informative updates. In our setting, Ii captures this principle directly: easy and hard prompts, corresponding to pi close to 1 or 0, receive fewer rollouts, while prompts of intermediate difficulty, where pi ≈ 1/2, are assigned more rollouts. This observation provides a natural justification for using reward variation as a measure of informativeness. However, in our rollout allocation setting, the latent pass probability pi is unknown 8
+
+and must be estimated online from historical rollouts. Rather than using a point estimate of pi, we maintain the posterior distribution 
+
+pi | H ki ∼ Beta( ak,i , b k,i ),
+
+which captures both the current estimate of the prompt difficulty and the remaining uncertainty in that estimate. We then define the posterior informativeness as the posterior expectation of the ideal learnability: 
+
+qk,i := E[Ii | H ki ] = E[pi(1 − pi) | H ki ].
+
+Under the Beta posterior, this yields 
+
+qk,i = ak,i bk,i 
+
+(ak,i + bk,i )( ak,i + bk,i + 1) .
+
+While prior work uses this variance-based learnability mainly to filter prompts into retained or discarded subsets, we use it as a continuous Bayesian score for optimizing rollout allocation under a fixed budget. Thus, qk,i can be interpreted as a Bayesian proxy for the ideal prompt-level learnability. Compared with directly filtering prompts based on empirical pass rates, this posterior formulation is better suited for online rollout allocation: it accounts for uncertainty induced by limited historical samples and provides a smooth, continuously updated estimate of how informative future rollouts from each prompt are expected to be. This motivates the plug-in utility used by the implementation, 
+
+U (qk,i , n ) = 1 − exp( −ηq k,i n),
+
+where larger qk,i increases the marginal value of additional rollouts, while concavity in n imposes diminishing returns and prevents excessive allocation to a single prompt. The theorem below an-alyzes the fixed-utility version obtained by holding qi fixed; the posterior score qk,i is used as a practical plug-in update in CERO. 
+
+## 4. Online Rollout Allocation Algorithm 
+
+We now present CERO , an online primal-dual rollout allocation algorithm for LLM reinforcement learning under a fixed generation budget. The formal pseudo-code is provided in Algorithm 1. 
+
+Online rollout allocation. Given the current dual variables ( θk, μ k), CERO determines the num-ber of rollouts to collect for each prompt by solving the prompt-wise allocation subproblem 
+
+Ni,k = arg max 
+
+> 0≤n≤Nmax
+
+(θki − μk)n, 9
+
+where Nmax is the per-prompt rollout cap. Since the objective is linear in n, the solution admits the threshold form 
+
+Ni,k =
+
+(
+
+Nmax , θki > μ k,
+
+0, θki ≤ μk.
+
+In implementation, we additionally clip the allocation by the remaining rollout budget to avoid overspending. The regret analysis below is stated for the primal–dual allocation rule with the box constraint 0 ≤ n ≤ Nmax , and controls budget violation through the global dual variable. Thus, a prompt receives rollouts only when its estimated marginal value exceeds the current global budget price. This rule provides an online scheduler for LLM rollout generation: prompts that are currently more informative receive more samples, while low-value prompts are skipped to preserve budget for future epochs. 
+
+Prompt-level feedback and dual update. After selecting Ni,k , the current policy samples responses from prompt xi,
+
+y(1)  
+
+> i,k
+
+, . . . , y (Ni,k ) 
+
+> i,k
+
+∼ πϕ(· | xi),
+
+and the generated responses are evaluated by the reward model or task-specific reward function. The resulting prompt–response–reward tuples are added to the rollout buffer D and are used to update the informativeness estimate of prompt xi. Specifically, CERO updates the Beta posterior associated with prompt xi, computes the next informativeness score qk+1 ,i , and recomputes the corresponding utility term. Using this updated prompt-level feedback, CERO performs a projected online gradient step on the prompt-level dual variable: 
+
+gkθi = Ni,k − 1
+
+K ∇U ∗ 
+
+> i
+
+(θki ), θk+1  
+
+> i
+
+= θki − ηθ gkθi
+
+ 
+
+> +
+
+.
+
+This update follows from the θi-subgradient of the per-epoch dual objective. Intuitively, it adjusts the future sampling priority of prompt xi by balancing the number of rollouts already allocated to the prompt against the utility implied by its current informativeness estimate. 
+
+Cross-epoch budget control. To regulate rollout usage over the entire training horizon, CERO 
+
+updates the global multiplier according to the discrepancy between the current epoch’s rollout consumption and the remaining budget Bk:
+
+gkμ = Bk
+
+K −
+
+> M
+
+X
+
+> i=1
+
+Ni,k , μk+1 = μk − ημgkμ
+
+ 
+
+> +
+
+.
+
+When the algorithm consumes rollouts faster than the target budget rate, μk increases, making future allocation decisions more selective. Conversely, when rollout consumption is below the target rate, μk decreases, allowing more prompts to become eligible for sampling in later epochs. This global update couples all prompt-level allocation decisions through the shared generation budget, while avoiding a rigid per-epoch rollout quota. 10 
+
+Algorithm 1 Cross-Epoch Online Adaptive Rollout Optimization (CERO)  
+
+> 1:
+
+Input: Number of prompts M , training epochs K, average rollout N , maximum rollouts Nmax ,utility functions Ui(·), policy πθ , batch size Bbatch  
+
+> 2:
+
+Initialize dual variables θ1, μ1, total rollout budget B0 = KM N , collected batch D = ∅ 
+
+> 3:
+
+for k = 1 to K do  
+
+> 4:
+
+for each prompt xi do  
+
+> 5:
+
+Compute the step allocation: Ni,k = arg max 0≤Ni,k ≤min( Nmax ,B −Bused )(θki − μk) · Ni,k . 
+
+> 6:
+
+Allocate Ni,k rollouts: y(1)  
+
+> i
+
+, . . . , y (Ni,k ) 
+
+> i
+
+∼ πθ (· | xi).  
+
+> 7:
+
+Add collected rollouts to batch: D ← D ∪ { y(1)  
+
+> i
+
+, . . . , y (Ni,k ) 
+
+> i
+
+} 
+
+> 8:
+
+Update remaining budget: Bk ← Bk − Ni,k  
+
+> 9:
+
+Update dual variables via online gradient descent: 
+
+gkθi = Ni,k − 1
+
+K ∇U ∗ 
+
+> i
+
+(θki ), θk+1  
+
+> i
+
+= θki − ηθ gkθi
+
+ 
+
+> +
+> 10:
+
+if |D| ≥ Bbatch then  
+
+> 11:
+
+Policy update  
+
+> 12:
+
+end if  
+
+> 13:
+
+end for  
+
+> 14:
+
+if B < 0 then  
+
+> 15:
+
+Terminate  
+
+> 16:
+
+end if  
+
+> 17:
+
+Update global dual variable: 
+
+gkμ = Bk
+
+K −
+
+> M
+
+X
+
+> i=1
+
+Ni,k , μk+1 = μk − ημgkμ
+
+ 
+
+> +
+
+, Bk+1 = Bk 
+
+> 18:
+
+end for 
+
+Integration with existing LLM RL pipelines. CERO can be used as a drop-in online rollout scheduler for existing LLM reinforcement-learning pipelines. In our implementation, we instan-tiate CERO on top of the widely used GRPO framework. Whenever the rollout buffer satisfies 
+
+|D| ≥ Bbatch , the policy is updated using the GRPO objective and the buffer is cleared. Impor-tantly, CERO leaves the underlying policy-gradient objective unchanged; it only modifies the data-collection process. By adapting rollout allocation to prompt-level feedback and global budget pressure, CERO improves rollout efficiency under a fixed sampling budget. 11 
+
+4.1. Theoretical Guarantee 
+
+Before stating the regret guarantee, we first define the offline benchmark against which the online rollout allocation algorithm is compared. For the theoretical analysis, we consider the setting where each prompt xi has a fixed informativeness score qi. To simplify notation, we suppress the dependence on qi and the utility hyperparameter η.Given a total rollout budget B, let OPT denote the optimal value of the offline allocation problem in Eq. (2). For CERO algorithm, we define its realized utility as 
+
+ALG := 
+
+> M
+
+X
+
+> i=1
+
+Ui
+
+> K
+
+X
+
+> k=1
+
+Ni,k 
+
+!
+
+,
+
+where Ni,k is the number of rollouts allocated to prompt xi at epoch k. The regret of CERO is defined as following: Reg := OPT − ALG 
+
+Theorem 1 (main result) . In the LLM RL post-training setting, suppose that each training prompt appears only once in each training epoch, and consider the CERO algorithm in Algorithm 1. Suppose the prompt-level Fenchel dual variables and the global rollout-budget dual variable are projected onto compact domains, 
+
+θk ∈ Θϵ := 
+
+> M
+
+Y
+
+> i=1
+
+[ϵ, c i], μk ∈ M := [0 , ¯μ],
+
+where ci = ηq i, ϵ > 0, and ¯μ < ∞. If the prompt-level and budget-level OCO updates incur regrets 
+
+Reg θ (K) and Reg μ(K), then 
+
+Reg ≤ Reg θ (K) + Reg μ(K).
+
+Consequently, if projected online gradient ascent is used on Θϵ and M with uniformly bounded supergradients, then 
+
+Reg = O(√K).
+
+## 5. Numerical Experiments 
+
+5.1. Experimental Setup 
+
+We integrate our proposed CERO with GRPO and compare it with the vanilla GRPO algorithm. We evaluate their performance on four open-weight language models: DeepSeek-R1-Distill-Qwen-1.5B (Guo et al. 2025) (abbreviated as R1-Distill-1.5B), Qwen3-4B-Base (Yang et al. 2025), Qwen3-4B-Instruct (Yang et al. 2025), and Qwen2.5-Math-7B (Yang et al. 2024). We post-training these LLMs via verl (Sheng et al. 2025) framework on DAPO-Math-17K dataset (Yu et al. 2025), which consists of 17917 training prompts with ground truth answers for verification. 12                                          
+
+> Table 1 Evaluation performance comparison across different models and benchmarks.
+> AIME24
+> AIME25
+> AIME26
+> AMC
+> Avg
+> R1-Distill-1.5B + GRPO 0.1041 0.1416 0.0875 0.5468 0.22 R1-Distill-1.5B + KnapsackRL R1-Distill-1.5B + CERO 0.152 0.1666 0.1208 0.6343 0.2684
+> Qwen3-4B-base + GRPO 0.15 0.1312 0.1104 0.5046 0.2241 Qwen3-4B-base + KnapsackRL Qwen3-4B-base + CERO 0.1875 0.1833 0.1812 0.5875 0.2845
+> Qwen3-4B-Instruct + GRPO 0.3208 0.3291 0.3687 0.8546 0.4683 Qwen3-4B-Instruct + KnapsackRL Qwen3-4B-Instruct + CERO 0.4 0.3625 0.3812 0.8609 0.5011
+> Qwen2.5-Math-7B + GRPO 0.2396 0.1541 0.1250 0.6531 0.2913 Qwen2.5-Math-7B + KnapsackRL Qwen2.5-Math-7B + CERO 0.2625 0.1750 0.1187 0.6703 0.3066
+
+We initiate the Beta posterior for training prompts as Beta(1 , 1). More training details are deferred in Appendix C. We evaluate mathematical reasoning on four competition-style benchmarks: AIME24 ,
+
+AIME25 , AIME26 , and AMC23 . The AIME sets test challenging multi-step high-school reason-ing with exact-match integer answers, while AMC23 provides broader coverage with more varied difficulty and problem formats. Together, these benchmarks assess whether improvements gener-alize across contest years and beyond AIME-style problems. 
+
+5.2. Main results and analysis 
+
+Table 1 compares CERO with vanilla GRPO across four representative models and four mathe-matical reasoning benchmarks. CERO consistently outperforms GRPO for every evaluated model– benchmark pair, indicating that its gains are not tied to a particular architecture, model scale, or post-training setting. Averaged across benchmarks, CERO improves over GRPO by +4 .84 points on R1-Distill-1.5B, +6 .04 points on Qwen3-4B-Base, +3 .28 points on Qwen3-4B-Instruct, and +1 .53 points on Qwen2.5-Math-7B. Such results demonstrate the effectiveness of our proposed method. In addition, CERO introduces negligible computational overhead: in our experiments, each allocation update takes less than one second. We next analyze the source of CERO’s gains from the perspective of training signal availability. Following Knapsack-RL (Li et al. 2025), we define an effective prompt as a prompt whose rollout group contains both successful and failed responses. Such prompts have non-zero within-group reward variance and therefore induce non-zero GRPO gradients. We use the effective prompt ratio 13 0 100 200 300 400 500 
+
+> Step
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> Effective Prompt Ratio
+> GRPO
+> CERO
+
+(a) DeepSeek-R1-Distill-Qwen-1.5B 0 100 200 300 400 500  
+
+> Step
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> 0.8
+> Effective Prompt Ratio
+> GRPO
+> CERO
+
+(b) Qwen3-4B-base 0 100 200 300 400 500 
+
+> Step
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> Effective Prompt Ratio
+> GRPO
+> CERO
+
+(c) Qwen3-4B-Instruct 0 100 200 300 400 500  
+
+> Step
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> 0.8
+> Effective Prompt Ratio
+> GRPO
+> CERO
+
+(d) Qwen2.5-Math 
+
+Figure 1 Effective prompt ratio comparison between CERO and GRPO. 
+
+to measure the fraction of prompts in a batch that provide useful learning signals, and report this metric in Figure 1. Across all LLM post-training settings, CERO consistently achieves a higher effective prompt ratio than GRPO, which helps explain its stronger downstream performance. In particular, Figure 1a shows that the effective prompt ratio of GRPO drops sharply after a certain number of training steps. This trend suggests that, by that stage, DeepSeek-R1-Distill-Qwen-1.5B has already learned many of the sampled prompts; as a result, later rollout groups often contain only successful or failure responses, yielding ineffective prompts with zero reward variance. In contrast, CERO adaptively allocates more rollout budget to informative prompts and stops before the effective prompt ratio collapses, thereby maintaining a higher proportion of useful training signals throughout training. 
+
+## 6. Conclusion 
+
+We introduced CERO , a cross-epoch adaptive rollout allocation framework for LLM RL post-training under a fixed global budget. By modeling prompt informativeness with a Beta posterior, using a concave saturating utility to capture diminishing returns, and deriving a Fenchel-dual on-line optimization formulation, CERO adaptively prioritizes prompts that provide higher expected learning value. We established an O(√K) regret guarantee and empirically showed consistent im-provements over GRPO across multiple models and mathematical reasoning benchmarks. These 14 
+
+results suggest that adaptive rollout budgeting is an effective and principled direction for improving the sample efficiency of RL post-training. 
+
+Limitations. Our theoretical regret guarantee is established for fixed prompt-level utilities, whereas the implemented version uses epoch-wise plug-in posterior informativeness scores. Thus, the current analysis does not fully capture the nonstationarity induced by policy updates and posterior refreshes. Empirically, we evaluate CERO on mathematical-reasoning post-training with four open-weight backbones and four benchmarks; broader validation on other domains, reward models, and larger-scale training regimes remains important. 
+
+## References 
+
+S. Agrawal and N. R. Devanur. Fast algorithms for online stochastic convex programming. In Proceedings of the twenty-sixth annual ACM-SIAM symposium on Discrete algorithms , pages 1405–1424. SIAM, 2014. S. Agrawal, Z. Wang, and Y. Ye. A dynamic near-optimal algorithm for online linear programming. Opera-tions Research , 62(4):876–890, 2014. A. Arlotto and I. Gurvich. Uniformly bounded regret in the multisecretary problem. Stochastic Systems , 9 (3):231–260, 2019. S. Bae, J. Hong, M. Y. Lee, H. Kim, J. Nam, and D. Kwak. Online difficulty filtering for reasoning ori-ented reinforcement learning. In Proceedings of the 19th Conference of the European Chapter of the Association for Computational Linguistics (Volume 1: Long Papers) , pages 700–719, 2026. S. Balseiro, H. Lu, and V. Mirrokni. Dual mirror descent for online allocation problems. In International Conference on Machine Learning , pages 613–628. PMLR, 2020. N. Buchbinder and J. Naor. Online primal-dual algorithms for covering and packing problems. In European Symposium on Algorithms , pages 689–701. Springer, 2005. N. Buchbinder and J. Naor. Improved bounds for online routing and packing via a primal-dual approach. In 
+
+2006 47th Annual IEEE Symposium on Foundations of Computer Science (FOCS’06) , pages 293–304. IEEE, 2006. X. Chen, J. Lu, M. Kim, D. Zhang, J. Tang, A. Pich´ e, N. Gontier, Y. Bengio, and E. Kamalloo. Self-evolving curriculum for llm reasoning. arXiv preprint arXiv:2505.14970 , 2025. X. A. Chen and Z. Wang. A dynamic learning algorithm for online matching problems with concave returns. 
+
+European Journal of Operational Research , 247(2):379–388, 2015. N. R. Devanur and T. P. Hayes. The adwords problem: online keyword matching with budgeted bidders under random permutations. In Proceedings of the 10th ACM conference on Electronic commerce , pages 71–78, 2009. N. R. Devanur and K. Jain. Online matching with concave returns. In Proceedings of the forty-fourth annual ACM symposium on Theory of computing , pages 137–144, 2012. 15 J. Feldman, M. Henzinger, N. Korula, V. S. Mirrokni, and C. Stein. Online stochastic packing applied to display ad allocation. In European Symposium on Algorithms , pages 182–194. Springer, 2010. D. Guo, D. Yang, H. Zhang, J. Song, R. Zhang, R. Xu, Q. Zhu, S. Ma, P. Wang, X. Bi, et al. Deepseek-r1: Incentivizing reasoning capability in llms via reinforcement learning. arXiv preprint arXiv:2501.12948 ,2025. Z. Hu, J. Qiu, T. Bai, H. Yang, B. Yuan, Q. Jing, C. He, and W. Zhang. Vade: Variance-aware dynamic sam-pling via online sample-level difficulty estimation for multimodal rl. arXiv preprint arXiv:2511.18902 ,2025. S. Jasin and S. Kumar. A re-solving heuristic with bounded revenue loss for network revenue management with customer choice. Mathematics of Operations Research , 37(2):313–345, 2012. J. Jiang and J. Zhang. Online resource allocation with stochastic resource consumption. arXiv preprint arXiv:2012.07933 , 2020. J. Jiang, W. Ma, and J. Zhang. Degeneracy is ok: Logarithmic regret for network revenue management with indiscrete distributions. Operations Research , 73(6):3405–3420, 2025. T. Kesselheim, A. T¨ onnis, K. Radke, and B. V¨ ocking. Primal beats dual on online packing lps in the random-order model. In Proceedings of the forty-sixth annual ACM symposium on Theory of computing , pages 303–312, 2014. X. Li and Y. Ye. Online linear programming: Dual convergence, new algorithms, and regret bounds. Oper-ations Research , 70(5):2948–2966, 2022. Z. Li, C. Chen, T. Yang, T. Ding, R. Sun, G. Zhang, W. Huang, and Z.-Q. Luo. Knapsack rl: Unlocking exploration of llms via optimizing budget allocation. arXiv preprint arXiv:2509.25849 , 2025. Z. Lin, M. Lin, Y. Xie, and R. Ji. Cppo: Accelerating the training of group relative policy optimization-based reasoning models. arXiv preprint arXiv:2503.22342 , 2025. S. Liu, J. Jiang, and X. Li. Non-stationary bandits with knapsacks. Advances in Neural Information Processing Systems , 35:16522–16532, 2022. I. Mahrooghi, A. Lotfi, and E. Abbe. Goldilocks rl: Tuning task difficulty to escape sparse rewards for reasoning. arXiv preprint arXiv:2602.14868 , 2026. A. Mehta, A. Saberi, U. Vazirani, and V. Vazirani. Adwords and generalized online matching. Journal of the ACM (JACM) , 54(5):22–es, 2007. M. Molinaro and R. Ravi. The geometry of online packing linear programs. Mathematics of Operations Research , 39(1):46–59, 2014. Z. Shao, P. Wang, Q. Zhu, R. Xu, J. Song, X. Bi, H. Zhang, M. Zhang, Y. Li, Y. Wu, et al. Deepseek-math: Pushing the limits of mathematical reasoning in open language models. arXiv preprint arXiv:2402.03300 , 2024. 16 G. Sheng, C. Zhang, Z. Ye, X. Wu, W. Zhang, R. Zhang, Y. Peng, H. Lin, and C. Wu. Hybridflow: A flexible and efficient rlhf framework. In Proceedings of the Twentieth European Conference on Computer Systems , pages 1279–1297, 2025. V. Shrivastava, A. Awadallah, V. Balachandran, S. Garg, H. Behl, and D. Papailiopoulos. Sample more to think less: Group filtered policy optimization for concise reasoning. arXiv preprint arXiv:2508.09726 ,2025. K. T. Talluri and G. J. Van Ryzin. The theory and practice of revenue management , volume 68. Springer Science & Business Media, 2006. Y. E. Xu, Y. Savani, F. Fang, and J. Z. Kolter. Not all rollouts are useful: Down-sampling rollouts in llm reinforcement learning. arXiv preprint arXiv:2504.13818 , 2025. A. Yang, B. Zhang, B. Hui, B. Gao, B. Yu, C. Li, D. Liu, J. Tu, J. Zhou, J. Lin, et al. Qwen2. 5-math technical report: Toward mathematical expert model via self-improvement. arXiv preprint arXiv:2409.12122 ,2024. A. Yang, A. Li, B. Yang, B. Zhang, B. Hui, B. Zheng, B. Yu, C. Gao, C. Huang, C. Lv, et al. Qwen3 technical report. arXiv preprint arXiv:2505.09388 , 2025. Z. Yao, Y.-K. Zhang, Y. Chen, Y. Sun, Z. Xu, Y. Yang, T. Hu, Q. Gu, H. Su, and X. Cai. Coba-rl: Capability-oriented budget allocation for reinforcement learning in llms. arXiv preprint arXiv:2602.03048 , 2026. Q. Yu, Z. Zhang, R. Zhu, Y. Yuan, X. Zuo, Y. Yue, W. Dai, T. Fan, G. Liu, L. Liu, et al. Dapo: An open-source llm reinforcement learning system at scale. arXiv preprint arXiv:2503.14476 , 2025. R. Zhang, D. Arora, S. Mei, and A. Zanette. Speed-rl: Faster training of reasoning models via online curriculum learning. arXiv preprint arXiv:2506.09016 , 2025. Z. Zhang, Z. Han, C. Mavromatis, Q. Zhu, Y. Zhang, S. Guan, D. Wang, X. Zhou, S. Wang, S. Adeshina, et al. Train less, learn more: Adaptive efficient rollout optimization for group-based reinforcement learning. arXiv preprint arXiv:2602.14338 , 2026. Y. Zong and J. Jiang. Online semi-infinite linear programming: Efficient algorithms via function approxi-mation. arXiv preprint arXiv:2603.16200 , 2026. 17 
+
+Appendix A: Proof of Theorem 1 
+
+Step 1: Fenchel representation of Ui. Recall that the prompt-level utility is 
+
+Ui(n) = 1 − exp( −cin), ci := ηq i,
+
+where qi is the informativeness score of prompt i and η > 0 is the temperature parameter. Throughout the proof, we treat qi and hence ci as fixed. The posterior update used in the implementation can be viewed as a plug-in procedure for updating these utilities over time. For n ≥ 0, we have 
+
+U ′ 
+
+> i
+
+(n) = ci exp( −cin).
+
+Hence 0 < U ′ 
+
+> i
+
+(n) ≤ ci.
+
+Therefore, the natural domain of the Fenchel dual variable is 
+
+θi ∈ [0 , c i].
+
+For a concave utility function, define its concave Fenchel conjugate by 
+
+U ∗ 
+
+> i
+
+(θi) := inf  
+
+> n≥0
+
+{θin − Ui(n)} .
+
+For Ui(n) = 1 − exp( −cin), this gives 
+
+U ∗ 
+
+> i
+
+(θi) = inf  
+
+> n≥0
+
+{θin − 1 + exp( −cin)} .
+
+For 0 < θ i ≤ ci, the first-order condition is 
+
+θi − ci exp( −cin) = 0 .
+
+Thus exp( −cin) = θi
+
+ci
+
+, n = 1
+
+ci
+
+log ci
+
+θi
+
+.
+
+Substituting this optimizer back into the conjugate yields 
+
+U ∗ 
+
+> i
+
+(θi) = θi · 1
+
+ci
+
+log ci
+
+θi
+
+− 1 + θi
+
+ci
+
+= θi
+
+ci
+
+log ci
+
+θi
+
++ θi
+
+ci
+
+− 1, 0 < θ i ≤ ci.
+
+The value at θi = 0 is understood by continuity: 
+
+U ∗ 
+
+> i
+
+(0) = −1.
+
+Therefore, 
+
+U ∗ 
+
+> i
+
+(θi) = θi
+
+ci
+
+log ci
+
+θi
+
++ θi
+
+ci
+
+− 1, θi ∈ [0 , c i],
+
+with the convention 0 log( ci/0) = 0. By concave Fenchel duality, for every n ≥ 0, 
+
+Ui(n) = min 
+
+> θi∈[0 ,c i]
+
+{θin − U ∗ 
+
+> i
+
+(θi)} .18 Equivalently, 
+
+−Ui(n) = max 
+
+> θi∈[0 ,c i]
+
+{U ∗ 
+
+> i
+
+(θi) − θin} .
+
+For technical convenience, the algorithm projects onto the compact truncated domain Θi = [ ϵ, c i],
+
+where ϵ > 0 is arbitrarily small. The approximation error from replacing [0 , c i] by [ ϵ, c i] can be absorbed into the dual-regret term. 
+
+Step 2: OCO control of the utility term. Let 
+
+ni := 
+
+> K
+
+X
+
+> k=1
+
+Ni,k 
+
+denote the total number of rollouts allocated to prompt i by the online algorithm. The realized utility of the algorithm is ALG = 
+
+> M
+
+X
+
+> i=1
+
+Ui(ni) = 
+
+> M
+
+X
+
+> i=1
+
+Ui
+
+> K
+
+X
+
+> k=1
+
+Ni,k 
+
+!
+
+.
+
+Using the concave Fenchel representation from Step 1, we have, for each i,
+
+−Ui(ni) = max 
+
+> θi∈[0 ,c i]
+
+{U ∗ 
+
+> i
+
+(θi) − θini} .
+
+Therefore, 
+
+−ALG = 
+
+> M
+
+X
+
+> i=1
+
+"
+
+−Ui
+
+> K
+
+X
+
+> k=1
+
+Ni,k 
+
+!# 
+
+= max 
+
+> θ∈Θ
+> M
+
+X
+
+> i=1
+
+"
+
+U ∗ 
+
+> i
+
+(θi) − θiKX
+
+> k=1
+
+Ni,k 
+
+#
+
+,
+
+where Θ := 
+
+> M
+
+Y
+
+> i=1
+
+[0 , c i].
+
+Rewriting the right-hand side as a sum over epochs gives 
+
+> M
+
+X
+
+> i=1
+
+"
+
+U ∗ 
+
+> i
+
+(θi) − θiK
+
+X
+
+> k=1
+
+Ni,k 
+
+#
+
+=
+
+> K
+
+X
+
+> k=1
+> M
+
+X
+
+> i=1
+
+ 1
+
+K U ∗ 
+
+> i
+
+(θi) − θiNi,k 
+
+
+
+.
+
+Define the prompt-level dual reward function 
+
+ψk (θ) := 
+
+> M
+
+X
+
+> i=1
+
+ 1
+
+K U ∗ 
+
+> i
+
+(θi) − θiNi,k 
+
+
+
+.
+
+Then 
+
+−ALG = max 
+
+> θ∈Θ
+> K
+
+X
+
+> k=1
+
+ψk (θ).
+
+For technical convenience, the algorithm projects onto the truncated compactdomain Θϵ := 
+
+> M
+
+Y
+
+> i=1
+
+[ϵ, c i],
+
+where ϵ > 0 is arbitrarily small. The error caused by replacingΘ with Θ ϵ can be absorbed into the prompt-level dualregret term. 19 Assume that the prompt-level online concave maximization subroutine guarantees max 
+
+> θ∈Θϵ
+> K
+
+X
+
+> k=1
+
+ψk (θ) −
+
+> K
+
+X
+
+> k=1
+
+ψk (θk ) ≤ Reg θ (K).
+
+Then 
+
+−ALG ≤
+
+> K
+
+X
+
+> k=1
+> M
+
+X
+
+> i=1
+
+ 1
+
+K U ∗ 
+
+> i
+
+(θki ) − θki Ni,k 
+
+
+
++ Reg θ (K). (4) 
+
+Step 3: OCO control of the budget violation. Let b := BK be the average rollout budget per epoch. The total budget violation of the online allocation is 
+
+" K
+
+X
+
+> k=1
+> M
+
+X
+
+> i=1
+
+Ni,k − B
+
+#
+
+> +
+
+.
+
+Since B = Kb , we can rewrite the violation as 
+
+" K
+
+X
+
+> k=1
+> M
+
+X
+
+> i=1
+
+Ni,k − b
+
+!# 
+
+> +
+
+.
+
+Let M := [0 , ¯μ] be the compact domain for the global budget dual variable, where ¯ μ ≥ 1. For any scalar z,we have [z]+ ≤ max  
+
+> μ∈M
+
+μz. 
+
+Applying this inequality with 
+
+z =
+
+> K
+
+X
+
+> k=1
+> M
+
+X
+
+> i=1
+
+Ni,k − b
+
+!
+
+,
+
+we obtain " KX
+
+> k=1
+> M
+
+X
+
+> i=1
+
+Ni,k − B
+
+#
+
+> +
+
+≤ max 
+
+> μ∈M
+> K
+
+X
+
+> k=1
+
+μ
+
+> M
+
+X
+
+> i=1
+
+Ni,k − b
+
+!
+
+.
+
+Define the budget dual reward function 
+
+qk (μ) := μ
+
+> M
+
+X
+
+> i=1
+
+Ni,k − b
+
+!
+
+.
+
+Assume that the global budget online concave maximization subroutine guarantees max 
+
+> μ∈M
+> K
+
+X
+
+> k=1
+
+qk (μ) −
+
+> K
+
+X
+
+> k=1
+
+qk (μk ) ≤ Reg μ(K).
+
+Then " K
+
+X
+
+> k=1
+> M
+
+X
+
+> i=1
+
+Ni,k − B
+
+#
+
+> +
+
+≤
+
+> K
+
+X
+
+> k=1
+
+qk (μk ) + Reg μ(K)=
+
+> K
+
+X
+
+> k=1
+
+μk
+
+> M
+
+X
+
+> i=1
+
+Ni,k − b
+
+!
+
++ Reg μ(K).
+
+(5) Adding (4) and (5), we get 
+
+− ALG +
+
+" K
+
+X
+
+> k=1
+> M
+
+X
+
+> i=1
+
+Ni,k − B
+
+#
+
+> +
+
+≤
+
+> K
+
+X
+
+> k=1
+
+( M
+
+X
+
+> i=1
+
+ 1
+
+K U ∗ 
+
+> i
+
+(θki ) − θki Ni,k 
+
+
+
++ μk
+
+> M
+
+X
+
+> i=1
+
+Ni,k − b
+
+!) 
+
++ Reg θ (K) + Reg μ(K). (6) 20 
+
+Step 4: Comparison with an evenly spread offline optimum. Let N ⋆i,k be an optimal offline allocation for the benchmark, and define the cumulative offline allocation for prompt i by 
+
+n⋆i := 
+
+> K
+
+X
+
+> k=1
+
+N ⋆i,k .
+
+Consider the evenly spread version of this offline allocation: ¯N ⋆i,k := n⋆i
+
+K , i ∈ [M ], k ∈ [K].
+
+Since 0 ≤ N ⋆i,k ≤ Nmax , we have 0 ≤ n⋆i ≤ KN max ,
+
+and therefore 0 ≤ ¯N ⋆i,k ≤ Nmax .
+
+Thus ¯N ⋆i,k is feasible for the per-round allocation subproblem in the continuous relaxation. At epoch k, the allocation rule chooses 
+
+Ni,k ∈ arg max 
+
+> 0≤n≤Nmax
+
+(θki − μk )n. 
+
+Therefore, for every i and k,(θki − μk )Ni,k ≥ (θki − μk ) ¯N ⋆i,k .
+
+Equivalently, 
+
+−(θki − μk )Ni,k ≤ − (θki − μk ) ¯N ⋆i,k .
+
+Adding 1 
+
+> K
+
+U ∗ 
+
+> i
+
+(θki ) and summing over i, we obtain 
+
+> M
+
+X
+
+> i=1
+
+ 1
+
+K U ∗ 
+
+> i
+
+(θki ) − θki Ni,k 
+
+
+
++ μk
+
+> M
+
+X
+
+> i=1
+
+Ni,k − b
+
+!
+
+≤
+
+> M
+
+X
+
+> i=1
+
+ 1
+
+K U ∗ 
+
+> i
+
+(θki ) − θki ¯N ⋆i,k 
+
+
+
++ μk
+
+> M
+
+X
+
+> i=1
+
+¯N ⋆i,k − b
+
+!
+
+.
+
+(7) Using ¯N ⋆i,k = n⋆i /K , the first term on the right-hand side becomes 
+
+> M
+
+X
+
+> i=1
+
+ 1
+
+K U ∗ 
+
+> i
+
+(θki ) − θki
+
+n⋆i
+
+K
+
+
+
+= 1
+
+K
+
+> M
+
+X
+
+> i=1
+
+U ∗ 
+
+> i
+
+(θki ) − θki n⋆i
+
+ .
+
+By the Fenchel inequality from Step 1, for any θki ∈ [0 , c i], 
+
+Ui(n⋆i ) ≤ θki n⋆i − U ∗ 
+
+> i
+
+(θki ).
+
+Equivalently, 
+
+U ∗ 
+
+> i
+
+(θki ) − θki n⋆i ≤ − Ui(n⋆i ).
+
+Therefore, 1
+
+K
+
+> M
+
+X
+
+> i=1
+
+U ∗ 
+
+> i
+
+(θki ) − θki n⋆i
+
+ ≤ − 1
+
+K
+
+> M
+
+X
+
+> i=1
+
+Ui(n⋆i ) = − OPT 
+
+K .21 It remains to control the budget term. Since the offline allocation is feasible, 
+
+> M
+
+X
+
+> i=1
+
+n⋆i =
+
+> M
+
+X
+
+> i=1
+> K
+
+X
+
+> k=1
+
+N ⋆i,k ≤ B. 
+
+Hence M
+
+X
+
+> i=1
+
+¯N ⋆i,k = 1
+
+K
+
+> M
+
+X
+
+> i=1
+
+n⋆i ≤ BK = b. 
+
+Since μk ≥ 0, we have 
+
+μk
+
+> M
+
+X
+
+> i=1
+
+¯N ⋆i,k − b
+
+!
+
+≤ 0.
+
+Combining the preceding inequalities gives, for every epoch k,
+
+> M
+
+X
+
+> i=1
+
+ 1
+
+K U ∗ 
+
+> i
+
+(θki ) − θki Ni,k 
+
+
+
++ μk
+
+> M
+
+X
+
+> i=1
+
+Ni,k − b
+
+!
+
+≤ − OPT 
+
+K .
+
+Summing over k = 1 , . . . , K , we obtain 
+
+> K
+
+X
+
+> k=1
+
+( MX
+
+> i=1
+
+ 1
+
+K U ∗ 
+
+> i
+
+(θki ) − θki Ni,k 
+
+
+
++ μk
+
+> M
+
+X
+
+> i=1
+
+Ni,k − b
+
+!) 
+
+≤ − OPT . (8) 
+
+Step 5: Combine the inequalities Substituting (8) into (6), we get 
+
+−ALG +
+
+" KX
+
+> k=1
+> M
+
+X
+
+> i=1
+
+Ni,k − B
+
+#
+
+> +
+
+≤ − OPT + Reg θ (K) + Reg μ(K).
+
+Rearranging, 
+
+OPT − ALG +
+
+" K
+
+X
+
+> k=1
+> M
+
+X
+
+> i=1
+
+Ni,k − B
+
+#
+
+> +
+
+≤ Reg θ (K) + Reg μ(K).
+
+Since the budget violation term is nonnegative, we can drop it from the left-hand side and obtain 
+
+OPT − ALG ≤ Reg θ (K) + Reg μ(K).
+
+Lemma 1 (OCO regret for dual ascent updates) . Let 
+
+Θϵ := 
+
+> M
+
+Y
+
+> i=1
+
+[ϵ, c i], M := [0 , ¯μ],
+
+where ci = ηq i, ϵ > 0, and ¯μ < ∞. Suppose that the prompt-level dual reward functions ψk : Θ ϵ → R are concave and have uniformly bounded supergradients: 
+
+∥∇ ψk (θ)∥2 ≤ Gθ , ∀θ ∈ Θϵ, k ∈ [K],
+
+and that the budget dual reward functions qk : M → R are concave and have uniformly bounded supergradients: 
+
+|∇ qk (μ)| ≤ Gμ, ∀μ ∈ M , k ∈ [K].
+
+Consider the projected online gradient ascent updates 
+
+θk+1 = Π Θϵ
+
+ θk + ηθ ∇ψk (θk ) ,
+
+and 
+
+μk+1 = Π M
+
+ μk + ημ∇qk (μk ) .22 
+
+Then, with 
+
+ηθ = Dθ
+
+Gθ
+
+√K , ημ = Dμ
+
+Gμ
+
+√K ,
+
+where 
+
+Dθ := sup 
+
+> θ,θ ′∈Θϵ
+
+∥θ − θ′∥2, Dμ := sup 
+
+> μ,μ ′∈M
+
+|μ − μ′|,
+
+we have 
+
+max 
+
+> θ∈Θϵ
+> K
+
+X
+
+> k=1
+
+ψk (θ) −
+
+> K
+
+X
+
+> k=1
+
+ψk (θk ) ≤ Dθ Gθ
+
+√K, 
+
+and 
+
+max 
+
+> μ∈M
+> K
+
+X
+
+> k=1
+
+qk (μ) −
+
+> K
+
+X
+
+> k=1
+
+qk (μk ) ≤ DμGμ
+
+√K. 
+
+Consequently, 
+
+Reg θ (K) = O(√K), Reg μ(K) = O(√K).
+
+According to Lemma 1, we can immediately obtain: Reg = OPT − ALG = O(√K).
+
+This completes the proof. 
+
+Appendix B: Proof of Lemma 1 
+
+W e prove the two regret bounds using the standard analysis of projected online gradient ascent. The proof is included for completeness. First consider the prompt-level dual variables. Let Θϵ =
+
+> M
+
+Y
+
+> i=1
+
+[ϵ, c i],
+
+and define its diameter 
+
+Dθ := sup 
+
+> θ,θ ′∈Θϵ
+
+∥θ − θ′∥2.
+
+The projected gradient ascent update is 
+
+θk+1 = Π Θϵ
+
+ θk + ηθ ∇ψk (θk ) .
+
+Fix any comparator θ ∈ Θϵ. By non-expansiveness of Euclidean projection, 
+
+∥θk+1 − θ∥22 ≤ θk + ηθ ∇ψk (θk ) − θ 22
+
+= ∥θk − θ∥22 + 2 ηθ ∇ψk (θk ), θ k − θ + η2 
+
+> θ
+
+∥∇ ψk (θk )∥22.
+
+Rearranging gives 
+
+∇ψk (θk ), θ − θk ≤ ∥θk − θ∥22 − ∥ θk+1 − θ∥22
+
+2ηθ
+
++ ηθ
+
+2 ∥∇ ψk (θk )∥22.
+
+Since ψk is concave, we have 
+
+ψk (θ) − ψk (θk ) ≤ ∇ψk (θk ), θ − θk .
+
+Combining the preceding two inequalities and using ∥∇ ψk (θk )∥2 ≤ Gθ , we obtain 
+
+ψk (θ) − ψk (θk ) ≤ ∥θk − θ∥22 − ∥ θk+1 − θ∥22
+
+2ηθ
+
++ ηθ G2
+
+> θ
+
+2 .23 Summing over k = 1 , . . . , K , the squared-distance terms telescope: 
+
+> K
+
+X
+
+> k=1
+
+ψk (θ) − ψk (θk ) ≤ ∥θ1 − θ∥22
+
+2ηθ
+
++ ηθ G2 
+
+> θ
+
+K
+
+2
+
+≤ D2
+
+> θ
+
+2ηθ
+
++ ηθ G2 
+
+> θ
+
+K
+
+2 .
+
+Choosing 
+
+ηθ = Dθ
+
+Gθ
+
+√K
+
+yields K
+
+X
+
+> k=1
+
+ψk (θ) − ψk (θk ) ≤ Dθ Gθ
+
+√K. 
+
+Since this holds for every θ ∈ Θϵ, we have max 
+
+> θ∈Θϵ
+> K
+
+X
+
+> k=1
+
+ψk (θ) −
+
+> K
+
+X
+
+> k=1
+
+ψk (θk ) ≤ Dθ Gθ
+
+√K. 
+
+We next prove the corresponding bound for the global budget multiplier. Let 
+
+M = [0 , ¯μ], Dμ := sup 
+
+> μ,μ ′∈M
+
+|μ − μ′| = ¯ μ. 
+
+The projected gradient ascent update is 
+
+μk+1 = Π M
+
+ μk + ημ∇qk (μk ) .
+
+Fix any comparator μ ∈ M . By non-expansiveness of projection, 
+
+|μk+1 − μ|2 ≤ μk + ημ∇qk (μk ) − μ 2
+
+= |μk − μ|2 + 2 ημ∇qk (μk )( μk − μ) + η2
+
+> μ
+
+|∇ qk (μk )|2.
+
+Rearranging gives 
+
+∇qk (μk )( μ − μk ) ≤ |μk − μ|2 − | μk+1 − μ|2
+
+2ημ
+
++ ημ
+
+2 |∇ qk (μk )|2.
+
+Since qk is concave, 
+
+qk (μ) − qk (μk ) ≤ ∇ qk (μk )( μ − μk ).
+
+Using the uniform gradient bound 
+
+|∇ qk (μk )| ≤ Gμ,
+
+we get 
+
+qk (μ) − qk (μk ) ≤ |μk − μ|2 − | μk+1 − μ|2
+
+2ημ
+
++ ημG2
+
+> μ
+
+2 .
+
+Summing over k = 1 , . . . , K gives 
+
+> K
+
+X
+
+> k=1
+
+qk (μ) − qk (μk ) ≤ |μ1 − μ|2
+
+2ημ
+
++ ημG2
+
+> μ
+
+K
+
+2
+
+≤ D2
+
+> μ
+
+2ημ
+
++ ημG2
+
+> μ
+
+K
+
+2 .
+
+Choosing 
+
+ημ = Dμ
+
+Gμ
+
+√K24 yields K
+
+X
+
+> k=1
+
+qk (μ) − qk (μk ) ≤ DμGμ
+
+√K. 
+
+Since this holds for every μ ∈ M , we obtain max 
+
+> μ∈M
+> K
+
+X
+
+> k=1
+
+qk (μ) −
+
+> K
+
+X
+
+> k=1
+
+qk (μk ) ≤ DμGμ
+
+√K. 
+
+Therefore, Reg θ (K) = O(√K), Reg μ(K) = O(√K).
+
+This completes the proof. 
+
+Appendix C: Experimental Details 
+
+In this section, we provide the training details for all four LLMs used in our experiments. All models are trained with CERO for 500 optimization steps using the same OGD update rule. We use H800 GPUs for all runs: the 1.5B and 4B models are trained on 4 GPUs, while the 7B model is trained on 8 GPUs. R1-Distill-1.5B runs about 90 GPU hours, Qwen3-4B runs about 170 GPU hours and Qwen2.5-Math-7B runs about 200 GPU hours. We report OGD-related hyperparameters in Table 2. Across all models, we initialize μ and θ to 10 −6
+
+and 10 −7, respectively. The OGD hyperparameter η is set to 2 × 10 −3 for R1-Distill-1.5B and 1 × 10 −3 for the remaining models. We tune the learning rates for μ and θ separately for each model while keeping the remaining training protocol fixed. 
+
+Table 2 Training details for the four trained LLM.

@@ -1,0 +1,320 @@
+Title: Formalizing all indexed mathematics as a benchmark for general reasoning, with the example of implementing dilatations of categories
+
+URL Source: https://arxiv.org/pdf/2606.03835v1
+
+Published Time: Wed, 03 Jun 2026 01:25:44 GMT
+
+Number of Pages: 14
+
+Markdown Content:
+# Formalizing all indexed mathematics as a benchmark for general reasoning, with the example of implementing dilatations of categories 
+
+Arnaud Mayeux 
+
+mayeux@wisc.edu 
+
+Abstract. Formal rigor distinguishes mathematics from other disci-plines, in the sense that mathematical statements are derived from ex-plicit axioms by logically verifiable steps. Interactive theorem provers support this by expressing definitions, theorems, and proofs in a fully for-mal language and verifying them mechanically. We consider the bench-mark problem of formalizing all published mathematics as a machine-verifiable and continuously updated corpus of mathematical knowledge. This viewpoint treats mathematics as a structured database of interde-pendent results and raises questions about scalability and organization of large formal libraries. As a case study, we present an ongoing formal-ization in categorical algebra, namely dilatations of categories, extending classical localizations and illustrating what such an implementation looks like in practice. 
+
+Keywords: formalizing all published mathematics, benchmark, theo-rem provers, database, dilatations of categories 
+
+# 1 Introduction 
+
+This paper is situated in the context of the growing interaction between mathematics and computer-assisted reasoning systems. Recent develop-ments in interactive theorem provers have made the formal expression of definitions, theorems, and proofs in a fully formal language, and their mechanical verification, both possible and increasingly accessible in prac-tice. In parallel, libraries such as Mathlib in the Lean theorem prover system show that substantial parts of modern mathematics are already repre-sented in machine-checkable form. We motivate the benchmark problem of formalizing all indexed mathe-matics in a machine-verifiable system and maintaining it as a continu-ously updated formal corpus. We argue that, at a theoretical level, the program is feasible in principle, and we highlight organizational and in-frastructural challenges. Within this framework, we present an ongoing case study in the formal-ization of categorical constructions, focusing on dilatations of categories, 
+
+> arXiv:2606.03835v1 [cs.DB] 2 Jun 2026
+
+2 Arnaud Mayeux which extend the classical theory of localization. This serves as a concrete example of how new mathematical structures can be developed within an existing formal library. 
+
+# 2 Mathematics and rigor 
+
+In principle, by the very definition of mathematics, mathematics gives us results derived with absolute rigor, based on axioms. This absolute certainty makes mathematics special among sciences. In applications to other sciences, mathematics does not always guarantee truth or practical relevance; other sciences require empirical evidence, interpretations, and contextual understanding. As a pillar, mathematics must remain fully rigorous. However, we have reached a time when mathematics is vast, and sometimes errors arise due to its expansion and human imperfection in checking details. On the other hand, as anticipated a long time ago (cf. e.g. [20, 12]), we now have machines able to compute the validity of a fully formalized proof 1. Theorem provers like Lean can renew the spe-cial status of mathematics regarding rigor. Theorem provers transform the verification of rigor into formal computations performed by highly reliable physical systems. As explained, we now have a way to check and verify mathematics mechanically. Currently, it is humans who must com-municate with the machine and explain all the details. There is already an AI-generative tool in Lean that, in principle, can fill in the proof by itself, but, as of today, AI systems get stuck very quickly when formaliz-ing advanced math. For instance, they get stuck on the very first lines of a random published article. Most mathematical results build on earlier ones, and formalizing a result also requires formalizing what it relies on. We refer to [3, 21, 7, 22, 1, 2, 8, 13, 4] for recent surveys on Lean and the-orem provers written by researchers who have long been active in this field. 
+
+# 3 Formalizing all mathematics as a benchmark 
+
+We aim to develop general AI systems capable of supporting a wide range of human reasoning routines. The previous sentence is slightly informal, and it is natural to list some of these routines for clarity. Until very recently, almost all existing mathematics had been produced and verified by humans. Any system claiming to be general must be able to perform at least all basic tasks that humans can, including verifying advanced mathematical results. Thus, a general intelligent system has to contain all indexed mathematics in a formalized way. 
+
+> 1
+
+Theorem proving began with the Logic Theorist [20], the first AI program to prove mathematical theorems. Interactive systems like LCF (Milner, 1972) [16, 17], Automath (de Bruijn, 1970) [6], HOL (Gordon, 1981) [11], Coq (Coquand, Huet, 1988) [9], and Isabelle (Paulson, 1990) [23] integrated computing and formal logic for verification. Lean and mathlib aim to scale formalization to the broader mathematical literature [21, 22, 14]. Formalizing all indexed mathematics 3This suggests the following benchmark: formalize all published mathe-matics and update it in real time. As of 2025, the main database for mathematics, MathSciNet, lists 4.5 millions publications. Whatever the estimate for the average size required to formalize a mathematical publication, these data could easily be stored in a relatively small data center. Once this is done (even partly), the integration of these data with artificial reasoning and generative methods [18, 19] will provide a very powerful method for mathematical research. Without full formalization of all indexed papers, current AI is not reliable enough for rigorous original mathematical research at a high level. Fully formalized mathematics is key to developing serious AI-powered tool for mathematical research. 
+
+# 4 Organizing formalization 
+
+Formalizing all mathematics is very important. Improving the tool we use is important: one can only acknowledge smoother version and more user friendly one. However, once we have a theorem prover which in principle can support all of mathematics, the major difference will be if actually all of mathematics is implemented or not. This would require the involve-ment of mathematicians themselves, not only computer scientists 2. So it is crucial to make mathematicians themselves want to participate in this enterprise. Our main point here is that compatibility between versions of Lean is crucial: more mathematicians will be willing to invest time in the language if they are confident that it will not become obsolete or incompatible within a few years. The following is a list of comments on the formalization of mathematics. We make no claim of originality, as these questions arise naturally in this context. 1. As a basic principle, new formalization depends on what is already formalized, because theorems and definitions rely on previous theo-rems and definitions. 2. Each contributor will inherently influence what can be formalized next. 3. One would want a database for all formalized mathematics. Today, Mathlib (http://leanprover-community.github.io/mathlib4 docs/) re-sembles Bourbaki more than MathSciNet or zbMATH Open: a useful polished foundational selective library rather than a comprehensive catalog of mathematics. Reservoir (http://reservoir.lean-lang.org/) points toward that broader vision by indexing Lean packages and repositories, tracking dependencies and compatibility, and providing searchable metadata and documentation. At present, Reservoir op-erates mainly at the level of projects, providing infrastructure for archiving and indexing formalization projects. To our knowledge, MathSciNet and Reservoir are not currently integrated, and there does not yet exist a unified established infrastructure connecting 
+
+> 2
+
+We already have hundreds of mathematicians involved with Lean and mathlib, and the number of participants continues to grow. However, as of today, this still represents only a small proportion of mathematicians. 4 Arnaud Mayeux large-scale mathematical publication indexing with large-scale for-malized mathematics repositories. 4. In case new versions of Lean appear, it is important to have a way to translate older formalizations into the new version to keep all formalized material compatible. In our opinion, this is fundamental to convince everybody that formalizing some mathematics is not time wasting. 5. When AI-assisted auto-formalization become better and better, we will have to focus carefully on the concordance on what AI produces and what the original paper actually said. This verification also applies to current human-produced formalizations. The database should include a section indicating the corresponding mathematical references and the formalization journal that validated each concor-dance. Including a user commentary section could be useful too. 6. A decisive step will occur when the speed of formalization surpasses the production of new unformalized mathematical knowledge. As of today, the volume of new mathematical publications is still much higher than the volume of formalization projects. 7. When a significant part of mathematics is formalized and a signifi-cant portion of new results relies on formalized mathematics, some pure math journals may start adding a ‘formalized’ label to pub-lications. Over time, by verified mathematics, new generations of mathematicians may mean by default what is formalized in such a system. In the rest of this paper, we will illustrate the above discussion on the example of dilatations of categories. Dilatation of categories is a very general and recently published construction in category theory. This con-struction relies on localization of categories. Localization of categories, introduced by Gabriel-Zisman [10], is now viewed as foundational and it has been formalized in Lean 4 and included in mathlib. Looking at the material of the formalization of localization of categories, we observed that it is accessible to formalize dilatations of categories. Therefore we decided to do this formalization. We mostly produced this formalization ourselves, as current AI systems were not able to correctly formalize this result. In this case, we therefore had to guide the formaliza-tion process manually. Again, the more the system is trained on various kinds of formalized mathematics, the more it will be able to perform later. 
+
+# 5 Categorical algebra in Lean 
+
+5.1 What are dilatations? 
+
+If one has a structure with a composition law (e.g. multiplication of numbers, or composition of arrows), which happens very often in math-ematics, one is familiar with the concept of fraction. A fraction is the quotient of a numerator by a denominator. By definition, the fraction composed appropriately with the denominator of the fraction equals the numerator. Dilatations form a very general process that adds fractions to a structure in a universal way [15]. Formalizing all indexed mathematics 5This refines localization [10], a well-known construction which is already formalized and part of mathlib. We use much of the material on local-ization in this work. We now fix a category C with objects Ob C and morphisms M or C. Let 
+
+Σ be a collection of morphisms of C. Let us recall some properties of the localization C[Σ−1]. We have a functor L : C → C [Σ−1]. The objects of the localization C[Σ−1] coincide with the objects of C, i.e. L is the identity on objects. Given a morphism d in Σ, L(d) is an isomorphism in 
+
+C[Σ−1]. If F : C → D is another functor such that F (d) is an isomorphism for all d in Σ, then F factors through L. Now assume that for any d in Σ
+
+we have a sieve Nd, in C over the codomain of d. The dilatation process will provide a category C′ and a functor Θ : C → C ′. The objects of C′
+
+will also coincide with the objects of C. For any d ∈ Σ and any n ∈ Nd,there exists a unique arrow b in C′ such that the diagram 
+
+X Y
+
+Z 
+
+> Θ(n)
+> bΘ(d)
+
+commutes. The element b is thought of as a non-commutative fraction 
+
+d\n = d−1 ◦ n. Dilatations also satisfy a natural universal property [15], namely Θ is universal among all functors F : C → D such that 1. the sieve generated by F (Nd) is included in the sieve generated by 
+
+F (d), for all morphisms d in the collection Σ,2. the localization D → D [Σ−1] is faithful. In the following, we discuss our ongoing formalization of dilatations of categories in Lean. The repository is available at https://github.com/rndmx/DilCat. All the material presented here compile correctly. The final version may differ slightly in some parts of the code. 
+
+5.2 Sieves 
+
+Recall that if X a
+
+−→ Y belongs to M or C, dom (a) := X is called the domain and cod (a) := Y the codomain (note that dom and cod also make sense for directed graphs). Recall that a sieve in C with codomain 
+
+X is a collection of morphisms stable by precompositions and whose codomains are X. This notion has been implemented in Lean in 
+
+Mathlib.CategoryTheory.Sites.Sieves .
+
+structure Sieve {C : Type u 1} [Category.{v 1} C] (X : C) where arrows : Presieve X downward_closed : ∀ {Y Z f} (_ : arrows f) (g : Z −→ Y), arrows (g ≫ f) 
+
+A preseave is a set of arrow with fixed codomain. 
+
+def Presieve (X : C) := 
+
+∀ {| Y|} , Set (Y −→ X) 6 Arnaud Mayeux 
+
+5.3 Directed graphs and localizations 
+
+In this section, we discuss localizations of categories. The content of this subsection was introduced in [10]. Here we follow the treatment in [15] and the formalization in 
+
+Mathlib.CategoryTheory.Localization.Construction . Let Σ be a col-lection of morphisms of C. In the formalization W corresponds to Σ in [15]. 
+
+Definition 51 Let G be the oriented graph (quiver) defined as follows. The vertices of G are equal to the objects of C. The directed lines of G
+
+are made of 1. for each morphism a of C, a directed line dom (a) a
+
+−→ cod (a) of G,2. for each morphism d in Σ a directed line cod (d) ld
+
+−→ dom (d) of G (in particular dom (ld) = cod (d) and cod (ld) = dom (d)). 
+
+universe uC’ uD’ uC uD variable {C : Type uC} [Category.{uC’} C] (W : MorphismProperty C) {D : Type uD} [Category.{uD’} D] namespace Localization namespace Construction structure LocQuiver (W : MorphismProperty C) where obj : C instance : Quiver (LocQuiver W) where Hom A B := (A.obj −→ 
+
+B.obj) ⊕ { f : B.obj −→ A.obj // W f } 
+
+Definition 52 A Σ-sequence of directed lines in G is a sequence, fi-nite and possibly empty, of directed lines x1, x 2, . . . , x n of G such that 
+
+cod (xi) = dom (xi+1 ) (n ⩾ 0 is an integer). By convention, an empty sequence is just an element in the collection Ob C. For a non-empty se-quence s = ( x1, . . . , x n), we define the domain as dom (s) = dom (x1) and the codomain as cod (s) = cod (xn). If a sequence s is empty and given by an object X, then we put dom (s) = cod (s) = X. Note that Σ-sequences of directed lines with compatible domains and codomains can be composed (by convention, composing a sequence s with an empty sequence e gives 
+
+s). 
+
+Definition 53 We say that two Σ-sequences of directed lines s and s′
+
+in G are equivalent if dom (s) = dom (s′), cod (s) = cod (s′) and if one can be obtained from the other by a chain of elementary equivalences of the following types: Formalizing all indexed mathematics 7
+
+1. a sequence x1, . . . , x n such that xi, x i+1 are equal to a, a ′ ∈ M or C
+
+and cod (a) = dom (a′), for some 1 ⩽ i, i + 1 ⩽ n, is equivalent to the sequence x1, . . . , x i−1, x ′, x i+2 , . . . , x n where x′ is the composition of 
+
+a and a′ in C,2. a sequence x1, . . . , x n such that xi, x i+1 are equal to ld, d with d ∈ Σ,for some 1 ⩽ i, i + 1 ⩽ n, is equivalent to the sequence 
+
+x1, . . . , x i−1, x i+2 , . . . , x n,3. a sequence x1, . . . , x n such that xi, x i+1 are equal to d, l d with d ∈ Σ,for some 1 ⩽ i, i + 1 ⩽ n, is equivalent to the sequence 
+
+x1, . . . , x i−1, x i+2 , . . . , x n,4. for any object X, the sequence Id X is equivalent to the empty se-quence at X.In other words and informally, two Σ-sequences of directed lines are equivalent if one can be obtained from the other by the operations con-sisting in exchanging parts of sequences as follows: 
+
+X a
+
+−→ Y a′
+
+−→ Z ↭ X a′◦a
+
+−−−→ ZY ld
+
+−→ Z d
+
+−→ Y ↭ Y (the empty sequence at Y )
+
+Z d
+
+−→ Y ld
+
+−→ Z ↭ Z (the empty sequence at Z)
+
+X Id X
+
+−−−→ X ↭ X (the empty sequence at X).
+
+The equivalence class of a sequence s is denoted by [s]. Note that equiv-alence classes of Σ-sequences of directed lines with compatible domains and codomains can be composed associatively. 
+
+Definition 54 A Σ-fraction is an equivalence class of Σ-sequence. 
+
+def ιPaths (X : C) : Paths (LocQuiver W) := 
+
+⟨X⟩
+
+@[simp] def ψ1 {X Y : C} (f : X −→ Y) : ιPaths W X −→ ιPaths W Y := (Paths.of _).map (Sum.inl f) @[simp] def ψ2 {X Y : C} (w : X −→ Y) (hw : W w) : ιPaths W Y −→ ι
+
+Paths W X := (Paths.of _).map (Sum.inr ⟨w, hw ⟩)inductive relations : HomRel (Paths (LocQuiver W)) | id (X : C) : relations ( ψ1 W ( 1 X)) ( 1 _) | comp {X Y Z : C} (f : X −→ Y) (g : Y −→ Z) : relations (ψ1 W (f ≫ g)) ( ψ1 W f ≫ ψ1 W g) 8 Arnaud Mayeux 
+
+| Winv 1 {X Y : C} (w : X −→ Y) (hw : W w) : relations ( ψ1 Ww ≫ ψ2 W w hw) ( 1 _) | Winv 2 {X Y : C} (w : X −→ Y) (hw : W w) : relations ( ψ2 Ww hw ≫ ψ1 W w) ( 1 _) 
+
+Definition 55 The localization of C relatively to Σ is the category C[Σ−1]
+
+whose objects are the objects of C and whose morphisms are Σ-fractions. We have a canonical functor L : C → C [Σ−1].
+
+def Localization := CategoryTheory.Quotient (Localization.Construction.relations W) instance : Category (Localization W) := by dsimp only [Localization] infer_instance def Q : C =⇒ W.Localization where obj X := (Quotient.functor _).obj ((Paths.of _).obj ⟨X⟩)map f := (Quotient.functor _).map ( ψ1 W f) map_id X := Quotient.sound _ (relations.id X) map_comp f g := Quotient.sound _ (relations.comp f g) 
+
+Proposition 56 (Universal property of localization) Let F : C → D be a functor such that F (d) is invertible for all d in Σ. Then there exists a unique functor F ′ : C[Σ−1] → D such that F = F ′ ◦ L.
+
+@[simps!] def lift : W.Localization =⇒ D := Quotient.lift (relations W) (liftToPathCategory G hG) (by rintro ⟨X⟩ ⟨ Y⟩ f1 f2 rrcases r with ⟨⟩ <;> all_goals aesop) theorem uniq (G 1 G2 : W.Localization =⇒ D) (h : W.Q ≫ G1 =W.Q ≫ G2) : G 1 = G 2
+
+5.4 Implementing dilatations of categories: centers 
+
+Let C be a category. 
+
+Definition 57 A center in C is a collection {[Ni, d i]}i∈I of pairs [Ni, d i],indexed by a collection I and such that, for all i in I, di is a morphism of C and Ni is a sieve over cod (di).Formalizing all indexed mathematics 9
+
+structure Center (C : Type u) [Category.{v} C] where I : Type u (nonempty : Nonempty I) dom : I → Ccod : I → Cmor : ∀ i : I, dom i −→ cod i N : ∀ i : I, Sieve (C := C) (cod i) 
+
+We now introduce the localized category and the quiver associated to the morphisms mor applying the material in Mathlib. 
+
+def IsCenterMor (f : Σ X Y : C, X −→ Y) : Prop := 
+
+∃ i : Z.I, f = ⟨Z.dom i, Z.cod i, Z.mor i ⟩
+
+def CenterMorphismProperty : MorphismProperty C := fun X Y f => IsCenterMor Z ⟨X, Y, f ⟩
+
+def CenterLocalization : Type u := (CenterMorphismProperty Z).Localization def LocalizationFunctor : C =⇒ (CenterMorphismProperty Z).Localization := (CenterMorphismProperty Z).Q def Quiv := LocQuiver (CenterMorphismProperty Z) 
+
+5.5 Implementing dilatations of categories: prescribed fractions 
+
+We now fix a center {[Ni, d i]}i∈I in C (we sometimes use the notation 
+
+Ndi to denote Ni). Put Σ = {di}i∈I .
+
+Definition 58 A {[Ni, d i]}i∈I -fraction is a Σ-fraction such that a rep-resentative can be written as 
+
+X1
+
+> n1
+
+−−→ Y1
+
+> ldi1
+
+−−−→ X2
+
+> n2
+
+−−→ Y2
+
+> ldi2
+
+−−−→ X3 . . . X knk
+
+−−→ Ykldik
+
+−−−→ Xk+1 
+
+> a
+
+−→ Xk+2 
+
+with a ∈ M or C, k ⩾ 0 and ij ∈ I, ni ∈ Nij for all j ∈ { 1, . . . , k }.
+
+structure Fraction := (k : N)(Xs : N → C) (Ys : N → C) (i : N → Z.I) (n_orig : Π (j : {j // j < k}), Xs j −→ Ys j) (n_dom : ∀ j : {j // j < k}, Z.dom (i j) = Xs (j+1)) (n_cod : ∀ j : {j // j < k}, Z.cod (i j) = Ys j) 10 Arnaud Mayeux 
+
+n : Π (j : {j // j < k}), Xs j −→ Z.cod (i j) := 
+
+λ j => n_orig j ≫ eqToHom (n_cod j).symm (n_in_N : ∀ j : {j // j < k }, Z.N (i j) (n j)) (a : Xs (k) −→ Xs (k+1)) (a_dom : Z.dom (i (k)) = Xs (k)) def inv_in_path (F: Fraction Z) (j : {j // j < (F.k )}): 
+
+ιPaths (CenterMorphismProperty Z) (Z.cod (F.i j)) −→ 
+
+ιPaths (CenterMorphismProperty Z) (Z.dom (F.i j)) := Localization.Construction. ψ2 (CenterMorphismProperty Z) (Z.mor (F.i j)) ⟨F.i ↑j, rfl ⟩
+
+def fraction_in_path_single (F : Fraction Z) (j : {j // j < F.k }) : 
+
+ιPaths (CenterMorphismProperty Z) (F.Xs j) −→ 
+
+ιPaths (CenterMorphismProperty Z) (F.Xs (j+1)) := Localization.Construction. ψ1 (CenterMorphismProperty Z) (F.n j) ≫
+
+inv_in_path Z F j ≫
+
+eqToHom (congrArg ( ιPaths (CenterMorphismProperty Z)) (F.n_dom j)) def fraction_in_path_seq (F : Fraction Z) : 
+
+Π (n : {n // n < F.k }), 
+
+ιPaths (CenterMorphismProperty Z) (F.Xs 0) −→ ιPaths (CenterMorphismProperty Z) (F.Xs (n+1)) | ⟨0, h ⟩ => fraction_in_path_single Z F ⟨0, h ⟩
+
+| ⟨n+1, h ⟩ => let prev : {j // j < F.k } := ⟨n, Nat.lt_of_succ_lt h ⟩
+
+fraction_in_path_seq F prev ≫ fraction_in_path_single Z F ⟨
+
+n+1, h ⟩
+
+def fraction_in_path_last (F : Fraction Z) : 
+
+ιPaths (CenterMorphismProperty Z) (F.Xs 0) −→ ιPaths (CenterMorphismProperty Z) (F.Xs (F.k)):= if h : F.k = 0 then eqToHom (congrArg ( ιPaths (CenterMorphismProperty Z)) (by rw [h])) else let x := F.k - 1 have hx : F.k-1 < F.k := Nat.sub_lt (Nat.pos_of_ne_zero h) (Nat.succ_pos _) fraction_in_path_seq Z F ⟨F.k - 1, hx ⟩ ≫ 
+
+eqToHom (congrArg ( ιPaths (CenterMorphismProperty Z)) (congrArg (F.Xs) (Nat.succ_pred_eq_of_pos (Nat.pos_of_ne_zero h)))) def fraction_in_path_full (F : Fraction Z) : 
+
+ιPaths (CenterMorphismProperty Z) (F.Xs 0) −→ ιPaths (CenterMorphismProperty Z) (F.Xs (F.k+1)):= Formalizing all indexed mathematics 11 
+
+fraction_in_path_last Z F ≫
+
+Localization.Construction. ψ1 (CenterMorphismProperty Z) (F.a) def fraction_in_loc_full (F : Fraction Z) :objEquiv (CenterMorphismProperty Z) (F.Xs 0) −→ 
+
+objEquiv (CenterMorphismProperty Z) (F.Xs (F.k+1)) := (CategoryTheory.Quotient.functor (relations (CenterMorphismProperty Z))).map (fraction_in_path_full Z F) 
+
+The dilatation of C with center {[Ni, d i]}i∈I is the category C′ defined as follows. The objects of C′ are equal to the objects of C. If X and Y are objects in C′, morphisms between X and Y are given by {[Ni, d i]}i∈I -fractions (cf. Definition 58) with domain X and codomain Y .We plan to formalize the following theorem as part of the continuing development of this work in progress. 
+
+Theorem 59 (Universal property) Let F : C → D be a Σ-regular func-tor (i.e. D → D [Σ−1] is faithful, cf. [15]) such that for any i in I, we have 
+
+SD  
+
+> F(Ni)
+
+⊂ SD 
+
+> F(di)
+
+.
+
+Then there is a unique functor F ′ : C′ → D such that the triangle of functors 
+
+C D
+
+C′  
+
+> F
+> ΘF′
+
+commutes. 
+
+# Limitations 
+
+1) The proposed benchmark of formalizing all indexed mathematics has limitations, as it depends on the clarity, consistency, and completeness of existing mathematical literature, and some published results may be incorrect, underspecified, or ambiguous, and may therefore require cor-rection, clarification, or reformulation before formalization. 2) Requiring all work to be fully formalized may limit the creativity of some visionary research. However, this is not a major problem, as it remains sufficient to distinguish strict, formal mathematics from more exploratory approaches in the field. It is still possible to publish visionary work that is not fully formalizable. 3) A key question is whether full formalization of the mathematical lit-erature is feasible at scale. The global mathematical corpus, as indexed in major repositories such as AMS-related databases, contains approxi-mately 4 .5 × 10 6 publications. An estimate of the formalization effort ranges from 0 .5 to 50 person-months per paper. For the corpus of 4 .5 × 10 6 publications, this yields: 12 Arnaud Mayeux 4.5 × 10 6 × 0.5 = 2 .25 × 10 6 person-months (≈ 1.88 × 10 5 person-years) ,
+
+4.5 × 10 6 × 50 = 2 .25 × 10 8 person-months (≈ 1.88 × 10 7 person-years) .
+
+Assuming partly AI-assisted formalization can provide efficiency gains between 5 × and 20 ×, the effective effort is reduced to approximately 9.4 × 10 3–3 .75 × 10 6 person-years. From a data infrastructure perspective, the total corpus size is quite small compared to modern industrial systems [5]. Hyperscale datacenters routinely operate at the exabyte scale (10 18 bytes). Assuming a combined representation size (PDF, LaTeX, Lean formaliza-tion, and associated integrating data) of approximately 1–100 MB per publication, the full mathematical corpus of 4 .5×10 6 papers is estimated to require between 4 .5 × 10 12 bytes ( ≈ 4.5 TB) and 4 .5 × 10 14 bytes ( ≈
+
+450 TB). This places the problem in a regime where computational storage is not limiting; instead, the dominant difficulty lies in structural transformation of unformalized knowledge into a consistent machine-verifiable represen-tation. While significant coordination and sustained effort will be required, both technological trends and community momentum suggest that full formal-ization of the indexed mathematical literature is a realistic long-term objective. It is plausible that in the near future, autoformalization sys-tems will be able to produce formalizations of some papers in seconds. For some papers, a human expert could then review and validate the autoformalized version in just a few minutes. This would dramatically reduce the effective effort. 
+
+# Declaration 
+
+The author declares that all materials reproduced from other sources are used with appropriate permissions and are duly cited. The author has no conflicts of interest that could affect the integrity or objectiv-ity of this work. This chapter is independent and has no connections or endorsements with other contributions in this volume. All funding, in-stitutional support, and contributions from individuals or organizations are gratefully acknowledged. The opinions expressed in this chapter are solely those of the author and do not necessarily reflect the views of affil-iated institutions. Generative AI tools may have been used for language refinement, but the author retains full responsibility for the content. 
+
+# Acknowledgements 
+
+The author thanks the anonymous reviewers for their constructive cri-tiques, comments, and supportive feedback, which improved the quality of the manuscript. Formalizing all indexed mathematics 13 
+
+# References 
+
+1. J. Avigad, Varieties of mathematical understanding, Bull. Amer. Math. Soc. (N.S.) 59 (2022), no. 1, 99–117 2. J. Avigad, Automated reasoning for mathematics, in Automated reasoning. Part I, 3–20, Lecture Notes in Comput. Sci. Lecture Notes in Artificial Intelligence, 14739, Springer, Cham, 2024. 3. J. Avigad, J. Harrison, Formally verified mathematics, Commun. ACM 57, 4 (2014), 66–75. 4. J. Avigad, J. Commelin, H. Macbeth and A. Topaz, Anatomy of a formal proof, Notices Amer. Math. Soc. 72 (2025), no. 2, 188–195. 5. Barroso, L.A., H¨ olzle, U., Ranganathan, P. (2026). WSC Hardware: Data Center Infrastructure. In: The Data Center as a Computer. Syn-thesis Lectures on Computer Architecture. Springer, Cham. 6. N.G. de Bruijn, The mathematical language Automath, its usage, and some of its extensions. Symposium on Automatic Demonstra-tion. 1970 Lecture Notes in Mathematics, vol 125. Springer, Berlin, Heidelberg. 7. K. Buzzard, Computers and mathematics, Lond. Math. Soc. Newsl. No. 484 (2019), 32–36. 8. K. Buzzard, Mathematical reasoning and the computer, Bull. Amer. Math. Soc. (N.S.) 61 (2024), no. 2, 211–224. 9. T. Coquand, G. Huet, The calculus of constructions, Information and Computation, Volume 76, Issues 2–3, 1988, Pages 95-120. 10. P. Gabriel, M. Zisman: Calculus of fractions and homotopy theory. Ergebnisse der Mathematik und ihrer Grenzgebiete, Band 35. New York: Springer-Verlag, 1967 11. M. Gordon, HOL: A proof generating system for higher-order logic,(Technical Report No. 103). University of Cambridge, Computer Laboratory. (1987) 12. R. Hamming, The mechanization of science Proceedings of the 1961 16th ACM national meeting. Association for Computing Machinery, New York, United States 13. P. Massot, Teaching mathematics using lean and controlled natural language, in 15th International Conference on Interactive Theorem Proving, Art. No. 27, 19 pp., LIPIcs. Leibniz Int. Proc. Inform., 309, Schloss Dagstuhl. Leibniz-Zent. Inform., Wadern. 14. Lean Community, Mathlib. 15. A. Mayeux, Dilatations of Categories, Higher Structures, 9 (2025), no. 2, 62–75. 16. R. Milner, Logic for Computable Functions: Description of a Ma-chine Implementation. Technical Report STAN-CS-72-288, A.I. Memo 169, Stanford University. 17. R. Milner, The use of machines to assist in rigorous proof, Philos. Trans. Roy. Soc. London Ser. A 312 (1984), no. 1522, 411–422. 18. Mousavi, S., Schukat, M., Howley, E. Deep Reinforcement Learning: An Overview. Proceedings of Intelligent Systems Conference. Intel-liSys 2016. Lecture Notes in Networks and Systems, vol 16. Springer, Cham. 14 Arnaud Mayeux 19. Toward large reasoning models: A survey of reinforced reasoning with large language models, Patterns 6 (2025), 101370. 20. A. Newell, J. C. Shaw, and H. A. Simon, : The logic theory ma-chine: A complex information processing system, IRE Transactions on Information Theory, vol. 2, no. 3, pp. 61–79, Sept. 1956 21. L. C. de Moura et al., The lean theorem prover (system descrip-tion), in Automated deduction—CADE 25, 378–388, Lecture Notes in Comput. Sci. Lecture Notes in Artificial Intelligence, 9195 , 2015, Springer, Cham 22. L. de Moura and S. Ullrich, The Lean 4 theorem prover and pro-gramming language, in Automated deduction—CADE 28, 625–635, Lecture Notes in Comput. Sci., 12699, Springer, Cham, 2021. 23. L. Paulson: Isabelle. A generic theorem prover. Lecture Notes in Comput. Sci., 828 Springer-Verlag, Berlin, 1994.

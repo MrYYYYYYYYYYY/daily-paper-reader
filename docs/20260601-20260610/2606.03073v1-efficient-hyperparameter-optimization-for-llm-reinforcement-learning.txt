@@ -1,0 +1,737 @@
+Title: Efficient Hyperparameter Optimization for LLM Reinforcement Learning
+
+URL Source: https://arxiv.org/pdf/2606.03073v1
+
+Published Time: Wed, 03 Jun 2026 00:29:29 GMT
+
+Number of Pages: 13
+
+Markdown Content:
+# Efficient Hyperparameter Optimization for LLM Reinforcement Learning 
+
+Minping Chen 1, *, Bowen Xiao 1, ∗, Du Liang 3, Chuxuan Zeng 3, Zeyi Wen 1, 2, †1The Hong Kong University of Science and Technology (Guangzhou) 
+
+> 2
+
+The Hong Kong University of Science and Technology 
+
+> 3
+
+China United Network Communications Group 
+
+> 1
+
+{mchen779, bxiao012}@connect.hkust-gz.edu.cn , 1, 2 wenzeyi@hkust-gz.edu.cn 
+
+> 3
+
+{dul28, zengchuxuan}@chinaunicom.cn 
+
+Abstract 
+
+Hyperparameters are critical to LLM reinforce-ment learning (RL), but existing hyperparam-eter optimization (HPO) methods remain inef-ficient in this area, due to the massive model scale and resource-intensive training cycles. In this paper, we propose Joint Fidelity Hyperpa-rameter Optimization (JF-HPO), which simul-taneously adapts both model size and training budget as fidelity. JF-HPO is empowered by: (i) a small proxy model of the target LLM for effi-cient training and evaluation in each HPO trial; (ii) several carefully designed early-stopping strategies based on training dynamics; (iii) an efficient checkpointing mechanism to eliminate redundant computations. JF-HPO significantly improves the computational efficiency of each trial (up to 14.9 ×) compared with existing HPO methods, thus achieving better predictive accu-racy in most cases under the same time bud-get. Notably, JF-HPO delivers performance improvements ranging from 5.8% to 111.6% over VeRL Recipe. 
+
+1 Introduction 
+
+The emergence of large language models (LLMs) has revolutionized a broad spectrum of natural lan-guage understanding and generation tasks (Minaee et al., 2024). Recent models such as OpenAI-o1 (OpenAI, 2024) and DeepSeek-R1 (Guo et al., 2025) have demonstrated remarkable reasoning ca-pabilities, largely attributed to the advances in rein-forcement learning (RL) techniques. In particular, Reinforcement Learning from Human Feedback (RLHF) (Bai et al., 2022; Ouyang et al., 2022) and Reinforcement Learning with Verifiable Reward (RLVR) (Gao et al., 2024; Guo et al., 2025; Team et al., 2025) have been instrumental in aligning model outputs with human preferences and enhanc-ing logical reasoning through rule-based rewards.   
+
+> *Equal contribution
+> †Corresponding author
+
+Figure 1: Performance improvements of our JF-HPO method across various tasks. 
+
+Despite the success of RLHF and RLVR, RL-based training for LLMs remains sensitive to hy-perparameter configurations (Eimer et al., 2023). Small variations in hyperparameters such as learn-ing rate and clipping ratio can lead to signifi-cant differences in final model performance and stability (see Figure 3 for more details). Hy-perparameter optimization (HPO) thus becomes effective for LLM RL. Figure 1 (and Figure 5) presents the performance comparison between us-ing the recommended hyperparameters from the VeRL Recipe (Sheng et al., 2025) and our HPO method, which clearly demonstrates the effective-ness of HPO. However, HPO is extremely time-consuming for LLM RL, since it involves mul-tiple rounds of training and evaluation. While existing multi-fidelity HPO methods like Succes-sive Halving (Jamieson and Talwalkar, 2016) and BOHB (Falkner et al., 2018) allow early termina-tion of poorly performing configurations, they are still inefficient in the contexts of LLM RL due to the massive model size and high computation cost. To address the inefficiency issue of existing HPO methods for LLM RL, we propose J oint F idelity Hyper p arameter O ptimization (JF-HPO), a novel HPO framework that simultaneously adapts both 
+
+> arXiv:2606.03073v1 [cs.LG] 2 Jun 2026
+
+model size and training budget as fidelity within a unified Bayesian optimization procedure. Since training LLM is computation-intensive and HPO in-volves multiple rounds of model training, JF-HPO leverages a small proxy model of the target large model for efficient training and evaluation. Fur-thermore, JF-HPO incorporates intelligent early-stopping strategies based on training dynamics, e.g., reward and KL divergence, and introduces an efficient checkpointing mechanism to avoid re-dundant computation. With these innovations, JF-HPO significantly reduces the computational cost of HPO in the LLM RL scenario, thus outperform-ing existing HPO methods in most cases under the same time budget. The main contributions of this paper are summarized as follows: • We propose JF-HPO, a novel HPO method that concurrently adapts both model size and training budget as fidelity. By exploiting a small proxy model for the target large model, JF-HPO reduces remarkable computation cost associated with model training and evaluation in each optimization trial. • To further accelerate the HPO process, we design several early-stopping strategies that allow timely termination of underperforming trials. Furthermore, we introduce an efficient checkpointing mechanism to avoid redundant computation for multi-fidelity HPO. • We evaluate JF-HPO across diverse tasks, demonstrating its superior efficiency (up to 14.9× faster per trial) and effectiveness—it outperforms existing HPO methods in most cases (22 out of 24 runs of experiments) or match their performance under the same time budget, and achieves performance gains of 5.8% to 111.6% over VeRL Recipe. 
+
+2 Preliminary 
+
+In this section, we introduce the preliminaries of re-inforcement learning algorithms. In this work, we use Group Relative Policy Optimization (GRPO), which is proposed by DeepSeek (Shao et al., 2024), to demonstrate the effectiveness of our JF-HPO method. Before introducing GRPO, we first present the background of Proximal Policy Optimization (PPO) (Schulman et al., 2017) for completeness. Select a         
+
+> configuration
+> -fidelity pair
+> Model training
+> Efficient
+> checkpoint
+> Early stop Model
+> evaluation
+> Update
+> Observation data
+> Gaussian Process
+> HP space
+> Small model
+> Budget
+> Time cost
+
+Figure 2: Overview of our joint fidelity hyperparameter optimization (JF-HPO) method. 
+
+2.1 Proximal Policy Optimization 
+
+Proximal Policy Optimization (PPO) (Schulman et al., 2017) proposes a clipped surrogate objective for optimizing policies. By restricting policy up-dates to a proximal region of the previous policy through clipping, PPO enhances training stability and boosts sample efficiency of RL. In more detail, PPO maximizes the following objective to update the policy model during training: 
+
+JPPO (θ) = E(p,o )∼D ,o ≤t∼πθ, old (·| p)
+
+"
+
+min πθ(ot | p, o <t )
+
+πθ, old (ot | p, o <t ) ˆAt,
+
+clip 
+
+ πθ(ot | p, o <t )
+
+πθ, old (ot | p, o <t ) , 1 − ε, 1 + ε
+
+
+
+ˆAt
+
+!# 
+
+,
+
+where πθ is the policy model, πθ, old is the old policy model, (p, o ) is a prompt-output pair sam-pled from dataset D and old policy πθ, old , ε is the clipping range for stabilizing training, and ˆAt
+
+is the advantage estimation at time step t com-puted based on the generalized advantage estima-tion (GAE) (Schulman et al., 2015): 
+
+ˆAt =
+
+> ∞
+
+X
+
+> l=0
+
+(γλ )lδt+l,δt = Rt + γV (st+1 ) − V (st), 0 ≤ γ, λ ≤ 1,
+
+where l is the offset of time step t, γ is a discount factor in range [0 , 1] , λ is a hyperparameter in GAE, 
+
+Rt and st are the reward and state at time step t,and V is the value function. 
+
+2.2 Group Relative Policy Optimization 
+
+The value function in PPO is typically a model that has a comparable size to the policy model. This leads to substantial memory consumption and computation overhead. Furthermore, the use of the value function is not necessary in the LLM context. To address these issues, Group Relative Policy Optimization (GRPO) (Shao et al., 2024) eliminates the value function and computes the advantage based on the average reward of a group of sampled outputs {oi}Gi=1 for the same prompt p:
+
+ˆAi,t = ri − mean( {Ri}Gi=1 )std( {Ri}Gi=1 ) ,
+
+where ˆAi,t is the advantage of the i-th output. Then the objective for GRPO is:          
+
+> JGRPO (θ) = E(p,o )∼D ,{oi}Gi=1 ∼πθ, old (·| p)
+> "
+> 1
+> G
+> GX
+> i=1
+> 1
+> |oi|
+> |oi|
+> X
+> t=1
+> min
+> 
+> ri,t (θ) ˆAi,t ,
+> clip  ri,t (θ),1−ε, 1 + εˆAi,t
+> 
+> −βD KL (πθ∥πref )
+> !#
+> ,
+
+where ri,t (θ) = πθ (oi,t |p,o i,<t ) 
+
+> πθ, old (oi,t |p,o i,<t )
+
+, πref is the refer-ence model, DKL is KL divergence (Kullback and Leibler, 1951) function, and β is a hyperparameter. 
+
+3 Methodology 
+
+In this section, we first provide the problem for-mulation and an overview of our method, then we elaborate on the technical details of our method. 
+
+3.1 Problem Formulation 
+
+Given an RL algorithm f , we use f (θ) to represent the model performance (e.g., accuracy), where θ
+
+denotes the model parameters. Then the objective of HPO for RL can be formulated as solving the following optimization problem, aiming to find the optimal hyperparameter configuration, subject to a total time budget: 
+
+ϕ∗ = arg max ϕ∈Φ f (θ, ϕ ), s.t. PNi=1 C(θ, ϕ i, r i) < B
+
+where Φ is the hyperparameter space, C(θ, ϕ i, m i)
+
+denotes the time cost for the i-th HPO trial at the fidelity ri, N is the total number of HPO trials, B is a time budget and ϕ∗ is the optimal configuration. 
+
+Bayesian Optimization (BO) for HPO BO is a classical HPO method, which typically has two key components: a surrogate model M to approxi-mate the objective function f (θ), i.e., M is a prior of f (θ), and an acquisition function α to obtain a promising configuration from the hyperparameter space. M and α are typically a Gaussian Process (GP) and Expected Improvement (EI) (Moˇ ckus, 1974), respectively. BO first initializes an obser-vation set D = {(ϕi, y i)}ti=1 , where yi denotes the model performance, e.g., accuracy, and per-forms the following interactive steps: (i) maximize the acquisition function to select a configuration 
+
+ϕt+1 ; (ii) evaluate ϕt+1 to obtain yt+1 and add 
+
+(ϕt+1 , y t+1 ) to the observation set D; (iii) update the surrogate model with D.
+
+3.2 Overview 
+
+Before elaborating on the technical details of our Joint Fidelity Hyper p arameter O ptimization (JF-HPO) method, we provide an overview first. As presented in Figure 2, given the total time budget and hyperparameter space, JF-HPO iteratively per-forms four key steps: (i) It begins with selecting a configuration-fidelity pair by maximizing the ac-quisition function. (ii) The selected configuration-fidelity pair is then utilized for model training with a small proxy model, which significantly improves the training efficiency compared with using the tar-get large model. Additionally, a checkpoint mecha-nism and several early-stopping strategies are de-signed to further enhance training efficiency. (iii) After model training, evaluation is performed to obtain the model performance, e.g., accuracy. (iv) The observation data and the Gaussian Process are updated. We summarize the overall procedure in Algorithm 1. Next, we introduce JF-HPO in detail. 
+
+3.3 Joint Fidelity for HPO 
+
+In the vanilla BO, the Expected Improvement (EI) acquisition function is defined as α = E[f (θ, ϕ ) −
+
+f ∗(θ, ϕ +)|D ], where f ∗(θ, ϕ +) is the incumbent best model performance evaluated with configura-tion ϕ+. In this scenario, the model performs train-ing until reaching the given number of steps/epochs, which is inefficient, especially for large language models. To address this issue, we extend the vanilla BO with a multi-fidelity strategy that is a joint adap-tation of model size and training budget. Multi-fidelity optimization is a widely used technique in HPO, offering an efficient and effective approxima-tion by focusing on obtaining performance rank-ings across different hyperparameters, rather than requiring their exact performance metrics. Model size is one kind of fidelity in our method, by us-ing a small proxy model to efficiently evaluate the rankings of different hyperparameters. To ensure the transfer of hyperparameters, the proxy model is from the same model family and shares the same architecture as the target model. Algorithm 1 Joint Fidelity HPO for LLM RL                                                                                                
+
+> Input: Hyperparameter space Φ, small proxy model θ′
+> , total budget B, max fidelity rmax , thresholds τ1, τ 2
+> Output: Optimal configuration ϕ∗
+> 1: Initialize GP with observation data D ← ∅ , checkpoint registry R ← ∅ ,f∗← −∞
+> 2: while P
+> iC(θ′, ϕ i, r i)<Bdo
+> 3: Select (ϕt, r t)by maximizing the acquisition function (Eq. 1) 4: if (ϕt, r ′
+> t)∈ R for some r′
+> t< r tthen
+> 5: Load checkpoint to resume training 6: Initialize step counter s←0
+> 7: while s < r tdo
+> 8: Train θ′
+> with configuration ϕt
+> 9: s←s+ 1
+> 10: if ∆LKL
+> LKL > τ 1or ∆Rtrain
+> Rtrain > τ 2or Rtrain = 0 for k
+> continuous steps then
+> 11: Early stop 12: Continue to next trial 13: end while
+> 14: Save model checkpoint and update R
+> 15: Evaluate θ′
+> to obtain f′(θ′, ϕ t, r t)
+> 16: Update the observation data D←D∪{(ϕt, r t, f ′(θ′, ϕ t, r t), C (θ′, ϕ t, r t)) }(Eq. 2) 17: if f′(θ′, ϕ t, r t)> f ∗then
+> 18: f∗←f′(θ′, ϕ t, r t),ϕ∗←ϕt
+> 19: Update GP (Eq. 3) with D
+> 20: end while
+> 21: Return ϕ∗
+
+Let r ∈ { r1, r 2, ..., r max } be a set of fidelity, i.e., number of training steps, then our acquisition function α can be defined as: 
+
+α(ϕt, r t) = E[f ′ (θ′ ,ϕ t,r t)−f ∗(θ,ϕ +,r max )|D ]  
+
+> E[C(θ′,ϕ t,r t)]
+
+, (1) where f ∗(θ, ϕ +, r max ) denotes the incumbent best model performance evaluated at the highest fidelity 
+
+rmax using the full model size and hyperparameter configuration ϕ+, f ′
+
+(θ′
+
+, ϕ t, r t) denotes the model performance of a significantly smaller model f ′
+
+(θ′
+
+)
+
+at fidelity rt, and C(θ′
+
+, ϕ t, r t) denote the time cost. We allocate the fidelity based on the Successive Halving technique (Jamieson and Talwalkar, 2016). As introduced in Section 3.1, BO needs to update the surrogate model in its interactive optimization process. Generally, we use the newly collected observation data to update the surrogate model. In our method, this is customized as: 
+
+D = D ∪ { (ϕt, r t, f ′
+
+(θ′
+
+, ϕ t, r t), C (θ′
+
+, ϕ t, r t)} (2) The surrogate mode is also a Gaussian Process (GP), defined as: 
+
+f (θ, ϕ, r ) ∼ GP (m(ϕ, r ), k (( ϕ, r ), (ϕ′
+
+, r ′
+
+)) , (3) where m(·) is the mean function and k(·) is the covariance kernel (e.g., Matérn, RBF). 
+
+Table 1: Recommended hyperparameters from the VeRL Recipe and the search space of HPO. 
+
+Hyperparameter VeRL Recipe Search Space Learning rate (LR) 1e-6 (5e-8, 1e-5) LR scheduler type constant [constant, cosine] Actor clip ratio 0.2 (0.05, 0.3) Gradient clip 1.0 (0.1, 10.0) KL loss coefficient 0.001 (0.0005, 0.005) #Rollout 3 [2, 3, 4, 5] 
+
+3.4 Early-stopping Strategies 
+
+To further improve the HPO efficiency of our method, we design the following effective early-stopping strategies to eliminate the under-performing configurations: (i) We early stop a trial if the increase ratio of the KL divergence exceeds a threshold τ1, i.e., ∆LKL  
+
+> LKL
+
+> τ 1, for k consecu-tive global training steps, where ∆LKL denotes the increase in KL divergence. The rationale behind this design choice is that the KL divergence helps constrain the policy model, preventing it from de-viating excessively from the reference model. A rapidly increasing KL divergence typically indi-cates that the policy model is changing too quickly between updates. This can result in instability and entrapment in local optima during the training pro-cess. (ii) We also early stop a trial if the decrease ratio of the training reward surpasses a threshold τ2,i.e., ∆Rtrain  
+
+> Rtrain
+
+> τ 2, or the training rewards remain to zero, for k consecutive global training steps, where ∆Rtrain denotes the decrease in training re-ward. This strategy is based on the rationale that significant decreases in training rewards or stag-nant rewards at zero for an extended period suggest that the current configuration is not conducive to learning a successful policy. To prevent promis-ing configurations from being prematurely halted, we set strict thresholds for early stopping (see Sec-tion 4.1), resulting in insensitivity and reasonable early stopping. 
+
+3.5 Efficient Checkpointing 
+
+In addition to the early-stopping strategies, we also introduce an efficient checkpointing mechanism, which substantially reduces the computation costs for HPO. In multi-fidelity HPO methods, e.g., suc-cessive halving, the algorithm explores a broad range of configurations at the early stage using a limited budget. Promising configurations are then allocated larger budgets in subsequent rounds. This process requires evaluating the surviving configu-Table 2: Performance comparison.                                                          
+
+> Model Method GSM8K MATH OpenBookQA MMLU Average LLaMA-3.1 8B VeRL Recipe 67.32 22.99 83.00 61.22 58.63 Random Search 78.39 30.97 85.60 64.23 64.80 BOHB 86.66 48.62 85.80 66.08 71.79 JF-HPO 87.11 48.64 87.80 68.34 72.97
+> Qwen-2.5 7B VeRL Recipe 83.47 63.21 88.20 68.81 75.92 Random Search 84.99 66.93 89.40 68.98 77.58 BOHB 81.65 70.29 91.00 69.58 78.13 JF-HPO 88.17 68.19 91.00 71.23 79.65
+> Qwen-3 14B VeRL Recipe 93.03 70.21 90.60 70.92 81.19 JF-HPO 94.84 71.83 92.60 72.14 82.85
+
+rations multiple times with different budgets, each involving time-intensive model training. To ad-dress this issue, we design a registry-based check-pointing mechanism to minimize redundant com-putation. Specifically, we maintain a registry table for each trial, which stores its metadata, including hyperparameters, budget, training steps, and the path of the model checkpoints. If a configuration successfully survives the trial with a larger budget, we retrieve its previous model checkpoints from the registry table based on its metadata. Therefore, we do not need to train the model from the start, thereby reducing significant time cost. 
+
+3.6 Algorithm Outline 
+
+Algorithm 1 outlines our JF-HPO approach. The core optimization procedure iterates while the cu-mulative computational cost remains below the pre-defined budget B. Each iteration comprises sev-eral distinct phases: The next configuration-fidelity pair (ϕt, r t) is selected by maximizing an acqui-sition function (Eq. 1) (cf. Line 3). To minimize redundant computation, JF-HPO implements an in-telligent checkpointing mechanism. If a partially trained model exists for configuration ϕt at a lower fidelity r′ 
+
+> t
+
+< r t, training resumes from this check-point (Line 4-5). Then the small proxy model θ′
+
+undergoes training for rt − r′ 
+
+> t
+
+iterations, and three conditions may trigger early stop (Line 7-13). Af-ter training, the model checkpoint is saved, and the registry table R is updated (Line 14). Mean-while, the algorithm evaluates the proxy model’s performance f ′(θ′, ϕ t, r t), stores the result in the observation set D, updates the best configuration 
+
+ϕ∗ if applicable, and refits the GP surrogate model with the augmented dataset (Line 15-18). After exhausting the budget, the algorithm returns the op-timal hyperparameter configuration ϕ∗ (Line 20). 
+
+4 Experiments 
+
+In this section, we present extensive experimental results to validate the effectiveness of our proposed JF-HPO method. We first introduce the experimen-tal setup, and then elaborate on the performance comparison on diverse tasks and in-depth analysis. 
+
+4.1 Experimental Setup Datasets To evaluate the effectiveness of our method, we conduct experiments on various bench-marks: (i) GSM8k (Cobbe et al., 2021) contains 8.5k (7.47k for training and 1.32k for testing) high-quality linguistically diverse grade school math word problems and requires multi-step reasoning. (ii) MATH (Hendrycks et al.) consists of problems from mathematics competitions (7.5k for training and 5k for testing), and each problem has a full step-by-step solution. (iii) OpenBookQA (Mihaylov et al., 2018) is a question-answering task that re-quires multi-step reasoning, use of additional com-monsense knowledge, and rich text comprehen-sion. It contains about 5k training data and 500 testing data. (iv) MMLU (Hendrycks et al., 2021) is a massive multitask test (57 tasks) consisting of multiple-choice questions from various branches of knowledge. We randomly select 10,000 samples from the training set for model learning, and eval-uate the model on the test set which has 14,042 samples. For all tasks, we report accuracy as the evaluation metric. 
+
+Models and Baselines We carry out experi-ments on multiple LLMs, including: Qwen-2.5-7B-Instruct (Yang et al., 2025), LLaMA-3.1-8B-Instruct (Touvron et al., 2023) and Qwen-3-14B (Qwen, 2025). We compare our approach with these baselines: VeRL Recipe which uses the recommended hyperparameters in the VeRL Table 3: Ablation Study. 
+
+Method Accuracy JF-HPO 88.17 
+
+-w/o proxy model 86.88 -w/o checkpointing 84.84 -w/o early stopping 86.35 recipes for training. Random Search (Bergstra and Bengio, 2012) which explores the hyperparam-eter space by randomly sampling combinations, offering a more efficient alternative to grid search. 
+
+BOHB (Falkner et al., 2018) is a hybrid algorithm that combines Bayesian optimization with the Hy-perband resource allocation strategy to efficiently explore hyperparameter configurations. 
+
+Implementation Details We implement our ap-proach based on the VeRL (Sheng et al., 2025) and SMAC3 (Lindauer et al., 2022) frameworks. Due to our limited training resources, we can only use a batch size of one or two per GPU in the ex-periments. Therefore, we do not search the batch size during HPO. Instead, we set the micro batch size to one or two and the global batch size to 256 using the gradient accumulation technique. To maximize the efficiency of HPO, we only set two discrete fidelities of model sizes: the proxy model and the target model. Therefore, BO uses the target large model only at the full fidelity and uses the small proxy model at all other lower fidelity lev-els. Nonetheless, the range of proxy model sizes can be expanded if needed. The proxy models are from the same series as the target model, and their sizes range from 0.5 billion to 1 billion. We use the best configuration from HPO to train the model for three epochs. Evaluation on the test set is per-formed after training. τ1 and τ2 are set to 15% and 10%, respectively, and k is set to 5. Hyperparame-ters from the VeRL recipe and the search space are presented in Table 1. We run our method and the HPO baselines under the same time budget, i.e., 48 hours, for fair comparison. 
+
+4.2 Main Results 
+
+In Table 2, we compare the performance across various tasks and models. Our method demon-strates consistently superior results compared to VeRL Recipe, and achieves better or competitive performance compared to the HPO baselines within the same time budget. For instance, our method 1e-7 2e-7 5e-7 1e-6 2e-6 5e-6 
+
+> 40
+> 45
+> 50
+> 55
+> Performance (%)
+> 42.99
+> 47.01
+> 51.33
+> 53.45
+> 51.93
+> 43.37
+> Best: 53.45
+
+(a) Learning rate 0.05 0.1 0.2 0.25 0.3 0.35 0.4   
+
+> 50
+> 51
+> 52
+> 53
+> 54
+> 55
+> 56
+> Performance (%)
+> 51.93
+> 51.55
+> 54.66
+> 52.01 52.01
+> 54.74
+> 51.55
+> Best: 54.74
+
+(b) Actor clip ratio 0 5e-4 1e-3 2e-3 3e-3 4e-3 5e-3  
+
+> 51
+> 52
+> 53
+> 54
+> 55
+> Performance (%)
+> 52.99 53.22
+> 53.60
+> 53.30
+> 52.69
+> 53.30
+> 52.99
+> Best: 53.60
+
+(c) KL loss coefficient 0.5 1.0 2.0 3.0 4.0 5.0   
+
+> 49
+> 50
+> 51
+> 52
+> 53
+> 54
+> 55
+> Performance (%)
+> 52.31
+> 50.95
+> 51.63
+> 53.60 53.60
+> 51.93
+> Best: 53.60
+
+(d) Gradient clip 2 3 4 5 6 7 
+
+> 51
+> 52
+> 53
+> 54
+> 55
+> 56
+> Performance (%)
+> 54.21
+> 52.46
+> 53.07
+> 53.83 53.68
+> 54.44
+> Best: 54.44
+
+(e) #Rollout 1e-06 2e-06 5e-06   
+
+> 40
+> 45
+> 50
+> 55
+> Performance (%)  53.45
+> 51.93
+> 43.37
+> 51.33
+> 52.77 51.78
+> Constant
+> Cosine
+
+(f) LR scheduler type 
+
+Figure 3: Effect of different hyperparameters on the final performance for the GSM8K task using Qwen-2.5 0.5B as the foundation model. 
+
+delivers 3.73%, 2.07%, and 1.52% performance improvements compared to VeRL Recipe, Ran-dom Search and BOHB, respectively. This advan-tage stems from our method’s significant enhance-ment of computational efficiency during individual HPO trials, allowing for a greater number of tri-als—and consequently, more hyperparameter con-figurations—to be explored within the allotted time. As a result, our method identifies more effective hyperparameter configurations tailored to different tasks and models. 
+
+4.3 Ablation Study 
+
+To isolate the effect of each proposed module, we conduct an ablation analysis on the GSM8K task us-ing Qwen-2.5 7B as the backbone. The results are as shown in Table 3, where the following variants are considered: (1) without using the proxy model in the multi-fidelity HPO (-w/o proxy model) (2) without using the efficient checkpointing mecha-nism (-w/o checkpointing), and (3) without using the early stopping strategies (-w/o early stopping). It is observed that removing any single module leads to a noticeable drop in performance, demon-strating the effectiveness of each module. Addi-tionally, the checkpointing mechanism contributes most to the final performance, because it helps Table 4: Efficiency comparison on the GSM8K task. BP denotes backward propagation. We use two GPUs for Qwen-2.5 7B and four GPUs for Random Search and BOHB on LLaMA-3.1 8B. Our JF-HPO method uses two GPUs when leveraging the small proxy model for training, and uses four GPUs only for the last trial of training on the large model with the best configuration.                                           
+
+> Model Method Throughput (Tokens/s) Avg. Time/Trial Trial Speedup Overall Rollout BP & Update Qwen-2.5 7B Random Search 521.6 1528.3 857.1 8.80 h 1.0 ×
+> BOHB 521.6 1528.3 857.1 2.20 h 4.0 ×
+> JF-HPO 8772.0 15624.0 24103.4 0.59 h 14.9 ×
+> LLaMA-3.1 8B Random Search 864.9 1906.5 1712.4 5.38 h 1.0 ×
+> BOHB 864.9 1906.5 1712.4 1.80 h 3.0 ×
+> JF-HPO 7167.3 15103.8 21647.0 0.59 h 9.1 ×
+
+reduce significant computation cost during HPO, enabling our method to explore more promising hyperparameters within the same time budget. 
+
+5 Discussion 
+
+5.1 Effect of Different Hyperparameters 
+
+To investigate the effect of different hyperparam-eters on the final model performance, we conduct a parameter sweep over a range of values for each hyperparameter in Table 1. It is important to note that in each experiment, we modify only one hy-perparameter while keeping the others consistent with the settings in the VeRL Recipe. The results are shown in Figure 3. It can be observed that the learning rate is the most influential hyperparam-eter affecting model performance. As the learn-ing rate increases up to 1e-6, the model perfor-mance improves significantly. However, when the learning rate exceeds 1e-6, the performance begins to decline. For most of the hyperparameters, we can observe clear performance gaps when varying their values, except for the KL loss coefficient. We also find that the transferability of hyperparameters from the proxy model to the target model depends on the degree of their sensitivity. For example, hy-perparameters that have a smaller impact on the model performance, e.g., the KL loss coefficient, are more transferable than the influential hyperpa-rameters, e.g., learning rate and actor clip ratio. Additionally, the learning rate and its schedul-ing type jointly affect the model performance. As shown in Figure 3 (f), using a larger learning rate, such as 2e-6 or 5e-6, paired with a cosine scheduler, yields better performance compared to pairing it with a constant scheduler. This is because the co-sine scheduler gradually increases then decreases the learning rate, allowing the model to make more refined adjustments as it approaches convergence. By contrast, a constant scheduler maintains the same learning rate throughout the training process, which may lead to overshooting or oscillations in the optimization path. 
+
+5.2 Efficiency Comparison 
+
+In Table 4, we present the HPO efficiency compar-ison on the GSM8K task with two different foun-dation models. Specifically, we compare these effi-ciency metrics: (i) overall throughput, throughput of rollout, i.e., generation of the outputs, backward propagation, and parameter update in RL; (ii) aver-age time for a trial in HPO; (iii) speedup of a trial. Compared with Random Search and BOHB, our JF-HPO method achieves remarkable improvements in throughput, since it uses a significantly smaller model to search the hyperparameters. Note that the throughputs for Random Search and BOHB are identical, as they both use the target large model for training. JF-HPO also reduces substantial time costs for a trial, and thus it can explore more hy-perparameter configurations under the same time budget as the baselines. Consequently, JF-HPO can achieve better final model performance. 
+
+5.3 Training Dynamics Comparison 
+
+As introduced in Section 3.4, we design several early stop strategies to improve the HPO efficiency based on the change of training reward and KL divergence loss. Here, we compare these two cru-cial training dynamics in RL to demonstrate why using the configuration obtained from our method performs better. We present the change of these dynamics during training, as illustrated in Figure 4. We employ LLaMA-3.1 8B and Qwen-2.5 7B as the foundational models and select three tasks for this comparison. Our method consistently achieves 0 20 40 60 80 100 120 
+
+> Training Step
+> 0.55
+> 0.60
+> 0.65
+> 0.70
+> 0.75
+> 0.80
+> 0.85
+> 0.90
+> 0.95
+> Training Reward
+> LLaMA-3.1 8B
+> VeRL Recipe
+> Ours
+
+(a) MMLU 0 10 20 30 40 50  
+
+> Training Step
+> 0.55
+> 0.60
+> 0.65
+> 0.70
+> 0.75
+> 0.80
+> 0.85
+> 0.90
+> 0.95
+> Training Reward
+> LLaMA-3.1 8B
+> VeRL Recipe
+> Ours
+
+(b) OpenBookQA 0 20 40 60 80  
+
+> Training Step
+> 0.55
+> 0.60
+> 0.65
+> 0.70
+> 0.75
+> 0.80
+> 0.85
+> 0.90
+> 0.95
+> Training Reward
+> Qwen-2.5 7B
+> VeRL Recipe
+> Ours
+
+(c) GSM8K 0 20 40 60 80 100 120 
+
+> Training Step
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> 0.8
+> KL Loss
+> LLaMA-3.1 8B
+> VeRL Recipe
+> Ours
+
+(d) MMLU 0 10 20 30 40 50  
+
+> Training Step
+> 0.00
+> 0.05
+> 0.10
+> 0.15
+> 0.20
+> KL Loss
+> LLaMA-3.1 8B
+> VeRL Recipe
+> Ours
+
+(e) OpenBookQA 0 20 40 60 80  
+
+> Training Step
+> 0.00
+> 0.02
+> 0.04
+> 0.06
+> 0.08
+> 0.10
+> 0.12
+> 0.14
+> 0.16
+> KL Loss
+> Qwen-2.5 7B
+> VeRL Recipe
+> Ours
+
+(f) GSM8K 
+
+Figure 4: Training reward and KL divergence loss comparison. See Figure 6 for more results. Table 5: Performance comparison across five difficulty levels of the MATH task on Qwen-2.5 7B. 
+
+Method Level-1 Level-2 Level-3 Level-4 Level-5 VeRL Recipe 91.08 79.98 72.50 58.98 38.80 JF-HPO 91.30 83.56 77.28 65.98 46.07 
+
+∆ (%) 0.24 4.48 6.59 11.87 18.74 
+
+overall higher training rewards and exhibits smaller increases in KL divergence loss on different tasks. This suggests that our method demonstrates more stable and effective RL training. Consequently, our method delivers superior evaluation performance across a range of tasks. 
+
+5.4 Comparison across Five Difficulty Levels 
+
+The MATH dataset contains five subsets of differ-ent difficulty levels, where the easiest problems for humans are assigned to “Level 1” and the hard-est problems are assigned to “Level 5”. Table 2 presents the overall performance of the MATH task. Here, we explore the performance comparison be-tween VeRL Recipe and our method across five dif-ficulty levels, as presented in Table 5. We observe a consistent decline in model performance as the dif-ficulty level increases, with significant performance gaps between different levels. For Level 5, JF-HPO also cannot achieve satisfactory performance, since HPO does not improve the upper bound perfor-mance of the given RL algorithm. Nonetheless, JF-HPO consistently outperforms VeRL Recipe, and the performance improvements tend to increase as the difficulty level rises. This indicates that model performance on difficult samples is more sensitive to hyperparameters compared to simpler samples, highlighting that JF-HPO offers significant advan-tages for addressing challenging tasks. 
+
+5.5 Rank Correlation Analysis 
+
+In this work, we use model size as one kind of fi-delity by exploiting a small proxy model to evaluate the rankings of different hyperparameters. Here, we provide a quantitative analysis of the Spear-man/Kendall rank correlation between the proxy model and the target model across different hy-perparameter settings. Specifically, we randomly sample five hyperparameter configurations (result-ing in a total of 120 different rankings) and use them to train the proxy model and target model, respectively, on the GSM8K task. The results are presented in Table 6, suggesting a good consistency in performance rankings across different configu-rations between the proxy model and the target model. We also analyze some failure cases and dis-cover that while larger learning rates, such as those exceeding 5e-6, can yield promising results on the small proxy model, they may cause overfitting for the larger target model. 
+
+Table 6: Spearman and Kendall rank correlation be-tween the proxy model (Qwen-2.5 0.5B) and the target model (Qwen-2.5 7B) across hyperparameter settings. 
+
+#Configurations Ranking space Spearman Kendall 5 120 0.90 0.80 
+
+6 Related Work 
+
+In this section, we provide an overview of reinforce-ment learning for large language models (LLMs), and discuss the existing hyperparameter optimiza-tion (HPO) methods. 6.1 Reinforcement Learning for LLMs 
+
+Reinforcement Learning (RL) (Sutton et al., 1998) plays an essential role in improving the ability of Large Language Models (LLMs) in instruction following and reasoning. Reinforcement Learn-ing from Human Feedback (RLHF) (Bai et al., 2022; Ouyang et al., 2022) is a typical approach to align base models with human preferences us-ing RL algorithms such as Proximal Policy Op-timization (PPO) (Schulman et al., 2017). Re-cently, Large Reasoning Models (LRMs), e.g., DeepSeek-R1 (Guo et al., 2025), have shown the importance of RL in enhancing the reasoning ca-pabilities of LLMs through rule-based rewards, i.e., reinforcement learning with verifiable reward (RLVR). RLVR is commonly used in mathemati-cal reasoning tasks and multiple-choice problems where the reward function outputs a binary score based on whether the model’s answer matches the ground truth (Guo et al., 2025; Team et al., 2025; Gao et al., 2024). This avoids the need for reward models, thus improving training effi-ciency. The success of RLVR is inseparable from advanced RL algorithms, including Group Relative Policy Optimization (GRPO) (Shao et al., 2024), Decouple Clip and Dynamic Sampling Policy Op-timization (DAPO) (Yu et al., 2025), and REIN-FORCE++ (Hu, 2025), etc. Our method is applica-ble to the most popular LLM reinforcement learn-ing algorithms, which typically adopt either the GRPO or PPO style and integrate with KL diver-gence loss and reward computation. In this work, we select GRPO, which is a strong RL algorithm and is used in DeepSeek, to demonstrate the effec-tiveness of JF-HPO for LLM RL. 
+
+6.2 Hyperparameter Optimization 
+
+Hyperparameter optimization (HPO) is critical in machine learning and deep learning, since hyper-parameters have a significant impact on the model performance and convergence rate. Many HPO techniques have been proposed in the past years, including grid search and random search (Bergstra and Bengio, 2012), Bayesian optimization (BO) methods (Snoek et al., 2012; Victoria and Mara-gatham, 2021; Wu et al., 2019), multi-fidelity strate-gies (Falkner et al., 2018; Li et al., 2018; Jiang et al., 2024), and gradient-based methods (Maclau-rin et al., 2015; Bohdal et al., 2021; Micaelli and Storkey, 2021), etc. For example, Successive Halving (SHA) (Micaelli and Storkey, 2021)be-gins by testing a group of configurations with limited resources, then advances only the top-performing half to proceed with double the re-sources. BOHB (Falkner et al., 2018) integrates BO and Hyperband (Li et al., 2018) to effectively man-age the exploration-exploitation trade-off while dynamically allocating resources, resulting in en-hanced efficiency and robustness compared to us-ing either method alone. Despite achieving notable advancements, exist-ing HPO methods are suitable for small models. In the context of LLM RL, training is very time-consuming due to the large model size and the requirement of performing both token-by-token generation and backpropagation. As a result, tra-ditional HPO methods involving multiple rounds of training and evaluation become impractical. In this work, we propose to leverage a significantly small proxy model for training and evaluation dur-ing HPO, alongside several efficient early-stopping strategies and a checkpointing mechanism to re-duce substantial computation cost. 
+
+7 Conclusion 
+
+In this work, we propose JF-HPO that effectively democratizes the hyperparameter optimization of large language model reinforcement learning by breaking the computational barrier. Unlike existing HPO methods that rely solely on training budget allocation, our approach uniquely integrates proxy model adaptation with registry-based checkpoint-ing and dynamics-aware early stopping. This joint-fidelity mechanism not only accelerates search ef-ficiency by an order of magnitude but also reveals that complex reasoning tasks are particularly sensi-tive to hyperparameter configurations, necessitat-ing the precise tuning our method provides. We plan to extend the applicability of JF-HPO to other advanced RL algorithms such as DAPO (Yu et al., 2025). Additionally, we aim to theoretically investigate the correlation bounds between proxy and target models to further refine the fidelity se-lection process in extremely large-scale scenarios (e.g., 70B model). 
+
+Limitations 
+
+Our method currently depends on a consistent per-formance correlation between the proxy and tar-get models to ensure valid hyperparameter trans-fer. In scenarios involving significant architectural shifts—for instance, transferring patterns from dense proxies to sparse architectures (e.g., Mixture-of-Experts)—the validity of this correlation re-mains unexplored. Additionally, although our eval-uation covers complex reasoning benchmarks, it does not explicitly account for open-ended gener-ation tasks (e.g., creative writing), where reward signals are inherently more subjective and the opti-mal hyperparameter landscape may differ. 
+
+Acknowledgments 
+
+This work is supported by the Research and Devel-opment of Heterogeneous Computing Power Cen-ter Interconnection and Scheduling Software Stack under Grant No. YF202400000003. 
+
+References 
+
+Yuntao Bai, Andy Jones, Kamal Ndousse, Amanda Askell, Anna Chen, Nova DasSarma, Dawn Drain, Stanislav Fort, Deep Ganguli, Tom Henighan, and 1 others. 2022. Training a helpful and harmless assis-tant with reinforcement learning from human feed-back. arXiv preprint arXiv:2204.05862 .James Bergstra and Yoshua Bengio. 2012. Random search for hyper-parameter optimization. The Jour-nal of Machine Learning Research , 13(1):281–305. Ondrej Bohdal, Yongxin Yang, and Timothy Hospedales. 2021. Evograd: Efficient gradient-based meta-learning and hyperparameter optimization. Advances in Neural Information Processing Systems , 34:22234– 22246. Karl Cobbe, Vineet Kosaraju, Mohammad Bavarian, Mark Chen, Heewoo Jun, Lukasz Kaiser, Matthias Plappert, Jerry Tworek, Jacob Hilton, Reiichiro Nakano, and 1 others. 2021. Training verifiers to solve math word problems. arXiv preprint arXiv:2110.14168 .Theresa Eimer, Marius Lindauer, and Roberta Raileanu. 2023. Hyperparameters in reinforcement learning and how to tune them. In International Conference on Machine Learning , pages 9104–9149. PMLR. Stefan Falkner, Aaron Klein, and Frank Hutter. 2018. Bohb: Robust and efficient hyperparameter optimiza-tion at scale. In International Conference on Machine Learning , pages 1437–1446. PMLR. Jiaxuan Gao, Shusheng Xu, Wenjie Ye, Weilin Liu, Chuyi He, Wei Fu, Zhiyu Mei, Guangju Wang, and Yi Wu. 2024. On designing effective rl reward at training time for llm reasoning. arXiv preprint arXiv:2410.15115 .Daya Guo, Dejian Yang, Haowei Zhang, Junxiao Song, Ruoyu Zhang, Runxin Xu, Qihao Zhu, Shi-rong Ma, Peiyi Wang, Xiao Bi, and 1 others. 2025. Deepseek-r1: Incentivizing reasoning capability in llms via reinforcement learning. arXiv preprint arXiv:2501.12948 .Dan Hendrycks, Collin Burns, Steven Basart, Andy Zou, Mantas Mazeika, Dawn Song, and Jacob Stein-hardt. 2021. Measuring massive multitask language understanding. Proceedings of the International Con-ference on Learning Representations (ICLR) .Dan Hendrycks, Collin Burns, Saurav Kadavath, Akul Arora, Steven Basart, Eric Tang, Dawn Song, and Jacob Steinhardt. Measuring mathematical problem solving with the math dataset. In Thirty-fifth Con-ference on Neural Information Processing Systems Datasets and Benchmarks Track (Round 2) .Jian Hu. 2025. Reinforce++: A simple and efficient approach for aligning large language models. arXiv preprint arXiv:2501.03262 .Kevin Jamieson and Ameet Talwalkar. 2016. Non-stochastic best arm identification and hyperparameter optimization. In Artificial Intelligence and Statistics ,pages 240–248. PMLR. Jiantong Jiang, Zeyi Wen, Atif Mansoor, and Ajmal Mian. 2024. Efficient hyperparameter optimization with adaptive fidelity identification. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 26181–26190. Solomon Kullback and Richard A Leibler. 1951. On information and sufficiency. The Annals of mathe-matical statistics , 22(1):79–86. Jia Li, Edward Beeching, Lewis Tunstall, Ben Lip-kin, Roman Soletskyi, Shengyi Huang, Kashif Rasul, Longhui Yu, Albert Q Jiang, Ziju Shen, and 1 oth-ers. 2024. Numinamath: The largest public dataset in ai4maths with 860k pairs of competition math problems and solutions. Hugging Face repository ,13(9):9. Lisha Li, Kevin Jamieson, Giulia DeSalvo, Afshin Ros-tamizadeh, and Ameet Talwalkar. 2018. Hyperband: A novel bandit-based approach to hyperparameter op-timization. Journal of Machine Learning Research ,18(185):1–52. Marius Lindauer, Katharina Eggensperger, Matthias Feurer, André Biedenkapp, Difan Deng, Carolin Ben-jamins, Tim Ruhkopf, René Sass, and Frank Hutter. 2022. Smac3: A versatile bayesian optimization package for hyperparameter optimization. Journal of Machine Learning Research , 23(54):1–9. Dougal Maclaurin, David Duvenaud, and Ryan Adams. 2015. Gradient-based hyperparameter optimization through reversible learning. In International Con-ference on Machine Learning , pages 2113–2122. PMLR. Paul Micaelli and Amos J Storkey. 2021. Gradient-based hyperparameter optimization over long hori-zons. Advances in Neural Information Processing Systems , 34:10798–10809. Todor Mihaylov, Peter Clark, Tushar Khot, and Ashish Sabharwal. 2018. Can a suit of armor conduct elec-tricity? a new dataset for open book question an-swering. In Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing ,pages 2381–2391. Shervin Minaee, Tomas Mikolov, Narjes Nikzad, Meysam Chenaghlu, Richard Socher, Xavier Am-atriain, and Jianfeng Gao. 2024. Large language models: A survey. arXiv preprint arXiv:2402.06196 .Jonas Moˇ ckus. 1974. On bayesian methods for seeking the extremum. In IFIP Technical Conference on Optimization Techniques , pages 400–404. Springer. OpenAI. 2024. Learning to reason with llms. Long Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida, Carroll Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, and 1 others. 2022. Training language models to follow in-structions with human feedback. Advances in Neural Information Processing Systems , 35:27730–27744. Qwen. 2025. Qwen3 technical report. Preprint ,arXiv:2505.09388. John Schulman, Philipp Moritz, Sergey Levine, Michael Jordan, and Pieter Abbeel. 2015. High-dimensional continuous control using generalized advantage esti-mation. arXiv preprint arXiv:1506.02438 .John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, and Oleg Klimov. 2017. Proxi-mal policy optimization algorithms. arXiv preprint arXiv:1707.06347 .Zhihong Shao, Peiyi Wang, Qihao Zhu, Runxin Xu, Junxiao Song, Xiao Bi, Haowei Zhang, Mingchuan Zhang, YK Li, Yang Wu, and 1 others. 2024. Deepseekmath: Pushing the limits of mathematical reasoning in open language models. arXiv preprint arXiv:2402.03300 .Guangming Sheng, Chi Zhang, Zilingfeng Ye, Xibin Wu, Wang Zhang, Ru Zhang, Yanghua Peng, Haibin Lin, and Chuan Wu. 2025. Hybridflow: A flexible and efficient rlhf framework. In Proceedings of the Twentieth European Conference on Computer Sys-tems , pages 1279–1297. Jasper Snoek, Hugo Larochelle, and Ryan P Adams. 2012. Practical bayesian optimization of machine learning algorithms. Advances in Neural Information Processing Systems , 25. Richard S Sutton, Andrew G Barto, and 1 others. 1998. 
+
+Reinforcement learning: An introduction , volume 1. MIT press Cambridge. Kimi Team, Angang Du, Bofei Gao, Bowei Xing, Changjiu Jiang, Cheng Chen, Cheng Li, Chenjun Xiao, Chenzhuang Du, Chonghua Liao, and 1 others. 2025. Kimi k1. 5: Scaling reinforcement learning with llms. arXiv preprint arXiv:2501.12599 .Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothée Lacroix, Baptiste Rozière, Naman Goyal, Eric Hambro, Faisal Azhar, Aurelien Rodriguez, Armand Joulin, Edouard Grave, and Guillaume Lample. 2023. LLaMA: Open and Efficient Foundation Language Models. Preprint ,arxiv:2302.13971. A Helen Victoria and Ganesh Maragatham. 2021. Au-tomatic tuning of hyperparameters using bayesian optimization. Evolving Systems , 12(1):217–223. Jia Wu, Xiu-Yun Chen, Hao Zhang, Li-Dong Xiong, Hang Lei, and Si-Hao Deng. 2019. Hyperparameter optimization for machine learning models based on bayesian optimization. Journal of Electronic Science and Technology , 17(1):26–40. An Yang, Baosong Yang, Beichen Zhang, Binyuan Hui, Bo Zheng, Bowen Yu, Chengyuan Li, Dayi-heng Liu, Fei Huang, Haoran Wei, Huan Lin, Jian Yang, Jianhong Tu, Jianwei Zhang, Jianxin Yang, Ji-axi Yang, Jingren Zhou, Junyang Lin, Kai Dang, and 23 others. 2025. Qwen2.5 technical report. Preprint ,arXiv:2412.15115. Qiying Yu, Zheng Zhang, Ruofei Zhu, Yufeng Yuan, Xiaochen Zuo, Yu Yue, Weinan Dai, Tiantian Fan, Gaohong Liu, Lingjun Liu, and 1 others. 2025. Dapo: An open-source llm reinforcement learning system at scale. arXiv preprint arXiv:2503.14476 .Yifan Zhang and Team Math-AI. 2025. American invi-tational mathematics examination (aime) 2025. 
+
+A AI Usage Disclosure 
+
+We utilize generative AI exclusively for minor lan-guage refinement tasks, such as automating gram-mar corrections and enhancing linguistic clarity. 
+
+B Notation 
+
+In Table 7, we present a comprehensive summary of the notations and their corresponding definitions used throughout this paper, aimed at enhancing clarity and understanding. 
+
+C More Experimental Results 
+
+Performance Improvements Due to the lim-ited space, we present additional results showcas-ing the performance improvements of our method across multiple tasks here, as illustrated in Fig-ure 5. The improvements of JF-HPO compared with VeRL Recipe on Qwen-2.5 7B range from 3.2% to 7.9% on the GSM8K, MATH, Open-BookQA and MMLU tasks, which are all statisti-cally significant gains. These results further demon-strate the robustness of our method across tasks of varying complexity. Table 7: Summary of notations and their definitions in this paper. 
+
+Notation Description 
+
+θ, θ′ Parameters of the policy model ( θ) and small proxy model ( θ′)
+
+πθ, πθ, old , πref Current, old, and reference policy models 
+
+(p, o ), D Prompt-output pair and dataset 
+
+ε Clipping range for stabilizing policy updates 
+
+ˆAt, ˆAi,t Estimated advantage at timestep t (GAE) and for i-th output in GRPO 
+
+γ, λ Discount factor and GAE hyperparameter 
+
+Rt, st, V Reward and state at timestep t, and value function 
+
+β Coefficient for KL divergence penalty 
+
+G Group size in GRPO 
+
+ϕ, ϕ∗, Φ Hyperparameter configuration, optimal configuration, and search space 
+
+B, N , r Total budget, number of trials, and fidelity level 
+
+C(θ, ϕ, r ), f (θ, ϕ, r ), f ′(θ′, ϕ, r ) Time cost, performance of full model, and performance of proxy model 
+
+f ∗ Incumbent best performance 
+
+α, M Acquisition function and surrogate model (GP) in BO 
+
+LKL , ∆LKL KL divergence loss and its increase 
+
+Rtrain , ∆Rtrain Training reward and its decrease 
+
+τ1, τ2, k Early-stopping thresholds and consecutive steps condition 
+
+R Checkpoint registry table GSM8K MATH OpenBookQA MMLU     
+
+> 10
+> 20
+> 30
+> 40
+> 50
+> 60
+> 70
+> 80
+> 90
+> 100
+> 83.47 88.17
+> 63.21 68.19
+> 88.20 91.00
+> 68.81 71.23
+> Qwen-2.5 7B VeRL Recipe
+> JF-HPO
+> +5.6%
+> +7.9%
+> +3.2%
+> +3.5%
+
+Figure 5: Performance improvements on Qwen-2.5 7B. 
+
+Training Dynamics Comparison Here, we pro-vide additional results of training reward and KL divergence loss comparison on Qwen-2.5 7B and Qwen-3 14B, respectively, as shown in Figure 6. We showcase this comparison on two tasks, i.e., OpenBookQA and GSM8K. Similar to the trends depicted in Figure 4, JF-HPO consistently achieves an overall higher reward and a slower and more controlled increase of KL divergence loss, which is crucial for large language model reinforcement learning. This analysis (Figure 4 and Figure 6) comprehensively reveals the effectiveness and bet-ter stability of our method. 
+
+Out-of-Distribution Evaluation To investigate the generalization capability of our method, we use the model trained on the MATH task to evalu-ate on two out-of-distribution (OOD) challenged tasks, i.e., AMC 2023 (Li et al., 2024) and AIME 2025 (Zhang and Math-AI, 2025). The results are presented in Table 8. We conduct this evaluation on the Qwen-2.5 7B model. The AMC 2023 dataset comprises 83 problems, drawn from two rigorous mathematics competitions (AMC 12A and 12B) de-signed for students in grades 12 and below through-out the United States. The AIME 2025 dataset is a specialized benchmark, featuring 30 problems from the 2025 edition of the American Invitational Mathematics Examination (AIME) II. Note that the AMC 2023 and AIME 2025 tasks only contain the test set, and they lack a training set for rein-forcement learning. Therefore, we do not use these two tasks in our main experiments, i.e., Table 2. Instead, we use them for the OOD evaluation. From Table 8, compared with the baseline, our 
+
+Table 8: Out-of-distribution (OOD) performance com-parison on Qwen-2.5 7B. The model is trained on the MATH task and evaluated on two OOD tasks. 
+
+Method MATH AMC 2023 AIME 2025 VeRL Recipe 63.21 27.71 0.0 JF-HPO 68.19 44.58 3.3 
+
+∆ (%) 7.88 60.88 +∞0 10 20 30 40 50 
+
+> Training Step
+> 0.55
+> 0.60
+> 0.65
+> 0.70
+> 0.75
+> 0.80
+> 0.85
+> 0.90
+> 0.95
+> Training Reward  Qwen-2.5 7B
+> VeRL Recipe
+> Ours
+
+(a) OpenBookQA 0 20 40 60 80  
+
+> Training Step
+> 0.55
+> 0.60
+> 0.65
+> 0.70
+> 0.75
+> 0.80
+> 0.85
+> 0.90
+> 0.95
+> Training Reward  Qwen-3 14B
+> VeRL Recipe
+> Ours
+
+(b) GSM8K 0 10 20 30 40 50 
+
+> Training Step
+> 0.000
+> 0.025
+> 0.050
+> 0.075
+> 0.100
+> 0.125
+> 0.150
+> 0.175
+> 0.200
+> KL Loss
+> Qwen-2.5 7B
+> VeRL Recipe
+> Ours
+
+(c) OpenBookQA 0 20 40 60 80  
+
+> Training Step
+> 0.000
+> 0.025
+> 0.050
+> 0.075
+> 0.100
+> 0.125
+> 0.150
+> 0.175
+> 0.200
+> KL Loss
+> Qwen-3 14B
+> VeRL Recipe
+> Ours
+
+(d) GSM8K 
+
+Figure 6: More results of training reward and KL divergence loss comparison. Table 9: Performance comparison on different MMLU subsets using two foundation models.                               
+
+> Method Humanities STEM Social Sciences Other LLaMA-3.1 8B VeRL Recipe 55.41 55.66 70.82 69.01 JF-HPO 59.94 58.96 76.08 74.28
+> ∆(%) 8.18 5.93 7.42 7.64
+> Qwen-2.5 7B VeRL Recipe 64.73 61.15 75.14 70.86 JF-HPO 67.30 61.66 79.95 74.60
+> ∆(%) 3.97 0.83 6.40 5.28
+
+JF-HPO method achieves remarkable relative im-provements on both the MATH task and the OOD tasks. This indicates our method learns a more robust model with better generalization capability. We also note the poor performance on the AIME 2025 task, since this task is very challenging. 
+
+Performance on Different MMLU Subsets The performance of the MMLU task in Table 2 is the av-erage accuracy across 57 subjects. These subjects can be categorized into four groups (Hendrycks et al., 2021): Humanities , STEM , Social Sciences ,and Other . To investigate whether our method can consistently achieve performance gains on differ-ent MMLU subsets, we present the performance comparison on different groups of MMLU subsets, as illustrated in Table 9. It can be observed that our method consistently surpasses VeRL Recipe on each group of MMLU subsets when using LLaMA-3.1 8B and Qwen-2.5 7B as the foundation mod-els. Specifically, for LLaMA-3.1 8B, our method achieves relative performance improvements ex-ceeding 5% across all subset groups. Similarly, for Qwen-2.5 7B, the relative performance improve-ments of our method are over 5% on the Social Sciences and Other groups. This analysis demon-strates that our method enhances model perfor-mance across various domains, showcasing its ro-bustness and adaptability.

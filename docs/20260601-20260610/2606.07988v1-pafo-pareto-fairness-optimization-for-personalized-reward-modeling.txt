@@ -1,0 +1,817 @@
+Title: PAFO: Pareto Fairness Optimization for Personalized Reward Modeling
+
+URL Source: https://arxiv.org/pdf/2606.07988v1
+
+Published Time: Tue, 09 Jun 2026 00:29:48 GMT
+
+Number of Pages: 20
+
+Markdown Content:
+# PAFO: Pareto Fairness Optimization for Personalized Reward Modeling 
+
+Xiaoyan Zhao 1∗, Haoting Ni 2∗, Yang Zhang 1, Chunyuan Zheng 3, Haoxuan Li 3, Fuli Feng 21National University of Singapore 
+
+> 2
+
+University of Science and Technology of China 3Peking University 
+
+xiaoyanzhao.ai@gmail.com 
+
+Abstract 
+
+Large language models (LLMs) increasingly rely on reward models to align their outputs with diverse user preferences. While personalized reward models aim to capture such heterogeneity, they are often trained on imbalanced user preference data and may therefore favor users whose preferences are more common in the training population. In this paper, we identify this failure mode as personalized reward bias, where reward modeling quality varies systematically with preference support rate. We formulate its mitigation as a Pareto fairness problem over group utilities, aiming to improve under-served users without degrading other user groups. To this end, we propose PAFO , a Pareto fairness optimization framework for per-sonalized reward modeling. PAFO first trains group-specialized reward models for majority and minority preference groups, then constructs conditional margin-level supervision to distill their heterogeneous preference boundaries into a single uni-fied model. The resulting model uses group information only during training and requires no explicit group labels at inference time. Experiments on Personal-LLM and DSP show that PAFO improves both minority-group and majority-group accu-racy while reducing user-level unfairness across multiple metrics, demonstrating its effectiveness for fairer LLM personalization. 
+
+1 Introduction 29.20%      
+
+> 81.13%
+> 51.93%
+> ga p
+> DSP
+> 55.50%
+> 92.73%
+> 37.23%
+> gap
+> Personal -LLM
+> Lo wSupport High Suppor tMinority Majority
+
+Figure 1: Minority users suffer substantially lower reward predic-tion accuracy than majority users, even under personalized RM. Reward models are central to the alignment of large language models, providing the scalar signals used to optimize policies in RLHF [ 1 – 3] and to select responses at test time [ 4, 5]. How-ever, reward models are not neutral estimators of human judgment. Existing studies have shown that they can encode systematic bi-ases [ 6– 8, 7 , 9], such as length bias, sycophancy, and social bias. These findings suggest that the reward signal used for alignment may reflect artifacts of the training or annotation process rather than the preferences that users actually intend to express [10, 11]. Most existing analyses study reward model bias in the population-level setting [ 10 , 12 ], where a single reward function is shared across all users [ 13 ] and bias is examined as a shared distortion or along predefined demographic axes. This perspective is insufficient for personalized alignment, where different users may naturally prefer different response styles, reasoning patterns, or interaction norms[ 14 – 17 ]. However, personalization addresses preference 
+
+> ∗Equal contribution. 40th Conference on Neural Information Processing Systems (NeurIPS 2026).
+> arXiv:2606.07988v1 [cs.AI] 6 Jun 2026
+
+heterogeneity without addressing preference-support imbalance. When preference data are imbalanced, the training objective can still be dominated by users whose preferences are more common, leaving rare or less-supported preference patterns insufficiently represented [18]. We refer to this failure mode as personalization unfairness in reward modeling: a systematic disparity in preference accuracy across users, structured by how well a user’s preference pattern is supported in the training distribution. Unlike conventional reward model biases, which manifest as a shared distortion across the population (e.g., length bias) [ 6 ] or along pre-specified demographic axes [ 13 , 19 ], personalization unfairness is support-structured —its incidence on a given user is determined by the rarity of that user’s preference pattern, a quantity that is neither annotated nor necessarily tied to explicit demographic attributes. Figure 1 illustrates this phenomenon empirically. On the Personal-LLM benchmark [ 20 ], representative personalized reward modeling methods exhibit a strong dependence between per-user accuracy and per-user support rate; on the DSP benchmark [ 21 ], accuracy on minority preference styles is substantially lower than on majority styles. Therefore, personalization may inherit preference-support imbalance rather than eliminate it. Mitigating personalization unfairness is challenging. Users with minority preferences provide few supervision signals, so their reward boundaries are hard to learn from data alone. Training a separate model per group would help, but separate models are unusable at inference in practice, where group membership is typically unknown. Single-model fixes such as reweighting or fairness regularization avoid this problem but tend to lift minority accuracy at the expense of majority accuracy, redistributing error rather than reducing it [ 22 ]. We therefore formulate the objective as Pareto improvement over preference groups: only no-regret gains for minorities count as solutions. We propose PAFO ( PA reto Fairness Optimization), a framework for personalized reward modeling. The core idea is to let a reward model first specialize on each preference group and then consolidate these group-specific abilities back into itself through self-distillation, so that group information is consumed only during training. Concretely, PAFO partitions data into minority-to-majority preference groups and finetunes a group-specialized reward model for each group, so that each minority’s preference structure is captured from within-group signal rather than diluted across the full population. A conditional teacher then routes each preference pair to its group-specialized model and uses the resulting reward margin as the supervision target for self-distillation. The same model, now serving as the student, is trained to match these group-specific margins while taking only the user-conditioning signals available at inference as input. This design realizes Pareto improvement: minority groups thus benefit from dedicated specialization, and majority groups are equally served by their own specialist, so the student inherits an undiluted majority signal instead of one reweighted against minority groups. Group information, used only as a training-time scaffold, is no longer needed at deployment. 
+
+Our main contributions can be summarized as follows: 
+
+• Problem. We identify and formalize personalization unfairness in reward modeling, where per-user reward quality is governed by preference-support imbalance, distinct from prior reward model biases that affect the population uniformly or along demographic axes. • Method. We frame mitigation as Pareto improvement over preference groups and propose PAFO, which specializes a reward model on each group and consolidates these abilities back via conditional margin-level self-distillation, requiring group information only at training time. • Results. On Personal-LLM and DSP, PAFO improves minority-group accuracy, preserves majority-group accuracy, and reduces user-level unfairness, showing that Pareto improvement is achievable in personalized reward modeling. 
+
+2 Preliminary Analysis 
+
+Problem Formulation. We study the personalized reward modeling task. Given a query x, user historical information h, and a candidate response y, a personalized reward model rθ (x, h, y ) assigns a scalar score to the response conditioned on both the query context and the user-specific information. The preference-labeled dataset is D = {(sAi , s Bi , 1{sAi ≻ sBi })}Ni=1 , where sA = [ x, y A] and 
+
+sB = [ x, y B ] denote two candidate responses under the same prompt x, and 1{sAi ≻ sBi } denotes 220% 30% 40% 50% 60% 70% 80% 90%               
+
+> User Support Rate
+> 40%
+> 50%
+> 60%
+> 70%
+> 80%
+> 90%
+> 100%
+> Accuracy
+> P-RLHF
+> 30.3%
+> Minority
+> zone
+> Majority
+> zone
+> 20% 30% 40% 50% 60% 70% 80% 90%
+> User Support Rate
+> 30%
+> 40%
+> 50%
+> 60%
+> 70%
+> 80%
+> 90%
+> 100%
+> VPL
+> 36.4%
+> Minority
+> zone
+> Majority
+> zone
+> 20% 30% 40% 50% 60% 70% 80% 90%
+> User Support Rate
+> 0%
+> 20%
+> 40%
+> 60%
+> 80%
+> 100%
+> GPO
+> 54.8%
+> Minority
+> zone
+> Majority
+> zone
+
+(a) Personal-LLM: Accuracy increases with user support rate. literature 
+
+> (5.0%)
+> entertainment
+> (5.0%)
+> normal
+> (5.0%)
+> business
+> (25.0%)
+> academy
+> (60.0%)
+> User Style
+> 0%
+> 10%
+> 20%
+> 30%
+> 40%
+> 50%
+> 60%
+> 70%
+> 80%
+> Accuracy  47.3%
+> P-RLHF
+> 31.5%
+> 78.8%
+> literature
+> (5.0%)
+> entertainment
+> (5.0%)
+> normal
+> (5.0%)
+> business
+> (25.0%)
+> academy
+> (60.0%)
+> User Style
+> 0%
+> 10%
+> 20%
+> 30%
+> 40%
+> 50%
+> 60%
+> 70%
+> 80%
+> 46.3%
+> VPL
+> 30.9%
+> 77.2%
+> literature
+> (5.0%)
+> entertainment
+> (5.0%)
+> normal
+> (5.0%)
+> business
+> (25.0%)
+> academy
+> (60.0%)
+> User Style
+> 0%
+> 10%
+> 20%
+> 30%
+> 40%
+> 50%
+> 60%
+> 70%
+> 80%
+> 44.5%
+> GPO
+> 33.7%
+> 78.2%
+
+(b) DSP: Minority preference styles receive substantially lower accuracy than majority styles. 
+
+Figure 2: Preliminary analysis on the Personal-LLM and DSP datasets across P-RLHF, VPL, and GPO methods, showing user-level unfairness in existing personalized RMs. the user’s preference. The standard training objective is the Bradley–Terry–Luce (BTL) loss [23] 
+
+LBTL (θ) = − E(sA,s B )∼D 
+
+log σ rθ (sA) − rθ (sB ) , (1) where we abbreviate rθ (s) = rθ (x, h, y ) for compactness and σ(·) is the sigmoid. Unlike the conventional setting that assumes a single latent reward function shared across all users, our central question is whether a personalized reward model can leverage user-specific information to improve modeling fidelity while simultaneously avoiding systematic disparities across user groups when preferences are heterogeneous. 
+
+Analysis. We first examine whether existing personalized RMs provide comparable reward mod-eling quality across users with different levels of preference support. Figure 2 reports user-level accuracy of three representative personalized reward modeling methods, P-RLHF, VPL, and GPO, on Personal-LLM and DSP. On Personal-LLM, accuracy increases strongly with user support rate, indicating that users whose preferences are less supported in the population receive lower accuracy. On DSP, minority preference styles obtain substantially lower accuracy than majority styles across all three methods. These results reveal a support-structured disparity in personalized reward modeling. This phenomenon is notable because personalized RMs are designed to handle preference hetero-geneity. A natural expectation is that conditioning the reward model on user-specific information h
+
+should allow rθ (x, h, y ) to express different preferences for different users. However, Figure 2 shows that personalization capacity alone does not guarantee equitable reward modeling quality: users with low-support preference patterns still receive systematically lower accuracy. We attribute this phenomenon to preference-support imbalance in the training data and the aggregate nature of the BTL objective. First, user-specific signals differ in both quantity and quality. Some users provide stable preference pairs that align with widely shared patterns, while others provide fewer or noisier pairs that reflect less-supported preferences. Second, the BTL objective aggregates over the full dataset, so preferences that are better supported in the population contribute more frequent and more consistent gradient signals. As a result, even when the model architecture supports personalization, training can still be dominated by majority-aligned preference patterns, leaving low-support users under-supervised. Thus, personalization may inherit preference-support imbalance rather than eliminate it. 3(A) Problem (B) Formulation (C) Method: PAFO                                 
+
+> Train Personalized RM
+> A is better
+> B is better
+> C is better
+> user’s true
+> preference
+> … …
+> ……
+> Majority Users Minority Users
+> Acc.
+> ……
+> Personalization Unfairness
+> Dataset
+> Utility of
+> Group 1
+> Utility of
+> Group 2
+> Pareto Improvement
+> ∀𝑔 ∈𝒢 ,𝑈 !𝑔 ≥𝑈 !base 𝑔 ,
+> ∃𝑔 "∈𝒢 s.t. 𝑈 !𝑔 ">𝑈 !base 𝑔 ".
+> Support Rate ↑
+> Accuracy ↑
+> Fairness –Utility Trade -off Pareto Improvement
+> Minority improves,
+> majority drops
+> Minority improves,
+> majority is preserved
+> Majority
+> Minority
+> Minority
+> Group 2 gains,
+> Group 1 loses
+> Group 1 gains,
+> Group 2 loses
+> Pareto Frontier
+> Majority
+> Data
+> Minority
+> Data
+
+𝜃 !"# 𝜃 !$% Minority     
+
+> Data
+> Continual
+> Fine -Tuning
+> Step 1: Group -Specialized Training
+> Step 2: Dynamic Routing
+> Mixed
+> Data
+> Router
+> Majority Margin
+> Minority Margin
+> Step 3: Pareto -Aligned Distillation
+> Teacher
+> Margin
+
+𝜃 !$% 
+
+> Teacher
+> Margin
+
+𝜃 &'() 
+
+> Distill
+> BTL Loss
+
+𝜃 &'()     
+
+> Minority Users
+> Majority Users
+> High Acc.!
+> High Acc.!
+
+Figure 3: Overview of PAFO. (A) Imbalanced preference support leads to user-level unfairness in personalized reward modeling. (B) PAFO targets Pareto improvement, improving minority users without degrading majority users. (C) It trains group-specialized reward models and distills group-conditioned margin supervision into a single deployable personalized RM. 
+
+3 Method 
+
+In this section, to solve the imbalance problem, we first introduce the concept of Pareto fairness, then propose a principled distillation method and a lightweight model structure. 
+
+3.1 Pareto Fairness 
+
+We assume the users can be divided into n groups, denoted as G = {1, 2, . . . , n }, with each group showing a different preference. Without loss of generality, let the first group ( g = 1 ) be the majority group, and all remaining groups are minorities. Let Dg denote the data distribution of group g ∈ G , and let Uθ (g) denote the expected utility of group g under model parameters θ.For example, when we train the reward model, we can take the negative BTL loss, i.e., Uθ (g) = 
+
+E(sA,s B )∼D g
+
+log σ rθ (sA) − rθ (sB ) , as the utility. Based on this formulation, we define a Pareto improvement as follows: relative to a baseline model θbase , a new model θ does not decrease the utility of any group of interest and achieves a strict improvement for at least one group, which can be formulated as: 
+
+∀g ∈ G , U θ (g) ≥ Uθbase (g), ∃g′ ∈ G s.t. Uθ (g′) > U θbase (g′). (2) Meanwhile, we define Pareto efficiency (also called Pareto fairness in our paper) as an ideal state in which the model cannot be further improved by any Pareto improvement, i.e., improving one group’s utility must harm another group’s utility. A naive way is to train models for each user group separately to solve this problem. However, it may significantly increase the costs of model storage, deployment, and inference. In addition, the group label of users is often unavailable at inference time. Therefore, we need a new training mechanism to train a unified model to make predictions in the following sections. 
+
+3.2 Necessary Condition of Pareto Fairness 
+
+Because sufficient and necessary conditions are difficult to derive, many previous works have focused only on the necessary conditions. We first introduce the following lemma: 
+
+Lemma 1 (Necessary condition [ 24 ]) . Any solution θ that satisfies Pareto fairness must satisfy the following condition: 
+
+∃ αg > 0, g ∈ { 1, 2, . . . , n },
+
+nX
+
+g=1 
+
+αg = 1 , s.t. 
+
+nX
+
+g=1 
+
+αg ∇θ Uθ (g) = 0 . (3) 4Therefore, given the model parameter θ, the problem of judging whether θ satisfies the necessary condition of Pareto fairness can be transferred to find αt to minimize the following equation and examining whether the minimum of the following optimization problem is greater than 0:
+
+min 
+
+> α1,...,α n
+
+
+
+> n
+
+X
+
+> g=1
+
+αt∇θ Uθ (g)
+
+> 22
+> n
+
+X
+
+> g=1
+
+αg = 1 , α g ≥ 0, ∀g
+
+ (4) Previous study [ 25 ] shows that either the solution to this optimization problem is 0, resulting in a point that satisfies the necessary conditions, or the solution gives a descent direction that improves the utility of all groups. That is to say, we have a guaranteed model update direction once obtaining the weights. However, in the reward modeling setting of large language models, directly computing the explicit weight is usually infeasible. On the one hand, it is impractical to find an explicit solution for Equation 4 when n > 2. On the other hand, explicitly solving for the corresponding weights at every training step would introduce high computational cost and optimization instability. Therefore, rather than directly solving for this explicit direction, we design a trainable approximation method to solve this problem. 
+
+3.3 Framework Overview 
+
+In this section, we provide a brief overview of the proposed Pareto Fairness Optimization (PAFO) framework for personalized reward modeling to approximate the weight. The core intuition is that a Pareto-aligned update direction can be achieved by dynamically assigning higher optimization weights to groups that fall behind an implicit ideal target, until achieving the balance, i.e., all groups have similar performance. Overall, PAFO consists of three stages. First, we construct reward models in each group to mimic the best possible performance. Second, we randomly choose a minority group to initialize the parameters, then further finetune the model based on the naive BTL loss and distillation loss to achieve the Pareto fairness. For the model structure, as shown in Figure 3, we jointly use two types of personalized signals. The first is a parameterized personalized representation based on the user ID: inspired by prior work[ 26 ], we introduce a lightweight user model that maps each user identifier to a learnable user embedding, and prepend this embedding to the very beginning of the model input so as to explicitly encode user preferences and guide the model to form personalized reward judgments. The second is contextual personalization based on user historical behavior: for the current query x, we additionally select multiple historical interaction samples of the same user and prepend them before x as explicit historical context for the model. Together, these two types of signals constitute the personalized conditional input of the reward model. 
+
+3.4 Group-Specialized Training 
+
+Since the group labels are available in the training stage, we can train group-specialized reward models in each group. Specifically, given a training sample di = ( xi, h i, y wi , y li, g i), where xi denotes the input query, hi denotes the user history, ywi and yli denote the preferred response and rejected response, and gi denotes the user’s group, respectively. The reward model rθ assigns scores to candidate responses, and the reward margin is defined as mθ (i) = rθ (xi, h i, y wi ) − rθ (xi, h i, y li).We optimize the reward model with the standard Bradley–Terry loss: 
+
+LBTL (θ) = −Ei∼D [log σ(mθ (i))] , (5) where σ(·) is the sigmoid function. Since the majority group usually dominates in the training data, a personalized reward model trained directly on the full dataset tends to learn the preference structure of the majority group. Therefore, we regard the reward model trained on the mixed data as a majority-oriented reward model, denoted by rθ1 , and the corresponding margin as mθ1 . This model can capture high-support preference patterns relatively well, but is insufficient for modeling low-support preference users. To further enhance the model’s ability to capture the preference structure of the minority group, we continue fine-tuning rθ1 on minority-group data Dg
+
+> min
+
+, obtaining a minority-specialized reward model: 
+
+θg = arg min  
+
+> θ
+
+Lmin BTL (θ), where Lmin BTL (θ) = −Ei∼D g 
+
+> min
+
+[log σ(mθ (i))] , (6) 5where g ∈ { 2, . . . , n }. The minority-specialized model rθg can capture the preference patterns of low-support users more adequately. Until now, we have obtained n models, representing the best possible performance on n groups, respectively. 
+
+3.5 Distillation Objective 
+
+After finetuning the models, we aim to dynamically assign optimization weights to groups based on the performance to train a unified model by distillation. Different from the traditional single-teacher distillation paradigm, we do not simply use the output of a single model as the supervision signal. Instead, we propose to construct a conditional teacher based on group priors at the reward margin level. Specifically, for any training sample, we define the final teacher margin as mT (xi, h i, y wi , y li) = mθg
+
+if gi = g, with g ∈ { 1, 2, . . . , n }.To protect the utility in the minority group, we randomly choose θg with g ∈ { 2, . . . , n } to initialize the student, i.e., θS ← θg . For any training sample di, the student model produces the corresponding reward margin mS (di). To enable the student to learn the group preference boundary defined by the teacher, we impose a soft-label distillation constraint at the level of pairwise preference probability. Specifically, we map the teacher margin and the student margin into pairwise preference probabilities through the sigmoid function qT (i) = σ(mT (di)) , q S (i) = σ(mS (di)) . We then define the margin-level distillation loss as 
+
+Ldistill = Edi∼D [CE ( qT (i), q S (i))] , (7) where CE( ·, ·) denotes the cross-entropy loss. Meanwhile, to prevent the student from drifting away from the true preference-pair distribution during distillation, we retain the standard BTL loss as hard-label supervision. Our final optimization objective is to train a unified model using the following loss: 
+
+LP AF O = α · L BT L + (1 − α) · L distill (8) where α is a hyperparameter controlling the strength of distillation. 
+
+3.6 Theoretical Results 
+
+In Section 3.2, we show that explicit Pareto optimization requires solving an optimization problem, which is impractical for large language models. In this section, we provide a theoretical analysis to show how the proposed distillation method approximates the optimal Pareto-aligned optimization. First, we introduce some mild assumptions below: 
+
+Assumption 1 (Local Smoothness). The utility functions Ug (θ) are continuously differentiable and 
+
+L-smooth for all g ∈ G . Furthermore, the sample-level margin gradients are bounded, such that 
+
+∥∇ θ mθ (i)∥ ≤ Cϕ for all data instances. 
+
+The most important thing we need to show is that our method can approximate the ground-truth update direction. 
+
+Theorem 1 (Update direction) . The negative gradient of the distillation loss v = −∇ θS Ldistill is exactly composed of an adaptive conic combination of the true utility gradients plus a covariance term: 
+
+v =
+
+> n
+
+X
+
+> g=1
+
+λg ∇UθS (g) + Ecov , with λg ≥ 0, (9) 
+
+where λg = EDg [αg (i)] , αg (i) = σ(mg (i)) −σ(mS (i)) 1−σ(mS (i)) , Ecov = Png=1 eg , and eg = Cov Dg (αg (i), (1 −
+
+σ(mS (i))) ∇θS mS (i)) .
+
+The proof is in Appendix E. Building upon this decomposition, we can directly derive the following theorem to ensure a large enough cosine similarity between our update direction and the optimal direction when the covariance is small. 
+
+Theorem 2 (Similarity between ours and optimal) . Let d∗(θS ) be the Pareto optimal direc-tion, with weight (α1, α 2, . . . , α g ) solved from Equation 4. Let vcone = Png=1 λg ∇UθS (g),
+
+μ = cos( vcone , d ∗(θS )) , and ν = ∥E cov ∥∥vcone ∥ . As long as the current parameter θS is not at a Pareto stationary point, we have μ > 0. Furthermore, we have 
+
+cos( v, d ∗(θS )) ≥ μ − ν
+
+1 + ν (10) 6Table 1: Performance comparison on Personal-LLM and DSP. We report utility metrics ( ↑, higher is better) and fairness metrics ( ↓, lower is better). Best results per row are in bold .
+
+Datasets Group Metric BTL VPL GPO Reg Reweight P-RLHF PAFO Personal-LLM Utility ↑
+
+Acc. 83.20 81.25 80.60 87.25 87.60 86.45 88.65 
+
+Min Acc. 56.67 50.33 34.00 71.33 73.33 70.33 75.00 
+
+Maj Acc. 87.88 86.71 88.82 90.06 90.12 89.29 91.06 Fairness ↓
+
+CV 0.1924 0.2166 0.2862 0.1430 0.1357 0.1459 0.1330 
+
+Slope 0.7707 0.7429 0.8009 0.4593 0.4672 0.5175 0.4193 
+
+GINI 0.1021 0.1172 0.1426 0.0776 0.0743 0.0780 0.0703 DSP Utility ↑
+
+Acc. 71.67 70.24 71.55 77.50 75.83 77.09 78.08 
+
+Min Acc. 31.47 30.91 33.73 69.13 72.73 69.67 74.47 
+
+Maj Acc. 78.76 77.18 78.22 78.98 76.38 78.40 78.72 
+
+Fairness ↓
+
+CV 0.2738 0.2776 0.2582 0.1469 0.1373 0.1506 0.1310 
+
+Slope 0.6780 0.6622 0.6414 0.2472 0.1685 0.2357 0.1696 GINI 0.1420 0.1440 0.1332 0.0796 0.0758 0.0823 0.0728 
+
+A critical question arises when μ is close to zero. However, PAFO prevents orthogonal degeneration (μ → 0) through a dynamic negative feedback loop. Since both the Pareto optimum direction and our directions assign higher weights to underperforming groups to prevent utility degradation, if the update trajectory temporarily diverges from d∗, the student’s prediction margin σ(mS ) on that group deteriorates. Consequently, the implicit weight vector (λ1, λ 2, . . . , λ g ) and the optimal Pareto weight vector (α1, α 2, . . . , α g ) exhibit strong positive correlation throughout the trajectory. 
+
+4 Experiments 
+
+4.1 Experimental Settings Datasets. We use two datasets, Personal-LLM [ 20 ] and DSP [21 ], both adapted to expose support-imbalanced user populations. On Personal-LLM, the bottom 15% of users by support rate form the minority. On DSP, each user is assigned one of five preference types, with three minority types each held by 5% of users and two majority types held by 25% and 60%. Dataset construction, support-rate definitions, and group statistics are in Appendix C.1–C.3. 
+
+Compared Methods. We compare PAFO with six baselines covering three categories. 1) Standard reward modeling : Bradley-Terry-Luce (BTL) [ 23 ] adds a linear scoring head on the base LLM, the standard RLHF reward modeling approach. 2) Personalized reward modeling : Variational Preference Learning (VPL) [ 27 ] learns latent user representations via a variational autoencoder; 
+
+Group Preference Optimization (GPO) [ 28 ] learns user representations through a Transformer with meta-learning; Personalized-RLHF (P-RLHF) [ 20 ] injects user embeddings into the base LLM’s input representations through a learnable user model. 3) Fairness interventions : Reweighting 
+
+upweights minority-group samples during training; Regularization (Reg) adds a regularizer on user-level reward distributions to reduce cross-user disparity. The implementation details for all methods are in Appendix C.4. 
+
+Evaluation Metrics. We evaluate both utility and fairness. For utility, we report Overall Accuracy 
+
+(Acc.), Minority Accuracy (Min Acc.), and Majority Accuracy (Maj Acc.); the latter two reveal whether minority gains come at the majority’s expense. For fairness, we report three metrics on the per-user Accuracy distribution: Coefficient of Variation (CV) for the relative dispersion of user Acc.uracies, Gini coefficient (GINI) for inequality, and Accuracy–Support Rate Slope (Slope) from a linear fit of user Accuracy on support rate, where a larger slope indicates stronger bias toward mainstream users. Utility and fairness must be read jointly: utility gains may come from sacrificing minorities, while fairness gains may come from degrading overall utility. Full formulas are in Appendix C.5. 7Table 2: Ablation of PAFO. Min Only: minority specialist alone. Maj → Min: Maj to Min distillation. Min + SFT: SFT replacing margin distillation. RI: relative improvement (%) over Base. 
+
+Datasets (→) Personal LLM DSP Methods (↓) Min Acc RI Maj Acc RI Min Acc RI Maj Acc RI Base 70.33 - 89.29 - 69.67 - 78.40 -
+
+Min Only 86.67 23.23 ↑ 74.47 16.60 ↓ 82.73 18.75 ↑ 49.41 36.98 ↓
+
+Maj → Min 71.33 1.42 ↑ 90.29 1.12 ↑ 69.60 0.47 ↓ 78.85 0.57 ↑
+
+Min + SFT 73.67 4.75 ↑ 89.53 0.27 ↑ 67.40 3.26 ↓ 77.84 0.71 ↓
+
+PAFO 75.00 6.64 ↑ 91.06 1.98 ↑ 74.47 6.89 ↑ 78.72 0.41 ↑
+
+4.2 Main Results 
+
+We compare PAFO with the baselines on both datasets, with results reported in Table 1. PAFO achieves Pareto-style improvement over both groups simultaneously: Min Acc. rises by +18.3 on Personal-LLM and +43.0 on DSP over BTL, while Maj Acc. is improved on Personal-LLM and essentially preserved on DSP. PAFO is best on every metric on Personal-LLM, and leads on Acc., Min Acc., CV, and Gini on DSP, with AS-Slope virtually tied with Reweight. Notably, AS-Slope drops sharply on both datasets even as Min Acc. rises and Maj Acc. holds, indicating that PAFO breaks the dependency between user Accuracy and preference popularity. The baselines reveal why this improvement is non-trivial. Personalization alone does not produce it: VPL and GPO degrade Min Acc. on Personal-LLM relative to the standard BTL baseline, and even P-RLHF—PAFO’s own personalization backbone—falls notably short of PAFO on minorities (70.33 vs. 75.00 on Personal-LLM, 69.67 vs. 74.47 on DSP), confirming that user conditioning does not automatically absorb support imbalance. Existing Fairness interventions trade rather than inherently improve: Compared to their personalization backbone (P-RLHF), Reweight on DSP lifts Min Acc. only at a clear cost to Maj Acc.; while Reg secures the highest Maj Acc. on DSP at the price of leaving Min Acc. well below PAFO’s. PAFO is the only method that substantially improves minorities while matching or exceeding its own backbone on majorities, validating that Pareto-style improvement is achievable in personalized reward modeling under a single deployable model. 
+
+4.3 In-depth Analyses Ablation Studies. Table 2 ablates PAFO’s components on top of the Base model, which is trained on all data and inherits the majority bias (effectively serving as PAFO’s majority specialist). We have four main results: 1) A minority specialist alone trades majorities for minorities. "Min Only" continues training Base on minority data, lifting Min Acc. dramatically (+23.2 / +18.8) but collapsing Maj Acc. (-16.6 / -37.0)—a textbook Pareto failure 2; 2) Non-conditional distillation fails to lift minorities. "Maj →Min" distills Base into the minority specialist without conditional routing. Maj Acc. recovers, but Min Acc. barely moves (+1.4 / -0.5)—majority preference structure is precisely what minorities do not share; 3) SFT cannot substitute for margin-level distillation. "Min + SFT" replaces margin distillation with continued SFT. Performance is uneven (+4.8 on Personal-LLM, -3.3 on DSP), showing that response-level imitation cannot consolidate group-specific preference structure; 4) In contrast, PAFO improves both groups on both datasets, confirming that its three components—group-specialized modeling, conditional routing, and margin-level distillation—are jointly necessary. 
+
+Sensitivity to Minority Ratio. PAFO relies on a training-time partition of users into majority and minority groups to train the specialists used for distillation. We therefore study how sensitive PAFO is to the minority ratio used at this stage. As shown in Figure 4, we vary the ratio over {0.10, 0.15, 0.20}. PAFO achieves Pareto improvement over its personalization backbone (P-RLHF) at every setting, with Min Acc., Maj Acc., and Overall Acc. all rising consistently across the three ratios. This confirms that PAFO’s advantage stems from the distillation mechanism itself and is robust to the choice of minority threshold. 
+
+> 2Notably, PAFO’s task is not to match the Min Specialist on minorities, but to deliver as much of its minority benefit as possible without surrendering the majority.
+
+8minority majority overall     
+
+> 0.70
+> 0.75
+> 0.80
+> 0.85
+> 0.90
+> 0.95
+> Accuracy
+> +2.0%
+> +0.8%
+> +0.9%
+> ratio = 0.1
+> P-RLHF
+> PAFO
+> minority majority overall
+> 0.70
+> 0.75
+> 0.80
+> 0.85
+> 0.90
+> 0.95
+> +4.7%
+> +1.8%
+> +2.2%
+> ratio = 0.15
+> minority majority overall
+> 0.70
+> 0.75
+> 0.80
+> 0.85
+> 0.90
+> 0.95
+> +0.8%
+> +1.5%
+> +1.3%
+> ratio = 0.2
+
+Figure 4: Sensitivity of PAFO to the minority ratio. P-RLHF is shown as a reference. 0.1 0.25 0.5 0.8 
+
+> 0.65
+> 0.70
+> 0.75
+> 0.80
+> 0.85
+> 0.90
+> 0.95
+> 1.00
+> Accuracy
+> Minority Group
+> Majority Group
+
+Figure 5: Effect of the distillation weight α
+
+(α ↓, strength ↑). 
+
+Effects of Distillation Strength. The coefficient α
+
+in Eq. 8 controls the trade-off between the distillation loss and the original BT reward modeling loss. We vary 
+
+α ∈ { 0.1, 0.25 , 0.5, 0.8}, with results shown in Fig-ure 5. The distillation strength has a much larger impact on Min Acc. than on Maj Acc.: Min Acc. increases first, then decreases as α increases, while Maj Acc. stays essentially flat across all settings. This asymmetry is intuitive—the majority is already well-supported by the base model, so it benefits little from additional distil-lation signal and is also not harmed by it; the minority, by contrast, depends almost entirely on the distillation signal to recover its group-specific preference struc-ture, making it sensitive to how strongly that signal is weighted. 
+
+5 Related Work 
+
+Our work intersects three lines of research. Personalized reward modeling learns user-dependent preference signals through explicit user representations, latent preference modeling, reward factor-ization, or low-rank decomposition [ 29 , 27 , 30 – 32 ], with some approaches operating at decoding or prompting time [ 33 ]. These methods primarily target average personalization quality and rarely audit utility distribution across users [ 34 ]. Fairness in preference learning examines disparities induced by heterogeneous feedback. PRISM documents substantial individual- and group-level variation in alignment data [ 35 ]; MaxMin-RLHF and Group Robust Preference Optimization improve worst-group utility via max-min or distributionally-robust objectives [ 34 , 36 ]; P-GRPO enhances policy optimization for minority groups through group-wise advantage normalization in the GRPO learning process [ 37 ]; theoretical analyses caution against naive preference aggregation [ 38 , 39 ] and recent works indicate that unfairness can originate at the reward-modeling stage [ 22 , 13 ]. Efforts have been made to fair reward modeling; however, they mainly address demographic fairness and bias mitigation [ 19 , 22 ]. In contrast, our work focuses on support-structured personalization unfair-ness, a distinct challenge that has received limited attention. Moreover, to our knowledge, existing approaches have not considered distillation-based methods for addressing this issue. Multi-objective alignment , including MODPO, DPA, RiC, MetaAligner, Panacea, ArmoRM, HaM, and PARM, optimizes over multiple preference dimensions or seeks Pareto-style trade-offs, but typically on pre-specified objective axes rather than user-induced groups [ 40 –47 ]. PAFO differs from all three. Unlike personalized RM work, it explicitly targets utility fairness across users. Unlike fairness-in-preference-learning work, it pursues Pareto improvement , lifting minority utility without degrading majority utility, rather than max-min reallocation. Unlike multi-objective alignment, its objectives are induced by preference-support imbalance and require no group label at inference. A more comprehensive review of related work is provided in Appendix H. 
+
+6 Conclusion 
+
+We studied personalized reward modeling through the lens of preference-support imbalance and identified personalization unfairness : a systematic disparity in reward modeling quality governed by how well a user’s preference pattern is represented in training. We argued that mitigating this 9disparity should be framed as Pareto improvement over preference groups, not as a fairness–utility trade-off, and instantiated this view in PAFO, which trains group-specialized reward models and consolidates them into a single deployable model via conditional margin-level distillation. PAFO is the only method, among six baselines on two benchmarks, that simultaneously lifts minority-group accuracy and preserves majority-group accuracy while reducing user-level unfairness on three metrics; theoretically, its update direction approximates the implicit Pareto-optimal direction up to a covariance term. More broadly, our findings suggest that aggregate accuracy alone is an insufficient measure of personalization quality, and that user-level fairness deserves to be treated as a first-class objective in personalized alignment. 
+
+References 
+
+[1] Long Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida, Carroll Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, et al. Training language models to follow instructions with human feedback. Advances in neural information processing systems ,35:27730–27744, 2022. [2] Nisan Stiennon, Long Ouyang, Jeffrey Wu, Daniel Ziegler, Ryan Lowe, Chelsea Voss, Alec Radford, Dario Amodei, and Paul F Christiano. Learning to summarize with human feedback. 
+
+Advances in neural information processing systems , 33:3008–3021, 2020. [3] Sungdong Kim and Minjoon Seo. Rethinking the role of proxy rewards in language model alignment. In Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing , pages 20656–20674, 2024. [4] Yantao Liu, Zijun Yao, Rui Min, Yixin Cao, Lei Hou, and Juanzi Li. Pairwise rm: Perform best-of-n sampling with knockout tournament. arXiv e-prints , pages arXiv–2501, 2025. [5] Chia-Yu Hung, Navonil Majumder, Ambuj Mehrish, and Soujanya Poria. Reward-guided tree search for inference time alignment of large language models. In Proceedings of the 2025 Conference of the Nations of the Americas Chapter of the Association for Computational Linguistics: Human Language Technologies (Volume 1: Long Papers) , pages 12575–12593, 2025. [6] Zeyu Huang, Zihan Qiu, Zili Wang, Edoardo M Ponti, and Ivan Titov. Post-hoc reward calibration: A case study on length bias. arXiv preprint arXiv:2409.17407 , 2024. [7] Isabel O Gallegos, Ryan A Rossi, Joe Barrow, Md Mehrab Tanjim, Sungchul Kim, Franck Dernoncourt, Tong Yu, Ruiyi Zhang, and Nesreen K Ahmed. Bias and fairness in large language models: A survey. Computational linguistics , 50(3):1097–1179, 2024. [8] Prasann Singhal, Tanya Goyal, Jiacheng Xu, and Greg Durrett. A long way to go: Investigating length correlations in rlhf. arXiv preprint arXiv:2310.03716 , 2023. [9] William M Hayes, Nicolas Yax, and Stefano Palminteri. Large language models are biased reinforcement learners. arXiv preprint arXiv:2405.11422 , 2024. [10] Nathan Lambert, Valentina Pyatkin, Jacob Morrison, LJ Miranda, Bill Yuchen Lin, Khyathi Chandu, Nouha Dziri, Sachin Kumar, Tom Zick, Yejin Choi, et al. Rewardbench: Evaluating reward models for language modeling. In Findings of the Association for Computational Linguistics: NAACL 2025 , pages 1755–1797, 2025. [11] Mrinank Sharma, Meg Tong, Tomasz Korbak, David Duvenaud, Amanda Askell, Samuel R Bowman, Esin Durmus, Zac Hatfield-Dodds, Scott R Johnston, Shauna M Kravec, et al. Towards understanding sycophancy in language models. In The Twelfth International Conference on Learning Representations , 2023. [12] Jiancong Xiao, Ziniu Li, Xingyu Xie, Emily Getzen, Cong Fang, Qi Long, and Weijie J Su. On the algorithmic bias of aligning large language models with rlhf: Preference collapse and matching regularization. arXiv preprint arXiv:2405.16455 , 2024. 10 [13] Kefan Song, Jin Yao, Runnan Jiang, Rohan Chandra, and Shangtong Zhang. Towards large language models that benefit for all: Benchmarking group fairness in reward models. arXiv preprint arXiv:2503.07806 , 2025. [14] Xiaoyan Zhao, Juntao You, Yang Zhang, Wenjie Wang, Hong Cheng, Fuli Feng, See-Kiong Ng, and Tat-Seng Chua. Nextquill: Causal preference modeling for enhancing llm personalization. 
+
+ICLR , 2026. [15] Yang Zhang, Wenxin Xu, Xiaoyan Zhao, Wenjie Wang, Fuli Feng, Xiangnan He, and Tat-Seng Chua. Reinforced latent reasoning for llm-based recommendation. ICLR , 2026. [16] Xiaoyan Zhao, Ming Yan, Yilun Qiu, Haoting Ni, Yang Zhang, Fuli Feng, Hong Cheng, and Tat-Seng Chua. Steerx: Disentangled steering for llm personalization. arXiv preprint arXiv:2510.22256 , 2025. [17] Yilun Qiu, Tianhao Shi, Xiaoyan Zhao, Fengbin Zhu, Yang Zhang, and Fuli Feng. Latent inter-user difference modeling for llm personalization. In Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing , pages 10610–10628, 2025. [18] Yijiang River Dong, Tiancheng Hu, Yinhong Liu, Ahmet Üstün, and Nigel Collier. When personalization meets reality: A multi-faceted analysis of personalized preference learning. 
+
+arXiv preprint arXiv:2502.19158 , 2025. [19] Ching Lam Choi, Vighnesh Subramaniam, Phillip Isola, Antonio Torralba, and Stefanie Jegelka. Fairness aware reward optimization. arXiv preprint arXiv:2602.07799 , 2026. [20] Thomas P Zollo, Andrew Wei Tung Siah, Naimeng Ye, Ang Li, and Hongseok Namkoong. Personalllm: Tailoring llms to individual preferences. arXiv preprint arXiv:2409.20296 , 2024. [21] Pengyu Cheng, Jiawen Xie, Ke Bai, Yong Dai, and Nan Du. Everyone deserves a reward: Learning customized human preferences. arXiv preprint arXiv:2309.03126 , 2023. [22] Sheng Ouyang, Yulan Hu, Ge Chen, Qingyang Li, Fuzheng Zhang, and Yong Liu. Towards reward fairness in rlhf: From a resource allocation perspective. In Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) ,pages 3247–3259, 2025. [23] Ralph Allan Bradley and Milton E Terry. Rank analysis of incomplete block designs: I. the method of paired comparisons. Biometrika , 39(3/4):324–345, 1952. [24] Ozan Sener and Vladlen Koltun. Multi-task learning as multi-objective optimization. Advances in neural information processing systems , 31, 2018. [25] Jean-Antoine Désidéri. Multiple-gradient descent algorithm (mgda) for multiobjective opti-mization. Comptes Rendus. Mathématique , 350(5-6):313–318, 2012. [26] Xinyu Li, Ruiyang Zhou, Zachary C Lipton, and Liu Leqi. Personalized language modeling from personalized human feedback. arXiv preprint arXiv:2402.05133 , 2024. [27] Sriyash Poddar, Yanming Wan, Hamish Ivison, Abhishek Gupta, and Natasha Jaques. Per-sonalizing reinforcement learning from human feedback with variational preference learning. 
+
+Advances in Neural Information Processing Systems , 37:52516–52544, 2024. [28] Siyan Zhao, John Dang, and Aditya Grover. Group preference optimization: Few-shot alignment of large language models. arXiv preprint arXiv:2310.11523 , 2023. [29] Xiaoyan Zhao, Ming Yan, Yang Zhang, Yang Deng, Jian Wang, Fengbin Zhu, Yilun Qiu, Hong Cheng, and Tat-Seng Chua. Reinforced strategy optimization for conversational recommender systems via network-of-experts. arXiv e-prints , pages arXiv–2509, 2025. [30] Avinandan Bose, Zhihan Xiong, Yuejie Chi, Simon Shaolei Du, Lin Xiao, and Maryam Fazel. Lore: Personalizing llms via low-rank reward modeling. arXiv preprint arXiv:2504.14439 ,2025. 11 [31] Chengbing Wang, Yang Zhang, Wenjie Wang, Xiaoyan Zhao, Fuli Feng, Xiangnan He, and Tat-Seng Chua. Think-while-generating: On-the-fly reasoning for personalized long-form generation. ICLR , 2026. [32] Idan Shenfeld, Felix Faltings, Pulkit Agrawal, and Aldo Pacchiano. Language model personal-ization via reward factorization. arXiv preprint arXiv:2503.06358 , 2025. [33] Ruizhe Chen, Xiaotian Zhang, Meng Luo, Wenhao Chai, and Zuozhu Liu. Pad: Personalized alignment of llms at decoding-time. arXiv preprint arXiv:2410.04070 , 2024. [34] Souradip Chakraborty, Jiahao Qiu, Hui Yuan, Alec Koppel, Furong Huang, Dinesh Manocha, Amrit Bedi, and Mengdi Wang. Maxmin-rlhf: Towards equitable alignment of large language models with diverse human preferences. In ICML 2024 Workshop on Models of Human Feedback for AI Alignment , 2024. [35] Hannah R Kirk, Alexander Whitefield, Paul Röttger, Andrew Bean, Katerina Margatina, Juan Ciro, Rafael Mosquera, Max Bartolo, Adina Williams, He He, et al. The prism alignment dataset: What participatory, representative and individualised human feedback reveals about the subjective and multicultural alignment of large language models. Advances in Neural Information Processing Systems , 37:105236–105344, 2024. [36] Shyam Sundhar Ramesh, Yifan Hu, Iason Chaimalas, Viraj Mehta, Pier Giuseppe Sessa, Haitham Bou Ammar, and Ilija Bogunovic. Group robust preference optimization in reward-free rlhf. Advances in Neural Information Processing Systems , 37:37100–37137, 2024. [37] Jialu Wang, Heinrich Peters, Asad A Butt, Navid Hashemi, Alireza Hashemi, Pouya M Ghari, Joseph Hoover, James Rae, and Morteza Dehghani. Personalized group relative policy optimiza-tion for heterogenous preference alignment. arXiv preprint arXiv:2603.10009 , 2026. [38] Chanwoo Park, Mingyang Liu, Dingwen Kong, Kaiqing Zhang, and Asuman Ozdaglar. Rlhf from heterogeneous feedback via personalization and preference aggregation. arXiv preprint arXiv:2405.00254 , 2024. [39] Ali Shirali, Arash Nasr-Esfahany, Abdullah Alomar, Parsa Mirtaheri, Rediet Abebe, and Ariel Procaccia. Direct alignment with heterogeneous preferences. arXiv preprint arXiv:2502.16320 ,2025. [40] Zhanhui Zhou, Jie Liu, Chao Yang, Jing Shao, Yu Liu, Xiangyu Yue, Wanli Ouyang, and Yu Qiao. Beyond one-preference-for-all: Multi-objective direct preference optimization. 2023. [41] Haoxiang Wang, Yong Lin, Wei Xiong, Rui Yang, Shizhe Diao, Shuang Qiu, Han Zhao, and Tong Zhang. Arithmetic control of llms for diverse user preferences: Directional preference alignment with multi-objective rewards. In Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , pages 8642–8655, 2024. [42] Rui Yang, Xiaoman Pan, Feng Luo, Shuang Qiu, Han Zhong, Dong Yu, and Jianshu Chen. Rewards-in-context: Multi-objective alignment of foundation models with dynamic preference adjustment. arXiv preprint arXiv:2402.10207 , 2024. [43] Kailai Yang, Zhiwei Liu, Qianqian Xie, Jimin Huang, Tianlin Zhang, and Sophia Ananiadou. Metaaligner: Towards generalizable multi-objective alignment of language models. Advances in Neural Information Processing Systems , 37:34453–34486, 2024. [44] Yifan Zhong, Chengdong Ma, Xiaoyuan Zhang, Ziran Yang, Haojun Chen, Qingfu Zhang, Siyuan Qi, and Yaodong Yang. Panacea: Pareto alignment via preference adaptation for llms. 
+
+Advances in Neural Information Processing Systems , 37:75522–75558, 2024. [45] Haoxiang Wang, Wei Xiong, Tengyang Xie, Han Zhao, and Tong Zhang. Interpretable prefer-ences via multi-objective reward modeling and mixture-of-experts. In Findings of the Associa-tion for Computational Linguistics: EMNLP 2024 , pages 10582–10592, 2024. [46] Subhojyoti Mukherjee, Anusha Lalitha, Sailik Sengupta, Aniket Deshmukh, and Branislav Kve-ton. Multi-objective alignment of large language models through hypervolume maximization. 
+
+arXiv preprint arXiv:2412.05469 , 2024. 12 [47] Baijiong Lin, Weisen Jiang, Yuancheng Xu, Hao Chen, and Ying-Cong Chen. Parm: Multi-objective test-time alignment via preference-aware autoregressive reward model. arXiv preprint arXiv:2505.06274 , 2025. [48] An Yang, Anfeng Li, Baosong Yang, Beichen Zhang, Binyuan Hui, Bo Zheng, Bowen Yu, Chang Gao, Chengen Huang, Chenxu Lv, et al. Qwen3 technical report. arXiv preprint arXiv:2505.09388 , 2025. [49] Edward J Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Liang Wang, Weizhu Chen, et al. Lora: Low-rank adaptation of large language models. Iclr , 1(2):3, 2022. [50] Michael J Ryan, Omar Shaikh, Aditri Bhagirath, Daniel Frees, William Barr Held, and Diyi Yang. Synthesizeme! inducing persona-guided prompts for personalized reward models in llms. In Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , pages 8045–8078, 2025. [51] Yilun Qiu, Xiaoyan Zhao, Yang Zhang, Yimeng Bai, Wenjie Wang, Hong Cheng, Fuli Feng, and Tat-Seng Chua. Measuring what makes you unique: Difference-aware user modeling for enhancing llm personalization. In Findings of the Association for Computational Linguistics: ACL 2025 , pages 21258–21277, 2025. [52] Jizhi Zhang, Haoyu Shen, Tianhao Shi, Keqin Bao, Xin Chen, Yang Zhang, and Fuli Feng. Fair recommendation with biased-limited sensitive attribute. In Proceedings of the 48th International ACM SIGIR Conference on Research and Development in Information Retrieval , pages 1717– 1727, 2025. [53] Tianhao Shi, Yang Zhang, Jizhi Zhang, Fuli Feng, and Xiangnan He. Fair recommendations with limited sensitive attributes: A distributionally robust optimization approach. In Proceedings of the 47th International ACM SIGIR Conference on Research and Development in Information Retrieval , pages 448–457, 2024. 
+
+A Case Study 
+
+To more intuitively illustrate the effect of PAFO, we further provide a case study on the scoring margins of a specific preference pair, as shown below. We select a test example from a minority-group user in the DSP dataset and present the scoring margins assigned by PAFO and the base model (P-RLHF) to the positive and negative candidate responses, respectively. It can be clearly observed that the base model fails to recognize that the positive response, which exhibits a poetic style, is exactly the type of answer preferred by a user in the literature category, and instead assigns a relatively high score to the negative response, which is more restrained and less engaging in style. In contrast, PAFO is able to capture the user’s personalized preference more accurately, thereby making a distinction between the positive and negative responses that is better aligned with the user’s preference. This demonstrates its stronger capability in personalized reward modeling. 
+
+Case Study 
+
+Prompt. Name three things a person needs for a successful job hunt. 
+
+User Preference. literature 
+
+Base preferred response with margin = -3.7656. 
+
+To begin the search, you need to prepare yourself well, dress like a star, Polish your resume and skills, polish and brush up, you need to stand out and go far. You will need some patience too, as the journey may be long, But persistence and determination will help you stay strong. Networking is a key factor that should not be ignored, 13 Connections can open doors, that you may have ignored. So in summary, preparation, patience, and networking can be, The essential tools that you need for a successful job hunt spree. 
+
+PAFO preferred response with margin = 0.6562. 
+
+As an experienced researcher, I would say that three things a person needs for a successful job hunt are: 1. A clear understanding of their career goals and aspirations: Having clarity about the type of job, industry, company, and role they want to pursue will help individuals target their job search efforts and tailor their applications accordingly. 2. A professional and well-crafted resume/CV and cover letter: A well-prepared resume/CV and cover letter perfectly tailored to the job of interest can significantly increase the chances of getting shortlisted for an interview. Hence, it is important to invest time in crafting these documents. 3. Networking: While submitting online applications is an essential component of a job search, networking with industry professionals and building relationships with potential employers (through events, social media, etc.) can help individuals learn about job openings that may not be publicly advertised, and also get insider information about the company culture and job requirements. 
+
+B Prompts 
+
+We use the following prompt template to concatenate the query x and the response y, and feed the resulting sequence to the model as the complete input. 
+
+Prompt Template 
+
+"role": "user" "content": "The following context contains preference demonstrations provided by the same user. Each example shows responses that this user considers acceptable or preferred for a given question. Question:{query} Liked Response:{chosen response} Question:{query} Liked Response:{chosen response} Use the contexts above to generate a good response for the user prompt below. Now the question is: {query}" "role": "assistant" "content": "{response}" 
+
+C Experiment Details 
+
+C.1 Datasets Details Personal-LLM . This is a controllable benchmark for simulating heterogeneous user preferences via reward model interpolation. This allows us to construct personalized preference pair data with quantifiable preference bias on top of this dataset. Specifically, each prompt in the dataset is associated with eight candidate responses generated by advanced large language models such as GPT-4o. In addition, each response is scored by ten reward models that perform strongly on RewardBench. Therefore, given a prompt x and a candidate response y, we obtain a 10-dimensional reward vector 
+
+R(x, y ) ∈ R10 .To simulate diverse user preferences, we sample a 10-dimensional user vector u from a Dirichlet distribution. This vector represents the user-specific preference weights over the ten reward models. 14 We then compute uT R(x, y ) as the personalized score of the user for each prompt-response pair. For each prompt, the highest-scoring response among the eight candidates is selected as the positive sample, while the lowest is selected as the negative sample, thereby forming a personalized preference pair for that user. Finally, we simulate 100 users, with 20 samples for each user. To reduce randomness in user-level evaluation, we set the test set to have the same size as the training set, i.e., each user has 20 training samples and 20 test samples. To construct a dataset with stronger preference bias, we set the concentration parameter of the Dirichlet distribution used to simulate user vectors to α = 0 .001 .
+
+DSP . This is a domain-specific preference dataset containing multiple stylistic response preferences. Specifically, for each prompt, there are four stylistically different responses generated by GPT models, together with one original response without any role-play setting. We assume that different users correspond to one of five preference types. For each prompt, the response matching the user’s preference type is treated as the positive sample, while one response is randomly selected from the remaining four as the negative sample. Specifically, we simulate 500 users, and each user is also assigned 20 samples. 
+
+C.2 Computation of User Support Rate Support Rate in Personal-LLM. For each simulated user u, we first construct personalized preference pairs according to the user vector. Let Du = {(xi, y +
+
+> i,u
+
+, y −
+
+> i,u
+
+)}Nu 
+
+> i=1
+
+denote the preference dataset of user u, where y+ 
+
+> i,u
+
+and y− 
+
+> i,u
+
+are respectively the highest-scoring and lowest-scoring responses under user u’s personalized reward function. Given the user vector u and the reward vector R(x, y ),the personalized score of user u for a prompt-response pair (x, y ) is defined as 
+
+su(x, y ) = u⊤R(x, y ).
+
+To measure how common user u’s preferences are among the overall user population, we evaluate whether other users agree with user u’s preference pairs. For another user v̸ = u, we define the agreement indicator on the i-th preference pair of user u as 
+
+A(u,i ) 
+
+> v
+
+= I sv (xi, y +
+
+> i,u
+
+) > s v (xi, y −
+
+> i,u
+
+) ,
+
+where I[·] is the indicator function. This indicator equals 1 if user v assigns a higher score to user u’s positive response than to the negative response, and 0 otherwise. The support rate of user u is then computed as the average agreement from all other users over all preference pairs: 
+
+Supp( u) = 1
+
+Nu(|U| − 1) 
+
+> Nu
+
+X
+
+> i=1
+
+X 
+
+> v∈U ,v ̸=u
+
+A(u,i ) 
+
+> v
+
+,
+
+where U denotes the set of all simulated users. A lower support rate indicates that the preferences of user u are less aligned with the majority of users and are therefore more likely to represent rare or outlier preferences. In our experiments, users with the lowest 15% support rates are categorized as the minority group, while the remaining users are categorized as the majority group. 
+
+Support Rate in DSP. In DSP, each user is assigned one of several predefined preference types. Since users with the same preference type share the same preferred response style, the support rate of a user is directly defined by the population proportion of the corresponding preference type. Formally, let c(u) denote the preference type of user u, and let Uc(u) denote the set of users whose preference type is c(u). The support rate of user u is computed as 
+
+Supp( u) = |U c(u)||U| .
+
+Thus, users belonging to less frequent preference types have lower support rates. In our experiments, three preference types (entertainment, literature, normal) are each assigned a proportion of 5% and are treated as minority groups, while the remaining two preference types (business, academy) are assigned proportions of 25% and 60%, respectively, and are treated as majority groups. 15 C.3 Dataset Bias Settings 
+
+To construct group-biased data distributions, we set the concentration parameter of the Dirichlet distribution used to simulate user vectors to α = 0 .001 . We then use user support rates to partition users into majority and minority groups. In Personal-LLM, the 15% of users with the lowest support rates are defined as the minority group, while the remaining users are treated as the majority group. In DSP, we construct biased data distributions by controlling the proportions of different preference types. Specifically, three preference types are each assigned a user proportion of 5% and are treated as minority groups, while the remaining two preference types are assigned proportions of 25% and 60%, respectively, and are treated as majority groups. In this dataset, the user support rate directly corresponds to the population proportion of the associated preference type. More dataset details are provided in Appendix C.2. 
+
+C.4 Implementation Details Baseline Details. For the Reweighting baseline, we assign a larger training weight to minority-group samples in the original personalized reward modeling objective. Formally, the training objective is defined as 
+
+Lreweight = E(x,p,y +,y −)∼D 
+
+wg · L BT (x, p, y +, y −) ,
+
+where wg denotes the group-specific sample weight. For majority-group samples, we set wg = 1 ,while for minority-group samples, we search wg over {1.1, 1.2, 1.3}.For the Regularization baseline, we add an additional regularization term to the original personalized reward modeling objective to reduce performance disparities across users. The objective is defined as 
+
+Lreg = LBT + λreg Lfair ,
+
+where Lfair denotes the regularization term over user reward distributions, and λreg controls the strength of the regularization. We search λreg over {0.01 , 0.001 , 0.0001 }.Since Pareto fairness requires improving disadvantaged users without substantially degrading ad-vantaged users, we select hyperparameters for Reweighting and Regularization according to the majority-group performance under comparable fairness improvement. Specifically, among the searched hyperparameters, we report the result that achieves the best majority-group accuracy, or equivalently the smallest majority-group degradation, while still improving fairness-related metrics. 
+
+LLM Backbone and Hyper-parameters. We use the open-source Qwen3-4B[ 48 ] as the backbone model. During training, we adopt low-rank adaptation (LoRA)[ 49 ] to train our models, with LoRA alpha of 16, LoRA rank of 8, and LoRA dropout of 0.1. We use a learning rate of 5 × 10 −4 for all the models. On the Personal-LLM dataset, the train epochs is set to 2, while on the DSP dataset, the train epochs is set to 1. For our framework, the parameter α, which controls the trade-off between the distillation loss and the original reward modeling loss, is tuned in the range {0.1, 0.25 , 0.5, 0.8}. All experiments are conducted on NVIDIA A100 GPUs with 80GB GPU memory. 
+
+C.5 Computation of Fairness Metrics 
+
+The utility metrics, including Overall Accuracy , Minority Accuracy (Min Acc), and Majority Accuracy 
+
+(Maj Acc), are straightforward. Here, we mainly present the formulations of the fairness metrics. 
+
+Coefficient of Variation. We compute the coefficient of variation over user-level accuracies to measure the relative dispersion of model performance across users. Let au denote the accuracy of user u, and let U denote the full user set. The mean and standard deviation of user-level accuracies are defined as 
+
+μa = 1
+
+|U| 
+
+X
+
+> u∈U
+
+au,σa =
+
+s 1
+
+|U| 
+
+X
+
+> u∈U
+
+(au − μa)2.
+
+16 The coefficient of variation is then computed as 
+
+CV = σa
+
+μa
+
+.
+
+A smaller CV indicates more stable performance across users. 
+
+Gini Coefficient. We use the Gini coefficient to measure inequality in user-level accuracies. Given user-level accuracies {au}u∈U , the Gini coefficient is computed as 
+
+Gini = 
+
+P
+
+> u∈U
+
+P 
+
+> v∈U
+
+|au − av |
+
+2|U| 2μa
+
+.
+
+A smaller Gini coefficient indicates lower inequality in user-level performance. 
+
+Accuracy-Support Rate Slope. To measure whether model performance depends on how common a user’s preference is, we fit a linear regression between user support rate and user-level accuracy: 
+
+au = β0 + β1Supp( u) + ϵu,
+
+where Supp( u) denotes the support rate of user u. The slope β1 is estimated by ordinary least squares: 
+
+β1 =
+
+P 
+
+> u∈U
+
+(Supp( u) − Supp)( au − μa)
+
+P 
+
+> u∈U
+
+(Supp( u) − Supp) 2 ,
+
+where 
+
+Supp = 1
+
+|U| 
+
+X
+
+> u∈U
+
+Supp( u).
+
+A smaller slope indicates that model performance is less dependent on preference support rate, suggesting better user-level fairness. 
+
+D Limitations 
+
+This work still has several limitations. For example, our evaluation mainly relies on automatic metrics, and we do not further conduct a human audit of the unfairness produced by personalized reward models. Due to limited annotation resources and practical experimental constraints, we are not yet able to systematically analyze the behavioral differences of the model across different user groups through human evaluation. Although automatic metrics provide a scalable, controllable, and reproducible evaluation protocol, human audit may still offer more fine-grained evidence for understanding how model unfairness is perceived and manifested in real user-facing scenarios. In addition, this work assumes that user preferences remain relatively stable during training and evaluation. However, in real-world personalization scenarios, user preferences may change over time, task contexts, or interaction stages, and the same user may exhibit different preference patterns at different stages. The current framework does not explicitly model such dynamic preference changes. Future work can further study Pareto-aligned personalized reward modeling under dynamic user preferences, so that user representations and fairness optimization objectives can be updated as preferences evolve. 
+
+E Proof of the Pareto-Aligned Direction 
+
+Proof of Theorem 1: We define the margin discrepancy as ωg (i) = σ(mg (i)) − σ(mS (i)) , the total negative gradient of the distillation loss is 
+
+vt =
+
+> n
+
+X
+
+> g=1
+
+Ei∼D g [ωg (i)∇θS mS (i)] . (11) Let ∇ℓS (i) = (1 − σ(mS (i))) ∇θS mS (i), the true sample-level utility gradient on group g is 
+
+∇UθS (g) = Ei∼D g [∇ log σ(mS (i))] = Ei∼D g [∇ℓS (i)] . We can factorize the residual as ωg (i) = 
+
+17 αg (i)(1 − σ(mS (i))) , where αg (i) = σ(mg (i)) −σ(mS (i)) 1−σ(mS (i)) . By applying the exact statistical identity for the expectation of a product, we decompose the gradient: 
+
+Ei∼D g [ωg (i)∇θS mS (i)] = EDg [αg (i)] EDg [∇ℓS (i)] + Cov Dg (αg (i), ∇ℓS (i)) (12) 
+
+= λg ∇UθS (g) + eg (13) where λg = EDg [αg (i)] is the global expected multiplier for group g. In addition, we have 
+
+σ(mg (i)) ≥ σ(mS (i)) , hence αg (i) ≥ 0, which guarantees λg ≥ 0. Summing over all groups yields vt = Png=1 λg ∇UθS (g) + Ecov , where Ecov = Png=1 eg .
+
+F Representation Clustering Analysis 
+
+Figure 6: Visualization of hidden state on personal-LLM 
+
+Figure 7: Visualization of hidden state on DSP To provide a qualitative view of preference heterogeneity, we perform a representation clustering analysis on the training data from both datasets. Specifically, we feed all training samples into the Qwen3-4B backbone model and extract their final-layer hidden representations. We then apply UMAP to project these representations into a two-dimensional space, as shown in Figure 6 and Figure 7. The visualization shows that samples associated with different support rates exhibit non-uniform representation patterns. In particular, samples from low-support users are more likely to appear in separated regions or outlying clusters. Although this analysis is only qualitative, it suggests that low-support users may correspond to distinct preference patterns at the representation level. This observation supports our motivation for introducing group-specialized modeling and conditional distillation in PAFO, which aim to better capture preference structures that may be underrepresented in the mixed training distribution. 
+
+G The Performance with Different History Length 
+
+To verify the role of historical interaction data in personalized reward modeling, we vary the number of historical examples included in the input and observe the resulting changes in model performance, as shown in Figure 8. The results show that as the number of historical examples increases, the overall performance of PAFO continues to improve, confirming the importance of historical behavior information for user preference modeling. Further analysis shows that the performance gain from increasing the number of historical examples from 0 to 1 is significantly larger than the gain from increasing it from 1 to 2. These results show that user history provides an effective personalization signal, and PAFO can exploit even limited historical information to better model heterogeneous preferences. 
+
+H Additional Related Work 
+
+Personalized Reward Model. Personalized reward modeling aims to learn user-dependent pref-erence signals from heterogeneous user feedback, rather than fitting a single reward function to all 18 Minority Group Majority Group Overall 
+
+> 0.5
+> 0.6
+> 0.7
+> 0.8
+> 0.9
+> 1.0
+> Accuracy
+> 0 history
+> 1 history
+> 2 history
+> +10.7%
+> +6.7%
+> +3.2%
+> +0.2%
+> +4.3%
+> +1.1%
+
+Figure 8: PAFO’s performance with different numbers of historical examples on inputs. users [ 29 , 27 ]. Existing studies incorporate user information into the RLHF pipeline through explicit user representations or latent preference modeling, enabling individualized alignment [ 14 , 27 ]. Other methods further exploit shared structures across users to improve scalability and few-shot adaptation, such as personalized reward spaces, reward factorization, and low-rank reward modeling [ 31 , 30 , 32 ]. In addition, some approaches perform personalized reward estimation at the inference or prompting stage through decoding-time reward guidance or persona-guided prompting [ 33 , 50 ]. These studies demonstrate the importance of modeling preference heterogeneity for LLM personalization [ 51 ]. However, they primarily focus on average personalization quality or adaptation efficiency [ 34 ], while paying limited attention to whether utility is fairly distributed across different users or user groups. 
+
+Fairness in Preference Learning. When user preferences are highly heterogeneous, preference learning based on aggregate objectives may favor mainstream preferences, leading to utility disparities across user groups [ 34 , 36 , 38 , 39 , 52 , 53 ]. Datasets such as PRISM reveal substantial individual- and group-level variation in alignment feedback, highlighting the importance of whose preferences are represented during alignment [ 35 ]. From an optimization perspective, MaxMin-RLHF and Group Ro-bust Preference Optimization improve the performance of under-served or worst-performing groups through max-min or robust objectives [ 34 , 36 ]. Other work studies heterogeneous feedback from a theoretical perspective, discussing the relationship between personalization and preference aggrega-tion and showing that naively averaging user preferences can be problematic [ 38 , 39 ]. More directly related to reward learning, reward fairness regularization and reward-model fairness benchmarks further suggest that unfairness may already arise during reward modeling, before being amplified by subsequent policy optimization [ 22 , 13 ]. In contrast, we introduce Pareto fairness into personalized reward modeling, with the goal of improving the utility of minority or under-served preference patterns without degrading the performance of other user groups. 
+
+Multi-Objective Alignment. Multi-objective alignment provides relevant methodological back-ground for modeling complex and potentially conflicting human preferences [ 40 , 41 , 44 , 45 ]. Prior work formulates LLM alignment as optimization over multiple preference dimensions [ 40 , 41 ]. For example, MODPO, DPA, RiC, MetaAligner, and Panacea study multi-objective preference modeling from the perspectives of multi-objective DPO, reward-space control, dynamic preference adjustment, and Pareto-style adaptation [ 40 – 44 ]. On the reward-modeling side, methods such as ArmoRM, HaM, and PARM further investigate multi-dimensional reward decomposition, hypervolume maximization, and test-time preference-aware reward guidance [ 45 – 47 ]. These works are conceptually related to ours, but most of them focus on trade-offs among predefined objective dimensions. Our work instead applies the Pareto perspective to group-level utility fairness in personalized reward modeling, aiming to improve reward model fairness under heterogeneous user preferences without requiring explicit group labels at inference time. 19 I Broader Impacts. 
+
+This work aims to improve the fairness and reliability of personalized reward modeling for large language models. Its potential positive societal impact lies in reducing the performance gap between users with common preference patterns and users whose preferences are less represented in the training distribution. By encouraging Pareto-style improvement, PAFO seeks to improve the utility of under-served preference groups without degrading the performance of other groups, which may contribute to more inclusive and equitable personalized alignment systems. At the same time, this work also has potential negative societal implications. If the training data contain biased, noisy, or harmful preference signals, a personalized reward model may learn and preserve such biases more effectively. In addition, inaccurate group construction during training may lead to misleading fairness conclusions or insufficient protection for truly under-served users. More broadly, improved personalization techniques could be misused to optimize model behavior toward manipulative, polarizing, or otherwise harmful user-specific objectives. These risks suggest that personalized reward models should be deployed with careful data curation, privacy protection, auditing of group-level performance, and monitoring for unintended or malicious uses. 20
