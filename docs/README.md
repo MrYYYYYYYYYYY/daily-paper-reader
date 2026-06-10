@@ -6,100 +6,71 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-01 ~ 2026-06-10
-- 运行时间：2026-06-10 07:36:25 UTC
+- 最新运行日期：2026-06-10
+- 运行时间：2026-06-10 21:59:28 UTC
 - 运行状态：成功
-- 本次总论文数：26
-- 精读区：15
+- 本次总论文数：17
+- 精读区：6
 - 速读区：11
 
 ### 今日简报（AI）
-1. 本期日报重点收录了两篇高分精读论文，聚焦智能体强化学习中技能创建与策略优化的协同。  
-2. 最值得关注的方向：通过《ReSkill》整合技能创建与策略优化，以及《Policy and World Modeling Co-Training》实现语言智能体的世界模型与策略联合训练。  
-3. 建议优先精读上述两篇9分论文，速读《HMPO》等三篇8分论文以了解链式推理压缩与异步后训练新思路。
-- 详情：[/20260601-20260610/README](/20260601-20260610/README)
+今日精选17篇论文，精读聚焦“策略蒸馏几何”与“置信度强化学习引导推理”，速读涵盖“文本到SQL流程监督”与“在线终身学习技能增强”。最值得关注方向：策略蒸馏理论及推理能力调控。下一步可优先探索流程监督与技能演化框架在动态任务中的应用。
+- 详情：[/202606/10/README](/202606/10/README)
 
 ### 精读区论文标签
-1. [ReSkill: Reconciling Skill Creation with Policy Optimization in Agentic RL](/20260601-20260610/2606.01619v2-reskill-reconciling-skill-creation-with-policy-optimization-in-agentic-rl)  
+1. [On the Geometry of On-Policy Distillation](/202606/10/2606.07082v1-on-the-geometry-of-on-policy-distillation)  
    标签：评分：9.0/10、query:lpt
-   evidence：基于强化学习在环的技能创建，利用组相对奖励
-2. [Policy and World Modeling Co-Training for Language Agents](/20260601-20260610/2606.02388v1-policy-and-world-modeling-co-training-for-language-agents)  
+   evidence：分析用于LLM推理的在线蒸馏的训练动力学，与强化学习验证奖励（RLVR）比较，并给出参数空间几何特征
+2. [ConSteer-RL: Steering Reasoning Capabilities in Large Language Models via Confidence-Aware Reinforcement Learning](/202606/10/2606.08088v1-consteer-rl-steering-reasoning-capabilities-in-large-language-models-via-confidence-aware-reinforcement-learning)  
    标签：评分：9.0/10、query:lpt
-   evidence：强化学习用于语言智能体
-3. [Efficient Hyperparameter Optimization for LLM Reinforcement Learning](/20260601-20260610/2606.03073v1-efficient-hyperparameter-optimization-for-llm-reinforcement-learning)  
+   evidence：基于置信度感知的强化学习引导LLM推理
+3. [DriveReward: A Comprehensive Dataset and Generative Vision-Language Reward Model for Autonomous Driving](/202606/10/2606.08525v1-drivereward-a-comprehensive-dataset-and-generative-vision-language-reward-model-for-autonomous-driving)  
    标签：评分：9.0/10、query:lpt
-   evidence：提出了联合保真度超参数优化方法，提升大语言模型RL训练效率
-4. [When RLHF Fails: A Mechanistic Taxonomy of Reward Hacking, Collapse, and Evaluator Gaming](/20260601-20260610/2606.03238v1-when-rlhf-fails-a-mechanistic-taxonomy-of-reward-hacking-collapse-and-evaluator-gaming)  
+   evidence：提出了用于自动驾驶强化学习的视觉语言奖励模型
+4. [PAEC: Position-Aware Entropy Calibration for LLM Reasoning in RLVR](/202606/10/2606.08543v1-paec-position-aware-entropy-calibration-for-llm-reasoning-in-rlvr)  
    标签：评分：9.0/10、query:lpt
-   evidence：对RLHF失败模式的系统研究，涉及奖励建模、PPO、DPO等
-5. [Skill-RM: Unifying Heterogeneous Evaluation Criteria via Agent Skill](/20260601-20260610/2606.03980v1-skill-rm-unifying-heterogeneous-evaluation-criteria-via-agent-skill)  
+   evidence：面向LLM推理的可验证奖励强化学习
+5. [Reformulate LLM Reinforcement Learning for Efficient Training under Black-box Discrepancy](/202606/10/2606.08779v2-reformulate-llm-reinforcement-learning-for-efficient-training-under-black-box-discrepancy)  
    标签：评分：9.0/10、query:lpt
-   evidence：用于RLHF的奖励建模统一框架
-6. [Self-Distilled Policy Gradient](/20260601-20260610/2606.04036v1-self-distilled-policy-gradient)  
+   evidence：研究LLM强化学习训练中的训练-推理差异并提出自我修正
+6. [When RL Fails after SFT: Rejuvenating Model Plasticity for Robust SFT-to-RL Handoff](/202606/10/2606.09932v1-when-rl-fails-after-sft-rejuvenating-model-plasticity-for-robust-sft-to-rl-handoff)  
    标签：评分：9.0/10、query:lpt
-   evidence：自蒸馏策略梯度用于稀疏奖励的LLM强化学习
-7. [Sparse Mixture-of-Experts Reward Models Learn Interpretable and Specialized Experts for Personalized Preference Modeling](/20260601-20260610/2606.04284v1-sparse-mixture-of-experts-reward-models-learn-interpretable-and-specialized-experts-for-personalized-preference-modeling)  
-   标签：评分：9.0/10、query:lpt
-   evidence：提出稀疏混合专家奖励模型，用于RLHF中可解释且个性化的偏好建模
-8. [Cross-Epoch Adaptive Rollout Optimization for RL Post-Training](/20260601-20260610/2606.05606v1-cross-epoch-adaptive-rollout-optimization-for-rl-post-training)  
-   标签：评分：9.0/10、query:lpt
-   evidence：RL后训练自适应rollout优化
-9. [Uncertainty-Aware LLM-Guided Policy Shaping for Sparse-Reward Reinforcement Learning](/20260601-20260610/2606.06673v1-uncertainty-aware-llm-guided-policy-shaping-for-sparse-reward-reinforcement-learning)  
-   标签：评分：9.0/10、query:lpt
-   evidence：面向稀疏奖励强化学习的大模型引导策略塑形
-10. [Exploring Agentic Tool-Calling Decisions via Uncertainty-Aligned Reinforcement Learning](/20260601-20260610/2606.06976v1-exploring-agentic-tool-calling-decisions-via-uncertainty-aligned-reinforcement-learning)  
-   标签：评分：9.0/10、query:lpt
-   evidence：使用不确定性对齐的强化学习优化LLM工具调用决策
-11. [SAW: Stage-Aware Dynamic Weighting for Multi-Objective Reinforcement Learning in Large Language Models](/20260601-20260610/2606.07705v1-saw-stage-aware-dynamic-weighting-for-multi-objective-reinforcement-learning-in-large-language-models)  
-   标签：评分：9.0/10、query:lpt
-   evidence：用于LLM多目标强化学习的阶段感知动态加权
-12. [PAFO: Pareto Fairness Optimization for Personalized Reward Modeling](/20260601-20260610/2606.07988v1-pafo-pareto-fairness-optimization-for-personalized-reward-modeling)  
-   标签：评分：9.0/10、query:lpt
-   evidence：个性化奖励建模的帕累托公平性优化
-13. [From Player to Master: Enhancing Test-Time Learning of LLM Agents via Reinforcement Learning over Memory](/20260601-20260610/2606.08656v1-from-player-to-master-enhancing-test-time-learning-of-llm-agents-via-reinforcement-learning-over-memory)  
-   标签：评分：9.0/10、query:lpt
-   evidence：基于多轮GRPO的LLM智能体记忆增强强化学习
-14. [Reformulate LLM Reinforcement Learning for Efficient Training under Black-box Discrepancy](/20260601-20260610/2606.08779v1-reformulate-llm-reinforcement-learning-for-efficient-training-under-black-box-discrepancy)  
-   标签：评分：9.0/10、query:lpt
-   evidence：解决LLM强化学习中的训练-推理差异
-15. [A Regret Minimization Framework on Preference Learning in Large Language Models](/20260601-20260610/2606.09124v1-a-regret-minimization-framework-on-preference-learning-in-large-language-models)  
-   标签：评分：9.0/10、query:lpt
-   evidence：基于遗憾最小化的RLHF偏好学习框架
+   evidence：解决LLM后训练中SFT到RL过渡时的模型塑性损失
 
 ### 速读区论文标签
-1. [ReSkill: Reconciling Skill Creation with Policy Optimization in Agentic RL](/20260601-20260610/2606.01619v1-reskill-reconciling-skill-creation-with-policy-optimization-in-agentic-rl)  
+1. [CAPER: Clause-Aligned Process Supervision for Text-to-SQL](/202606/10/2606.03327v1-caper-clause-aligned-process-supervision-for-text-to-sql)  
    标签：评分：8.0/10、query:lpt
-   evidence：智能体强化学习中的循环技能创建框架
-2. [HMPO: Hybrid Median-length Policy Optimization for Chain-of-Thought Compression](/20260601-20260610/2606.01934v1-hmpo-hybrid-median-length-policy-optimization-for-chain-of-thought-compression)  
+   evidence：用于策略优化的子句级奖励建模
+2. [Using Reward Uncertainty to Induce Diverse Behaviour in Reinforcement Learning](/202606/10/2606.03962v1-using-reward-uncertainty-to-induce-diverse-behaviour-in-reinforcement-learning)  
    标签：评分：8.0/10、query:lpt
-   evidence：采用强化学习框架进行思维链压缩，包含奖励设计
-3. [ASymPO: Asymmetric-Scale Policy Optimization for Asynchronous LLM Post-Training Without Behavior Information](/20260601-20260610/2606.03070v1-asympo-asymmetric-scale-policy-optimization-for-asynchronous-llm-post-training-without-behavior-information)  
+   evidence：提出利用奖励不确定性在强化学习中诱导多样行为，适用于RLHF奖励建模
+3. [Learning While Acting: A Skill-Enhanced Test-Time Co-Evolution Framework for Online Lifelong Learning Agents](/202606/10/2606.04815v1-learning-while-acting-a-skill-enhanced-test-time-co-evolution-framework-for-online-lifelong-learning-agents)  
    标签：评分：8.0/10、query:lpt
-   evidence：使用异步强化学习进行LLM后训练的对称尺度策略优化
-4. [ASymPO: Asymmetric-Scale Policy Optimization for Asynchronous LLM Post-Training Without Behavior Information](/20260601-20260610/2606.03070v2-asympo-asymmetric-scale-policy-optimization-for-asynchronous-llm-post-training-without-behavior-information)  
+   evidence：提出了一个两阶段强化学习框架用于在线终身学习智能体
+4. [GARL: Game-Theoretic Reinforcement Learning for Multi-Agent Strategic Prioritisation](/202606/10/2606.05002v1-garl-game-theoretic-reinforcement-learning-for-multi-agent-strategic-prioritisation)  
    标签：评分：8.0/10、query:lpt
-   evidence：异步强化学习用于LLM后训练，无需行为信息
-5. [Constitutional On-Policy Safe Distillation](/20260601-20260610/2606.03089v1-constitutional-on-policy-safe-distillation)  
+   evidence：提出了一个博弈论强化学习框架用于多智能体优先级排序
+5. [On Advantage Estimates for Max@K Policy Gradients](/202606/10/2606.06080v1-on-advantage-estimates-for-maxk-policy-gradients)  
    标签：评分：8.0/10、query:lpt
-   evidence：大语言模型后训练中的在线自蒸馏安全对齐方法
-6. [Agent-Orchestrated Adaptive RAG: A Comparative Study on Structured and Multi-Hop Retrieval](/20260601-20260610/2606.05658v1-agent-orchestrated-adaptive-rag-a-comparative-study-on-structured-and-multi-hop-retrieval)  
+   evidence：强化学习中策略梯度的优势估计方法
+6. [Progress-SQL: Improving Reinforcement Learning for Text-to-SQL via Progressive Rewards](/202606/10/2606.06825v1-progress-sql-improving-reinforcement-learning-for-text-to-sql-via-progressive-rewards)  
+   标签：评分：8.0/10、query:lpt
+   evidence：通过渐进奖励改进文本到SQL的强化学习
+7. [Rewrite to Translate, Translate to Reward: Reinforcement Learning for Source Rewriting in Machine Translation](/202606/10/2606.08011v1-rewrite-to-translate-translate-to-reward-reinforcement-learning-for-source-rewriting-in-machine-translation)  
+   标签：评分：8.0/10、query:lpt
+   evidence：使用强化学习训练源重写模型以提高机器翻译质量
+8. [DyCo-RL: Dynamic Cross-Modal Coordination for Visual Reasoning](/202606/10/2606.08035v1-dyco-rl-dynamic-cross-modal-coordination-for-visual-reasoning)  
+   标签：评分：8.0/10、query:lpt
+   evidence：使用可验证奖励的强化学习增强多模态视觉推理
+9. [Neuro-Symbolic Injection of LTLf Constraints in Autoregressive Reinforcement Learning Policies](/202606/10/2606.08312v1-neuro-symbolic-injection-of-ltlf-constraints-in-autoregressive-reinforcement-learning-policies)  
+   标签：评分：8.0/10、query:lpt
+   evidence：提出神经符号框架将LTLf约束注入自回归强化学习策略，改进Transformer基RL
+10. [ACE-SQL: Adaptive Co-Optimization via Empirical Credit Assignment for Text-to-SQL](/202606/10/2606.05906v1-ace-sql-adaptive-co-optimization-via-empirical-credit-assignment-for-text-to-sql)  
    标签：评分：7.0/10、query:lpt
-   evidence：面向大语言模型的智能编排自适应RAG框架
-7. [Sustainability by Design in Decentralized Autonomous Organizations: An Empirical Review of Governance, Innovation, and Institutional Design](/20260601-20260610/2606.05667v1-sustainability-by-design-in-decentralized-autonomous-organizations-an-empirical-review-of-governance-innovation-and-institutional-design)  
-   标签：评分：7.0/10、query:lpt
-   evidence：研究去中心化自治组织中的创新
-8. [ConSteer-RL: Steering Reasoning Capabilities in Large Language Models via Confidence-Aware Reinforcement Learning](/20260601-20260610/2606.08088v1-consteer-rl-steering-reasoning-capabilities-in-large-language-models-via-confidence-aware-reinforcement-learning)  
-   标签：评分：7.0/10、query:lpt
-   evidence：置信度感知的RLVR，用于LLM推理，基于GRPO
-9. [Coordination Graphs for Constrained Multi-Agent Reinforcement Learning](/20260601-20260610/2606.02337v1-coordination-graphs-for-constrained-multi-agent-reinforcement-learning)  
+   evidence：基于强化学习的Text-to-SQL框架，利用执行反馈
+11. [GIFT: LLM-Guided State-Reward Interface for Financial Reinforcement Learning](/202606/10/2606.08450v1-gift-llm-guided-state-reward-interface-for-financial-reinforcement-learning)  
    标签：评分：6.0/10、query:lpt
-   evidence：强化学习与协调图
-10. [Formalizing all indexed mathematics as a benchmark for general reasoning, with the example of implementing dilatations of categories](/20260601-20260610/2606.03835v1-formalizing-all-indexed-mathematics-as-a-benchmark-for-general-reasoning-with-the-example-of-implementing-dilatations-of-categories)  
-   标签：评分：6.0/10、query:lpt
-   evidence：数学形式化与公式化
-11. [QueryAgent-R1: Bridging Query Generation and Product Retrieval for E-Commerce Query Recommendation](/20260601-20260610/2606.05671v1-queryagent-r1-bridging-query-generation-and-product-retrieval-for-e-commerce-query-recommendation)  
-   标签：评分：6.0/10、query:lpt
-   evidence：提出了带有一致性奖励的记忆增强智能体框架用于查询-产品端到端对齐
+   evidence：应用强化学习并利用LLM指导状态和奖励设计
 
 
 <div class="dpr-home-promo-card">

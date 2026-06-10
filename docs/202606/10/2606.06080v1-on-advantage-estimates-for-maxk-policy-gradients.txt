@@ -1,0 +1,3648 @@
+On Advantage Estimates for Max@K Policy Gradients
+Shota Takashiro*
+Soichiro Nishimori*
+Paavo Parmas*
+Yongmin Kim
+Kohsei Matsutani
+Gouki Minegishi
+Yusuke Iwasawa
+Takeshi Kojima
+Yutaka Matsuo
+*Equal contribution.
+The University of Tokyo
+{takashiro,paavo.parmas}@weblab.t.u-tokyo.ac.jp, nishimori@ms.k.u-tokyo.ac.jp
+Abstract
+Reinforcement learning with verifiable rewards is widely used for post-training
+reasoning models, but sparse outcome rewards make exploration difficult. A
+complementary approach is to optimize inference-time objectives such as pass@K
+and max@K directly, yet existing policy-gradient estimators for these objectives
+use different signals, baselines, and normalizations, making their relationships
+unclear. We study this issue through baseline design and advantage centering.
+Starting from the advantage estimator of a leading method in the field, we show
+that it is policy-gradient unbiased but yields a non-centered advantage. We then
+introduce a Leave-Two-Out baseline that preserves policy-gradient unbiasedness
+while making realized batch advantages exactly centered. The resulting method,
+MaxPO, has an efficient quadratic-time implementation and integrates naturally
+into group-based RL for LLM post-training. We further derive the canonical
+finite-batch advantage for max@K, providing a unified view of existing advantage
+estimators. Empirically, we verify that the L2O baseline reduces gradient variance
+and outperforms non-centered alternatives.
+1
+Introduction
+Reinforcement learning with verifiable rewards has become a common post-training method for
+large language models, particularly for reasoning tasks where the final answer can be checked
+automatically [46]. In such settings, rewards are typically sparse and outcome-based: a sampled
+completion receives a positive reward only if its final answer is correct. This sparsity makes
+exploration difficult, since the policy must discover useful reasoning paths in a large combinatorial
+space. Existing work has addressed this issue by adding exploration incentives, including entropy
+regularization [9, 70, 13] and count-based bonuses [49, 3]. These methods can be effective, but they
+introduce auxiliary objectives and require careful tuning of their trade-off with the task reward.
+A complementary direction is to optimize the objective that is actually used at inference time.
+Reasoning models are often evaluated by repeated sampling: a prompt is considered solved if at least
+one of several sampled completions is correct. This motivates pass@K, the probability that at least
+one out of K samples is correct, and its continuous-reward generalization max@K. Several recent
+works have proposed unbiased policy-gradient estimators for pass@K and max@K [26, 51, 69, 8,
+54, 41, 2, 53]. However, because the max operation couples multiple samples in a nontrivial way, the
+relationship among these estimators is not immediately clear. As a result, it remains unclear which
+estimator should be preferred, even when they target the same objective.
+We study this question through a classical criterion from the policy-gradient literature: the quality of
+the advantage estimator. Subtracting a baseline can reduce variance while preserving unbiasedness [58,
+17, 33], and a particularly desirable advantage estimator is centered. For batched policy-gradient
+estimators, an even stronger property is exact centering: the realized batch-average advantage is zero
+Preprint.
+arXiv:2606.06080v1  [cs.LG]  4 Jun 2026
+
+
+for every sampled batch. This property removes unnecessary common-mode variation in the gradient
+estimate and provides a principled way to compare otherwise unbiased estimators.
+From this perspective, we first revisit the estimator of Walder and Karkhanis [54] from the Expected
+Improvement (EI) viewpoint from our prior work [36]. This estimator provides a general unbiased
+policy-gradient estimator for max@K with K ≤B, where B is the number of sampled responses.
+We show that the PG estimator is unbiased but the resulting advantage is not centered, leaving
+room for variance reduction through an additional baseline. To address this, we introduce a Leave-
+Two-Out (L2O) baseline. The resulting estimator remains unbiased as a policy-gradient estimator,
+while its advantage is zero-mean in expectation and exactly centered within every realized batch.
+We also derive an efficient O(B2) vectorized implementation and incorporate the estimator into
+group-based reinforcement learning for LLM post-training, which we call MaxPO, or Max@K
+Policy Optimization.
+We then step back from the EI estimator and ask what the advantage should be for a finite-batch
+max@K policy gradient. In ordinary policy gradients, an advantage is a return minus a baseline.
+For max@K, however, the relevant return of a response is not its individual reward alone, because
+the objective evaluates the maximum reward within a group of K samples. Thus, the natural return
+assigned to response i is the expected max@K value of a group conditioned on containing i, which
+we denote by ui. The corresponding baseline should remove the contribution of response i while
+preserving the same max@K objective; this gives the leave-one-out expected max@K value vi,
+computed from groups that exclude i. This leads to the canonical finite-batch advantage ui −vi:
+the max@K analogue of a return minus a leave-one-out baseline. This view explains why MaxPO
+recovers the centered canonical signal, and it also provides a common language for comparing
+existing estimators. Under this view, current methods fall into two categories: uncentered signals
+such as EI-only/PKPO, and (normalized) canonical signals such as MaxPO.
+Empirically, we first validate the variance-reduction effect of our method in controlled bandit and
+maze environments, with the maze results reported in Appendix G.2. We also validate the practical
+efficacy of our method for LLM reasoning tasks using Llama-3.2-3B-Instruct and Qwen2.5-Math-7B
+(Sec. 5.2). Specifically, on the Llama-3.2-3B-Instruct model, our method (EI+L2O) achieved an
+average reduction of 77.4% in gradient variance during training compared to PKPO, an existing
+method without L2O [54]. Our method also improved task-average pass@256 performance by
+5.2% on Qwen2.5-Math-7B and by 2.4% on Llama-3.2-3B-Instruct relative to PKPO across five
+math reasoning benchmarks (AIME24, AIME25, AMC23, MATH500 [21], and Minerva [28]).
+Furthermore, we demonstrated that our method consistently outperforms strong representative LLM
+post-training baselines (PKPO, GRPO, Entropy-Adv).
+2
+Background
+In this section, we first formalize the setting of reasoning tasks and review the objectives of pass@K
+and max@K policy optimization. We then outline the motivation for our work and introduce the
+fundamental concepts required to construct our proposed estimator.
+Setting.
+We consider a setting in which an agent generates an action a ∈A, where A is a finite set,
+and the action is evaluated by a reward function r : A →R. Our goal is to learn a policy πθ ∈∆(A),
+parameterized by θ ∈Rd, that maximizes the expected reward JRL(θ) = Ea∼πθ[r(a)]. When it is
+clear from the context, we omit the dependence on πθ for brevity. In practice, the policy may take
+additional information as input (e.g., questions in LLM reasoning), but we omit this dependence, and
+the same statements naturally apply to that setting (Sec. 3.2). During optimization, we assume access
+to a batch of B actions a1, . . . , aB ∈A sampled from the policy and rewards r1, . . . , rB ∈R. We
+denote the batch by D = (a1:B, r1:B).
+2.1
+Policy Gradient Estimation and Variance Reduction
+In this study, we focus on the policy gradient (PG) method, which directly optimizes πθ via gradient
+ascent using ∇J(θ) = Ea∼πθ[r(a)∇θ log πθ(a)] [58]. Because policy gradient estimates can exhibit
+high variance, we introduce a constant baseline b to reduce variance [17]. This yields the following
+expression.
+∇J(θ) = Ea∼πθ [(r(a) −b)∇θ log πθ(a)] .
+(1)
+2
+
+
+We use the term advantage to denote the action-dependent scalar multiplier of the score function
+(i.e., r(a) −b in Eq. (1)). As long as the baseline is action-independent, the PG estimator remains
+unbiased because Ea∼πθ[b ∇θ log πθ(a)] = 0. A common choice is to use the expected reward as the
+baseline, b = Ea∼πθ[r(a)], so that the advantage has zero mean: Ea∼πθ[r(a) −b] = 0 [17]. Using
+such a zero-mean advantage removes a constant offset from the reward signal, which is often a
+dominant source of variance.
+Batch estimation.
+Given the batch D, we can approximate the gradient using the REINFORCE
+estimator [58] ˆg =
+1
+B
+PB
+i=1(ri −bi)∇θ log πθ(ai). Here, bi is the baseline for sample i. We
+distinguish two notions of unbiasedness and one notion of centering:
+1. Unbiased PG estimator: We call a PG estimator ˆg unbiased when ED∼πθ[ˆg] = ∇J(θ).
+Here, ED∼πθ[·] denotes expectation over random batches D = (a1:B, r1:B) obtained by
+i.i.d. sampling from πθ and evaluating rewards under r. This requires that the baseline bi
+does not depend on ri, which would introduce action dependence into the PG estimator.
+2. Unbiased advantage: We call an advantage estimator (e.g., ri −bi) unbiased when
+ED∼πθ[ri −bi] = 0.
+3. Centering:
+We
+call
+the
+realized
+batch-average
+advantage
+centered
+when
+1
+B
+PB
+i=1(ri −bi) = 0.
+This is a stronger per-batch property than unbiasedness in
+expectation; the latter does not in general imply centering.
+Unbiasedness of the PG estimator is a prerequisite for policy gradient methods, and an unbiased
+advantage is crucial for variance reduction [17]. Therefore, we aim to achieve both forms of
+unbiasedness, and it turns out that centering also holds. For a batch PG estimator, a naïve way to obtain
+an unbiased advantage estimator is to set the baseline to the batch mean reward, bi = 1
+B
+PB
+j=1 rj, as
+an estimator of Ea∼πθ[r(a)]. However, this violates the independence condition because bi depends
+on ri, resulting in a biased PG estimator. A common remedy is to use a Leave-One-Out (L1O)
+baseline, bi =
+1
+B−1
+P
+j̸=i rj, to avoid dependence on ri [40, 35]. Although L1O works in this simple
+RL setting, it may fail for more complicated objectives, as is the case for max@K (see Sec. 3.1).
+2.2
+Pass@K and max@K Policy Optimization
+Recently, in the context of RL for reasoning tasks with binary rewards (correct/incorrect), directly
+optimizing the pass@K metric has been proposed to incentivize answer diversity [51, 69, 8, 54, 41, 2,
+53]. Pass@K optimization aims to maximize the probability that at least one of K sampled answers
+is correct. The max@K objective generalizes pass@K to continuous reward functions [54] and is
+defined as the expected maximum reward among K ≤B samples.
+JK(θ) := Ea1:K∼πθ
+
+max
+k=1,...,K r(ak)
+
+.
+(2)
+The PG for this objective was first given in our prior work with Koyamada et al. [26]:
+∇JK(θ) := Ea1:K
+"
+max
+k=1,...,K r(ak)
+K
+X
+k=1
+∇θ log πθ(ak)
+#
+.
+(3)
+Our goal is to propose an estimator that is unbiased as a PG estimator and also yields an advantage
+with zero expectation. However, the formulation in Eq. (3) makes it difficult to evaluate the advantage
+because the K actions are coupled through the max operator. To address this issue, we leverage an
+alternative formulation of the max@K PG.
+Expected Improvement Formulation.
+Nishimori et al. [36] proposed a method to decouple
+the max@K PG into a per-action expectation by building on the baseline proposed by Tang et al.
+[51]: W−k := maxk′̸=k r(ak′). Using the identity maxk rk −W−k = (rk −W−k)+, where
+(z)+ := max(z, 0), the PG can be rewritten as:
+∇JK(θ) = E
+" K
+X
+k=1
+∇θ log πθ(ak)
+ r(ak) −W−k
+
++
+#
+.
+3
+
+
+By exploiting the symmetry under the i.i.d. assumption, we arrive at the simplified form (Prop. 2 of
+Nishimori et al. [36]):
+∇JK(θ) = KEa∼πθ [∇θ log πθ(a) s(a)] ,
+s(a) := Ea1:K−1∼πθ
+h r(a) −WK−1
+
++
+i
+,
+(4)
+with WK−1 = maxj=1,...,K−1 r(aj). s(a) is referred to as the Expected Improvement (EI) of
+action a, as it quantifies the expected gain of a over the best of K −1 other samples [36].
+Motivation for Further Variance Reduction.
+Compared to the standard PG in RL (Eq. (1)),
+the EI term s(a) serves as the advantage. Moreover, s(a) corresponds to the expected value of the
+advantage in the max @K −max @(K −1) estimator proposed by Walder and Karkhanis [54]. While
+their estimator reduces variance compared to naïve approaches, Eq. (4) reveals a critical limitation.
+Because s(a) is the output of a ReLU, it is non-negative, implying Ea∼πθ[s(a)] > 0. This consistently
+positive advantage corresponds to an underestimated baseline, which can be particularly harmful
+because it may steer policy optimization toward suboptimal actions [11]. Thus, their estimator is
+unbiased as a PG estimator but not as an advantage estimator, leaving room for further variance
+reduction through appropriate baseline subtraction.
+3
+Proposed Method
+In Sec. 3.1, we derive a baseline that guarantees unbiasedness of both the PG estimator and the
+resulting advantage and exactly centers the realized batch-average advantage, and we present an
+efficient computation method. Finally, Sec. 3.2 describes how to integrate our approach into modern
+RL algorithms, instantiating it as MaxPO (Max@K Policy Optimization).
+3.1
+Unbiased Advantage Estimation
+Given a batch D = (a1:B, r1:B), we first construct unbiased estimators si of the expected improve-
+ment s(ai) defined in Eq. (4).
+si := EI
+ ri −max
+j∈I rj
+
++
+
+.
+(5)
+Here, I is a subset of size K −1 drawn uniformly without replacement from the indices {1, . . . , B}\
+{i}. By U-statistics theory [22], si is an unbiased estimator of s(ai). Note that si is equivalent to one
+of Walder and Karkhanis [54]’s advantage estimators (max@K - max@(K-1)).
+Recall the three notions introduced in Sec. 2.1. For the desired estimator, we seek a baseline bi
+that satisfies the following three conditions: (1) Independence: bi does not depend on ri, ensuring
+an unbiased PG estimator; (2) Unbiased advantage: ED∼πθ[si −bi] = 0; and (3) Centering:
+1
+B
+PB
+i=1(si −bi) = 0 for every realized batch. As discussed in Sec. 2.1, a common approach is the
+L1O baseline, bL1O
+−i
+:=
+1
+B−1
+P
+j̸=i sj. However, in the max@K setting, the estimator sj, j ̸= i can
+implicitly depend on ri, because ri acts as a potential comparator (maximum over the subset of size
+K −1) in the construction of sj. Consequently, bL1O
+−i
+can correlate with ri, thereby violating the
+independence condition and leading to a biased PG estimator.
+Leave-Two-Out (L2O) Baseline.
+To satisfy all three conditions, we propose the Leave-Two-Out
+(L2O) baseline:
+bL2O
+−i
+:=
+1
+B −1
+X
+j̸=i
+s(−i)
+j
+,
+s(−i)
+j
+:= EI′
+ rj −max
+k∈I′ rk
+
++
+
+.
+(6)
+Here, I′ is a subset of size K −1 drawn uniformly from {1, . . . , B} \ {i, j}. We exclude i to ensure
+independence from ri, while keeping the comparator subset size K −1 consistent with the original
+EI definition. This requires K −1 ≤B −2, i.e., K ≤B −1. By construction, bL2O
+−i
+is independent
+of ri because ri does not appear as a comparator in its computation. The following proposition
+establishes the centering condition. Together with the independence property above, it implies that
+the full estimator K
+B
+PB
+i=1 ∇θ log πθ(ai)(si −bL2O
+−i ) is an unbiased PG estimator for the max@K
+objective, and that si −bL2O
+−i
+is an unbiased advantage estimator.
+4
+
+
+Algorithm 1 Max@K Policy Optimization
+1: Input: policy πθ, objective size K, number of questions per batch M, group size G with
+2 ≤K ≤G −1.
+2: while not converged do
+3:
+Sample questions {xm}M
+m=1.
+4:
+for each question xm do
+5:
+Sample G outputs {am
+j }G
+j=1 ∼πθ(· | xm) and evaluate rewards {rm
+j }G
+j=1.
+6:
+Compute EI scores sm and L2O baselines bm,L2O.
+7:
+Set sequence-level advantages Am = sm −bm,L2O.
+8:
+end for
+9:
+Update θ using a group-based policy-gradient objective with advantages {Am}M
+m=1.
+10: end while
+Proposition 3.1 (Unbiasedness and Centering of the L2O Baseline). For any i, the L2O advantage
+satisfies
+ED∼πθ
+
+si −bL2O
+−i
+
+= 0,
+and
+1
+B
+B
+X
+i=1
+ si −bL2O
+−i
+
+= 0,
+(7)
+for any realized batch D. Hence si −bL2O
+−i
+is unbiased as an advantage estimator and exactly
+centered at the batch level.
+The proof is in Appendix D.1. While the theoretical properties of the L2O baseline are desirable,
+its practical application hinges on computational efficiency. Computing bL2O := [bL2O
+−1 , . . . , bL2O
+−B ]⊤
+naively costs O(B3) because it evaluates O(B) EI terms for each of the B indices i, and each EI
+term naively scans O(B) candidate comparators in the (reduced) batch. However, leveraging the
+ReLU-based formulation of the EI estimator, we can compute the L2O baseline in O(B2).
+Theorem 3.2 (Efficient Computation of the L2O Baseline). Given a batch of rewards r =
+[r1, . . . , rB]⊤, the L2O baseline bL2O can be computed in O(B2) time.
+The proof is provided in Appendix E. The resulting vectorized formulation maps directly to GPU-
+friendly dense primitives (e.g., broadcasted elementwise operations and matrix–vector products),
+making it straightforward to leverage GPU parallelism in practice.
+3.2
+Integration with RL Algorithms for LLM Training
+We integrate L2O-based advantage estimation into group-based RL for LLM post-training as MaxPO
+(Max@K Policy Optimization). Algorithm 1 summarizes the procedure. For each question xm, we
+sample G outputs {am
+j }G
+j=1 from πθ(· | xm) and evaluate their sequence-level rewards {rm
+j }G
+j=1.
+Within each question-specific group, G plays the role of the batch size B used in the EI and L2O
+computations. We compute group-wise EI scores sm and L2O baselines bm,L2O, and define the
+sequence-level advantage Am
+j = sm
+j −bm,L2O
+j
+. Before clipping and regularization, the corresponding
+group-wise estimator is K
+G
+PG
+j=1 ∇θ log πθ(am
+j
+| xm)Am
+j , which is an unbiased policy-gradient
+estimator for the max@K objective within the group. MaxPO is applicable to any policy-gradient
+algorithm that accepts sequence-level advantages. In our LLM experiments, we instantiate it with
+group-based training [46, 31]. Since verifier rewards are assigned at the sequence level, we broadcast
+Am
+j to every token in output am
+j when forming the token-level loss. The resulting objective is identical
+to standard group-based clipped policy optimization except for the advantage construction. EI-only
+methods use the raw EI scores sm, whereas MaxPO subtracts the L2O baseline and uses the centered
+advantages sm −bm,L2O. We give the exact token-level clipped objective and KL regularization
+term in Appendix C.
+4
+Canonical Finite-Batch Advantage for Max@K Policy Gradient
+Sec. 3 derived MaxPO by adding an L2O baseline to the EI estimator of Walder and Karkhanis [54],
+yielding an unbiased policy-gradient estimator with a centered advantage for max@K. However, EI
+is only one possible starting point for constructing pass@K/max@K advantages. Recent methods
+5
+
+
+use different primitives, including analytical pass@K signals, all-subsets reward transformations,
+and standard-deviation-normalized advantages [8, 2, 51]. These differences make direct comparison
+difficult: the estimators may center different vectors, subtract different baselines, or apply different
+batch-dependent normalizations.
+This section provides a unified baseline view of these estimators. We first propose a canonical
+finite-batch advantage form based on the leave-one-out principle [40, 35]. We then show that existing
+estimators can be understood as uncentered signals, fixed-scale versions of this canonical direction,
+or normalized variants of it.
+4.1
+Canonical Finite-Batch Marginal Advantage
+For a fixed prompt, let B = {1, . . . , B} denote the sampled responses and define M(S) :=
+maxj∈S rj for any subset S ⊆B. We define
+ui :=
+1
+ B−1
+K−1
+
+X
+S⊆B\{i}
+|S|=K−1
+M(S ∪{i}),
+vi :=
+1
+ B−1
+K
+
+X
+T ⊆B\{i}
+|T |=K
+M(T).
+(8)
+Here, ui is the conditional expected max@K value of a group containing response i. It is the max@K
+analogue of the return of action i. The quantity vi is the leave-one-out expected max@K value
+computed without response i. It is the corresponding leave-one-out baseline. The signal ui −vi
+is therefore the finite-batch max@K analogue of a return minus a leave-one-out baseline. Because
+vi excludes response i, subtracting it preserves policy-gradient unbiasedness. Its centering is less
+immediate than in the ordinary return-minus-mean case, but follows by a finite-subset counting
+argument. Let V range over all size-K subsets of B. When we sum ui over i, each subset V
+contributes M(V ) exactly K times, once for each i ∈V :
+B
+X
+i=1
+ui =
+K
+ B−1
+K−1
+
+X
+V ⊆B
+|V |=K
+M(V ).
+(9)
+When we sum vi over i, the same subset V contributes exactly B −K times, once for each i /∈V :
+B
+X
+i=1
+vi = B −K
+ B−1
+K
+
+X
+V ⊆B
+|V |=K
+M(V ).
+(10)
+Since K/
+ B−1
+K−1
+
+= (B −K)/
+ B−1
+K
+
+, the two sums are equal, and hence P
+i(ui −vi) = 0 for every
+realized batch. Thus, ui −vi is the canonical centered finite-batch advantage; the full proof and its
+equivalence to EI+L2O are given in Appendix F.
+4.2
+Existing Estimators as Baseline Choices
+Having identified the canonical coefficient, we can now relate the existing estimators to the canonical
+advantage signal.
+EI-based advantage estimators.
+To connect EI with the marginal view, define wi
+:=
+1
+(
+B−1
+K−1)
+P
+S⊆B\{i}
+|S|=K−1
+M(S) the expected maximum of the K −1 comparator responses excluding i. The
+EI-only estimator can then be written as si = ui−wi, because M(S∪{i}) = M(S)+(ri−M(S))+.
+Thus, EI subtracts the comparator-max baseline wi rather than the leave-one-out max@K baseline vi.
+This is sufficient for policy-gradient unbiasedness, because wi excludes response i, but it is not the
+canonical centered advantage. In general, ui −wi is nonnegative and non-centered.
+MaxPO corrects this difference via the L2O baseline. Indeed, we can show
+Proposition 4.1. Given a batch B and a subset size K, the L2O baseline bL2O
+i
+is equal to vi −wi
+and therefore satisfies
+si −bL2O
+i
+= ui −vi,
+(11)
+for any i ∈B.
+The proof is provided in Appendix F. This equality shows that L2O rectifies the EI-based advantage
+estimator to the canonical centered advantage.
+6
+
+
+Table 1: Baseline view of pass@K/max@K advantages. ✓indicates methods used in the original
+papers’ experiments (for MaxPO, this refers to our experiments). Fixed constants are shown when
+they clarify equivalence up to learning-rate scaling for fixed B and K. The methods used in the
+experiments fall into two categories: (1) Uncentered, which does not center the signal, and (2)
+(Normalized) Canonical, which is canonical up to a fixed scale.
+Used
+Method
+Mathematical signal
+Relation to canonical
+✓
+Walder and Karkhanis [54], EI-only
+si = ui −wi
+Uncentered
+✓
+MaxPO
+si −bL2O
+i
+= ui −vi
+Canonical.
+✓
+Chen et al. [8], Eq. (14,15)
+B−K
+B
+(ui −vi)/σgroup
+Normalized. For pass@K
+Chen et al. [8], w.o. std.
+B−K
+B
+(ui −vi)
+Proportional. For pass@K
+Bagirov et al. [2], Eq. (9)
+˜ri = K
+B ui
+Proportional to ui
+Bagirov et al. [2], mean-centered
+˜ri −¯˜r = K(B−K)
+B2
+(ui −vi)
+Proportional
+✓
+Bagirov et al. [2], BoN mean, Appendix
+K(B−K)
+B2
+(ui −vi)/std(˜r)
+Normalized
+Figure 1: Estimation error (left), variance vs. action space size (center), and variance vs. K (right).
+Mean and standard error over 100 random seeds.
+Generality of L2O.
+This cancellation is not specific to choosing EI as the starting signal. Suppose
+the starting signal for response i is an exact average over groups containing i of M(S ∪{i}) −C(S),
+where C(S) is any comparator-only baseline depending on the other K −1 responses S but not on
+response i. Then applying the same L2O construction cancels the averaged C(S) term and again
+yields ui −vi. Thus, L2O maps any exact comparator-only baseline of this form to the canonical
+centered finite-batch advantage; Appendix F.3 gives the proof.
+Non-EI estimators.
+The same view clarifies how non-EI estimators [8, 2] relate to MaxPO. Table 1
+summarizes how existing estimators defined with K ≤B relate to the canonical direction. The table
+suggests that the estimators used in their experiments [54, 8, 2] fall into two classes: uncentered and
+(normalized) canonical. The first class is uncentered: PKPO/EI-only is policy-gradient unbiased but
+uses the non-centered signal ui −wi. The second class is (normalized) canonical, or canonical up
+to a fixed scale: MaxPO exactly recovers ui −vi, while raw analytical pass@K and mean-centered
+all-subsets estimators recover the same direction up to fixed constants. Thus, for the analytical signal
+of Chen et al. and the mean-centered all-subsets signal of Bagirov et al., what is biased relative to
+MaxPO is the magnitude, not the direction; in the standard-deviation-normalized versions used in
+their experiments, this fixed positive scale is normalized away or absorbed into the effective step size,
+so it does not change the normalized update direction. This view reveals that although the derivations
+are different, some estimators are equivalent to MaxPO up to a fixed scale.
+5
+Experiments
+In Sec. 5.1, we validate the theoretical properties of the L2O baseline in bandits. In Sec. 5.2, we
+validate the efficacy of MaxPO on reasoning tasks.
+7
+
+
+1
+2
+4
+8
+16
+32
+64
+128
+256
+Number of tries k
+0.1
+0.3
+0.5
+0.7
+pass@k
+Ours
+PKPO
+Entropy-Adv
+GRPO
+Base
+(a) Llama-3.2-3B-Instruct
+1
+2
+4
+8
+16
+32
+64
+128
+256
+Number of tries k
+0.2
+0.4
+0.6
+0.8
+pass@k
+Ours
+PKPO
+Entropy-Adv
+GRPO
+Base
+(b) Qwen2.5-Math-7B
+Figure 2: Task-average pass@k (k ≤256). Unweighted average over AIME24, AIME25, AMC23,
+MATH500, and Minerva (temperature 0.6, top-p 0.95). Our method demonstrates consistent improve-
+ment over strong baselines.
+5.1
+Bandits
+Here, we validate the two theoretical properties of the L2O baseline: (1) unbiasedness as a PG
+estimator and (2) variance reduction over the raw EI estimator due to centering the advantage.
+Setting.
+To emulate a discrete-action setting such as LLM training, we consider a multi-armed
+bandit with rewards r ∈R|A| and logits l ∈R|A| each sampled from N(0, 1). We sample a batch of
+B actions ai ∼softmax(l), observe rewards ri, and construct three PG estimators: (1) EI: si, (2)
+EI+L2O: si −bL2O
+−i , and (3) EI+L1O: si −bL1O
+−i , as defined in Sec. 3. The ground-truth gradient gtrue
+is computed analytically via the closed-form derivative of the expected improvement (Proposition 1
+of Nishimori et al. [36]). For the bias plot, we vary the number of batches N ∈{103, 104, 105, 106}
+and measure the estimation error ∥1
+N
+PN
+j=1 ˆgj −gtrue∥(fixing B = 8, K = 2). For variance, we
+report the empirical total variance 1
+N
+PN
+j=1 ∥ˆgj −¯g∥2 with ¯g = 1
+N
+PN
+j=1 ˆgj and N = 105, sweeping
+(i) the action space size |A| ∈{10, 50, 100, 1000} at K = 2, B = 8, and (ii) the comparator size
+K ∈{2, . . . , 6} at |A| = 100, B = 8. Detailed protocols and results for additional batch sizes are
+reported in Appendix G.1.
+Results.
+The results in Fig. 1 validate our theoretical claims. First, the estimation errors of EI+L2O
+and EI both decrease at the theoretical O(1/
+√
+N) rate (left), confirming that they are unbiased PG
+estimators, whereas EI+L1O exhibits an approximately constant error, confirming that L1O yields
+a biased PG. Regarding variance, the variance-reduction effect of L2O over raw EI grows with
+the action space size (center), a regime particularly relevant for LLMs. Furthermore, L2O is most
+effective for moderate K relative to B = 8 (right): the L2O baseline must form K −1 comparators
+from B −2 samples to preserve unbiasedness, so a too-small comparator budget yields a noisy
+baseline and diminishes the variance-reduction effect.
+5.2
+LLM Reasoning Experiments
+We evaluate the efficacy of our variance-reduced objective on challenging math reasoning tasks. Our
+experiments address two questions: (i) whether our estimator improves pass@k on standard reasoning
+benchmarks, and (ii) whether it stabilizes RL optimization by reducing the variance of the gradient
+estimator during training.
+5.2.1
+Experimental Setting
+Training.
+We perform RL fine-tuning on Llama-3.2-3B-Instruct [16] and Qwen2.5-Math-7B [61].
+We compare our method (EI+L2O) against three baselines: GRPO [46], Entropy-Adv [9], and
+PKPO [54]. Our method follows the algorithm described in Sec. 3.2, and we implement the LLM RL
+training pipeline using the verl framework [48]. We include PKPO as the closest prior method that
+directly optimizes pass@K/max@K using an unbiased expected-improvement (EI) policy-gradient
+estimator; in our notation, PKPO can be viewed as the EI-only variant, so this comparison isolates the
+8
+
+
+benefit of our centered advantage estimation. Note that the concurrent work of Bagirov et al. [2] and
+prior work of Chen et al. [8] are equivalent to MaxPO up to a constant rescaling factor and standard
+deviation normalization (which removes any effect from rescaling). Therefore, these works also
+provide experimental evidence for the overall efficacy of the approach. Our contribution relative to the
+literature is the canonical ui −vi unbiased form of the gradient estimator, thus our experiments focus
+on how this form improves over the non-centered PKPO variant. Unless otherwise stated, we use a
+fixed training objective size K = 2. Training data and hyperparameters are provided in App. H.1.
+Throughout this section, K refers to the training objective size (max@K/pass@K objective), while k
+denotes the evaluation compute in pass@k.
+Evaluation.
+We evaluate on five math reasoning benchmarks: AIME24, AIME25, AMC23,
+MATH500 [21], and Minerva [28]. All evaluations use nucleus sampling with temperature 0.6
+and top-p 0.95. To reduce evaluation variance, we generate n = 1024 samples for every benchmark.
+We report the unbiased pass@k [7] metric for k ∈{1, 2, 4, 8, . . .}, computed as
+pass@k := Ex∼D
+"
+1 −
+ n−c
+k
+
+ n
+k
+
+#
+,
+(12)
+where n is the number of sampled completions and c is the number of correct completions among
+them. For consistent task-averaging in the main text, we report results up to k ≤256 for all
+benchmarks, and additionally report k ≤1024 for AIME24, AIME25, and AMC23 in Appendix H.2.
+5.2.2
+Main Results
+Figure 2 shows the task-average pass@k curves up to k = 256 for both Llama and Qwen. The
+main pattern is that EI+L2O becomes strongest as inference compute increases: although GRPO
+is competitive at very small k, our method overtakes the baselines at moderate-to-large k, which is
+the regime most relevant to pass@K optimization. Compared to PKPO, our method improves task-
+average pass@256 by 5.2% on Qwen2.5-Math-7B and by 2.4% on Llama-3.2-3B-Instruct relative to
+PKPO across five math reasoning benchmarks. These gains persist over a wide range of k, supporting
+the claim that centering the advantage helps the policy make better use of additional test-time samples.
+We provide extended results up to k = 1024 for AIME24, AIME25, and AMC23 in Appendix H.2.
+For an ablation over different K values, refer to Appendix H.2.1.
+5.2.3
+Variance Reduction During Training
+Figure 3:
+Adam-moment variance
+proxy during training (3 seeds). The
+proxy is estimated from Adam states
+via Var(g)
+≈
+ˆvt −ˆm 2
+t
+and aggre-
+gated across parameters. Our method
+(EI+L2O) reduces this variance proxy
+compared to PKPO across training, sup-
+porting the proposed variance-reduction
+mechanism.
+To test our theoretical motivation, we measure a smoothed
+proxy for the variance of model gradients during RL train-
+ing on Llama-3.2-3B-Instruct. Directly computing gradi-
+ent variance is expensive at LLM scale, so we estimate
+this proxy from the states of the Adam optimizer [25].
+Specifically, Adam maintains exponential moving aver-
+ages of the first and second moments of gradients; after
+bias correction, we estimate a smoothed proxy for the
+element-wise variance as Var(g) ≈ˆvt −ˆm 2
+t , and aggre-
+gate it across all parameters by summing. This is not the
+exact instantaneous gradient variance, but it is practical
+at LLM scale and computed identically for all methods,
+making it suitable for comparison.
+Figure 3 reports mean ± standard deviation over three ran-
+dom seeds. Our method yields consistently lower values of
+this Adam-moment variance proxy than PKPO throughout
+training, indicating more stable policy gradient updates.
+Notably, at the end of training, our method achieved a
+77.4% relative reduction in this proxy compared to PKPO.
+This provides empirical evidence that centering the EI
+signal with L2O reduces estimator variance in practice,
+matching the paper’s main theoretical claim.
+9
+
+
+6
+Conclusion
+In this paper, we revisit pass@K and max@K policy optimization through the lens of advantage
+estimation, with a focus on unbiased advantage estimation. We first identified that the advantage
+estimator of Walder and Karkhanis [54], a leading method in the field, is unbiased as a PG estimator
+but not centered as an advantage estimator. We then introduced a Leave-Two-Out (L2O) baseline that
+preserves policy-gradient unbiasedness while making the realized batch advantages exactly centered.
+We also derived the canonical finite-batch advantage form that enables us to organize and relate
+existing estimators in a unified manner, classifying them into uncentered, canonical, and normalized
+canonical classes. Finally, we empirically verified that the L2O baseline reduces gradient variance
+and outperforms non-centered alternatives.
+Limitations and Future Work.
+Our analysis focuses on finite-batch, on-policy estimation under
+i.i.d. sampling within each group. Extending the same canonical view to off-policy training, adaptive
+sampling, and settings with correlated generations is an important direction for future work. Our
+L2O construction also requires K ≤B −1, which may limit its direct use when the optimization
+objective size approaches the group size. In addition, our LLM experiments focus on mathematical
+reasoning tasks with verifiable sequence-level rewards. Further experiments on broader domains,
+noisy or partial rewards, larger models, and different verifier designs are needed to understand the
+generality of the method.
+Broader Impacts.
+Max@K and pass@K are increasingly important metrics for reasoning models
+because they capture the quality of a model under repeated sampling, which is a common inference-
+time protocol. By identifying a canonical finite-batch advantage form for max@K, this work provides
+a principled foundation for designing, comparing, and diagnosing policy-gradient estimators for
+such inference-time objectives. This may help improve the efficiency and stability of post-training
+methods and reduce unnecessary variance in optimization. At the same time, better optimization of
+repeated-sampling reasoning objectives may strengthen models that can be misused for large-scale
+cheating, deceptive assistance, or other forms of harmful automated problem solving.
+Author Contributions
+Shota Takashiro*: Equal first author. LLM experiment lead, paper writing (particularly LLM
+sections)
+Soichiro Nishimori*: Equal first author. Lead writer, toy experiments (bandit, maze)
+Paavo Parmas*: Equal first author. Conceptualization, all theoretical derivations, proposed and
+oversaw project, significant comments and editing on the paper, example code.
+Yongmin Kim: Helped on the LLM engineering side, L1O implementation, tests.
+Kohsei Matsutani: Helped with the LLM experiments, dataset survey, evaluation results, contributed
+to LLM related work sections.
+Gouki Minegishi: Entropy bonus baseline implementation, gradient variance estimation from Adam
+implementation.
+Yusuke Iwasawa: Funding acquisition, overall management and student supervision in the lab.
+Takeshi Kojima: Comments and writing, particularly from the LLM perspective.
+Yutaka Matsuo: Funding acquisition, overall management and student supervision in the lab.
+Acknowledgements
+Paavo Parmas was supported by JST ACT-X, Japan, Grant Number JPMJAX23CO. This work was
+supported by the UTokyo-Google AI Symbiotic Future Society Program.
+References
+[1] Peter Auer, Nicolo Cesa-Bianchi, and Paul Fischer. Finite-time analysis of the multiarmed
+bandit problem. Machine learning, 47(2):235–256, 2002.
+10
+
+
+[2] Farid Bagirov, Mikhail Arkhipov, Ksenia Sycheva, Evgeniy Glukhov, and Egor Bogomolov.
+The best of N worlds: Aligning reinforcement learning with best-of-N sampling via max@k
+optimisation. arXiv preprint arXiv:2510.23393, 2025.
+[3] Chenjia Bai, Yang Zhang, Shuang Qiu, Qiaosheng Zhang, Kang Xu, and Xuelong Li. On-
+line preference alignment for language models via count-based exploration. arXiv preprint
+arXiv:2501.12735, 2025.
+[4] Dake Bu, Wei Huang, Andi Han, Atsushi Nitanda, Bo Xue, Qingfu Zhang, Hau-San Wong, and
+Taiji Suzuki. Consistency is not always correct: Towards understanding the role of exploration
+in post-training reasoning. arXiv preprint arXiv:2511.07368, 2025.
+[5] Yuri Burda, Harrison Edwards, Amos Storkey, and Oleg Klimov. Exploration by random
+network distillation. arXiv preprint arXiv:1810.12894, 2018.
+[6] Fan Chen, Audrey Huang, Noah Golowich, Sadhika Malladi, Adam Block, Jordan T. Ash,
+Akshay Krishnamurthy, and Dylan J. Foster. The coverage principle: How pre-training enables
+post-training. arXiv preprint arXiv:2510.15020, 2025.
+[7] Mark Chen, Jerry Tworek, Heewoo Jun, Qiming Yuan, Henrique Ponde de Oliveira Pinto, Jared
+Kaplan, Harri Edwards, Yuri Burda, Nicholas Joseph, and Greg Brockman et al. Evaluating
+large language models trained on code. arXiv preprint arXiv:2107.03374, 2021.
+[8] Zhipeng Chen, Xiaobo Qin, Youbin Wu, Yue Ling, Qinghao Ye, Wayne Xin Zhao, and Guang
+Shi. Pass@k training for adaptively balancing exploration and exploitation of large reasoning
+models. arXiv preprint arXiv:2508.10751, 2025.
+[9] Daixuan Cheng, Shaohan Huang, Xuekai Zhu, Bo Dai, Xin Zhao, Zhenliang Zhang, and Furu
+Wei. Reasoning with exploration: An entropy perspective. Proceedings of the AAAI Conference
+on Artificial Intelligence, 40(36):30377–30385, 2026. doi: 10.1609/aaai.v40i36.40290.
+[10] Paul F Christiano, Jan Leike, Tom Brown, Miljan Martic, Shane Legg, and Dario Amodei. Deep
+reinforcement learning from human preferences. In Advances in Neural Information Processing
+Systems, volume 30, 2017.
+[11] Wesley Chung, Valentin Thomas, Marlos C Machado, and Nicolas Le Roux. Beyond variance
+reduction: Understanding the true impact of baselines on policy optimization. In International
+conference on machine learning, pages 1999–2009. PMLR, 2021.
+[12] Karl Cobbe, Vineet Kosaraju, Mohammad Bavarian, Mark Chen, Heewoo Jun, Lukasz Kaiser,
+Matthias Plappert, Jerry Tworek, Jacob Hilton, Reiichiro Nakano, Christopher Hesse, and John
+Schulman. Training verifiers to solve math word problems. arXiv preprint arXiv:2110.14168,
+2021.
+[13] Ganqu Cui, Yuchen Zhang, Jiacheng Chen, Lifan Yuan, Zhi Wang, Yuxin Zuo, Haozhan Li,
+Yuchen Fan, Huayu Chen, Weize Chen, et al. The entropy mechanism of reinforcement learning
+for reasoning language models. arXiv preprint arXiv:2505.22617, 2025.
+[14] Xingyu Dang, Christina Baek, Kaiyue Wen, Zico Kolter, and Aditi Raghunathan. Weight
+ensembling improves reasoning in language models. In Second Conference on Language
+Modeling, 2025.
+[15] Jingtong Gao, Ling Pan, Yejing Wang, Rui Zhong, Chi Lu, Qingpeng Cai, Peng Jiang, and
+Xiangyu Zhao. Navigate the unknown: Enhancing LLM reasoning with intrinsic motivation
+guided exploration. arXiv preprint arXiv:2505.17621, 2025.
+[16] Aaron Grattafiori, Abhimanyu Dubey, Abhinav Jauhri, Abhinav Pandey, Abhishek Kadian,
+Ahmad Al-Dahle, Aiesha Letman, Akhil Mathur, Alan Schelten, and Alex Vaughan et al. The
+Llama 3 herd of models. arXiv preprint arXiv:2407.21783, 2024.
+[17] Evan Greensmith, Peter L Bartlett, and Jonathan Baxter. Variance reduction techniques for
+gradient estimates in reinforcement learning. Journal of Machine Learning Research, 5(Nov):
+1471–1530, 2004.
+11
+
+
+[18] Shixiang Gu, Sergey Levine, Ilya Sutskever, and Andriy Mnih. Muprop: Unbiased backpropa-
+gation for stochastic neural networks. arXiv preprint arXiv:1511.05176, 2015.
+[19] Daya Guo, Dejian Yang, Haowei Zhang, Junxiao Song, Ruoyu Zhang, Runxin Xu, Qihao Zhu,
+Shirong Ma, Peiyi Wang, and Xiao Bi et al. DeepSeek-R1: Incentivizing reasoning capability
+in LLMs via reinforcement learning. arXiv preprint arXiv:2501.12948, 2025.
+[20] Andre He, Daniel Fried, and Sean Welleck. Rewarding the unlikely: Lifting GRPO beyond
+distribution sharpening. arXiv preprint arXiv:2506.02355, 2025.
+[21] Dan Hendrycks, Collin Burns, Saurav Kadavath, Akul Arora, Steven Basart, Eric Tang, Dawn
+Song, and Jacob Steinhardt. Measuring mathematical problem solving with the math dataset.
+arXiv preprint arXiv:2103.03874, 2021.
+[22] Wassily Hoeffding. A class of statistics with asymptotically normal distribution. In Break-
+throughs in statistics: Foundations and basic theory, pages 308–334. Springer, 1992.
+[23] Sihan Hu, Xiansheng Cai, Yuan Huang, Zhiyuan Yao, Linfeng Zhang, Pan Zhang, Youjin Deng,
+and Kun Chen. Emergent slow thinking in LLMs as inverse tree freezing. arXiv preprint
+arXiv:2509.23629, 2025.
+[24] Yuxian Jiang, Yafu Li, Guanxu Chen, Dongrui Liu, Yu Cheng, and Jing Shao. Rethinking
+entropy regularization in large reasoning models. arXiv preprint arXiv:2509.25133, 2025.
+[25] Diederik P. Kingma and Jimmy Ba. Adam: A method for stochastic optimization. arXiv preprint
+arXiv:1412.6980, 2017.
+[26] Sotetsu Koyamada, Paavo Parmas, Tadashi Kozuno, and Shin Ishii. Emergence of exploration in
+policy gradient reinforcement learning via resetting, 2023. URL https://openreview.net/forum?
+id=GKsNIC_mQRG.
+[27] Nathan Lambert, Jacob Morrison, Valentina Pyatkin, Shengyi Huang, Hamish Ivison, Faeze
+Brahman, Lester James Validad Miranda, Alisa Liu, Nouha Dziri, Xinxi Lyu, Yuling Gu,
+Saumya Malik, Victoria Graf, Jena D. Hwang, Jiangjiang Yang, Ronan Le Bras, Oyvind Tafjord,
+Christopher Wilhelm, Luca Soldaini, Noah A. Smith, Yizhong Wang, Pradeep Dasigi, and
+Hannaneh Hajishirzi. Tulu 3: Pushing frontiers in open language model post-training. In Second
+Conference on Language Modeling, 2025.
+[28] Aitor Lewkowycz, Anders Johan Andreassen, David Dohan, Ethan Dyer, Henryk Michalewski,
+Vinay Venkatesh Ramasesh, Ambrose Slone, Cem Anil, Imanol Schlag, Theo Gutman-Solo,
+Yuhuai Wu, Behnam Neyshabur, Guy Gur-Ari, and Vedant Misra. Solving quantitative reasoning
+problems with language models. In Advances in Neural Information Processing Systems, 2022.
+[29] Tianjian Li, Yiming Zhang, Ping Yu, Swarnadeep Saha, Daniel Khashabi, Jason Weston, Jack
+Lanchantin, and Tianlu Wang. Jointly reinforcing diversity and quality in language model
+generations. arXiv preprint arXiv:2509.02534, 2025.
+[30] Zhenwen Liang, Sidi Lu, Wenhao Yu, Kishan Panaganti, Yujun Zhou, Haitao Mi, and Dong
+Yu. Can LLMs guide their own exploration? gradient-guided reinforcement learning for LLM
+reasoning. arXiv preprint arXiv:2512.15687, 2025.
+[31] Zichen Liu, Changyu Chen, Wenjun Li, Penghui Qi, Tianyu Pang, Chao Du, Wee Sun Lee,
+and Min Lin. Understanding r1-zero-like training: A critical perspective. In Conference on
+Language Modeling (COLM), 2025.
+[32] Kohsei Matsutani, Shota Takashiro, Gouki Minegishi, Takeshi Kojima, Yusuke Iwasawa, and
+Yutaka Matsuo. RL squeezes, SFT expands: A comparative study of reasoning LLMs. In The
+Fourteenth International Conference on Learning Representations, 2026.
+[33] Jincheng Mei, Wesley Chung, Valentin Thomas, Bo Dai, Csaba Szepesvari, and Dale Schuur-
+mans. The role of baselines in policy gradient optimization. Advances in Neural Information
+Processing Systems, 35:17818–17830, 2022.
+12
+
+
+[34] Andriy Mnih and Danilo Rezende.
+Variational inference for monte carlo objectives.
+In
+International Conference on Machine Learning, pages 2188–2196. PMLR, 2016.
+[35] Volodymyr Mnih, Adria Puigdomenech Badia, Mehdi Mirza, Alex Graves, Timothy Lillicrap,
+Tim Harley, David Silver, and Koray Kavukcuoglu. Asynchronous methods for deep reinforce-
+ment learning. In International conference on machine learning, pages 1928–1937. PmLR,
+2016.
+[36] Soichiro Nishimori, Paavo Parmas, Sotetsu Koyamada, Tadashi Kozuno, Toshinori Kitamura,
+Shin Ishii, and Yutaka Matsuo. Emergence of exploration in policy gradient reinforcement
+learning via retrying. In Forty-third International Conference on Machine Learning, 2026. URL
+https://openreview.net/forum?id=NpvBAOc87E.
+[37] OpenAI, Aaron Jaech, Adam Kalai, Adam Lerer, Adam Richardson, Ahmed El-Kishky, Aiden
+Low, Alec Helyar, Aleksander Madry, Alex Beutel, Alex Carney, et al. OpenAI o1 system card.
+arXiv preprint arXiv:2412.16720, 2024.
+[38] Paavo Parmas. Total stochastic gradient algorithms and applications in reinforcement learning.
+Advances in Neural Information Processing Systems, 31, 2018.
+[39] Paavo Parmas and Masashi Sugiyama. A unified view of likelihood ratio and reparameterization
+gradients. In International Conference on Artificial Intelligence and Statistics, pages 4078–4086.
+PMLR, 2021.
+[40] Paavo Parmas, Carl Edward Rasmussen, Jan Peters, and Kenji Doya. PIPPS: Flexible model-
+based policy search robust to the curse of chaos. In Jennifer Dy and Andreas Krause, editors,
+Proceedings of the 35th International Conference on Machine Learning, volume 80 of Pro-
+ceedings of Machine Learning Research, pages 4065–4074. PMLR, 10–15 Jul 2018. URL
+https://proceedings.mlr.press/v80/parmas18a.html.
+[41] Ruotian Peng, Yi Ren, Zhouliang Yu, Weiyang Liu, and Yandong Wen. SimKO: Simple Pass@K
+policy optimization. arXiv preprint arXiv:2510.14807, 2025.
+[42] Jan Peters and Stefan Schaal. Reinforcement learning of motor skills with policy gradients.
+Neural networks, 21(4):682–697, 2008.
+[43] John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, and Oleg Klimov. Proximal
+policy optimization algorithms. arXiv preprint arXiv:1707.06347, 2017.
+[44] Amrith Setlur, Matthew YR Yang, Charlie Snell, Jeremy Greer, Ian Wu, Virginia Smith, Max
+Simchowitz, and Aviral Kumar. e3: Learning to explore enables extrapolation of test-time
+compute for LLMs. arXiv preprint arXiv:2506.09026, 2025.
+[45] Darsh J Shah, Peter Rushton, Somanshu Singla, Mohit Parmar, Kurt Smith, Yash Vanjani,
+Ashish Vaswani, Adarsh Chaluvaraju, Andrew Hojel, Andrew Ma, Anil Thomas, Anthony
+Polloreno, Ashish Tanwer, Burhan Drak Sibai, Divya S Mansingka, Divya Shivaprasad, Ishaan
+Shah, Karl Stratos, Khoi Nguyen, Michael Callahan, Michael Pust, Mrinal Iyer, Philip Monk,
+Platon Mazarakis, Ritvik Kapila, Saurabh Srivastava, and Tim Romanski. Rethinking reflection
+in pre-Training. arXiv preprint arXiv:2504.04022, 2025.
+[46] Zhihong Shao, Peiyi Wang, Qihao Zhu, Runxin Xu, Junxiao Song, Xiao Bi, Haowei Zhang,
+Mingchuan Zhang, YK Li, Yang Wu, et al. Deepseekmath: Pushing the limits of mathematical
+reasoning in open language models. arXiv preprint arXiv:2402.03300, 2024.
+[47] Han Shen. On entropy control in LLM-RL algorithms. In The Fourteenth International
+Conference on Learning Representations, 2026.
+[48] Guangming Sheng, Chi Zhang, Zilingfeng Ye, Xibin Wu, Wang Zhang, Ru Zhang, Yanghua
+Peng, Haibin Lin, and Chuan Wu. HybridFlow: A flexible and efficient RLHF framework.
+arXiv preprint arXiv:2409.19256, 2024.
+[49] Yuda Song, Julia Kempe, and Remi Munos. Outcome-based exploration for LLM reasoning.
+arXiv preprint arXiv:2509.06941, 2025.
+13
+
+
+[50] Yuda Song, Hanlin Zhang, Carson Eisenach, Sham M. Kakade, Dean Foster, and Udaya Ghai.
+Mind the gap: Examining the self-improvement capabilities of large language models. In The
+Thirteenth International Conference on Learning Representations, 2025.
+[51] Yunhao Tang, Kunhao Zheng, Gabriel Synnaeve, and Remi Munos. Optimizing language
+models for inference time objectives using reinforcement learning. In Proceedings of the
+42nd International Conference on Machine Learning, volume 267 of Proceedings of Machine
+Learning Research, pages 59066–59085. PMLR, 2025.
+[52] George Tucker, Andriy Mnih, Chris J Maddison, John Lawson, and Jascha Sohl-Dickstein.
+Rebar: Low-variance, unbiased gradient estimates for discrete latent variable models. Advances
+in Neural Information Processing Systems, 30, 2017.
+[53] Jens Tuyls, Dylan J Foster, Akshay Krishnamurthy, and Jordan T Ash. Representation-based ex-
+ploration for language models: From test-time to post-training. arXiv preprint arXiv:2510.11686,
+2025.
+[54] Christian Walder and Deep Tejas Karkhanis. Pass@K policy optimization: Solving harder
+reinforcement learning problems. Advances in Neural Information Processing Systems, 38:
+152416–152445, 2025.
+[55] Zengzhi Wang, Fan Zhou, Xuefeng Li, and Pengfei Liu. OctoThinker: Mid-training incentivizes
+reinforcement learning scaling. arXiv preprint arXiv:2506.20512, 2025.
+[56] Lex Weaver and Nigel Tao. The optimal reward baseline for gradient-based reinforcement
+learning. arXiv preprint arXiv:1301.2315, 2013.
+[57] Xumeng Wen, Zihan Liu, Shun Zheng, Zhijian Xu, Shengyu Ye, Zhirong Wu, Xiao Liang,
+Yang Wang, Junjie Li, Ziming Miao, Jiang Bian, and Mao Yang. Reinforcement learning
+with verifiable rewards implicitly incentivizes correct reasoning in base LLMs. arXiv preprint
+arXiv:2506.14245, 2025.
+[58] Ronald J Williams. Simple statistical gradient-following algorithms for connectionist reinforce-
+ment learning. Machine Learning, 8(3):229–256, May 1992.
+[59] Cathy Wu, Aravind Rajeswaran, Yan Duan, Vikash Kumar, Alexandre M Bayen, Sham Kakade,
+Igor Mordatch, and Pieter Abbeel. Variance reduction for policy gradient with action-dependent
+factorized baselines. arXiv preprint arXiv:1803.07246, 2018.
+[60] Fang Wu, Weihao Xuan, Ximing Lu, Mingjie Liu, Yi Dong, Zaid Harchaoui, and Yejin Choi. The
+invisible leash: Why RLVR may or may not escape its origin. arXiv preprint arXiv:2507.14843,
+2025.
+[61] An Yang, Beichen Zhang, Binyuan Hui, Bofei Gao, Bowen Yu, Chengpeng Li, Dayiheng Liu,
+Jianhong Tu, Jingren Zhou, Junyang Lin, Keming Lu, Mingfeng Xue, Runji Lin, Tianyu Liu,
+Xingzhang Ren, and Zhenru Zhang. Qwen2.5-math technical report: Toward mathematical
+expert model via self-improvement. arXiv preprint arXiv:2409.12122, 2024.
+[62] An Yang, Anfeng Li, Baosong Yang, Beichen Zhang, Binyuan Hui, Bo Zheng, Bowen Yu,
+Chang Gao, Chengen Huang, and Chenxu Lv et al. Qwen3 technical report. arXiv preprint
+arXiv:2505.09388, 2025.
+[63] An Yang, Baosong Yang, Beichen Zhang, Binyuan Hui, Bo Zheng, Bowen Yu, Chengyuan
+Li, Dayiheng Liu, Fei Huang, Haoran Wei, Huan Lin, Jian Yang, Jianhong Tu, Jianwei Zhang,
+Jianxin Yang, Jiaxi Yang, Jingren Zhou, Junyang Lin, Kai Dang, Keming Lu, Keqin Bao, Kexin
+Yang, Le Yu, Mei Li, Mingfeng Xue, Pei Zhang, Qin Zhu, Rui Men, Runji Lin, Tianhao Li,
+Tianyi Tang, Tingyu Xia, Xingzhang Ren, Xuancheng Ren, Yang Fan, Yang Su, Yichang Zhang,
+Yu Wan, Yuqiong Liu, Zeyu Cui, Zhenru Zhang, and Zihan Qiu. Qwen2.5 technical report.
+arXiv preprint arXiv:2412.15115, 2025.
+[64] Zhaoning Yu, Will Su, Leitian Tao, Haozhu Wang, Aashu Singh, Hanchao Yu, Jianyu Wang,
+Hongyang Gao, Weizhe Yuan, Jason Weston, Ping Yu, and Jing Xu. RESTRAIN: From spurious
+votes to signals – self-driven rl with self-penalization. arXiv preprint arXiv:2510.02172, 2025.
+14
+
+
+[65] Yang Yue, Zhiqi Chen, Rui Lu, Andrew Zhao, Zhaokai Wang, Yang Yue, Shiji Song, and Gao
+Huang. Does reinforcement learning really incentivize reasoning capacity in LLMs beyond
+the base model? In The Thirty-ninth Annual Conference on Neural Information Processing
+Systems, 2025.
+[66] Charlie Zhang, Graham Neubig, and Xiang Yue. On the interplay of pre-training, mid-training,
+and rl on reasoning language models. arXiv preprint arXiv:2512.07783, 2025.
+[67] Shenao Zhang, Donghan Yu, Yihao Feng, Bowen Jin, Zhaoran Wang, John Peebles, and Zirui
+Wang. Learning to reason as action abstractions with scalable mid-training rl. arXiv preprint
+arXiv:2509.25810, 2025.
+[68] Rosie Zhao, Alexandru Meterez, Sham Kakade, Cengiz Pehlevan, Samy Jelassi, and Eran
+Malach. Echo chamber: Rl post-training amplifies behaviors learned in pretraining. In Second
+Conference on Language Modeling, 2025.
+[69] Haizhong Zheng, Yang Zhou, Brian R Bartoldson, Bhavya Kailkhura, Fan Lai, Jiawei Zhao,
+and Beidi Chen. Act only when it pays: Efficient reinforcement learning for LLM reasoning via
+selective rollouts. arXiv preprint arXiv:2506.02177, 2025.
+[70] Tianyu Zheng, Tianshun Xing, Qingshui Gu, Taoran Liang, Xingwei Qu, Xin Zhou, Yizhi Li,
+Zhoufutu Wen, Chenghua Lin, Wenhao Huang, et al. First return, entropy-eliciting explore.
+arXiv preprint arXiv:2507.07017, 2025.
+[71] Yujun Zhou, Zhenwen Liang, Haolin Liu, Wenhao Yu, Kishan Panaganti, Linfeng Song, Dian
+Yu, Xiangliang Zhang, Haitao Mi, and Dong Yu. Evolving language models without labels:
+Majority drives selection, novelty promotes variation. arXiv preprint arXiv:2509.15194, 2025.
+15
+
+
+A
+Additional Related Work
+A.1
+RLVR in LLMs
+Reinforcement learning with verifiable rewards (RLVR) [27, 19] is a training paradigm that optimizes
+LLM policies in domains such as math and code using deterministic feedback from objective verifiers
+to ground model reasoning in provable correctness rather than subjective human preference [10].
+Despite this promise [19, 37], recent studies suggest that RLVR in LLMs primarily serves to amplify
+behaviors that are already present in the base model [31, 68, 45]. Yue et al. [65] investigated the
+pass@K metric [7, 50, 14, 57, 60], which measures the probability that at least one correct solution is
+obtained when drawing K independent samples (i.e., best-of-K), and found experimentally that as
+K increases, the base model’s pass@K eventually exceeds that of the RLVR-trained model. This
+phenomenon has been linked to diversity collapse [14, 13] and squeezing reasoning paths [32, 23, 4].
+Several studies [55, 67, 6, 66] argue that mid-training is important. Consistent with this view,
+empirical results suggest that RLVR underperforms on Llama models [16] relative to Qwen models
+[63, 62].
+A.2
+Exploration in RL for LLMs
+In light of these limitations, prior studies have incorporated exploration into RLVR. Cui et al.
+[13], Cheng et al. [9], Zheng et al. [70], Shen [47], Jiang et al. [24] leveraged entropy bonuses to
+encourage exploration via policy uncertainty. Song et al. [49] proposed outcome-based exploration
+using UCB-style bonuses [1]. Yu et al. [64] applied self-penalization by assigning negative rewards
+to high-confidence answers that deviate from the majority consensus. He et al. [20] improved
+exploration by up-weighting low-probability but correct trajectories, and Gao et al. [15] adopted
+Random Network Distillation (RND) [5] to provide bonuses for unknown trajectories. Zhou et al.
+[71] augmented training with a semantic novelty score computed from embeddings, Li et al. [29]
+employed a semantic diversity score with an external semantic comparator, and Tuyls et al. [53]
+computed a representation-based novelty score from hidden states to boost exploration. Liang et al.
+[30] leveraged reward-model gradients to improve temperature sampling. Setlur et al. [44] promoted
+in-context exploration via skill asymmetries and negative gradients, enabling reliable extrapolation
+with increased test-time compute.
+Other studies directly optimize the pass@K metric; these are discussed in App. A.4.
+A.3
+Policy Gradient Estimator and Baseline
+Policy gradients are a central approach for optimizing policies in RL [58, 17, 38, 39]. The high
+variance of gradient estimates is a fundamental challenge in policy gradient methods, often hindering
+stable convergence [58]. To mitigate this, the method of control variates—subtracting a baseline b(x)
+from the return—is the standard variance reduction technique. Theoretically, the optimal baseline
+depends on the norm of the score function and the specific reward structure [42, 56]. Greensmith
+et al. [17] provided a comprehensive analysis, demonstrating that while the exact optimal baseline is
+computationally expensive, a baseline that approximates the expected return—thereby making the
+advantage approximately zero-mean—captures the majority of the variance reduction benefits. This
+insight justifies the widespread adoption of value function baselines in modern algorithms like PPO
+[43] and A3C [35].
+In domains involving discrete latent variables or sequence generation, where learning a separate value
+function is often unstable or costly, sample-based baselines have become the dominant approach.
+This concept was further refined in the context of variational inference by Mnih and Rezende [34]
+(VIMCO) and Gu et al. [18], which utilize the average reward of other samples in the batch (Leave-
+One-Out; L1O) to construct a low-variance gradient estimator for discrete variables. Specifically,
+Tucker et al. [52] highlighted that such control variates are essential for training effective estimators
+in high-dimensional discrete spaces.
+Recently, these multi-sample baseline techniques have been adapted for reasoning tasks in LLMs.
+Group Relative Policy Optimization (GRPO) [46] applies group-based normalization, effectively an
+L1O baseline, to stabilize training without a critic network. However, these standard L1O techniques
+rely on the linearity of the expectation operator. Wu et al. [59] discussed the complexities of action-
+dependent baselines, but the specific challenges of the max@K objective remain underexplored. In the
+16
+
+
+max@K setting, the non-linear dependency between samples introduced by the max operator renders
+standard L1O baselines biased, necessitating the development of our strictly unbiased Leave-Two-Out
+(L2O) approach.
+A.4
+Pass@K Policy Optimization
+Recent advancements in reasoning tasks have increasingly focused on directly optimizing the pass@K
+metric, an evaluation criterion where K independent samples are drawn from the model, and success
+is defined by at least one sample being correct [51, 54, 41, 2, 8]. The primary objective of this
+approach is to maintain model diversity, thereby encouraging exploration to discover correct solutions.
+Tang et al. [51] first proposed optimizing the pass@K objective using RL, while Chen et al. [8]
+provided an empirical analysis of its effects on model behavior, particularly regarding entropy and
+generation diversity. Most relevant to our work is Walder and Karkhanis [54], who generalize the
+pass@K objective to continuous rewards (denoted as max@K) and propose multiple estimators for
+this objective. However, we observe that the estimators proposed by Walder and Karkhanis [54] can
+lead to overestimated advantage terms. To address this, we re-examine the max@K objective and
+propose a novel estimator designed to ensure the advantage function has an expected value of zero,
+thereby stabilizing optimization.
+Prior to the development of pass@K policy optimization, the RL community has explored optimizing
+expected rewards across multiple trials [26]. Koyamada et al. [26] formally introduced the ReMax
+objective to maximize the max@K outcome, originally optimizing it within a resettable simulator.
+Subsequently, Nishimori et al. [36] extended this framework by deriving a policy gradient estimator.
+We are inspired by their expected-improvement form of the policy-gradient estimator, which enables
+us to analyze the advantage term of the max@K policy gradient. However, a direct application is
+infeasible in the language model setting, where computing rewards for the entire action space is
+intractable. Therefore, we propose a practical estimator that approximates the EI using only a limited
+batch of samples.
+17
+
+
+B
+Code to Compute the Estimators
+Below, we provide code to compute the statistics proposed in Sec. 3, namely the EI estimator si and
+the L2O baseline bL2O
+−i .
+1 import
+jax.numpy as jnp
+2 from
+scipy.special
+import
+gammaln
+3
+4 def
+comb(n, k):
+5
+"""Computes
+binomial
+coefficient C(n, k) in log -space."""
+6
+return
+jnp.exp(gammaln(n + 1) - gammaln(k + 1) - gammaln(n - k + 1))
+7
+8 def
+compute_batch_ei (returns: jnp.ndarray , K: int) -> jnp.ndarray:
+9
+"""
+10
+Computes
+the
+unbiased
+EI
+estimator
+s_i
+using
+matrix
+operations .
+11
+Corresponds
+to
+Theorem E.1.
+12
+"""
+13
+B = returns.shape [0]
+14
+# Sort
+rewards: r_ {(1)} <= ...
+<= r_{(B)}
+15
+order = jnp.argsort(returns)
+16
+r_sorted = returns[order]
+17
+18
+# Compute
+Difference
+Matrix D_{i,j} = (r_{(i)} - r_{(j)})_+
+19
+D = jnp.maximum(r_sorted [:, None] - r_sorted[None , :], 0.0)
+20
+21
+# Compute
+Weight
+Vector
+w_j (Theorem E.1)
+22
+# w_j = C(j-1, K-2) / C(B-1, K -1)
+23
+ranks = jnp.arange(B)
+24
+w = comb(ranks , K - 2) / comb(B - 1, K - 1)
+25
+w = jnp.nan_to_num(w) # Handle
+cases
+where
+rank < K-2
+26
+# s = D @ w
+27
+s_sorted = D @ w
+28
+# Restore
+original
+order
+29
+return
+s_sorted[jnp.argsort(order)]
+30
+31 def
+compute_l2o_baseline (returns: jnp.ndarray , K: int) -> jnp.ndarray:
+32
+"""
+33
+Computes
+the L2O
+baseline
+b_{-i}^{ L2O} (Theorem E.2) in O(B^2).
+34
+"""
+35
+B = returns.shape [0]
+36
+order = jnp.argsort(returns)
+37
+r_sorted = returns[order]
+38
+39
+# Difference
+Matrix D and
+Column
+Sums
+S_l
+40
+D = jnp.maximum(r_sorted [:, None] - r_sorted[None , :], 0.0)
+41
+S = jnp.sum(D, axis =0) # S_l = sum_k D_{k,l}
+42
+43
+# LOO
+Column
+Mean
+Matrix M_{i,l} (Theorem E.2)
+44
+# M_{i,l} = (S_l - D_{i,l}) / (B - 1)
+45
+M = (S[None , :] - D) / (B - 1)
+46
+47
+# L2O
+Weight
+Matrix W^{L2O}_{i,l}
+48
+# Rank
+adjustment: (l -1) - 1 if l > i else (l -1)
+49
+i_idx = jnp.arange(B)[:, None]
+50
+l_idx = jnp.arange(B)[None , :]
+51
+adjusted_rank = l_idx - (l_idx > i_idx).astype(jnp.float32)
+52
+53
+W = comb(adjusted_rank , K - 2) / comb(B - 2, K - 1)
+54
+W = jnp.nan_to_num(W)
+55
+W = W * (1.0 - jnp.eye(B)) # Set
+diagonal (l=i) to 0
+56
+57
+# b_{-i}^{ L2O} = sum_l M_{i,l} * W_{i,l}
+58
+b_sorted = jnp.sum(M * W, axis =1)
+59
+return
+b_sorted[jnp.argsort(order)]
+60
+Listing 1: Code to compute the statistics proposed in Sec. 3
+18
+
+
+Algorithm 2 Max@K Policy Optimization
+1: Input: Policy πθ, objective size K, the number of questions per batch M, group size G with
+2 ≤K ≤G −1.
+2: while not converged do
+3:
+Sample M questions {xm}M
+m=1.
+4:
+for each question xm do
+5:
+Sample G outputs {aj}G
+j=1 ∼πθ(· | xm) and evaluate rewards {rj}G
+j=1.
+6:
+Compute EI scores s (Theorem E.1) and the L2O baseline bL2O (Theorem E.2).
+7:
+Compute advantages: Adv = s −bL2O.
+8:
+end for
+9:
+Update θ by maximizing Eq. (13) with Adv.
+10: end while
+C
+Details of Max@K Policy Optimization
+We integrate our method into modern RL algorithms for LLM post-training. Algorithm 2 summarizes
+the overall procedure when combining EI + L2O with group-based RL, which we call Max@K
+Policy Optimization (MaxPO). In Sec. 3.1 and Appendix E, B denotes the number of samples
+used to compute EI and L2O for a single input. In LLM training, this computation is applied
+independently within each question-specific group. Concretely, for each question xm, we sample
+G outputs {am
+j }G
+j=1 from πθ(· | xm) and evaluate their sequence-level rewards {rm
+j }G
+j=1. Within
+such a group, G plays the role of B from Sec. 3.1 and Appendix E. From these rewards, we compute
+group-wise EI scores sm and L2O baselines bm,L2O. Accordingly, for each question-specific group,
+the estimator K
+G
+PG
+j=1 ∇θ log πθ(am
+j
+| xm)
+ sm
+j −bm,L2O
+−j
+
+is unbiased as a PG estimator. Thus,
+our method acts as a reward transformation from raw sequence rewards to centered sequence-level
+advantages (sm
+j −bm,L2O
+−j
+)G
+j=1, which optimize the max@K objective (Eq. (2)).
+While applicable to any PG-based algorithm, we instantiate our method using group-based RL
+algorithms such as Group Relative Policy Optimization (GRPO) [46] and Dr.GRPO [31] for their
+success in reasoning tasks. An optimization batch contains M questions, yielding question-specific
+groups (xm, am
+1:G, rm
+1:G)M
+m=1. Each output text consists of a sequence of tokens. Because rewards
+in reasoning tasks are typically assigned at the sequence level, we first compute a sequence-level
+advantage Am
+j = sm
+j −bm,L2O
+−j
+for each output text. We then broadcast this same scalar to all token
+positions when forming the token-level loss, i.e., Am
+j,i = Am
+j for every token position i in output am
+j .
+In practice, this corresponds to assigning the same reward to all tokens in an output text, rm
+j,i = rm
+j .
+Given a reference policy πref, we optimize the following loss:
+L(θ) = 1
+M
+M
+X
+m=1
+K
+G
+G
+X
+j=1
+1
+|am
+j |
+|am
+j |
+X
+i=1
+min
+
+ϕθ(xm, am
+j,i)Am
+j,i, ϕε
+θ(xm, am
+j,i)Am
+j,i
+
+−βKL(πθ|πref),
+(13)
+where β ≥0 and ε ≥0 are hyperparameters, and KL denotes the Kullback–Leibler (KL) divergence.
+We define ϕθ(x, ai) = πθ(ai | x, a<i)/πref(ai | x, a<i) as the ratio between our policy and the ref-
+erence policy, and ϕε
+θ(x, ai) as its clipped version in [1 −ε, 1 + ε]. |am
+j | is the sequence length of
+the j-th text in the m-th group. Eq. (13) is identical to GRPO [46] except for how the advantage
+is computed. While standard GRPO normalizes rewards by dividing by the inner-group standard
+deviation, a practice that introduces bias into the PG estimator, both our method and Pass@K Policy
+Optimization (PKPO) [54] avoid this division to preserve unbiasedness. The key distinction from
+Walder and Karkhanis [54] lies in the advantage construction: while their approach is equivalent to
+using our raw EI scores, we further subtract the L2O baseline to achieve lower variance.
+D
+Proofs
+D.1
+Proof of Proposition 3.1
+In this appendix, we prove both claims in Proposition 3.1: unbiasedness of the L2O advantage in
+expectation and exact centering of its realized batch mean.
+19
+
+
+Proof. We assume 2 ≤K ≤B −1 so that all subsets used below are well-defined. Let D =
+(a1:B, r1:B) be a set of samples where each action is drawn i.i.d. from πθ and ri := r(ai). We
+define the population Expected Improvement µEI as the expected gain of a single action against the
+maximum of K −1 other independent samples. Formally, let a1, . . . , aK
+i.i.d.
+∼πθ be K independent
+random variables. Due to the i.i.d. assumption on a1, . . . , aK, the population EI is defined as:
+µEI := Ea [s(a)] = Ea1:K
+"
+r(a1) −
+max
+k=2,...,K r(ak)
+
++
+#
+.
+(14)
+Unbiasedness of the EI Estimator si.
+First, we verify that si targets µEI following the U-statistics
+theory [22]. Given a batch D = (a1:B, r1:B), si is constructed by averaging over all possible subsets
+of size K −1 from the batch excluding i (denoted as U−i = {1, . . . , B} \ {i}).
+si := EI
+"
+ri −max
+k∈I rk
+
++
+#
+=
+1
+ B−1
+K−1
+
+X
+I⊆U−i,|I|=K−1
+
+ri −max
+k∈I rk
+
++
+.
+(15)
+Taking the expectation over random batches D ∼πθ:
+ED∼πθ [si] =
+1
+ B−1
+K−1
+
+X
+I⊆U−i,|I|=K−1
+ED∼πθ
+"
+ri −max
+k∈I rk
+
++
+#
+.
+(16)
+For any fixed subset I of size K −1, the set of indices {i} ∪I constitutes K distinct samples. Again,
+by the i.i.d. assumption, the joint distribution of {ai} ∪{ak}k∈I depends only on the number of
+samples, not their indices. Thus:
+ED∼πθ
+"
+ri −max
+k∈I rk
+
++
+#
+= Ea1:K
+"
+r(a1) −
+max
+k=2,...,K r(ak)
+
++
+#
+= µEI.
+(17)
+Substituting this back:
+ED∼πθ [si] =
+1
+ B−1
+K−1
+
+X
+I⊆U−i,|I|=K−1
+µEI = µEI.
+(18)
+Unbiasedness of the L2O Baseline bL2O
+−i .
+Next, we show that the baseline also targets µEI. The
+L2O baseline is defined as the average of leave-two-out estimators:
+bL2O
+−i
+:=
+1
+B −1
+X
+j̸=i
+s(−i)
+j
+.
+(19)
+Here, s(−i)
+j
+is the EI estimator for sample j computed using indices U−ij = {1, . . . , B} \ {i, j}.
+Crucially, to estimate the same quantity µEI (which involves a 1-vs-(K −1) comparison), s(−i)
+j
+must aggregate over subsets of size K −1:
+s(−i)
+j
+:=
+1
+ B−2
+K−1
+
+X
+I′⊆U−ij,|I′|=K−1
+
+rj −max
+k∈I′ rk
+
++
+.
+(20)
+By the linearity of expectation:
+ED∼πθ
+
+bL2O
+−i
+
+=
+1
+B −1
+X
+j̸=i
+ED∼πθ
+h
+s(−i)
+j
+i
+.
+(21)
+Focusing on a single term ED∼πθ
+h
+s(−i)
+j
+i
+:
+ED∼πθ
+h
+s(−i)
+j
+i
+=
+1
+ B−2
+K−1
+
+X
+I′⊆U−ij,|I′|=K−1
+ED∼πθ
+"
+rj −max
+k∈I′ rk
+
++
+#
+.
+(22)
+20
+
+
+Similar to the proof of the unbiasedness of the EI estimator, for any subset I′ of size K −1 drawn
+from U−ij, the set {j} ∪I′ consists of K distinct i.i.d. samples. Thus, by the i.i.d. assumption, we
+have:
+ED∼πθ
+"
+rj −max
+k∈I′ rk
+
++
+#
+= Ea1:K
+"
+r(a1) −
+max
+k=2,...,K r(ak)
+
++
+#
+= µEI.
+(23)
+Summing over all subsets:
+ED∼πθ
+h
+s(−i)
+j
+i
+=
+1
+ B−2
+K−1
+ ·
+B −2
+K −1
+
+· µEI = µEI.
+(24)
+Finally, averaging over j ̸= i:
+ED∼πθ
+
+bL2O
+−i
+
+=
+1
+B −1
+X
+j̸=i
+µEI = µEI.
+(25)
+Exact Centering of the Realized Batch Mean.
+We now show that the batch-average L2O advantage
+is exactly zero for every realized batch D. It suffices to prove that
+B
+X
+i=1
+bL2O
+−i
+=
+B
+X
+i=1
+si.
+(26)
+Fix j ∈{1, . . . , B} and consider the average of the leave-two-out EI estimators targeting sample j
+over all removed indices i ̸= j:
+1
+B −1
+X
+i̸=j
+s(−i)
+j
+=
+1
+B −1
+X
+i̸=j
+1
+ B−2
+K−1
+
+X
+I⊆{1,...,B}\{i,j}, |I|=K−1
+
+rj −max
+k∈I rk
+
++
+.
+(27)
+Re-index the inner sum by subsets I ⊆U−j := {1, . . . , B} \ {j} of size K −1. For any fixed such
+subset I, the term (rj −maxk∈I rk)+ appears once for each removed index i /∈I ∪{j}. There are
+exactly B −K such choices of i. Therefore,
+1
+B −1
+X
+i̸=j
+s(−i)
+j
+=
+B −K
+(B −1)
+ B−2
+K−1
+
+X
+I⊆U−j, |I|=K−1
+
+rj −max
+k∈I rk
+
++
+(28)
+=
+1
+ B−1
+K−1
+
+X
+I⊆U−j, |I|=K−1
+
+rj −max
+k∈I rk
+
++
+(29)
+= sj,
+(30)
+where the second equality uses the combinatorial identity
+B −K
+(B −1)
+ B−2
+K−1
+ =
+1
+ B−1
+K−1
+.
+(31)
+Summing this identity over j yields
+B
+X
+i=1
+bL2O
+−i
+=
+1
+B −1
+B
+X
+i=1
+X
+j̸=i
+s(−i)
+j
+=
+B
+X
+j=1
+1
+B −1
+X
+i̸=j
+s(−i)
+j
+=
+B
+X
+j=1
+sj.
+(32)
+Hence,
+1
+B
+B
+X
+i=1
+ si −bL2O
+−i
+
+= 0
+(33)
+for every realized batch D.
+Conclusion.
+Combining Eq. (18), Eq. (25), and the exact batch-centering identity above, we
+conclude that the L2O advantage is unbiased in expectation and exactly centered at the batch
+level.
+21
+
+
+E
+Derivation for Efficient Computation
+E.1
+Computation for the EI Estimator
+First, we demonstrate how to efficiently compute the EI vector s = [s(1), . . . , s(B)]⊤using its rank
+structure. Assume rewards are sorted in ascending order: r(1) ≤· · · ≤r(B). Let W = maxk∈I r(k)
+be the maximum reward in the batch. For a target sample i, the term
+ r(i) −W
+
++ is non-zero
+only if W < r(i). The probability that the maximum W equals a specific value r(j) (where
+j < i) follows a hypergeometric distribution depending only on the rank j: P(W = r(j)) :=
+  j−1
+K−2
+
+/
+ B−1
+K−1
+
+,
+for j < i. Here, the denominator represents the total number of ways to choose
+K −1 samples from B −1 candidates. The numerator corresponds to fixing r(j) as the maximum and
+choosing the remaining K −2 samples from the j −1 candidates smaller than r(j). Consequently,
+the estimator s(i) can be expressed as a weighted sum of pairwise ReLU differences:
+s(i) =
+B
+X
+j=1
+P(W = r(j))
+ r(i) −r(j)
+
++,
+(34)
+This formulation leads directly to a matrix-based computation: multiplying the ReLU-difference
+matrix by the probability weights.
+Theorem E.1 (Efficient Vectorized Computation of Batch EI). Let r ∈RB be the sorted reward
+vector. Define the ReLU-difference matrix D ∈RB×B as Di,j =
+ r(i) −r(j)
+
++, and the weight
+vector w ∈RB as wj =
+  j−1
+K−2
+
+/
+ B−1
+K−1
+
+. The vector of EI estimators s is given by:
+s = Dw.
+(35)
+We now prove Theorem E.1, which shows that the EI estimator can be computed efficiently using
+matrix operations.
+Proof. Assume 2 ≤K ≤B. Let the batch rewards be sorted as r(1) ≤· · · ≤r(B), and fix a rank
+index i ∈{1, . . . , B}. By definition,
+s(i) := EI
+
+
+
+
+
+r(i) −max
+j∈I r(j)
+|
+{z
+}
+:=W
+
+
+
+
++
+
+,
+(36)
+=
+B
+X
+j=1
+P(W = r(j))
+ r(i) −r(j)
+
++ ,
+(37)
+where the probability is for the distribution of the uniformly sampled subset I of size K −1 from the
+comparator pool U−i = {1, . . . , B} \ {i}. Since (r(i) −r(j))+ = 0 for all j ≥i, only ranks j < i
+can contribute to the expectation. Therefore, it suffices to compute P(W = r(j)) for j < i.
+Fix j < i. The event {W = r(j)} occurs if and only if j ∈I and the remaining K −2 indices in I
+are chosen from the j −1 indices with rewards strictly smaller than r(j). The number of such subsets
+is
+  j−1
+K−2
+
+. The total number of comparator subsets is
+ B−1
+K−1
+
+. Hence, for j < i,
+P(W = r(j)) =
+  j−1
+K−2
+
+ B−1
+K−1
+.
+(38)
+Using the law of total expectation and the fact that only j < i contributes, we obtain
+s(i) =
+B
+X
+j=1
+P(W = r(j)) (r(i) −r(j))+ =
+B
+X
+j=1
+wj Di,j,
+(39)
+where Di,j := (r(i) −r(j))+ and wj :=
+  j−1
+K−2
+
+/
+ B−1
+K−1
+
+. Stacking the identities for all i yields
+s = Dw.
+22
+
+
+Complexity Analysis. Our method requires O(B log B) time for sorting and O(B2) time to construct
+the pairwise difference matrix and perform the resulting matrix–vector multiplication. We note that
+Walder and Karkhanis [54] derived an algorithm that computes the EI estimator in O(B log B +
+K). In the context of LLM training, the batch size B (typically the group size, e.g., 16–64) is
+small. Moreover, our vectorized formulation maps directly to GPU-friendly dense primitives (e.g.,
+broadcasted elementwise operations and matrix–vector products), making it straightforward to
+leverage GPU parallelism in practice.
+E.2
+Computation for the L2O Baseline (proof of Theorem 3.2)
+As with the EI estimator, we compute the L2O baseline using matrix multiplication. To this end, we
+rewrite bL2O
+−i
+as a weighted sum of ReLU differences:
+bL2O
+−i
+=
+1
+B −1
+B
+X
+l̸=i
+P(W−i = r(l))
+X
+j̸=i
+ r(j) −r(l)
+
++,
+(40)
+where W−i is the maximum of a subset drawn from the population excluding i. Compared with
+Eq. (34), this form also admits a matrix computation of the weighted sum of ReLU differences.
+Theorem E.2 (Efficient Computation of L2O Baseline). Let Sl = PB
+k=1 Dk,l be the column sums of
+D. Define the Leave-One-Out column mean matrix M ∈RB×B as Mi,l = (Sl −Di,l)/(B −1).
+Then, the vector of L2O baselines bL2O ∈RB is given by the row-wise dot product:
+bL2O
+−i
+=
+B
+X
+l=1
+Mi,l W L2O
+i,l
+, where
+W L2O
+i,l
+=
+
+
+
+
+
+0
+if l = i,
+ (l−1)−I[l>i]
+K−2
+
+ B−2
+K−1
+
+if l ̸= i.
+(41)
+Here, the indicator I[l > i] adjusts the rank of r(l) after removing index i from the sorted batch.
+We now prove Theorem E.2, which shows that the L2O baseline can be computed efficiently using
+matrix operations.
+Proof. Assume 2 ≤K ≤B −1. Let r(1) ≤· · · ≤r(B) be the sorted rewards. Define D ∈RB×B
+by Dj,l :=
+ r(j) −r(l)
+
++. Fix an index i ∈{1, . . . , B}. Recall that
+bL2O
+−i
+:=
+1
+B −1
+X
+j̸=i
+s(−i)
+j
+.
+(42)
+For each j ̸= i, define s(−i)
+j
+by sampling I′ uniformly without replacement among all subsets of size
+K −1 from {1, . . . , B} \ {i, j} and setting W−i := maxk∈I′ r(k). Then
+s(−i)
+j
+= EI′
+h r(j) −W−i
+
++
+i
+=
+X
+l∈{1,...,B}\{i,j}
+P
+ W−i = r(l)
+  r(j) −r(l)
+
++.
+(43)
+Note that Dj,l = (r(j) −r(l))+ = 0 for all l ≥j. For l ≥j, we have Dj,l = (r(j) −r(l))+ = 0,
+hence these terms do not contribute regardless of the value assigned to W L2O
+i,l
+. Therefore, it suffices
+to compute P(W−i = r(l)) for l < j.
+Fix l < j with l ̸= i. The event {W−i = r(l)} occurs if and only if l ∈I′ and the remaining K −2
+indices in I′ are chosen from indices with rank strictly below l. Among {1, . . . , l −1}, the only
+index that may be excluded from the sampling pool {1, . . . , B} \ {i, j} is i when i < l. Since l < j,
+excluding j does not remove any index from {1, . . . , l −1}. Thus, the number of available indices
+strictly below l in the pool is (l −1) −I[l > i]. Hence, the number of valid subsets I′ of size K −1
+for which W−i = r(l) is
+ (l−1)−I[l>i]
+K−2
+
+. The total number of possible subsets I′ is
+ B−2
+K−1
+
+. Therefore,
+for any l < j with l ̸= i,
+P
+ W−i = r(l)
+
+=
+ (l−1)−I[l>i]
+K−2
+
+ B−2
+K−1
+
+= W L2O
+i,l
+.
+(44)
+23
+
+
+Crucially, the right-hand side depends on i and l but not on j, as long as l < j.
+Substituting (44) into (43) and using Dj,l = (r(j) −r(l))+ yields
+s(−i)
+j
+=
+B
+X
+l=1
+W L2O
+i,l
+Dj,l.
+(45)
+Averaging over j ̸= i and exchanging the finite sums gives
+bL2O
+−i
+=
+1
+B −1
+X
+j̸=i
+B
+X
+l=1
+W L2O
+i,l
+Dj,l =
+B
+X
+l=1
+W L2O
+i,l
+1
+B −1
+X
+j̸=i
+Dj,l.
+(46)
+Let Sl := PB
+k=1 Dk,l. Then
+1
+B −1
+X
+j̸=i
+Dj,l = Sl −Di,l
+B −1
+=: Mi,l.
+(47)
+Substituting into (46) yields
+bL2O
+−i
+=
+B
+X
+l=1
+Mi,l W L2O
+i,l
+.
+(48)
+This holds for each i ∈{1, . . . , B}, which completes the proof.
+F
+Unified View of Estimators
+In this appendix, we provide a unified view of our proposed estimators and those of Walder and
+Karkhanis [54] from the perspective of marginal statistics.
+F.1
+Definitions of Marginal Statistics
+Let B = {1, . . . , B} be the set of indices for the batch of samples. We assume a fixed batch size
+B and a subset size K such that 2 ≤K ≤B −1. For any subset S ⊆B, let M(S) := maxj∈S rj.
+All expectations below are finite averages over subsets, equivalent to sampling uniformly without
+replacement.
+We formally define the two key statistics ui and vi for a specific index i ∈B:
+• Conditional Expected Max ui: The expected maximum of a size-K group conditioned on
+containing i:
+ui :=
+1
+ B−1
+K−1
+
+X
+S⊆B\{i},|S|=K−1
+max(ri, M(S)).
+(49)
+• Leave-One-Out Expected Max vi: The expected maximum of a size-K group drawn from
+the pool excluding i:
+vi :=
+1
+ B−1
+K
+
+X
+T ⊆B\{i},|T |=K
+M(T).
+(50)
+The quantity γ(ui −vi), where γ = K/B, represents the exact marginal contribution of sample i to
+the max@K objective under finite without-replacement sampling. We first record the finite-batch
+centering proof for this canonical signal; the equivalence between EI+L2O and this canonical signal
+is proved in the following subsection.
+Centering of the canonical finite-batch advantage.
+The leave-one-out term vi depends only on
+rewards in B \ {i}, so it is a valid leave-one-out baseline for response i and preserves policy-gradient
+unbiasedness. It remains to prove that the realized batch average of ui −vi is exactly zero. Summing
+the definitions over all i, every size-K subset V ⊆B contributes to ui exactly when i ∈V . Since
+|V | = K, each M(V ) is counted exactly K times:
+B
+X
+i=1
+ui =
+K
+ B−1
+K−1
+
+X
+V ⊆B
+|V |=K
+M(V ).
+(51)
+24
+
+
+Similarly, a size-K subset V contributes to vi exactly when i /∈V . There are B −K such indices, so
+B
+X
+i=1
+vi = B −K
+ B−1
+K
+
+X
+V ⊆B
+|V |=K
+M(V ).
+(52)
+The coefficients are equal because
+K
+ B−1
+K−1
+ = B −K
+ B−1
+K
+ .
+(53)
+Therefore P
+i ui = P
+i vi, and hence
+1
+B
+B
+X
+i=1
+(ui −vi) = 0
+(54)
+for every realized batch. This establishes exact centering of the canonical finite-batch advantage.
+F.2
+Relationship Between EI-L2O and Marginal Statistics
+We now show that our bias-corrected signal γ(si −bi) is identical to the marginal contribution
+γ(ui −vi). First, we explicitly define the finite-batch Expected Improvement si and the L2O baseline
+bi:
+• Expected Improvement si: The direct finite-sample version of si = E[(ri −W)+] where
+W is the maximum of K −1 comparators:
+si :=
+1
+ B−1
+K−1
+
+X
+S⊆B\{i},|S|=K−1
+(ri −M(S))+.
+(55)
+• L2O Baseline bi: The average of leave-two-out EI values:
+bi :=
+1
+B −1
+X
+j̸=i
+s(−i)
+j
+,
+(56)
+where s(−i)
+j
+is the EI of j computed over the pool B \ {i, j}.
+Using the identity max(ri, M(S)) = M(S) + (ri −M(S))+, we decompose ui as:
+ui = wi + si,
+(57)
+where wi is the expected comparator-max when sampling K −1 items from the pool excluding i.
+We now show that the L2O baseline removes exactly the gap between the comparator-max baseline
+wi and the leave-one-out max@K baseline vi. Fix i and expand
+bi =
+1
+B −1
+X
+j̸=i
+1
+ B−2
+K−1
+
+X
+S⊆B\{i,j}
+|S|=K−1
+(M(S ∪{j}) −M(S)) .
+(58)
+For the first term, every size-K subset T ⊆B \ {i} appears exactly K times, once for each possible
+choice of j ∈T. Therefore,
+1
+(B −1)
+ B−2
+K−1
+
+X
+j̸=i
+X
+S⊆B\{i,j}
+|S|=K−1
+M(S ∪{j}) =
+1
+ B−1
+K
+
+X
+T ⊆B\{i}
+|T |=K
+M(T) = vi.
+(59)
+For the second term, every size-(K −1) subset S ⊆B \ {i} appears exactly B −K times, once for
+each j ∈B \ ({i} ∪S). Thus,
+1
+(B −1)
+ B−2
+K−1
+
+X
+j̸=i
+X
+S⊆B\{i,j}
+|S|=K−1
+M(S) =
+1
+ B−1
+K−1
+
+X
+S⊆B\{i}
+|S|=K−1
+M(S) = wi.
+(60)
+Hence bi = vi −wi. Combining this with si = ui −wi yields
+si −bi = (ui −wi) −(vi −wi) = ui −vi.
+(61)
+Thus, the scaled signal γ(si −bi) exactly recovers the marginal contribution γ(ui −vi).
+25
+
+
+F.3
+L2O for Arbitrary Comparator-Only Baselines
+The previous subsection treats EI, which corresponds to subtracting the comparator-max baseline
+C(S) = M(S) before applying L2O. The same cancellation holds for any baseline that depends only
+on the comparator set.
+Proposition F.1 (L2O cancels arbitrary comparator-only baselines). Fix 2 ≤K ≤B −1 and
+a realized batch B. Let C(S) be any scalar-valued function of a comparator set S ⊆B with
+|S| = K −1. For each i ∈B, define the comparator-baselined group signal
+αC
+i :=
+1
+ B−1
+K−1
+
+X
+S⊆B\{i}
+|S|=K−1
+(M(S ∪{i}) −C(S)) .
+(62)
+Define its L2O baseline by recomputing the same signal for each j ̸= i after removing i:
+bC
+i :=
+1
+B −1
+X
+j̸=i
+αC,(−i)
+j
+,
+(63)
+where
+αC,(−i)
+j
+:=
+1
+ B−2
+K−1
+
+X
+S⊆B\{i,j}
+|S|=K−1
+(M(S ∪{j}) −C(S)) .
+(64)
+Then
+αC
+i −bC
+i = ui −vi
+(65)
+for every i ∈B.
+Proof. Define the averaged comparator-only baseline for response i by
+ci :=
+1
+ B−1
+K−1
+
+X
+S⊆B\{i}
+|S|=K−1
+C(S).
+(66)
+By the definition of ui, the starting signal decomposes as
+αC
+i = ui −ci.
+(67)
+It remains to compute the L2O baseline bC
+i . Expanding its definition gives
+bC
+i =
+1
+B −1
+X
+j̸=i
+1
+ B−2
+K−1
+
+X
+S⊆B\{i,j}
+|S|=K−1
+(M(S ∪{j}) −C(S)) .
+(68)
+We handle the M part and the C part separately. For the M part, every size-K subset T ⊆B \ {i}
+appears exactly K times, once for each possible choice of j ∈T. Therefore,
+1
+(B −1)
+ B−2
+K−1
+
+X
+j̸=i
+X
+S⊆B\{i,j}
+|S|=K−1
+M(S ∪{j})
+(69)
+=
+K
+(B −1)
+ B−2
+K−1
+
+X
+T ⊆B\{i}
+|T |=K
+M(T)
+(70)
+=
+1
+ B−1
+K
+
+X
+T ⊆B\{i}
+|T |=K
+M(T) = vi.
+(71)
+26
+
+
+For the comparator-only baseline part, every size-(K −1) subset S ⊆B \ {i} appears exactly B −K
+times, once for each choice of j ∈B \ ({i} ∪S). Thus,
+1
+(B −1)
+ B−2
+K−1
+
+X
+j̸=i
+X
+S⊆B\{i,j}
+|S|=K−1
+C(S)
+(72)
+=
+B −K
+(B −1)
+ B−2
+K−1
+
+X
+S⊆B\{i}
+|S|=K−1
+C(S)
+(73)
+=
+1
+ B−1
+K−1
+
+X
+S⊆B\{i}
+|S|=K−1
+C(S) = ci.
+(74)
+Combining the two parts yields
+bC
+i = vi −ci.
+(75)
+Therefore,
+αC
+i −bC
+i = (ui −ci) −(vi −ci) = ui −vi.
+(76)
+This proposition includes EI as the special case C(S) = M(S), for which αC
+i = si, and the raw
+conditional max signal as the special case C(S) = 0, for which αC
+i = ui. The comparator-only
+condition is essential: if the added term depends on the target response itself, then the leave-out
+property and the cancellation above need not hold.
+F.4
+Comparison with Walder and Karkhanis [54]’s estimators
+Walder and Karkhanis [54] provide two primary advantage estimators: sloo_minus_one (their
+Eq. 33) and sloo (their Eq. 29). Here, we formally show the equivalence between EI and their
+sloo_minus_one estimator (max@K - max@(K-1)). We then describe how the other sloo estimator
+is biased differently from sloo_minus_one.
+sloo_minus_one and EI-only Signal
+The sloo_minus_one variant is defined as the difference between the max of a size-K subset and
+the max of the same subset excluding index i.
+sloo−1
+i
+=
+1
+ B
+K
+
+X
+S⊆B\{i},|S|=K−1
+(max(ri, M(S)) −M(S)) .
+(77)
+Using the fundamental identity relating the maximum to the ReLU (Positive Part) function,
+max(a, b) = b + (a −b)+, the term inside the summation becomes:
+max(ri, M(S)) −M(S) = (ri −M(S))+.
+(78)
+Substituting this back into the estimator and multiplying by
+ B−1
+K−1
+
+/
+ B−1
+K−1
+
+to align with the definition
+of Expected Improvement (si):
+sloo−1
+i
+=
+ B−1
+K−1
+
+ B
+K
+
+
+
+1
+ B−1
+K−1
+
+X
+S⊆B\{i},|S|=K−1
+(ri −M(S))+
+
+
+(79)
+= K
+B si = γsi.
+(80)
+This proves that their sloo_minus_one is exactly equivalent to our EI-only signal scaled by γ.
+27
+
+
+sloo and Rescaled Marginal Signal
+Walder and Karkhanis [54]’s sloo variant is defined as:
+sloo
+i
+= S(i, K, B) −
+1
+B −1
+X
+j∈B\{i}
+S(j, K, B \ {i}).
+(81)
+Walder and Karkhanis [54] define S(i, K, U) as a normalized sum over K-subsets containing index i:
+S(i, K, U) :=
+1
+ |U|
+K
+
+X
+I⊆U,|I|=K,i∈I
+max
+t∈I rt.
+(82)
+Based on this definition, we derive the connection to our ui and vi:
+1. Connection to ui: Every K-subset I ⊆B with i ∈I can be written as {i} ∪S where
+|S| = K −1. Thus:
+S(i, K, B) =
+ B−1
+K−1
+
+ B
+K
+ ui = K
+B ui.
+(83)
+2. Connection to vi: Consider the sum over the reduced pool U = B \ {i}:
+X
+j∈U
+S(j, K, U) =
+1
+ B−1
+K
+
+X
+I⊆U,|I|=K
+
+X
+j∈I
+1
+
+M(I) = Kvi,
+(84)
+since each K-subset I contains exactly K indices j. Dividing by B −1 yields:
+1
+B −1
+X
+j̸=i
+S(j, K, B \ {i}) =
+K
+B −1vi.
+(85)
+Substituting these into the definition of Eq. (29):
+sloo
+i
+= K
+B ui −
+K
+B −1vi = γ
+
+ui −
+B
+B −1vi
+
+.
+(86)
+Comparing this to our signal γ(ui −vi), we see a discrepancy in the coefficient of vi. Our method
+uses ui −vi, whereas Walder and Karkhanis [54] implicitly use ui −
+B
+B−1vi. Since our EI + L2O
+signal ui −vi is the unbiased advantage estimator, their sloo
+i
+is biased at finite B: it underestimates the
+advantage by
+γ
+B−1vi. Furthermore, Walder and Karkhanis [54] did not evaluate sloo experimentally,
+and we likewise exclude it because there is no clear justification for using a biased estimator.
+In summary, their sloo_minus_one (max@K - max@(K-1)) estimator tends to overestimate the
+advantage, whereas sloo underestimates it at finite batch sizes. This contrast highlights the theoretical
+motivation for our L2O-based approach.
+F.5
+Comparison with the Analytical pass@K Estimator of Chen et al. [8]
+We next relate the analytical binary pass@K estimator of Chen et al. [8] to the marginal statistics ui
+and vi. This comparison applies to binary rewards, ri ∈{0, 1}. Let Nneg be the number of negative
+responses in the batch. For binary rewards, the all-subsets mean ¯m is the empirical pass@K value:
+¯m = 1 −
+ Nneg
+K
+
+ B
+K
+ .
+(87)
+This is the group-level mean used in the analytical derivation of Chen et al. [8].
+We show that the raw analytical numerator of Chen et al. [8], before division by the group standard
+deviation, is exactly
+ui −¯m.
+(88)
+There are two cases.
+28
+
+
+Positive response.
+If ri = 1, then every size-K subset containing i has maximum reward one.
+Therefore,
+ui = 1.
+(89)
+The raw analytical numerator for a positive response is the positive group reward minus the group
+mean:
+AChen,raw
+i
+= 1 −¯m = ui −¯m.
+(90)
+Negative response.
+If ri = 0, then a size-K subset containing i is positive if and only if at least
+one of the other K −1 responses is positive. Hence
+ui = 1 −
+ Nneg−1
+K−1
+
+ B−1
+K−1
+ .
+(91)
+The raw analytical numerator for a negative response is the probability that a group containing this
+response is positive, minus the group mean:
+AChen,raw
+i
+= 1 −
+ Nneg−1
+K−1
+
+ B−1
+K−1
+
+−¯m = ui −¯m.
+(92)
+Thus, for both positive and negative responses,
+AChen,raw
+i
+= ui −¯m.
+(93)
+We next relate ui −¯m to the canonical signal ui −vi. Partitioning all size-K subsets of B into
+those containing i and those not, and using
+ B−1
+K−1
+
+/
+ B
+K
+
+= K/B and
+ B−1
+K
+
+/
+ B
+K
+
+= (B −K)/B,
+the all-subsets mean satisfies
+¯m = K
+B ui + B −K
+B
+vi.
+(94)
+Subtracting both sides from ui yields
+ui −¯m = B −K
+B
+(ui −vi).
+(95)
+Using Eq. (95), we obtain
+AChen,raw
+i
+= ui −¯m = B −K
+B
+(ui −vi).
+(96)
+Therefore, in the binary setting, the raw analytical estimator of Chen et al. [8] has the same centered
+direction as MaxPO up to a fixed scale.
+The estimator used in Chen et al. [8] further divides this numerator by a group standard deviation
+σgroup. Thus,
+AChen,std
+i
+= ui −¯m
+σgroup
+.
+(97)
+This normalization may be useful as an optimization heuristic, but it introduces a random batch-
+dependent scale. Consequently, the numerator is proportional to the MaxPO marginal signal, while
+the standard-deviation-normalized coefficient is not the exact no-std policy-gradient estimator derived
+from ui −vi.
+F.6
+Comparison with the All-Subsets max@K Transform of Bagirov et al. [2]
+We now compare MaxPO with the on-policy all-subsets transformation of Bagirov et al. [2]. The
+derivation in this subsection is on-policy and does not include the probability-ratio correction used in
+their off-policy estimator.
+Let ˜ri (Eq. (9) of Bagirov et al. [2]) denote the raw all-subsets transformed reward assigned to sample
+i:
+˜ri :=
+1
+ B
+K
+
+X
+I⊆B
+|I|=K, i∈I
+M(I).
+(98)
+29
+
+
+Every size-K subset I containing i can be written as I = S∪{i}, where S ⊆B\{i} and |S| = K−1.
+Therefore,
+˜ri =
+1
+ B
+K
+
+X
+S⊆B\{i}
+|S|=K−1
+M(S ∪{i})
+=
+ B−1
+K−1
+
+ B
+K
+ ui = K
+B ui.
+(99)
+Thus, the raw on-policy transformation of Bagirov et al. [2] is an uncentered all-subsets marginal
+signal.
+Next, consider ordinary mean-centering of the transformed rewards. Since
+1
+B
+B
+X
+i=1
+ui = ¯m,
+(100)
+we have
+¯˜r := 1
+B
+B
+X
+i=1
+˜ri = K
+B ¯m.
+(101)
+Therefore,
+˜ri −¯˜r = K
+B (ui −¯m)
+= K
+B · B −K
+B
+(ui −vi)
+= K(B −K)
+B2
+(ui −vi).
+(102)
+Thus, the mean-centered on-policy all-subsets transform of Bagirov et al. [2] recovers the same
+centered direction as MaxPO up to a fixed scale.
+If one instead applies z-score normalization to the transformed rewards, the numerator remains
+proportional to ui −vi, but the denominator introduces a random batch-dependent scale:
+˜ri −¯˜r
+std(˜r) =
+K(B−K)
+B2
+(ui −vi)
+std(˜r)
+.
+(103)
+As with the standard-deviation-normalized analytical pass@K estimator, this changes the exact
+no-std policy-gradient coefficient.
+Finally, the off-policy estimator of Bagirov et al. [2] is not simply another baseline choice for ui
+or vi. It introduces probability ratios for samples drawn from an older policy and then applies a
+first-order approximation to the product of ratios. This produces a different approximate estimator.
+The equivalences above therefore apply only to the on-policy all-subsets transformation and its
+mean-centered or z-score-normalized variants.
+Clarifying “BoN mean” versus mean-centered EI.
+A possible source of ambiguity is the phrase
+“BoN mean” in Bagirov et al. [2]. One possible reading is that BoN mean starts from the EI or LOO-1
+signal and then applies the usual GRPO-style mean and standard-deviation normalization. Under this
+reading, the centered signal would be
+AmeanEI
+i
+:= si −¯s,
+¯s := 1
+B
+B
+X
+j=1
+sj.
+(104)
+This is not MaxPO. Using si = ui −wi, we have
+AmeanEI
+i
+= (ui −wi) −(¯u −¯w),
+(105)
+which does not simplify to ui −vi in general. Moreover, ¯s can depend on ri, because ri may appear
+as a comparator inside sj for j ̸= i. Thus, mean-centering EI is not the L2O correction and does not
+generally satisfy the leave-out condition required by the policy-gradient unbiasedness argument.
+30
+
+
+The all-subsets transform in Eq. (98) is a different vector. It is proportional to ui, not to the EI signal
+si = ui −wi:
+˜ri = K
+B ui.
+(106)
+Therefore, centering ˜ri is fundamentally different from centering si. As shown in Eq. (102),
+˜ri −¯˜r = K(B −K)
+B2
+(ui −vi),
+(107)
+so the mean-centered all-subsets transform is proportional to the MaxPO direction. In short,
+si −¯s ̸≡ui −vi,
+˜ri −¯˜r ∝ui −vi.
+(108)
+The distinction is entirely about which vector is being centered.
+G
+Toy Experiments
+In this section, we explain the detailed settings and additional results for the toy experiments we
+presented in Sec. 5.
+G.1
+Bandits
+G.1.1
+Setting
+We generate random bandit instances to rigorously evaluate the statistical properties—bias and
+variance—of the gradient estimators. For each problem instance (seed), we sample the reward vector
+r ∈R|A| and the policy logit vector θ ∈R|A| from a standard normal distribution:
+θ ∼N(0, I),
+r ∼N(0, I).
+(109)
+The policy is defined as a softmax distribution over actions, πθ(a) = softmax(θ)a. Unless otherwise
+stated, we fix the max@K parameter to K = 2 and the batch size to B = 8. We construct the PG
+estimator ˆg using EI: si, EI+L2O: si −bL2O
+−i , and EI+L1O: si −bL1O
+−i . For example, the EI estimator
+for ∇JK(θ) takes the form ˆg = K
+B
+PB
+i=1 si∇θ log πθ(ai).
+Ground Truth and Estimators.
+For a fixed problem instance specified by (θ, r), we compute the
+ground-truth max@K policy gradient gtrue := ∇JK(θ) analytically via the closed-form derivative
+of the expected improvement (Proposition 1 of Nishimori et al. [36]). Each gradient estimator ˆg is
+computed from a group of B i.i.d. actions sampled from πθ.
+Estimation Error (“Bias”) Protocol.
+For each fixed instance (θ, r), we generate N independent
+gradient estimates {ˆgj}N
+j=1. We measure the (finite-sample) estimation error of the Monte Carlo
+mean relative to the ground truth:
+Err(θ, r) := ∥¯gN −gtrue∥2 ,
+¯gN := 1
+N
+N
+X
+j=1
+ˆgj.
+(110)
+Empirical Total Variance Protocol.
+To quantify estimator stability, we measure the empirical total
+variance, defined as the trace of the sample covariance:
+d
+TVN(θ, r) := Tr
+
+1
+N
+N
+X
+j=1
+(ˆgj −¯gN)(ˆgj −¯gN)⊤
+
+= 1
+N
+N
+X
+j=1
+∥ˆgj −¯gN∥2
+2.
+(111)
+Equivalently, using the second-moment identity,
+d
+TVN(θ, r) = 1
+N
+N
+X
+j=1
+∥ˆgj∥2
+2 −∥¯gN∥2
+2.
+(112)
+Unless stated otherwise, we use N = 105 to estimate d
+TVN.
+The total variance of score-function gradients can scale with the action-space dimensionality. To
+assess variance reduction in high-dimensional regimes (relevant to LLM settings), we report d
+TVN
+across varying numbers of actions.
+31
+
+
+Aggregation Across Seeds.
+We repeat the above procedure over L = 100 independent random
+seeds, each generating a new pair (θ, r), and report the mean and standard error of Err(θ, r) and
+d
+TVN(θ, r) across seeds.
+Sweep Configurations.
+For the bias plot, we vary the number of batches N ∈{103, 104, 105, 106}
+to assess whether the estimation error decreases with N, fixing B = 8 and K = 2. To examine
+variance, we vary the action space size |A| ∈{10, 50, 100, 1000} (fixing K = 2, B = 8) and
+the comparator size K ∈{2, 3, 4, 5, 6} (fixing B = 8, |A| = 100). Larger |A| corresponds to
+LLM-relevant regimes; varying K probes how the available comparator budget affects the L2O
+baseline.
+Comparison Baselines.
+We compare three estimators: EI (si), EI+L2O (si −bL2O
+−i ), and EI+L1O
+(si −bL1O
+−i ), as defined in Sec. 3.
+G.1.2
+Action Space Size and Variance in Softmax Policy
+In the bandit setting with a softmax policy, the total variance of the policy gradient estimator is
+inherently tied to the dimensionality of the action space, denoted by |A|. Here, we derive this
+relationship analytically.
+Consider the score function for a selected action a, given by ∇θ log πθ(a) = ea −πθ, where
+ea is the one-hot vector for action a and πθ is the probability vector. Assuming the gradient
+variance is dominated by sampling noise (i.e., neglecting the squared norm of the expected gradient,
+∥E [ˆg] ∥2 ≈0), we approximate the total variance by the expected squared norm of the score function:
+Vtotal(πθ) ≈Ea∼πθ
+h
+∥∇θ log πθ(a)∥2i
+.
+(113)
+Expanding the squared norm ∥ea −πθ∥2 yields
+∥ea −πθ∥2 = (ea −πθ)⊤(ea −πθ)
+(114)
+= ∥ea∥2 −2e⊤
+a πθ + ∥πθ∥2
+(115)
+= 1 −2πθ(a) + ∥πθ∥2.
+(116)
+Taking expectation over a ∼πθ gives
+Vtotal(πθ) =
+|A|
+X
+a=1
+πθ(a)
+ 1 −2πθ(a) + ∥πθ∥2
+(117)
+=
+|A|
+X
+a=1
+πθ(a) −2
+|A|
+X
+a=1
+πθ(a)2 + ∥πθ∥2
+|A|
+X
+a=1
+πθ(a)
+(118)
+= 1 −2∥πθ∥2 + ∥πθ∥2
+(119)
+= 1 −∥πθ∥2.
+(120)
+Eq. (120) shows that this approximation depends only on the squared ℓ2-norm of the probability
+vector.
+To see the effect of the action space size |A|, consider the uniform policy (which is common at
+initialization), where πθ(a) = 1/|A| for all a. Then
+Vtotal(πuniform) = 1 −
+|A|
+X
+a=1
+ 1
+|A|
+2
+= 1 −|A| ·
+1
+|A|2 = 1 −1
+|A|.
+(121)
+This implies that the variance increases with |A| and approaches 1 as |A| →∞. For example, a binary
+bandit (|A| = 2) yields Vtotal(πuniform) = 0.5, whereas |A| = 1000 yields Vtotal(πuniform) = 0.999.
+Thus, large action spaces can exhibit substantially higher gradient variance in the early stages of
+learning under a softmax policy.
+32
+
+
+G.1.3
+Additional Results
+Here, we report additional results for the bandit setting. In particular, we plot the variance of the
+gradient estimator for different batch sizes B ∈{8, 16, 32}.
+B=8
+B=16
+B=32
+Figure 4: Variance vs action space size.
+Variance vs action space size.
+Here, we report additional results on variance versus action
+space size (Figure 4).
+We plot the variance of the gradient estimator for action space sizes
+|A| ∈{10, 50, 100, 1000}, with batch sizes B ∈{8, 16, 32} and K = 2. As expected, the variance
+decreases as the batch size increases. Moreover, the variance-reduction effect of the L2O baseline
+becomes more pronounced as the action space size increases, consistent with the results in Sec. 5.1.
+B=8
+B=16
+B=32
+Figure 5: Variance vs K.
+Variance vs K.
+Here, we report additional results on variance versus K (Figure 5). We plot the
+variance while varying K, with batch sizes B ∈{8, 16, 32} and |A| = 100. As before, the variance
+decreases as the batch size increases. We also observe that the variance-reduction effect of the L2O
+baseline is largest when K is moderate relative to the batch size B, which is consistent with the
+results in Sec. 5.1.
+G.2
+Maze Environment
+Here, we report additional results for the maze environment.
+G.2.1
+Setting
+S
+Figure 6: Structure of the Bi-
+ased Maze Environment. The
+red line indicates the unique op-
+timal path.
+Environment.
+The maze is deterministic, with binary actions
+(0 or 1) available at each state. The agent receives a reward of
++1 for each forward step along a valid path. There exists a single
+correct path to the goal (indicated by the red line in Fig. 6); if the
+agent selects the optimal action at every step, it can progress for
+up to 1000 steps. If the agent takes an incorrect action, the episode
+terminates within one or two steps. We design the maze to exhibit
+structural bias, where the correct action is 1 in 75% of the states.
+Consequently, a policy that blindly prioritizes action 1 can achieve
+moderately high returns, creating a local optimum that discourages exploration of the optimal path.
+33
+
+
+Policy Parameterization.
+We parameterize the policy using tabular logits for each state–action
+pair, augmented with a global bias vector, π(a | s) = softmax(θs,a + ϕa), where θ ∈R|S|×|A| and
+ϕ ∈R|A|. The global parameter ϕ captures an environmental bias toward specific actions and is used
+as a proxy for exploratory tendency, as it represents the default policy in unvisited states (since θ is
+initialized near 0).
+Estimator Construction for Multi-Step RL.
+In episodic RL settings, the optimization objective
+is defined over the cumulative return of an episode rather than immediate rewards. Let τi =
+(si,0, ai,0, ri,0, . . . ) denote the i-th trajectory in a batch of size B. We define the episode return
+as Ri = P
+t ri,t and the cumulative score function as Ψi = P
+t ∇θ log πθ(ai,t|si,t). To apply the
+estimators derived in Section 3, we simply substitute the immediate reward ri with the episode
+return Ri and the score function ψ(x, ai) with Ψi. The specific gradient estimators compared in our
+experiments are:
+• Standard REINFORCE (with L1O Baseline): Optimizes the standard expected return
+J(θ) = Ex,a∼πθ [R(x, a)]. We use the standard Leave-One-Out (L1O) baseline to reduce
+variance:
+ˆgstd := 1
+B
+B
+X
+i=1
+Ψi(Ri −b−i),
+where b−i =
+1
+B −1
+X
+j̸=i
+Rj.
+(122)
+For entropy-regularized REINFORCE, we added the entropy bonus term βH(πθ) to the
+objective, where H(πθ) = −P
+a πθ(a) log πθ(a) and β is set to 0.01.
+• EI (Vanilla): Optimizes the max@K objective using the raw Expected Improvement score
+si (calculated via Eq. (4) in Sec. 3.1 using returns {Rj}B
+j=1):
+ˆgei := K
+B
+B
+X
+i=1
+Ψisi.
+(123)
+• EI + L2O (Ours): Optimizes the max@K objective using the centered advantage si −bL2O
+−i :
+ˆgl2o := K
+B
+B
+X
+i=1
+Ψi(si −bL2O
+−i ),
+(124)
+where bL2O
+−i
+is the L2O baseline computed from {Rj}B
+j=1 as defined in Theorem E.2.
+Hyperparameters.
+The learning rate is set to 0.03 after a grid search over {0.01, 0.03, 0.05}. We
+collect trajectories with batch sizes B ∈{5, 8, 16, 32} and train for 3000 iterations. We report the
+mean and standard error over 10 different random seeds.
+Metrics.
+To quantify variance reduction, we measure the total variance of the gradient estimator
+Tr(V[ˆg]). In Figure 7, we report the "Grad Var Ratio", which is defined as the ratio of the gradient
+variance of our method (EI + L2O) to that of the vanilla EI estimator:
+Ratio =
+P
+d Var(ˆg(d)
+l2o)
+P
+d Var(ˆg(d)
+ei )
+,
+(125)
+where the sum is taken over all parameters. A ratio less than 1.0 indicates effective variance reduction.
+34
+
+
+G.2.2
+Results
+0
+100
+200
+300
+400
+500
+600
+700
+800
+Episode Return
+Batch Size = 5
+Batch Size = 8
+Batch Size = 16
+Batch Size = 32
+0.5
+0.6
+0.7
+0.8
+0.9
+P(a = 1)
+0
+500
+1000
+1500
+2000
+2500
+3000
+Update Step
+10
+4
+10
+3
+10
+2
+10
+1
+100
+Var Ratio (ˆgL2O/ˆgEI)
+0
+500
+1000
+1500
+2000
+2500
+3000
+Update Step
+0
+500
+1000
+1500
+2000
+2500
+3000
+Update Step
+0
+500
+1000
+1500
+2000
+2500
+3000
+Update Step
+REINFORCE
+REINFORCE + Ent
+EI (K=2)
+EI (K=3)
+EI (K=4)
+EI + L2O (K=2)
+EI + L2O (K=3)
+EI + L2O (K=4)
+Figure 7: Moving average (window size 10) of the average return, probability of action 1 (via
+global bias ϕa), and gradient variance ratio across different batch sizes B ∈{5, 8, 16, 32}. The
+error bars are computed using the standard error of the moving average. Our method (EI + L2O)
+consistently outperforms standard REINFORCE, Entropy-regularized REINFORCE, and vanilla
+EI. The probability plots indicate that EI-based methods maintain an exploratory policy (prob.
+≈0.75) matching the environmental prior, whereas REINFORCE baselines converge to a greedy
+strategy (prob. > 0.9). The gradient variance ratio (EI + L2O / EI) remains consistently below 1.0,
+demonstrating the effectiveness of the L2O baseline.
+In Figure 7, we present the full results for the maze environment across varying batch sizes B ∈
+{5, 8, 16, 32}, reporting the average return, the probability of selecting action 1 (via the global bias
+parameter ϕa), and the gradient variance ratio. We observe that EI + L2O consistently outperforms
+all baselines—standard REINFORCE, Entropy-regularized REINFORCE, and vanilla EI—across
+all tested batch sizes. The probability plots reveal that EI + L2O maintains a policy with a strong
+exploratory tendency (action 1 probability ≈0.75), preventing the collapse to the suboptimal
+greedy strategy observed in the REINFORCE baselines. Furthermore, the gradient variance ratio
+is consistently less than 1.0, confirming that the L2O baseline effectively reduces variance in all
+settings. Notably, the variance-reduction effect appears more pronounced when the comparator set
+size is small (e.g., K = 2). This is expected, as increasing the number of comparators (K) tends to
+drive more Expected Improvement values to zero, since it becomes harder to beat the maximum of
+a larger set. As a result, the additional variance reduction available from L2O naturally decreases.
+Nevertheless, the L2O baseline provides a consistent benefit across all configurations.
+H
+LLM Experiments
+In this section, we provide additional results for the LLM experiments presented in Sec. 5.2.
+H.1
+Setting
+All models are trained with a learning rate of 10−6, a batch size of 1024, and an optimization
+mini-batch size of 256. For each input problem, we roll out 8 responses using a temperature of 1.0.
+The Qwen model is trained on the MATH training split [21], while the Llama model is trained on
+35
+
+
+Table 2: Task-average pass@k (k ≤256). Unweighted average over AIME24, AIME25, AMC23,
+MATH500, and Minerva under the evaluation protocol in Sec. 5.2.1.
+Method
+1
+2
+4
+8
+16
+32
+64
+128
+256
+Qwen2.5-Math-7B
+GRPO
+40.7
+45.5
+49.2
+52.2
+55.4
+58.7
+62.1
+65.6
+69.3
+Entropy-Adv
+38.4
+43.7
+48.3
+52.3
+56.3
+60.2
+64.1
+67.7
+70.9
+PKPO
+37.2
+42.6
+47.4
+51.4
+55.1
+59.0
+62.9
+66.8
+70.6
+MaxPO (Ours)
+39.9
+46.5
+51.7
+56.2
+60.1
+63.8
+67.5
+71.1
+74.3
+Llama-3.2-3B-Instruct
+GRPO
+22.4
+28.0
+33.3
+38.2
+42.9
+47.7
+52.7
+57.5
+62.1
+Entropy-Adv
+22.1
+27.7
+33.2
+38.5
+43.6
+48.5
+53.3
+58.2
+63.1
+PKPO
+20.1
+25.5
+31.3
+37.1
+42.5
+47.5
+52.7
+58.0
+63.5
+MaxPO (Ours)
+21.8
+27.6
+33.4
+38.7
+43.8
+48.9
+54.0
+59.5
+65.0
+Table 3: Per-benchmark pass@1 / pass@256. Results for each benchmark under the same evaluation
+protocol as Sec. 5.2.1.
+Method
+AIME24
+AIME25
+AMC23
+MATH500
+Minerva
+Avg.
+Qwen2.5-Math-7B
+GRPO
+30.3/72.0
+10.5/41.1
+63.3/96.1
+76.3/92.9
+23.0/44.5
+40.7/69.3
+Entropy-Adv
+25.6/72.3
+9.8/47.3
+59.5/97.0
+74.7/93.6
+22.4/44.2
+38.4/70.9
+PKPO
+19.9/72.9
+11.1/49.2
+60.7/94.4
+72.9/93.1
+21.4/43.4
+37.2/70.6
+MaxPO (Ours)
+28.5/74.2
+10.6/54.7
+62.2/98.0
+75.6/95.7
+22.9/48.8
+39.9/74.3
+Llama-3.2-3B-Instruct
+GRPO
+13.7/50.5
+0.5/34.3
+30.2/93.5
+52.0/90.5
+15.5/41.6
+22.4/62.1
+Entropy-Adv
+12.6/49.2
+0.9/36.5
+29.5/94.8
+52.4/91.7
+15.1/43.2
+22.1/63.1
+PKPO
+9.3/54.4
+0.5/34.0
+27.4/96.8
+49.2/90.7
+14.2/41.4
+20.1/63.5
+MaxPO (Ours)
+11.7/58.1
+0.6/35.4
+29.9/96.0
+51.7/91.8
+15.3/43.8
+21.8/65.0
+a combined dataset of the GSM8K training split [12] and MATH Level 1 training examples. We
+exclude evaluation examples from the RL training data, including all problems used in AIME24,
+AIME25, AMC23, MATH500, and Minerva evaluation.
+H.2
+Additional Results
+Tables 2 and 3 summarize the same evaluation protocol as the main text, reporting (i) task-average
+pass@k up to k ≤256 and (ii) per-benchmark pass@1 and pass@256. Figure 8 provides the
+per-benchmark pass@k curves to visualize how improvements distribute across datasets and across
+inference compute. In addition, Figure 9 analyzes how RL training changes the empirical support of
+correct solutions relative to the base model, following the taxonomy of Wu et al. [60]. Specifically, for
+each problem under a matched sampling budget, we categorize outcomes into Support Preservation,
+Support Shrinkage, Support Expansion, or Out of Support (see the caption of Figure 9).
+36
+
+
+1
+4
+16
+64 2561024
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Qwen2.5-Math-7B
+pass@k
+aime2024
+1
+4
+16
+64 2561024
+aime2025
+1
+4
+16
+64 2561024
+amc23
+1
+4
+16
+64
+256
+math
+1
+4
+16
+64
+256
+minerva
+1
+4
+16
+64 2561024
+Number of tries k
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Llama-3.2-3B-Instruct
+pass@k
+1
+4
+16
+64 2561024
+Number of tries k
+1
+4
+16
+64 2561024
+Number of tries k
+1
+4
+16
+64
+256
+Number of tries k
+1
+4
+16
+64
+256
+Number of tries k
+Ours
+PKPO
+Entropy-Adv
+GRPO
+Figure 8: Per-benchmark pass@k curves. For each benchmark, we plot pass@k as a function
+of inference compute k for all methods. This complements the task-average curves in Figure 2
+by showing where gains come from across datasets and inference-compute levels, and whether
+improvements persist as k increases.
+37
+
+
+53.3%
+10.0%
+16.7%
+20.0%
+n=30
+AIME 2024
+GRPO
+50.0%
+13.3%
+13.3%
+23.3%
+n=30
+Entropy-Adv
+60.0%
+16.7%
+20.0%
+n=30
+PKPO
+60.0%
+23.3%
+13.3%
+n=30
+Ours
+43.3%
+6.7%6.7%
+43.3%
+n=30
+AIME 2025
+40.0%
+10.0%
+16.7%
+33.3%
+n=30
+46.7%
+46.7%
+n=30
+43.3%
+6.7% 10.0%
+40.0%
+n=30
+95.0%
+5.0%
+n=40
+AMC 2023
+97.5%
+n=40
+100.0%
+n=40
+100.0%
+n=40
+93.0%
+n=500
+MATH-500
+94.0%
+n=500
+93.8%
+n=500
+94.2%
+n=500
+46.0%
+6.2%
+47.1%
+n=272
+Minerva
+46.7%
+5.5%
+46.0%
+n=272
+44.5%
+7.7%
+47.1%
+n=272
+48.2%
+46.0%
+n=272
+Support Preservation
+Support Shrinkage
+Support Expansion
+Out of Support
+Figure 9: Empirical support dynamics relative to the base model, following the taxonomy of Wu
+et al. [60]. For each benchmark, we categorize each problem into one of four cases under a matched
+sampling budget: (i) Support Preservation: both the base model and the RL-trained model produce at
+least one correct completion; (ii) Support Shrinkage: the base model succeeds but the RL-trained
+model fails; (iii) Support Expansion: the RL-trained model succeeds but the base model fails; and (iv)
+Out of Support: neither model produces a correct completion. Donut charts report the proportions for
+each RL method across benchmarks (sample sizes are shown in the plots).
+H.2.1
+Effect of Objective Size K
+We study the impact of the training objective size K by comparing K ∈{2, 4} while keeping other
+settings fixed. As shown in Figure 10, increasing K consistently decreases pass@1 but improves
+pass@k for large k (e.g., k = 256) for both Llama and Qwen. This indicates an exploration-
+exploitation trade-off: increasing K promotes broader exploration, which reduces one-shot accuracy
+but improves the probability of success when multiple samples are available. Overall, K = 2 offers
+the best balance in our setting and is used as the default.
+38
+
+
+(a) Llama-3.2-3B-Instruct
+(b) Qwen2.5-Math-7B
+Figure 10: Sensitivity to the training objective size K (K ∈{2, 4}). Reported curves are task-average
+pass@k (unweighted average over AIME24, AIME25, AMC23, MATH500, and Minerva). For
+both Llama and Qwen, increasing K lowers pass@1 while boosting pass@k for large k, indicating
+an exploration-exploitation trade-off: broader exploration reduces one-shot accuracy but improves
+success probability given more samples.
+I
+LLM Usage
+LLMs were used to edit the manuscript and to assist with algebraic manipulations in derivations
+proposed by the authors. The key research ideas were proposed by the authors.
+39

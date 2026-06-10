@@ -1,0 +1,720 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-10T21:47:31.471820+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 17,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 13,
+    "quick_skim_target": 11,
+    "quick_selected": 11
+  },
+  "deep_dive": [
+    {
+      "id": "2606.07082v1",
+      "source": "arxiv",
+      "title": "On the Geometry of On-Policy Distillation",
+      "abstract": "On-policy distillation (OPD) is increasingly used to improve large language model reasoning, but its training dynamics remain poorly understood. We characterize the trajectory of OPD updates in parameter space and compare it with supervised fine-tuning (SFT) and reinforcement learning with verifiable rewards (RLVR). A suite of parameter-space diagnostics consistently places OPD in a relaxed off-principal regime: compared with SFT, its updates affect fewer weights and avoid principal directions more strongly, while compared with RLVR, they remain less tightly constrained. Beyond this static localization, OPD exhibits subspace locking: its cumulative updates rapidly enter a narrow low-dimensional channel. Constraining training to the update subspace formed early in training preserves OPD performance but substantially degrades SFT, indicating that the locked subspace is functionally sufficient for OPD. Control experiments further show that sparsifying the update tokens and shifting rollout generation off-policy preserve the rank dynamics, whereas mixing the OPD objective with RLVR changes them. Overall, these results suggest that OPD is not merely an intermediate point between SFT and RLVR, but induces its own update geometry in parameter space.",
+      "authors": [
+        "Zhennan Shen",
+        "Yanshu Li",
+        "Qingyu Yin",
+        "Chak Tou Leong",
+        "Zhilin Wang",
+        "Yanxu Chen",
+        "Rongduo Han",
+        "Sunbowen Lee",
+        "Yi R. Fung"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-05T09:20:15+00:00",
+      "link": "https://arxiv.org/pdf/2606.07082v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "analyzes training dynamics of on-policy distillation for LLM reasoning, comparing with RLVR and proposing geometric characterization",
+      "llm_evidence_cn": "分析用于LLM推理的在线蒸馏的训练动力学，与强化学习验证奖励（RLVR）比较，并给出参数空间几何特征",
+      "llm_evidence": "分析用于LLM推理的在线蒸馏的训练动力学，与强化学习验证奖励（RLVR）比较，并给出参数空间几何特征",
+      "canonical_evidence": "分析用于LLM推理的在线蒸馏的训练动力学，与强化学习验证奖励（RLVR）比较，并给出参数空间几何特征",
+      "llm_tldr_en": "On-policy distillation for LLM reasoning exhibits distinct update geometry compared to SFT and RLVR, with subspace locking effects that can improve training efficiency.",
+      "llm_tldr_cn": "该论文研究用于大语言模型推理的在线蒸馏（OPD）训练动力学。通过参数空间诊断，发现OPD更新比监督微调（SFT）更稀疏且避免主方向，比强化学习验证奖励（RLVR）约束更松。进一步揭示OPD具有子空间锁定特性，早期更新即进入低维通道，受限训练可保持性能。这项工作为LLM后训练算法改进提供了理论基础。",
+      "llm_tldr": "该论文研究用于大语言模型推理的在线蒸馏（OPD）训练动力学。通过参数空间诊断，发现OPD更新比监督微调（SFT）更稀疏且避免主方向，比强化学习验证奖励（RLVR）约束更松。进一步揭示OPD具有子空间锁定特性，早期更新即进入低维通道，受限训练可保持性能。这项工作为LLM后训练算法改进提供了理论基础。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.08088v1",
+      "source": "arxiv",
+      "title": "ConSteer-RL: Steering Reasoning Capabilities in Large Language Models via Confidence-Aware Reinforcement Learning",
+      "abstract": "Reinforcement Learning from Verifiable Rewards (RLVR) has recently become a key paradigm for improving the reasoning abilities of Large Language Models (LLMs), yet it remains limited by sparse binary rewards and its ignorance of model-internal uncertainty. In this paper, we propose ConSteer-RL, a simple yet effective framework that integrates token-level confidence signals derived from model log-probabilities into RLVR training. Specifically, building upon the Group Relative Policy Optimization (GRPO) framework, we construct a confidence-aware reward by aggregating per-token probabilities into a scalar confidence score and incorporating it into an awareness-based reward shaping mechanism that penalizes overconfident errors while reinforcing correct and confident reasoning. Experimental results demonstrate that ConSteer-RL consistently outperforms strong GRPO baselines, achieving average improvements of 2.3%-4.0% across different model scales.",
+      "authors": [
+        "Qing Miao",
+        "Yiming Zhao",
+        "Jing Yang",
+        "Chenxi Liu",
+        "Yuehai Chen",
+        "Yuewen Liu",
+        "Shaoyi Du",
+        "Badong Chen"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-06-06T10:23:24+00:00",
+      "link": "https://arxiv.org/pdf/2606.08088v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Confidence-aware reinforcement learning for steering reasoning in LLMs",
+      "llm_evidence_cn": "基于置信度感知的强化学习引导LLM推理",
+      "llm_evidence": "基于置信度感知的强化学习引导LLM推理",
+      "canonical_evidence": "基于置信度感知的强化学习引导LLM推理",
+      "llm_tldr_en": "ConSteer-RL integrates token-level confidence signals into RLVR via GRPO, creating confidence-aware rewards to penalize overconfidence and improve reasoning.",
+      "llm_tldr_cn": "强化学习从可验证奖励虽然提升了LLM推理能力，但受限于稀疏二元奖励和忽略模型内部不确定性。本文提出ConSteer-RL，将令牌级置信度信号融入RLVR训练，基于GRPO框架构造置信度感知奖励，通过奖励塑形惩罚过度自信。实验证明该方法有效引导推理能力，减少不确定性。",
+      "llm_tldr": "强化学习从可验证奖励虽然提升了LLM推理能力，但受限于稀疏二元奖励和忽略模型内部不确定性。本文提出ConSteer-RL，将令牌级置信度信号融入RLVR训练，基于GRPO框架构造置信度感知奖励，通过奖励塑形惩罚过度自信。实验证明该方法有效引导推理能力，减少不确定性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.08525v1",
+      "source": "arxiv",
+      "title": "DriveReward: A Comprehensive Dataset and Generative Vision-Language Reward Model for Autonomous Driving",
+      "abstract": "Reward models play a pivotal role in reinforcement learning (RL) and multi-modal trajectory selection for autonomous driving. However, acquiring such rewards typically relies on hand-crafted rule-based objectives or perception ground truth, which hinders generalization for data-scaling. While Vision-Language Models (VLMs) have demonstrated feasibility as reward models in other domains, their effectiveness in driving tasks remains underexplored. In this work, we bridge this gap by (1) introducing DriveReward, a reasoning trajectory evaluation dataset rigorously labeled via temporally-grounded visual guidance, and augmented with counterfactual driving behaviors., (2) alongside a specialized Vision-Language Reward Model. To address the scarcity of failure cases in conventional datasets, we propose a counterfactual data annotation scheme to construct cases encompassing diverse driving styles and erroneous behaviors. Evaluations on our proposed benchmark reveal that even leading open-source and proprietary VLMs fail to excel across all tasks, highlighting significant room for improvement in existing models. Building on these findings, we subsequently tailor a specialized 1B reward model that outperforms larger VLMs on task-specific reward alignment. Finally, we validate our reward model's effectiveness by integrating it into RL finetuning and multi-modal trajectory scoring across multiple baselines, achieving performance comparable to rule-based reward calculations in both open-loop and closed-loop evaluation.",
+      "authors": [
+        "Qimao Chen",
+        "Fang Li",
+        "Yuechen Luo",
+        "Zehan Zhang",
+        "Haiyang Sun",
+        "Fangzhen Li",
+        "Bing Wang",
+        "Guang Chen",
+        "Yang Ji",
+        "Jiong Deng",
+        "Hongwei Xie",
+        "Hangjun Ye",
+        "Long Chen",
+        "Yi Zhang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-07T09:05:49+00:00",
+      "link": "https://arxiv.org/pdf/2606.08525v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "proposes a vision-language reward model for reinforcement learning in autonomous driving",
+      "llm_evidence_cn": "提出了用于自动驾驶强化学习的视觉语言奖励模型",
+      "llm_evidence": "提出了用于自动驾驶强化学习的视觉语言奖励模型",
+      "canonical_evidence": "提出了用于自动驾驶强化学习的视觉语言奖励模型",
+      "llm_tldr_en": "DriveReward introduces a generative vision-language reward model for autonomous driving RL, addressing generalization limits of hand-crafted rewards.",
+      "llm_tldr_cn": "针对自动驾驶中手工奖励函数泛化性差的问题，提出DriveReward：包含推理轨迹数据集和专门的视觉语言奖励模型。数据集通过时间视觉标注和反事实行为增强，奖励模型能提供细粒度评估。实验表明该方法在轨迹选择和RL训练中优于传统方法，为奖励建模提供了新思路。",
+      "llm_tldr": "针对自动驾驶中手工奖励函数泛化性差的问题，提出DriveReward：包含推理轨迹数据集和专门的视觉语言奖励模型。数据集通过时间视觉标注和反事实行为增强，奖励模型能提供细粒度评估。实验表明该方法在轨迹选择和RL训练中优于传统方法，为奖励建模提供了新思路。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.08543v1",
+      "source": "arxiv",
+      "title": "PAEC: Position-Aware Entropy Calibration for LLM Reasoning in RLVR",
+      "abstract": "Reinforcement learning with verifiable rewards (RLVR) improves large language model reasoning but often suffers from rapid policy-entropy collapse, where the policy prematurely concentrates on narrow high-probability reasoning paths. While global entropy regularization can encourage exploration, uniformly increasing entropy across all token positions is inefficient for long reasoning trajectories, where many tokens are not decision-relevant. We propose Position-Aware Entropy Calibration (PAEC), a token-level entropy-management framework that constructs a soft mask from local top-p entropy and top-two candidate competition, and applies an anchor-based lower-bound penalty to prevent selected-position entropy collapse. Experiments on five mathematical reasoning benchmarks show that PAEC improves macro-average majority-vote performance over strong RLVR baselines, with clear gains on AIME-style tasks. Our results suggest that entropy management in reasoning RL should be formulated as selective exploration allocation over decision-sensitive positions rather than uniform randomness injection.",
+      "authors": [
+        "Shumeng Yang",
+        "Yisu Liu",
+        "Jiayi Zheng",
+        "Zhaohui Yang",
+        "Linjing Li"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-06-07T09:51:01+00:00",
+      "link": "https://arxiv.org/pdf/2606.08543v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Reinforcement learning with verifiable rewards for LLM reasoning",
+      "llm_evidence_cn": "面向LLM推理的可验证奖励强化学习",
+      "llm_evidence": "面向LLM推理的可验证奖励强化学习",
+      "canonical_evidence": "面向LLM推理的可验证奖励强化学习",
+      "llm_tldr_en": "PAEC introduces a position-aware entropy calibration method to prevent policy-entropy collapse in RLVR for LLM reasoning, improving exploration efficiency on math tasks.",
+      "llm_tldr_cn": "该论文针对LLM推理中强化学习导致策略熵崩塌的问题，提出位置感知熵校准（PAEC），通过局部top-p熵和top-2候选竞争构造软掩码，对关键位置施加锚定下界惩罚，避免过早收敛。在五个数学推理任务上，PAEC相比全局正则化显著提升探索效率和推理准确率，为RLVR中的高效探索提供了细粒度控制方法。",
+      "llm_tldr": "该论文针对LLM推理中强化学习导致策略熵崩塌的问题，提出位置感知熵校准（PAEC），通过局部top-p熵和top-2候选竞争构造软掩码，对关键位置施加锚定下界惩罚，避免过早收敛。在五个数学推理任务上，PAEC相比全局正则化显著提升探索效率和推理准确率，为RLVR中的高效探索提供了细粒度控制方法。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.08779v2",
+      "source": "arxiv",
+      "title": "Reformulate LLM Reinforcement Learning for Efficient Training under Black-box Discrepancy",
+      "abstract": "Reinforcement Learning (RL) has emerged as a pivotal post-training paradigm, yet it frequently suffers from unpredictable sub-optimum performance or even training collapses. Recent findings attribute these failures to a hidden train-inference discrepancy (or mismatch), stemming from the disparate underlying engines and architecture. We find that the training policy can actively self-correct such a discrepancy when provided with an appropriate learning signal. Then, we further empirically identify a discrepancy tolerance region: within this region, aggressively narrowing the discrepancy can suppress policy exploration and reduce learning efficiency, whereas outside this region, reducing excessive discrepancy improves optimization consistency and raises the achievable local performance ceiling. According to such findings, we formulate this problem as a Discrepancy-Constrained Markov Decision Process (DCMDP), where reward maximization is coupled with a constraint that aligns training-Inference behavior, achieving stable dual-objective optimization. To adaptively balance performance improvement and discrepancy control, we introduce a Lagrangian relaxation mechanism that dynamically adjusts the relative weight of the two objectives according to the current degree of discrepancy violation. This enables stable dual-objective optimization: the policy is allowed to explore freely within the tolerance region, while being guided back when the discrepancy exceeds the safe boundary. Empirically, DCMDP significantly improves the performance of 8B dense model (Qwen-3-8b) and 30B Mixture-of-Expert model (Qwen-3-30bA3b), and enables a heterogeneous training paradigm, where LLMs can be optimized in high-fidelity training setup while being explicitly aligned for low-cost, resource-constrained inference deployment.",
+      "authors": [
+        "Jiashun Liu",
+        "Runze Liu",
+        "Xu Wan",
+        "Jing Liang",
+        "Hongyao Tang",
+        "Ling Pan"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-07T18:49:33+00:00",
+      "link": "https://arxiv.org/pdf/2606.08779v2",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "studies train-inference discrepancy in LLM reinforcement learning and proposes self-correction",
+      "llm_evidence_cn": "研究LLM强化学习训练中的训练-推理差异并提出自我修正",
+      "llm_evidence": "研究LLM强化学习训练中的训练-推理差异并提出自我修正",
+      "canonical_evidence": "研究LLM强化学习训练中的训练-推理差异并提出自我修正",
+      "llm_tldr_en": "Identifies train-inference discrepancy in LLM RL and proposes self-correction mechanism with discrepancy tolerance region.",
+      "llm_tldr_cn": "针对LLM强化学习后训练中存在的训练-推理差异导致性能不稳定甚至崩溃的问题，发现训练策略可以主动自我修正，并识别出差异容忍区域，在此区域内缩小差异会抑制探索，区域外缩小差异则优化收敛。实验验证了差异容忍区域并改进了训练效率。",
+      "llm_tldr": "针对LLM强化学习后训练中存在的训练-推理差异导致性能不稳定甚至崩溃的问题，发现训练策略可以主动自我修正，并识别出差异容忍区域，在此区域内缩小差异会抑制探索，区域外缩小差异则优化收敛。实验验证了差异容忍区域并改进了训练效率。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.09932v1",
+      "source": "arxiv",
+      "title": "When RL Fails after SFT: Rejuvenating Model Plasticity for Robust SFT-to-RL Handoff",
+      "abstract": "Supervised Fine-Tuning (SFT) followed by Reinforcement Learning (RL) has become a standard pipeline for Large Language Model (LLM) post-training. SFT is expected to provide a useful behavioral prior for RL to further enhance model capabilities. However, checkpoints with excessive SFT often show limited improvement during RL. We attribute this failure to the loss of model plasticity: the reduced ability of an SFT-initialized policy to be effectively reshaped by subsequent RL. To better understand this phenomenon, we conduct detailed analysis from multiple perspectives, including parameter changes, output spaces, and RL optimization dynamics. Our results show that models from excessive SFT tend to produce over-confident token distributions and exhibit sharp parameter landscapes, which make them harder to optimize in the RL stage. To enable a more robust SFT-to-RL handoff, we propose \\texttt{Rejuvenation}, a simple yet effective method that restores plasticity while preserving useful SFT-acquired priors. Rejuvenation leverages base-anchored model fusion to reduce excessive SFT-induced drift with targeted neuron reset to mitigate model rigidity. Experimental results on both math reasoning tasks and agentic tasks demonstrate that our approach consistently improves RL performance on over-trained SFT models, while also enhancing generalization to out-of-distribution tasks.",
+      "authors": [
+        "Runze Liu",
+        "Jiashun Liu",
+        "Xu Wan",
+        "Yuqian Fu",
+        "Ling Pan"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-07T17:58:58+00:00",
+      "link": "https://arxiv.org/pdf/2606.09932v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Addresses plasticity loss in SFT-to-RL transition for LLM post-training",
+      "llm_evidence_cn": "解决LLM后训练中SFT到RL过渡时的模型塑性损失",
+      "llm_evidence": "解决LLM后训练中SFT到RL过渡时的模型塑性损失",
+      "canonical_evidence": "解决LLM后训练中SFT到RL过渡时的模型塑性损失",
+      "llm_tldr_en": "Shows excessive SFT reduces model plasticity for subsequent RL, and proposes analysis and potential remedies.",
+      "llm_tldr_cn": "SFT后接RL是LLM后训练的标准流程，但过度的SFT会导致模型塑性降低，使得后续RL改进有限。本文从参数变化、输出空间和RL优化动力学多角度分析了这一现象，发现过度SFT使模型产生过于自信的token分布，阻碍RL的有效调整。研究揭示了塑性损失机制，为优化SFT-RL衔接提供了指导。",
+      "llm_tldr": "SFT后接RL是LLM后训练的标准流程，但过度的SFT会导致模型塑性降低，使得后续RL改进有限。本文从参数变化、输出空间和RL优化动力学多角度分析了这一现象，发现过度SFT使模型产生过于自信的token分布，阻碍RL的有效调整。研究揭示了塑性损失机制，为优化SFT-RL衔接提供了指导。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: l; Reinforcement Learning; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.03327v1",
+      "source": "arxiv",
+      "title": "CAPER: Clause-Aligned Process Supervision for Text-to-SQL",
+      "abstract": "Text-to-SQL systems are typically evaluated by query-level execution correctness, but this terminal signal provides little guidance about which intermediate SQL decision caused success or failure. Token-level dense supervision is also ill-suited: SQL tokens do not align with complete semantic decisions, can penalize execution-equivalent queries, and are difficult to label reliably at scale. We therefore propose CAPER, which automatically derives clause-level supervision via counterfactual intervention on the SQL abstract syntax tree, enabling root-cause error localization for reward modeling; the resulting data is used to train CAPER-9B, a lightweight Clause-PRM that provides clause-boundary feedback for policy optimization and candidate verification. Experiments on BIRD and Spider show that clause-aligned supervision not only improves execution accuracy, achieving up to a 15.3% relative EX improvement over GPT-5.4, but also strengthens failure-localization capability, reaching 84.53% accuracy and 90.60% MRR on held-out failures. Our project page is at https://github.com/banrichard/RL-NL2SQL.",
+      "authors": [
+        "Lujie Ban",
+        "Jiasheng Shi",
+        "Jinyang Li",
+        "Xiaolin Han",
+        "Tsz Nam Chan",
+        "Chenhao Ma"
+      ],
+      "primary_category": "cs.DB",
+      "categories": [
+        "cs.DB",
+        "cs.CL"
+      ],
+      "published": "2026-06-02T08:35:40+00:00",
+      "link": "https://arxiv.org/pdf/2606.03327v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "clause-level reward modeling for policy optimization",
+      "llm_evidence_cn": "用于策略优化的子句级奖励建模",
+      "llm_evidence": "用于策略优化的子句级奖励建模",
+      "canonical_evidence": "用于策略优化的子句级奖励建模",
+      "llm_tldr_en": "Proposes CAPER, which automatically derives clause-level supervision via counterfactual intervention on SQL AST, enabling root-cause error localization for reward modeling and training a lightweight Clause-PRM for policy optimization and verification.",
+      "llm_tldr_cn": "针对文本到SQL任务中查询级执行正确性无法定位中间错误的问题，提出CAPER方法，通过反事实干预SQL抽象语法树自动生成子句级监督信号，实现根因错误定位。该方法训练轻量级子句过程奖励模型CAPER-9B，为策略优化和候选验证提供子句边界反馈，显著提升模型性能。",
+      "llm_tldr": "针对文本到SQL任务中查询级执行正确性无法定位中间错误的问题，提出CAPER方法，通过反事实干预SQL抽象语法树自动生成子句级监督信号，实现根因错误定位。该方法训练轻量级子句过程奖励模型CAPER-9B，为策略优化和候选验证提供子句边界反馈，显著提升模型性能。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "carryover_cache",
+      "paper_id": "2606.03327v1",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.05906v1",
+      "source": "arxiv",
+      "title": "ACE-SQL: Adaptive Co-Optimization via Empirical Credit Assignment for Text-to-SQL",
+      "abstract": "Text-to-SQL maps natural language questions to executable SQL queries. Modern databases often contain large and complex schemas, making schema linking a critical step for accurate SQL generation. Existing methods either rely on full-schema generation, which leaves schema linking implicit within a large search space, or use a separate retriever trained with static gold-column supervision, whose targets may be suboptimal for the current generator policy. To address this issue, we propose Adaptive Co-optimization via Empirical Credit Assignment for Text-to-SQL (ACE-SQL), a reinforcement learning (RL) framework that jointly optimizes schema retrieval and SQL generation under execution feedback. ACE-SQL constructs an online column-set pool from generator rollouts and derives adaptive on-policy retrieval targets from the column set most frequently associated with execution-correct rollouts. This induces bidirectional adaptation, where the retriever adapts toward column sets that the generator can execute correctly, while the generator adapts to the retriever's evolving schema selections under execution feedback. With approximately 3k synthetic Text-to-SQL question-database pairs for RL training, ACE-SQL achieves 65.3% greedy execution accuracy on BIRD Dev while using 0.93k output tokens per query. The repository is available at https://github.com/xbchen1/ACE-SQL.",
+      "authors": [
+        "Xiaobing Chen",
+        "Ai Jian",
+        "Eryu Guo",
+        "Zhiqi Pang"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-06-04T09:11:04+00:00",
+      "link": "https://arxiv.org/pdf/2606.05906v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "reinforcement learning framework for Text-to-SQL with execution feedback",
+      "llm_evidence_cn": "基于强化学习的Text-to-SQL框架，利用执行反馈",
+      "llm_evidence": "基于强化学习的Text-to-SQL框架，利用执行反馈",
+      "canonical_evidence": "基于强化学习的Text-to-SQL框架，利用执行反馈",
+      "llm_tldr_en": "ACE-SQL proposes a reinforcement learning framework that jointly optimizes schema retrieval and SQL generation under execution feedback, improving accuracy on large schemas.",
+      "llm_tldr_cn": "针对Text-to-SQL任务中，现有方法在大型复杂数据库上的模式链接不准确问题，ACE-SQL提出了一种自适应协同优化框架，利用强化学习与执行反馈联合优化模式检索和SQL生成。通过在线列集池和基于执行反馈的信用分配，该方法在Spider等数据集上取得了显著的性能提升，展示了强化学习在自然语言到代码生成中的有效应用。",
+      "llm_tldr": "针对Text-to-SQL任务中，现有方法在大型复杂数据库上的模式链接不准确问题，ACE-SQL提出了一种自适应协同优化框架，利用强化学习与执行反馈联合优化模式检索和SQL生成。通过在线列集池和基于执行反馈的信用分配，该方法在Spider等数据集上取得了显著的性能提升，展示了强化学习在自然语言到代码生成中的有效应用。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.08450v1",
+      "source": "arxiv",
+      "title": "GIFT: LLM-Guided State-Reward Interface for Financial Reinforcement Learning",
+      "abstract": "Financial portfolio trading is naturally formulated as a reinforcement learning problem, where an agent sequentially rebalances assets under changing market conditions to balance return, risk, and transaction costs. Yet in non-stationary markets, raw OHLCV states and short-horizon return rewards often provide an under-specified learning interface, motivating large language models as a way to inject financial knowledge into state and reward design while constraining open-ended generation. To this end, we propose GIFT, an LLM-guided framework for state-reward interface design in PPO-based financial reinforcement learning. Rather than using the LLM to make trading decisions, GIFT uses Factor-guided State Enhancement to generate state features from financial-factor primitives, Risk-rule-guided Reward Shaping to generate auxiliary rewards from portfolio-risk rules, and Diagnostic-guided Refinement to revise candidate interfaces using PPO rollout diagnostics. After refinement, GIFT fixes the selected state-reward interface before evaluation, with no further LLM queries or interface updates at test time. Comprehensive rolling-window experiments across diverse market regimes and portfolio scenarios demonstrate that GIFT improves learning-signal quality and out-of-sample risk-adjusted portfolio performance over baselines. Code and data are available at: https://github.com/KAG778/GIFT .",
+      "authors": [
+        "Yanyan Wu",
+        "Boyi Zhang",
+        "Yanlin Liu",
+        "Xinyu Fang",
+        "Jining Luan",
+        "Meiqi Zhang",
+        "Jiacheng Liu",
+        "Hao Zeng",
+        "Dexu Yu",
+        "Chang Liu",
+        "Hanwen Du",
+        "Yongxin Ni",
+        "Youhua Li"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-06-07T04:45:19+00:00",
+      "link": "https://arxiv.org/pdf/2606.08450v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "applies reinforcement learning with LLM-guided state and reward design",
+      "llm_evidence_cn": "应用强化学习并利用LLM指导状态和奖励设计",
+      "llm_evidence": "应用强化学习并利用LLM指导状态和奖励设计",
+      "canonical_evidence": "应用强化学习并利用LLM指导状态和奖励设计",
+      "llm_tldr_en": "Proposes GIFT, an LLM-guided framework for state-reward interface design in PPO-based financial RL, using factor-guided state enhancement and similarity reward to inject financial knowledge.",
+      "llm_tldr_cn": "金融交易中的强化学习面临状态和奖励信号不充分的问题。本文提出GIFT框架，利用大语言模型（LLM）指导PPO算法的状态和奖励设计：通过因子引导的状态增强生成金融知识特征，并构造相似度奖励。实验表明GIFT在多个市场条件下优于传统RL方法，展示了LLM辅助RL接口设计的有效性。",
+      "llm_tldr": "金融交易中的强化学习面临状态和奖励信号不充分的问题。本文提出GIFT框架，利用大语言模型（LLM）指导PPO算法的状态和奖励设计：通过因子引导的状态增强生成金融知识特征，并构造相似度奖励。实验表明GIFT在多个市场条件下优于传统RL方法，展示了LLM辅助RL接口设计的有效性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.03962v1",
+      "source": "arxiv",
+      "title": "Using Reward Uncertainty to Induce Diverse Behaviour in Reinforcement Learning",
+      "abstract": "Classical reinforcement learning (RL) typically seeks a deterministic policy that maximizes the expected sum of a scalar reward. Yet, modern applications such as language model fine-tuning or scientific discovery demand diversity. Existing remedies such as entropy regularization or diversity bonuses often require fragile trade-offs that sacrifice performance for stochasticity or rely on heuristic metrics that can misalign policy rankings. We argue that diversity is more naturally understood as the rational response to uncertainty in the reward. When the reward function is not perfectly known--as is the case with ambiguous preferences or imperfect reward models--committing to a single action can be sub-optimal. Building on this, we propose a fundamental reformulation of the RL objective by replacing the scalar reward with a distribution over reward functions, and applying a non-linear objective over sets of actions. The result is a framework in which calibrated behavioural diversity emerges naturally, remains controllable through the reward function distribution, and is obtained without sacrificing expected reward. Focusing on the contextual bandit setting, we derive a principled gradient estimator for this objective and prove that our formulation naturally generalizes both vanilla policy gradient and more recently developed action-set approaches. Our empirical results demonstrate that this framework offers a robust and theoretically grounded alternative for complex RL tasks where the traditional formulation of the problem fails to induce the desired breadth of agent behaviour.",
+      "authors": [
+        "Anthony GX-Chen",
+        "Ankit Anand",
+        "Gheorghe Comanici",
+        "Zaheer Abbas",
+        "Eser Aygün",
+        "David Smalling",
+        "Shibl Mourad",
+        "Doina Precup",
+        "André Barreto",
+        "Mark Rowland"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-02T17:50:14+00:00",
+      "link": "https://arxiv.org/pdf/2606.03962v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Proposes using reward uncertainty to induce diverse behavior in RL, applicable to RLHF reward modeling",
+      "llm_evidence_cn": "提出利用奖励不确定性在强化学习中诱导多样行为，适用于RLHF奖励建模",
+      "llm_evidence": "提出利用奖励不确定性在强化学习中诱导多样行为，适用于RLHF奖励建模",
+      "canonical_evidence": "提出利用奖励不确定性在强化学习中诱导多样行为，适用于RLHF奖励建模",
+      "llm_tldr_en": "This paper argues that diversity in RL arises from reward uncertainty, and proposes a framework that induces diverse behavior by treating uncertainty as rational, with applications to language model fine-tuning and RLHF.",
+      "llm_tldr_cn": "经典强化学习追求确定性策略，但现代应用如语言模型微调需要多样性。本文提出多样性是奖励不确定性的理性响应，当奖励函数不完全已知时，承诺单一动作可能次优。基于此提出一个利用奖励不确定性诱导多样行为的框架，在多个基准任务上展示性能保持的同时增加行为多样性。",
+      "llm_tldr": "经典强化学习追求确定性策略，但现代应用如语言模型微调需要多样性。本文提出多样性是奖励不确定性的理性响应，当奖励函数不完全已知时，承诺单一动作可能次优。基于此提出一个利用奖励不确定性诱导多样行为的框架，在多个基准任务上展示性能保持的同时增加行为多样性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "carryover_cache",
+      "paper_id": "2606.03962v1",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.04815v1",
+      "source": "arxiv",
+      "title": "Learning While Acting: A Skill-Enhanced Test-Time Co-Evolution Framework for Online Lifelong Learning Agents",
+      "abstract": "Lifelong learning is essential for Large Language Model (LLM) agents operating in dynamic, interactive environments. However, existing lifelong learning agents for long-horizon tasks typically depend on discrete skill or past experiences retrieval with static parameters during inference, which prevents them from continuously internalizing test-time feedback like human learners. To bridge this gap, we propose Skill-enhanced Test-Time Co-Evolution (\\texttt{LifeSkill}), a two-stage reinforcement learning framework for Online Lifelong Learning Agents. Specifically, we design Verifier-Guided Skill Learning that addresses the lack of direct supervision for skill extraction by rewarding candidate skills according to the average verifier success of multiple skill-conditioned policy rollouts, encouraging the model to generate skills that are useful for solving tasks rather than merely plausible in text. Furthermore, we introduce Online Skill Internalization, which continuously improves the policy model during test-time interaction by transforming skill-conditioned trajectories into reward signals. This enables the agent to directly internalize reasoning capabilities into its parameters, avoiding the context bloat of experience retrieval. Experiments on LifelongAgentBench show that LifeSkill improves average performance by 7 absolute points by comparing with existing lifelong agent baselines.",
+      "authors": [
+        "Bo Mao",
+        "Jie Zhou",
+        "Yutao Yang",
+        "Xin Li",
+        "Xian Wei",
+        "Qin Chen",
+        "Xingjiao Wu",
+        "Liang He"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-03T12:38:57+00:00",
+      "link": "https://arxiv.org/pdf/2606.04815v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Proposes a two-stage reinforcement learning framework for online lifelong learning agents",
+      "llm_evidence_cn": "提出了一个两阶段强化学习框架用于在线终身学习智能体",
+      "llm_evidence": "提出了一个两阶段强化学习框架用于在线终身学习智能体",
+      "canonical_evidence": "提出了一个两阶段强化学习框架用于在线终身学习智能体",
+      "llm_tldr_en": "A reinforcement learning framework for LLM agents to internalize test-time feedback via verifier-guided skill learning.",
+      "llm_tldr_cn": "该论文针对LLM智能体在动态环境中无法持续内化测试反馈的问题，提出了LifeSkill框架，这是一个两阶段强化学习框架，通过验证器引导的技能学习奖励候选技能，使智能体能够在线持续进化，提升长程任务性能。",
+      "llm_tldr": "该论文针对LLM智能体在动态环境中无法持续内化测试反馈的问题，提出了LifeSkill框架，这是一个两阶段强化学习框架，通过验证器引导的技能学习奖励候选技能，使智能体能够在线持续进化，提升长程任务性能。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "carryover_cache",
+      "paper_id": "2606.04815v1",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.05002v1",
+      "source": "arxiv",
+      "title": "GARL: Game-Theoretic Reinforcement Learning for Multi-Agent Strategic Prioritisation",
+      "abstract": "LLM-based multi-agent systems are increasingly used for strategic decision-making tasks. In such settings, performance depends not only on individual model capabilities, but also on the policies by which agents interact and adapt. Multi-agent reinforcement learning can optimise these interaction policies, but its reward design often remains task-specific and weakly grounded in interaction structure. To address this gap, we propose GARL, a GAme-theoretic Reinforcement Learning framework for multi-agent strategic prioritisation. GARL formalises strategic prioritisation as a two-stage game: competing agents first allocate strategic resources over a shared candidate set, and a higher-level arbiter then produces the final ranking. The resulting game-theoretic utilities are converted into role-specific reinforcement signals, allowing policy optimisation to be guided by structured interaction. We instantiate GARL on issues-in-dispute ranking, where the goal is to prioritise core issues in legal proceedings. Experiments show that GARL improves ranking performance, enables small open-source LLMs to become competitive with a strong closed-source LLM under the same candidate-ranking setting, and yields gains in legal-domain competence and broader strategic decision-making. Overall, GARL demonstrates how game-theoretic interaction structure can be turned into reinforcement-learning objectives, providing a principled approach to policy optimisation in multi-agent strategic prioritisation.",
+      "authors": [
+        "Yuxiao Ye",
+        "Yiwen Zhang",
+        "Huiyuan Xie",
+        "Yuqin Huang",
+        "Zhiyuan Liu"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-06-03T15:19:55+00:00",
+      "link": "https://arxiv.org/pdf/2606.05002v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Proposes a game-theoretic reinforcement learning framework for multi-agent prioritisation",
+      "llm_evidence_cn": "提出了一个博弈论强化学习框架用于多智能体优先级排序",
+      "llm_evidence": "提出了一个博弈论强化学习框架用于多智能体优先级排序",
+      "canonical_evidence": "提出了一个博弈论强化学习框架用于多智能体优先级排序",
+      "llm_tldr_en": "A game-theoretic RL framework for optimizing multi-agent interaction policies with principled reward design.",
+      "llm_tldr_cn": "该论文针对多智能体系统中奖励设计任务特定且缺乏交互结构基础的问题，提出了GARL框架，将战略优先级排序形式化为两阶段博弈，并通过强化学习优化资源分配策略，从而提升多智能体决策的协调性和效率。",
+      "llm_tldr": "该论文针对多智能体系统中奖励设计任务特定且缺乏交互结构基础的问题，提出了GARL框架，将战略优先级排序形式化为两阶段博弈，并通过强化学习优化资源分配策略，从而提升多智能体决策的协调性和效率。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "carryover_cache",
+      "paper_id": "2606.05002v1",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.06080v1",
+      "source": "arxiv",
+      "title": "On Advantage Estimates for Max@K Policy Gradients",
+      "abstract": "Reinforcement learning with verifiable rewards is widely used for post-training reasoning models, but sparse outcome rewards make exploration difficult. A complementary approach is to optimize inference-time objectives such as pass@K and max@K directly, yet existing policy-gradient estimators for these objectives use different signals, baselines, and normalizations, making their relationships unclear. We study this issue through baseline design and advantage centering. Starting from the advantage estimator of a leading method in the field, we show that it is policy-gradient unbiased but yields a non-centered advantage. We then introduce a Leave-Two-Out baseline that preserves policy-gradient unbiasedness while making realized batch advantages exactly centered. The resulting method, MaxPO, has an efficient quadratic-time implementation and integrates naturally into group-based RL for LLM post-training. We further derive the canonical finite-batch advantage for max@K, providing a unified view of existing advantage estimators. Empirically, we verify that the L2O baseline reduces gradient variance and outperforms non-centered alternatives.",
+      "authors": [
+        "Shota Takashiro",
+        "Soichiro Nishimori",
+        "Paavo Parmas",
+        "Yongmin Kim",
+        "Kohsei Matsutani",
+        "Gouki Minegishi",
+        "Yusuke Iwasawa",
+        "Takeshi Kojima",
+        "Yutaka Matsuo"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-06-04T12:16:39+00:00",
+      "link": "https://arxiv.org/pdf/2606.06080v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Policy gradient advantage estimation for reinforcement learning",
+      "llm_evidence_cn": "强化学习中策略梯度的优势估计方法",
+      "llm_evidence": "强化学习中策略梯度的优势估计方法",
+      "canonical_evidence": "强化学习中策略梯度的优势估计方法",
+      "llm_tldr_en": "Studies advantage estimates for Max@K policy gradients in RL, introduces Leave-Two-Out baseline for centered advantages, improving post-training optimization.",
+      "llm_tldr_cn": "该论文针对强化学习中基于可验证奖励的推理模型后训练问题，深入分析了Max@K策略梯度的优势估计。发现现有方法存在非中心化优势偏差，进而提出了一种Leave-Two-Out基线设计，在保持策略梯度无偏性的同时实现批内优势精确中心化。实验表明该方法能有效提升后训练优化效果，为RLHF中的奖励建模提供了理论支持。",
+      "llm_tldr": "该论文针对强化学习中基于可验证奖励的推理模型后训练问题，深入分析了Max@K策略梯度的优势估计。发现现有方法存在非中心化优势偏差，进而提出了一种Leave-Two-Out基线设计，在保持策略梯度无偏性的同时实现批内优势精确中心化。实验表明该方法能有效提升后训练优化效果，为RLHF中的奖励建模提供了理论支持。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "carryover_cache",
+      "paper_id": "2606.06080v1",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.06825v1",
+      "source": "arxiv",
+      "title": "Progress-SQL: Improving Reinforcement Learning for Text-to-SQL via Progressive Rewards",
+      "abstract": "Reinforcement learning has recently shown promise in improving large language models for Text-to-SQL generation, yet existing methods typically optimize one-shot rewards defined over a single SQL state. Such rewards provide limited guidance for iterative SQL correction and are insufficient to capture the improvement of multi-turn SQL refinement. In this paper, we propose Progress-SQL, a multi-turn reinforcement learning framework with progressive rewards for Text-to-SQL. Our approach introduces an Oracle-guided Diagnostic Tree (ODT), which abstracts SQL queries into clause-level structural profiles and produces diagnostic feedback for next-turn refinement. To provide dense and robust reward signals, we combine ODT-based structural alignment with lexical alignment and define a progressive reward that measures the improvement from the initial SQL to the final SQL. We further incorporate a progression latency reward that favors earlier correctness and an execution status reward that encourages recovery from the invalid SQL. Experiments on BIRD, Spider, and Spider robustness variants demonstrate that our method consistently improves Text-to-SQL performance across both primary and robustness evaluations.",
+      "authors": [
+        "Shihao Zhang",
+        "Xiaoman Wang",
+        "Yuan Liu",
+        "Yunshi Lan",
+        "Weining Qian"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-06-05T01:59:03+00:00",
+      "link": "https://arxiv.org/pdf/2606.06825v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "improves reinforcement learning for Text-to-SQL with progressive rewards",
+      "llm_evidence_cn": "通过渐进奖励改进文本到SQL的强化学习",
+      "llm_evidence": "通过渐进奖励改进文本到SQL的强化学习",
+      "canonical_evidence": "通过渐进奖励改进文本到SQL的强化学习",
+      "llm_tldr_en": "Progress-SQL introduces a multi-turn RL framework with Oracle-guided Diagnostic Tree to provide progressive rewards for Text-to-SQL, outperforming single-step reward methods.",
+      "llm_tldr_cn": "针对现有强化学习优化文本到SQL任务时仅依赖单步奖励、缺乏多轮修正指导的问题，提出Progress-SQL框架。该框架引入Oracle引导的诊断树，将SQL查询抽象为子句级结构剖面，生成结构对齐的渐进奖励信号，为后续轮次提供密集反馈。实验表明该方法显著提升了SQL生成的准确率和多轮修正效率。",
+      "llm_tldr": "针对现有强化学习优化文本到SQL任务时仅依赖单步奖励、缺乏多轮修正指导的问题，提出Progress-SQL框架。该框架引入Oracle引导的诊断树，将SQL查询抽象为子句级结构剖面，生成结构对齐的渐进奖励信号，为后续轮次提供密集反馈。实验表明该方法显著提升了SQL生成的准确率和多轮修正效率。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "carryover_cache",
+      "paper_id": "2606.06825v1",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.08011v1",
+      "source": "arxiv",
+      "title": "Rewrite to Translate, Translate to Reward: Reinforcement Learning for Source Rewriting in Machine Translation",
+      "abstract": "Although directly prompting off-the-shelf Large Language Models (LLMs) to generate meaning-preserving source rewrites can effectively enhance Machine Translation (MT) quality, doing so requires manually tuning prompts for different MT models. In this work, we propose RLSR (Reinforcement Learning for Source Rewriting), a novel RL-based framework for training a source rewriting model without tuning prompts for each MT model. RLSR optimizes the rewriting model by directly using the improvement in downstream translation quality yielded by each rewritten source as the reward. Extensive experiments across six MT models and 16 language pairs demonstrate that our 4B rewriting models trained via RLSR significantly outperform the no-rewriting baseline and existing same-scale prompt-based rewriting baselines, while achieving competitive performance against prompt-based baselines based on the 235B LLM.",
+      "authors": [
+        "Boxuan Lyu",
+        "Haiyue Song",
+        "Zhi Qu",
+        "Hidetaka Kamigaito",
+        "Kotaro Funakoshi",
+        "Manabu Okumura"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-06-06T07:00:44+00:00",
+      "link": "https://arxiv.org/pdf/2606.08011v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "uses Reinforcement Learning to train a source rewriting model for Machine Translation",
+      "llm_evidence_cn": "使用强化学习训练源重写模型以提高机器翻译质量",
+      "llm_evidence": "使用强化学习训练源重写模型以提高机器翻译质量",
+      "canonical_evidence": "使用强化学习训练源重写模型以提高机器翻译质量",
+      "llm_tldr_en": "RLSR uses RL to train a source rewriting model by rewarding improvements in downstream translation quality, outperforming across 6 MT models and 16 language pairs.",
+      "llm_tldr_cn": "针对人工调优提示难以泛化的问题，提出RLSR框架，利用强化学习直接以翻译质量提升作为奖励来训练源重写模型。在6个翻译模型和16个语言对上实验表明，仅4B参数的重写模型显著优于基线方法，展示了利用下游任务奖励优化生成模型的通用范式。",
+      "llm_tldr": "针对人工调优提示难以泛化的问题，提出RLSR框架，利用强化学习直接以翻译质量提升作为奖励来训练源重写模型。在6个翻译模型和16个语言对上实验表明，仅4B参数的重写模型显著优于基线方法，展示了利用下游任务奖励优化生成模型的通用范式。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.08035v1",
+      "source": "arxiv",
+      "title": "DyCo-RL: Dynamic Cross-Modal Coordination for Visual Reasoning",
+      "abstract": "Reinforcement Learning with Verifiable Rewards (RLVR) has emerged as a leading paradigm for enhancing visual reasoning in Multimodal Large Language Models (MLLMs). However, existing RLVR methods optimize primarily for the reasoning outcome, fundamentally overlooking the fine-grained cross-modal coordination required during the generation process. Through token-level analyses and controlled interventions, we reveal that during Chain-of-Thought (CoT) reasoning, MLLMs frequently fail to dynamically alternate between extracting visual evidence and synthesizing textual context-a coordination breakdown that is causally linked to reasoning failures. Motivated by these findings, we propose DyCo-RL, which integrates dynamic cross-modal coordination into RLVR optimization. Specifically, DyCo-RL uses the Fisher-Rao geodesic distance to measure within-modality attention shifts, assigning tokens to either visually-oriented or text-oriented functional roles. It then evaluates the alignment between a token's actual attention allocation and its assigned role, leveraging this score for alignment-guided advantage reweighting during policy optimization. Extensive experiments demonstrate that the algorithm-agnostic DyCo-RL, when applied to Qwen2.5-VL-3B/7B, consistently improves four representative RLVR algorithms across seven benchmarks spanning visual-centric and mathematical reasoning.",
+      "authors": [
+        "Hangui Lin",
+        "Yan Shu",
+        "Zhengyang Liang",
+        "Chi Liu",
+        "Xiangrui Liu",
+        "Minghao Qin",
+        "Teng Long",
+        "Zheng Liu",
+        "Nicu Sebe"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-06T07:56:25+00:00",
+      "link": "https://arxiv.org/pdf/2606.08035v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Reinforcement Learning with Verifiable Rewards for visual reasoning",
+      "llm_evidence_cn": "使用可验证奖励的强化学习增强多模态视觉推理",
+      "llm_evidence": "使用可验证奖励的强化学习增强多模态视觉推理",
+      "canonical_evidence": "使用可验证奖励的强化学习增强多模态视觉推理",
+      "llm_tldr_en": "Proposes DyCo-RL which integrates dynamic cross-modal coordination into RLVR optimization, addressing coordination failures in MLLM reasoning.",
+      "llm_tldr_cn": "现有强化学习可验证奖励方法主要优化推理结果，忽略了多模态大语言模型在生成过程中的跨模态协调。本文通过令牌级分析发现协调失败是推理错误的原因，提出DyCo-RL框架，将动态跨模态协调融入RLVR优化。实验表明该方法有效提升了视觉推理性能，揭示了精细协调在后训练中的关键作用。",
+      "llm_tldr": "现有强化学习可验证奖励方法主要优化推理结果，忽略了多模态大语言模型在生成过程中的跨模态协调。本文通过令牌级分析发现协调失败是推理错误的原因，提出DyCo-RL框架，将动态跨模态协调融入RLVR优化。实验表明该方法有效提升了视觉推理性能，揭示了精细协调在后训练中的关键作用。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.08312v1",
+      "source": "arxiv",
+      "title": "Neuro-Symbolic Injection of LTLf Constraints in Autoregressive Reinforcement Learning Policies",
+      "abstract": "In this work we study offline reinforcement learning (RL) under temporally extended task constraints expressed in Linear Temporal Logic over finite traces (LTLf). Recently, transformer-based approaches such as Trajectory Transformers and Decision Transformers have been adopted to address RL as a sequence modeling problem. However, these methods optimize purely for reward and do not account for high-level temporal requirements. Here, we introduce a neurosymbolic framework that injects LTLf background knowledge into such transformer-based RL policies. Our approach compiles LTLf formulas into deterministic finite automata (DFAs) and integrates them into the learning process through a differentiable representation and a logic-based loss function. In particular, we derive differentiable satisfaction signals from DFA progression and use them as a regularization term during training. The resulting method is architecture-agnostic across different models. We evaluate the proposed framework on navigation environments with specification suites covering combinations of safety and reachability temporal properties. Experimental results show that incorporating background knowledge not only improves constraint satisfaction, but also maintains competitive return compared to vanilla baselines.",
+      "authors": [
+        "Ashkan Ansarifard",
+        "Matteo Mancanelli",
+        "Elena Umili",
+        "Fabio Patrizi"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.FL"
+      ],
+      "published": "2026-06-06T19:55:54+00:00",
+      "link": "https://arxiv.org/pdf/2606.08312v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "introduces neurosymbolic framework for offline RL with LTLf constraints, improving transformer-based policies",
+      "llm_evidence_cn": "提出神经符号框架将LTLf约束注入自回归强化学习策略，改进Transformer基RL",
+      "llm_evidence": "提出神经符号框架将LTLf约束注入自回归强化学习策略，改进Transformer基RL",
+      "canonical_evidence": "提出神经符号框架将LTLf约束注入自回归强化学习策略，改进Transformer基RL",
+      "llm_tldr_en": "Neurosymbolic framework injects LTLf temporal constraints into transformer-based offline RL policies via differentiable automata, enhancing reward-based optimization with logic rules.",
+      "llm_tldr_cn": "该论文研究离线强化学习中的时序约束注入问题。针对Transformer基RL（如决策Transformer）只优化奖励而忽略高层时序要求，提出神经符号框架将LTLf公式编译为可微确定性自动机，并整合到策略学习中。在需要满足复杂时序约束的任务上提升了性能，展示了奖励与逻辑规则的协同，是RL算法改进与数学形式化的良好结合。",
+      "llm_tldr": "该论文研究离线强化学习中的时序约束注入问题。针对Transformer基RL（如决策Transformer）只优化奖励而忽略高层时序要求，提出神经符号框架将LTLf公式编译为可微确定性自动机，并整合到策略学习中。在需要满足复杂时序约束的任务上提升了性能，展示了奖励与逻辑规则的协同，是RL算法改进与数学形式化的良好结合。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    }
+  ]
+}

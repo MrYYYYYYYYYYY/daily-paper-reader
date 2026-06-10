@@ -1,139 +1,12 @@
 {
-  "generated_at": "2026-06-10T07:22:07.783894+00:00",
-  "updated_date": "20260601-20260610",
+  "generated_at": "2026-06-10T21:47:31.473545+00:00",
+  "updated_date": "20260610",
   "carryover_days": 9,
   "tag_states": {
     "lpt": {
-      "updated_date": "20260601-20260610",
+      "updated_date": "20260610",
       "carryover_days": 9,
       "items": [
-        {
-          "id": "2606.06080v1",
-          "source": "arxiv",
-          "title": "On Advantage Estimates for Max@K Policy Gradients",
-          "abstract": "Reinforcement learning with verifiable rewards is widely used for post-training reasoning models, but sparse outcome rewards make exploration difficult. A complementary approach is to optimize inference-time objectives such as pass@K and max@K directly, yet existing policy-gradient estimators for these objectives use different signals, baselines, and normalizations, making their relationships unclear. We study this issue through baseline design and advantage centering. Starting from the advantage estimator of a leading method in the field, we show that it is policy-gradient unbiased but yields a non-centered advantage. We then introduce a Leave-Two-Out baseline that preserves policy-gradient unbiasedness while making realized batch advantages exactly centered. The resulting method, MaxPO, has an efficient quadratic-time implementation and integrates naturally into group-based RL for LLM post-training. We further derive the canonical finite-batch advantage for max@K, providing a unified view of existing advantage estimators. Empirically, we verify that the L2O baseline reduces gradient variance and outperforms non-centered alternatives.",
-          "authors": [
-            "Shota Takashiro",
-            "Soichiro Nishimori",
-            "Paavo Parmas",
-            "Yongmin Kim",
-            "Kohsei Matsutani",
-            "Gouki Minegishi",
-            "Yusuke Iwasawa",
-            "Takeshi Kojima",
-            "Yutaka Matsuo"
-          ],
-          "primary_category": "cs.LG",
-          "categories": [
-            "cs.LG",
-            "cs.AI",
-            "cs.CL"
-          ],
-          "published": "2026-06-04T12:16:39+00:00",
-          "link": "https://arxiv.org/pdf/2606.06080v1",
-          "tags": [
-            "keyword:lpt"
-          ],
-          "llm_score": 8.0,
-          "llm_evidence_en": "Policy gradient advantage estimation for reinforcement learning",
-          "llm_evidence_cn": "强化学习中策略梯度的优势估计方法",
-          "llm_evidence": "强化学习中策略梯度的优势估计方法",
-          "canonical_evidence": "强化学习中策略梯度的优势估计方法",
-          "llm_tldr_en": "Studies advantage estimates for Max@K policy gradients in RL, introduces Leave-Two-Out baseline for centered advantages, improving post-training optimization.",
-          "llm_tldr_cn": "该论文针对强化学习中基于可验证奖励的推理模型后训练问题，深入分析了Max@K策略梯度的优势估计。发现现有方法存在非中心化优势偏差，进而提出了一种Leave-Two-Out基线设计，在保持策略梯度无偏性的同时实现批内优势精确中心化。实验表明该方法能有效提升后训练优化效果，为RLHF中的奖励建模提供了理论支持。",
-          "llm_tldr": "该论文针对强化学习中基于可验证奖励的推理模型后训练问题，深入分析了Max@K策略梯度的优势估计。发现现有方法存在非中心化优势偏差，进而提出了一种Leave-Two-Out基线设计，在保持策略梯度无偏性的同时实现批内优势精确中心化。实验表明该方法能有效提升后训练优化效果，为RLHF中的奖励建模提供了理论支持。",
-          "llm_tags": [
-            "query:lpt"
-          ],
-          "matched_query_tag": "query:lpt",
-          "matched_query_text": "Reinforcement Learning",
-          "matched_requirement_id": "req-2",
-          "selection_source": "carryover_cache",
-          "paper_id": "2606.06080v1",
-          "carry_days": 1
-        },
-        {
-          "id": "2606.04815v1",
-          "source": "arxiv",
-          "title": "Learning While Acting: A Skill-Enhanced Test-Time Co-Evolution Framework for Online Lifelong Learning Agents",
-          "abstract": "Lifelong learning is essential for Large Language Model (LLM) agents operating in dynamic, interactive environments. However, existing lifelong learning agents for long-horizon tasks typically depend on discrete skill or past experiences retrieval with static parameters during inference, which prevents them from continuously internalizing test-time feedback like human learners. To bridge this gap, we propose Skill-enhanced Test-Time Co-Evolution (\\texttt{LifeSkill}), a two-stage reinforcement learning framework for Online Lifelong Learning Agents. Specifically, we design Verifier-Guided Skill Learning that addresses the lack of direct supervision for skill extraction by rewarding candidate skills according to the average verifier success of multiple skill-conditioned policy rollouts, encouraging the model to generate skills that are useful for solving tasks rather than merely plausible in text. Furthermore, we introduce Online Skill Internalization, which continuously improves the policy model during test-time interaction by transforming skill-conditioned trajectories into reward signals. This enables the agent to directly internalize reasoning capabilities into its parameters, avoiding the context bloat of experience retrieval. Experiments on LifelongAgentBench show that LifeSkill improves average performance by 7 absolute points by comparing with existing lifelong agent baselines.",
-          "authors": [
-            "Bo Mao",
-            "Jie Zhou",
-            "Yutao Yang",
-            "Xin Li",
-            "Xian Wei",
-            "Qin Chen",
-            "Xingjiao Wu",
-            "Liang He"
-          ],
-          "primary_category": "cs.LG",
-          "categories": [
-            "cs.LG",
-            "cs.AI"
-          ],
-          "published": "2026-06-03T12:38:57+00:00",
-          "link": "https://arxiv.org/pdf/2606.04815v1",
-          "tags": [
-            "keyword:lpt"
-          ],
-          "llm_score": 8.0,
-          "llm_evidence_en": "Proposes a two-stage reinforcement learning framework for online lifelong learning agents",
-          "llm_evidence_cn": "提出了一个两阶段强化学习框架用于在线终身学习智能体",
-          "llm_evidence": "提出了一个两阶段强化学习框架用于在线终身学习智能体",
-          "canonical_evidence": "提出了一个两阶段强化学习框架用于在线终身学习智能体",
-          "llm_tldr_en": "A reinforcement learning framework for LLM agents to internalize test-time feedback via verifier-guided skill learning.",
-          "llm_tldr_cn": "该论文针对LLM智能体在动态环境中无法持续内化测试反馈的问题，提出了LifeSkill框架，这是一个两阶段强化学习框架，通过验证器引导的技能学习奖励候选技能，使智能体能够在线持续进化，提升长程任务性能。",
-          "llm_tldr": "该论文针对LLM智能体在动态环境中无法持续内化测试反馈的问题，提出了LifeSkill框架，这是一个两阶段强化学习框架，通过验证器引导的技能学习奖励候选技能，使智能体能够在线持续进化，提升长程任务性能。",
-          "llm_tags": [
-            "query:lpt"
-          ],
-          "matched_query_tag": "query:lpt",
-          "matched_query_text": "Reinforcement Learning",
-          "matched_requirement_id": "req-2",
-          "selection_source": "carryover_cache",
-          "paper_id": "2606.04815v1",
-          "carry_days": 1
-        },
-        {
-          "id": "2606.05002v1",
-          "source": "arxiv",
-          "title": "GARL: Game-Theoretic Reinforcement Learning for Multi-Agent Strategic Prioritisation",
-          "abstract": "LLM-based multi-agent systems are increasingly used for strategic decision-making tasks. In such settings, performance depends not only on individual model capabilities, but also on the policies by which agents interact and adapt. Multi-agent reinforcement learning can optimise these interaction policies, but its reward design often remains task-specific and weakly grounded in interaction structure. To address this gap, we propose GARL, a GAme-theoretic Reinforcement Learning framework for multi-agent strategic prioritisation. GARL formalises strategic prioritisation as a two-stage game: competing agents first allocate strategic resources over a shared candidate set, and a higher-level arbiter then produces the final ranking. The resulting game-theoretic utilities are converted into role-specific reinforcement signals, allowing policy optimisation to be guided by structured interaction. We instantiate GARL on issues-in-dispute ranking, where the goal is to prioritise core issues in legal proceedings. Experiments show that GARL improves ranking performance, enables small open-source LLMs to become competitive with a strong closed-source LLM under the same candidate-ranking setting, and yields gains in legal-domain competence and broader strategic decision-making. Overall, GARL demonstrates how game-theoretic interaction structure can be turned into reinforcement-learning objectives, providing a principled approach to policy optimisation in multi-agent strategic prioritisation.",
-          "authors": [
-            "Yuxiao Ye",
-            "Yiwen Zhang",
-            "Huiyuan Xie",
-            "Yuqin Huang",
-            "Zhiyuan Liu"
-          ],
-          "primary_category": "cs.CL",
-          "categories": [
-            "cs.CL"
-          ],
-          "published": "2026-06-03T15:19:55+00:00",
-          "link": "https://arxiv.org/pdf/2606.05002v1",
-          "tags": [
-            "keyword:lpt"
-          ],
-          "llm_score": 8.0,
-          "llm_evidence_en": "Proposes a game-theoretic reinforcement learning framework for multi-agent prioritisation",
-          "llm_evidence_cn": "提出了一个博弈论强化学习框架用于多智能体优先级排序",
-          "llm_evidence": "提出了一个博弈论强化学习框架用于多智能体优先级排序",
-          "canonical_evidence": "提出了一个博弈论强化学习框架用于多智能体优先级排序",
-          "llm_tldr_en": "A game-theoretic RL framework for optimizing multi-agent interaction policies with principled reward design.",
-          "llm_tldr_cn": "该论文针对多智能体系统中奖励设计任务特定且缺乏交互结构基础的问题，提出了GARL框架，将战略优先级排序形式化为两阶段博弈，并通过强化学习优化资源分配策略，从而提升多智能体决策的协调性和效率。",
-          "llm_tldr": "该论文针对多智能体系统中奖励设计任务特定且缺乏交互结构基础的问题，提出了GARL框架，将战略优先级排序形式化为两阶段博弈，并通过强化学习优化资源分配策略，从而提升多智能体决策的协调性和效率。",
-          "llm_tags": [
-            "query:lpt"
-          ],
-          "matched_query_tag": "query:lpt",
-          "matched_query_text": "Reinforcement Learning",
-          "matched_requirement_id": "req-2",
-          "selection_source": "carryover_cache",
-          "paper_id": "2606.05002v1",
-          "carry_days": 1
-        },
         {
           "id": "2606.08620v1",
           "source": "arxiv",
@@ -154,13 +27,13 @@
             "query:lpt"
           ],
           "llm_score": 8.0,
-          "llm_evidence_en": "reinforcement learning for LLM query rewriting with plan-aware rewards",
-          "llm_evidence_cn": "使用强化学习训练LLM进行查询重写，奖励包含执行反馈",
-          "llm_evidence": "使用强化学习训练LLM进行查询重写，奖励包含执行反馈",
-          "canonical_evidence": "使用强化学习训练LLM进行查询重写，奖励包含执行反馈",
-          "llm_tldr_en": "SPA uses RL to train LLMs for SQL query rewriting, with rewards for semantic equivalence, plan divergence, and runtime speedup, improving database performance.",
-          "llm_tldr_cn": "基于LLM的查询重写常产生语义等价但执行计划不变或变慢的重写。SPA提出计划感知强化学习框架，扩展GRPO引入多维度奖励，包括语义等价、文本距离、计划差异和运行时加速。实验表明SPA生成的重写显著提升查询执行效率，为数据库自动优化提供新路径。",
-          "llm_tldr": "基于LLM的查询重写常产生语义等价但执行计划不变或变慢的重写。SPA提出计划感知强化学习框架，扩展GRPO引入多维度奖励，包括语义等价、文本距离、计划差异和运行时加速。实验表明SPA生成的重写显著提升查询执行效率，为数据库自动优化提供新路径。",
+          "llm_evidence_en": "SQL-Plan-Aware RL framework for query rewriting with LLMs",
+          "llm_evidence_cn": "基于强化学习的SQL查询重写框架",
+          "llm_evidence": "基于强化学习的SQL查询重写框架",
+          "canonical_evidence": "基于强化学习的SQL查询重写框架",
+          "llm_tldr_en": "SPA trains LLMs to rewrite SQL queries using reinforcement learning with physical execution feedback, improving runtime performance.",
+          "llm_tldr_cn": "SQL查询重写是提升数据库性能的重要技术，但现有方法存在局限。本文提出SPA框架，利用强化学习训练大语言模型进行查询重写，将重写建模为策略优化问题，并扩展GRPO算法结合语义等价、改写距离、物理计划差异和运行时加速等多重奖励信号。实验表明SPA能有效生成性能更优的查询改写，验证了强化学习在查询优化中的潜力。",
+          "llm_tldr": "SQL查询重写是提升数据库性能的重要技术，但现有方法存在局限。本文提出SPA框架，利用强化学习训练大语言模型进行查询重写，将重写建模为策略优化问题，并扩展GRPO算法结合语义等价、改写距离、物理计划差异和运行时加速等多重奖励信号。实验表明SPA能有效生成性能更优的查询改写，验证了强化学习在查询优化中的潜力。",
           "llm_tags": [
             "query:lpt"
           ],
@@ -169,134 +42,6 @@
           "matched_requirement_id": "req-2",
           "selection_source": "carryover_cache",
           "paper_id": "2606.08620v1",
-          "carry_days": 1
-        },
-        {
-          "id": "2606.03962v1",
-          "source": "arxiv",
-          "title": "Using Reward Uncertainty to Induce Diverse Behaviour in Reinforcement Learning",
-          "abstract": "Classical reinforcement learning (RL) typically seeks a deterministic policy that maximizes the expected sum of a scalar reward. Yet, modern applications such as language model fine-tuning or scientific discovery demand diversity. Existing remedies such as entropy regularization or diversity bonuses often require fragile trade-offs that sacrifice performance for stochasticity or rely on heuristic metrics that can misalign policy rankings. We argue that diversity is more naturally understood as the rational response to uncertainty in the reward. When the reward function is not perfectly known--as is the case with ambiguous preferences or imperfect reward models--committing to a single action can be sub-optimal. Building on this, we propose a fundamental reformulation of the RL objective by replacing the scalar reward with a distribution over reward functions, and applying a non-linear objective over sets of actions. The result is a framework in which calibrated behavioural diversity emerges naturally, remains controllable through the reward function distribution, and is obtained without sacrificing expected reward. Focusing on the contextual bandit setting, we derive a principled gradient estimator for this objective and prove that our formulation naturally generalizes both vanilla policy gradient and more recently developed action-set approaches. Our empirical results demonstrate that this framework offers a robust and theoretically grounded alternative for complex RL tasks where the traditional formulation of the problem fails to induce the desired breadth of agent behaviour.",
-          "authors": [
-            "Anthony GX-Chen",
-            "Ankit Anand",
-            "Gheorghe Comanici",
-            "Zaheer Abbas",
-            "Eser Aygün",
-            "David Smalling",
-            "Shibl Mourad",
-            "Doina Precup",
-            "André Barreto",
-            "Mark Rowland"
-          ],
-          "primary_category": "cs.LG",
-          "categories": [
-            "cs.LG",
-            "cs.AI"
-          ],
-          "published": "2026-06-02T17:50:14+00:00",
-          "link": "https://arxiv.org/pdf/2606.03962v1",
-          "tags": [
-            "keyword:lpt"
-          ],
-          "llm_score": 8.0,
-          "llm_evidence_en": "Proposes using reward uncertainty to induce diverse behavior in RL, applicable to RLHF reward modeling",
-          "llm_evidence_cn": "提出利用奖励不确定性在强化学习中诱导多样行为，适用于RLHF奖励建模",
-          "llm_evidence": "提出利用奖励不确定性在强化学习中诱导多样行为，适用于RLHF奖励建模",
-          "canonical_evidence": "提出利用奖励不确定性在强化学习中诱导多样行为，适用于RLHF奖励建模",
-          "llm_tldr_en": "This paper argues that diversity in RL arises from reward uncertainty, and proposes a framework that induces diverse behavior by treating uncertainty as rational, with applications to language model fine-tuning and RLHF.",
-          "llm_tldr_cn": "经典强化学习追求确定性策略，但现代应用如语言模型微调需要多样性。本文提出多样性是奖励不确定性的理性响应，当奖励函数不完全已知时，承诺单一动作可能次优。基于此提出一个利用奖励不确定性诱导多样行为的框架，在多个基准任务上展示性能保持的同时增加行为多样性。",
-          "llm_tldr": "经典强化学习追求确定性策略，但现代应用如语言模型微调需要多样性。本文提出多样性是奖励不确定性的理性响应，当奖励函数不完全已知时，承诺单一动作可能次优。基于此提出一个利用奖励不确定性诱导多样行为的框架，在多个基准任务上展示性能保持的同时增加行为多样性。",
-          "llm_tags": [
-            "query:lpt"
-          ],
-          "matched_query_tag": "query:lpt",
-          "matched_query_text": "Reinforcement Learning",
-          "matched_requirement_id": "req-2",
-          "selection_source": "carryover_cache",
-          "paper_id": "2606.03962v1",
-          "carry_days": 1
-        },
-        {
-          "id": "2606.06825v1",
-          "source": "arxiv",
-          "title": "Progress-SQL: Improving Reinforcement Learning for Text-to-SQL via Progressive Rewards",
-          "abstract": "Reinforcement learning has recently shown promise in improving large language models for Text-to-SQL generation, yet existing methods typically optimize one-shot rewards defined over a single SQL state. Such rewards provide limited guidance for iterative SQL correction and are insufficient to capture the improvement of multi-turn SQL refinement. In this paper, we propose Progress-SQL, a multi-turn reinforcement learning framework with progressive rewards for Text-to-SQL. Our approach introduces an Oracle-guided Diagnostic Tree (ODT), which abstracts SQL queries into clause-level structural profiles and produces diagnostic feedback for next-turn refinement. To provide dense and robust reward signals, we combine ODT-based structural alignment with lexical alignment and define a progressive reward that measures the improvement from the initial SQL to the final SQL. We further incorporate a progression latency reward that favors earlier correctness and an execution status reward that encourages recovery from the invalid SQL. Experiments on BIRD, Spider, and Spider robustness variants demonstrate that our method consistently improves Text-to-SQL performance across both primary and robustness evaluations.",
-          "authors": [
-            "Shihao Zhang",
-            "Xiaoman Wang",
-            "Yuan Liu",
-            "Yunshi Lan",
-            "Weining Qian"
-          ],
-          "primary_category": "cs.CL",
-          "categories": [
-            "cs.CL",
-            "cs.AI"
-          ],
-          "published": "2026-06-05T01:59:03+00:00",
-          "link": "https://arxiv.org/pdf/2606.06825v1",
-          "tags": [
-            "keyword:lpt",
-            "query:lpt"
-          ],
-          "llm_score": 8.0,
-          "llm_evidence_en": "improves reinforcement learning for Text-to-SQL with progressive rewards",
-          "llm_evidence_cn": "通过渐进奖励改进文本到SQL的强化学习",
-          "llm_evidence": "通过渐进奖励改进文本到SQL的强化学习",
-          "canonical_evidence": "通过渐进奖励改进文本到SQL的强化学习",
-          "llm_tldr_en": "Progress-SQL introduces a multi-turn RL framework with Oracle-guided Diagnostic Tree to provide progressive rewards for Text-to-SQL, outperforming single-step reward methods.",
-          "llm_tldr_cn": "针对现有强化学习优化文本到SQL任务时仅依赖单步奖励、缺乏多轮修正指导的问题，提出Progress-SQL框架。该框架引入Oracle引导的诊断树，将SQL查询抽象为子句级结构剖面，生成结构对齐的渐进奖励信号，为后续轮次提供密集反馈。实验表明该方法显著提升了SQL生成的准确率和多轮修正效率。",
-          "llm_tldr": "针对现有强化学习优化文本到SQL任务时仅依赖单步奖励、缺乏多轮修正指导的问题，提出Progress-SQL框架。该框架引入Oracle引导的诊断树，将SQL查询抽象为子句级结构剖面，生成结构对齐的渐进奖励信号，为后续轮次提供密集反馈。实验表明该方法显著提升了SQL生成的准确率和多轮修正效率。",
-          "llm_tags": [
-            "query:lpt"
-          ],
-          "matched_query_tag": "query:lpt",
-          "matched_query_text": "Reinforcement Learning",
-          "matched_requirement_id": "req-2",
-          "selection_source": "carryover_cache",
-          "paper_id": "2606.06825v1",
-          "carry_days": 1
-        },
-        {
-          "id": "2606.03327v1",
-          "source": "arxiv",
-          "title": "CAPER: Clause-Aligned Process Supervision for Text-to-SQL",
-          "abstract": "Text-to-SQL systems are typically evaluated by query-level execution correctness, but this terminal signal provides little guidance about which intermediate SQL decision caused success or failure. Token-level dense supervision is also ill-suited: SQL tokens do not align with complete semantic decisions, can penalize execution-equivalent queries, and are difficult to label reliably at scale. We therefore propose CAPER, which automatically derives clause-level supervision via counterfactual intervention on the SQL abstract syntax tree, enabling root-cause error localization for reward modeling; the resulting data is used to train CAPER-9B, a lightweight Clause-PRM that provides clause-boundary feedback for policy optimization and candidate verification. Experiments on BIRD and Spider show that clause-aligned supervision not only improves execution accuracy, achieving up to a 15.3% relative EX improvement over GPT-5.4, but also strengthens failure-localization capability, reaching 84.53% accuracy and 90.60% MRR on held-out failures. Our project page is at https://github.com/banrichard/RL-NL2SQL.",
-          "authors": [
-            "Lujie Ban",
-            "Jiasheng Shi",
-            "Jinyang Li",
-            "Xiaolin Han",
-            "Tsz Nam Chan",
-            "Chenhao Ma"
-          ],
-          "primary_category": "cs.DB",
-          "categories": [
-            "cs.DB",
-            "cs.CL"
-          ],
-          "published": "2026-06-02T08:35:40+00:00",
-          "link": "https://arxiv.org/pdf/2606.03327v1",
-          "tags": [
-            "keyword:lpt",
-            "query:lpt"
-          ],
-          "llm_score": 8.0,
-          "llm_evidence_en": "clause-level reward modeling for policy optimization",
-          "llm_evidence_cn": "用于策略优化的子句级奖励建模",
-          "llm_evidence": "用于策略优化的子句级奖励建模",
-          "canonical_evidence": "用于策略优化的子句级奖励建模",
-          "llm_tldr_en": "Proposes CAPER, which automatically derives clause-level supervision via counterfactual intervention on SQL AST, enabling root-cause error localization for reward modeling and training a lightweight Clause-PRM for policy optimization and verification.",
-          "llm_tldr_cn": "针对文本到SQL任务中查询级执行正确性无法定位中间错误的问题，提出CAPER方法，通过反事实干预SQL抽象语法树自动生成子句级监督信号，实现根因错误定位。该方法训练轻量级子句过程奖励模型CAPER-9B，为策略优化和候选验证提供子句边界反馈，显著提升模型性能。",
-          "llm_tldr": "针对文本到SQL任务中查询级执行正确性无法定位中间错误的问题，提出CAPER方法，通过反事实干预SQL抽象语法树自动生成子句级监督信号，实现根因错误定位。该方法训练轻量级子句过程奖励模型CAPER-9B，为策略优化和候选验证提供子句边界反馈，显著提升模型性能。",
-          "llm_tags": [
-            "query:lpt"
-          ],
-          "matched_query_tag": "query:lpt",
-          "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
-          "matched_requirement_id": "req-6",
-          "selection_source": "carryover_cache",
-          "paper_id": "2606.03327v1",
           "carry_days": 1
         }
       ]
