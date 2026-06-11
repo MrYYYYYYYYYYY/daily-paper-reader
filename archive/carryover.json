@@ -1,50 +1,12 @@
 {
-  "generated_at": "2026-06-10T21:47:31.473545+00:00",
-  "updated_date": "20260610",
+  "generated_at": "2026-06-11T22:22:19.967372+00:00",
+  "updated_date": "20260611",
   "carryover_days": 9,
   "tag_states": {
     "lpt": {
-      "updated_date": "20260610",
+      "updated_date": "20260611",
       "carryover_days": 9,
-      "items": [
-        {
-          "id": "2606.08620v1",
-          "source": "arxiv",
-          "title": "SPA: A SQL-Plan-Aware Reinforcement Learning Framework for Query Rewriting with LLMs",
-          "abstract": "SQL query rewriting is a well-established technique for improving database performance without schema or index changes, yet finding effective rewrites for modern analytical workloads remains difficult: rule-based methods are limited to predefined transformations, while LLM-based approaches often produce rewrites that are semantically valid but compile to equivalent physical plans or degrade runtime performance. We present SPA, a SQL-Plan-Aware reinforcement learning framework that trains LLMs to rewrite queries using physical execution feedback. SPA formulates rewriting as a policy optimization problem and extends GRPO with rewards spanning semantic equivalence, textual rewrite distance, physical-plan divergence, and runtime speedup. To handle reward sparsity across query difficulty, SPA introduces Probability-Gated Adaptive Reward Shaping, a query-level curriculum that unlocks higher-level rewards only once a rollout group achieves sufficient mastery of lower-level objectives, and further improves sample efficiency through on-policy self-improvement by recycling slowdown rewrites from the current policy as targeted training signals. On both IID and OOD workloads, SPA outperforms rule-based and strong LLM baselines in end-to-end runtime, substantially reduces harmful slowdown rewrites, and yields strong tail-latency gains.",
-          "authors": [
-            "Xinyi Huang",
-            "Zhengjie Miao"
-          ],
-          "primary_category": "cs.DB",
-          "categories": [
-            "cs.DB"
-          ],
-          "published": "2026-06-07T13:12:46+00:00",
-          "link": "https://arxiv.org/pdf/2606.08620v1",
-          "tags": [
-            "keyword:lpt",
-            "query:lpt"
-          ],
-          "llm_score": 8.0,
-          "llm_evidence_en": "SQL-Plan-Aware RL framework for query rewriting with LLMs",
-          "llm_evidence_cn": "基于强化学习的SQL查询重写框架",
-          "llm_evidence": "基于强化学习的SQL查询重写框架",
-          "canonical_evidence": "基于强化学习的SQL查询重写框架",
-          "llm_tldr_en": "SPA trains LLMs to rewrite SQL queries using reinforcement learning with physical execution feedback, improving runtime performance.",
-          "llm_tldr_cn": "SQL查询重写是提升数据库性能的重要技术，但现有方法存在局限。本文提出SPA框架，利用强化学习训练大语言模型进行查询重写，将重写建模为策略优化问题，并扩展GRPO算法结合语义等价、改写距离、物理计划差异和运行时加速等多重奖励信号。实验表明SPA能有效生成性能更优的查询改写，验证了强化学习在查询优化中的潜力。",
-          "llm_tldr": "SQL查询重写是提升数据库性能的重要技术，但现有方法存在局限。本文提出SPA框架，利用强化学习训练大语言模型进行查询重写，将重写建模为策略优化问题，并扩展GRPO算法结合语义等价、改写距离、物理计划差异和运行时加速等多重奖励信号。实验表明SPA能有效生成性能更优的查询改写，验证了强化学习在查询优化中的潜力。",
-          "llm_tags": [
-            "query:lpt"
-          ],
-          "matched_query_tag": "query:lpt",
-          "matched_query_text": "Reinforcement Learning",
-          "matched_requirement_id": "req-2",
-          "selection_source": "carryover_cache",
-          "paper_id": "2606.08620v1",
-          "carry_days": 1
-        }
-      ]
+      "items": []
     }
   }
 }

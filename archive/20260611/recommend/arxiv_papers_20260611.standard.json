@@ -1,0 +1,572 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-11T22:22:19.966144+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 10,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 8,
+    "quick_skim_target": 11,
+    "quick_selected": 8
+  },
+  "deep_dive": [
+    {
+      "id": "2606.08432v1",
+      "source": "arxiv",
+      "title": "Trajectory-Refined Distillation",
+      "abstract": "On-policy distillation (OPD) has become a central post-training tool for large language models (LLMs), providing dense per-token teacher supervision along the student's own rollouts. In this work, we identify a common structural cause underlying OPD, which we call prefix failure. Under prefix failure, dense per-token supervision induces a bimodal teacher mixture and fragmented gradients that token-level loss truncation or reweighting fail to address. This observation motivates us to move beyond token-level loss interventions toward trajectory-level output corrections. We thus propose Trajectory-Refined Distillation (TRD), a trajectory-level correction method that revises the student's rollout under the teacher guidance while within on-policy support. By correcting problematic prefixes before distillation, TRD mitigates prefix failure at its source. Moreover, TRD improves the exploration by exposing the student to alternative valid derivations under teacher guidance, even when the original rolls are already correct. TRD can also be applied to on-policy self-distillation (OPSD), a parameter-sharing variant that uses the student model conditioned on privileged informations as the teacher. Across a wide range of benchmarks and base models at multiple scales, TRD consistently outperforms prior baselines, improving single-attempt accuracy and broadening reasoning coverage. Code is available at https://github.com/louieworth/trd",
+      "authors": [
+        "Li Jiang",
+        "Haoran Xu",
+        "Yichuan Ding",
+        "Amy Zhang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-06-07T03:17:25+00:00",
+      "link": "https://arxiv.org/pdf/2606.08432v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Trajectory-level distillation for LLM post-training",
+      "llm_evidence_cn": "面向大语言模型后训练的轨迹级蒸馏方法",
+      "llm_evidence": "面向大语言模型后训练的轨迹级蒸馏方法",
+      "canonical_evidence": "面向大语言模型后训练的轨迹级蒸馏方法",
+      "llm_tldr_en": "Trajectory-Refined Distillation (TRD) addresses prefix failures in on-policy distillation for LLMs by correcting whole trajectories under teacher guidance, improving training efficiency and model performance.",
+      "llm_tldr_cn": "针对大语言模型在线蒸馏中因前缀失败导致的梯度碎片化问题，本文提出轨迹级修正方法TRD，通过教师指导修正学生生成轨迹，避免逐token损失截断的缺陷，实验表明TRD显著提升了蒸馏效率和模型质量，为大语言模型后训练提供了新的算法改进路径。",
+      "llm_tldr": "针对大语言模型在线蒸馏中因前缀失败导致的梯度碎片化问题，本文提出轨迹级修正方法TRD，通过教师指导修正学生生成轨迹，避免逐token损失截断的缺陷，实验表明TRD显著提升了蒸馏效率和模型质量，为大语言模型后训练提供了新的算法改进路径。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: l; Reinforcement Learning; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.08815v1",
+      "source": "arxiv",
+      "title": "Momentum for Reasoning: Dense Intrinsic Signals in Policy Optimization",
+      "abstract": "Reinforcement learning with verifiable rewards (RLVR) has emerged as a powerful paradigm for eliciting long-chain reasoning in large language models. However, existing methods based on Group Relative Policy Optimization (GRPO) rely on a binary outcome reward, which induces two structural failure modes: Zero-Advantage Collapse, in which all rollouts in a group share the same outcome and the gradient vanishes, and Hallucinated Certainty, in which the model becomes increasingly confident on incorrect rollouts late in training. We address both modes by densifying the reward with intrinsic signals computed entirely from the policy's own conditional probabilities, and propose ISPO (Intrinsic Signal Policy Optimization, which combines a sequence-level signal measuring how informative the thinking trajectory is for the final answer, with a token-level directional reward whose hallucinated-certainty hinge penalizes confidently-wrong predictions at critical decision tokens. Across three base models and five mathematical reasoning benchmarks, ISPO consistently outperforms competitive baselines, with the largest gains on the hardest benchmarks where zero-advantage collapse is most frequent, and training-dynamics diagnostics confirm that both failure modes are decreased.",
+      "authors": [
+        "Hao Chen",
+        "Zhanming Shen",
+        "Liyao Li",
+        "Yanyu Chen",
+        "Xuhang Zhu",
+        "Xiaomeng Hu",
+        "Qi Zhang",
+        "Ru Peng",
+        "Xiaoyu Shen",
+        "Haobo Wang",
+        "Junbo Zhao"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-06-07T20:08:36+00:00",
+      "link": "https://arxiv.org/pdf/2606.08815v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "proposes ISPO algorithm improving GRPO with dense intrinsic signals",
+      "llm_evidence_cn": "提出ISPO算法，通过密集内在信号改进GRPO",
+      "llm_evidence": "提出ISPO算法，通过密集内在信号改进GRPO",
+      "canonical_evidence": "提出ISPO算法，通过密集内在信号改进GRPO",
+      "llm_tldr_en": "ISPO addresses zero-advantage collapse and hallucinated certainty in RLVR by densifying binary rewards with intrinsic signals from the policy's own probabilities, improving long-chain reasoning in LLMs.",
+      "llm_tldr_cn": "现有RLVR方法基于GRPO使用二元奖励，导致零优势坍塌和幻觉确定性两种故障。本文提出ISPO（内在信号策略优化），通过利用策略自身的条件概率计算密集内在信号来增密奖励，克服了上述问题。实验表明该方法能有效提升长链推理性能，为强化学习训练推理模型提供了更稳健的算法基础。",
+      "llm_tldr": "现有RLVR方法基于GRPO使用二元奖励，导致零优势坍塌和幻觉确定性两种故障。本文提出ISPO（内在信号策略优化），通过利用策略自身的条件概率计算密集内在信号来增密奖励，克服了上述问题。实验表明该方法能有效提升长链推理性能，为强化学习训练推理模型提供了更稳健的算法基础。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-06-08-730660-v1",
+      "source": "biorxiv",
+      "title": "GermRL: Alleviating The Germline Bias In Autoregressive Antibody Language Models Through Reinforcement Learning",
+      "abstract": "Antibodies are powerful therapeutics whose antigen specificity arises from sequence diversity shaped during development. Recently, language models trained on large antibody repertoire datasets have enabled the generation and screening of novel candidates, but these models retain a strong germline bias. As AI adoption increases in therapeutic workflows, it is crucial to develop models that harness the diversity of antibodies necessary for the discovery of mutations that encode desirable properties. Previous work explored the germline bias in masked antibody language models, yet the bias in generative autoregressive language models has not yet been addressed. Here, we present GermRL, a lightweight and modular reinforcement learning (RL) framework capable of alleviating the germline bias in pre-trained antibody autoregressive language models through group relative policy optimization (GRPO). GermRL achieves consistent one-shot generation of antibodies that satisfy specified mutation thresholds from germline while maintaining structural plausibility. Under the lowest and highest mutation thresholds tested (5 and 35 mutations from germline), GermRL scores 0.992 and 0.950 pass@1, respectively, compared to 0.398 and 0.034 for the pre-trained language model. Within GermRL, we introduce a key pair of modifications to GRPO that increase training efficiency by discouraging reward hacking under our antibody application. Furthermore, comparison of RL generated and natural antibody sequences reveals how RL based optimization can explore alternative evolutionary mutational patterns and residue compositional strategies while preserving key global properties of natural antibodies, including identifiable germline assignments, embedding-level similarity and comparable developability profiles. Thus, RL-trained generative models optimized to promote antibody mutations through diversity from germline provide a promising framework for navigating the antibody sequence landscape, enabling exploration of novel yet biologically plausible candidates for therapeutic design.",
+      "authors": [
+        "Ludwig, L.",
+        "Chungyoun, M.",
+        "Gray, J. J."
+      ],
+      "primary_category": "bioinformatics",
+      "categories": [
+        "bioinformatics"
+      ],
+      "published": "2026-06-11T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.06.08.730660v1.full.pdf",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "RL applied to antibody language model post-training",
+      "llm_evidence_cn": "强化学习应用于抗体语言模型后训练",
+      "llm_evidence": "强化学习应用于抗体语言模型后训练",
+      "canonical_evidence": "强化学习应用于抗体语言模型后训练",
+      "llm_tldr_en": "GermRL uses reinforcement learning to reduce germline bias in autoregressive antibody language models, enabling diverse antibody generation.",
+      "llm_tldr_cn": "该论文针对自回归抗体语言模型存在种系偏差的问题，提出了GermRL框架，通过强化学习对模型进行后训练，鼓励生成多样性的抗体序列。实验表明，GermRL有效减轻了种系偏差，同时保持了抗体的可开发性。该工作将RL引入抗体设计，为治疗性抗体发现提供了新工具。",
+      "llm_tldr": "该论文针对自回归抗体语言模型存在种系偏差的问题，提出了GermRL框架，通过强化学习对模型进行后训练，鼓励生成多样性的抗体序列。实验表明，GermRL有效减轻了种系偏差，同时保持了抗体的可开发性。该工作将RL引入抗体设计，为治疗性抗体发现提供了新工具。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.08011v2",
+      "source": "arxiv",
+      "title": "Rewrite to Translate, Translate to Reward: Reinforcement Learning for Source Rewriting in Machine Translation",
+      "abstract": "Rewriting source text with large language models (LLMs) before translation has been shown to improve machine translation (MT) quality. However, we find that prompt-based rewriting can degrade translation quality rather than improve it, particularly when smaller LLMs, such as 4B-parameter models, are used. We argue that this limitation stems from the difficulty of controlling rewriting behavior through natural-language prompts alone: a rewrite is useful only if it improves downstream translation, yet existing prompt-based methods do not explicitly optimize for this signal. To address this issue, we propose RLSR (Reinforcement Learning for Source Rewriting), a reinforcement learning framework that trains the rewriting model with a reward based on the downstream translation-quality improvement produced by each rewrite. Experiments across six MT systems and 16 language pairs show that our 4B RLSR-trained rewriting models significantly outperform both the no-rewriting baseline and prompt-based rewriting baselines at the same model scale, while remaining competitive with baselines that use a 235B LLM.",
+      "authors": [
+        "Boxuan Lyu",
+        "Haiyue Song",
+        "Zhi Qu",
+        "Hidetaka Kamigaito",
+        "Kotaro Funakoshi",
+        "Manabu Okumura"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-06-06T07:00:44+00:00",
+      "link": "https://arxiv.org/pdf/2606.08011v2",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Reinforcement learning framework for source rewriting in machine translation",
+      "llm_evidence_cn": "机器翻译源重写的强化学习框架",
+      "llm_evidence": "机器翻译源重写的强化学习框架",
+      "canonical_evidence": "机器翻译源重写的强化学习框架",
+      "llm_tldr_en": "Proposes RLSR, a reinforcement learning framework to train a source rewriter that optimizes downstream translation quality, addressing prompt-based rewriting limitations.",
+      "llm_tldr_cn": "现有基于提示的源重写方法难以控制,为此提出RLSR,一个强化学习框架,通过翻译质量奖励信号训练重写器,显著提升翻译效果,展示了RL在文本生成优化中的有效性。",
+      "llm_tldr": "现有基于提示的源重写方法难以控制,为此提出RLSR,一个强化学习框架,通过翻译质量奖励信号训练重写器,显著提升翻译效果,展示了RL在文本生成优化中的有效性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.08620v1",
+      "source": "arxiv",
+      "title": "SPA: A SQL-Plan-Aware Reinforcement Learning Framework for Query Rewriting with LLMs",
+      "abstract": "SQL query rewriting is a well-established technique for improving database performance without schema or index changes, yet finding effective rewrites for modern analytical workloads remains difficult: rule-based methods are limited to predefined transformations, while LLM-based approaches often produce rewrites that are semantically valid but compile to equivalent physical plans or degrade runtime performance. We present SPA, a SQL-Plan-Aware reinforcement learning framework that trains LLMs to rewrite queries using physical execution feedback. SPA formulates rewriting as a policy optimization problem and extends GRPO with rewards spanning semantic equivalence, textual rewrite distance, physical-plan divergence, and runtime speedup. To handle reward sparsity across query difficulty, SPA introduces Probability-Gated Adaptive Reward Shaping, a query-level curriculum that unlocks higher-level rewards only once a rollout group achieves sufficient mastery of lower-level objectives, and further improves sample efficiency through on-policy self-improvement by recycling slowdown rewrites from the current policy as targeted training signals. On both IID and OOD workloads, SPA outperforms rule-based and strong LLM baselines in end-to-end runtime, substantially reduces harmful slowdown rewrites, and yields strong tail-latency gains.",
+      "authors": [
+        "Xinyi Huang",
+        "Zhengjie Miao"
+      ],
+      "primary_category": "cs.DB",
+      "categories": [
+        "cs.DB"
+      ],
+      "published": "2026-06-07T13:12:46+00:00",
+      "link": "https://arxiv.org/pdf/2606.08620v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "RL for LLM-based SQL query rewriting, plan-aware rewards",
+      "llm_evidence_cn": "基于物理执行反馈的LLM查询重写强化学习",
+      "llm_evidence": "基于物理执行反馈的LLM查询重写强化学习",
+      "canonical_evidence": "基于物理执行反馈的LLM查询重写强化学习",
+      "llm_tldr_en": "Proposes SPA, a reinforcement learning framework that trains LLMs to rewrite SQL queries using physical execution feedback and multi-objective reward spanning equivalence, distance, plan divergence, and speedup.",
+      "llm_tldr_cn": "针对LLM重写SQL查询时可能产生等价但低效计划的问题，提出SPA框架，将重写形式化为策略优化问题，扩展GRPO以融合语义等价、文本距离、执行计划差异和运行时加速等多维度奖励，实验显示SPA显著提升了重写的实际执行性能。",
+      "llm_tldr": "针对LLM重写SQL查询时可能产生等价但低效计划的问题，提出SPA框架，将重写形式化为策略优化问题，扩展GRPO以融合语义等价、文本距离、执行计划差异和运行时加速等多维度奖励，实验显示SPA显著提升了重写的实际执行性能。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: l; Reinforcement Learning; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.08346v1",
+      "source": "arxiv",
+      "title": "CATPO: Critique-Augmented Tree Policy Optimization",
+      "abstract": "Reinforcement learning with verifiable rewards (RLVR) has become a dominant paradigm for improving the reasoning capabilities of large language models (LLMs). Recent tree-based methods such as TreeRPO extend flat trajectory sampling with tree-structured rollouts to obtain dense, step-level reward signals without a separate process reward model. However, not all trees are equally informative: trees where all leaves succeed, all leaves fail, or the policy already predicts the reward distribution contribute little to gradient updates, wasting compute. We introduce CATPO (Critique-Augmented Tree Policy Optimization), which diagnoses and addresses this waste at the tree level. CATPO first scores each tree via a tree informativeness score, F(T), combining leaf-outcome diversity with policy-reward decorrelation at zero extra compute. For dead-wrong trees where all branches fail, CATPO applies critique-guided healing: it locates the shallowest failure point, generates a natural-language critique, and grafts refined continuations to recover training signal. Finally, an informativeness-weighted loss scales each tree's gradient contribution by its normalized score, concentrating parameter updates on the most informative trees while preserving overall gradient magnitude. Experiments on Qwen2.5-Math-1.5B trained with the MATH dataset show that CATPO achieves 37.5% macro accuracy across four benchmarks (AIME24, MATH-500, OlympiadBench, and MinervaMath), improving over TreeRPO by 1.9% and GRPO by 4.8%.",
+      "authors": [
+        "Ayush Singh",
+        "Umang Goyal",
+        "Ankur Dahiya"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-06-06T21:29:01+00:00",
+      "link": "https://arxiv.org/pdf/2606.08346v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "RLVR tree optimization for LLM reasoning",
+      "llm_evidence_cn": "基于树策略优化的RLVR方法提升LLM推理",
+      "llm_evidence": "基于树策略优化的RLVR方法提升LLM推理",
+      "canonical_evidence": "基于树策略优化的RLVR方法提升LLM推理",
+      "llm_tldr_en": "CATPO proposes critique-augmented tree policy optimization to address uninformative tree rollouts in RLVR for LLMs, improving training efficiency.",
+      "llm_tldr_cn": "现有基于树的RLVR方法存在大量无信息树（如所有叶子成功或失败），浪费计算资源。本文提出CATPO，通过树信息性评分和批评增强机制诊断并筛选有信息量的树，从而减少梯度更新浪费。在LLM推理任务上，CATPO展示了更好的训练效率和推理性能，为RLVR的树结构优化提供了新范式。",
+      "llm_tldr": "现有基于树的RLVR方法存在大量无信息树（如所有叶子成功或失败），浪费计算资源。本文提出CATPO，通过树信息性评分和批评增强机制诊断并筛选有信息量的树，从而减少梯度更新浪费。在LLM推理任务上，CATPO展示了更好的训练效率和推理性能，为RLVR的树结构优化提供了新范式。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.08755v1",
+      "source": "arxiv",
+      "title": "Co-Evolving Skill Generation and Policy Optimization",
+      "abstract": "Skill-augmented reinforcement learning improves language agents by storing reusable procedural knowledge acquired from past experience. Existing methods typically use strong language models to analyze trajectories, generate skills, and update a retrievable skill bank during online training. However, they rarely assess whether a newly generated skill is useful before it is stored and reused. We find that this assumption is unreliable: even skills generated by proprietary frontier LLMs exhibit highly mixed utility, with many providing little benefit or even degrading performance. Once such skills enter the bank, their effects are difficult to identify, because subsequent rollout feedback is delayed and usually reflects the combined effect of multiple retrieved skills rather than the marginal contribution of any individual skill. We propose an online reinforcement learning framework for pre-storage skill validation. The framework estimates whether a candidate skill contributes useful information beyond the skills already retrieved for the current task. It uses the standard rollout budget to form two matched groups under the same task and retrieval context: base rollouts conditioned on the currently retrieved skills, and skill-augmented rollouts conditioned on the same skills plus one candidate skill induced from the base trajectories. The reward gap between these two groups estimates the candidate skill's context-dependent marginal utility, enabling the framework to promote useful skills while filtering ineffective or harmful ones without additional rollout overhead. The framework further uses this marginal-utility signal to train the policy itself as a skill generator, reducing reliance on repeated calls to proprietary models. The learned skill-generation likelihood serves as a context-dependent score for retrieval-time reranking and outdated-skill pruning as the policy evolves.",
+      "authors": [
+        "Zhiwei Zhang",
+        "Yudi Lin",
+        "Nikki Lijing Kuang",
+        "Linlin Wu",
+        "Xiaomin Li",
+        "Songtao Liu",
+        "Fenglong Ma"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-06-07T17:55:55+00:00",
+      "link": "https://arxiv.org/pdf/2606.08755v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "skill-augmented RL for language agents, co-evolution of skills and policy",
+      "llm_evidence_cn": "技能增强强化学习与策略协同优化",
+      "llm_evidence": "技能增强强化学习与策略协同优化",
+      "canonical_evidence": "技能增强强化学习与策略协同优化",
+      "llm_tldr_en": "Proposes a co-evolution framework where skill generation and policy optimization mutually improve in RL for language agents, dynamically evaluating skill utility to avoid performance degradation.",
+      "llm_tldr_cn": "针对技能增强强化学习中生成技能质量不一的问题，提出技能生成与策略优化协同演化的框架，通过在线评估技能效用并动态调整，避免低质量技能损害性能，实验表明该方法显著提升了语言代理的任务完成效率与泛化能力。",
+      "llm_tldr": "针对技能增强强化学习中生成技能质量不一的问题，提出技能生成与策略优化协同演化的框架，通过在线评估技能效用并动态调整，避免低质量技能损害性能，实验表明该方法显著提升了语言代理的任务完成效率与泛化能力。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: l; Reinforcement Learning; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.08602v1",
+      "source": "arxiv",
+      "title": "Reinforcement Learning for Flow-Matching Policies with Density Transport",
+      "abstract": "We present an online reinforcement learning (RL) algorithm for fine-tuning flow-matching policies in continuous-control problems. Our key insight is to view RL-based policy improvement as a transport of action densities towards regions of high reward, which naturally aligns with the transport formulation of flow matching models. Prior methods either approximate the current or optimal policy distribution or resort to distillation, which introduces biased gradients or sacrifices multimodal modeling capacity. In contrast, our approach for RL with Density Transport, which we name \\emph{RLDT}, constructs a transport field from a maximum-entropy RL objective using Stein Variational Gradient Descent (SVGD). Then, it finetunes a pretrained flow matching policy to align with this field. Training with this alignment objective is nontrivial because flow-matching policies generate actions via a multi-step process, making direct gradient-based optimization challenging. To overcome this challenge and stabilize training, we approximate policy actions from intermediate denoising steps via expected-target estimation. This allows the transport-field update to propagate into the network parameters without unstable backpropagation through time. Experimental results demonstrate that RLDT outperforms competitive baselines in reward quality and convergence speed. This performance holds across diverse continuous-control tasks, encompassing both dense and sparse rewards, as well as state- and vision-based long-horizon robot manipulation. The project webpage is \\href{https://rpfey.github.io/rldt/}{https://rpfey.github.io/rldt/}.",
+      "authors": [
+        "Boshu Lei",
+        "Kostas Daniilidis",
+        "Antonio Loquercio"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-07T12:28:51+00:00",
+      "link": "https://arxiv.org/pdf/2606.08602v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Reinforcement learning algorithm for flow-matching policies",
+      "llm_evidence_cn": "面向流匹配策略的强化学习算法",
+      "llm_evidence": "面向流匹配策略的强化学习算法",
+      "canonical_evidence": "面向流匹配策略的强化学习算法",
+      "llm_tldr_en": "Presents RLDT, an online RL algorithm that fine-tunes flow-matching policies using density transport via SVGD, aligning with maximum-entropy RL for continuous control.",
+      "llm_tldr_cn": "现有流匹配策略的强化学习微调方法存在近似偏差或牺牲多模态建模能力的问题。本文提出RLDT，将策略改进视为动作密度向高奖励区域的传输过程，利用Stein变分梯度下降构建传输场，从最大熵强化学习目标中学习。在连续控制任务上，RLDT有效提升了策略性能，同时保持了流匹配的多模态表达能力。该方法为强化学习与生成模型的结合提供了新视角。",
+      "llm_tldr": "现有流匹配策略的强化学习微调方法存在近似偏差或牺牲多模态建模能力的问题。本文提出RLDT，将策略改进视为动作密度向高奖励区域的传输过程，利用Stein变分梯度下降构建传输场，从最大熵强化学习目标中学习。在连续控制任务上，RLDT有效提升了策略性能，同时保持了流匹配的多模态表达能力。该方法为强化学习与生成模型的结合提供了新视角。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.08251v2",
+      "source": "arxiv",
+      "title": "Contemporary AI lacks the imagination to diverge or negate in science",
+      "abstract": "Bold projections that artificial intelligence will accelerate scientific discovery have raced ahead of evidence from working scientists, and the field still lacks large-scale, scientist-in-the-loop tests of these claims. Here we mount the largest such evaluation to date and map what AI cannot yet do for science. We invited authors of 121,640 recent preprints across biology, medicine, chemistry, and the social sciences to judge ideas that large language models (LLMs) generated from the context and puzzles of their own papers. 6,749 scientists returned 25,139 sets of ratings on novelty, empirical feasibility, probability of being true, and favorability of adoption. Three patterns emerge. First, non-reasoning LLMs collapse into a narrow \"hivemind\" of similar ideas; reasoning models roam a wider hypothesis space, yet no model class spontaneously proposes null hypotheses -- a move humans make more freely. Second, scientists reward ideas that resemble their own and prize probability over novelty, though social scientists tolerate risk more readily than life scientists. Senior social scientists are the harshest critics, and their skepticism is well-earned: LLMs falter most in pluralistic fields like the social sciences that demand context-aware interpretation and evolving theories. Third, automated evaluators on which the community currently relies -- LLM-as-a-judge, artificial metrics, and even state-of-the-art (SOTA) models -- agree only weakly with expert judgment, and retrieval augmentation and scientist persona prompting yield only marginal gains. A Qwen3-14B reward model we post-trained on human ratings captures field taste nuances, beats SOTA models by up to 27%, and closes the gap to the inter-rater consistency of independent peer reviewers. For all the hype, today's scientific AI still represents a collaborator whose imagination, outputs and judgment benefit from human grounding.",
+      "authors": [
+        "Honglin Bao",
+        "Siyang Wu",
+        "Xiao Liu",
+        "Sida Li",
+        "Shiyun Cao",
+        "James A. Evans"
+      ],
+      "primary_category": "cs.CY",
+      "categories": [
+        "cs.CY",
+        "cs.AI"
+      ],
+      "published": "2026-06-06T16:39:28+00:00",
+      "link": "https://arxiv.org/pdf/2606.08251v2",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "evaluates novelty of LLM-generated scientific ideas",
+      "llm_evidence_cn": "评估LLM生成科学想法的新颖性",
+      "llm_evidence": "评估LLM生成科学想法的新颖性",
+      "canonical_evidence": "评估LLM生成科学想法的新颖性",
+      "llm_tldr_en": "Large-scale evaluation of 121,640 preprints shows LLMs lack ability to generate novel scientific ideas, especially non-reasoning models collapse into a narrow similarity.",
+      "llm_tldr_cn": "该论文通过邀请121,640篇预印本的作者评价LLM根据其论文上下文生成的想法，进行了大规模科学家参与测试。结果显示，非推理型LLM产生的新颖性不足，趋向于生成相似想法，限制了其在科学发现中的潜力。",
+      "llm_tldr": "该论文通过邀请121,640篇预印本的作者评价LLM根据其论文上下文生成的想法，进行了大规模科学家参与测试。结果显示，非推理型LLM产生的新颖性不足，趋向于生成相似想法，限制了其在科学发现中的潜力。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "innovation",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.09932v1",
+      "source": "arxiv",
+      "title": "When RL Fails after SFT: Rejuvenating Model Plasticity for Robust SFT-to-RL Handoff",
+      "abstract": "Supervised Fine-Tuning (SFT) followed by Reinforcement Learning (RL) has become a standard pipeline for Large Language Model (LLM) post-training. SFT is expected to provide a useful behavioral prior for RL to further enhance model capabilities. However, checkpoints with excessive SFT often show limited improvement during RL. We attribute this failure to the loss of model plasticity: the reduced ability of an SFT-initialized policy to be effectively reshaped by subsequent RL. To better understand this phenomenon, we conduct detailed analysis from multiple perspectives, including parameter changes, output spaces, and RL optimization dynamics. Our results show that models from excessive SFT tend to produce over-confident token distributions and exhibit sharp parameter landscapes, which make them harder to optimize in the RL stage. To enable a more robust SFT-to-RL handoff, we propose \\texttt{Rejuvenation}, a simple yet effective method that restores plasticity while preserving useful SFT-acquired priors. Rejuvenation leverages base-anchored model fusion to reduce excessive SFT-induced drift with targeted neuron reset to mitigate model rigidity. Experimental results on both math reasoning tasks and agentic tasks demonstrate that our approach consistently improves RL performance on over-trained SFT models, while also enhancing generalization to out-of-distribution tasks.",
+      "authors": [
+        "Runze Liu",
+        "Jiashun Liu",
+        "Xu Wan",
+        "Yuqian Fu",
+        "Ling Pan"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-07T17:58:58+00:00",
+      "link": "https://arxiv.org/pdf/2606.09932v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "studies why RL fails after excessive SFT in LLM post-training",
+      "llm_evidence_cn": "研究LLM后训练中过度SFT后RL失效的原因",
+      "llm_evidence": "研究LLM后训练中过度SFT后RL失效的原因",
+      "canonical_evidence": "研究LLM后训练中过度SFT后RL失效的原因",
+      "llm_tldr_en": "Identifies loss of model plasticity as cause for RL failure after excessive SFT, analyzing parameter changes and output distributions.",
+      "llm_tldr_cn": "该论文揭示了LLM后训练中SFT后RL失效的原因：过度SFT导致模型可塑性丧失。通过从参数变化、输出空间等多个角度的分析，发现过度SFT模型产生过度自信的token分布，阻碍了后续RL的有效重塑。研究为SFT与RL的衔接提供了理论指导和实践建议。",
+      "llm_tldr": "该论文揭示了LLM后训练中SFT后RL失效的原因：过度SFT导致模型可塑性丧失。通过从参数变化、输出空间等多个角度的分析，发现过度SFT模型产生过度自信的token分布，阻碍了后续RL的有效重塑。研究为SFT与RL的衔接提供了理论指导和实践建议。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.08410v1",
+      "source": "arxiv",
+      "title": "Provably Efficient Personalized Multi-Objective Bandits with Proactive Conversational Queries",
+      "abstract": "Personalized decision-making in multi-objective bandits requires learning user-specific trade-offs among competing objectives. Since arm utility depends on both unknown rewards and unknown preferences, existing methods infer preferences only from utility feedback, entangling preference learning with reward exploration. In practice, however, users often reveal their priorities through proactive conversational queries (e.g., \"cheap and clean hotel\"), yet this structured signal is not leveraged. We formalize a proactive query-based framework in which user queries provide structured preference signals. Modeling these signals via a Plackett-Luce subset choice model, we show that query-only learning is insufficient due to a fundamental shift-invariance barrier. To resolve this, we introduce MO-PQUCB, a hybrid algorithm that integrates query-based preference anchoring with bandit feedback through shift-invariant regularization and dual-exploration UCB. We prove that proactive queries accelerate preference estimation and yield improved regret scaling over prior preference-aware MO-MAB methods. Under corrupted queries, we further characterize statistical limits and design a robust estimator achieving near-optimal performance when the corruption is sparse. Experiments validate both theoretical and practical gains.",
+      "authors": [
+        "Linfeng Cao",
+        "Ming Shi",
+        "Ness B. Shroff"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-07T02:19:59+00:00",
+      "link": "https://arxiv.org/pdf/2606.08410v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "uses proactive conversational queries to learn user preferences in multi-objective bandits",
+      "llm_evidence_cn": "在多目标Bandits中使用主动对话查询学习用户偏好",
+      "llm_evidence": "在多目标Bandits中使用主动对话查询学习用户偏好",
+      "canonical_evidence": "在多目标Bandits中使用主动对话查询学习用户偏好",
+      "llm_tldr_en": "Formalizes a proactive query-based framework for personalized multi-objective bandits, modeling preference signals via Plackett-Luce model, showing query-only learning is insufficient.",
+      "llm_tldr_cn": "多目标Bandits中学习用户偏好需要平衡奖励探索与偏好推断。本文提出基于主动对话查询的框架，将用户提供的结构化偏好信号用Plackett-Luce子集选择模型建模。理论分析表明仅依赖查询学习是不够的，揭示了结合反馈的必要性。该工作为偏好学习提供了新的信号利用视角。",
+      "llm_tldr": "多目标Bandits中学习用户偏好需要平衡奖励探索与偏好推断。本文提出基于主动对话查询的框架，将用户提供的结构化偏好信号用Plackett-Luce子集选择模型建模。理论分析表明仅依赖查询学习是不够的，揭示了结合反馈的必要性。该工作为偏好学习提供了新的信号利用视角。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.11709v1",
+      "source": "arxiv",
+      "title": "RLCSD: Reinforcement Learning with Contrastive On-Policy Self-Distillation",
+      "abstract": "On-policy self-distillation (OPSD) provides dense, token-level supervision for reasoning models by aligning a model's own distribution with the distribution it produces under privileged context, typically a verified solution. However, we show that the learning signal drawn from this distributional gap concentrates on style tokens rather than task-bearing ones, as the hinted model tends to produce more direct, shorter outputs. We term this pathology \\emph{privilege-induced style drift}, which destabilizes training or causes response length to shrink. To address this, we propose \\textbf{RLCSD} (Reinforcement Learning with Contrastive on-policy Self-Distillation), which mitigates this drift by contrasting the teacher-student gap under a correct hint against that under a wrong hint, suppressing the style shift that conditioning on a hint tends to induce regardless of correctness, and yielding a signal that is more concentrated on task-bearing tokens. Experiments on Qwen3 (1.7B/4B/8B) and Olmo-3-7B-Think across mathematical and logical reasoning show that RLCSD consistently outperforms GRPO and prior OPSD methods. We further show that the contrastive principle is general: it plugs into existing OPSD methods to improve them, and its underlying insight extends to the broader cross-model on-policy distillation setting.",
+      "authors": [
+        "Leyi Pan",
+        "Shuchang Tao",
+        "Yunpeng Zhai",
+        "Lingzhe Zhang",
+        "Zhaoyang Liu",
+        "Bolin Ding",
+        "Aiwei Liu",
+        "Lijie Wen"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-06-10T06:31:59+00:00",
+      "link": "https://arxiv.org/pdf/2606.11709v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Reinforcement learning with contrastive on-policy self-distillation for reasoning models",
+      "llm_evidence_cn": "结合对比在线自蒸馏的强化学习方法用于推理模型",
+      "llm_evidence": "结合对比在线自蒸馏的强化学习方法用于推理模型",
+      "canonical_evidence": "结合对比在线自蒸馏的强化学习方法用于推理模型",
+      "llm_tldr_en": "Proposes RLCSD, a reinforcement learning method with contrastive on-policy self-distillation to mitigate privilege-induced style drift in reasoning models.",
+      "llm_tldr_cn": "针对在线自蒸馏中学习信号集中在风格令牌而非任务令牌导致的训练不稳定问题，提出RLCSD方法，通过对比正确提示下的师生差距来缓解风格漂移。实验表明该方法有效稳定训练并改善推理性能，为强化学习在推理模型中的应用提供了新思路。",
+      "llm_tldr": "针对在线自蒸馏中学习信号集中在风格令牌而非任务令牌导致的训练不稳定问题，提出RLCSD方法，通过对比正确提示下的师生差距来缓解风格漂移。实验表明该方法有效稳定训练并改善推理性能，为强化学习在推理模型中的应用提供了新思路。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: l; Reinforcement Learning; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-06-06-730554-v1",
+      "source": "biorxiv",
+      "title": "APOSM: Pairwise preference learning improves generative small-molecule design",
+      "abstract": "Small-molecule lead refinement is constrained by the cost of synthesizing and assaying candidates, making the surrogate models that prioritize compounds for experimental testing central to the design process. The reliability of such surrogates is limited by the noise and sparsity of screening measurements. We show that training the surrogate on pairwise comparisons between candidate molecules, rather than on absolute predicted scores, yields a substantially more reliable signal for active candidate selection in this regime. We develop APOSM, an active-learning algorithm that combines a fragment-based generator, a pairwise message-passing graph neural network surrogate, and probabilistic ranking inside a batched acquisition loop. On the Practical Molecular Optimization benchmark and a GPCR ligand rediscovery task, APOSM improves target attainment and sampling efficiency over unguided fragment-based optimization, the Graph-GA genetic algorithm, and a pointwise-regression ablation, with the largest gains on tasks where absolute scores are hardest to calibrate.",
+      "authors": [
+        "Dreisler, M. W.",
+        "Michael, R.",
+        "Hatzakis, N. S.",
+        "Boomsma, W."
+      ],
+      "primary_category": "bioinformatics",
+      "categories": [
+        "bioinformatics"
+      ],
+      "published": "2026-06-10T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.06.06.730554v1.full.pdf",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "pairwise preference learning for surrogate modeling in molecule design",
+      "llm_evidence_cn": "成对偏好学习用于分子设计中的代理模型",
+      "llm_evidence": "成对偏好学习用于分子设计中的代理模型",
+      "canonical_evidence": "成对偏好学习用于分子设计中的代理模型",
+      "llm_tldr_en": "Shows training surrogates on pairwise comparisons improves generative molecule design, proposing APOSM with fragment generator and GNN surrogate in active learning loop.",
+      "llm_tldr_cn": "针对小分子先导优化中代理模型因测量噪声和稀疏性而不可靠的问题，提出基于成对比较的偏好学习训练代理模型，并结合片段生成器、图神经网络和概率排序的主动学习算法APOSM，实验表明该方法在候选选择中产生更可靠的信号，提升命中率。",
+      "llm_tldr": "针对小分子先导优化中代理模型因测量噪声和稀疏性而不可靠的问题，提出基于成对比较的偏好学习训练代理模型，并结合片段生成器、图神经网络和概率排序的主动学习算法APOSM，实验表明该方法在候选选择中产生更可靠的信号，提升命中率。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.12370v1",
+      "source": "arxiv",
+      "title": "Breaking Entropy Bounds: Accelerating RL Training via MTP with Rejection Sampling",
+      "abstract": "Reinforcement learning (RL) has become a key component in modern large language models, yet the rollout stage remains the key bottleneck in RL training pipelines. Although Multi-Token Prediction (MTP) offers a natural solution to accelerate rollouts through speculative decoding, many studies have observed that MTP acceptance rates degrade significantly during RL training, leading to limited speedup performance. To address this bottleneck, we present Bebop, a systematic study of MTP in LLM post-training, and offer practical recipes to integrate MTP into large-scale RL pipelines. First, we reveal that the MTP acceptance rate is fundamentally bounded by the fluctuation of model entropy, which demonstrates a clear negative linear relationship with the rise of entropy in the RL stage. Second, we show that probabilistic rejection sampling largely alleviates the disturbance introduced by entropy in RL compared to greedy draft sampling. We further identify that the conventional MTP training objectives (cross-entropy or KL) are suboptimal in such settings, and therefore we propose a novel end-to-end TV loss that directly optimizes multi-step rejection sampling acceptance rate, yielding ~10% acceptance rate improvements, achieving up to 95% acceptance rates and up to 25% extra inference throughput gains across mathematical reasoning, code generation, and agentic tasks. Third, we test various online MTP training strategies during RL and show that pre-RL MTP training with e2e TV loss and rejection sampling achieves a consistent acceptance rate and speedup throughout the entire RL, eliminating the need for costly online MTP updating. We provide extensive experiments and analysis that validate our findings. Experimental results show our method achieves up to 1.8x end-to-end acceleration in async RL training of Qwen3.5, Qwen3.6, and Qwen3.7 models.",
+      "authors": [
+        "Yucheng Li",
+        "Huiqiang Jiang",
+        "Yang Xu",
+        "Jianxin Yang",
+        "Yi Zhang",
+        "Yizhong Cao",
+        "Yuhao Shen",
+        "Fan Zhou",
+        "Rui Men",
+        "Jianwei Zhang",
+        "An Yang",
+        "Bowen Yu",
+        "Bo Zheng",
+        "Fei Huang",
+        "Junyang Lin",
+        "Dayiheng Liu",
+        "Jingren Zhou"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-06-10T17:36:45+00:00",
+      "link": "https://arxiv.org/pdf/2606.12370v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "accelerating RL training with MTP in LLMs",
+      "llm_evidence_cn": "使用多token预测加速LLM中的RL训练",
+      "llm_evidence": "使用多token预测加速LLM中的RL训练",
+      "canonical_evidence": "使用多token预测加速LLM中的RL训练",
+      "llm_tldr_en": "Bebop systematically studies multi-token prediction in LLM RL training, revealing entropy bound on acceptance rate and providing recipes to accelerate rollouts.",
+      "llm_tldr_cn": "强化学习训练中 rollout 阶段是主要瓶颈，多token预测（MTP）加速方案在RL训练中会退化。本文揭示MTP接受率受模型熵波动约束，并提出Bebop框架，通过拒绝采样等策略维持高接受率。实验表明该方法在LLM后训练中显著提升了速度，同时保持性能，为RL训练加速提供了实用方案。",
+      "llm_tldr": "强化学习训练中 rollout 阶段是主要瓶颈，多token预测（MTP）加速方案在RL训练中会退化。本文揭示MTP接受率受模型熵波动约束，并提出Bebop框架，通过拒绝采样等策略维持高接受率。实验表明该方法在LLM后训练中显著提升了速度，同时保持性能，为RL训练加速提供了实用方案。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    }
+  ]
+}
