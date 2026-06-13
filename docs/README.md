@@ -6,46 +6,26 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-12
-- 运行时间：2026-06-12 22:11:43 UTC
+- 最新运行日期：2026-06-13
+- 运行时间：2026-06-13 20:47:03 UTC
 - 运行状态：成功
-- 本次总论文数：8
-- 精读区：6
-- 速读区：2
+- 本次总论文数：2
+- 精读区：1
+- 速读区：1
 
 ### 今日简报（AI）
-1) 今日精读聚焦强化学习与模型蒸馏，PRPO与轨迹精炼蒸馏双双高分。  
-2) 最值得看PRPO（9.0分）提出的感知增强策略优化，以及Trajectory-Refined Distillation（8.0分）的精细蒸馏方法。  
-3) 建议优先精读这两篇，深入理解动态优势重塑与轨迹优化对AI性能的提升。
-- 详情：[/202606/12/README](/202606/12/README)
+今日共浏览2篇论文，精读1篇（《Structure-Conditioned Actor-Critic Branches for Quality-Diversity Reinforcement Learning》8.0分），速读1篇（《Distilling LLM Reasoning into an Interpretable Policy Tree for Human-AI Collaboration》7.0分）。最值得关注的是质量-多样性强化学习中的结构条件Actor-Critic方法，以及将大模型推理蒸馏为可解释策略树的人机协作路径。建议优先精读前者以提升强化学习多样性生成能力，速读后者可了解大模型落地场景。
+- 详情：[/202606/13/README](/202606/13/README)
 
 ### 精读区论文标签
-1. [PRPO: Perception-Reinforced Policy Optimization via Token-Level Dynamic Advantage Reshaping](/202606/12/2606.08708v1-prpo-perception-reinforced-policy-optimization-via-token-level-dynamic-advantage-reshaping)  
-   标签：评分：9.0/10、query:lpt
-   evidence：大视觉语言模型的令牌级强化学习
-2. [Trajectory-Refined Distillation](/202606/12/2606.08432v1-trajectory-refined-distillation)  
+1. [Structure-Conditioned Actor-Critic Branches for Quality-Diversity Reinforcement Learning](/202606/13/2606.08735v1-structure-conditioned-actor-critic-branches-for-quality-diversity-reinforcement-learning)  
    标签：评分：8.0/10、query:lpt
-   evidence：针对在线策略蒸馏的轨迹级纠正方法
-3. [ToolRec: Calibrated Preference Alignment for Query Recommendation in On-Device Assistants](/202606/12/2606.08466v1-toolrec-calibrated-preference-alignment-for-query-recommendation-in-on-device-assistants)  
-   标签：评分：8.0/10、query:lpt
-   evidence：面向设备端助手的LLM查询推荐偏好对齐
-4. [SPA: A SQL-Plan-Aware Reinforcement Learning Framework for Query Rewriting with LLMs](/202606/12/2606.08620v1-spa-a-sql-plan-aware-reinforcement-learning-framework-for-query-rewriting-with-llms)  
-   标签：评分：8.0/10、query:lpt
-   evidence：使用强化学习结合计划感知奖励进行基于LLM的SQL查询重写
-5. [From Holistic Evaluation to Structured Criteria: Rubrics Across the Evolving LLM Landscape](/202606/12/2606.08625v1-from-holistic-evaluation-to-structured-criteria-rubrics-across-the-evolving-llm-landscape)  
-   标签：评分：8.0/10、query:lpt
-   evidence：关于评估、强化学习和安全对齐中量规的综述
-6. [Co-Evolving Skill Generation and Policy Optimization](/202606/12/2606.08755v1-co-evolving-skill-generation-and-policy-optimization)  
-   标签：评分：8.0/10、query:lpt
-   evidence：技能增强强化学习中技能生成与策略优化的协同进化
+   evidence：质量多样化强化学习，引入演员-评论家分支
 
 ### 速读区论文标签
-1. [Contemporary AI lacks the imagination to diverge or negate in science](/202606/12/2606.08251v1-contemporary-ai-lacks-the-imagination-to-diverge-or-negate-in-science)  
-   标签：评分：6.0/10、query:lpt
-   evidence：大规模评估LLM在科学发现中的表现
-2. [Continuous Strategy Adaptation and Discrete Switching Driven by Environment and Internal State in Meta-Learning](/202606/12/biorxiv-10-64898-2026-06-08-729424-v1-continuous-strategy-adaptation-and-discrete-switching-driven-by-environment-and-internal-state-in-meta-learning)  
-   标签：评分：6.0/10、query:lpt
-   evidence：使用时变元参数的强化学习模型分析行为
+1. [Distilling LLM Reasoning into an Interpretable Policy Tree for Human-AI Collaboration](/202606/13/2606.08596v1-distilling-llm-reasoning-into-an-interpretable-policy-tree-for-human-ai-collaboration)  
+   标签：评分：7.0/10、query:lpt
+   evidence：结合强化学习和LLM蒸馏构建策略树
 
 
 <div class="dpr-home-promo-card">

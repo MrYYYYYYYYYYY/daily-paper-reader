@@ -1,0 +1,93 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-13T20:44:37.337515+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [
+    {
+      "id": "2606.08735v1",
+      "source": "arxiv",
+      "title": "Structure-Conditioned Actor-Critic Branches for Quality-Diversity Reinforcement Learning",
+      "abstract": "Quality-diversity reinforcement learning (QD-RL) aims to construct policy repertoires that contain both high-performing and behaviorally diverse policies. Existing QD-RL methods mainly diversify policy instances after rollout evaluation or use learned value information to improve policy quality and behavior targeting, while the learning branches that generate candidate policies remain less explored. This paper proposes SV-QD-RL, a structure-value coupled framework that represents each candidate as a structure-conditioned actor-critic branch. Each branch contains an actor, a structural mask, a branch-specific critic, a replay state, and evaluation attributes including behavior, return, sparsity, and value profile. The structural mask defines the actor subspace in which the branch learns, while the branch-specific critic and replay state shape its value-learning trajectory. A branch-aware QD archive then evaluates and retains branches according to behavioral quality, structural footprint, and value-profile information. Experiments on MuJoCo continuous-control tasks show that SV-QD-RL constructs policy repertoires with strong archive quality and behaviorally useful diversity. Ablation and diagnostic analyses further indicate that structural conditioning, critic differentiation, and memory-consistent refinement make complementary contributions to behavioral specialization. Schedule-aware repertoire evaluation shows that the learned archive provides selectable policy alternatives under changing behavior-level requirements. These results suggest that coupling actor structure with branch-specific value learning is an effective mechanism for generating diverse QD-RL policy repertoires.",
+      "authors": [
+        "Lianrong Zuo",
+        "Peilan Xu",
+        "Yong Liu",
+        "Wenjian Luo"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-06-07T17:08:28+00:00",
+      "link": "https://arxiv.org/pdf/2606.08735v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Quality-diversity reinforcement learning with actor-critic branches",
+      "llm_evidence_cn": "质量多样化强化学习，引入演员-评论家分支",
+      "llm_evidence": "质量多样化强化学习，引入演员-评论家分支",
+      "canonical_evidence": "质量多样化强化学习，引入演员-评论家分支",
+      "llm_tldr_en": "This paper proposes SV-QD-RL, a structure-value coupled framework for quality-diversity reinforcement learning, where each policy candidate is a structure-conditioned actor-critic branch, enabling efficient exploration and diversity.",
+      "llm_tldr_cn": "现有质量多样化强化学习方法多在策略评估后多样化或依赖价值信息，而候选策略生成分支未充分探索。本文提出SV-QD-RL框架，将每个候选策略表示为结构条件化的演员-评论家分支，包含演员、结构掩码、分支评论家等组件。该方法支持基于结构掩码的行为多样性，并通过价值引导提升策略质量。实验表明SV-QD-RL在多种任务上实现了更优的性能与行为多样性平衡。该工作为RL算法改进提供了新思路。",
+      "llm_tldr": "现有质量多样化强化学习方法多在策略评估后多样化或依赖价值信息，而候选策略生成分支未充分探索。本文提出SV-QD-RL框架，将每个候选策略表示为结构条件化的演员-评论家分支，包含演员、结构掩码、分支评论家等组件。该方法支持基于结构掩码的行为多样性，并通过价值引导提升策略质量。实验表明SV-QD-RL在多种任务上实现了更优的性能与行为多样性平衡。该工作为RL算法改进提供了新思路。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.08596v1",
+      "source": "arxiv",
+      "title": "Distilling LLM Reasoning into an Interpretable Policy Tree for Human-AI Collaboration",
+      "abstract": "Constructing efficient and reliable policies to assist humans is indispensable for human-AI collaboration. Existing methods mainly follow two lines of work. Most prior work relies on multi-agent reinforcement learning (MARL) to learn black-box policies, which limits interpretability and raises safety concerns. Recent methods query large language models (LLMs) at each decision step, causing slow responses and high inference costs. We propose Collaboration Policy Tree (Co-pi-tree), a closed-loop method that learns an executable policy tree consisting of a partner-behavior prediction tree and an agent-action selection tree. Co-pi-tree constructs a policy by distilling LLM reasoning into policy tree code. It then evaluates the policy through partner interaction, obtains feedback, and uses natural language to summarize the interaction feedback to improve problematic branches. Experiments in Overcooked-AI show that Co-pi-tree improves average reward by 35.4% over the baseline average, while reducing the number of LLM queries by 77.7% and test-time latency by 97.1%. Project page: https://beiwenzhang.github.io/Co-pi-tree/",
+      "authors": [
+        "Beiwen Zhang",
+        "Yongheng Liang",
+        "Guowei Zou",
+        "Haitao Wang",
+        "Hejun Wu"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.HC"
+      ],
+      "published": "2026-06-07T12:20:32+00:00",
+      "link": "https://arxiv.org/pdf/2606.08596v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Uses reinforcement learning (MARL) and LLM distillation to construct policy trees",
+      "llm_evidence_cn": "结合强化学习和LLM蒸馏构建策略树",
+      "llm_evidence": "结合强化学习和LLM蒸馏构建策略树",
+      "canonical_evidence": "结合强化学习和LLM蒸馏构建策略树",
+      "llm_tldr_en": "Proposes Co-pi-tree, which distills LLM reasoning into an interpretable policy tree for human-AI collaboration, evaluated in cooperative tasks outperforming MARL baselines.",
+      "llm_tldr_cn": "该论文针对人机协作中策略可解释性和效率问题，提出Co-pi-tree方法，将LLM推理蒸馏为可执行的策略树，包含伙伴行为预测和智能体动作选择，在多个协作任务上相比多智能体强化学习基线取得了更优性能，且具有可解释性和低推理成本。",
+      "llm_tldr": "该论文针对人机协作中策略可解释性和效率问题，提出Co-pi-tree方法，将LLM推理蒸馏为可执行的策略树，包含伙伴行为预测和智能体动作选择，在多个协作任务上相比多智能体强化学习基线取得了更优性能，且具有可解释性和低推理成本。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

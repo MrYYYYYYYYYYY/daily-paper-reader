@@ -1,0 +1,39 @@
+{
+  "label": "2026-06-13",
+  "date": "2026-06-13",
+  "generated_at": "2026-06-13T20:47:10",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202606/13/2606.08735v1-structure-conditioned-actor-critic-branches-for-quality-diversity-reinforcement-learning",
+      "section": "deep",
+      "title_en": "Structure-Conditioned Actor-Critic Branches for Quality-Diversity Reinforcement Learning",
+      "authors": "Lianrong Zuo, Peilan Xu, Yong Liu, Wenjian Luo",
+      "date": "2026-06-07",
+      "pdf": "https://arxiv.org/pdf/2606.08735v1",
+      "score": "8.0",
+      "evidence": "质量多样化强化学习，引入演员-评论家分支",
+      "tldr": "现有质量-多样性强化学习方法主要依赖策略实例的多样化，但忽略了生成候选策略的学习分支。本文提出SV-QD-RL框架，将每个候选表示为结构条件化的演员-评论家分支，包含结构掩码、分支特定评论家和记忆状态。通过分支感知QD存档评估行为质量和价值分布。在MuJoCo任务中，该方法构建的策略库兼具高质量和行为多样性，消融分析表明结构条件化、评论家区分化和记忆一致性细化各自贡献了行为专业化。该工作为生成多样化策略库提供了有效机制。",
+      "tags": "query:lpt",
+      "abstract_en": "Quality-diversity reinforcement learning (QD-RL) aims to construct policy repertoires that contain both high-performing and behaviorally diverse policies. Existing QD-RL methods mainly diversify policy instances after rollout evaluation or use learned value information to improve policy quality and behavior targeting, while the learning branches that generate candidate policies remain less explored. This paper proposes SV-QD-RL, a structure-value coupled framework that represents each candidate as a structure-conditioned actor-critic branch. Each branch contains an actor, a structural mask, a branch-specific critic, a replay state, and evaluation attributes including behavior, return, sparsity, and value profile. The structural mask defines the actor subspace in which the branch learns, while the branch-specific critic and replay state shape its value-learning trajectory. A branch-aware QD archive then evaluates and retains branches according to behavioral quality, structural footprint, and value-profile information. Experiments on MuJoCo continuous-control tasks show that SV-QD-RL constructs policy repertoires with strong archive quality and behaviorally useful diversity. Ablation and diagnostic analyses further indicate that structural conditioning, critic differentiation, and memory-consistent refinement make complementary contributions to behavioral specialization. Schedule-aware repertoire evaluation shows that the learned archive provides selectable policy alternatives under changing behavior-level requirements. These results suggest that coupling actor structure with branch-specific value learning is an effective mechanism for generating diverse QD-RL policy repertoires.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/13/2606.08596v1-distilling-llm-reasoning-into-an-interpretable-policy-tree-for-human-ai-collaboration",
+      "section": "quick",
+      "title_en": "Distilling LLM Reasoning into an Interpretable Policy Tree for Human-AI Collaboration",
+      "authors": "Beiwen Zhang, Yongheng Liang, Guowei Zou, Haitao Wang, Hejun Wu",
+      "date": "2026-06-07",
+      "pdf": "https://arxiv.org/pdf/2606.08596v1",
+      "score": "7.0",
+      "evidence": "结合强化学习和LLM蒸馏构建策略树",
+      "tldr": "现有方法在构建人机协作策略时面临可解释性差或推理成本高的问题。本文提出Co-pi-tree，通过将LLM推理蒸馏为可执行的策略树代码，并结合交互反馈进行优化。在Overcooked-AI上，该方法平均奖励提升35.4%，LLM查询减少77.7%，测试延迟降低97.1%。Co-pi-tree实现了高效、可解释的人机协作策略。",
+      "tags": "query:lpt",
+      "abstract_en": "Constructing efficient and reliable policies to assist humans is indispensable for human-AI collaboration. Existing methods mainly follow two lines of work. Most prior work relies on multi-agent reinforcement learning (MARL) to learn black-box policies, which limits interpretability and raises safety concerns. Recent methods query large language models (LLMs) at each decision step, causing slow responses and high inference costs. We propose Collaboration Policy Tree (Co-pi-tree), a closed-loop method that learns an executable policy tree consisting of a partner-behavior prediction tree and an agent-action selection tree. Co-pi-tree constructs a policy by distilling LLM reasoning into policy tree code. It then evaluates the policy through partner interaction, obtains feedback, and uses natural language to summarize the interaction feedback to improve problematic branches. Experiments in Overcooked-AI show that Co-pi-tree improves average reward by 35.4% over the baseline average, while reducing the number of LLM queries by 77.7% and test-time latency by 97.1%. Project page: https://beiwenzhang.github.io/Co-pi-tree/",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
