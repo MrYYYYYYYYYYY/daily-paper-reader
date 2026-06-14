@@ -6,26 +6,35 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-13
-- 运行时间：2026-06-13 20:47:03 UTC
+- 最新运行日期：2026-06-14
+- 运行时间：2026-06-14 21:08:39 UTC
 - 运行状态：成功
-- 本次总论文数：2
-- 精读区：1
-- 速读区：1
+- 本次总论文数：4
+- 精读区：4
+- 速读区：0
 
 ### 今日简报（AI）
-今日共浏览2篇论文，精读1篇（《Structure-Conditioned Actor-Critic Branches for Quality-Diversity Reinforcement Learning》8.0分），速读1篇（《Distilling LLM Reasoning into an Interpretable Policy Tree for Human-AI Collaboration》7.0分）。最值得关注的是质量-多样性强化学习中的结构条件Actor-Critic方法，以及将大模型推理蒸馏为可解释策略树的人机协作路径。建议优先精读前者以提升强化学习多样性生成能力，速读后者可了解大模型落地场景。
-- 详情：[/202606/13/README](/202606/13/README)
+今天精读4篇论文，其中两篇高影响力研究分别聚焦扩散大语言模型的奖励-状态对齐和组合推理。  
+值得关注的方向：9分论文《Back on Track》提出通过重新校准推理状态与奖励信号提升扩散LLM性能；8分论文《Operads》引入操作数框架增强LLM的模块化推理能力。  
+建议下一阶段：优先深入扩散模型的结构化推理机制，并尝试将操作数方法复用到现有推理任务中。
+- 详情：[/202606/14/README](/202606/14/README)
 
 ### 精读区论文标签
-1. [Structure-Conditioned Actor-Critic Branches for Quality-Diversity Reinforcement Learning](/202606/13/2606.08735v1-structure-conditioned-actor-critic-branches-for-quality-diversity-reinforcement-learning)  
+1. [Back on Track: Aligning Rewards and States for Reasoning in Diffusion Large Language Models](/202606/14/2606.08501v1-back-on-track-aligning-rewards-and-states-for-reasoning-in-diffusion-large-language-models)  
+   标签：评分：9.0/10、query:lpt
+   evidence：PAPO框架为扩散LLM中的RL对齐奖励与状态
+2. [Operads for compositional reasoning in LLMs](/202606/14/2606.13634v1-operads-for-compositional-reasoning-in-llms)  
    标签：评分：8.0/10、query:lpt
-   evidence：质量多样化强化学习，引入演员-评论家分支
+   evidence：提出操作范畴作为LLM组合推理的严格数学框架
+3. [Dense Supervision, Sparse Updates: On the Sparsity and Geometry of On-Policy Distillation](/202606/14/2606.13657v1-dense-supervision-sparse-updates-on-the-sparsity-and-geometry-of-on-policy-distillation)  
+   标签：评分：8.0/10、query:lpt
+   evidence：基于在线策略的蒸馏用于大语言模型后训练，稀疏性分析
+4. [Reinforcement learning-driven unified generative framework for multi-objective RNA codon design](/202606/14/biorxiv-10-64898-2026-06-12-732012-v1-reinforcement-learning-driven-unified-generative-framework-for-multi-objective-rna-codon-design)  
+   标签：评分：8.0/10、query:lpt
+   evidence：强化学习驱动的RNA生成框架
 
 ### 速读区论文标签
-1. [Distilling LLM Reasoning into an Interpretable Policy Tree for Human-AI Collaboration](/202606/13/2606.08596v1-distilling-llm-reasoning-into-an-interpretable-policy-tree-for-human-ai-collaboration)  
-   标签：评分：7.0/10、query:lpt
-   evidence：结合强化学习和LLM蒸馏构建策略树
+- 本次无速读推荐。
 
 
 <div class="dpr-home-promo-card">

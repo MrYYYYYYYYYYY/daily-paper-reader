@@ -1,0 +1,69 @@
+{
+  "label": "2026-06-14",
+  "date": "2026-06-14",
+  "generated_at": "2026-06-14T21:08:46",
+  "count": 4,
+  "papers": [
+    {
+      "paper_id": "202606/14/2606.08501v1-back-on-track-aligning-rewards-and-states-for-reasoning-in-diffusion-large-language-models",
+      "section": "deep",
+      "title_en": "Back on Track: Aligning Rewards and States for Reasoning in Diffusion Large Language Models",
+      "authors": "Yawen Shao, Jie Xiao, Kai Zhu, Yu Liu, Hongchen Luo, Xueyang Fu, Yang Cao, Wei Zhai, Zheng-Jun Zha",
+      "date": "2026-06-07",
+      "pdf": "https://arxiv.org/pdf/2606.08501v1",
+      "score": "9.0",
+      "evidence": "PAPO框架为扩散LLM中的RL对齐奖励与状态",
+      "tldr": "扩散大语言模型(dLLM)在推理强化学习中面临双重重定向错位：终端奖励稀疏地均分到所有中间步导致过程-奖励错位；策略更新常偏移到非轨迹状态导致状态-轨迹错位。为此提出PAPO框架，通过步感知过程奖励(SPR)将稀疏终端奖励转化为密集逐步信用，以及熵引导历史重演(EHR)在高不确定性步回放真实轨迹，实现RL更新与生成轨迹整体对齐。在GSM8K、MATH500、Countdown和Sudoku四个基准上分别提升4.5%、4.8%、42.2%和16.1%，显著超越基线。",
+      "tags": "query:lpt",
+      "abstract_en": "Reinforcement learning (RL) holds immense promise for enhancing the reasoning capabilities of diffusion large language models (dLLMs). However, progress is fundamentally constrained by a dual misalignment between authentic generation trajectory and the gradient update process: (i) Process-reward misalignment. Sparse, terminal rewards are indiscriminately assigned to all intermediate steps of the generation process, failing to provide discriminative credit assignment. (ii) State-trajectory misalignment. Policy updates are often diverted toward artificial, out-of-trajectory states, squandering gradients on less informative samples. To address these limitations, we introduce Process Aligned Policy Optimization (PAPO), a novel framework that holistically aligns the RL update with the dLLM's generative trajectory via Step-Aware Process Rewards (SPR) that transform sparse terminal rewards into dense, step-wise credit, and Entropy-Guided Historical Re-enactment (EHR) that replays authentic trajectories at high-uncertainty steps. Extensive experiments on four benchmarks demonstrate that PAPO significantly outperforms baselines, achieving gains of up to 4.5% on GSM8K, 4.8% on MATH500, 42.2% on Countdown and 16.1% on Sudoku.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/14/2606.13634v1-operads-for-compositional-reasoning-in-llms",
+      "section": "deep",
+      "title_en": "Operads for compositional reasoning in LLMs",
+      "authors": "Nathaniel Bottman, Kyle Richardson",
+      "date": "2026-06-11",
+      "pdf": "https://arxiv.org/pdf/2606.13634v1",
+      "score": "8.0",
+      "evidence": "提出操作范畴作为LLM组合推理的严格数学框架",
+      "tldr": "大语言模型通过问题分解提升推理能力，但缺乏数学基础。本文引入操作域理论，将问题模板建模为操作，QA模型视为操作域上的代数，并提出操作域一致性指标。在12个LLM和4个多跳QA数据集上，该指标与准确性强相关，优于温度自一致性基线。操作域为组合推理提供了严格数学框架，为分析推理可靠性提供了新工具。",
+      "tags": "query:lpt",
+      "abstract_en": "Question decomposition, i.e. breaking a complex query into simpler sub-queries whose answers are composed to produce a final answer, is a widely used strategy for improving LLM reasoning, yet it currently lacks a rigorous mathematical foundation. In this paper, we propose operads, mathematical structures that model many-in, one-out operations and compositions thereof, as a natural framework for describing question decomposition. We define the questions operad $Q$, in which operations correspond to question templates and composition corresponds to substitution of sub-answers, and show how QA models can be interpreted as algebras over $Q$. Beyond reframing existing practice, this operadic perspective points toward new methods, in particular a notion of operadic consistency, which measures whether a QA model's answers agree across the partial collapses of a question decomposition tree. Empirical evaluation of operadic consistency is reported in our companion paper (Bottman, Liu, and Richardson, 2026), which finds it strongly correlated with accuracy across twelve LLMs and four multi-hop QA datasets and outperforming standard temperature-based self-consistency baselines. We argue that operads are the natural mathematical home for question decomposition, and that invariants such as operadic consistency open new directions for analyzing and improving the reliability of multi-step reasoning.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/14/2606.13657v1-dense-supervision-sparse-updates-on-the-sparsity-and-geometry-of-on-policy-distillation",
+      "section": "deep",
+      "title_en": "Dense Supervision, Sparse Updates: On the Sparsity and Geometry of On-Policy Distillation",
+      "authors": "Guo Yu, Wenlin Liu, Yulan Hu, Hao-Xuan Ma, Jun-Peng Jiang, Han-Jia Ye",
+      "date": "2026-06-11",
+      "pdf": "https://arxiv.org/pdf/2606.13657v1",
+      "score": "8.0",
+      "evidence": "基于在线策略的蒸馏用于大语言模型后训练，稀疏性分析",
+      "tldr": "在线策略蒸馏（OPD）结合学生在线轨迹与密集教师监督，其参数更新具有稀疏性：更新量小且坐标稀疏，主要集中于前馈网络层。仅训练稀疏子网络可恢复全OPD性能，但SGD优化器逊于AdamW，因密集监督保持了梯度异质性。几何上，更新数值满秩但谱集中，远离源权重奇异子空间，落在源权重接近零的区域。这些发现表明OPD并非密集重写，而是保留了在线策略后训练的本质几何特征。",
+      "tags": "query:lpt",
+      "abstract_en": "On-policy distillation (\\textsc{OPD}) has recently become a prominent post-training recipe as it combines two desirable ingredients: on-policy student trajectories and dense teacher supervision, yet how this hybrid changes a model's parameters remains unclear. Across several language and vision-language model pairs and use cases, our analysis yields two main findings. On sparsity, \\textsc{OPD}-style updates are small and coordinate-sparse. They are distributed across layers and are usually FFN-heavy. This sparse structure is operationally useful: training only the discovered subnetwork recovers nearly the same performance as full \\textsc{OPD}. However, the sparsity-inducing SGD optimizer underperforms AdamW in our optimizer ablation, likely because dense teacher supervision preserves heterogeneous coordinate-wise gradient scales where AdamW's adaptive scaling remains useful. On geometry, the updates are numerically full-rank but spectrally concentrated; they lie mostly away from the principal singular subspaces of the source weights and fall disproportionately on coordinates where the source weights are close to zero. These findings suggest that dense teacher supervision does not turn \\textsc{OPD} into ordinary dense parameter rewriting; instead, \\textsc{OPD} retains important geometric signatures of on-policy post-training.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/14/biorxiv-10-64898-2026-06-12-732012-v1-reinforcement-learning-driven-unified-generative-framework-for-multi-objective-rna-codon-design",
+      "section": "deep",
+      "title_en": "Reinforcement learning-driven unified generative framework for multi-objective RNA codon design",
+      "authors": "Lin, S., Tan, H., Wang, K., Wang, R., Wang, H., Zhu, T., Xiong, Y.",
+      "date": "2026-06-13",
+      "pdf": "https://www.biorxiv.org/content/10.64898/2026.06.12.732012v1.full.pdf",
+      "score": "8.0",
+      "evidence": "强化学习驱动的RNA生成框架",
+      "tldr": "现有RNA密码子设计方法存在长序列处理效率低和泛化性差的问题，依赖解耦的“生成-优化”范式。本文提出RNARL，一个强化学习驱动的统一生成框架，直接学习生成高性能序列并同时优化多目标。RNARL能够有效优化超过3900个核苷酸的长序列，在6个物种和5种RNA类型上均表现出优越性能和较好普适性。该工作为RNA密码子设计建立了有效且通用的框架，并提供了用户友好的网络平台以促进应用。",
+      "tags": "query:lpt",
+      "abstract_en": "Current RNA codon design methods are limited by inefficient long-sequence processing and poor generalizability, often relying on a decoupled \"generate-or-optimize\" paradigm. We introduce RNARL, a reinforcement learning-driven framework that unifies sequence generation with multi-objective optimization. RNARL directly learns to generate high-performance sequences, effectively optimizing sequences over 3,900 nucleotides and demonstrating superior performance and universality across six species and five RNA types. RNARL thus establishes an effective and generalizable framework for RNA codon design. Finally, a user-friendly web platform is freely available to facilitate its application for RNA therapeutic design.",
+      "source": "biorxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
