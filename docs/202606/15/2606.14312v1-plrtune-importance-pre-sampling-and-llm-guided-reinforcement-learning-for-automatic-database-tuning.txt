@@ -1,0 +1,617 @@
+Title: PLRTune: Importance Pre-Sampling and LLM-Guided Reinforcement Learning for Automatic Database Tuning
+
+URL Source: https://arxiv.org/pdf/2606.14312v1
+
+Published Time: Mon, 15 Jun 2026 00:45:24 GMT
+
+Number of Pages: 14
+
+Markdown Content:
+# PLRTune: Importance Pre-Sampling and LLM-Guided Reinforcement Learning for Automatic Database Tuning 
+
+Xinyue Yang 1,2 , Chen Zheng 1,2,3,* , Yaoyang Hou 3, Renhao Zhang 3,Yinyan Zhang 2, Heng Zhang 2
+
+> 1
+
+University of Chinese Academy of Sciences, Nanjing, China 
+
+> 2
+
+Institute of Software, Chinese Academy of Sciences, Beijing, China 
+
+> 3
+
+Hangzhou Institute for Advanced Study, UCAS, Hangzhou, China 
+
+Abstract —Configuration tuning is critical to database perfor-mance, yet automatic database tuning remains challenging due to high-dimensional knob spaces, substantial online tuning cost, unreliable textual hints derived from Large Language Models (LLMs) or community documents, and the difficulty of exploiting the remaining optimization room after initialization. Hence, we propose PLRTune, a staged database tuning system that leverages workload-specific domain knowledge to identify a reduced search space and further optimize within this promis-ing region. First, we develop an importance pre-sampling and reranking strategy to identify the dominant knob subset in a workload-specific manner and derive a compact state represen-tation. Second, we design an execution-guided hint refinement technique to improve the initialization quality of documentation-guided tuning. Finally, we propose a post-tuning refinement stage that leverages Twin Delayed Deep Deterministic Policy Gradient (TD3) to explore the dominant knob subset and further exploit the remaining optimization room. We evaluate PLRTune on MySQL and PostgreSQL across diverse benchmark workloads. Compared with state-of-the-art approaches, PLRTune achieves the best final result on all tested workloads, improving over the corresponding best-performing alternative by 9.50% on average. Moreover, PLRTune reaches the strongest baseline’s best performance level 9.03 × faster on average across workloads, demonstrating its practical runtime efficiency without sacrificing final tuning quality. 
+
+Index Terms —automatic database tuning, DBMS knob tuning, large language models, reinforcement learning, pre-sampling 
+
+I. I NTRODUCTION 
+
+Modern database management systems (DBMSs) under-pin a wide range of data-intensive applications [1]. Their performance is highly sensitive to configuration parameters, commonly referred to as knobs [2], [3]. Systems such as MySQL and PostgreSQL expose hundreds of tunable knobs controlling memory, execution, logging, and concurrency be-havior. Because these knobs are high-dimensional, strongly interdependent, and sensitive to workload and hardware char-acteristics, manual tuning by database administrators (DBAs) is time-consuming and often yields suboptimal configurations [4]–[6]. To reduce the burden of manual tuning, prior work has explored automatic database tuning from multiple directions 
+
+*Chen Zheng is the corresponding author. 
+
+[1], [4], [7]–[12]. Broadly, existing studies can be understood from three perspectives. The first perspective is data-driven tuning , where systems such as OtterTune [13] and E2ETune [14] perform prior data collection and model learning to build reusable tuning knowledge from historical observations. The second perspective is iterative optimization-based tuning ,where methods directly tune a target workload by repeatedly selecting configurations, running workloads, and updating the optimizer according to observed performance. These methods typically formulate tuning as an online black-box optimiza-tion or sequential decision-making problem, and progressively improve configurations by balancing exploration of unseen regions with exploitation of accumulated feedback. Typical examples include Bayesian Optimization methods [2], [4], [10] and Reinforcement Learning methods [5], [8], [9], [15]. The third perspective is documentation-driven or knowledge-guided tuning , where methods such as DB-BERT and GP-Tuner [16], [17] leverage textual resources including DBMS manuals, engineering blogs, and community discussions to extract tuning hints and guide knob selection and value recommendation. Together, these studies show that automatic database tuning can benefit from offline knowledge reuse, online optimization, and external domain knowledge. Despite recent progress, efficient automatic database tuning still faces several practical challenges. 
+
+C1. Low tuning efficiency due to high-dimensional knob spaces. Modern DBMSs expose hundreds of tunable knobs, which collectively define a vast and high-dimensional config-uration space. Searching such a space can significantly reduce tuning efficiency by slowing down the optimization process and increasing tuning cost. Yet, for a specific workload, only a small subset of knobs often has dominant impact on performance, while many others contribute little [13], [18]. This makes it important to focus tuning on workload-relevant knobs rather than treating all exposed knobs uniformly from the beginning. 
+
+C2. Limited starting quality of existing warm-start strategies. Many online tuning methods suffer from cold start and may require numerous ineffective trials before reach-ing competitive configurations [5], [9], [15]. Although some 
+
+> arXiv:2606.14312v1 [cs.DB] 12 Jun 2026
+
+TABLE I: Raw DB-BERT-style hint quality averaged over three Sysbench workloads.         
+
+> DBMS Raw Hinted Params Negative Params Never Used Neg. or Unused
+> MySQL 30 17 421 (70.0%) PostgreSQL 24 11 213 (54.2%)
+
+methods introduce warm-start mechanisms, such as GA-based sample generation, such initialization may still be insufficient under strict online tuning budgets, especially when tuning is conducted in a restart-based single-server setting without extensive cloned or parallel exploration [15]. Consequently, the starting quality of tuning remains an important factor that affects both convergence speed and practical tuning cost. 
+
+C3. Low-quality hints in text-guided tuning. 
+
+Documentation-guided methods rely heavily on the quality of textual hints [16], [17]. In practice, however, not all extracted hints are useful for a specific workload or DBMS setting. To examine this issue, we conduct a small motivating analysis using the raw DB-BERT-style hint set before execution-guided refinement. For each DBMS, we run the analysis on three representative Sysbench workloads, namely read-only, read-write, and write-only, and average the observed parameter impact across these workloads. For each hinted parameter, we analyze whether it is selected during initialization and whether its average observed impact is positive or negative. A parameter is marked as Negative when its selected trials show lower average objective values than unselected trials, and as 
+
+Never Used when it is never selected during initialization. As shown in Table I, a large fraction of raw hinted pa-rameters are either associated with negative impact or never selected in the initialization traces. Specifically, this happens for 70.0% of the raw hinted parameters in MySQL and 54.2% in PostgreSQL. This result suggests that textual hints can provide useful prior knowledge, but they should not be blindly treated as fixed tuning rules. Directly following low-value or context-mismatched hints may mislead the tuning process, resulting in poor initialization and slower tuning progress. 
+
+C4. Remaining optimization room after knowledge-guided tuning. Documentation-guided methods can leverage textual hints to achieve rapid performance gains at the early stage of tuning [16], [17]. However, even with a strong initial boost, the configurations derived from textual guidance are often still suboptimal. This is because text-guided tun-ing is naturally limited by the hinted knobs, recommended value regions, and prior knowledge extracted from external documents or language models. It does not systematically exploit the remaining continuous configuration space through execution feedback. Thus, a significant portion of the achiev-able performance may remain beyond what knowledge-guided initialization alone can close. To address these challenges, we propose PLRTune, athree-phase database tuning system that follows a staged warmup-to-fine-tuning pipeline. The system progressively moves through three phases: importance pre-sampling and reranking, execution-guided hint refinement, and post-tuning refinement. In this way, PLRTune reduces search-space com-plexity, improves early-stage initialization quality, and further exploits the remaining optimization room within a unified pipeline. 
+
+Phase 0: Importance Pre-Sampling and Reranking. To address C1 , we propose an importance pre-sampling and reranking phase that first uses Latin hypercube sampling (LHS) to obtain well-distributed samples from the validated candidate knob space and collect diverse workload obser-vations into a shared pool. PLRTune then applies Random Forest to score and rerank knobs according to their work-load relevance, and further uses PCA to derive a compact state representation from internal metrics. This phase also identifies recurring high-impact knobs across workloads as a reusable workload-aware prior. In this way, Phase 0 identi-fies performance-critical knobs, reduces the effective search space, and mitigates the tuning inefficiency caused by high-dimensional knob spaces. 
+
+Phase 1: Execution-Guided Hint Refinement. To address 
+
+C2 and C3 , we propose an execution-guided hint-refinement phase that refines textual hints through execution-guided filter-ing and empirical recommendations. This phase improves ini-tialization quality, enabling PLRTune to start from a stronger performance level while reducing the risk that low-quality hints mislead the tuning process and delay convergence. 
+
+Phase 2: Post-Tuning Refinement. To address C4 , we per-form post-tuning refinement within the reduced knob subspace identified in Phase 0, starting from the stronger region obtained after Phase 1. Specifically, PLRTune applies TD3 as a state-aware refinement optimizer in this reduced space to further exploit the remaining tuning room and improve final tuning quality after the initial performance gains have already been achieved. We conduct extensive experiments on MySQL and Post-greSQL across nine workloads, including TPC-H, TPC-C, YCSB, and Sysbench variants. The evaluation covers end-to-end tuning quality, convergence behavior, ablation stud-ies, runtime efficiency, and cross-hardware reuse. PLRTune achieves the best final performance on all tested workloads, improving over the corresponding best baselines by 9.50% on average. Moreover, PLRTune reaches the strongest baseline’s best performance level 9.03 × faster on average across work-loads, while still achieving better final performance on every workload. It also remains effective on both lower-resource and higher-resource target servers. The key contributions of this work are summarized as follows: 1) We propose PLRTune, a novel staged database tuning system that leverages workload-specific domain knowl-edge to improve database tuning. PLRTune provides a unified tuning pipeline that coordinates workload-specific knowledge and execution feedback across different tuning stages. The system supports the complete transition from identifying promising tuning directions, to constructing strong initial configurations, and to further improving con-figuration quality under a limited tuning budget. 2) We design a workload-aware tuning strategy that in-tegrates prior construction, execution-guided initializa-tion, and reduced-space refinement. PLRTune constructs workload-specific knob and state priors through importance pre-sampling, Random-Forest-based knob reranking, and PCA-based state compression, reducing unnecessary ex-ploration in the original high-dimensional space. It further treats documentation-derived hints as candidates to be vali-dated rather than fixed rules: execution feedback is used to adapt hint values, prune low-value hints, and strengthen ini-tialization with empirical priors. Starting from this stronger initialization, TD3-based post-tuning refinement exploits the residual optimization room within the reduced knob subspace. 3) We conduct extensive experiments and cost analysis to evaluate the effectiveness and portability of PLRTune. 
+
+We evaluate PLRTune on MySQL and PostgreSQL across diverse benchmark workloads and hardware settings. Com-pared with state-of-the-art methods, PLRTune achieves the best final tuning performance on all tested workloads while reaching strong configurations within a shorter tuning time. II. M OTIVATION 
+
+We further motivate the design of PLRTune from three observations. These observations explain why efficient auto-matic database tuning requires workload-aware search-space reduction, strong early-stage initialization, and post-tuning refinement after text-guided tuning. 
+
+M1: Workload-aware knob identification and dimen-sionality reduction are critical for efficient tuning. DBMS performance is typically dominated by a small subset of knobs, and this subset can vary substantially across workloads. Prior work has observed that knob importance should be treated in a workload-aware manner rather than reused uniformly across workloads [18]. Directly tuning the full knob space is therefore inefficient: the search cost grows with dimensionality, while the performance gain often diminishes quickly as additional low-impact knobs are included [13], [18]. HUNTER addresses this issue by applying Random Forest for knob ranking and principal component analysis (PCA) for metric compression, showing that dimensionality reduction can effectively reduce tuning overhead [15]. Moreover, compared with reusing a con-crete final configuration, which is tightly coupled to specific hardware, data, and runtime states, reusing workload-relevant important knobs provides a more suitable prior for later tun-ing. Motivated by these observations, our first phase collects workload-specific observations, applies Random-Forest-based analysis to identify important knobs, uses PCA to derive a compact state representation, and retains the resulting knob subset as a reusable workload-aware prior for subsequent tuning. 
+
+M2: Strong early-stage initialization should focus on the most influential knobs. Prior work suggests that tuning is more effective when it focuses on high-impact knobs rather than treating all knobs equally from the beginning [13], [15]. For example, OtterTune adopts an incremental tuning strategy DB-BERT DB-BERT + TD3 0 20 40 60 80 100 
+
+> Tuning Step
+> 40
+> 60
+> 80
+> 100
+> 120
+> 140
+> 160
+> TPS/p95
+> MySQL Sysbench Read-Write
+
+Fig. 1: Motivating experiment comparing DB-BERT initializa-tion with TD3-based post-tuning on MySQL Sysbench Read-Write. and shows that it performs better than directly tuning either too few or too many knobs at once [13]. In addition, DB-BERT uses textual hints to guide a small number of important knobs toward recommended directions, enabling rapid early convergence [16]. These observations motivate our second phase: we use text-guided tuning as an intermediate initial-ization stage, so that the system can quickly move workload-relevant knobs toward promising regions and alleviate the low efficiency caused by cold start. 
+
+M3: Text-guided tuning still leaves residual optimization room. Prior text-guided methods show that database perfor-mance can be improved quickly by adjusting a small number of important knobs according to textual hints [16], [17]. This indicates that focusing on hinted high-impact knobs is an effective way to obtain rapid gains. However, such guidance is naturally limited by the hinted knobs and recommended value regions. GPTuner also suggests that methods such as DB-BERT mainly adjust a limited set of hinted knobs, and there-fore may leave substantial optimization space unexplored [17]. To further validate this issue in our setting, we conduct a small motivating experiment on MySQL Sysbench Read-Write: after running DB-BERT for 8 initialization steps, we use the result-ing configuration as the starting point and continue tuning with TD3-based post-tuning refinement. As shown in Fig. 1, DB-BERT quickly reaches a strong best-so-far value and then remains nearly flat, while DB-BERT+TD3 continues to improve the objective value from about 144 to around 170. This result shows that the config-uration produced by text-guided tuning is a strong starting point, but it does not fully close the remaining optimization space. Therefore, after text-guided initialization, tuning should continue to exploit residual opportunities through execution-guided refinement. III. P RELIMINARIES 
+
+Consistent with prior database tuning systems, we represent each tuning trial using a unified tuple (S, A, P ), where A
+
+denotes the action taken in the trial, i.e., the database con-figuration applied to the DBMS, S denotes the internal state observed during the trial, and P denotes the resulting external performance. a) A (Action / Configuration) : A represents the vector of tunable database knobs applied in one trial. In this work, we first construct a practical candidate action space from the exposed DBMS variables through lightweight LLM-assisted screening followed by deterministic validation. The validation step removes knobs that are unsupported in the target DBMS version, unsafe to modify, have invalid value domains, or are incompatible with the single-node evaluation protocol used in our experiments. After this construction step, we use 150 knobs for MySQL 8.0.45 and 100 knobs for PostgreSQL 16.13 as the practical candidate action spaces throughout the study. These spaces cover major performance-relevant categories, in-cluding memory management, storage-engine behavior, check-point/WAL or logging controls, connection and thread man-agement, cache-related settings, optimizer-related parameters, and selected monitoring or timeout controls. This follows prior tuning practice that constructs filtered candidate spaces before further dimensionality reduction [18]. 
+
+b) P (Performance Metrics) : P denotes the external performance of the database under configuration A. In our experiments, we measure throughput and tail latency, including TPS, QPS, and p95 latency, for transactional and mixed workloads, while using execution time for TPC-H. The specific scalar objective used for optimization is defined later in the experimental setup. 
+
+c) S (State / Internal Metrics) : S represents the internal state of the DBMS collected during one tuning trial. For MySQL, we query enabled InnoDB metrics from 
+
+information_schema.INNODB_METRICS , resulting in 74 internal metrics in MySQL 8.0.45. For PostgreSQL 16.13, we collect 112 internal metrics from system statistics views, including pg_stat_database , pg_stat_bgwriter ,
+
+pg_stat_activity , and related WAL, I/O, lock, and conflict statistics views. To reduce measurement noise, internal metrics are collected over multiple frames during each benchmark run. Let mti
+
+denote the value of metric mi at frame t ∈ { 1, 2, . . . , T }.We aggregate the temporal observations into a single scalar si
+
+for each metric according to whether the metric is cumulative or instantaneous. For cumulative counters, which monotonically increase over time, we use the difference between the last and first frames: 
+
+scounter  
+
+> i
+
+= mTi − m1 
+
+> i
+
+. (1) For instantaneous or gauge-style metrics, which reflect the current operating state and may fluctuate during a run, we use the temporal average: 
+
+sgauge  
+
+> i
+
+= 1
+
+T
+
+> T
+
+X
+
+> t=1
+
+mti. (2) The resulting state vector is then written as 
+
+S = [ s1, s 2, . . . , s d],
+
+where d = 74 for MySQL and d = 112 for PostgreSQL before dimensionality reduction. In PLRTune, this state rep-resentation is further compressed by PCA to improve the efficiency and stability of the later post-tuning refinement stage. 
+
+d) Shared Pool : All tuples (S, A, P ) generated during Phase 0 importance pre-sampling and subsequent tuning are stored in a shared pool for later reuse across different stages of the system. IV. S YSTEM ARCHITECTURE AND WORKFLOW 
+
+PLRTune is designed as a staged tuning pipeline that sep-arates prior construction, initialization, and final refinement. Given a target DBMS and workload, PLRTune repeatedly ap-plies candidate configurations, executes the workload, collects internal state metrics and external performance, and stores the resulting tuples (S, A, P ) in a Shared Pool. The key design idea is to avoid optimizing the full knob space from scratch. Instead, PLRTune first constructs a workload-specific reduced action and state space, then uses execution-guided textual hints to obtain a strong initialization, and finally performs state-aware reinforcement-learning refinement within the reduced subspace. For a newly arriving workload, PLRTune may optionally use lightweight workload-type matching to retrieve a relevant knob prior from the Shared Pool. This step compares simple workload-composition features with historical workloads and selects the closest workload type. The matched result is used only to identify or reuse a candidate set of workload-relevant knobs, rather than to transfer concrete knob values or a final configuration. The actual tuned values are still determined through execution feedback in the following phases. Figure 2 illustrates the overall architecture of PLRTune. The system is centered around the Shared Pool, which stores tuning tuples and connects three stages: Phase 0 constructs workload-specific knob and state priors, Phase 1 validates and refines documentation-derived hints to build a stronger initialization, and Phase 2 performs state-aware refinement in the reduced subspace. Together, these stages use workload-specific priors and execution feedback to reduce unnecessary search and exploit the remaining optimization room. 
+
+A. Phase 0: Importance Pre-Sampling and Reranking 
+
+The goal of Phase 0 is to construct a workload-specific reduced tuning subspace before the subsequent stages of PLRTune. Rather than relying on the online optimizer to dis-cover important knobs and compact state representations from scratch, PLRTune first collects diverse workload observations over the validated candidate knob space and uses them to build workload-aware priors. This phase serves two purposes: (1) it provides a broad and well-distributed sample basis for estimating knob relevance, and (2) it derives reduced action and state representations that make later online refinement more focused and efficient. For each DBMS version and workload type, PLRTune generates candidate configurations using LHS. Compared with naive random sampling, LHS encourages more uniform cov-erage of the high-dimensional candidate knob space, which reduces the risk that the subsequent importance analysis is Fig. 2: System architecture and workflow of PLRTune. biased by a narrow set of early configurations. In each step, a sampled knob vector is mapped to an executable DBMS configuration, applied to the target system, and evaluated under the corresponding benchmark workload. During execution, PLRTune records the applied knob values, the aggregated internal state metrics, and the resulting external performance into the Shared Pool in the unified tuple form (S, A, P ).Based on the collected samples, Phase 0 reduces the later tuning burden through two concrete analyses. First, PLR-Tune trains a Random-Forest-based performance model on the pre-sampled observations and uses the resulting feature-importance scores to rerank knobs according to workload relevance. The Top-K knobs with the largest importance scores are retained as the reduced action subspace for later stages. This design allows subsequent optimization to focus on influential knobs instead of treating all candidate knobs uniformly. Second, PLRTune applies principal component analysis (PCA) to the collected internal state metrics. Since many DBMS metrics are correlated or redundant, directly using the full state vector would increase dimensionality, noise, and optimization difficulty. PCA projects the original state vector into a compact representation while preserving most of its variance, thereby providing a lower-dimensional and more stable state input for refinement. The output of Phase 0 therefore consists of two workload-specific priors: (1) a Top-K knob set identified through Random-Forest-based reranking, and (2) a compact PCA-based state representation derived from internal metrics. These priors do not directly determine the final configuration. In-stead, they constrain and inform the later execution-guided hint-refinement and post-tuning refinement stages, so that PLRTune can reduce unnecessary search while still relying on execution feedback to determine the final tuned values. The concrete sampling budget, knob-selection stability, and state-dimension sensitivity are reported in the experimental section. 
+
+B. Phase 1: Execution-Guided Hint Refinement 
+
+The goal of Phase 1 is to improve initialization quality before post-tuning refinement. Rather than directly applying raw textual hints, PLRTune treats this stage as an execution-
+
+Fig. 3: Phase 1 workflow for execution-guided hint refinement and initialization construction. guided hint-refinement process. As shown in Figure 3, Phase 1 builds a reusable hint store from external text, converts raw hints into executable formulas, uses execution feedback to adapt hint values and weights, and then refines the hint store through pruning and empirical prior fusion. In this way, Phase 1 turns noisy documentation-derived knowledge into a stronger and more reliable initialization signal for Phase 2. The upper part of Figure 3 corresponds to LLM-based corpus building and hint extraction. PLRTune collects textual tuning knowledge from vendor manuals, engineering blogs, and community discussions, and stores the extracted recom-mendations in a hint store. Following prior work on text-guided database tuning, the current implementation uses a BERT-based language model to analyze text snippets and identify knob-related recommendations. This step provides a reusable source of prior knowledge, but PLRTune does not directly apply the raw textual hints because they may be incomplete, redundant, or workload-dependent. The next block in Figure 3 performs hint extraction and normalization. Raw hints expressed in natural language are converted into structured parameter–value formulas. A normal-ized hint may specify either an absolute value, such as setting a connection-related knob to a fixed value, or a resource-relative value, such as setting a memory-related knob as a fraction of RAM. Resource-relative hints are instantiated using system properties such as RAM or CPU resources. This normalization step is important because it turns heterogeneous textual recommendations into executable DBMS configuration rules, allowing the later initializer to operate on structured hints rather than unprocessed text. The middle part of Figure 3 corresponds to hint-based warm-start construction. Starting from the normalized hint set, PLRTune first prioritizes candidate hints and selects a small subset for the current initialization step. It then uses an A2C-guided decision module to adapt the suggested values around their original recommendations and to learn how much weight each selected hint should receive. The adapted and weighted hints are aggregated into an executable DBMS configuration, which is then evaluated under the benchmark workload. The observed objective value is fed back to guide later value adaptation and weight learning. Through this design, Phase 1 improves initialization quality not by blindly trusting textual hints, but by using execution feedback to select, adjust, and combine them within a small number of warm-start steps. The lower-left feedback path in Figure 3 corresponds to execution-guided hint pruning. In practice, not all extracted hints are equally useful: some consistently improve perfor-mance, whereas others are rarely selected or are associated with degraded objective values. PLRTune therefore estimates parameter-level marginal contribution from the initialization traces collected in Phase 1. Parameters that are never selected are categorized as Never Used . For the remaining parameters, PLRTune compares the average tuning objective between trials in which the parameter is selected and trials in which it is not, and uses the resulting relative lift to categorize each parameter as Positive , Negative , or Neutral . Parameters categorized as Negative or Never Used are removed from the reusable hint store before later runs. This pruning mechanism reduces the negative impact of noisy or low-value hints, and its effectiveness is evaluated in the component ablation by comparing PLRTune with the variant without hint refinement. The lower-right part of Figure 3 corresponds to empirical prior fusion. In addition to pruning low-value hints, PLRTune augments the refined hint store with structured empirical recommendations. These priors complement documentation-derived hints with empirically effective settings, especially for important knobs. Representative examples for MySQL and PostgreSQL are shown in Table II. The resulting enhanced hint store is constructed separately for the two DBMSs and is reused by later initialization runs. A practical advantage of Phase 1 is that corpus processing, hint pruning, and empirical prior fusion are decoupled from repeated tuning runs. The full workflow in Figure 3 is mainly executed when building or refreshing the enhanced hint store. Once this store has been materialized, subsequent tuning runs can invoke the initializer directly without rebuilding the full refinement pipeline. The output of Phase 1 is therefore twofold: an enhanced reusable hint store and a stronger initial configuration derived from it, which together provide a more reliable starting point for the post-tuning refinement stage in 
+
+Fig. 4: Structure of Phase 2 post-tuning refinement in PLR-Tune. Phase 2. 
+
+C. Phase 2: Post-Tuning Refinement 
+
+The goal of Phase 2 is to further improve final tuning quality after the strong initialization obtained in Phase 1. Instead of restarting optimization from the DBMS default configuration or exploring the full candidate knob space, PLRTune treats this phase as residual post-tuning refinement. The action space is restricted to the Top-K important knobs selected by the Phase 0 knob-importance analysis, and the state space is represented by the compact PCA-based state features derived from the pre-sampled observations. Therefore, Phase 2 refines the remaining high-value tuning room within a workload-specific reduced search space. We adopt TD3 as the reinforcement-learning backbone of Phase 2. TD3 is suitable for continuous knob optimization and improves over standard DDPG-style actor–critic meth-ods through twin critics, delayed actor updates, and target-network-based stabilization. In PLRTune, TD3 is used as a state-aware refinement optimizer rather than a from-scratch black-box optimizer. The actor network proposes adjustments only for the Top-K knobs, while knobs outside the reduced subspace inherit their values from the Phase 1 initialization. The critic networks evaluate the resulting state–action pairs using the compact PCA state representation and the tuning objective as the reward signal. Figure 4 illustrates the iterative refinement process of Phase 2. Starting from the initial configuration produced by Phase 1, the actor generates a candidate update in the reduced Top-K action space. This update is mapped back to an executable DBMS configuration by modifying only the se-lected important knobs and keeping the remaining knob values unchanged. The configuration is then applied to the DBMS and evaluated under the target workload. During execution, PLRTune collects both the external objective value and the internal state metrics, projects the state metrics into the PCA-based compact state space, and stores the resulting transition in the replay buffer. The replay buffer supports iterative TD3 updates. In each update, the twin critics estimate the value of candidate state– action pairs, which reduces the risk of overestimating config-uration quality. The actor is updated less frequently than the critics, and target networks are used to stabilize training across TABLE II: Representative OtterTune-style recommendations used for hint fusion in Phase 1.                                 
+
+> (a) OtterTune Configuration (MySQL) (b) OtterTune Configuration (PostgreSQL)
+> innodb_buffer_pool_size = 8.8 G shared_buffers = 4 G
+> innodb_thread_sleep_delay = 0 checkpoint_segments = 540
+> innodb_flush_method =O_DIRECT effective_cache_size = 18 G
+> innodb_log_file_size = 1.3 G bgwriter_lru_maxpages = 1000
+> innodb_thread_concurrency = 0 bgwriter_delay = 213 ms
+> innodb_max_dirty_pages_pct_lwm = 0 checkpoint_completion_target = 0.8
+> innodb_read_ahead_threshold = 56 deadlock_timeout = 6 s
+> innodb_adaptive_max_sleep_delay = 150000 default_statistics_target = 78
+> innodb_buffer_pool_instances = 8 effective_io_concurrency = 3
+> thread_cache_size = 9 checkpoint_timeout = 1 h
+
+consecutive tuning steps. These mechanisms make Phase 2 more stable under the limited tuning budget, especially be-cause each DBMS trial is expensive and only a small number of online evaluations can be performed. This design improves final performance through focused residual exploration. Phase 1 quickly moves the system into a promising region, but textual hints and empirical priors may still leave workload-specific performance unexplored. Phase 2 addresses this gap by using runtime state feedback to continue refinement in the reduced subspace. Since the optimizer no longer needs to search over all candidate knobs or process the full internal metric vector, it can spend the online budget on workload-relevant knobs and compact runtime states. Together, the three phases provide a compact workload-aware search space, a strong execution-guided initialization, and state-aware post-tuning refinement. This staged design en-ables PLRTune to achieve both rapid early-stage improvement and high final tuning quality. V. E XPERIMENTS 
+
+A. Experimental Setup 1) Testbed and Implementation Details: All main experi-ments are conducted on a single x86-64 KVM virtual ma-chine running Ubuntu 24.04, with 12 vCPUs on an AMD EPYC 7713 host, 64 GB RAM, and a 120 GB SSD. No GPU accelerators are used. The DBMSs are MySQL 8.0.45 and PostgreSQL 16.13, and their validated candidate action spaces and internal metric settings are described in Section III. All candidate configurations are evaluated under the same single-machine protocol. For MySQL, selected knob values are applied using SET PERSIST ; for PostgreSQL, they are applied using ALTER SYSTEM SET . When a configuration contains restart-required parameters, the DBMS is restarted be-fore benchmark execution so that the configuration takes effect consistently. This protocol standardizes candidate evaluation, while each baseline keeps its original optimization logic as closely as possible. To evaluate cross-hardware reuse, we use the main testbed as the source server and introduce two target servers: a lower-resource target server with 8 CPU cores, 16 GB memory, and 100 GB storage, and a higher-resource target server with 32 CPU cores, 128 GB memory, and 500 GB storage. All methods are repeated three times for each workload, and we report the average result. 
+
+2) Benchmarks and Workloads: We evaluate PLRTune on representative transactional, mixed, and analytical workloads. For MySQL, we use Sysbench read-only, Sysbench write-only, Sysbench read-write, TPC-C, YCSB, and TPC-H. For PostgreSQL, we use Sysbench read-only, Sysbench write-only, and Sysbench read-write. These workloads cover read-intensive, write-intensive, mixed transaction, and analytical access patterns. Unless otherwise stated, all methods are evaluated within a 100-minute tuning window. For Sysbench, TPC-C, and YCSB, each trial uses a 60-second benchmark execution window. For TPC-H, each trial measures the complete query execution time. 
+
+3) Baselines: We compare PLRTune with representative baselines from reinforcement-learning-based, LLM-guided, and sample-efficient tuning methods. 
+
+HUNTER [15] is a hybrid RL-based tuner that combines GA-generated warm-start samples, Random Forest, PCA, and deep reinforcement learning. Since its original framework benefits from cloned instances and parallelized exploration, we adapt it to the same single-machine evaluation protocol used by all methods. 
+
+DB-BERT [16] extracts textual tuning hints from manuals and related documents, and performs hint-guided optimization based on the extracted knowledge. 
+
+GPTuner [17] is an LLM-assisted tuner that leverages heterogeneous textual knowledge, workload-aware knob se-lection, and Coarse-to-Fine Bayesian optimization. 
+
+LlamaTune [18] improves sample efficiency through search-space shaping and dimensionality reduction. In our experiments, we instantiate it with SMAC [53]. Each baseline follows the default or recommended algorithm-specific hyperparameters from its original paper or official implementation. We only adapt the execution protocol to ensure a unified single-machine comparison, including the same workload execution window, configuration application procedure, and 100-minute tuning budget. For PLRTune, the Phase 1 initialization settings are aligned with DB-BERT where applicable, and the Phase 2 TD3-related settings are aligned with HUNTER where applicable. 
+
+4) Evaluation Metrics: For transactional and mixed work-loads, we evaluate both throughput and tail latency using the scalarized objective 
+
+fitness = TPS p95 ,where a higher value indicates better performance. This ob-jective favors configurations that improve throughput without excessively increasing tail latency. For TPC-H, we use execu-tion time as the objective, where a lower value is better. We also analyze convergence behavior with respect to wall-clock tuning time and compare the time required to reach strong or best-observed configurations under the same evaluation protocol. 
+
+B. Phase 0 Prior Construction Analysis 
+
+This section analyzes two key parameter choices in Phase 0: the pre-sampling budget used for stable important-knob iden-tification, and the retained PCA state dimension used for compact state representation. These analyses determine the Phase 0 settings used in the subsequent experiments. 
+
+1) Knob Stability Under Increasing Pre-Sampling Steps: 
+
+We first study how many pre-sampling steps are needed to obtain a stable Top-K important-knob set. For a given prefix length (n), we compute the Top-K knob set from the first (n) pre-sampling steps and compare it with the Top-
+
+K set obtained from the full pre-sampling collection. The similarity is measured by the Jaccard index between TopK( n)
+
+and TopK(full) . A higher Jaccard value indicates that the important-knob set obtained from the prefix samples is closer to the final Top-K result. Figure 5 shows the stability curves for both MySQL and PostgreSQL under different Top-K settings. In both systems, the Jaccard similarity increases steadily as the number of pre-sampling steps grows, indicating that the identified important-knob sets gradually converge to the full-sample result. By around 2500 pre-sampling steps, most curves approach or exceed the 0.90 threshold, suggesting that the Top-K results have become sufficiently stable. Based on this observation, we set the Phase 0 pre-sampling budget to 2500 steps in PLRTune. This setting provides stable workload-specific knob priors for later stages without introducing unnecessary additional pre-sampling cost. 
+
+2) PCA-Based State Compression: We next determine the retained state dimension after PCA-based compression. Figure 6 reports the cumulative explained variance as the number of principal components increases for MySQL and PostgreSQL. We select the retained dimension using a cu-mulative explained variance threshold of 0.99, so that the compressed state representation preserves approximately 99% of the variance in the original internal metrics. Under this criterion, the retained state dimension is 13 for MySQL and 17 for PostgreSQL. These dimensions are used as the compact state representation in the subsequent Phase 2 refinement experiments. 
+
+C. Phase 1 Convergence Behavior 
+
+This section determines the tuning-step budget used for Phase 1 in the final PLRTune configuration. To isolate the behavior of the hint-guided initialization stage, we run Phase 1 alone on three representative Sysbench workloads for both 0 500 1000 1500 2000 2500      
+
+> steps
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Jaccard(TopK(n), TopK(full))
+> MySQL
+> Top10
+> Top20
+> Top30
+> Top40
+> Top50
+> Top60
+> Top70
+> Top80
+> Top90
+> Top100
+> Top110
+> Top120
+> Top130
+> Top140
+> Top150
+> threshold=0.90 0500 1000 1500 2000 2500
+> steps
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Jaccard(TopK(n), TopK(full))
+> PostgreSQL
+> Top10
+> Top20
+> Top30
+> Top40
+> Top50
+> Top60
+> Top70
+> Top80
+> Top90
+> Top100
+> threshold=0.90
+
+Fig. 5: Top-K stability under increasing pre-sampling steps on MySQL and PostgreSQL. 10 20 30 40 50 60 70      
+
+> Principal components
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Explained variance
+> MySQL
+> threshold=0.99
+> dim = 13 10 20 30 40 50 60
+> Principal components
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Explained variance
+> PostgreSQL
+> threshold=0.99
+> dim = 17
+
+Fig. 6: Cumulative explained variance under PCA for MySQL and PostgreSQL. MySQL and PostgreSQL, without enabling the subsequent TD3-based refinement. Figure 7 shows that Phase 1 improves rapidly during the first few tuning steps across all six workloads. The curves become much flatter after several additional iterations, indicating that most initialization gains have already been obtained. Although a few workloads still show small improvements after step 8, the marginal gain becomes limited compared with the addi-tional tuning cost. Based on this observation, we set the Phase 1 budget to 8 tuning steps in the final PLRTune configuration. This setting provides a strong initial configuration for Phase 2 while avoiding spending too much of the end-to-end tuning budget on the initialization stage. The remaining budget is then used by Phase 2 for TD3-based post-tuning refinement. 
+
+D. End-to-End Tuning Performance 1) Overall Results: In this section, we evaluate the end-to-end tuning performance of PLRTune on both MySQL and PostgreSQL workloads under the 100-minute tuning budget. All results use the final PLRTune configuration: Phase 1 per-forms 8 hint-guided initialization steps, and Phase 2 conducts TD3-based post-tuning refinement over the Top-50 workload-relevant knobs identified in Phase 0. The choice of Top-50 is analyzed later in Section V-E1. 0 5 8 10 15 20           
+
+> step
+> 275
+> 300
+> 325
+> 350
+> 375
+> TPS/p95
+> sysbench read 05810 15 20
+> step
+> 50
+> 100
+> 150
+> sysbench readwrite 05810 15 20
+> step
+> 100
+> 200
+> 300
+> 400
+> 500
+> sysbench write
+
+(a) MySQL workloads 0 5 8 10 15 20           
+
+> step
+> 350
+> 400
+> 450
+> TPS/p95
+> sysbench read 05810 15 20
+> step
+> 125
+> 150
+> 175
+> 200
+> 225
+> sysbench readwrite 05810 15 20
+> step
+> 750
+> 1000
+> 1250
+> 1500
+> sysbench write
+
+(b) PostgreSQL workloads 
+
+Fig. 7: Standalone convergence behavior of the Phase 1 hint-guided initialization stage on three representative Sysbench workloads for MySQL and PostgreSQL. Figure 8 shows the best-so-far tuning curves with respect to wall-clock time, including all compared methods. Table III summarizes the best-baseline comparison for each workload by reporting the best-performing alternative, its best objective value and time-to-best, the time required by PLRTune to reach that alternative’s best performance level, PLRTune’s own best objective value and time-to-best, and the final gain over the best-performing alternative. Overall, PLRTune shows a clear two-stage trajectory: Phase 1 quickly moves the DBMS to a strong initial region, while Phase 2 continues to improve the best-so-far performance within the reduced Top-50 knob sub-space. This confirms that hint-guided initialization provides a strong start, but further state-aware refinement is still necessary to exploit the remaining optimization room. As reported in Table III, PLRTune achieves the best final result on all nine workloads within the 100-minute tuning bud-get. On MySQL, PLRTune improves over the best-performing alternative by 14.61% on TPC-C, 6.66% on YCSB, 9.79% on Sysbench read, 11.01% on Sysbench read-write, and 14.86% 
+
+on Sysbench write, with an average improvement of 11.39% 
+
+over the five TPS/p95 workloads. On PostgreSQL, PLRTune improves over the best-performing alternative by 9.00% on Sysbench read, 11.11% on Sysbench read-write, and 8.31% 
+
+on Sysbench write, with an average improvement of 9.47% .Across all workloads, PLRTune improves over the correspond-ing best-performing alternatives by 9.50% on average, and by 
+
+10.67% on average over the eight TPS/p95 workloads. The curves in Figure 8 show a consistent pattern across both DBMSs. PLRTune, DB-BERT, and GPTuner often obtain strong early gains, confirming the usefulness of hint-guided or knowledge-guided initialization. However, DB-BERT and GPTuner frequently become flat after their initial improve-ments, whereas PLRTune continues to improve after Phase 1. This indicates that textual guidance can locate a promising region quickly, but cannot fully exploit the remaining tuning room. PLRTune further converts this residual room into final performance gains through TD3-based refinement in the re-duced knob subspace. In contrast, HUNTER and LlamaTune generally improve more slowly under our single-machine evaluation protocol, especially because they do not provide the same hint-guided initialization mechanism as PLRTune. TPC-H is the only workload where the final gap is small, with PLRTune improving over the best-performing alternative by only 0.16% . Most methods except HUNTER converge rapidly on this workload and reach a strong region early, leaving limited residual tuning room after the initial stage. Taken together, these results show that PLRTune consis-tently improves both tuning quality and convergence behavior across different DBMSs and workload types. Its main ad-vantage comes from combining fast hint-guided initialization with reduced-space TD3 refinement: Phase 1 quickly reaches a strong region, while Phase 2 continues to exploit the remaining optimization room that documentation-guided baselines do not fully close. 
+
+2) Runtime Efficiency Analysis: We further analyze runtime efficiency from an end-to-end tuning perspective using the same best-so-far curves as in the main experiments. The measured wall-clock time includes configuration application, workload execution, and metric collection. As shown in Ta-ble III, PLRTune reaches the best-performing alternative’s best performance level earlier on every workload. Averaged across workloads, PLRTune reaches this shared target 9.03 × faster ,showing that it can obtain baseline-level tuning quality much earlier under the same end-to-end evaluation protocol. We also report PLRTune’s own-best time as a stricter criterion, because PLRTune’s own best performance is higher than the best-performing alternative’s best performance on every workload. In most workloads, PLRTune reaches its own stronger best result faster than the best-performing alternative reaches its own best. The only exceptions are MySQL YCSB and PostgreSQL Sysbench write, where PLRTune spends more time reaching its own best result. However, in both cases, PLR-Tune has already reached the alternative’s best-performance target earlier, and the additional time is spent improving be-yond that target. Overall, PLRTune reaches baseline-level per-formance faster on all workloads while achieving an average final improvement of 9.50% , with the maximum improvement reaching 14.86% .
+
+E. Ablation and Sensitivity Analysis 1) Top-N Sensitivity: We next study the sensitivity of PLRTune to the size of the reduced knob subspace. For both MySQL and PostgreSQL, we evaluate Top-N settings from 10 to 100 on three Sysbench workloads each under the same 100-minute tuning window used in the main end-to-end experiments. Each variant follows the same PLRTune pipeline and changes only the number of important knobs retained for Phase 2 refinement. As shown in Figure 9, Top-50 reaches the best or near-best result on almost all six workloads. Smaller settings such as Top-10 or Top-20 often exclude useful knobs and limit the final achievable performance, whereas larger settings reintroduce more low-value or noisy dimensions and bring little additional benefit. These results show that Top-50 provides a robust balance between search efficiency and refinement capacity across both DBMSs. Based on these observations, we adopt DB-BERT PLRTune (phase 1) PLRTune (phase 2) GPTuner Hunter LlamaTune 0 10 20 30 40 50 60 70 80 90 100                                                   
+
+> time (min)
+> 180k
+> 200k
+> 220k
+> 240k
+> 260k
+> execution time(ms)  tpch 010 20 30 40 50 60 70 80 90 100
+> time (min)
+> 0.250
+> 0.275
+> 0.300
+> 0.325
+> 0.350
+> 0.375
+> 0.400
+> 0.425
+> TPS / p95_ms  tpcc 010 20 30 40 50 60 70 80 90 100
+> time (min)
+> 10500
+> 11000
+> 11500
+> 12000
+> 12500
+> TPS / p95_ms  ycsb 010 20 30 40 50 60 70 80 90 100
+> time (min)
+> 280
+> 300
+> 320
+> 340
+> 360
+> 380
+> 400
+> TPS / p95_ms  sysbench read 010 20 30 40 50 60 70 80 90 100
+> time (min)
+> 40
+> 60
+> 80
+> 100
+> 120
+> 140
+> 160
+> 180
+> TPS / p95_ms  sysbench readwrite 010 20 30 40 50 60 70 80 90 100
+> time (min)
+> 100
+> 200
+> 300
+> 400
+> 500
+> 600
+> TPS / p95_ms  sysbench write
+
+(a) MySQL workloads 0 10 20 30 40 50 60 70 80 90 100                     
+
+> time (min)
+> 350
+> 400
+> 450
+> 500
+> TPS / p95_ms  sysbench read 010 20 30 40 50 60 70 80 90 100
+> time (min)
+> 140
+> 160
+> 180
+> 200
+> 220
+> 240
+> 260
+> TPS / p95_ms  sysbench readwrite 010 20 30 40 50 60 70 80 90 100
+> time (min)
+> 600
+> 800
+> 1000
+> 1200
+> 1400
+> 1600
+> 1800
+> 2000
+> TPS / p95_ms  sysbench write
+
+(b) PostgreSQL workloads 
+
+Fig. 8: End-to-end best-so-far tuning performance of PLRTune and representative baselines across MySQL and PostgreSQL workloads. TABLE III: End-to-end best-so-far and runtime-efficiency comparison against the best-performing alternative within the 100-minute budget. 
+
+Workload Metric Best-Performing Alternative Alternative Best Alternative Time (min) PLRTune Target Time (min; Runtime Change) PLRTune Best PLRTune Best Time (min; Runtime Change) Final Gain 
+
+MySQL TPC-H Exec. time (ms) DB-BERT 177239.00 61.15 26.29 (2.33 × faster) 176960.00 26.29 (2.33 × faster) +0.16% 
+
+MySQL TPC-C TPS/p95 DB-BERT 0.3662 83.33 16.68 (5.00 × faster) 0.4197 59.45 (1.40 × faster) +14.61% 
+
+MySQL YCSB TPS/p95 DB-BERT 11778.88 25.48 16.46 (1.55 × faster) 12563.14 34.99 (1.37 × longer) +6.66% 
+
+MySQL Read TPS/p95 GPTuner 375.34 59.98 12.21 (4.91 × faster) 412.07 40.72 (1.47 × faster) +9.79% 
+
+MySQL Read-Write TPS/p95 GPTuner 156.21 67.04 2.67 (25.11 × faster) 173.40 65.68 (1.02 × faster) +11.01% 
+
+MySQL Write TPS/p95 DB-BERT 516.71 96.44 3.04 (31.72 × faster) 593.48 26.43 (3.65 × faster) +14.86% 
+
+PG Read TPS/p95 GPTuner 473.10 91.74 16.42 (5.59 × faster) 515.69 69.17 (1.33 × faster) +9.00% 
+
+PG Read-Write TPS/p95 GPTuner 238.42 35.28 12.42 (2.84 × faster) 264.90 23.83 (1.48 × faster) +11.11% 
+
+PG Write TPS/p95 GPTuner 1863.31 77.63 35.54 (2.18 × faster) 2018.12 95.41 (1.23 × longer) +8.31% Average – – – – 9.03 × faster – – +9.50% 
+
+Top-50 as the default reduced knob subspace in the final PLRTune configuration. 
+
+2) Phase and Component Ablation: We next analyze the contribution of each major component of PLRTune using MySQL Sysbench read-write as a representative controlled ablation workload. The evaluated variants are designed to examine the three core roles of PLRTune: Phase 0 reduces the online search burden through workload-specific reduced-subspace construction, Phase 1 improves initialization qual-ity through execution-guided hint refinement, and Phase 2 improves final tuning quality through state-aware post-tuning refinement. Figure 10 compares the full PLRTune with variants that remove Phase 0 reduced-subspace construction, remove hint refinement, remove Phase 1 initialization, or replace the Phase 2 optimizer with DDPG or SMAC. The full PLRTune achieves the strongest best-so-far performance, while all ab-lated variants show clear degradation. Removing Phase 0 weakens later refinement because the optimizer no longer benefits from a workload-specific reduced knob prior or compact PCA-based state representation. Re-moving hint refinement leads to a weaker Phase 1 initial-ization, and removing Phase 1 causes much slower early-stage progress, making the optimizer closer to cold-start RL. These results confirm that both reduced-subspace construction and execution-guided warm start are important for effective refinement. Replacing TD3 with DDPG or SMAC also lowers the final result. This shows that Phase 2 is not merely a second search stage, but benefits from state-aware refinement in the reduced subspace. In particular, the weaker SMAC variant does not imply that SMAC is ineffective as a general-purpose optimizer; rather, it reflects the specific role of Phase 2in PLRTune, where the goal is residual refinement from a strong initialization using compact runtime state feedback. 10 20 30 40 50 60 70 80 90 100 
+
+> Number of Knobs
+> 370
+> 380
+> 390
+> 400
+> 410
+> TPS / p95_ms
+
+sysbench read 10 20 30 40 50 60 70 80 90 100 
+
+> Number of Knobs
+> 167.5
+> 170.0
+> 172.5
+> 175.0
+> 177.5
+
+sysbench readwrite 10 20 30 40 50 60 70 80 90 100 
+
+> Number of Knobs
+> 560
+> 570
+> 580
+> 590
+
+sysbench write (a) MySQL workloads 10 20 30 40 50 60 70 80 90 100 
+
+> Number of Knobs
+> 480
+> 500
+> TPS / p95_ms
+
+sysbench read 10 20 30 40 50 60 70 80 90 100 
+
+> Number of Knobs
+> 240
+> 250
+> 260
+
+sysbench readwrite 10 20 30 40 50 60 70 80 90 100 
+
+> Number of Knobs
+> 1700
+> 1800
+> 1900
+> 2000
+
+sysbench write 
+
+(b) PostgreSQL workloads 
+
+Fig. 9: Top-N sensitivity under the 100-minute tuning window on three Sysbench workloads for MySQL and PostgreSQL. 0 20 40 60 80 100 
+
+time (min)     
+
+> 40
+> 60
+> 80
+> 100
+> 120
+> 140
+> 160
+> 180
+> TPS / p95_ms
+> W/O Phase-0 pre-sampling
+> W/O hint refinement
+> W/O Phase-1 warm start
+> Phase-2 = DDPG
+> Phase-2 = SMAC
+> PLRTune
+> 55 60 65 70 75
+> 167.5
+> 170.0
+> 172.5
+> 175.0
+
+Fig. 10: Ablation results on MySQL Sysbench read-write. Overall, the strongest result is achieved only when workload-specific reduced-subspace construction, enhanced hint-guided initialization, and TD3-based post-tuning refinement are used together. 
+
+F. Cross-Hardware Reuse Evaluation 
+
+We evaluate whether the workload-specific important-knob priors identified by PLRTune remain useful when the same workload type is deployed on differently configured servers. We consider two heterogeneous target servers: a lower-resource target server with 8 CPU cores, 16 GB memory, and 100 GB storage, and a higher-resource target server with 32 CPU cores, 128 GB memory, and 500 GB storage. As shown in Figure 11, PLRTune remains effective after the hardware configuration changes. On both the lower-resource and higher-resource target servers, it achieves the best final tuning performance across the tested Sysbench workloads. The two-stage pattern also remains visible: Phase 1 rapidly moves the system to a strong initial region, and Phase 2 further improves the final result through post-tuning refinement. Importantly, PLRTune reuses only the workload-specific Top-K knob prior identified during Phase 0, rather than directly transferring a final configuration from the source server. On each target server, this prior defines the reduced DB-BERT 
+
+GPTuner 
+
+PLRTune (phase 1) 
+
+Hunter 
+
+PLRTune (phase 2) 
+
+LlamaTune 0 10 20 30 40 50 60 70 80 90 100                     
+
+> time (min)
+> 24
+> 26
+> 28
+> 30
+> 32
+> 34
+> 36
+> TPS / p95_ms  sysbench read 010 20 30 40 50 60 70 80 90 100
+> time (min)
+> 2.5
+> 5.0
+> 7.5
+> 10.0
+> 12.5
+> 15.0
+> sysbench readwrite 010 20 30 40 50 60 70 80 90 100
+> time (min)
+> 10
+> 20
+> 30
+> 40
+> 50
+> 60
+> sysbench write
+
+(a) Lower-resource target server 0 10 20 30 40 50 60 70 80 90 100                     
+
+> time (min)
+> 100
+> 200
+> 300
+> 400
+> 500
+> TPS / p95_ms  sysbench read 010 20 30 40 50 60 70 80 90 100
+> time (min)
+> 0
+> 5
+> 10
+> 15
+> 20
+> 25
+> 30
+> sysbench readwrite 010 20 30 40 50 60 70 80 90 100
+> time (min)
+> 10
+> 20
+> 30
+> 40
+> 50
+> 60
+> sysbench write
+
+(b) Higher-resource target server 
+
+Fig. 11: Cross-hardware reuse results on lower-resource and higher-resource target servers across three Sysbench work-loads. tuning subspace, while Phase 1 and Phase 2 are still executed locally to adapt the configuration to the new hardware environ-ment. These results indicate that the workload-specific priors identified by PLRTune remain useful beyond a single fixed hardware setting. VI. R ELATED WORK 
+
+Automatic database tuning has been studied from several perspectives, including search-based and data-driven tuning, reinforcement-learning-based optimization, language-model-guided methods, and sample-efficient hybrid designs [13], [19]–[33]. 
+
+Search-based and data-driven tuning. Early automatic tuning methods typically treat the DBMS as a black-box optimization target and search the configuration space through repeated trials [34]–[36]. BestConfig [11] partitions the configuration space and explores promising regions, while data-driven systems such as OtterTune [13] reuse historical workload–configuration–performance observations to recom-mend settings for new workloads. E2ETune [14] further learns workload-to-configuration mappings with a fine-tuned gen-erative model. These methods show the value of historical observations, but their effectiveness may be limited when prior knowledge is insufficient or when the target deployment differs substantially from previously observed environments. 
+
+Reinforcement-learning-based tuning. Another line of work formulates database tuning as a sequential decision-making problem [5], [37]–[42]. CDBTune [5] applies DDPG-style reinforcement learning to continuous knob optimiza-tion, and Qtune [9] studies query-aware RL-based tuning. HUNTER [15] combines warm-start exploration, Random-Forest-based knob ranking, PCA-based state compression, and deep reinforcement learning. These studies demonstrate the potential of RL-based tuning, but also expose practical challenges such as cold-start cost, sample inefficiency, and deployment overhead under limited tuning budgets. 
+
+Language-model-guided tuning. Recent studies use man-uals, blogs, forums, and other textual sources to guide database tuning with language models [16], [17], [43]– [46]. DB-BERT [16] extracts knob-specific hints and recom-mended values from text corpora for hint-guided optimiza-tion, while GPTuner [17] integrates heterogeneous knowledge sources, workload-aware knob selection, and Coarse-to-Fine Bayesian optimization. Other methods such as λ-Tune [47] and LaTuner [48] further explore LLM-based tuning strategies. These methods can provide informative initialization, but textual guidance alone may not fully exploit the remaining optimization room of the target system. 
+
+Sample-efficient and hybrid tuning. Recent work also improves tuning efficiency by reducing or reshaping the search space [15], [18], [49]–[52]. LlamaTune [18] improves sample efficiency through search-space shaping, dimension-ality reduction, and biased handling of special values, while HUNTER [15] combines warm-start exploration, reduced-space analysis, and RL-based refinement. These studies sug-gest that search-space reduction and staged optimization are important for effective tuning under limited budgets. Prior work offers two complementary insights for im-proving database tuning efficiency. Reduced-space tuners such as HUNTER show that focusing reinforcement learn-ing on important knobs and compact states can make later-stage exploration more efficient under limited budgets [15]. Text-guided tuners such as DB-BERT and GPTuner show that documentation-derived knowledge can quickly move the DBMS toward promising configurations [16], [17]. These insights are useful at different stages of the tuning process: textual guidance is especially helpful for early-stage initial-ization, while reduced-space reinforcement learning is more suitable for continued refinement after a strong region has been reached. PLRTune therefore organizes these ideas into a staged pipeline. It first constructs workload-specific reduced action and state spaces, then refines textual hints through execution feedback to obtain a stronger initialization, and fi-nally continues state-aware TD3 refinement within the reduced subspace. This design allows prior knowledge to accelerate early progress while preserving execution-driven optimization for the remaining tuning room. VII. C ONCLUSION 
+
+This paper presents PLRTune, a staged automatic database tuning system built on importance pre-sampling and rerank-ing, execution-guided hint refinement, and state-aware post-tuning refinement. Rather than treating all knobs uniformly from the beginning, PLRTune first identifies workload-relevant important knobs and derives a compact state representation, then refines textual hints to construct a stronger and more reliable initialization, and finally performs TD3-based refine-ment within the reduced knob subspace to further improve final tuning quality. Extensive experiments on MySQL and PostgreSQL show that this staged design is effective across diverse workloads. PLRTune achieves the best final result on all nine tested work-loads under the same end-to-end evaluation setting. Compared with the corresponding best baselines, PLRTune improves the final objective by 9.50% on average across all workloads, and by 10.67% on average over the eight workloads evaluated by TPS/p95. Runtime-efficiency analysis further shows that PLR-Tune reaches the strongest baseline’s best performance level 
+
+9.03 × faster on average across workloads. Under the stricter own-best criterion, PLRTune usually reaches its own stronger best result faster than the strongest baseline reaches its own best result, with only two workload-level exceptions where additional time is spent improving beyond the baseline target. Ablation studies confirm that workload-aware search-space reduction, execution-guided hint refinement, and state-aware TD3-based post-tuning refinement all contribute meaningfully to the final result. Cross-hardware experiments further show that workload-specific important-knob priors can remain useful across differently configured target servers when followed by local initialization and refinement. Overall, the results suggest that combining workload-aware prior construction, stronger hint-guided initialization, and state-aware reduced-space refinement provides an effective way to achieve both fast tuning progress and strong final tuning performance under practical end-to-end tuning budgets. ACKNOWLEDGMENT 
+
+The work was supported by the Strategic Priority Research Program of the Chinese Academy of Sciences under Grant No. XDA0360202. REFERENCES [1] X. Zhao, X. Zhou, and G. Li, “Automatic database knob tuning: A survey,” IEEE Transactions on Knowledge and Data Engineering , vol. 35, no. 12, pp. 12470–12490, 2023. [2] X. Zhang, Z. Chang, Y. Li, H. Wu, J. Tan, F. Li, et al., “Facilitating database tuning with hyper-parameter optimization: a comprehensive experimental evaluation,” arXiv preprint arXiv:2110.12654 , 2021. [3] K. Kanellis, R. Alagappan, and S. Venkataraman, “Too many knobs to tune? towards faster database tuning by pre-selecting important knobs,” in 12th USENIX Workshop on Hot Topics in Storage and File Systems (HotStorage 20) , 2020. [4] S. Duan, V. Thummala, and S. Babu, “Tuning database configuration parameters with ituned.,” Proc. VLDB Endow. , vol. 2, no. 1, pp. 1246– 1257, 2009. [5] J. Zhang, Y. Liu, K. Zhou, G. Li, Z. Xiao, B. Cheng, J. Xing, Y. Wang, T. Cheng, L. Liu, et al., “An end-to-end automatic cloud database tuning system using deep reinforcement learning,” in Proceedings of the 2019 international conference on management of data , pp. 415–432, 2019. [6] A. J. Storm, C. Garcia-Arellano, S. S. Lightstone, Y. Diao, and M. Surendra, “Adaptive self-tuning memory in DB2,” in Proceedings of the 32nd international conference on Very large data bases , pp. 1081–1092, 2006. [7] S. Cereda, S. Valladares, P. Cremonesi, S. Doni, et al., “Cgptuner: a contextual gaussian process bandit approach for the automatic tuning of it configurations under varying workload conditions,” Proceedings of the VLDB Endowment , vol. 14, no. 8, pp. 1401–1413, 2021. [8] Y. Gur, D. Yang, F. Stalschus, and B. Reinwald, “Adaptive Multi-Model Reinforcement Learning for Online Database Tuning.,” in EDBT , pp. 439–444, 2021. [9] G. Li, X. Zhou, S. Li, and B. Gao, “Qtune: A query-aware database tuning system with deep reinforcement learning,” Proceedings of the VLDB Endowment , vol. 12, no. 12, pp. 2118–2130, 2019. [10] J. Wang, I. Trummer, and D. Basu, “UDO: universal database optimiza-tion using reinforcement learning,” arXiv preprint arXiv:2104.01744 ,2021. [11] Y. Zhu, J. Liu, M. Guo, Y. Bao, W. Ma, Z. Liu, et al., “Bestconfig: tapping the performance potential of systems via automatic configuration tuning,” in Proceedings of the 2017 symposium on cloud computing , pp. 338–350, 2017. [12] X. Zhang, H. Wu, Z. Chang, S. Jin, J. Tan, F. Li, et al., “Restune: Resource oriented tuning boosted by meta-learning for cloud databases,” in Proceedings of the 2021 international conference on management of data , pp. 2102–2114, 2021. [13] D. Van Aken, A. Pavlo, G. J. Gordon, and B. Zhang, “Automatic database management system tuning through large-scale machine learn-ing,” in Proceedings of the 2017 ACM international conference on management of data , pp. 1009–1024, 2017. [14] X. Huang, H. Li, J. Zhang, X. Zhao, Z. Yao, Y. Li, et al., “E2etune: End-to-end knob tuning via fine-tuned generative language model,” arXiv preprint arXiv:2404.11581 , 2024. [15] B. Cai, Y. Liu, C. Zhang, G. Zhang, K. Zhou, L. Liu, et al., “HUNTER: an online cloud database hybrid tuning system for personalized re-quirements,” in Proceedings of the 2022 International Conference on Management of Data , pp. 646–659, 2022. [16] I. Trummer, “DB-BERT: A Database Tuning Tool that Reads the Manual,” in Proceedings of the 2022 International Conference on Management of Data , pp. 190–203, 2022. [17] J. Lao, Y. Wang, Y. Li, J. Wang, Y. Zhang, Z. Cheng, et al., “Gptuner: An llm-based database tuning system,” ACM SIGMOD Record , vol. 54, no. 1, pp. 101–110, 2025. [18] K. Kanellis, C. Ding, B. Kroth, A. M¨ uller, C. Curino, and S. Venkatara-man, “LlamaTune: sample-efficient DBMS configuration tuning,” arXiv preprint arXiv:2203.05128 , 2022. [19] E. Dritsas and M. Trigka, “Machine learning in modern database systems: Techniques, architectures, and deployment challenges,” En-gineering Applications of Artificial Intelligence , vol. 170, pp. 114225, 2026. [20] S. J. Qiao, H. L. Fan, N. Han, L. Du, Y. H. Peng, R. M. Tang, et al., “Learning database optimization techniques: the state-of-the-art and prospects,” Frontiers of Computer Science , vol. 19, no. 12, pp. 1912612, 2025. [21] Y. Wu, X. Zhou, Y. Zhang, and G. Li, “Automatic index tuning: A survey,” IEEE Transactions on Knowledge and Data Engineering , vol. 36, no. 12, pp. 7657–7676, 2024. [22] T. Siddiqui and W. Wu, “ML-powered index tuning: An overview of recent progress and open challenges,” ACM SIGMOD Record , vol. 52, no. 4, pp. 19–30, 2024. [23] S. Chaudhuri and V. R. Narasayya, “An efficient, cost-driven index selection tool for Microsoft SQL server,” in VLDB , vol. 97, pp. 146–155, 1997. [24] J. Ding, U. F. Minhas, J. Yu, C. Wang, J. Do, Y. Li, H. Zhang, B. Chandramouli, J. Gehrke, D. Kossmann, et al., “ALEX: an updatable adaptive learned index,” in Proceedings of the 2020 ACM SIGMOD international conference on management of data , pp. 969–984, 2020. [25] A. Galakatos, M. Markovitch, C. Binnig, R. Fonseca, and T. Kraska, “Fiting-tree: A data-aware index structure,” in Proceedings of the 2019 international conference on management of data , pp. 1189–1206, 2019. [26] T. Kraska, A. Beutel, E. H. Chi, J. Dean, and N. Polyzotis, “The case for learned index structures,” in Proceedings of the 2018 international conference on management of data , pp. 489–504, 2018. [27] J. Liu and C. Zhang, “Distributed Learning Systems with First-order Methods: An Introduction,” Foundations and Trends in Databases , vol. 9, no. 1, pp. 1–100, 2020. [28] L. Ma, D. Van Aken, A. Hefny, G. Mezerhane, A. Pavlo, and G. J. Gordon, “Query-based workload forecasting for self-driving database management systems,” in Proceedings of the 2018 International Con-ference on Management of Data , pp. 631–645, 2018. [29] L. Ma, W. Zhang, J. Jiao, W. Wang, M. Butrovich, W. S. Lim, et al., “MB2: decomposed behavior modeling for self-driving database man-agement systems,” in Proceedings of the 2021 International Conference on Management of Data , pp. 1248–1261, 2021. [30] Z. Sadri, L. Gruenwald, and E. Leal, “Online index selection using deep reinforcement learning for a cluster database,” in 2020 IEEE 36th International Conference on Data Engineering Workshops (ICDEW) , pp. 158–161, 2020. [31] K. Schnaitter and N. Polyzotis, “Semi-automatic index tuning: Keeping dbas in the loop,” arXiv preprint arXiv:1004.1249 , 2010. [32] J. Tan, T. Zhang, F. Li, J. Chen, Q. Zheng, P. Zhang, et al., “Ibtune: Individualized buffer tuning for large-scale cloud databases.,” Proc. VLDB Endow. , vol. 12, no. 10, pp. 1221–1234, 2019. [33] D. Van Aken, D. Yang, S. Brillard, A. Fiorino, B. Zhang, C. Bilien, et al., “An inquiry into machine learning-based automatic configuration tuning services on real-world database management systems,” Proceedings of the VLDB Endowment , vol. 14, no. 7, pp. 1241–1253, 2021. [34] A. Mahgoub, P. Wood, S. Ganesh, S. Mitra, W. Gerlach, T. Harrison, et al., “Rafiki: A middleware for parameter tuning of nosql datastores for dynamic metagenomics workloads,” in Proceedings of the 18th ACM/IFIP/USENIX Middleware Conference , pp. 28–40, 2017. [35] J. Zhang, K. Zhou, G. Li, Y. Liu, M. Xie, B. Cheng, et al., “CDBTune+: An efficient deep reinforcement learning-based automatic cloud database tuning system,” The VLDB Journal , vol. 30, no. 6, pp. 959–987, 2021. [36] A. Mahgoub, A. M. Medoff, R. Kumar, S. Mitra, A. Klimovic, S. Chaterji, et al., “ {OPTIMUSCLOUD }: Heterogeneous configuration optimization for distributed databases in the cloud,” in 2020 USENIX Annual Technical Conference (USENIX ATC 20) , pp. 189–203, 2020. [37] F. Ye, Y. Li, X. Wang, N. Nedjah, P. Zhang, and H. Shi, “Parameters tuning of multi-model database based on deep reinforcement learning,” 
+
+Journal of Intelligent Information Systems , vol. 61, no. 1, pp. 167–190, 2023. [38] L. Shi, T. Li, L. Wei, Y. Tao, C. Li, and Y. Gao, “FASTune: Towards Fast and Stable Database Tuning System with Reinforcement Learning,” 
+
+Electronics , vol. 12, no. 10, pp. 2168, 2023. [39] C. Li, J. Wang, J. Shi, L. Liu, and S. Zhang, “ADWTune: an adaptive dynamic workload tuning system with deep reinforcement learning,” 
+
+Complex & Intelligent Systems , vol. 11, no. 4, pp. 192, 2025. [40] Z. Li, Y. Tu, and Z. Ma, “A sample-aware database tuning system with deep reinforcement learning.,” Journal of Database Management , vol. 35, no. 1, 2024. [41] S. Lai, X. Wu, and Z. Peng, “E2RLIXT: An end-to-end framework for robust index tuning based on reinforcement learning,” Computers and Electrical Engineering , vol. 122, pp. 109958, 2025. [42] S. Wu, Y. Li, H. Zhu, J. Zhao, and G. Chen, “Dynamic index construc-tion with deep reinforcement learning,” Data Science and Engineering ,vol. 7, no. 2, pp. 87–101, 2022. [43] H. Dou, L. Jin, Y. Zhou, J. He, and Y. Zhang, “DemoTuner: Efficient DBMS Knobs Tuning via LLM-Assisted Demonstration Reinforcement Learning,” arXiv preprint arXiv:2511.09998 , 2025. [44] Z. Xuan and L. Wantao, “LGTune: An LLM-Guided Database Knob Reinforcement Learning Tuning System,” in International Conference on Intelligent Computing , pp. 183–194, 2025. [45] X. Zhang, T. Chen, Z. Han, Z. Hong, W. Lu, S. Wang, M. Sha, A. Wang, S. Liu, Y. Zhang, et al., “Why Database Manuals Are Not Enough: Efficient and Reliable Configuration Tuning for DBMSs via Code-Driven LLM Agents,” arXiv preprint arXiv:2603.22708 , 2026. [46] Y. Li, H. Li, Z. Pu, J. Zhang, X. Zhang, T. Ji, et al., “Is large language model good at database knob tuning? A comprehensive experimental evaluation,” arXiv preprint arXiv:2408.02213 , 2024. [47] V. Giannakouris and I. Trummer, “ λ-tune: Harnessing large language models for automated database system tuning,” Proceedings of the ACM on Management of Data , vol. 3, no. 1, pp. 1–26, 2025. [48] C. Fan, Z. Pan, W. Sun, C. Yang, and W. N. Chen, “Latuner: An llm-enhanced database tuning system based on adaptive surrogate model,” in Joint European Conference on Machine Learning and Knowledge Discovery in Databases , pp. 372–388, 2024. [49] J. Seo, K. Kim, S. Seo, and S. Park, “DARK: Deep automatic Redis knobs tuning system depending on the persistence method,” Expert Systems with Applications , vol. 221, pp. 119697, 2023. [50] J. Lee, S. Seo, J. Choi, and S. Park, “K2vTune: A workload-aware con-figuration tuning for RocksDB,” Information Processing & Management ,vol. 61, no. 1, pp. 103567, 2024. [51] Y. Chai, J. Ge, Q. Zhang, Y. Chai, X. Wang, and Q. Zhang, “Corre-lation Expert Tuning System for Performance Acceleration,” Big Data Research , vol. 30, pp. 100345, 2022. [52] R. Cao, L. Bao, K. Zhao, and P. Zhangsun, “ETune: Efficient Configu-ration Tuning for Big-Data Software Systems via Configuration Space Reduction,” Journal of Systems and Software , vol. 209, pp. 111936, 2024. [53] F. Hutter, H. H. Hoos, and K. Leyton-Brown, “Sequential model-based optimization for general algorithm configuration,” in International Conference on Learning and Intelligent Optimization , pp. 507–523, 2011.

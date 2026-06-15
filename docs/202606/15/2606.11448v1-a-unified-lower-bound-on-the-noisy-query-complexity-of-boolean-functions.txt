@@ -1,0 +1,1330 @@
+Title: A Unified Lower Bound on the Noisy Query Complexity of Boolean Functions
+
+URL Source: https://arxiv.org/pdf/2606.11448v1
+
+Published Time: Thu, 11 Jun 2026 00:19:32 GMT
+
+Number of Pages: 22
+
+Markdown Content:
+# A Unified Lower Bound on the Noisy Query Complexity of Boolean Functions 
+
+Yuzhou Gu ∗ Xin Li † Yinzhan Xu ‡
+
+Abstract 
+
+We study the query complexity of Boolean functions f : {0, 1}n → { 0, 1} in the noisy query model introduced by Feige, Raghavan, Peleg and Upfal [SICOMP 1994]. In this model, an algorithm can adaptively query the bits of an input vector, but each query result is independently flipped with constant probability p ∈ (0 , 1/2); repeated queries are allowed. The noisy query complexity Np(f ) of a function f is defined as the minimum expected number of queries needed to compute f (x) with error probability at most 1 /3, for the worst case input x.We prove a general lower bound on Np(f ) based on degree statistics of certain subgraphs of the Boolean hypercube. This is the first general lower bound beyond those implied by the simple observation that Np(f ) is lower bounded by the randomized query complexity. We show that this recovers (up to a constant factor) most previously known lower bounds on the noisy query complexity of Boolean functions, providing a unified framework for understanding these results and simplifying the proofs in several cases. Furthermore, this resolves in the affirmative an open problem of Gu, Li and Xu [COLT 2025] that Np(f ) = Ω( I(f ) log I(f )), where I(f ) denotes the total influence of f . We also apply our general lower bound to obtain tight bounds on the noisy query complexity for several new functions. 
+
+# 1 Introduction 
+
+In modern computation architectures, especially in large systems, errors occur inevitably due to various reasons such as hardware failures, communication errors and environmental noise. It is thus crucial to design algorithms that are robust in the presence of errors. Feige et al. [1994] formally defined the following extremely natural and basic noisy query model that incorporates errors: Let 
+
+f : {0, 1}n → { 0, 1} be a Boolean function. Given an unknown fixed input x ∈ { 0, 1}n, a (potentially randomized) algorithm can query each bit xi, but the returned bit could be flipped with some fixed constant probability p, and repeated queries are allowed. The goal is to compute f (x) while minimizing the number of queries. There has been a lot of work studying this model [Reischuk and Schmeltz, 1991, Feige, 1992, Kenyon and King, 1994, Evans and Pippenger, 1998, Zhu et al., 2023, 2024, Wang et al., 2025, Gu et al., 2025], as well as the related noisy comparison model [Horstein, 1963, Berlekamp, 1964, Burnashev and Zigangirov, 1974, Feige, 1992, Ben-Or and Hassidim, 2008, Emamjomeh-Zadeh et al., 2016, Dereniowski et al., 2019, Wang et al., 2022, Gu and Xu, 2023, Wang et al., 2023, Zhu et al., 2023, Dereniowski et al., 2025]. However, despite much attention, even such a basic model has not been fully understood. Let Np(f ) denote the minimum expected number of noisy queries needed to compute f with error probability ≤ 1/3 by an adaptive randomized algorithm. Clearly, Np(f ) ≥ Ω( R(f )), the randomized 
+
+> ∗sevenkplus.g@gmail.com
+> †lixints@cs.jhu.edu
+> ‡xyzhan@ucsd.edu
+
+1
+
+> arXiv:2606.11448v1 [cs.DS] 9 Jun 2026
+
+query complexity for computing f within error 1 /3, as computation with exact queries can only be easier than computation with noisy queries. Also, Np(f ) = O(R(f ) log R(f )) 1 for the following reason: Given a randomized algorithm for computing f with exact queries, one can repeat each query O(log R(f )) times in the noisy query model and take the majority results, so that each query will be correct with probability 1 − O(1 / R(f )). Hence, by union bound, all R(f ) queries can be simulated correctly with constant probability. However, this [Ω( R(f )) , O (R(f ) log R(f ))] range is not strong enough to fully determine Np(f ), and there exist f where Np(f ) = Θ( R(f )) and others where Np(f ) = Θ( R(f ) log R(f )). For instance, it is known that PARITY [Feige et al., 1994] and Graph-Connectivity [Gu et al., 2025] have Np(f ) = Θ( R(f ) log R(f )), and AND, OR have 
+
+Np(f ) = Θ( R(f )) [Feige et al., 1994]. Hence, it is not possible to fully characterize Np(f ) using only 
+
+R(f ), and it is also important to study Np(f ) with respect to other complexity measures. Two important measures of Boolean functions are their sensitivity and influence. For any 
+
+x ∈ { 0, 1}n, the sensitivity of f at x, s(f, x ), is defined as the number of y such that f (x)̸ = f (y)and x, y only differ at one bit; and the maximum sensitivity of f at any input x is denoted as 
+
+s(f ). On the other hand, the total influence I(f ) is the same as the average sensitivity over all inputs, i.e., I(f ) = Ex∼{ 0,1}n [s(f, x )]. Both sensitivity and influence are central notions in Boolean function analysis and have been used in various contexts such as hardness of approximation [Dinur and Safra, 2005], voting theory [Mossel, 2012] and random graph theory [Friedgut and Kalai, 1996]. Sensitivity and its variants have also been shown to be closely related to many query complexity measures (e.g., [Nisan and Szegedy, 1994]). It is well-known that R(f ) = Ω( s(f )) [Nisan, 1989] and hence we also have Np(f ) = Ω( s(f )). In [Reischuk and Schmeltz, 1991], the authors proved that the non-adaptive noisy query complexity of any Boolean function f is at least Ω( s(f ) log s(f )), so a natural question is whether this can be extended to adaptive queries. This is not possible. For instance, the OR function has sensitivity n
+
+and adaptive noisy query complexity O(n) [Feige et al., 1994]. This motivates Gu et al. [2025] to study the relationship between Np(f ) and I(f ), as I(f ) = 
+
+Ex∼{ 0,1}n [s(f, x )] is the average sensitivity of f which can be smaller than s(f ). As before, the simple fact that Np(f ) ≥ Ω( R(f )) also implies Np(f ) = Ω( I(f )). Can there be better bounds on 
+
+Np(f ) based on I(f )? Gu et al. [2025] conjectured that Np(f ) = Ω( I(f ) log I(f )), and proved it for the special case where function f has near-maximum Θ( n) total influence I(f ). In this work, we resolve their conjecture in the affirmative. 
+
+Theorem 1. For every constant p ∈ (0 , 1/2) , there exists a constant c = c(p) > 0 such that 
+
+Np(f ) ≥ c I(f ) log I(f ) for every Boolean function f .
+
+This is the first lower bound on the noisy query complexity that is general enough to apply to an arbitrary function (besides the trivial Ω( R(f )) lower bound). Previously, lower bounds are often studied for specific functions [Feige et al., 1994], restricted classes of functions such as random functions [Reischuk and Schmeltz, 1991, Feige, 1992, Evans and Pippenger, 1998] and functions with high total influence [Gu et al., 2025], or restricted algorithms such as non-adaptive algorithms [Reischuk and Schmeltz, 1991]. This is also the best lower bound of Np(f ) based purely on I(f )one could hope for, because for any value of v ∈ [n], there are functions where I(f ) = v and 
+
+Np(f ) = Θ( I(f ) log I(f )) (e.g., PARITY on a subset of v indices). 
+
+1.1 Main Technical Theorem and Other Applications 
+
+Theorem 1 is a consequence of an even stronger result which we will explain next. Consider the Boolean hypercube H. For every edge ( x, y ) ∈ E(H), we keep it if f (x)̸ = f (y) and remove       
+
+> 1Throughout the paper, we use the convention that xlog x= 0 for x= 0.
+
+2it otherwise. Let us call the remaining graph Hf . Our main technical theorem that leads to Theorem 1 is the following: 
+
+Theorem 2. For every constant p ∈ (0 , 1/2) and γ ∈ (0 , 1] , there exists c = c(p, γ ) > 0 such that the following holds. Let f : {0, 1}n → { 0, 1} be a Boolean function and let G be an induced subgraph of Hf with a nonempty edge set. Let d1 = min x∈V (G) deg G(x). Let μ be the distribution on V (G)
+
+defined as μ(x) = deg G(x)2|E(G)| and let d2 ≥ d1 be any number satisfying Px∼μ(deg G(x) ≥ d2) ≥ γ. Then 
+
+Np(f ) ≥ c · d2 log(1 + d1).
+
+Note that the distribution μ is equivalent to the following distribution: We first sample a random edge from E(G), and then sample a random endpoint of the edge. Using this interpretation, our theorem works for the case where G has a constant fraction of edges that have one endpoint of degree at least d2.To see how Theorem 2 implies Theorem 1, we consider the degeneracy of a Boolean function 
+
+f , which may be a parameter of independent interest (even though degeneracy is a well-studied concept in graph theory, the degeneracy of Hf has not been studied to the best of our knowledge). The degeneracy of a graph is the smallest integer k such that every subgraph of the graph has at least one vertex with degree at most k. We use degen (f ) to denote the degeneracy of Hf . By definition of degen (f ), there exists an induced subgraph G of Hf where the minimum degree of G is 
+
+degen (f ). Hence, we can apply Theorem 2 with d1 = d2 = degen (f ) to obtain the following result: 
+
+Theorem 3. For every constant p ∈ (0 , 1/2) , there exists a constant c = c(p) > 0 such that 
+
+Np(f ) ≥ c degen (f ) log degen (f ) for every Boolean function f .
+
+Note that the average degree of Hf is exactly I(f ). A basic fact in graph theory is that the average degree of a graph is at most twice its degeneracy (see e.g., Lick and White [1970]). Applying this basic fact to Hf , we get that I(f ) ≤ 2 degen (f ). Therefore, Theorem 3 implies Theorem 1. We also remark that degen (f ) is related to sensitivity. More precisely, it can be seen that 
+
+degen (f ) = max ∅⊊V ⊆{ 0,1}n min x∈V s(fV , x ), where fV is the partial function which agrees with f
+
+on V but undefined everywhere else. We also apply Theorem 2 to obtain several new lower bounds for more specific functions. The first example is biased random function, which extends the previous lower bound on unbiased random functions [Reischuk and Schmeltz, 1991, Feige, 1992, Evans and Pippenger, 1998] to a more general setting (in the following, a biased random function means that for each input x ∈ { 0, 1}n,the value f (x) is sampled independently, with Pr[ f (x) = 1] = q, where q need not equal 1 /2): 
+
+Theorem 4. Let λ ∈ (0 , 1) , p ∈ (0 , 1/2) , γ > 0 be fixed constants. Let f : {0, 1}n → { 0, 1} be a biased random function where for each x ∈ { 0, 1}n, f (x) = 1 independently with probability 
+
+q = γn −λ. Then Np(f ) ≥ Ω( n log n) with probability 1 − exp( −cn ) for some constant c > 0 over the randomness of f .
+
+Our second example considers the complexity of counting the number of any fixed pattern 
+
+t = t1t2 · · · tk in the bit sequence x1x2 · · · xn as a subsequence. This is a vast generalization of the problem on counting the number of 1’s in the sequence x1x2 · · · xn, which was known to require Ω( n log n) noisy queries [Feige et al., 1994]. Note that this subsequence counting problem does not have Boolean output, but our techniques can still apply to such functions, via reduction from a threshold version of the function which has Boolean output. Also, Np(f ) for non-Boolean functions 
+
+f can be defined analogously. 
+
+Theorem 5. Let t ∈ { 0, 1}k be a fixed pattern for some k = O(1) . Let f : {0, 1}n → Z be a function where f (x) denotes the number of times t appears in x1, . . . , x n as a (not necessarily contiguous) subsequence. Let p ∈ (0 , 1/2) be a constant. Then Np(f ) = Ω( n log n).
+
+3Besides showing new lower bounds on Np(f ), Theorem 2 is strong enough to unify all previous nontrivial (i.e. Np(f ) ≫ R(f )) asymptotic noisy query lower bounds to the best of our knowledge. Previously, nontrivial lower bounds for Np(f ) were known for PARITY, k-THRESHOLD, symmetric functions [Feige et al., 1994], random functions [Reischuk and Schmeltz, 1991, Feige, 1992, Evans and Pippenger, 1998], Graph-Connectivity and s-t-Connectivity [Gu et al., 2025], and functions with Ω( n) total influence [Gu et al., 2025]. There are also examples whose lower bounds follow by directly reducing from these problems (e.g., s-t Shortest Path [Gu et al., 2025]). Besides such examples, this is a comprehensive list to the best of our knowledge. Among these problems, functions with Ω( n) total influence are a special case of Theorem 1. PARITY and random functions have Θ( n)total influence, so they are also special cases of Theorem 1. In Section 5, we will explain how Theorem 2 implies the lower bounds of noisy query complexity for k-THRESHOLD, symmetric functions, Graph-Connectivity and s-t-Connectivity. Because Theorem 2 is stronger than previous approaches, the new lower bound proofs based on it are also much simpler than previous proofs in some cases. For instance, to show the lower bound for Graph-Connectivity, Gu et al. [2025] had to analyze the structure of a uniform spanning tree of a complete graph, which is quite complicated and takes 5 pages of their proofs. Our proof based on Theorem 2 is quite simple and does not rely on Gu et al. [2025]’s structural results. We remark that the lower bound obtained from Theorem 2 is not tight in general. The best lower bound one can hope to obtain using Theorem 2 is Ω(∆( Hf ) log ∆( Hf )), where ∆( Hf ) denotes the maximum degree of Hf . As ∆( Hf ) is exactly the sensitivity of f , s(f ), the best lower bound we can hope to obtain is Ω( s(f ) log s(f )). Recall Np(f ) = Ω( R(f )), so as long as R(f ) = ω(s(f ) log s(f )) (see e.g., [Rubinstein, 1995] for examples), our lower bound is not tight. There are many known examples with R(f ) = ω(s(f ) log s(f )). 
+
+# 2 Preliminaries 
+
+For a simple undirected graph G, V (G) denotes the set of vertices and E(G) denotes the set of edges. For x ∈ V (G), deg G(x) denotes the degree of x in G.For x ∈ { 0, 1}n, |x| denotes the Hamming weight of x. For a Boolean function f : {0, 1}n →{0, 1}, Hf denotes the graph whose vertices are {0, 1}n and there is an edge between two vertices 
+
+x and y if and only if x and y differ at exactly one bit and f (x)̸ = f (y). Bin( n, p ) denotes the binomial distribution. The Chernoff bound states that for X ∼ Bin( n, p ), 
+
+μ = np , and ϵ ≥ 0, we have 
+
+P(X ≥ (1 + ϵ)μ) ≤ exp 
+
+
+
+− ϵ2
+
+2 + ϵ μ
+
+
+
+,
+
+P(X ≤ (1 − ϵ)μ) ≤ exp 
+
+
+
+− ϵ2
+
+2 μ
+
+
+
+.
+
+We also use the Azuma-Hoeffding inequality. Let g : {0, 1}n → R where 
+
+|g(x1, . . . , x n) − g(y1, . . . , y n)| ≤ B
+
+for some bound B, for every x and y that differ at exactly one bit. Then for every λ > 0, 
+
+Px∼{ 0,1}n (|g(x) − E[g(x)] | ≥ λB ) ≤ 2 exp( −2λ2/n ).
+
+Markov’s inequality states that for a non-negative random variable X, P(X ≥ tE[X]) ≤ 1/t for all t > 0. We will also use the following corollary: 4Corollary 6. Let X be a random variable taking values in [0 , 1] , then P(X ≥ t) ≥ E[X] − t for 
+
+0 ≤ t ≤ E[X].Proof. We have 
+
+P(X ≥ t) = P(1 − X ≤ 1 − t) ≥ 1 − P(1 − X ≥ 1 − t) ≥ 1 − 1 − E[X]1 − t ≥ E[X] − t, 
+
+where the third step is by Markov’s inequality. 
+
+# 3 Technical Overview 
+
+In this section, we give a high-level overview of our proof for the main technical theorem Theorem 2. Our proof uses the three-phase framework developed in Feige [1992], Gu et al. [2025]. Given an input x ∈ { 0, 1}n, the goal of the three-phase problem is also to compute f (x) by querying the input bits xi. In the first phase, the algorithm queries every bit c1 log d1 times in a nonadaptive way with noisy queries. In the second phase, some information is revealed to the algorithm for free. In the third phase, the algorithm can adaptively make c2d2 exact queries to compute f (x)(for simplicity, in this overview we assume a worst case c2d2 query bound; in the actual proof, we relax it to an expected bound). As shown in Gu et al. [2025], if an algorithm cannot solve the three-phase problem with constant error probability, then any algorithm A making c1c2d2 log( d1)noisy queries cannot compute f (x) with constant error probability. Essentially, if there is such an algorithm A for computing f (x), then we can simulate it for the three-phase problem. As shown in Gu et al. [2025], there is some way to design the second phase, so that the observations made in the first two phases are equivalent to the following: 
+
+• For every i where xi = 1, xi is revealed independently with probability p+, where p+ =1 − d−c3±o(1) 1 for some constant c3;
+
+• For every i where xi = 0, xi is revealed independently with probability p−, where p− = o(1). Let z ∈ { 0, 1, ⋆ }n denote the revealed information up to the second phase, i.e., zi = xi if xi is revealed, and zi = ⋆ otherwise. Let νx be the distribution of z under x.Previous methods using the three-phase framework [Gu et al., 2025] (or the predecessor two-phase framework in the case of Feige et al. [1994]) use ad-hoc analyses tailored to the specific functions. We instead provide a unified approach, based on degree statistics of a certain subgraph of the Boolean hypercube. Our approach first differs from Gu et al. [2025] by defining a distribution 
+
+μ that applies to any Boolean function. Recall the distribution μ and a subgraph G of Hf from the statement of Theorem 2, where μ(x) = deg G(x)2|E(G)| for x ∈ V (G). We can extend μ to {0, 1}n, simply by setting μ(x) = 0 for x / ∈ V (G). This will be the hard distribution for the three-phase problem. Our goal is to show that, after the three phases, the probability of f (x) = 0 and the probability of f (x) = 1 are both likely lower bounded by a constant, where x is distributed with respect to the posterior distribution under all the observations. If this holds, then no matter what value the algorithm outputs for f (x), there is always a constant error probability. Our approach for showing such balance conditions is different from previous approaches [Feige et al., 1994, Gu et al., 2025]. Previously, they were shown either by ad-hoc analyses or, for the case of high-influence functions [Gu et al., 2025], by the fact that I(f ) = Θ( n) implies this balance condition. Our approach is more refined and, as we will see shortly, uses a graph-theoretical view of this condition. As a warm-up, we will first describe why the probability of f (x) = 0 and the probability of 
+
+f (x) = 1 are both likely lower bounded by a constant after the first two phases. This is necessary 5for the lower bound, because otherwise, the algorithm can simply return the value that is more likely, and achieve sub-constant error probability without any queries in the third phase. Let μz denote the posterior probability of x under the observation z. We need to show that min {μz (f −1(0)) , μ z (f −1(1)) } ≥ Ω(1), with good probability. Let Xz denote the support of μz . We can imagine a graph, whose vertices are Xz , and there is an edge between two vertices x and y if (x, y ) ∈ E(G). Each vertex x has a weight, which equals μz (x), and we will also assign each edge (x, y ) a weight wz (x, y ). The degree of a vertex x is defined as wdeg z (x) = μz (x)−1 X
+
+> y:( x,y )∈E(G)
+
+wz (x, y ).
+
+This is a bipartite graph, where one side is Xz ∩ f −1(0), and the other side is Xz ∩ f −1(1). If we can show an upper bound D on the maximum degree, and show a lower bound M on the total edge weight, then the total vertex weights of either side of the bipartite graph can be lower bounded by M/D , i.e., min {μz (f −1(0)) , μ z (f −1(1)) } ≥ M/D . The values for M and D we aim for are 
+
+M = Ω( √1 − p+) and D = O(√1 − p+), which can show min {μz (f −1(0)) , μ z (f −1(1)) } ≥ Ω(1) via the previous inequality. More precisely, we will show an upper bound D on the degree of most probability mass of x under μz , which is still able to give us a lower bound. Towards this goal, we define wz (x, y ) = 
+
+q μz (x)μz (y)deg G(x) deg G(y) . Let N+(x) denote the set of y where (x, y ) ∈ E(G) and |y| = |x| + 1, and let N−(x) denote the set of y where ( x, y ) ∈ E(G) and 
+
+|y| = |x| − 1. By some calculation, one can show the following equality (this is Equation (4) in Section 4) that relates the degree of x with the number of vertices in N+(x) and in N−(x) that also appears in the support of μz .wdeg z (x) = deg G(x)−1 |N+(x) ∩ X z |
+
+s
+
+1 − p+
+
+1 − p−
+
++ |N−(x) ∩ X z |
+
+s
+
+1 − p−
+
+1 − p+
+
+!
+
+. (1) 
+
+Upper bound on degree of “most” vertices. Because |N+(x) ∩ X z | ≤ deg G(x), the contri-bution of the first term in Equation (1) is only 
+
+q 1−p+ 
+
+> 1−p−
+
+= O(√1 − p+) (recall p− = o(1)). Next, we consider the second term. For z ∼ νx, for any y ∈ N−(x), y ∈ X z if zi = ⋆, where i is the index that 
+
+x and y differ. This happens with probability 1 − p+, and is independent for different y ∈ N−(x). Thus, we can apply concentration bounds to show that it is likely that 
+
+|N−(x) ∩ X z | ≤ O((1 − p+) · | N−(x)|) = O((1 − p+) · deg G(x)) .
+
+If this holds, then the contribution of the second term in Equation (1) can also be bounded by 
+
+O(√1 − p+). This is where we need the condition that the minimum degree of G is d1; otherwise, the deviation probability of the above concentration becomes too large. 
+
+Lower bound on total edge weights. We will show that with constant probability (over the randomness of z), wdeg z (x) = Ω( √1 − p+) for a constant density of x under μz . If this holds, then the total edge weights can be lower bounded by 12 Ex∼μz [wdeg z (x)] ≥ Ω( p1 − p+)as desired. By the assumption in the statement of Theorem 2, for x ∼ μ, with constant probability, we have deg G(x) ≥ d2. Hence, either |N+(x)| ≥ deg G(x)/2 ≥ d2/2, or |N−(x)| ≥ deg G(x)/2 ≥ d2/2, 6with constant probability. We will assume without loss of generality that the former case holds. Fix any x where |N+(x)| ≥ deg G(x)/2 ≥ d2/2. As before, when z ∼ νx, some y ∈ N+(x) remains in Xz when zi = ⋆, where i is the index of the bit where x and y differ. Again, we can apply concentration bounds to show that it is likely 
+
+|N+(x) ∩ X z | ≥ Ω((1 − p−) · | N+(x)|) = Ω((1 − p−) · deg G(x)) .
+
+Hence, by Equation (1), wdeg z (x) ≥ Ω( √1 − p+) as desired. 
+
+Handling the third phase. In the third phase, the algorithm can make c2d2 adaptive exact queries. Each query reveals one bit of the input vector x, and the posterior distribution of x will change. In particular, the posterior probability of those x that are inconsistent with the revealed bit will become 0, and the posterior distribution of other x’s will be scaled properly. Let μz,t denote the posterior distribution of x after the first t queries and let Xz,t denote the support of μz,t . We can consider the subgraph of the graph on Xz considered above, on the subset of vertices Xz,t . All the vertex weights should be scaled to μz,t (x), and all edge weights should also be scaled properly. Intuitively, because now we are considering a subgraph, the upper bound on the degrees of “most” vertices should still hold. To show a lower bound for the total edge weights, let X denote the set of x where |N+(x)| ≥ 
+
+deg G(x)/2 ≥ d2/2 and |N+(x) ∩ X z | = Ω(deg G(x)). Previous steps can establish that μz (X) ≥ Ω(1) with constant probability. It is not difficult to check that E[μz,t (X) | z] = μz (X), so E[μz,t (X) |
+
+z] ≥ Ω(1) with constant probability (over z) as well. Hence, with constant probability, vertices in 
+
+X still carry a constant fraction of the weights in the subgraph on Xz,t . Because each query in the third phase reveals one bit, |N+(x) ∩ X z,t | ≥ Ω(deg G(x)) − t for any x ∈ X. As t ≤ c2d2, for sufficiently small c2, we still have |N+(x) ∩ X z,t | ≥ Ω(deg G(x)) − c2d2 = Ω(deg G(x)). Hence, we can still use a formula similar to Equation (1) to obtain a lower bound of total edge weights. 
+
+# 4 Proof of the Main Technical Theorem 
+
+In this section, we prove Theorem 2, which we recall below: 
+
+Theorem 2. For every constant p ∈ (0 , 1/2) and γ ∈ (0 , 1] , there exists c = c(p, γ ) > 0 such that the following holds. Let f : {0, 1}n → { 0, 1} be a Boolean function and let G be an induced subgraph of Hf with a nonempty edge set. Let d1 = min x∈V (G) deg G(x). Let μ be the distribution on V (G)
+
+defined as μ(x) = deg G(x)2|E(G)| and let d2 ≥ d1 be any number satisfying Px∼μ(deg G(x) ≥ d2) ≥ γ. Then 
+
+Np(f ) ≥ c · d2 log(1 + d1).
+
+We will show that there exists a constant D so that theorem statement holds whenever d1 ≥ D
+
+(this implies d2 ≥ D as well because d2 ≥ d1). For d1 ≤ D, the result follows from Np(f ) = Ω( R(f )) = Ω(max x s(f, x )) = Ω( d2). In this proof, asymptotic notations (such as o(·)) are with respect to d1 → ∞ . In particular, o(1) denotes a function that goes to 0 as d1 → ∞ . By taking D
+
+to be sufficiently large, we can assume these o(1) terms are smaller than an arbitrary constant. 
+
+4.1 The Three-Phase Framework 
+
+We use the three-phase framework developed in Feige et al. [1994], Gu et al. [2025]. Consider the following three-phase problem. 
+
+• Phase 1: The algorithm nonadaptively queries each bit m1 = c1 log d1 times using noisy queries for some constant c1 > 0. 7• Phase 2: The oracle reveals certain input bits for free. 
+
+• Phase 3: The algorithm adaptively makes m2 = c2d2 exact queries in expectation for some constant c2 > 0. After the three phases, the algorithm needs to output f (x) with success probability at least 1 − δ
+
+for some constant δ > 0. The following reduction comes from Gu et al. [2025]. 
+
+Proposition 7. If there is an algorithm that computes f (x) with success probability at least 1 − δ
+
+in the worst case using c1c2d2 log d1 queries in expectation in the noisy query model, then it can solve the corresponding three-phase problem with success probability at least 1 − δ in the worst case. Proof sketch. Let A be an algorithm for computing f (x) in the noisy query model. The three-phase problem can simulate the noisy query model and supply A with noisy bits. Because of Phase 1, this simulation can already support the first m1 = c1 log d1 noisy queries to each bit xi. If A
+
+makes more than m1 queries to some bit xi, the three-phase problem makes an exact query for xi
+
+in Phase 3, and can simulate all future noisy queries to xi. Since A makes c1c2d2 log d1 queries in expectation, the expected number of xi to which A makes more than m1 queries is at most (c1c2d2 log d1)/m 1 = c2d2. Hence, the three-phase problem makes at most c2d2 queries in Phase 3 in expectation. In the definition of Np(f ), we require the algorithm to be correct with probability at least 2 /3. By repeating O(log(1 /δ )) = O(1) times and taking the majority answer, the success probability can be boosted to 1 − δ. Therefore, to prove Theorem 2, it suffices to show the following hardness result for the three-phase problem. 
+
+Proposition 8. There exists c1, c 2, δ > 0 such that no algorithm can solve the corresponding three-phase problem with success probability at least 1 − δ in the worst case. 
+
+Let G be the induced subgraph of Hf as in the statement of Theorem 2 and μ be the corre-sponding distribution on V (G) where μ(x) = deg G(x)2|E(G)| . We will show that the three-phase problem is hard even if the input x is drawn from the distribution μ.
+
+4.2 Phase 1 and 2 
+
+Let m1 = c1 log d1. Let ai denote the number of Phase 1 queries to bit i whose answers are 1. Then 
+
+ai ∼ Bin( m1, 1 − p) for xi = 1 and ai ∼ Bin( m1, p ) for xi = 0. For 0 ≤ j ≤ m1, define 
+
+pj = P(Bin( m1, 1 − p) = j) = 
+
+m1
+
+j
+
+
+
+(1 − p)j pm1−j .
+
+Let I = pm 1 − m0.61 , pm 1 + m0.61
+
+.In Phase 2, the oracle reveals the following information: 
+
+• Step 2a: The oracle reveals all xi with ai /∈ I.
+
+• Step 2b: The oracle reveals every xi = 1 independently with probability qai , where qk =1 − pm1−k pkl 
+
+> pkpm1−kl
+
+(for integer k ∈ I) and kl = ⌈pm 1 − m0.61 ⌉.8Step 2b is a reweighting process so that the posterior probability that each coordinate is 1 does not depend on ai. Intuitively, if xi = 0, then the probability that ai = k for some value of k and 
+
+xi is unrevealed after Step 2b is pm1−k. On the other hand, if xi = 1, then the probability that 
+
+ai = k and xi is unrevealed after Step 2b is pk · (1 − qk) = pm1−k pkl
+
+> pm1−kl
+
+. The ratio between these two values is always the same value pkl
+
+> pm1−kl
+
+regardless of the value of k. Thus intuitively, ai does not give information on xi.The difference between Gu et al. [2025]’s and our Phase 1 and 2 is that we choose m1 = c1 log d1,while Gu et al. [2025] has m1 = c1 log n. The analysis remains largely the same, and we only need to replace their dependency on n with d1. Hence, by [Gu et al., 2025, Definition 9], observations in Phase 1 and 2 are equivalent to the following process: 
+
+• Observe every xi = 1 independently with probability 
+
+p+ = 1 − X
+
+> k∈I
+
+pk(1 − qk) = 1 − d−c3±o(1) 1 ,
+
+where c3 = c1(1 − 2p) log 1−pp . By picking sufficiently small c1, we can guarantee c3 < 1. 
+
+• Observe every xi = 0 independently with probability 
+
+p− = P(Bin( m1, p ) /∈ I) = o(1) .
+
+Let z ∈ { 0, 1, ⋆ }n denote the revealed information up to Phase 2. That is, zi = xi if xi is revealed and zi = ⋆ otherwise. So P(zi = 1 |xi = 1) = p+, P(zi = 0 |xi = 0) = p−.For fixed z, let μz denote the distribution of x conditioned on z. Let Xz = supp μz . Note that 
+
+Xz = {x : zi ∈ { xi, ⋆ } ∀ i ∈ [n]} ∩ supp μ.That is, μz is the posterior distribution of x given the observations in Phase 1 and 2. Let νx
+
+denote the distribution of z conditioned on x and let ν denote the overall distribution of z. Note that by Bayes, 
+
+νx(z) = μz (x)ν(z)
+
+μ(x) ∝ μz (x)ν(z)deg G(x) . (2) 
+
+4.3 Balance Lemma 
+
+In this section, we establish a condition for a posterior distribution to be balanced (Lemma 9). That is, given the observations, one cannot guess f (x) with error probability o(1). As an example, we show that at the end of Phase 2, with probability 1 − o(1), μz is balanced. For ( x, y ) ∈ E(G), define edge weight 
+
+wz (x, y ) = 
+
+s
+
+μz (x)μz (y)deg G(x) deg G(y) .
+
+For x ∈ X z , define weighted degree as wdeg z (x) = μz (x)−1 X
+
+> y:( x,y )∈E(G)
+
+wz (x, y ).
+
+(When μz (x) = 0, define wdeg z (x) = 0.) The weighted degree satisfies the nice property that 
+
+X 
+
+> x∈f−1(0)
+
+μz (x) wdeg z (x) = X 
+
+> x∈f−1(1)
+
+μz (x) wdeg z (x).
+
+9Define average weighted degree as wdeg z = Ex∼μz [wdeg z (x)] = 2 X 
+
+> x∈f−1(0)
+
+μz (x) wdeg z (x) = 2 X 
+
+> x∈f−1(1)
+
+μz (x) wdeg z (x).
+
+The following lemma shows that if the weighted degree is not too concentrated on a small set, then the posterior distribution is balanced. In the following, we use the convention that for any measure η and any nonnegative function h, the product η(A) max x∈A h(x) is defined to be 0 when 
+
+A = ∅.
+
+Lemma 9 (Balance Lemma) . Let A ⊆ X z . Suppose 
+
+max   
+
+> x∈X z\A
+
+wdeg z (x) ≤ C wdeg z
+
+for some C > 0. Then 
+
+min μz (f −1(0)) , μ z (f −1(1)) ≥ 12C − μz (A) max x∈A wdeg z (x)
+
+C wdeg z
+
+.
+
+Proof. 
+
+12 wdeg z = X 
+
+> x∈f−1(0)
+
+μz (x) wdeg z (x)
+
+≤ X
+
+> x∈A
+
+μz (x) wdeg z (x) + X 
+
+> x∈f−1(0) \A
+
+μz (x) wdeg z (x)
+
+≤ μz (A) max  
+
+> x∈A
+
+wdeg z (x) + μz (f −1(0)) max   
+
+> x∈X z\A
+
+wdeg z (x)
+
+≤ μz (A) max  
+
+> x∈A
+
+wdeg z (x) + C wdeg z μz (f −1(0)) .
+
+Rearranging terms, we get 
+
+μz (f −1(0)) ≥ 12C − μz (A) max x∈A wdeg z (x)
+
+C wdeg z
+
+.
+
+By the same argument, we get the bound for μz (f −1(1)). Let x, y ∈ X z , ( x, y ) ∈ E(G) differ at bit i. Then we must have zi = ⋆ and 
+
+wz (x, y )
+
+μz (x) =
+
+s
+
+μz (y)
+
+μz (x) · 1deg G(x) deg G(y)= 1deg G(x)
+
+s
+
+μz (y)
+
+μz (x) · deg G(x)deg G(y)= 1deg G(x)
+
+s
+
+νy(z)
+
+νx(z) (Equation (2)) = 1deg G(x)
+
+ 1 − p+
+
+1 − p−
+
+(yi−xi)/2
+
+,
+
+10 In particular, max 
+
+> x∈X z
+
+wdeg z (x) ≤
+
+s
+
+1 − p−
+
+1 − p+
+
+. (3) We now study the distribution of weighted degree. For x ∈ V (G), let N+(x) := {y : ( x, y ) ∈
+
+E(G), |y| = |x| + 1 } denote the up-neighbors of x, and N−(x) := {y : ( x, y ) ∈ E(G), |y| = |x| − 1}
+
+denote the down-neighbors of x. Then for x ∈ X z , we have wdeg z (x) = deg G(x)−1 |N+(x) ∩ X z |
+
+s
+
+1 − p+
+
+1 − p−
+
++ |N−(x) ∩ X z |
+
+s
+
+1 − p−
+
+1 − p+
+
+!
+
+. (4) We have |N+(x) ∩ X z | ≤ | N+(x)| ≤ deg G(x), so the contribution of the first term is ≤
+
+q 1−p+ 
+
+> 1−p−
+
+.For the second term, we need to prove some concentration bounds on |N−(x) ∩ X z |.When z ∼ νx, each down-neighbor y of x is in Xz independently with probability 1 − p+ (it happens when the corresponding bit of x is not revealed, which happens with probability 1 − p+). So |N−(x) ∩ X z | ∼ Bin( |N−(x)|, 1 − p+). By Chernoff bound, |N−(x)| ≤ deg G(x) and deg G(x) ≥ d1, we have 
+
+Pz∼νx (|N−(x) ∩ X z | ≥ (1 + ε) deg G(x)(1 − p+)) 
+
+≤ exp 
+
+
+
+− ε2
+
+2 + ε deg G(x)(1 − p+)
+
+
+
+≤ exp 
+
+
+
+− ε2
+
+2 + ε d1−c3±o(1) 1
+
+
+
+,
+
+for any ε > 0. For given z, let Abad ,z = {x ∈ X z : |N−(x) ∩ X z | ≥ 2 deg G(x)(1 − p+)}. Then (we pick ε = 1, and the ε2 
+
+> 2+ ε
+
+term can be absorbed to the o(1) factor) 
+
+Ez∼ν [μz (Abad ,z )] = Px∼μPz∼νx (x ∈ Abad ,z ) ≤ exp 
+
+
+
+−d1−c3±o(1) 1
+
+
+
+. (5) By Markov’s inequality, we have 
+
+Pz∼ν μz (Abad ,z ) ≥
+
+r
+
+exp 
+
+
+
+−d1−c3±o(1) 1
+
+!
+
+≤
+
+r
+
+exp 
+
+
+
+−d1−c3±o(1) 1
+
+
+
+.
+
+Note that 
+
+r
+
+exp 
+
+
+
+−d1−c3±o(1) 1
+
+
+
+= exp 
+
+
+
+−d1−c3±o(1) 1
+
+
+
+, for suitable choices of the o(1) terms. Thus, 
+
+Pz∼ν
+
+
+
+μz (Abad ,z ) ≥ exp 
+
+
+
+−d1−c3±o(1) 1
+
+ 
+
+≤ exp 
+
+
+
+−d1−c3±o(1) 1
+
+
+
+. (6) For x ∈ X z \Abad ,z , we have wdeg z (x) ≤ deg G(x)−1 deg G(x)
+
+s
+
+1 − p+
+
+1 − p−
+
++ 2 deg G(x)(1 − p+)
+
+s
+
+1 − p−
+
+1 − p+
+
+!
+
+≤ 4p(1 − p+)(1 − p−). (7) 11 We now have bounds on μz (Abad ,z ) and wdeg z (x) for x ∈ X z \Abad ,z . Next, we establish a lower bound on wdeg z .Fix x ∈ V (G). Then max {| N+(x)|, |N−(x)|} ≥ deg G(x)/2 ≥ d1/2. If |N−(x)| ≥ deg G(x)/2, then 
+
+Pz∼νx
+
+
+
+|N−(x) ∩ X z | ≤ 14 deg G(x)(1 − p+)
+
+
+
+≤ exp 
+
+
+
+−d1−c3±o(1) 1
+
+
+
+.
+
+Similar to |N−(x) ∩ X z |, |N+(x) ∩ X z | ∼ Bin( |N+(x)|, 1 − p−). So if |N+(x)| ≥ deg G(x)/2, then 
+
+Pz∼νx
+
+
+
+|N+(x) ∩ X z | ≤ 14 deg G(x)(1 − p−)
+
+
+
+≤ exp 
+
+
+
+−d1−o(1) 1
+
+
+
+. (8) Combining the two cases and recalling Equation (4), we get 
+
+Pz∼ν Px∼μz
+
+
+
+wdeg z (x) ≤ 14
+
+p(1 − p+)(1 − p−)
+
+
+
+= Px∼μPz∼νx
+
+
+
+wdeg z (x) ≤ 14
+
+p(1 − p+)(1 − p−)
+
+
+
+≤ exp 
+
+
+
+−d1−c3±o(1) 1
+
+
+
+.
+
+By Markov’s inequality, we have 
+
+Pz∼ν
+
+
+
+Px∼μz
+
+
+
+wdeg z (x) ≤ 14
+
+p(1 − p+)(1 − p−)
+
+
+
+> 1/2
+
+
+
+≤ exp 
+
+
+
+−d1−c3±o(1) 1
+
+
+
+.
+
+So 
+
+Pz∼ν
+
+
+
+wdeg z ≤ 18
+
+p(1 − p+)(1 − p−)
+
+
+
+≤ exp 
+
+
+
+−d1−c3±o(1) 1
+
+
+
+. (9) Let E1 be the event that μz (Abad ,z ) ≤ exp 
+
+
+
+−d1−c3±o(1) 1
+
+
+
+(recall Equation (6)). Let E2 be the event that wdeg z ≥ 18
+
+p(1 − p+)(1 − p−). Then by Equations (6) and (9), we have 
+
+Pz∼ν (E1 ∩ E 2) ≥ 1 − exp 
+
+
+
+−d1−c3±o(1) 1
+
+
+
+. (10) Conditioned on E1 ∩ E 2, we apply Lemma 9. By Equation (7) and definition of E2, we can take 
+
+C = 32 in Lemma 9. So we have min μz (f −1(0)) , μ z (f −1(1)) ≥ 164 − μz (Abad ,z ) max x∈Abad ,z wdeg z (x)32 wdeg z
+
+≥ 164 −
+
+exp 
+
+
+
+−d1−c3±o(1) 1
+
+ q 1−p−
+
+> 1−p+
+
+32 · 18
+
+p(1 − p+)(1 − p−)
+
+≥ 164 − o(1) .
+
+This means that with probability at least 1 −exp 
+
+
+
+−d1−c3±o(1) 1
+
+
+
+over z, the posterior distribution 
+
+μz is balanced after Phase 2. 12 4.4 Phase 3 
+
+In Phase 3, the algorithm adaptively queries m2 = c2d2 bits in expectation. We will show that with constant probability, after the m2 queries, wdeg z decreases by at most a constant factor. Then we can use Lemma 9 again to show that the posterior distribution is still balanced. Let B = {x ∈ V (G) : deg G(x) ≥ d2}. By the definition of d2, μ(B) ≥ γ. For every x ∈ B,we have max {| N+(x)|, |N−(x)|} ≥ deg G(x)/2 ≥ d2/2. Let B+ = {x ∈ B : |N+(x)| ≥ deg G(x)/2}
+
+and B− = {x ∈ B : |N−(x)| ≥ deg G(x)/2}. Then max {μ(B+), μ (B−)} ≥ μ(B)/2 ≥ γ/ 2. WLOG assume that μ(B+) ≥ γ/ 2. (If not, we can define g(x) = f (1 − x) and prove a lower bound for g
+
+instead. Clearly, Np(f ) = Np(g). ) We show that after Phase 2, with constant probability, vertices in B+ contribute a constant amount to wdeg z . Let Bgood ,z = {x ∈ B+ : |N+(x) ∩ X z | ≥ 14 deg G(x)(1 − p−)}. For x ∈ B+, by the same analysis as Equation (8) (and now we have deg G(x) ≥ d2, instead of the bound deg G(x) ≥ d1
+
+used in Equation (8)), 
+
+Pz∼νx (x ∈ Bgood ,z ) ≥ 1 − exp 
+
+
+
+−d1−c3±o(1) 2
+
+
+
+= 1 − o(1) .
+
+So 
+
+Ez∼ν μz (Bgood ,z ) = Ex∼μ
+
+1x∈B+ Pz∼νx (x ∈ Bgood ,z ) ≥ γ/ 2 − o(1) .
+
+By Corollary 6, we have 
+
+Pz∼ν (μz (Bgood ,z ) ≥ γ/ 4) ≥ γ/ 4 − o(1) .
+
+Let E3 be the event that after Phase 2, μz (Bgood ,z ) ≥ γ/ 4. Then Pz∼ν (E3) ≥ γ/ 4 − o(1). For any k, define E≤k = Tkj=1 Ej . Then Pz∼ν (E≤3) ≥ γ/ 4 − o(1) by union bound. Note that for x ∈ Bgood ,z , by Equation (4), we have wdeg z (x) ≥ 14
+
+p(1 − p+)(1 − p−).
+
+So at the beginning of Phase 3, conditioned on E≤3, we have wdeg z ≥ X
+
+> x∈Bgood ,z
+
+μz (x) wdeg z (x) ≥ γ
+
+16 
+
+p(1 − p+)(1 − p−).
+
+This bound is weaker than Equation (9), but the analysis is more robust under queries in Phase 3. In the following, we will study the effect of queries in Phase 3. Let q be the number of queries in Phase 3. Note that E[q] = m2. Let i1, . . . , i q denote the queried bits in Phase 3 and b1, . . . , b q
+
+denote the corresponding query results. For 0 ≤ t ≤ q, let μz,t denote the posterior distribution after t queries in Phase 3. Then μz, 0 = μz .For the t-th query, the query result bt is equal to b ∈ { 0, 1} with probability Px∼μz,t −1 (xit = b). For a fixed x, μz,t (x) changes to 0 if xit̸ = bt and changes to μz,t −1(x)   
+
+> Px′∼μz,t −1(x′
+> it=bt)
+
+if xit = bt. The expectation is equal to μz,t −1(x). Therefore, μz,t (x) is a martingale over the query results. In particular, E[μz,q | z] = μz by the optional stopping theorem. Conditioned on E≤3,
+
+E [μz,q (Bgood ,z )] = E [μz (Bgood ,z )] ≥ γ/ 4.
+
+13 By Corollary 6, we have 
+
+P (μz,q (Bgood ,z ) ≥ γ/ 8) ≥ γ/ 8.
+
+Let E4 be the event that μz,q (Bgood ,z ) ≥ γ/ 8. Then P(E4 | E ≤3) ≥ γ/ 8. Because E[μz,q | z] = μz , we have E[μz,q (Abad ,z )] = E[μz (Abad ,z )] ≤ exp 
+
+
+
+−d1−c3±o(1) 1
+
+
+
+(recall Equation (5)). By Markov’s inequality, we have (similar to Equation (6)) 
+
+P
+
+
+
+μz,q (Abad ,z ) ≥ exp 
+
+
+
+−d1−c3±o(1) 1
+
+ 
+
+≤ exp 
+
+
+
+−d1−c3±o(1) 1
+
+
+
+.
+
+Let E5 be the event that μz,q (Abad ,z ) ≤ exp 
+
+
+
+−d1−c3±o(1) 1
+
+
+
+. Then 
+
+P(E5 | E ≤3) ≥ 1 − P(¬E 5 | E ≤3) ≥ 1 − P(¬E 5)/P(E≤3) ≥ 1 − o(1) .
+
+By union bound, P(E≤5) = P(E≤3)P(E4 ∩ E 5 | E ≤3) ≥ (γ/ 4 − o(1))( γ/ 8 − o(1)) = γ2/32 − o(1). Because E[q] = m2, we have 
+
+E[q | E ≤5] ≤ m2
+
+P(E≤5) ≤ (1 + o(1)) 32 m2
+
+γ2 .
+
+So conditioned on E≤5, with probability at least 1 /2 − o(1), we have q ≤ 64 m2 
+
+> γ2
+
+= 64 c2d2 
+
+> γ2
+
+. Let E6 be the event that q ≤ 64 c2d2 
+
+> γ2
+
+. Then P(E≤6) ≥ γ2/64 − o(1). From now on we condition on E≤6. We would like to show that μz,q is balanced. For 0 ≤ t ≤ q,define Xz,t = supp μz,t and 
+
+wz,t (x, y ) = 
+
+s
+
+μz,t (x)μz,t (y)deg G(x) deg G(y) ,
+
+wdeg z,t (x) = μz,t (x)−1 X
+
+> y:( x,y )∈E(G)
+
+wz,t (x, y ),
+
+wdeg z,t = Ex∼μz,t [wdeg z,t (x)] .
+
+We have the following variation of Lemma 9 for μz,q .
+
+Lemma 10 (Balance Lemma) . Let A ⊆ X z,q . Suppose 
+
+max   
+
+> x∈X z,q \A
+
+wdeg z,q (x) ≤ C wdeg z,q 
+
+for some C > 0. Then 
+
+min μz,q (f −1(0)) , μ z,q (f −1(1)) ≥ 12C − μz,q (A) max x∈A wdeg z,q (x)
+
+C wdeg z,q 
+
+.
+
+The proof is essentially the same as Lemma 9 and is omitted. For x ∈ X z,t , we have wdeg z,t (x) = X
+
+> y:( x,y )∈E(G)
+
+s
+
+μz,t (y)
+
+μz,t (x) · 1deg G(x) deg G(y)= X
+
+> y:( x,y )∈E(G)
+
+1y∈X z,t 
+
+s
+
+μz (y)
+
+μz (x) · 1deg G(x) deg G(y)= deg G(x)−1 |N+(x) ∩ X z,t |
+
+s
+
+1 − p+
+
+1 − p−
+
++ |N−(x) ∩ X z,t |
+
+s
+
+1 − p−
+
+1 − p+
+
+!
+
+.
+
+14 For any x ∈ Bgood ,z ∩ X z,q , |N+(x) ∩ X z,t | decreases by at most one after each query. So 
+
+|N+(x) ∩ X z,q | ≥ | N+(x) ∩ X z | − q ≥ 14 deg G(x)(1 − p−) − 64 c2d2
+
+γ2 . (11) Because deg G(x) ≥ d2, for c2 = 11024 γ2, the last expression is at least 18 deg G(x)(1 − p−) for sufficiently large d1 as p− = o(1). Then wdeg z,q ≥ X 
+
+> x∈Bgood ,z ∩X z,q
+
+μz,q (x) wdeg z,q (x)
+
+≥ μz,q (Bgood ,z ) · 18
+
+p(1 − p+)(1 − p−) (by definition of Bgood ,z )
+
+≥ γ
+
+64 
+
+p(1 − p+)(1 − p−). (by definition of E4)On the other hand wdeg z,q (x) ≤ wdeg z (x) for all x ∈ X z,q . So max  
+
+> x∈X z,q \Abad ,z
+
+wdeg z,q (x) ≤ max  
+
+> x∈X z\Abad ,z
+
+wdeg z (x) Equation (7) 
+
+≤ 4p(1 − p+)(1 − p−) ≤ 256 
+
+γ wdeg z,q .
+
+Finally, let A := Abad ,z ∩ X z,q , then 
+
+μz,q (A) max x∈A wdeg z,q (x)wdeg z,q 
+
+≤ μz,q (A) max x∈A wdeg z (x)
+
+> γ
+> 64
+
+p(1 − p+)(1 − p−) (by definition of E5)
+
+≤
+
+exp 
+
+
+
+−d1−c3±o(1) 1
+
+ q 1−p−
+
+> 1−p+
+> γ
+> 64
+
+p(1 − p+)(1 − p−) (Equation (3)) = o(1) .
+
+We now apply Lemma 10 with C = 256  
+
+> γ
+
+and A to get that μz,q is balanced. That is, the posterior distribution μz,q satisfies min μz,q (f −1(0)) , μ z,q (f −1(1)) ≥ γ
+
+512 − o(1) conditioned on E≤6. Recall P(E≤6) ≥ γ2/64 −o(1). Therefore, for small enough δ > 0, any algorithm cannot compute f (x) with error probability at most δ in the three-phase problem. This finishes the proof. 
+
+# 5 Applications 
+
+In this section, we show various applications of Theorem 2. We start with the following lemma which will be used in several of the proofs. 
+
+Lemma 11. Let λ ∈ [0 , 1) , γ 1, γ 2, γ 3 > 0, p ∈ (0 , 1/2) be constants. Then there exists c =
+
+c(λ, γ 1, γ 2, γ 3, p ) such that the following holds. Let f : {0, 1}n → { 0, 1} be a Boolean function and let 
+
+G be an induced subgraph of Hf . Suppose there exists a set S of γ1n−λ · | V (G)| vertices with degree at least γ2n in G, and the total number of edges in G is at most γ3n|S|. Then Np(f ) ≥ cn log n.
+
+15 Proof. We iteratively remove vertices whose degrees are smaller than 14 γ1γ2n1−λ from G until there are no such vertices left. Let G′ denote the remaining graph and let S′ denote V (G′) ∩ S.The total number of edges we delete from G is at most 14 γ1γ2n1−λ · | V (G)|. Because initially, the total degree of all vertices from S is at least |S| · γ2n, the total degree of all vertices from S′ in 
+
+G′ is at least (removing one edge can decrease the degrees of two vertices) 
+
+|S| · γ2n − 2 · 14 γ1γ2n1−λ · | V (G)| ≥ 12 |S| · γ2n. 
+
+Hence, if we sample a random s ∈ S, E[deg G′ (s)/n ] ≥ 12 |S| · γ2n/ |S|/n ≥ γ2/2 (here, if s̸ ∈ S′, we regard deg G′ (s) as 0). By Corollary 6, Pr(deg G′ (s)/n ≥ γ2/4) ≥ γ2/4, i.e., there are 14 γ2|S| vertices whose degrees are at least 14 γ2n in G′. We call these vertices Sgood .Let μ be the distribution from Theorem 2’s statement applied to G′, i.e., μ(x) = deg G′ (x)2|E(G′)| for 
+
+x ∈ V (G′). We have 
+
+μ(Sgood ) = 
+
+P 
+
+> s∈Sgood
+
+deg G′ (s)2|E(G′)|≥
+
+  14 γ2|S| ·   14 γ2n
+
+2|E(G)|≥
+
+  14 γ2|S| ·   14 γ2n
+
+2 · γ3n|S|≥ γ22
+
+32 γ3
+
+.
+
+Therefore, we can apply Theorem 2 with d1 ≥ 14 γ1γ2n1−λ and d2 ≥ 14 γ2n to obtain 
+
+Np(f ) ≥ c 14 γ2n · log 
+
+
+
+1 + 14 γ1γ2n1−λ
+
+
+
+≥ c′n log n
+
+for some constant c′.Next, we prove the lower bound for biased random functions. 
+
+Theorem 4. Let λ ∈ (0 , 1) , p ∈ (0 , 1/2) , γ > 0 be fixed constants. Let f : {0, 1}n → { 0, 1} be a biased random function where for each x ∈ { 0, 1}n, f (x) = 1 independently with probability 
+
+q = γn −λ. Then Np(f ) ≥ Ω( n log n) with probability 1 − exp( −cn ) for some constant c > 0 over the randomness of f .Proof. First, by Chernoff bound, the number of x where f (x) = 1 is between 23 q · 2n and 43 q · 2n
+
+with probability ≥ 1 − exp( −c1q2n) for some constant c1 > 0. Let this event be E1.Next, for any fixed x, consider its neighbors in the Boolean hypercube. The number of them that evaluate to 1 is distributed as Bin( n, q ). Let us denote the random variable by Y . We assume 
+
+n is sufficiently large so that q ≤ 1/2. Then by Chernoff bound, Pr 
+
+
+
+Y ≥ 23 n
+
+
+
+≤ exp( −c2n)for some constant c2 > 0. Let Xbad ⊆ { 0, 1}n be the set of x whose neighborhood contains more than 23 n elements that evaluate to 1. Hence, E [|Xbad |] ≤ 2n · exp( −c2n). By Markov’s 16 inequality, Pr( |Xbad | > 2n · exp( −c2n/ 2)) ≤ exp( −c2n/ 2). Let E2 denote the event where |Xbad | ≤ 
+
+2n · exp( −c2n/ 2). We will show that under E1 ∩E 2 (which happens with probability 1 −exp( −cn ) for some constant 
+
+c by union bound), Np(f ) ≥ Ω( n log n). For any x ∈ f −1(1) \Xbad , it has at least n/ 3 neighbors in Hf . Furthermore, under E1 ∩ E 2,
+
+f −1(1) \Xbad ≥ 23 q · 2n − | Xbad | ≥ ( 23 − o(1)) q · 2n. Finally, under E1 ∩ E 2, the total number of edges in Hf is at most 43 q · n · 2n ≤ (2 + o(1)) n|f −1(1) \Xbad |.Therefore, we can apply Lemma 11 where G := Hf and S := f −1(1) \Xbad . This finishes the proof. Next, we show our lower bound for the subsequence counting problem: 
+
+Theorem 5. Let t ∈ { 0, 1}k be a fixed pattern for some k = O(1) . Let f : {0, 1}n → Z be a function where f (x) denotes the number of times t appears in x1, . . . , x n as a (not necessarily contiguous) subsequence. Let p ∈ (0 , 1/2) be a constant. Then Np(f ) = Ω( n log n).Proof. Assume without loss of generality that tk = 1, by complementing all bits if tk = 0. Also, assume without loss of generality tj = 0 for some j ∈ [k], as otherwise the lower bound is implied by the known lower bound of computing |x| [Feige et al., 1994]. Let C be a sufficiently large constant. Let ℓ = ⌊n/ (k + ( C − 1)( k − | t|)) ⌋ and r = n − ℓ(( k +(C − 1)( k − | t|))). We will consider a subset of all possible inputs, where all but the last ℓ bits are fixed. More precisely, let L1 be the concatenation of ℓ bits of 1’s, and let L0 be the concatenation of Cℓ bits of 0’s. Let P be r copies of the bit 1 − t1. For x ∈ { 0, 1}ℓ, define 
+
+g(x) = f (P, L t1 , L t2 , . . . , L tk−1 , x ).
+
+Note that the first r bits cannot be involved in any subsequence t. Clearly, an Ω( ℓ log ℓ) lower bound for computing g will imply an Ω( ℓ log ℓ) = Ω( n log n) lower bound for computing f .For any xi = 1, the number of subsequences t using xi in Lt1 , L t2 , . . . , L tk−1 , x is at least 
+
+Qk−1 
+
+> j=1
+
+|Ltj | = Ck−| t| · ℓk−1. On the other hand, for any xi = 0, the number of subsequences involving xi is at most kk−1Ck−| t|− 1ℓk−1 (by using the fact that the number of 1’s in the whole sequence is at most kℓ and the number of 0’s in the whole sequence is at most Ckℓ ). Hence, by setting C > 2kk−1, we can guarantee that g(y) − g(x) ≥ c1 · ℓk−1 for some constant c1 > 0, where 
+
+y and x differ at exactly one bit and yi = 1 , x i = 0 on that bit. On the other hand, if y and x differ at one bit, we have |g(y) − g(x)| = O(ℓk−1), because each bit can only be involved in O(ℓk−1) subsequences. Hence, we can apply the Azuma-Hoeffding inequality to obtain that, 
+
+Px∼{ 0,1}ℓ
+
+
+
+|g(x) − E[g(x)] | ≤ c2ℓk−0.5
+
+≥ 0.9 (12) for some constant c2 > 0. Furthermore, let Bbad denote the set of x ∈ { 0, 1}ℓ where the number of 0’s is less than ℓ/ 3. By Chernoff bound, |Bbad | ≤ exp( −c3ℓ) · 2ℓ for some constant c3 > 0. Next, we split Z≥0 into intervals of length c1 · ℓk−1, and we denote the intervals by I1, I 2, . . . . 
+
+Let Im be the interval maximizing |g−1(Im)|. Let S denote g−1(Im)\Bbad . Let T be the largest element in Im, and consider the threshold version gT of g defined as gT (x) = [ g(x) ≤ T ]. 
+
+• By Equation (12), there exist O(√ℓ) intervals Ia, I a+1 , . . . , I b such that Pbi=a |g−1(Ii)| ≥ 
+
+0.9·2ℓ. Hence, |g−1(Im)| ≥ 0.9·2ℓ/O (√ℓ) = Ω(2 ℓ/√ℓ) as m maximizes |g−1(Im)|. By the upper bound on Bbad , this also implies |S| ≥ | g−1(Im)| − exp( −c3ℓ) · 2ℓ = Ω( |g−1(Im)|) = Ω(2 ℓ/√ℓ). 17 • For every x ∈ S, if we flip any xi = 0 to 1 and obtain y, g(y) − g(x) ≥ c1 · ℓk−1 by previous discussion. By definition of intervals and T , T − c1ℓk−1 < g (x) ≤ T . Hence, g(y) > T . This means that gT (x)̸ = gT (y), and y is a neighbor of x in HgT . As x / ∈ Bbad , the number of such neighbors is Ω( ℓ). 
+
+• Finally, let ( x, y ) be any edge in HgT , with gT (x) = 1 and gT (y) = 0, i.e., g(x) ≤ T and 
+
+g(y) > T . As discussed earlier, g(y) − g(x) = O(ℓk−1), so we must have g(x) > T − O(ℓk−1). This means that x is from g−1(Ii) for some i = m − O(1). Hence, the total number of edges of HgT is upper bounded by 
+
+> m
+
+X
+
+> i=m−O(1)
+
+ℓ · | g−1(Ii)| = O(ℓ|g−1(Im)|) = O(ℓ|S|).
+
+Because of the three bullet points, we can apply Lemma 11 with input dimension ℓ, λ = 1 /2, 
+
+G = HgT and the above set S to obtain Np(gT ) = Ω( ℓ log ℓ) = Ω( n log n), which implies Np(g) = Ω( n log n) and Np(f ) = Ω( n log n). 
+
+5.1 New Proofs of Previous Results 
+
+In this section, we show that our main technical theorem is general enough to imply all previous known nontrivial lower bounds on the noisy query complexity. As discussed in Section 1, it suffices to consider k-THRESHOLD, symmetric functions, Graph-Connectivity and s-t-Connectivity. We first consider symmetric functions. A Boolean function f : {0, 1}n → { 0, 1} is symmetric if for any permutation π on [ n] and any x ∈ { 0, 1}n, f (x) = f (xπ(1) , x π(2) , . . . , x π(n)). In other words, the value of f (x) only depends on the Hamming weight of x.
+
+Theorem 12 (Feige et al. [1994]) . Let f be a symmetric function. Let 1 ≤ k ≤ n be any integer such that there exists y0 with Hamming weight k − 1 and y1 with Hamming weight k such that 
+
+f (y0)̸ = f (y1). Then the noisy query complexity of f is Ω( n log min {k, n − k + 1 }).Proof. For every 0 ≤ i ≤ n, let Wi be the set of all x ∈ { 0, 1}n with Hamming weight i. Consider the induced subgraph of Hf on vertices Wk−1 ∪ Wk. Because f is symmetric, f (x) = f (y0) for every 
+
+x ∈ Wk−1 and f (x) = f (y1) for every x ∈ Wk. Hence, the degree of every vertex x ∈ Wk−1 in this induced subgraph is n − k + 1, and the degree of every x ∈ Wk is k. The minimum degree is thus 
+
+d1 ≥ min {k, n − k + 1 }. Let μ(x) be the distribution defined in Theorem 2 where μ(x) = deg G(x)2|E(G)| .Note that Pr 
+
+> x∼μ
+
+[x ∈ Wk] = |Wk| · k
+
+2|Wk| · k = 1 /2.
+
+Therefore, a random x sampled with respect to distribution μ has degree k with 1 /2 probability, and has degree n − k + 1 with 1 /2 probability. Hence, letting d2 = max {k, n − k + 1 }
+
+Pr 
+
+> x∼μ
+
+[deg G(x) ≥ d2] ≥ 1/2.
+
+Therefore, Theorem 2 implies that Np(f ) = Ω( d2 log d1) = Ω(max {k, n − k + 1 } log min {k, n − k +1}) = Ω( n log min {k, n − k + 1 }). In the k-THRESHOLD problem where 1 ≤ k ≤ n, we are given x ∈ { 0, 1}n, and we need to de-termine whether |x| ≥ k. As k-THRESHOLD is a special case of symmetric functions, Theorem 12 immediately implies an Ω( n log min {k, n − k + 1 }) lower bound for the noisy query complexity of 
+
+k-THRESHOLD, which was originally shown in Feige et al. [1994]. 18 In Graph-Connectivity for N -vertex graphs, the input is a Boolean vector x ∈ { 0, 1}([N ]2 ), where each x{u,v } for an unordered pair {u, v } indicates whether the edge ( u, v ) exists in the graph. The goal is to determine whether the graph is connected. 
+
+Theorem 13 (Gu et al. [2025]) . The noisy query complexity for Graph-Connectivity for N -vertex graphs is Ω( N 2 log N ).Proof. Let f denote Graph-Connectivity throughout this proof. Let S1 denote the set of all spanning trees on N vertices, and let S0 denote the set of all disjoint union of two spanning trees {T1, T 2} (T1 and T2 are not ordered) where |T1| + |T2| = N
+
+and |T1|, |T2| ≥ N/ 3. Clearly, f (x) = 1 for x ∈ S1 and f (x) = 0 for x ∈ S0. We use the following facts to estimate the sizes of S0 and S1:
+
+Fact 14. The number of labeled N -vertex trees is N N −2.
+
+Fact 15 (Stirling’s formula) . There is a constant ε > 0, so that for all N ≥ k ≥ 1,
+
+Nk
+
+
+
+≥ ε · N N +1 /2
+
+kk+1 /2(N − k)N −k+1 /2 .
+
+We immediately obtain |S1| = N N −2 and 
+
+|S0| ≥ 
+
+> ⌊N/ 2−1⌋
+
+X
+
+> k=⌈N/ 3⌉
+
+Nk
+
+
+
+kk−2(N − k)N −k−2
+
+≥
+
+> ⌊N/ 2−1⌋
+
+X
+
+> k=⌈N/ 3⌉
+
+Ω N N +1 /2
+
+kk+1 /2(N − k)N −k+1 /2 · kk−2(N − k)N −k−2
+
+!
+
+≥
+
+> ⌊N/ 2−1⌋
+
+X
+
+> k=⌈N/ 3⌉
+
+Ω  N N −4.5
+
+≥ Ω( N N −3.5) ≥ Ω( |S1|/N 1.5).
+
+Consider the induced subgraph of Hf on the vertex set S0 ∪ S1, which we call G. For every 
+
+x = T1 ⊔ T2 ∈ S0, deg G(x) ≥ 2N 2 
+
+> 9
+
+, because we can connect any edge between T1 and T2 to obtain a spanning tree. Because G is bipartite where S0 is one side of the bipartition, 
+
+|E(G)| ≤ N 2 · | S0|.
+
+Hence, we have obtained a subgraph G of Hf where there exists S0 ⊆ V (G) such that 
+
+• deg G(s) = Ω( N 2) for every s ∈ S0;
+
+• |S0| ≥ Ω( N −1.5)|V (G)|;
+
+• |E(G)| ≤ N 2|S0|.Hence, we can apply Lemma 11 with n :=  N
+
+> 2
+
+, S := S0 and λ = 3 /4 to obtain the Ω( N 2 log N )lower bound. 19 In the related s-t-Connectivity problem, instead of determining whether a given graph is con-nected, we need to determine whether two fixed vertices s and t in the graph are connected. Via a similar proof, we can also show the lower bound for s-t-Connectivity. 
+
+Theorem 16 (Gu et al. [2025]) . The noisy query complexity for s-t-Connectivity for N -vertex graphs is Ω( N 2 log N ).Proof sketch. As the proof is very similar to the proof of the lower bound for Graph-Connectivity, we only highlight the difference here. The initial subgraph of Hf we will look at is on S0 ∪ S1,where S1 still denotes the set of all spanning trees, but S0 denotes the set of all disjoint union of two spanning trees {T1, T 2} where |T1| + |T2| = N , |T1|, |T2| ≥ N/ 3, and additionally s ∈ T1, t ∈ T2.This affects the size of S0. Now we have 
+
+|S0| ≥ 
+
+> ⌊N/ 2−1⌋
+
+X
+
+> k=⌈N/ 3⌉
+
+N − 2
+
+k − 1
+
+
+
+kk−2(N − k)N −k−2.
+
+Because  N −2
+
+> k−1
+
+ =  Nk
+
+ · k(N −k)   
+
+> N(N−1)
+
+= Ω(  Nk
+
+) for k in the specified range, we still obtain the same asymptotic lower bound for |S0|. Hence, the rest of the proof follows verbatim. 
+
+# 6 Acknowledgment 
+
+X. L. is supported by NSF Award CCF-2127575. Y. X. is supported by NSF HDR TRIPODS Phase II grant 2217058 (EnCORE Institute). 
+
+# References 
+
+Michael Ben-Or and Avinatan Hassidim. The bayesian learner is optimal for noisy binary search (and pretty good for quantum as well). In Proceedings of the 2008 49th Annual IEEE Symposium on Foundations of Computer Science (FOCS) , pages 221–230, 2008. doi: 10.1109/FOCS.2008.58. 1Elwyn R. Berlekamp. Block coding with noiseless feedback . PhD thesis, Massachusetts Institute of Technology, 1964. 1 M. V. Burnashev and K. Sh. Zigangirov. An interval estimation problem for controlled observations. 
+
+Probl. Peredachi Inf. , 10(3):51–61, 1974. 1 Dariusz Dereniowski, Stefan Tiegel, Przemyslaw Uzna´ nski, and Daniel Wolleb-Graf. A framework for searching in graphs in the presence of errors. In Proceedings of the 2nd Symposium on Simplicity in Algorithms (SOSA) , pages 4:1–4:17, 2019. 1 Dariusz Dereniowski, Aleksander Lukasiewicz, and Przemyslaw Uznanski. Noisy (binary) searching: Simple, fast and correct. In Proceedings of the 42nd International Symposium on Theoretical Aspects of Computer Science (STACS) , pages 29:1–29:18, 2025. 1 Irit Dinur and Samuel Safra. On the hardness of approximating minimum vertex cover. Ann. Math. , pages 439–485, 2005. 2 20 Ehsan Emamjomeh-Zadeh, David Kempe, and Vikrant Singhal. Deterministic and probabilistic binary search in graphs. In Proceedings of the 48th Annual ACM SIGACT Symposium on Theory of Computing (STOC) , pages 519–532, 2016. 1 William Evans and Nicholas Pippenger. Average-case lower bounds for noisy boolean decision trees. 
+
+SIAM J. Comput. , 28(2):433–446, 1998. 1, 2, 3, 4 Uriel Feige. On the complexity of finite random functions. Inf. Process. Lett. , 44(6):295–296, 1992. 1, 2, 3, 4, 5 Uriel Feige, Prabhakar Raghavan, David Peleg, and Eli Upfal. Computing with noisy information. 
+
+SIAM J. Comput. , 23(5):1001–1018, 1994. 1, 2, 3, 4, 5, 7, 17, 18 Ehud Friedgut and Gil Kalai. Every monotone graph property has a sharp threshold. Proc. Am. Math. Soc. , 124(10):2993–3002, 1996. 2 Yuzhou Gu and Yinzhan Xu. Optimal bounds for noisy sorting. In Proceedings of the 55th Annual ACM Symposium on Theory of Computing (STOC) , pages 1502–1515, 2023. 1 Yuzhou Gu, Xin Li, and Yinzhan Xu. Tight bounds for noisy computation of high-influence functions, connectivity, and threshold. In Proceedings of 38th Conference on Learning Theory (COLT) , pages 2540–2591, 2025. 1, 2, 4, 5, 7, 8, 9, 19, 20 Michael Horstein. Sequential transmission using noiseless feedback. IEEE Trans. Inf. Theory , 9 (3):136–143, 1963. 1 Claire Kenyon and Valerie King. On boolean decision trees with faulty nodes. Random Struct. Algorithms , 5(3):453–464, 1994. 1 Don R Lick and Arthur T White. k-degenerate graphs. Canadian Journal of Mathematics , 22(5): 1082–1096, 1970. 3 Elchanan Mossel. A quantitative arrow theorem. Probab. Theory Relat. Fields , 154(1):49–88, 2012. 2Noam Nisan. Crew prams and decision trees. In Proceedings of the twenty-first annual ACM symposium on Theory of computing , pages 327–335, 1989. 2 Noam Nisan and Mario Szegedy. On the degree of boolean functions as real polynomials. Comput. Complex. , 4:301–313, 1994. 2 R¨ udiger Reischuk and Bernd Schmeltz. Reliable computation with noisy circuits and decision trees-a general n log n lower bound. In Proceedings 32nd Annual Symposium of Foundations of Computer Science (FOCS) , pages 602–611, 1991. 1, 2, 3, 4 David Rubinstein. Sensitivity vs. block sensitivity of boolean functions. Combinatorica , 15(2): 297–299, 1995. 4 Ziao Wang, Nadim Ghaddar, and Lele Wang. Noisy sorting capacity. In Proceedings of the 2022 IEEE International Symposium on Information Theory (ISIT) , pages 2541–2546. IEEE, 2022. 1 Ziao Wang, Nadim Ghaddar, Banghua Zhu, and Lele Wang. Variable-length insertion-based noisy sorting. In Proceedings of the 2023 IEEE International Symposium on Information Theory (ISIT) , pages 1782–1787, 2023. 1 21 Ziao Wang, Nadim Ghaddar, Banghua Zhu, and Lele Wang. Noisy computing of the threshold function. In Proceedings of the 36th International Conference on Algorithmic Learning Theory ,2025. 1 Banghua Zhu, Ziao Wang, Nadim Ghaddar, Jiantao Jiao, and Lele Wang. On the optimal bounds for noisy computing. In Proceedings of the 2023 IEEE International Symposium on Information Theory (ISIT) , pages 1788–1793, 2023. 1 Banghua Zhu, Ziao Wang, Nadim Ghaddar, Jiantao Jiao, and Lele Wang. Noisy computing of the OR and MAX functions. IEEE J. Sel. Areas Inf. Theory , 5:302–313, 2024. 1 22

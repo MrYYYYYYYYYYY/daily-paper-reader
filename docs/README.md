@@ -6,35 +6,48 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-14
-- 运行时间：2026-06-14 21:08:39 UTC
+- 最新运行日期：2026-06-15
+- 运行时间：2026-06-15 22:10:28 UTC
 - 运行状态：成功
-- 本次总论文数：4
-- 精读区：4
-- 速读区：0
+- 本次总论文数：8
+- 精读区：6
+- 速读区：2
 
 ### 今日简报（AI）
-今天精读4篇论文，其中两篇高影响力研究分别聚焦扩散大语言模型的奖励-状态对齐和组合推理。  
-值得关注的方向：9分论文《Back on Track》提出通过重新校准推理状态与奖励信号提升扩散LLM性能；8分论文《Operads》引入操作数框架增强LLM的模块化推理能力。  
-建议下一阶段：优先深入扩散模型的结构化推理机制，并尝试将操作数方法复用到现有推理任务中。
-- 详情：[/202606/14/README](/202606/14/README)
+今日共推荐8篇论文，精读6篇，其中两篇获9.0高分，聚焦前沿研究。
+
+最值得关注的方向：长期船舶轨迹与目的地预测结合推理大语言模型，以及布尔函数噪声查询复杂度的统一下界。
+
+建议优先精读这两篇9.0分论文，它们对理解大模型推理与理论计算机科学前沿有直接帮助。
+- 详情：[/202606/15/README](/202606/15/README)
 
 ### 精读区论文标签
-1. [Back on Track: Aligning Rewards and States for Reasoning in Diffusion Large Language Models](/202606/14/2606.08501v1-back-on-track-aligning-rewards-and-states-for-reasoning-in-diffusion-large-language-models)  
+1. [Towards Long-Horizon Vessel Trajectory and Destination Forecasting with Reasoning Large Language Models](/202606/15/2606.08633v1-towards-long-horizon-vessel-trajectory-and-destination-forecasting-with-reasoning-large-language-models)  
    标签：评分：9.0/10、query:lpt
-   evidence：PAPO框架为扩散LLM中的RL对齐奖励与状态
-2. [Operads for compositional reasoning in LLMs](/202606/14/2606.13634v1-operads-for-compositional-reasoning-in-llms)  
+   evidence：使用可验证奖励的强化学习（RLVR）进行大语言模型后训练
+2. [A Unified Lower Bound on the Noisy Query Complexity of Boolean Functions](/202606/15/2606.11448v1-a-unified-lower-bound-on-the-noisy-query-complexity-of-boolean-functions)  
+   标签：评分：9.0/10、query:lpt
+   evidence：噪声查询复杂度的数学公式下界
+3. [CacheRL:Multi-Turn Tool-Calling Agents via Cached Rollouts and Hybrid Reward](/202606/15/2606.14179v1-cacherlmulti-turn-tool-calling-agents-via-cached-rollouts-and-hybrid-reward)  
+   标签：评分：9.0/10、query:lpt
+   evidence：使用强化学习和混合奖励进行代理训练
+4. [Can Post-Training Turn LLMs into Good Medical Coders? An Empirical Study of Generative ICD Coding](/202606/15/2606.13940v1-can-post-training-turn-llms-into-good-medical-coders-an-empirical-study-of-generative-icd-coding)  
    标签：评分：8.0/10、query:lpt
-   evidence：提出操作范畴作为LLM组合推理的严格数学框架
-3. [Dense Supervision, Sparse Updates: On the Sparsity and Geometry of On-Policy Distillation](/202606/14/2606.13657v1-dense-supervision-sparse-updates-on-the-sparsity-and-geometry-of-on-policy-distillation)  
+   evidence：基于强化学习的后训练用于LLM ICD编码
+5. [Retrospective Progress-Aware Self-Refinement for LLM Agent Training](/202606/15/2606.14302v1-retrospective-progress-aware-self-refinement-for-llm-agent-training)  
    标签：评分：8.0/10、query:lpt
-   evidence：基于在线策略的蒸馏用于大语言模型后训练，稀疏性分析
-4. [Reinforcement learning-driven unified generative framework for multi-objective RNA codon design](/202606/14/biorxiv-10-64898-2026-06-12-732012-v1-reinforcement-learning-driven-unified-generative-framework-for-multi-objective-rna-codon-design)  
+   evidence：基于强化学习的LLM智能体训练与进度感知自优化
+6. [PLRTune: Importance Pre-Sampling and LLM-Guided Reinforcement Learning for Automatic Database Tuning](/202606/15/2606.14312v1-plrtune-importance-pre-sampling-and-llm-guided-reinforcement-learning-for-automatic-database-tuning)  
    标签：评分：8.0/10、query:lpt
-   evidence：强化学习驱动的RNA生成框架
+   evidence：使用强化学习和LLM引导进行数据库调优
 
 ### 速读区论文标签
-- 本次无速读推荐。
+1. [Be My Tutor: On-Policy Co-Distillation for Mutual LLM Improvement via Peer Feedback](/202606/15/2606.14368v1-be-my-tutor-on-policy-co-distillation-for-mutual-llm-improvement-via-peer-feedback)  
+   标签：评分：7.0/10、query:lpt
+   evidence：基于同策略的共蒸馏和同伴反馈改进LLM
+2. [CQC-RAG: Robust Retrieval-Augmented Generation via Cross-Query Consistency](/202606/15/2606.13438v1-cqc-rag-robust-retrieval-augmented-generation-via-cross-query-consistency)  
+   标签：评分：6.0/10、query:lpt
+   evidence：通过跨查询一致性改进检索增强生成算法，提升LLM鲁棒性
 
 
 <div class="dpr-home-promo-card">

@@ -1,0 +1,337 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-15T22:05:51.308022+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 6,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [
+    {
+      "id": "2606.08633v1",
+      "source": "arxiv",
+      "title": "Towards Long-Horizon Vessel Trajectory and Destination Forecasting with Reasoning Large Language Models",
+      "abstract": "Long-horizon maritime trajectory prediction is important for shipping management, logistics planning, and maritime risk analysis, yet month-level forecasting remains insufficiently studied. Existing deep learning methods mainly focus on short- and mid-term coordinate extrapolation and often struggle to preserve route feasibility and destination correctness over extended horizons. This paper investigates joint long-horizon vessel trajectory and destination forecasting with reasoning-capable large language models, and develops a Maritime LLM post-training framework based on Reinforcement Learning with Verifiable Reward (RLVR). An AIS-based benchmark is constructed with 60-day historical trajectories and 30-day forecasting horizons, where trajectories are converted into semantic textual representations for RL prompt construction. RLVR aligns LLMs with maritime forecasting objectives by enforcing physical validity, providing early-weighted trajectory supervision, and evaluating destination correctness through hierarchical matching and curriculum learning. Experimental results show that RLVR-trained LLMs substantially improve over zero-shot LLMs and representative deep learning baselines, especially on destination-related metrics. Among the evaluated RLVR-trained variants, 4B LLMs achieve the best overall performance, suggesting that reward-compatible optimization and task-specific capacity matching are more important than simply using larger 8B or 14B LLMs. The results also show that LSTM remains a strong deep learning baseline under limited fine-tuning data, while Transformer-style spatio-temporal models typically require larger datasets and richer structured inputs. Overall, this work advances semantic, verifier-aligned maritime forecasting for operational decision support.",
+      "authors": [
+        "Hongwei Wang",
+        "Miao Zhou",
+        "Fengde Wang",
+        "Yuting Wang",
+        "Jiewen Yu",
+        "Jun-Yan He",
+        "Bohao Qu",
+        "Wanbing Zhang",
+        "Xiuju Fu",
+        "Qing Guo",
+        "Zipei Fan",
+        "Yingying Xing",
+        "Yi Yuan"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-06-07T13:55:11+00:00",
+      "link": "https://arxiv.org/pdf/2606.08633v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "uses Reinforcement Learning with Verifiable Reward (RLVR) for LLM post-training",
+      "llm_evidence_cn": "使用可验证奖励的强化学习（RLVR）进行大语言模型后训练",
+      "llm_evidence": "使用可验证奖励的强化学习（RLVR）进行大语言模型后训练",
+      "canonical_evidence": "使用可验证奖励的强化学习（RLVR）进行大语言模型后训练",
+      "llm_tldr_en": "Proposes a Maritime LLM post-training framework using RLVR for long-horizon vessel trajectory and destination forecasting, constructing an AIS benchmark.",
+      "llm_tldr_cn": "针对长期海事轨迹预测中现有方法难以保持路径可行性和目的地正确性的问题，本文提出了一种基于强化学习与可验证奖励（RLVR）的海事大语言模型后训练框架。该方法利用推理能力强的LLM进行联合轨迹和目的地预测，并构建了基于AIS的基准数据集。实验表明该框架能有效提升长时域预测的准确性，为LLM在特定领域后训练提供了新范式。",
+      "llm_tldr": "针对长期海事轨迹预测中现有方法难以保持路径可行性和目的地正确性的问题，本文提出了一种基于强化学习与可验证奖励（RLVR）的海事大语言模型后训练框架。该方法利用推理能力强的LLM进行联合轨迹和目的地预测，并构建了基于AIS的基准数据集。实验表明该框架能有效提升长时域预测的准确性，为LLM在特定领域后训练提供了新范式。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.11448v1",
+      "source": "arxiv",
+      "title": "A Unified Lower Bound on the Noisy Query Complexity of Boolean Functions",
+      "abstract": "We study the query complexity of Boolean functions $f: \\{0, 1\\}^n \\rightarrow \\{0, 1\\}$ in the noisy query model introduced by Feige, Raghavan, Peleg and Upfal [SICOMP 1994]. In this model, an algorithm can adaptively query the bits of an input vector, but each query result is independently flipped with constant probability $p \\in (0, 1/2)$; repeated queries are allowed. The noisy query complexity $\\mathsf{N}_p(f)$ of a function $f$ is defined as the minimum expected number of queries needed to compute $f(x)$ with error probability at most $1/3$, for the worst case input $x$.   We prove a general lower bound on $\\mathsf{N}_p(f)$ based on degree statistics of certain subgraphs of the Boolean hypercube. This is the first general lower bound beyond those implied by the simple observation that $\\mathsf{N}_p(f)$ is lower bounded by the randomized query complexity. We show that this recovers (up to a constant factor) most previously known lower bounds on the noisy query complexity of Boolean functions, providing a unified framework for understanding these results and simplifying the proofs in several cases. Furthermore, this resolves in the affirmative an open problem of Gu, Li and Xu [COLT 2025] that $\\mathsf{N}_p(f) = Ω(\\mathsf{I}(f) \\log \\mathsf{I}(f))$, where $\\mathsf{I}(f)$ denotes the total influence of $f$. We also apply our general lower bound to obtain tight bounds on the noisy query complexity for several new functions.",
+      "authors": [
+        "Yuzhou Gu",
+        "Xin Li",
+        "Yinzhan Xu"
+      ],
+      "primary_category": "cs.DS",
+      "categories": [
+        "cs.DS",
+        "cs.CC",
+        "cs.IT"
+      ],
+      "published": "2026-06-09T21:00:16+00:00",
+      "link": "https://arxiv.org/pdf/2606.11448v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Math formulation of noisy query complexity lower bound",
+      "llm_evidence_cn": "噪声查询复杂度的数学公式下界",
+      "llm_evidence": "噪声查询复杂度的数学公式下界",
+      "canonical_evidence": "噪声查询复杂度的数学公式下界",
+      "llm_tldr_en": "Proves a unified lower bound on noisy query complexity using degree statistics of Boolean hypercube subgraphs.",
+      "llm_tldr_cn": "该论文针对布尔函数在噪声查询模型中的复杂度问题，利用布尔超立方体子图的度统计，首次证明了通用下界。这一结果超越了以往仅限于特定函数类的方法，为理解噪声环境下的计算复杂性提供了新的理论工具。该下界的推导过程体现了精巧的数学构造。",
+      "llm_tldr": "该论文针对布尔函数在噪声查询模型中的复杂度问题，利用布尔超立方体子图的度统计，首次证明了通用下界。这一结果超越了以往仅限于特定函数类的方法，为理解噪声环境下的计算复杂性提供了新的理论工具。该下界的推导过程体现了精巧的数学构造。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "math formulation",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.14179v1",
+      "source": "arxiv",
+      "title": "CacheRL:Multi-Turn Tool-Calling Agents via Cached Rollouts and Hybrid Reward",
+      "abstract": "We present CacheRL, a system for training small agent foundation models that achieves 92 percent process accuracy on multi-step tool-calling tasks, approaching GPT-5's 94 percent while requiring 100 times less compute. Our approach addresses three challenges in practical agent training: transferring tool-calling knowledge from large models at scale, enabling reinforcement learning without costly live tool execution, and learning robustly from noisy cached environments. CacheRL introduces three key innovations. First, a hybrid thinking trajectory pipeline augments agent trajectories with LLM-generated reasoning traces, producing training examples that teach models not only what tools to call but also why. Second, the CacheAgentLoop eliminates live execution costs through a three-tier fuzzy cache while preserving trajectory fidelity using token-level masking. Third, a cache-tier-aware reward dynamically adjusts answer-quality weights to avoid penalizing models for cache-induced limitations. Through iterative supervised fine-tuning (SFT) and Group Relative Policy Optimization (GRPO), CacheRL improves Qwen3-4B-Thinking's validation reward from 0.43 to 0.78. On public agentic tool-calling benchmarks, our model achieves competitive performance against frontier models such as GPT-5. Ablation studies show that removing knowledge transfer reduces performance by 41 percent, while cache-aware rewards contribute a 17 percent improvement. Interestingly, reinforcement learning improves training stability but yields limited gains beyond strong supervised fine-tuning, suggesting that data quality and reward design play a more important role than complex optimization methods in building practical small agent models.",
+      "authors": [
+        "Md Amirul Islam",
+        "Sumiran Thakur",
+        "Huancheng Chen",
+        "Su Min Park",
+        "Jiayun Wang",
+        "Gyuhak Kim"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-06-12T07:01:50+00:00",
+      "link": "https://arxiv.org/pdf/2606.14179v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Uses reinforcement learning with hybrid reward for agent training",
+      "llm_evidence_cn": "使用强化学习和混合奖励进行代理训练",
+      "llm_evidence": "使用强化学习和混合奖励进行代理训练",
+      "canonical_evidence": "使用强化学习和混合奖励进行代理训练",
+      "llm_tldr_en": "CacheRL trains small agent models for multi-turn tool-calling using reinforcement learning with cached rollouts and hybrid reward, achieving 92% accuracy with 100x less compute than GPT-5.",
+      "llm_tldr_cn": "CacheRL针对多轮工具调用任务训练小型代理模型，提出一种结合缓存回滚和混合奖励的强化学习框架。该方法通过混合思维轨迹流水线增强训练数据，利用缓存代理循环避免在线工具执行成本，并设计混合奖励信号指导学习。实验表明，该方法在减少100倍计算量的前提下达到92%的过程准确率，接近GPT-5的94%，有效解决了在线执行成本高和噪声环境下的鲁棒学习挑战。",
+      "llm_tldr": "CacheRL针对多轮工具调用任务训练小型代理模型，提出一种结合缓存回滚和混合奖励的强化学习框架。该方法通过混合思维轨迹流水线增强训练数据，利用缓存代理循环避免在线工具执行成本，并设计混合奖励信号指导学习。实验表明，该方法在减少100倍计算量的前提下达到92%的过程准确率，接近GPT-5的94%，有效解决了在线执行成本高和噪声环境下的鲁棒学习挑战。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.13940v1",
+      "source": "arxiv",
+      "title": "Can Post-Training Turn LLMs into Good Medical Coders? An Empirical Study of Generative ICD Coding",
+      "abstract": "Automated International Classification of Diseases (ICD) coding is a core medical-coding task for billing, epidemiology, and clinical decision support. Generative large language models (LLMs) are often reported as weak medical coders, but this finding mainly comes from inference-time settings such as prompting, retrieval, reranking, or tool use, leaving the role of task-specific post-training underexplored. We present a controlled empirical study of post-training for generative ICD coding, comparing discriminative baselines with LLM coders across prompting, supervised fine-tuning, and reinforcement learning under a common protocol and metric set. To our knowledge, this is the first study to evaluate RL-based post-training for generative LLM coders in ICD coding. We further introduce PHI, a diagnostic curriculum that extends GRPO to refine missed-code cases. Our results show that prompting-only evaluation substantially underestimates the potential of LLMs for ICD coding. SFT provides the main capability jump, GRPO further improves code-set prediction beyond SFT, and PHI provides targeted gains on macro-level performance. These findings suggest that the main bottleneck is not the generative formulation alone, but how the model is adapted and optimized for full-taxonomy recall. We release our code, data splits, and checkpoints at https://github.com/AlexandreWANG915/LLM4ICD.",
+      "authors": [
+        "Ziqing Wang",
+        "Weihao Li",
+        "Shijie Chen",
+        "Yuan Luo",
+        "Kaize Ding"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-06-11T22:04:50+00:00",
+      "link": "https://arxiv.org/pdf/2606.13940v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "RL-based post-training for LLM ICD coding",
+      "llm_evidence_cn": "基于强化学习的后训练用于LLM ICD编码",
+      "llm_evidence": "基于强化学习的后训练用于LLM ICD编码",
+      "canonical_evidence": "基于强化学习的后训练用于LLM ICD编码",
+      "llm_tldr_en": "First controlled study of post-training (SFT, RL) for generative ICD coding, showing RL can significantly improve LLM coding performance.",
+      "llm_tldr_cn": "该文系统研究了后训练（包括监督微调和强化学习）对生成式大语言模型在ICD编码任务上的影响。实验发现，以往认为LLM编码能力弱的结论主要来自推理时设置，而任务专用的后训练，特别是强化学习，能大幅提升编码准确性。这是首个评估基于RL后训练用于ICD编码的工作，揭示了后训练在领域任务中的关键作用。",
+      "llm_tldr": "该文系统研究了后训练（包括监督微调和强化学习）对生成式大语言模型在ICD编码任务上的影响。实验发现，以往认为LLM编码能力弱的结论主要来自推理时设置，而任务专用的后训练，特别是强化学习，能大幅提升编码准确性。这是首个评估基于RL后训练用于ICD编码的工作，揭示了后训练在领域任务中的关键作用。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.14302v1",
+      "source": "arxiv",
+      "title": "Retrospective Progress-Aware Self-Refinement for LLM Agent Training",
+      "abstract": "LLM-based agents trained with reinforcement learning optimize step-wise action prediction but lack metacognitive awareness of task progress, inducing a gap that hinders long-horizon scaling. A pilot study reveals that online progress prompting hurts performance while retrospective demonstrations help, yet this capability cannot emerge from outcome-reward training alone. We present RePro, Retrospective Progress-Aware Training, a framework that trains agents to self-generate progress signals via a forward-then-reflect rollout paradigm: the agent executes actions online, then retrospectively reassesses its step-wise progress given the completed trajectory and known outcome. RePro initializes with a Retrospection Warmup that teaches reflection format from minimal external demonstrations, then further trains through RePro-PO with a composite reward that produces self-generated signals without continuous external supervision. Experiments on WebShop, ALFWorld, and Sokoban show that RePro enhances the Qwen family's performance, with up to $12\\%$ absolute success rate gains.",
+      "authors": [
+        "Xinbei Ma",
+        "Congmin Zheng",
+        "Jiyang Qiu",
+        "Jiale Hong",
+        "Yao Yao",
+        "Xiangmou Qu",
+        "Jiaxin Yin",
+        "Xingyu Lou",
+        "Jun Wang",
+        "Weiwen Liu",
+        "Weinan Zhang",
+        "Zhuosheng Zhang",
+        "Hai Zhao"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-06-12T09:38:47+00:00",
+      "link": "https://arxiv.org/pdf/2606.14302v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "LLM agent training with reinforcement learning and progress-aware self-refinement",
+      "llm_evidence_cn": "基于强化学习的LLM智能体训练与进度感知自优化",
+      "llm_evidence": "基于强化学习的LLM智能体训练与进度感知自优化",
+      "canonical_evidence": "基于强化学习的LLM智能体训练与进度感知自优化",
+      "llm_tldr_en": "RePro trains LLM agents with reinforcement learning to self-generate progress signals via retrospective reflection, enabling long-horizon task scaling.",
+      "llm_tldr_cn": "现有基于强化学习的LLM智能体训练缺乏任务进度感知能力，限制了长程任务扩展。本文提出RePro框架，通过前向执行后回顾反思的范式，让智能体自生成进度信号。实验表明该方法能有效提升长程任务性能，弥补了纯结果奖励训练的不足。",
+      "llm_tldr": "现有基于强化学习的LLM智能体训练缺乏任务进度感知能力，限制了长程任务扩展。本文提出RePro框架，通过前向执行后回顾反思的范式，让智能体自生成进度信号。实验表明该方法能有效提升长程任务性能，弥补了纯结果奖励训练的不足。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.14312v1",
+      "source": "arxiv",
+      "title": "PLRTune: Importance Pre-Sampling and LLM-Guided Reinforcement Learning for Automatic Database Tuning",
+      "abstract": "Configuration tuning is critical to database performance, yet automatic database tuning remains challenging due to high-dimensional knob spaces, substantial online tuning cost, unreliable textual hints derived from Large Language Models (LLMs) or community documents, and the difficulty of exploiting the remaining optimization room after initialization.   Hence, we propose PLRTune, a staged database tuning system that leverages workload-specific domain knowledge to identify a reduced search space and further optimize within this promising region. First, we develop an importance pre-sampling and reranking strategy to identify the dominant knob subset in a workload-specific manner and derive a compact state representation. Second, we design an execution-guided hint refinement technique to improve the initialization quality of documentation-guided tuning. Finally, we propose a post-tuning refinement stage that leverages Twin Delayed Deep Deterministic Policy Gradient (TD3) to explore the dominant knob subset and further exploit the remaining optimization room.   We evaluate PLRTune on MySQL and PostgreSQL across diverse benchmark workloads. Compared with state-of-the-art approaches, PLRTune achieves the best final result on all tested workloads, improving over the corresponding best-performing alternative by 9.50% on average. Moreover, PLRTune reaches the strongest baseline's best performance level 9.03 times faster on average across workloads, demonstrating its practical runtime efficiency without sacrificing final tuning quality.",
+      "authors": [
+        "Xinyue Yang",
+        "Chen Zheng",
+        "Yaoyang Hou",
+        "Renhao Zhang",
+        "Yinyan Zhang",
+        "Heng Zhang"
+      ],
+      "primary_category": "cs.DB",
+      "categories": [
+        "cs.DB"
+      ],
+      "published": "2026-06-12T09:50:40+00:00",
+      "link": "https://arxiv.org/pdf/2606.14312v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Uses reinforcement learning with LLM guidance for database tuning",
+      "llm_evidence_cn": "使用强化学习和LLM引导进行数据库调优",
+      "llm_evidence": "使用强化学习和LLM引导进行数据库调优",
+      "canonical_evidence": "使用强化学习和LLM引导进行数据库调优",
+      "llm_tldr_en": "PLRTune combines importance pre-sampling and LLM-guided reinforcement learning to automatically tune database configurations, achieving efficient optimization in high-dimensional knob spaces.",
+      "llm_tldr_cn": "PLRTune针对数据库自动调优挑战，提出结合重要性预采样和LLM引导的强化学习框架。该方法通过工作负载感知的重要性预采样识别关键旋钮子集，并利用LLM生成紧凑状态表示，在保持高性能的同时降低在线调优成本。实验证明其在多种数据库负载上显著优于现有方法。",
+      "llm_tldr": "PLRTune针对数据库自动调优挑战，提出结合重要性预采样和LLM引导的强化学习框架。该方法通过工作负载感知的重要性预采样识别关键旋钮子集，并利用LLM生成紧凑状态表示，在保持高性能的同时降低在线调优成本。实验证明其在多种数据库负载上显著优于现有方法。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.14368v1",
+      "source": "arxiv",
+      "title": "Be My Tutor: On-Policy Co-Distillation for Mutual LLM Improvement via Peer Feedback",
+      "abstract": "We study multi-domain LLM training in which two models, each stronger in a different domain, co-evolve by tutoring each other through on-policy feedback. Unlike one-way distillation or single-model fine-tuning, our goal is mutual Pareto improvement: each model improves across domains without losing its original strength. To this end, we propose On-Policy Co-Distillation (OPCoD), where each student's self-distillation is conditioned on its own correct rollout and feedback from its peer. To make feedback exchange effective, OPCoD uses cognizance-based gating to decide when to give feedback and feedback anchoring to ground feedback in the problem. On Science Q\\&A tasks, OPCoD consistently outperforms baselines and achieves Pareto improvement across all evaluated domain pairs and students.",
+      "authors": [
+        "Woohyeon Byeon",
+        "Jiwon Jeon",
+        "Jeonghye Kim",
+        "Youngchul Sung"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-06-12T11:55:51+00:00",
+      "link": "https://arxiv.org/pdf/2606.14368v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "on-policy co-distillation with peer feedback for LLM improvement",
+      "llm_evidence_cn": "基于同策略的共蒸馏和同伴反馈改进LLM",
+      "llm_evidence": "基于同策略的共蒸馏和同伴反馈改进LLM",
+      "canonical_evidence": "基于同策略的共蒸馏和同伴反馈改进LLM",
+      "llm_tldr_en": "Proposes On-Policy Co-Distillation (OPCoD) for mutual LLM improvement via on-policy feedback and peer tutoring, achieving Pareto improvement on multi-domain tasks.",
+      "llm_tldr_cn": "该研究针对多领域大语言模型训练中单模型微调或单向蒸馏难以实现跨领域共同提升的问题，提出了基于同策略的共蒸馏方法OPCoD。该方法利用同伴反馈和认知门控机制，使两个在不同领域各有优势的模型通过相互教学实现帕累托改进。在科学问答任务上，OPCoD持续超越基线，证明了同策略反馈在协同训练中的有效性。",
+      "llm_tldr": "该研究针对多领域大语言模型训练中单模型微调或单向蒸馏难以实现跨领域共同提升的问题，提出了基于同策略的共蒸馏方法OPCoD。该方法利用同伴反馈和认知门控机制，使两个在不同领域各有优势的模型通过相互教学实现帕累托改进。在科学问答任务上，OPCoD持续超越基线，证明了同策略反馈在协同训练中的有效性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.13438v1",
+      "source": "arxiv",
+      "title": "CQC-RAG: Robust Retrieval-Augmented Generation via Cross-Query Consistency",
+      "abstract": "Retrieval-Augmented Generation (RAG) has become a common approach for improving the factuality of Large Language Models (LLMs), yet its reliability remains highly sensitive to how external evidence is retrieved and used. Semantically equivalent queries with different syntactic forms may lead to different retrieval results, while irrelevant or misleading documents can further induce hallucinated answers. Existing multi-path reasoning methods improve robustness by sampling multiple candidate answers and applying voting- or confidence-based selection, but they still face two limitations: diversity is often injected through uncontrollable decoding randomness, and answer evaluation is usually confined to a single query-induced evidence view. To address these limitations, we propose a Cross-Query Consistency Hypothesis: correct answers tend to maintain high confidence across semantically equivalent but syntactically diverse queries, whereas noise-induced hallucinations exhibit unstable confidence under such query variations. Based on this hypothesis, we introduce CQC-RAG, a framework that co-designs query-level diversity injection with cross-query consistency evaluation. CQC-RAG rewrites the original question into diverse but meaning-preserving queries, reranks a shared document pool to construct query-conditioned reasoning contexts, applies an evidence-grounded protocol to extract answer-evidence pairs and selects answers according to their confidence stability across these contexts. This design enables self-evaluation without external supervision and does not rely on expanded retrieval coverage. Experiments on four open-domain question answering benchmarks show that CQC-RAG outperforms the strongest previous multi-query baseline by +4.76 pp EM on TriviaQA and +9.12 pp EM on MuSiQue, validating the effectiveness of cross-query consistency for filtering noise-induced hallucinations.",
+      "authors": [
+        "Yanjia Sun",
+        "Sifan Liu",
+        "Jie Shao"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR"
+      ],
+      "published": "2026-06-11T15:01:49+00:00",
+      "link": "https://arxiv.org/pdf/2606.13438v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "robust retrieval-augmented generation via cross-query consistency, an algorithm improvement for LLMs",
+      "llm_evidence_cn": "通过跨查询一致性改进检索增强生成算法，提升LLM鲁棒性",
+      "llm_evidence": "通过跨查询一致性改进检索增强生成算法，提升LLM鲁棒性",
+      "canonical_evidence": "通过跨查询一致性改进检索增强生成算法，提升LLM鲁棒性",
+      "llm_tldr_en": "CQC-RAG improves LLM factuality by generating multiple queries and cross-verifying evidence, reducing hallucination from retrieval bias.",
+      "llm_tldr_cn": "检索增强生成（RAG）的可靠性受限于检索结果的敏感性和无关文档的误导。本文提出CQC-RAG方法，通过生成多个语义等效但语法不同的问题，并利用跨查询一致性验证证据，有效缓解了检索偏差导致的幻觉问题。实验证明该方法在多个QA基准上显著提升事实准确性，是RAG算法的重要改进。",
+      "llm_tldr": "检索增强生成（RAG）的可靠性受限于检索结果的敏感性和无关文档的误导。本文提出CQC-RAG方法，通过生成多个语义等效但语法不同的问题，并利用跨查询一致性验证证据，有效缓解了检索偏差导致的幻觉问题。实验证明该方法在多个QA基准上显著提升事实准确性，是RAG算法的重要改进。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
