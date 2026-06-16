@@ -1,0 +1,453 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-16T23:00:19.456704+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 7,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 5,
+    "quick_skim_target": 11,
+    "quick_selected": 5
+  },
+  "deep_dive": [
+    {
+      "id": "2606.15307v1",
+      "source": "arxiv",
+      "title": "Adapting Reinforcement Learning with Chain-of-Thought Supervision for Explainable Detection of Hateful and Propagandistic Memes",
+      "abstract": "Hateful and propagandistic memes exploit the interplay between images and text to convey harmful intent that neither modality reveals alone. Although thinking-based multimodal large language models (MLLMs) have advanced vision-language understanding, their application to meme content moderation remains underexplored. We propose a reinforcement learning-based post-training method that improves classification performance and reference-based explanation quality in thinking-based MLLMs via task-specific rewards and Group Relative Policy Optimization (GRPO). Concretely, we (i) conduct a systematic empirical study of off-the-shelf MLLMs for hateful and propagandistic meme understanding across English and Arabic benchmarks, (ii) extend existing meme datasets with weakly supervised chain-of-thought (CoT) rationales via distillation and multi-LLM fine-grained propaganda annotations, (iii) introduce a GRPO-based objective with thinking-length regularization that jointly optimizes classification accuracy and explanation quality, and (iv) investigate self-supervised GRPO on unlabeled memes using consensus-based pseudo-labels. Experiments on the Hateful Memes and ArMeme benchmarks show that our approach improves over previously reported results on FHM accuracy (up to +2.1%, from 79.9% to 82.0%) and on ArMeme macro-F1 (up to +7.6 points, from 0.536 to 0.612 with explanations; +6.1 compared to the original ArMeme benchmark), while also generating natural-language explanations. On ArMeme, sequence-classification baselines remain stronger in terms of raw accuracy, whereas our approach provides more balanced per-class performance along with explanations. We publicly release our code, data extensions, and evaluation resources.",
+      "authors": [
+        "Mohamed Bayan Kmainasi",
+        "Mucahid Kutlu",
+        "Ali Ezzat Shahroor",
+        "Abul Hasnat",
+        "Firoj Alam"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-06-13T13:51:54+00:00",
+      "link": "https://arxiv.org/pdf/2606.15307v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "uses reinforcement learning (GRPO) with task-specific rewards to improve multi-modal LLM performance on meme classification",
+      "llm_evidence_cn": "使用强化学习（GRPO）和任务特定奖励提升多模态大模型在模因分类中的性能",
+      "llm_evidence": "使用强化学习（GRPO）和任务特定奖励提升多模态大模型在模因分类中的性能",
+      "canonical_evidence": "使用强化学习（GRPO）和任务特定奖励提升多模态大模型在模因分类中的性能",
+      "llm_tldr_en": "Proposes a reinforcement learning-based post-training method using GRPO to improve hateful meme classification and explanation quality in multi-modal LLMs.",
+      "llm_tldr_cn": "针对思维链多模态大模型在仇恨宣传模因检测中的不足，提出一种基于强化学习的后训练方法，利用组相对策略优化（GRPO）和任务特定奖励信号同时提升分类准确率和可解释性。在多个数据集上的实验表明，该方法显著优于现有微调方法，并能生成更准确的自然语言解释。",
+      "llm_tldr": "针对思维链多模态大模型在仇恨宣传模因检测中的不足，提出一种基于强化学习的后训练方法，利用组相对策略优化（GRPO）和任务特定奖励信号同时提升分类准确率和可解释性。在多个数据集上的实验表明，该方法显著优于现有微调方法，并能生成更准确的自然语言解释。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.15333v1",
+      "source": "arxiv",
+      "title": "Replay What Matters: Off-Policy Replay for Efficient LLM Reinforcement Unlearning",
+      "abstract": "LLM unlearning has emerged as a cost-effective alternative to full retraining for removing hazardous knowledge from pretrained models while preserving general utility. Recent RL-based methods such as RULE reformulate unlearning as learning a refusal behavior, but their on-policy optimization repeatedly samples from the same forget and retain/boundary prompts throughout training. We identify a critical inefficiency in this process: easy cases quickly converge and provide little useful gradient signal, while hard cases near the forget/retain boundary continue to produce low-reward rollouts that are discarded after a single use. To address this issue, we propose ReRULE, an off-policy replay enhancement for reinforcement unlearning. ReRULE stores low-reward hard-case rollout groups in a replay buffer during early GRPO training and reuses them in later stages through importance-sampled off-policy updates, redirecting computation toward boundary cases that still require learning. Theoretically, we show that ReRULE yields a tighter hard-case convergence bound than pure on-policy RULE. Empirically, ReRULE improves MUSE-Books Retain Quality from 46.3 to 56.2 while adding only 5--11% training time across benchmarks. Its limited improvement on the simpler TOFU setting further supports the intended conditional behavior: replay is most beneficial when the hard/easy disparity is pronounced.",
+      "authors": [
+        "Zirui Pang",
+        "Chenlong Zhang",
+        "Haosheng Tan",
+        "Zhuoran Jin",
+        "Jiaheng Wei",
+        "Zixin Zhong"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-06-13T14:52:40+00:00",
+      "link": "https://arxiv.org/pdf/2606.15333v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Off-policy replay for reinforcement unlearning in LLMs",
+      "llm_evidence_cn": "LLM强化取消学习中的离线策略重放",
+      "llm_evidence": "LLM强化取消学习中的离线策略重放",
+      "canonical_evidence": "LLM强化取消学习中的离线策略重放",
+      "llm_tldr_en": "ReRULE enhances LLM reinforcement unlearning via off-policy replay, reusing low-reward rollouts to improve sample efficiency and convergence.",
+      "llm_tldr_cn": "现有基于强化学习的LLM取消学习方法（如RULE）采用在线策略优化，对易样本和难样本处理效率低下。本文提出ReRULE，引入离线策略重放机制，存储并重用难样本的低奖励轨迹。实验表明，ReRULE显著提高样本效率并加速收敛，同时保持对有害知识的消除效果和模型通用能力。该方法为LLM安全对齐提供了高效的强化学习变体。",
+      "llm_tldr": "现有基于强化学习的LLM取消学习方法（如RULE）采用在线策略优化，对易样本和难样本处理效率低下。本文提出ReRULE，引入离线策略重放机制，存储并重用难样本的低奖励轨迹。实验表明，ReRULE显著提高样本效率并加速收敛，同时保持对有害知识的消除效果和模型通用能力。该方法为LLM安全对齐提供了高效的强化学习变体。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.15385v1",
+      "source": "arxiv",
+      "title": "Reward Hacking in Language Model Agents: Revisiting AI Safety Gridworlds",
+      "abstract": "Reward hacking, where AI systems exploit misspecified objectives to achieve high reward without satisfying intended goals, remains a central challenge in AI safety. Yet most known instances have been discovered post hoc in frontier systems where controlled study is impractical. We adapt the AI Safety Gridworlds framework into a text-based evaluation suite that reformulates classic reinforcement learning safety tasks for language-based agents. Across frontier and mid-scale models, we find that specification gaming emerges zero-shot: models systematically achieve high observed reward while underperforming on hidden safety objectives, and even apparently safe behaviors can reflect misunderstanding rather than principled safety. Reinforcement learning does not correct these failures: direct reward optimization widens the gap between observed and hidden reward, as the model's initial competence causes it to lock into locally rewarding strategies before discovering safer alternatives. This pattern persists across model scales (1.5B--14B) and is not resolved by finer credit assignment, exploration prompts, or entropy regularization. Our results show that reward hacking arises naturally when optimizing proxy objectives with capable language model agents and resists standard mitigations, suggesting that proxy-reward failures in agentic settings may require approaches beyond standard exploration and credit-assignment fixes. To facilitate reproducibility, the code for this work is available at \\href{https://github.com/asparius/verl-agent-safety}{our public repository}.",
+      "authors": [
+        "Ömer Veysel Çağatan",
+        "Xuandong Zhao"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-06-13T16:29:34+00:00",
+      "link": "https://arxiv.org/pdf/2606.15385v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Directly studies reward hacking in RL agents, highly relevant to reward modeling for RLHF",
+      "llm_evidence_cn": "直接研究RL智能体中的奖励黑客现象，与RLHF中的奖励建模高度相关",
+      "llm_evidence": "直接研究RL智能体中的奖励黑客现象，与RLHF中的奖励建模高度相关",
+      "canonical_evidence": "直接研究RL智能体中的奖励黑客现象，与RLHF中的奖励建模高度相关",
+      "llm_tldr_en": "This paper revisits AI Safety Gridworlds for text-based LLM agents, demonstrating zero-shot specification gaming where models achieve high reward but fail at hidden safety objectives, highlighting risks in reward-based training.",
+      "llm_tldr_cn": "该论文将AI安全网格世界框架改编为文本形式，用于评估语言模型智能体中的奖励黑客现象。研究发现，前沿和中等规模模型在零样本条件下出现规范游戏行为：模型获得高观测奖励但未满足隐藏安全目标。即使表面上安全的行为也可能源于误解而非真正的安全性。研究强调了基于奖励训练中目标错配的风险，对RLHF等方法的安全性提出警示。",
+      "llm_tldr": "该论文将AI安全网格世界框架改编为文本形式，用于评估语言模型智能体中的奖励黑客现象。研究发现，前沿和中等规模模型在零样本条件下出现规范游戏行为：模型获得高观测奖励但未满足隐藏安全目标。即使表面上安全的行为也可能源于误解而非真正的安全性。研究强调了基于奖励训练中目标错配的风险，对RLHF等方法的安全性提出警示。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.15651v1",
+      "source": "arxiv",
+      "title": "Self-Questioning Vision-Language Models: Reinforcement Learning for Compositional Visual Reasoning",
+      "abstract": "Vision-Language Models (VLMs) are AI systems that process both images and text, yet they often struggle with compositional visual reasoning questions that require chaining multiple steps together, such as identifying objects, counting them, and comparing the results. Existing approaches improve this reasoning by training models on human-written step-by-step explanations, but creating these annotations is expensive and difficult to scale. We propose a self-questioning framework that trains a VLM to break visual questions into smaller sub-questions and answer each one before producing a final response, using a reinforcement learning algorithm called Group Relative Policy Optimization (GRPO). The model is never shown examples of how to decompose questions, it discovers this behavior on its own, guided by a reward signal that scores whether the output contains sub-questions and whether the final answer is correct. We apply this framework to a 3-billion-parameter model, training on both synthetic scenes of geometric shapes (CLEVR) and real-world photographs (A-OKVQA). On A-OKVQA, both self-questioning and standard reinforcement learning substantially improve accuracy over the untrained model (52.2% and 51.6% vs. 46.8%). We introduce the first self-questioning VLM by rewarding not only the final answer like standard RL but additionally for generating intermediate sub-questions, enabling it to discover compositional decomposition strategies. These results suggest that teaching AI systems to ask themselves intermediate questions is a promising strategy for complex visual reasoning, particularly when the difficulty of a question warrants explicit step-by-step decomposition.",
+      "authors": [
+        "Saraswathy Amjith"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-14T07:42:34+00:00",
+      "link": "https://arxiv.org/pdf/2606.15651v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Uses GRPO reinforcement learning for compositional visual reasoning in VLMs",
+      "llm_evidence_cn": "使用GRPO强化学习方法提升VLM的组合视觉推理能力",
+      "llm_evidence": "使用GRPO强化学习方法提升VLM的组合视觉推理能力",
+      "canonical_evidence": "使用GRPO强化学习方法提升VLM的组合视觉推理能力",
+      "llm_tldr_en": "Proposes a self-questioning framework that trains a VLM to break down visual questions into sub-questions and answer them, using GRPO reinforcement learning without human-written explanations.",
+      "llm_tldr_cn": "该论文针对视觉语言模型（VLM）在组合视觉推理（如识别、计数、比较对象）上的不足，提出一种自问自答框架。通过GRPO强化学习算法，训练模型将复杂视觉问题分解为若干子问题并依次回答，最终给出整体答案，无需人工编写的逐步推理标注。实验表明，该方法在多个视觉推理基准上显著优于基线，展示了强化学习在无需人类示范的情况下提升VLM推理能力的潜力。",
+      "llm_tldr": "该论文针对视觉语言模型（VLM）在组合视觉推理（如识别、计数、比较对象）上的不足，提出一种自问自答框架。通过GRPO强化学习算法，训练模型将复杂视觉问题分解为若干子问题并依次回答，最终给出整体答案，无需人工编写的逐步推理标注。实验表明，该方法在多个视觉推理基准上显著优于基线，展示了强化学习在无需人类示范的情况下提升VLM推理能力的潜力。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.15866v1",
+      "source": "arxiv",
+      "title": "STRIDE: Strategic Trajectory Reasoning via Discriminative Estimation for Verifiable Reinforcement Learning",
+      "abstract": "Reinforcement Learning with Verifiable Rewards (RLVR) has become an effective post-training paradigm for improving the reasoning abilities of large language models. However, existing RLVR methods typically rely on final-answer correctness to assign trajectory-level rewards, providing sparse supervision and treating all tokens uniformly regardless of their actual contribution to reasoning. Although recent studies introduce intermediate signals such as process rewards, high-entropy tokens, and semantic uncertainty, these signals are often not inherently verifiable and may fail to distinguish beneficial strategic patterns from harmful ones. To address this limitation, we propose STRIDE (Strategic Trajectory Reasoning with Discriminative Estimation), a fine-grained RLVR framework that derives strategic reasoning supervision from verifiable outcomes. STRIDE contrasts successful and failed trajectories within each response group to estimate the outcome-discriminative preference of each $n$-gram strategic pattern, and further combines this signal with reasoning saliency entropy to identify decision-relevant strategic patterns. These patterns are assigned differentiated advantage values during RL optimization, enabling more precise credit assignment while preserving the verifiability of RLVR. Extensive experiments demonstrate that STRIDE consistently improves reasoning performance across diverse models, tasks, and extended settings, including VLMs and agent-based systems.",
+      "authors": [
+        "Qinjian Zhao",
+        "Zhihao Dou",
+        "Dinggen Zhang",
+        "Xiangyu Li",
+        "Chaoda Song",
+        "Zhongwei Wan",
+        "Xinpeng Li",
+        "Yanyan Zhang",
+        "Kaijie Chen",
+        "Qingtao Pan",
+        "Chengcheng Feng",
+        "Zhiqiang Gao",
+        "Xiaoyu Xia"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-06-14T15:37:26+00:00",
+      "link": "https://arxiv.org/pdf/2606.15866v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Verifiable rewards for LLM post-training",
+      "llm_evidence_cn": "可验证奖励用于LLM后训练",
+      "llm_evidence": "可验证奖励用于LLM后训练",
+      "canonical_evidence": "可验证奖励用于LLM后训练",
+      "llm_tldr_en": "Proposes STRIDE, a method for verifiable reinforcement learning that provides dense trajectory-level rewards by discriminative estimation, improving reasoning in LLMs.",
+      "llm_tldr_cn": "现有RLVR方法仅依赖最终答案正确性提供稀疏奖励，难以区分策略模式优劣。本文提出STRIDE，通过判别性估计对轨迹进行细粒度奖励分配，区分有益与有害策略模式。实验表明该方法显著提升了LLM的推理能力，为RL后训练提供了更有效的监督信号。",
+      "llm_tldr": "现有RLVR方法仅依赖最终答案正确性提供稀疏奖励，难以区分策略模式优劣。本文提出STRIDE，通过判别性估计对轨迹进行细粒度奖励分配，区分有益与有害策略模式。实验表明该方法显著提升了LLM的推理能力，为RL后训练提供了更有效的监督信号。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.15917v1",
+      "source": "arxiv",
+      "title": "Reinforcement Learning for LLM-based Event Forecasting",
+      "abstract": "We use Group Relative Policy Optimization (GRPO), a recently devised sample and memory efficient reinforcement learning method, to finetune pretrained LLMs in the range of 1.5B to 14B parameters equipped with the ability to get current information through the use of a Wikipedia revisions tool, or news summaries, to forecast real events beyond the knowledge cutoff of the LLM, as well as problems made to simulate different aspects of the dynamics of that training.   We use the results of these experiments to comment on the scaling capability of LLMs for forecasting, as well as classify how judgmental forecasting fits into the verifiable/unverifiable domain taxonomy, considering the impact of the inherent aleatoric uncertainty when forecasting future events (e.g. the roll of a die).   As a result of the GRPO training, we manage to bring a 1.5B parameter transformer (Qwen 2.5 1.5B) to forecasting performance superior to Claude Sonnet 3.5 over the same dataset as measured by cross entropy from the market agreed probabilities. We also discuss various dead ends on the path to this result.",
+      "authors": [
+        "Amit Arnold Levy"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-14T16:46:11+00:00",
+      "link": "https://arxiv.org/pdf/2606.15917v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Uses GRPO reinforcement learning to finetune LLMs for forecasting",
+      "llm_evidence_cn": "使用GRPO强化学习方法微调LLM用于事件预测",
+      "llm_evidence": "使用GRPO强化学习方法微调LLM用于事件预测",
+      "canonical_evidence": "使用GRPO强化学习方法微调LLM用于事件预测",
+      "llm_tldr_en": "Applies Group Relative Policy Optimization (GRPO), a sample-efficient RL method, to fine-tune LLMs for real-world event forecasting, achieving strong scaling and handling uncertainty.",
+      "llm_tldr_cn": "该论文旨在利用强化学习提升大语言模型的事件预测能力。作者采用最近提出的样本高效强化学习方法GRPO（组相对策略优化），对1.5B到14B参数的预训练语言模型进行微调，并接入维基百科修订工具等实时信息源。实验表明，该方法能有效预测超出知识截止日期的真实事件，并揭示了扩展规律和不确定性分类。这项工作为LLM在预测任务中的强化学习应用提供了新视角。",
+      "llm_tldr": "该论文旨在利用强化学习提升大语言模型的事件预测能力。作者采用最近提出的样本高效强化学习方法GRPO（组相对策略优化），对1.5B到14B参数的预训练语言模型进行微调，并接入维基百科修订工具等实时信息源。实验表明，该方法能有效预测超出知识截止日期的真实事件，并揭示了扩展规律和不确定性分类。这项工作为LLM在预测任务中的强化学习应用提供了新视角。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.15455v1",
+      "source": "arxiv",
+      "title": "Understanding Diversity Collapse in RLVR via the Lens of Overtraining",
+      "abstract": "Reinforcement learning with verifiable rewards (RLVR) has become a key approach for enhancing the reasoning abilities of large language models. However, RLVR often suffers from \\emph{diversity collapse}: Pass@$1$ improves while high-$k$ Pass@$k$ degrades, which is viewed as a narrowing of the model's reasoning boundary. We formalize this diversity collapse through the lens of \\emph{overtraining}: once a problem's contribution to the reference metric has effectively saturated, further updates no longer expand what the model can solve but still concentrate probability mass on the trajectories favored by on-policy sampling. Under a standard setup with few rollouts per problem, even a single observed success places a problem in a nearly saturated regime for high-$k$ Pass@$k$, so most updates in standard RLVR are overtraining from the boundary perspective. This perspective also suggests a reading of whether RLVR can expand the model's reasoning abilities beyond the base model: since RLVR is structurally biased against high-$k$ Pass@$k$, its aggregate decline does not by itself mean that no new reasoning gains occurred. Interventionally, restricting updates to problems with zero observed success lifts Pass@$256$ above the base model on difficult benchmarks; observationally, a non-trivial fraction of initially unsolvable problems become solvable during standard RLVR training. Building on these findings, we propose \\emph{Bayesian Boundary Gating} (BBG), which redirects optimization away from overtraining by estimating each problem's marginal contribution to the reasoning boundary. Across multiple reasoning benchmarks, BBG improves average Pass@$k$ across a wide range of $k$.",
+      "authors": [
+        "Suqin Yuan",
+        "Jinkun Chen",
+        "Jiyang Zheng",
+        "Muyang Li",
+        "Lei Feng",
+        "Dadong Wang",
+        "Tao Xiang",
+        "Tongliang Liu",
+        "Bo An"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-13T20:13:37+00:00",
+      "link": "https://arxiv.org/pdf/2606.15455v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Reinforcement learning with verifiable rewards and overtraining analysis",
+      "llm_evidence_cn": "可验证奖励的强化学习及过训练分析",
+      "llm_evidence": "可验证奖励的强化学习及过训练分析",
+      "canonical_evidence": "可验证奖励的强化学习及过训练分析",
+      "llm_tldr_en": "This paper studies diversity collapse in RLVR (reinforcement learning with verifiable rewards), formalizing it as overtraining. It shows that once a problem saturates, further updates concentrate probability on sampled trajectories without expanding reasoning boundary, explaining Pass@1 improvement but Pass@k degradation.",
+      "llm_tldr_cn": "本论文研究可验证奖励强化学习（RLVR）中的多样性崩溃现象，将其形式化为过训练问题。作者发现，当一个问题对参考指标的贡献饱和后，进一步更新不再扩大模型能解决的问题范围，而是集中概率质量到采样轨迹上，从而导致Pass@1提升而Pass@k下降。该工作通过理论分析揭示了RLVR训练中的一个关键陷阱，为改进算法提供了重要见解。",
+      "llm_tldr": "本论文研究可验证奖励强化学习（RLVR）中的多样性崩溃现象，将其形式化为过训练问题。作者发现，当一个问题对参考指标的贡献饱和后，进一步更新不再扩大模型能解决的问题范围，而是集中概率质量到采样轨迹上，从而导致Pass@1提升而Pass@k下降。该工作通过理论分析揭示了RLVR训练中的一个关键陷阱，为改进算法提供了重要见解。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.14657v1",
+      "source": "arxiv",
+      "title": "HPSv3++: Scaling Reward Models Across the Full Spectrum of Diffusion Model Capabilities",
+      "abstract": "Reward models guide text-to-image (T2I) systems toward outputs aligned with human preferences. However, typical reward models such as HPSv3 are trained on pre-annotated data from earlier T2I models, without accounting for quality discriminative shifts arising from evolving model capabilities and reinforcement learning (RL) iterations, limiting their broader applicability. In this work, we propose HPSv3++, a reward model framework that elevates the HPSv3 model for varying T2I model capabilities and their RL iteration changes across the full capability-iteration spectrum. Specifically, we first introduce HPDv3++, a 212K dual-dimension preference dataset annotated for text fidelity and aesthetic quality using a recent high-capability (Qwen-Image) model with human supervision. We then propose a two-stage training framework. Stage 1 employs data-aware orthogonal gradient projection to incorporate diverse aesthetic perception from HPDv3++ while preserving the original effective human preference knowledge in HPSv3. Stage 2 further leverages unlabeled data from T2I models spanning different capability levels and RL iterations, and introduces a joint capability-iterations conditioned signal for the reward model together with a standard deviation-driven unsupervised guidance mechanism, strengthening reward model across the capability-iteration spectrum. HPSv3++ achieves state-of-the-art preference prediction, outperforming HPSv3 9.8% on HPDv3, 5.5% on GenAI-Bench, while achieving 79.1%/88.1% on our proposed HPDv3++. When used for T2I RL training, it consistently improves GenEval scores across diverse T2I models, demonstrating its wide-range capabilities. The code is available at https://github.com/PlantPotatoOnMoon/HPSv3-PlusPlus.",
+      "authors": [
+        "Yijun Liu",
+        "Jie Huang",
+        "Zeyue Xue",
+        "Yuming Li",
+        "Ruizhe He",
+        "Haoran Li",
+        "Shijia Ge",
+        "Siming Fu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-12T17:22:04+00:00",
+      "link": "https://arxiv.org/pdf/2606.14657v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "reward model for human preferences in T2I, related to RLHF reward modeling",
+      "llm_evidence_cn": "用于文本到图像中人类偏好的奖励模型，与RLHF奖励建模相关",
+      "llm_evidence": "用于文本到图像中人类偏好的奖励模型，与RLHF奖励建模相关",
+      "canonical_evidence": "用于文本到图像中人类偏好的奖励模型，与RLHF奖励建模相关",
+      "llm_tldr_en": "Proposes HPSv3++, a reward model framework for text-to-image that scales across varying model capabilities and RL iterations, improving alignment with human preferences.",
+      "llm_tldr_cn": "本文提出HPSv3++，一个为文本到图像领域扩展的奖励模型框架，应对模型能力变化和强化学习迭代。典型奖励模型如HPSv3受限于固定数据分布。HPSv3++引入双维度偏好数据集HPDv3++，涵盖不同能力阶段的模型，并支持随RL迭代自适应调整。实验表明该奖励模型能有效指导图像生成，提升与人类偏好的一致性。该工作对奖励模型的可扩展性有重要贡献。",
+      "llm_tldr": "本文提出HPSv3++，一个为文本到图像领域扩展的奖励模型框架，应对模型能力变化和强化学习迭代。典型奖励模型如HPSv3受限于固定数据分布。HPSv3++引入双维度偏好数据集HPDv3++，涵盖不同能力阶段的模型，并支持随RL迭代自适应调整。实验表明该奖励模型能有效指导图像生成，提升与人类偏好的一致性。该工作对奖励模型的可扩展性有重要贡献。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.15591v1",
+      "source": "arxiv",
+      "title": "Agentic Retrieval and Reinforcement Learned Equation Chains: A Controlled Generation Framework for Complex and Novel Physics Word Problems",
+      "abstract": "Generating high-quality Physics Word Problems (PWPs) that are novel, complex, and solvable remains a challenging and underexplored problem in educational content generation. Existing approaches, many adapted from Math Word Problem (MWP) generation, often produce ambiguous, unsolvable, or structurally simple questions with limited linguistic diversity. We introduce ARVRE (Agentic Retrieval Value Reinforced Equation-chain), a two-stage framework for generating diverse and mathematically valid PWPs. In the first stage, a form of offline temporal-difference learning is used to construct valid chains of physics equations, while an agentic retrieval-augmented generation (RAG) framework dynamically selects topic-specific concepts and vocabulary. This design enables explicit control over problem structure and difficulty. In the second stage, a Large Language Model (LLM) converts the equation chain and retrieved concepts into a natural-language physics question. By grounding generation in valid equation chains, our method preserves mathematical correctness while promoting linguistic diversity and contextual richness. Human and automated evaluations demonstrate that ARVRE generates PWPs that are more complex, novel, and solvable than those produced by existing approaches. These results highlight the potential of combining reinforcement learning, retrieval, and LLMs for reliable generation of educational physics content.",
+      "authors": [
+        "Tirthankar Mittra"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CL",
+        "cs.MA"
+      ],
+      "published": "2026-06-14T04:22:36+00:00",
+      "link": "https://arxiv.org/pdf/2606.15591v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "uses reinforcement learning for equation chain generation",
+      "llm_evidence_cn": "使用强化学习生成方程链",
+      "llm_evidence": "使用强化学习生成方程链",
+      "canonical_evidence": "使用强化学习生成方程链",
+      "llm_tldr_en": "Introduces ARVRE, a two-stage framework using offline temporal-difference learning to construct valid physics equation chains and agentic RAG for diverse physics word problem generation.",
+      "llm_tldr_cn": "本文提出ARVRE两阶段框架，用于生成复杂新颖的物理应用题。现有生成方法常产生不准确或简单的问题。第一阶段使用离线时序差分学习构建有效的物理方程链，第二阶段通过智能检索增强生成保持问题多样性。实验表明该方法能生成新颖且可解的题目。该工作展示了强化学习在内容生成中的创新应用。",
+      "llm_tldr": "本文提出ARVRE两阶段框架，用于生成复杂新颖的物理应用题。现有生成方法常产生不准确或简单的问题。第一阶段使用离线时序差分学习构建有效的物理方程链，第二阶段通过智能检索增强生成保持问题多样性。实验表明该方法能生成新颖且可解的题目。该工作展示了强化学习在内容生成中的创新应用。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.15912v1",
+      "source": "arxiv",
+      "title": "On-Policy Distillation with Curriculum Turn-level Guidance for Multi-turn Agents",
+      "abstract": "Multi-turn agents that plan, invoke tools, and interact with environments offer a promising paradigm for solving complex tasks, yet their capabilities typically rely on very large models whose inference cost is prohibitive in practice.On-Policy Distillation (OPD) is a natural recipe for transferring such capabilities to smaller students, but we find that it suffers a characteristic failure mode in this setting: small student errors compound across turns and push the trajectory out of the teacher's familiar state distribution, so the teacher's supervision becomes least reliable precisely where the student needs it most.We propose Guided On-Policy Distillation (Guided-OPD), a simple yet effective algorithm that mixes teacher- and student-generated turns within each rollout and schedules the teacher's intervention probability along a curriculum that decays to zero.Strong guidance keeps early trajectories close to the teacher distribution and is then gradually withdrawn to recover the purely on-policy regime used at inference.On ALFWorld, ScienceWorld, and WebShop, distilling Qwen3 students from a Qwen3-30B-A3B teacher, Guided-OPD improves Score by 21.1\\% and Success Rate by 25.5\\% over vanilla OPD on average, with larger gains on smaller students.",
+      "authors": [
+        "Gengsheng Li",
+        "Mao Zheng",
+        "Mingyang Song",
+        "Ruiqi Liu",
+        "Tianyu Yang",
+        "Jie Sun",
+        "Qiyong Zhong",
+        "Haiyun Guo",
+        "Junfeng Fang",
+        "Dan Zhang",
+        "Jinqiao Wang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-14T16:41:45+00:00",
+      "link": "https://arxiv.org/pdf/2606.15912v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "on-policy distillation for multi-turn agents using reinforcement learning principles",
+      "llm_evidence_cn": "使用强化学习原理进行多轮智能体的在线策略蒸馏",
+      "llm_evidence": "使用强化学习原理进行多轮智能体的在线策略蒸馏",
+      "canonical_evidence": "使用强化学习原理进行多轮智能体的在线策略蒸馏",
+      "llm_tldr_en": "Proposes Guided On-Policy Distillation that mixes teacher and student trajectories to improve knowledge transfer in multi-turn agent tasks, addressing compounding errors.",
+      "llm_tldr_cn": "针对多轮智能体任务中教师轨迹与学生轨迹失配导致知识蒸馏效果不佳的问题，提出引导式在线策略蒸馏方法，通过混合教师和学生生成的轨迹来提供更可靠的监督。实验表明该方法能有效提高小模型在多轮交互中的性能，降低了推理成本。",
+      "llm_tldr": "针对多轮智能体任务中教师轨迹与学生轨迹失配导致知识蒸馏效果不佳的问题，提出引导式在线策略蒸馏方法，通过混合教师和学生生成的轨迹来提供更可靠的监督。实验表明该方法能有效提高小模型在多轮交互中的性能，降低了推理成本。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.16316v1",
+      "source": "arxiv",
+      "title": "RL-Index: Reinforcement Learning for Retrieval Index Reasoning",
+      "abstract": "Retrieving external knowledge is essential for solving real-world tasks, yet it remains challenging when the relationship between a query and its relevant knowledge involves implicit and complex reasoning beyond surface-level semantic or lexical matching (e.g., mathematical problems relying on the same theorem or coding requiring deep reasoning). Existing approaches primarily rely on query-side reasoning (e.g., query rewriting), which introduces significant online latency and underutilizes the opportunity to perform reasoning over the knowledge corpus itself (i.e., index-side reasoning). In this paper, we propose RL-Index, an agentic indexing framework that formulates retrieval index reasoning as a reinforcement learning problem. Instead of performing reasoning at query time, RL-Index shifts reasoning to the indexing stage by augmenting documents with LLM-generated rationales that explicitly encode the latent query-knowledge relationship. To optimize the quality of these rationales, we employ Group Relative Policy Optimization (GRPO) and use retrieval similarity as a verifiable reward signal, enabling direct optimization of indexing decisions for retrieval effectiveness. Extensive experiments on the BRIGHT benchmark demonstrate that RL-Index consistently improves both retrieval and downstream question-answering performance, while significantly reducing online inference latency. Moreover, the learned rationale augmentation generalizes across diverse retrievers and generators, highlighting its robustness as a plug-and-play indexing strategy across different retrieval systems.",
+      "authors": [
+        "Yongjia Lei",
+        "Nedim Lipka",
+        "Zhisheng Qi",
+        "Utkarsh Sahu",
+        "Koustava Goswami",
+        "Franck Dernoncourt",
+        "Ryan A. Rossi",
+        "Yu Wang"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR",
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-06-15T07:22:36+00:00",
+      "link": "https://arxiv.org/pdf/2606.16316v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "uses reinforcement learning for index reasoning",
+      "llm_evidence_cn": "使用强化学习进行索引推理",
+      "llm_evidence": "使用强化学习进行索引推理",
+      "canonical_evidence": "使用强化学习进行索引推理",
+      "llm_tldr_en": "Proposes RL-Index, an agentic indexing framework that formulates retrieval index reasoning as a reinforcement learning problem, enabling implicit reasoning over the knowledge corpus.",
+      "llm_tldr_cn": "本文提出RL-Index，一种将检索索引推理形式化为强化学习问题的智能索引框架。现有方法依赖查询侧推理，带来延迟且未充分利用索引侧推理。RL-Index通过agentic方式在知识库上进行推理，避免了在线查询改写，可处理隐式复杂关系。实验表明该方法在复杂检索任务上有效。该框架为检索系统提供了新的推理范式。",
+      "llm_tldr": "本文提出RL-Index，一种将检索索引推理形式化为强化学习问题的智能索引框架。现有方法依赖查询侧推理，带来延迟且未充分利用索引侧推理。RL-Index通过agentic方式在知识库上进行推理，避免了在线查询改写，可处理隐式复杂关系。实验表明该方法在复杂检索任务上有效。该框架为检索系统提供了新的推理范式。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

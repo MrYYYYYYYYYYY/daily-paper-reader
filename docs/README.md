@@ -6,48 +6,53 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-15
-- 运行时间：2026-06-15 22:10:28 UTC
+- 最新运行日期：2026-06-16
+- 运行时间：2026-06-16 23:06:23 UTC
 - 运行状态：成功
-- 本次总论文数：8
+- 本次总论文数：11
 - 精读区：6
-- 速读区：2
+- 速读区：5
 
 ### 今日简报（AI）
-今日共推荐8篇论文，精读6篇，其中两篇获9.0高分，聚焦前沿研究。
-
-最值得关注的方向：长期船舶轨迹与目的地预测结合推理大语言模型，以及布尔函数噪声查询复杂度的统一下界。
-
-建议优先精读这两篇9.0分论文，它们对理解大模型推理与理论计算机科学前沿有直接帮助。
-- 详情：[/202606/15/README](/202606/15/README)
+今日重点推荐两篇高分研究：将思维链监督融入强化学习实现仇恨与宣传模因的可解释检测，以及通过离线策略回放高效实现大模型遗忘以提升安全性。值得关注强化学习在内容审核与模型安全中的创新应用，同时注意RLVR训练中多样性崩溃的机制分析。建议普通读者优先精读这两篇9分论文，学习如何利用思维链增强可解释性，并探索高效遗忘技术的实际价值。
+- 详情：[/202606/16/README](/202606/16/README)
 
 ### 精读区论文标签
-1. [Towards Long-Horizon Vessel Trajectory and Destination Forecasting with Reasoning Large Language Models](/202606/15/2606.08633v1-towards-long-horizon-vessel-trajectory-and-destination-forecasting-with-reasoning-large-language-models)  
+1. [Adapting Reinforcement Learning with Chain-of-Thought Supervision for Explainable Detection of Hateful and Propagandistic Memes](/202606/16/2606.15307v1-adapting-reinforcement-learning-with-chain-of-thought-supervision-for-explainable-detection-of-hateful-and-propagandistic-memes)  
    标签：评分：9.0/10、query:lpt
-   evidence：使用可验证奖励的强化学习（RLVR）进行大语言模型后训练
-2. [A Unified Lower Bound on the Noisy Query Complexity of Boolean Functions](/202606/15/2606.11448v1-a-unified-lower-bound-on-the-noisy-query-complexity-of-boolean-functions)  
+   evidence：使用强化学习（GRPO）和任务特定奖励提升多模态大模型在模因分类中的性能
+2. [Replay What Matters: Off-Policy Replay for Efficient LLM Reinforcement Unlearning](/202606/16/2606.15333v1-replay-what-matters-off-policy-replay-for-efficient-llm-reinforcement-unlearning)  
    标签：评分：9.0/10、query:lpt
-   evidence：噪声查询复杂度的数学公式下界
-3. [CacheRL:Multi-Turn Tool-Calling Agents via Cached Rollouts and Hybrid Reward](/202606/15/2606.14179v1-cacherlmulti-turn-tool-calling-agents-via-cached-rollouts-and-hybrid-reward)  
+   evidence：LLM强化取消学习中的离线策略重放
+3. [Reward Hacking in Language Model Agents: Revisiting AI Safety Gridworlds](/202606/16/2606.15385v1-reward-hacking-in-language-model-agents-revisiting-ai-safety-gridworlds)  
    标签：评分：9.0/10、query:lpt
-   evidence：使用强化学习和混合奖励进行代理训练
-4. [Can Post-Training Turn LLMs into Good Medical Coders? An Empirical Study of Generative ICD Coding](/202606/15/2606.13940v1-can-post-training-turn-llms-into-good-medical-coders-an-empirical-study-of-generative-icd-coding)  
-   标签：评分：8.0/10、query:lpt
-   evidence：基于强化学习的后训练用于LLM ICD编码
-5. [Retrospective Progress-Aware Self-Refinement for LLM Agent Training](/202606/15/2606.14302v1-retrospective-progress-aware-self-refinement-for-llm-agent-training)  
-   标签：评分：8.0/10、query:lpt
-   evidence：基于强化学习的LLM智能体训练与进度感知自优化
-6. [PLRTune: Importance Pre-Sampling and LLM-Guided Reinforcement Learning for Automatic Database Tuning](/202606/15/2606.14312v1-plrtune-importance-pre-sampling-and-llm-guided-reinforcement-learning-for-automatic-database-tuning)  
-   标签：评分：8.0/10、query:lpt
-   evidence：使用强化学习和LLM引导进行数据库调优
+   evidence：直接研究RL智能体中的奖励黑客现象，与RLHF中的奖励建模高度相关
+4. [Self-Questioning Vision-Language Models: Reinforcement Learning for Compositional Visual Reasoning](/202606/16/2606.15651v1-self-questioning-vision-language-models-reinforcement-learning-for-compositional-visual-reasoning)  
+   标签：评分：9.0/10、query:lpt
+   evidence：使用GRPO强化学习方法提升VLM的组合视觉推理能力
+5. [STRIDE: Strategic Trajectory Reasoning via Discriminative Estimation for Verifiable Reinforcement Learning](/202606/16/2606.15866v1-stride-strategic-trajectory-reasoning-via-discriminative-estimation-for-verifiable-reinforcement-learning)  
+   标签：评分：9.0/10、query:lpt
+   evidence：可验证奖励用于LLM后训练
+6. [Reinforcement Learning for LLM-based Event Forecasting](/202606/16/2606.15917v1-reinforcement-learning-for-llm-based-event-forecasting)  
+   标签：评分：9.0/10、query:lpt
+   evidence：使用GRPO强化学习方法微调LLM用于事件预测
 
 ### 速读区论文标签
-1. [Be My Tutor: On-Policy Co-Distillation for Mutual LLM Improvement via Peer Feedback](/202606/15/2606.14368v1-be-my-tutor-on-policy-co-distillation-for-mutual-llm-improvement-via-peer-feedback)  
+1. [Understanding Diversity Collapse in RLVR via the Lens of Overtraining](/202606/16/2606.15455v1-understanding-diversity-collapse-in-rlvr-via-the-lens-of-overtraining)  
+   标签：评分：8.0/10、query:lpt
+   evidence：可验证奖励的强化学习及过训练分析
+2. [HPSv3++: Scaling Reward Models Across the Full Spectrum of Diffusion Model Capabilities](/202606/16/2606.14657v1-hpsv3-scaling-reward-models-across-the-full-spectrum-of-diffusion-model-capabilities)  
    标签：评分：7.0/10、query:lpt
-   evidence：基于同策略的共蒸馏和同伴反馈改进LLM
-2. [CQC-RAG: Robust Retrieval-Augmented Generation via Cross-Query Consistency](/202606/15/2606.13438v1-cqc-rag-robust-retrieval-augmented-generation-via-cross-query-consistency)  
+   evidence：用于文本到图像中人类偏好的奖励模型，与RLHF奖励建模相关
+3. [On-Policy Distillation with Curriculum Turn-level Guidance for Multi-turn Agents](/202606/16/2606.15912v1-on-policy-distillation-with-curriculum-turn-level-guidance-for-multi-turn-agents)  
+   标签：评分：7.0/10、query:lpt
+   evidence：使用强化学习原理进行多轮智能体的在线策略蒸馏
+4. [RL-Index: Reinforcement Learning for Retrieval Index Reasoning](/202606/16/2606.16316v1-rl-index-reinforcement-learning-for-retrieval-index-reasoning)  
+   标签：评分：7.0/10、query:lpt
+   evidence：使用强化学习进行索引推理
+5. [Agentic Retrieval and Reinforcement Learned Equation Chains: A Controlled Generation Framework for Complex and Novel Physics Word Problems](/202606/16/2606.15591v1-agentic-retrieval-and-reinforcement-learned-equation-chains-a-controlled-generation-framework-for-complex-and-novel-physics-word-problems)  
    标签：评分：6.0/10、query:lpt
-   evidence：通过跨查询一致性改进检索增强生成算法，提升LLM鲁棒性
+   evidence：使用强化学习生成方程链
 
 
 <div class="dpr-home-promo-card">
