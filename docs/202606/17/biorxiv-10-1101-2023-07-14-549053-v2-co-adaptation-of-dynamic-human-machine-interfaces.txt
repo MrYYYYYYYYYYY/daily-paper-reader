@@ -1,0 +1,449 @@
+Title: Co-adaptation of dynamic human-machine interfaces
+
+URL Source: https://www.biorxiv.org/content/10.1101/2023.07.14.549053v2.full.pdf
+
+Number of Pages: 12
+
+Markdown Content:
+> JOURNAL OF L ATEX CLASS FILES, MAY 2026 1
+
+# Co-adaptation of dynamic human-machine interfaces 
+
+Amber H.Y. Chou, Momona Yamagami, Maneeshika M. Madduri, Benjamin J. Chasnov, Finley Hutchison, Lauren N. Peterson, Samuel A. Burden Member, IEEE, 
+
+Abstract —Despite the growing prevalence of learning algo-rithms in daily life, methods for analysis and synthesis of how these systems interact with people are limited. We studied optimization-based algorithms that co-adapt with people in the presence of dynamic machines, finding limitations on current theory that motivated us to conduct an experiment where human subjects interact through a dynamic interface with a machine that has complex dynamics. Experimental results provided evidence of co-adaptation and a trade-off between performance and the “effort” of the human and interface, defined as the norm of their output signals. We developed a parsimonious model of the human adaptation strategy observed in our experiments and conducted a simulation study using this model. Our computational results matched the empirical results, suggesting our human subjects adapted to minimize a combination of error and effort. These results demonstrate how co-adaptation between humans and intelligent interfaces shapes behavior and performance, and introduces a modeling framework that can be used in future work to systematically design interaction outcomes. 
+
+Index Terms —Human-in-the-loop control, dynamic human-machine interfaces, co-adaptation, two learners. 
+
+I. I NTRODUCTION 
+
+With practice and effort, people can learn to control dynamic systems like vehicles [1]–[3], tele- and co-robots [4]–[6], prostheses [7]–[9], exoskeletons [10]–[12], or brain-computer interfaces [13]–[15]. To facilitate and shape this learning, it is tempting to inject intelligence into the interface between the human and machine [16]. Since people continually adapt to their sensorimotor context [17], [18], an intelligent interface in this closed-loop interaction creates a two learner problem [19], [20], where the human and interface co-adapt [21]. Ana-lyzing and synthesizing these systems is critically important in current and emerging applications, including driver assis-tance [22], surgical robotics [23], rehabilitative robotics [24], active prosthetics [8], and neural interfaces (both invasive [13] and non-invasive [25], [26]). Motivated by the optimal feedback control hypothesis for human motor control [27]–[30], we modeled the interaction between a human, adaptive interface, and dynamic machine using a robust control framework [31]. We assumed that both the human and the interface solve optimal control problems to determine their behaviors. In our theoretical analysis, we allowed arbitrarily large (but finite) system orders of the dy-namic machine, and analyzed the equilibrium behavior of such           
+
+> S. A. Burden, A. H.Y. Chou, M. Madduri, B. J. Chasnov, and F. Hutchison are with the Electrical and Computer Engineering Department, University of Washington, Seattle, WA 98195 USA (e-mail: sburden@uw.edu). M. Yamagami and L. Peterson are with the Electrical and Computer Engineering Department, Rice University, Houston, TX 77005 USA. This work has been submitted to the IEEE for possible publication. Copyright may be transferred without notice, after which this version may no longer be accessible.
+
+systems. We found that a simple form of this problem has no solution due to a fundamental theoretical limitation neglected in prior work [32]–[34]. In prior work, it was assumed that the human and the interface had noise-free observations of the machine’s state vector, which we regard as unrealistic in real-world applications. For example, in the context of neuroprosthetics, where an intelligent neural interface seeks to help a person control a dynamic device, intrinsic stochasticity of neural signals [35] injects noise into the system, precluding access to full information. This finding led us to conduct a human subjects experiment and simulation to understand and model how people behave in-the-loop with adaptive interfaces and dynamic machines under more realistic conditions. In our experiment, we investigated co-adaptation between humans and adaptive interfaces in the presence of specific machine dynamics that are fundamentally challenging to con-trol [2]. We recruited participants ( N = 11 ) to perform a continuous disturbance-rejection task using a one-dimensional manual input device [3]. We deployed adaptive interfaces with 0th-, 1st-, and 2nd-order dynamics, which correspond to the position-, velocity-, and acceleration-based systems that people routinely encounter in daily life [1]. The interface controller coefficients were updated as the participant completed a se-quence of trials by estimating a model of the participant’s feedback controller and optimizing a performance criterion of interest. We compared the system performance and human behavior with co-adaptation and without co-adaptation, finding that co-adaptation led to diverse outcomes exhibiting trade-offs between agent behavior and system performance. Driven by this experimental finding, we conducted a com-putational analysis to test whether a model for co-adaptation can replicate the empirical outcomes we observed. Specifically, we modeled human behavior as arising from minimization of a cost function. We implemented a simulation where the human model and interface alternately optimize their costs and we conducted a parameter sweep over the space of penalty terms in the two agents’ cost functions. This simulation yielded behaviors that aligned closely with empirical observations. Our experimental and computational findings will inform future frameworks and deployments of co-adaptive interfaces in human-machine interactions. II. A MODEL OF CO -ADAPTATION 
+
+We consider systems where the machine has dynamics, that is, where the dimension of the machine’s state vector – the system order [36, Sec. 2.2] – is greater than or equal to 1. The zero-dimensional case was studied in prior work [37]– [39]. We modeled dynamic human-machine interfaces (HMI) as the block diagrams in Figure 1, where: H represents  
+
+> .CC-BY-NC-ND 4.0 International license available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint this version posted June 14, 2026. ;https://doi.org/10.1101/2023.07.14.549053 doi: bioRxiv preprint JOURNAL OF L ATEX CLASS FILES, MAY 2026 2
+
+y u
+
+H
+
+M
+
+I
+
+wzp
+
+ab
+
+qwz H/M/I                                        
+
+> Fig. 1. Block diagram models for human-machine interfaces (HMI). (a) This diagram specifies that the human Htransforms signal pto signal q, i.e. the human observes output pfrom machine Mand provides control input q
+> to the machine. Similarly, the interface Itransforms machine output yto control input u, and the machine Mtransforms both of the control inputs
+> q, u and an external input wto produce outputs p, z, y . The external input
+> wcan contain a disturbance to reject (e.g. measurement or process noise) or areference to track (e.g. a trajectory or stationary point). ( b) This diagram shows a simplification of ( a) that obscures details about the interconnection between H,M, and I, instead denoting the transformation H/M/I resulting from this interconnection. The block H/M/I is defined so that ( a,b ) both specify the same transformation from wto z.
+
+the human “in-the-loop”, M is the machine that is being controlled, and I is the interface we seek to synthesize. When the blocks H, M , and I are given linear time-invariant (LTI) transformations [40, Lec. 3], these diagrams are not solely conceptual – they provide mathematical specifications of the closed-loop transformation from input disturbance w to output error z. Although humans are generally nonlinear, they can behave remarkably linearly when interacting with finite-order LTI machine-and-interface dynamics [1]. These observations motivate us in what follows to focus on the finite-order LTI case where there exists a comprehensive toolkit for analysis and synthesis of feedback systems [31], [36], [40], [41]. 
+
+A. Interface synthesis 
+
+The field of robust control theory [31] provides methods for synthesizing the interface I in Figure 1 (conventionally termed the controller ) to optimize a performance criterion with respect to fixed models of human H and machine M (and, optionally, uncertainty in the models). The performance criteria of interest in robust control are system norms that quantify how much signal power is transferred from input disturbance w to output error z. In this robust control paradigm, the interface I is synthesized by solving an optimization problem 
+
+min  
+
+> I
+
+|| H/M/I || I (1) where the norm ∥·∥ I encodes what components of z the interface seeks to make as small as possible. Under appropriate restrictions on the choice of norm ∥·∥ I , models of human H
+
+and machine M , and statistics of input w and output z, a solution I∗ to the optimization problem in (1) exists [31] and can be computed using efficient numerical algorithms [41]. As an example, the well-known linear-quadratic Gaussian 
+
+(LQG) regulator [40, Lec. 24] is obtained by solving (1) when: the disturbance w is Gaussian; the error z consists of (linear 
+
+H
+
+M/I wzp q
+
+y u
+
+I
+
+ab wz
+
+H/M                                          
+
+> Fig. 2. Block diagrams from human and machine perspectives. Given LTI transformations H,M, and I, the blocks M/I and H/M are defined so that the diagrams in ( a,b) specify the same transformation from wto z
+> as the diagrams in Fig. 1. Mathematically, the U/L operation is defined as the linear fractional transformation [31, Ch. 3, 10] between blocks Uand
+> L. These simplified diagrams are conceptually useful when reasoning from the individual perspectives of the human Hand interface Ias they jointly interact with the machine M. Indeed, Hinteracts with the interconnection
+> M/I between Mand Ias illustrated in ( a), whereas Iinteracts with the interconnection H/M between Hand Mas in ( b).
+
+transformations of) the state of the machine x and the control input u; the human-machine transformation H/M (defined in Figure 2) is stabilizable and observable [40, Lec. 14, 15]; and 
+
+∥·∥ I is the 2-norm. If the statistics of the human H and machine M in Figure 1 are stationary regardless of the implemented interface I (e.g. if H and M are given as fixed LTI transformations or distri-butions of LTI transformations), then the preceding paragraph describes a remarkably flexible framework for synthesizing an optimal interface I∗ [31], [42]. However, although it may be reasonable to assume or ensure machine dynamics are stationary, ample evidence suggests that the human will naturally adapt to any perceived change in the interface, and moreover that this adaptation will not be random – rather, the human’s transformation will be strongly influenced by the interface [1], [2], [25], [43]. Therefore if the interface I∗ is synthesized by solving (1) with respect to an initial guess or estimate of the human’s transformation H, it is reasonable to expect the human will adapt its transformation from H to 
+
+eH when the interface changes from I to I∗. Unfortunately, the synthesized interface I∗ is not optimal with respect to the adapted human transformation eH. In fact, implementing I∗ in-the-loop with eH could yield arbitrarily bad performance [44]. 
+
+B. Co-adaptation 
+
+The preceding observations motivate the study of interfaces that co-adapt with the human and, hence, regard the human H
+
+and interface I as two learners [19], [20] playing a dynamic game [45] through their interaction with the machine M .As a starting point for modeling this interaction, prior work suggests the human may play this game by solving their own optimization problem [27]–[30] 
+
+min  
+
+> H
+
+|| H/M/I || H (2) where the norm ∥·∥ H encodes what components of z the human seeks to make as small as possible. Other than in the  
+
+> .CC-BY-NC-ND 4.0 International license available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint this version posted June 14, 2026. ;https://doi.org/10.1101/2023.07.14.549053 doi: bioRxiv preprint JOURNAL OF L ATEX CLASS FILES, MAY 2026 3
+
+special case where the goals of the human and interface are perfectly aligned so that ∥·∥ I = ∥·∥ H, the outcome of the game defined by simultaneously considering the optimization problems in (1) and (2) will generally represent a compromise between the player’s conflicting goals. One such outcome con-sidered in prior work on human-machine interfaces [19], [32], [33], [37] is a Nash equilibrium [45], [46] defined by a pair of transformations H∗, I∗ such that H∗ minimizes H/M/I ∗
+
+> H
+
+with respect to H and I∗ minimizes H∗/M/I I with respect to I.
+
+C. Non-existence of Nash equilibria 
+
+This section provides theoretical analysis of the dynamic game defined in the preceding section that is played by a human H and interface I interacting with a machine M . We will assume in what follows that H, M , and I are finite-order linear time-invariant (LTI) transformations of continuous-time signals. The game of interest is specified by the coupled optimization problems 
+
+min  
+
+> H
+
+H/ (M/I ) H (3a) 
+
+min  
+
+> I
+
+(H/M )/I I (3b) where ∥·∥ H, ∥·∥ I denote the cost functions of the human and interface, respectively, and the closed-loop transformations 
+
+H/ (M/I ) = H/M/I = ( H/M )/I are defined in Fig. 2. The simplified block diagrams in Fig. 2 are useful to illustrate (i) the combined machine-interface system (M/I ) the human H
+
+interacts with and (ii) the combined human-machine system 
+
+(H/M ) the interface I interacts with. Given LTI transformations M and I, the (central, strictly feasible) solution H∗ of the optimization problem in (3a) with respect to the 2- or ∞-norm is, under standard sta-bilizability and detectability conditions, an LTI transforma-tion [31, Thm 14.7] that can be computed using efficient algorithms [41]. With the exception of the special cases con-sidered in prior work [32]–[34] (termed full information and 
+
+full control in [31], [47]), the number of state variables in the dynamics of H∗ (the system’s order ) is equal to the sum of the number of state variables in M and I; if we let #( T ) denote the number of state variables in the LTI transformation T , this property can be written #( H) = #( M ) + #( I). Similarly, given LTI transformations H and M , the solution I∗ of the optimization problem in (3b) is an LTI transformation, and the number of state variables in I∗ equals the sum of the number of state variables in H and M : #( I) = #( H) + #( M ). We will assume this generic condition holds in what follows. We will show in the Theorem below that the game in (3) generally has no Nash equilibrium defined in terms of finite-order LTI transformations when M has dynamics, i.e., #( M ) ≥ 1. To see why this may be the case, consider the co-adaptive interaction wherein H and I alternately solve their optimization problems ((3a) and (3b), respectively). Even starting from a static interface with #( I) = 0 , solving (3a) with respect to given M and I yields a solution H∗ with 
+
+#( H) = #( M ) ≥ 1, so subsequently solving (3b) with respect to given H∗ and M yields solution I∗ with #( I) = #( H) + #( M ) = 2 #( M ) ≥ 2. Iterating this process yields a sequence of H and I with ever-increasing numbers of state variables, preventing the existence of a stationary point for (3) in the sense of Nash defined with finite-order LTI transforms. 
+
+Theorem: Suppose M is a finite-order linear time-invariant (LTI) transformation with dynamics so that 1 ≤ #( M ) < ∞,and suppose that ∥·∥ H and ∥·∥ I are system 2- or ∞-norms. If there exists a Nash equilibrium for (3) defined in terms of finite-order LTI transformations H∗, I∗, then at least one of 
+
+H∗/M or M/I ∗ is full information or full control. 
+
+Proof (by contradiction): Suppose there exists a Nash equilibrium H∗, I ∗ for (3) such that H∗ and I∗ are LTI and have finite order. If neither H∗/M nor M/I ∗ is full information or full control, then [31, Thm. 14.7] implies 
+
+#( H∗) = #( M ) + #( I∗) and #( I∗) = #( H∗) + #( M ).Substituting the second equation from the preceding sentence into the first and simplifying yields 0 = 2 #( M ). But since 
+
+#( M ) ≥ 1, this equation is a contradiction. 
+
+Remark: The co-adaptation games studied in prior work [19], [32]–[34], [37] consider only the full information case, where it is assumed that the interface can observe the state of the machine M and human H with no measurement noise and similarly the human can observe the state of the machine and interface I with no noise. In this case, the game can admit a Nash equilibrium defined in terms of static state feedback transformations for H and I [45, Sec. 6.2.2]. 
+
+Example: The neuroprosthetic example from the introduction illustrates why full information or full control assumptions are unrealistic. Indeed, full information would require both adaptive agents – human and interface – have noise-free measurements of all system states, including those internal to the other adaptive agent. Similarly, full control for either agent would require that agent to directly influence all system states, including those internal to the other; although it might be possible in principle to give the brain full control over the machine and interface, it seems implausible (and perhaps undesirable) for the interface to have full control over the human’s neural state. Either assumption seems inconsistent with our understanding of neural dynamics [35]. 
+
+Remark: The preceding Theorem only applies to the case where H, M , and I are all finite-order LTI transformations as in [31]. Indeed, solutions of multi-agent stochastic optimal control problems need not be linear even if dynamics are linear and disturbances are Gaussian [48]; we cannot say at present whether the human-machine game considered here has nonlinear stationary points. Furthermore, the techniques in [31] are not applicable in the presence of delay or other common structural constraints, which necessitate the use of new tools [42]. 
+
+III. M ETHODS 
+
+The experiment and computational analysis were designed to determine whether and how human-machine interfaces (HMI) co-adapt, and to characterize how co-adaptation affects human, interface, and system performance relative to a non-adaptive baseline . 
+
+> .CC-BY-NC-ND 4.0 International license available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint this version posted June 14, 2026. ;https://doi.org/10.1101/2023.07.14.549053 doi: bioRxiv preprint JOURNAL OF L ATEX CLASS FILES, MAY 2026 4
+
+y
+
+Mym
+
+d H I
+
+uI
+
+uH
+
+uH
+
++
+
+Ibase 1 1
+
+adb c
+
+Ibase                     
+
+> Fig. 3. Human subjects experiment design. (a) Participants provide output
+> uHusing a 1D manual device to ( b) control the position of a cursor yon a computer display to minimize the distance to a reference line in the middle of the screen. ( c) Human H, machine M, and interface Iare connected in series, with the human viewing cursor yand producing response uHthat is input to I. The machine output is perturbed by external disturbance signals
+> d. ( d) Experiment conditions and trial structure. Tindicates the number of trials (e.g., T= 3 means there are 3 trials in the block). Three conditions (0th-, 1st-, and 2nd-order interface) are presented in random order, followed by 3 pass-through trials after each block.
+
+A. Human subjects 
+
+Eleven participants were recruited (age: 19-36; gender: 6 women, 5 men; hand dominance: 10 right-handed, 1 left-handed). All were daily computer users. All participants pro-vided informed consent according to the University of Wash-ington, Seattle’s Institutional Review Board (IRB #00000909). 
+
+B. Task 
+
+Participants controlled a one-dimensional (1D) cursor using a 1D slider (35 ×12 ×22 mm rectangular handle on a 10 cm slide potentiometer; Figure 3a). The slider input uH was transformed through interface I and a fixed machine M to produce cursor position y on the screen (Figure 3c). Partici-pants were instructed to keep the cursor as close to the center line, y = 0 , as possible (Figure 3b). We chose a nonminimum-phase second-order machine to increase task complexity [2]: 
+
+¨m + 3 .6 ˙ m + 4 m = −2( ˙ uI − 2.2uI ),M (s) = −2( s − 2.2) 
+
+s2 + 3 .6s + 4 ,y = m + d, 
+
+(4) where ˙m represents the time-domain machine output m
+
+differentiated by time, M (s) is the continuous-time rep-resentation of transformation M in the frequency do-main, s = jω . The cursor position y was updated at 60 Hz, so the continuous-time machine was discretized (scipy.signal.cont2discrete ). We introduced an unpredictable disturbance d to the cur-sor (Figure 3c), which mimics the measurement or pro-cess noise from external devices. Following prior work [3], [26], [49], disturbance signals were constructed as a sum of sinusoidal signals with the first eight prime multiples of a base frequency of 1/20 Hz (stimulated frequencies 
+
+Ω = [0 .10 , 0.15 , 0.25 , 0.35 , 0.55 , 0.65 , 0.85 , 0.95] Hz). The magnitudes at each frequency component was normalized by its frequency to ensure constant signal power. The phase of each frequency component was randomized in each trial to produce pseudorandom time-domain signals. 
+
+C. Signal processing 
+
+Prior work demonstrated that when humans are tasked with tracking references and rejecting additive disturbances through a linear time-invariant (LTI) [36, Ch. 3, pg. 4] system M ,humans behave approximately like LTI transformations for a range of reference and disturbance signals [1], [3], [49]. Thus, we can analyze our system in Figure 3c using the frequency-domain representations [50, Ch. 5] of signals and LTI systems. In this paper, time-domain signal x with a “hat” b· denotes the Fourier transform, bx, in the frequency-domain. We recorded time-domain signals y and uH at each sam-pling interval, and collected the updated interface dynamics I
+
+for each trial. In post-hoc analysis, we converted these signals into their frequency-domain forms, by and buH , for each trial, then derived the interface input buI and the human transforma-tion H (feedback controller) at stimulated frequencies: 
+
+buI = I(jω )buH (jω ) (5a) 
+
+H(jω ) = buH (jω )
+
+by(jω ) , (5b) where ω ∈ Ω. Given this H, the prescribed signals d, and transformations M, I , we can additionally derive the steady-state signals via block diagram algebra [36, Sec. 2.2]: 
+
+by(jω ) = bd(jω )1 + H(jω )M (jω )I(jω ) ,
+
+buH (jω ) = H(jω )by(jω ),
+
+buI (jω ) = I(jω )H(jω )by(jω ),
+
+(6) which were used in the interface updates (section III-E). 
+
+D. Conditions 
+
+We tested interfaces that have 0th-, 1st- and 2nd-order dynamics (Table I), corresponding to the position-, velocity-, and acceleration-based systems [1] (Figure 3d). Participants first completed 3 trials of a pass-through interface with an identity mapping (I(z) = 1, i.e., uI [t] = uH [t]), then performed the three interface conditions in random order. Each condition block consists of 3 baseline trials, followed by 15 trials of co-adaptation, and 3 additional baseline trials. At the end of each condition block, participants completed another 3 pass-through trials, with a total of 12 pass-through trials per participant. Each trial was 40 seconds after a 5-second ramp-up (45 seconds total). Participants were encouraged to rest between trials and required to take a three-minute break between condition blocks. Total experimental duration was approximately 2 hours per participant. 
+
+E. Interface adaptation Interface cost: We defined an interface cost that minimizes human effort in addition to its own effort and task error [34]. The cost function was a linear combination of task error, interface effort, and human effort: 
+
+cI (H, I ) = ∥(by, bu)∥∥ bd∥ = ∥by∥ + λI ∥buI ∥ + λH ∥buH ∥∥ bd∥ (7)                      
+
+> .CC-BY-NC-ND 4.0 International license available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint this version posted June 14, 2026. ;https://doi.org/10.1101/2023.07.14.549053 doi: bioRxiv preprint JOURNAL OF L ATEX CLASS FILES, MAY 2026 5
+> TABLE I
+> The discrete-time representations of 0th-, 1st-, 2nd-order, and pass-through interfaces tested in the experiment. z=ejωdt , where dt = 1 /60 second.
+> condition dynamics baseline 0th I0(z) = bI0,base (z) = 5
+> 1st I1(z) = b0z+b1
+> z+aI1,base (z) = 1.55 z−1.55
+> z−0.98
+> 2nd I2(z) = b0z2+b1z+b2
+> z2+a0z+a1I2,base (z) = 1.06 z2−2.12 z+1 .06
+> z2−1.99 z+0 .99
+> pass-through Ipass (z) = 1
+
+with penalty terms λI = 0 .5 and λH = 1 .5, which were estimated from pilot data to ensure the scaled interface and human efforts were within the same order of magnitude as the task error. We further scaled the interface penalty λI by half to avoid optimization from getting stuck at the smallest possible interface magnitudes. We used 2-norm to match the task instruction of minimizing the cumulative cursor displacement. 
+
+Interface parameters discretization: The parameter space for each interface order was discretized into three candidate lists Ilist of transfer-function coefficients ( a, b in Table I). 
+
+1) 0th-order interfaces: gain b ∈ [0 .05 , 5] to ensure interface remained responsive to user input without becoming unman-ageably volatile, sampled at 100 equidistant points. 
+
+2) 1st-order interfaces: We generated 1st-order high-pass interfaces by sweeping gains ( 0.05 to 5) and cutoff frequencies (0.05 to 1 Hz), with 100 equidistant points per range. The cutoff range was selected to align with the low-frequency crossover observed in human manual control tasks [3], [51]. Since the cursor updated at 60 Hz, we mapped continuous-time interface dynamics to their discrete-time representa-tions. To ensure interfaces are stable or marginally stable, we excluded any interfaces where the eigenvalues of the denominator exceeded |1| in discrete time. We also excluded configurations resulting in negative DC gain at z = 1 , to prevent control inversion, which our pilot participants reported as confusing and counter-intuitive. This resulted in a global parameter set of 8,546 combinations of coefficients ( b0, b 1, a ). 
+
+3) 2nd-order interface: We generated 2nd-order high-pass in-terfaces by sweeping gains ( 0.05 to 5), cutoff frequencies ( 0.05 
+
+to 1 Hz), and damping ratios ( 0.5 to 1), with 50 points per parameter for computational efficiency. Damping ratios below 1 were selected to ensure the interfaces remained stable and avoided aggressive noise amplification. We again computed the discrete-time representation of each interfaces, and then excluded configurations where interfaces were unstable or had negative DC gain, yielding a global set of 87,038 combinations of coefficients ( b0, b 1, b 2, a 0, a 1). For both 1st- and 2nd-order interfaces, we also explored low- and band-pass filters in pilot testing, but they consistently yielded higher task errors than high-pass filters. Thus, we restricted our adaptation framework to high-pass interfaces, as their phase-lead characteristic [52, Ch. 7.11] has the potential to compensate for sensorimotor delays in the nervous system. 
+
+Interface baselines: We started and ended each condition block with a baseline interface: 0th-order I0,base , 1st-order 
+
+I1,base , and 2nd-order I2,base . Having different orders of base-lines allowed for a controlled comparison within the same interface complexity, so we could verify whether improve-ments stem from co-adaptation or were simply an artifact of transitioning to a higher-order interface. We also use the baselines as the starting interfaces in co-adaptation. We synthesized the baseline interfaces using pilot subject data, where 6 pilot subjects performed the same dynamic game with a pass-through interface ( I = 1 ) and the second-order machine defined in (4). We estimated human transformations as (5b), then determined the optimal interface by searching through the parameter space Ilist to minimize the interface cost 
+
+cI (H, I ) in (7), for each of the three conditions. We used these three optimal interfaces as the baselines, and all participants used the same baselines. 
+
+Interface updates: The interface update occurred at the end of every co-adaptation trial for a total of 15 trials for each condition. The interface updates occurred in three steps. 
+
+1) Human model: we estimated human transformation H
+
+in (5b) for each trial. This model was subsequently updated as a weighted combination between the historical estimate H−
+
+and the current trial’s estimate H:
+
+H+ = αH H− + (1 − αH )H (8) where αH = 0 .75 for gradual updates in the human model. For the first co-adaptation trial, the human model was initialized using data from the 3 preceding non-adaptive baseline trials. 
+
+2) Interface grid search: For each candidate interface in Ilist ,we computed the steady-state signals ˆy, ˆuH , ˆuI using (6) and generated d with random phase, then performed a grid search to identify a parameter set that minimizes the interface cost: 
+
+I∗ = arg min  
+
+> I
+
+cI (H+, I ). (9) 
+
+3) Interface updates: Smooth Batch [13] was implemented to ensure gradual interface changes between trials. The interface for the subsequent trial I+ was defined as a weighted com-bination of the previous trial’s interface I− and the optimal interface I∗:
+
+I+ = αI I− + (1 − αI )I∗, (10) where αI is the adaptation rate. We employed a conservative adaptation rate of αI = 0 .75 in this study. We selected this adaptation rate because previous studies using the Smooth Batch algorithm suggested that aggressive adaptation rates may lead to poor convergence [53]. A pseudo-code summa-rizing the steps of the interface update is in Algorithm 1 .
+
+F. Evaluation 
+
+We evaluated our experimental results against the following three hypotheses. 
+
+H1 (whether co-adaptation occurred): We tested whether humans and interfaces changed after 15 trials of adaptation compared to non-adaptive baselines. For each condition (0th-, 1st-, 2nd-order), we compared the distributions ( N = 11 ) of  
+
+> .CC-BY-NC-ND 4.0 International license available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint this version posted June 14, 2026. ;https://doi.org/10.1101/2023.07.14.549053 doi: bioRxiv preprint JOURNAL OF L ATEX CLASS FILES, MAY 2026 6
+
+Algorithm 1 Interface update during co-adaptation Human completes a trial with I−.
+
+Input: Human response buH , disturbance bd, and human transformation H− of the previous trial. 
+
+Output: Next interface I+.Compute human transformation (5b) H(jω ) = buH (jω ) 
+
+> by(jω )
+
+.Update human model as (8) H+ = αH H− + (1 − αH )H.
+
+for all I in Ilist do 
+
+Compute by, buH , buI (6). Compute interface cost (7): cI = ∥by∥+λI ∥buI ∥+λH ∥buH ∥∥ bd∥ .
+
+end for 
+
+Find optimal interface I∗ = arg min I cI (H+, I ).Update the next interface I+ = αI I− + (1 − αI )I∗.transformations, human ∥H∥ and interface ∥I∥, between the co-adapted final interface (averaged of last 3) and the non-adaptive baseline (average of 6 baseline trials) using paired 
+
+t-tests at each stimulated frequency ( α = 0 .05 ). The null hypothesis H1 0 is: there is no significant difference in the transformations of either the interface or the humans after adaptation compared to their respective baselines. 
+
+H2 (baselines vs. pass-through): We investigated whether the three baselines ( I0,base , I1,base , I2,base ; Table I) improved from having “no interface” (pass-through with I = 1 , Ipass )in terms of the interface cost cI (H, I ) defined in (7). We first confirmed normality of the average cost of each group using Shapiro-Wilk test ( p > 0.05 ), then performed one-way ANOVA to compare the groups. We used paired t-tests with Bonferroni correction as post-hoc tests. The null hypothesis 
+
+H2 0 is: there is no significant difference in performance between baselines and pass-through. 
+
+H3 (adaptive vs. non-adaptive): Our primary outcomes of interest were the differences in performance with and without co-adaptation. Because our algorithm explicitly optimizes the interface cost, we identified the reduction of this cost as the primary indicator of performance improvement. Additionally, we assessed changes in task error, human effort, and inter-face effort to reflect the practical goal of maximizing task performance while minimizing burdens from both agents. We defined our performance metrics as follows: 
+
+1) Task error : norm of the cursor displacement by(jω ) at the stimulated frequencies of a trial. 
+
+2) Human effort : norm of the manual device inputs buH (jω )
+
+at the stimulated frequencies of a trial. 
+
+3) Interface effort : norm of the interface inputs buI (jω )
+
+calculated in (5a) at the stimulated frequencies of a trial. 
+
+4) Interface cost : cI (H, I ) defined in (7) at the stimulated frequencies of a trial. 
+
+5) Stability margin : the stability margin of the open loop transfer function L(jω ) = H(jω )M (jω )I(jω ), by calculating the absolute distance between L(jω ) and the critical point −1
+
+in Nyquist plot. Higher value indicates better stability margin. We confirmed normality using Shapiro-Wilk test ( p > 0.05 ), and used paired t-tests to compare the co-adapted final trials (average of last 3) and baseline trials (average of 6) in each performance metric, for each condition. The null hypothesis 
+
+H3 0 is: there is no significant difference in each performance metric between co-adapted finals and baselines. We used Python 3.11 for Shapiro-Wilks tests, ANOVA test, and paired t-tests. Data and analyses to reproduce the results are available in a publicly-accessible repository [54]. 
+
+G. Human system identification 
+
+To characterize co-adaptation in simulation, we needed to first identify a parsimonious model of the human feedback controller in post-hoc. In a previous study, we estimated the human controller in 2nd-order machine interaction using the crossover model in [1]: 
+
+H(jω ) ≈ k(jω + 1) e−jωτ . (11) We estimated the human gain k and sensorimotor delay τ from prior experimental data in [3], which had the same disturbance-rejection task but a simpler 2nd-order machine dynamics. We reported in [55] with the average human gain and delay of 
+
+k = 2 .75 and τ = 0 .321 seconds, respectively. In this study, since finite-order interfaces were introduced into the system, the crossover model with a 2nd-order machine may no longer apply. However, humans do not implement arbitrarily high-order transformations [1], [43]. Therefore, we started with models incorporating the lowest possible degrees of dynamics: 1st- and 2nd-order dynamics, each with a human sensorimotor delay of τ = 0 .321 :
+
+Hfit, 1st (jω ) = b0z + b1
+
+z + a0
+
+e−jωτ ,Hfit, 2nd (jω ) = b0z2 + b1z + b2
+
+z2 + a0z + a1
+
+e−jωτ .
+
+(12) We fit the 1st- and 2nd-order models to the empirical human transformation by minimizing the difference between the modeled and empirical data. Specifically, we performed a grid search of parameters a, b over the range [−10 , 10] , and performed optimization with the L-BFGS algorithm. 
+
+H. Co-adaptation simulation 
+
+Building upon our theoretical framework and experimental observations, we conducted a simulation to derive a computa-tional model of the HMI co-adaptation. The objective was to identify the simulation parameters that best approximate our empirical results. Since our theory showed that there can be no Nash equilibrium when the order of the human and interface dynamics are unbounded, we constrained the simulation to low-order system dynamics for both human and interface. We evaluated the fit for both 1st- and 2nd-order human models with sensorimotor delay (Section III-G), and selected the model order that most accurately captured the empirical human transformations. Following prior work [37], [53], we modeled human adaptation as the minimization of a cost function defined as a linear combination of task performance and human effort, mirroring the structure of the interface cost: 
+
+cH (H, I ) = ∥(by, buH )∥∥ bd∥ = ∥by∥ + μH ∥buH ∥∥ bd∥ . (13)  
+
+> .CC-BY-NC-ND 4.0 International license available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint this version posted June 14, 2026. ;https://doi.org/10.1101/2023.07.14.549053 doi: bioRxiv preprint JOURNAL OF L ATEX CLASS FILES, MAY 2026 7
+
+We applied an alternating optimization procedure to syn-thesize the optimal human H∗ and interface I∗ in simulation. Starting with the baseline Ibase as the initial interface, we synthesized H∗ by minimizing human cost in (13). We im-posed constraints on the human model to reflect physiological limitations: a phase constraint of ∠H < π because humans cannot predict future task signals, and a magnitude constraint of |H| ≤ 2.5 for frequencies ≥ 0.55 Hz to account for the limited human control bandwidth. Human parameters 
+
+b0, b 1, b 2, a 0, a 1 in (12) were randomly initialized over the range [−20 , 20] and the optimal human H∗ was obtained by minimizing the non-convex cost using the Sequential Least Squares Programming (SLSQP). Subsequently, we held H∗ constant and synthesized I∗ by minimizing the interface cost cI (H, I ) using the experimental algorithm. This alternating optimization was iterated 15 times, mirroring the 15 trials performed in the empirical study. We performed a parameter sweep of the penalty terms, 
+
+λI , λ H in (7) and μH in (13), across the range [0 .5, 10] .The optimal set of penalties was identified by minimizing the difference between the simulated and the experimental data. Model performance was evaluated using the standardized distance ( z-score): z = ˆx−¯xσ , where ˆx denotes the simulated value, and ¯x and σ represent the mean and standard deviation of the empirical subject data, respectively. A simulated result was considered consistent with experimental result if |z| < 1.IV. E XPERIMENTAL RESULTS 
+
+Eleven participants completed the disturbance-rejection task in the presence of a dynamic machine in (4), over a sequence of 21 trials (3 non-adaptive baselines; 15 co-adaptations; 3 non-adaptive baselines) in each of the three conditions presented in random order: 0th-, 1st, and 2nd-order interfaces (Table I). 
+
+A. Humans and interfaces co-adapted 
+
+We tested our first hypothesis, whether humans and inter-faces co-adapted in our experiment ( H1 ). We found significant differences between the magnitudes of non-adaptive baseline interfaces (dashed lines; Figure 4a) and the co-adapted final interfaces (blue lines; Figure 4a), where p < 0.05 at all eight stimulated frequencies. This implies that in all three conditions, after 15 trials of co-adaptation, interfaces adapted to a different interface than the baseline. We then examined human adaptation in response to these interface adaptations. We found significant differences be-tween human transformations in baseline trials (dashed lines; Figure 4b) and co-adapted final trials (red lines; Figure 4b). These differences p < 0.05 were present across the majority of stimulated frequencies, particularly in the low-frequency range (< 0.55 Hz). Thus, we reject the null hypothesis H1 0.In addition, we observed a trade-off in magnitude shifts of the human and interface agents. In the 0th-order condition, in-terface magnitudes decreased relative to baseline while human magnitudes increased. Conversely, in the 1st- and 2nd-order conditions, we observed that interface magnitudes increased, whereas human magnitudes decreased. These results provide evidence of a trade-off between the two decision-making agents as they co-adapt in this dynamic game. 
+
+B. High pass interfaces improved performance 
+
+We tested our second hypothesis, whether the baseline interfaces would yield a different performance than the pass-through interface ( H2 ). We defined our primary performance metric as the interface cost cI (H, I ) in (7). One-way ANOVA with post-hoc paired t-tests found no statistically significant difference in interface cost between the 0th-order baseline and the pass-through ( t(10) = 0 .097 , cor-rected p = 1 ). Furthermore, participants subjectively reported in 0th-order baseline trials that the cursor was overly “sensi-tive”, likely due to the large input scaling of 5 ( I0,base = 5 ). In contrast, interface costs for the 1st- and 2nd-order base-lines were significantly lower than those of the pass-through condition (1st-order: t(10) = 8 .76 , corrected p < 0.001 ; 2nd-order: t(10) = 9 .98 , corrected p < 0.001 ). These findings demonstrate that the order of the interface dynamics influenced system performance, with higher-order (1st- and 2nd-order) high-pass interfaces yielding better performance relative to the pass-through baseline. Thus, we fail to reject the null hypothesis H2 0 for the 0th-order condition, and reject the null hypothesis for the 1st- and 2nd-order conditions. 
+
+C. Performance improved or maintained after co-adaptation 
+
+We evaluated the effect of co-adaptation using five perfor-mance metrics: task error ∥by∥ (cursor displacements), human effort ∥buH ∥ (human responses), interface effort ∥buI ∥ in (5a), interface cost cI (H, I ) in (7), and the stability margin of the open-loop transfer function L = HM I . We tested our third hypothesis, whether the co-adapted interfaces yielded a different performance than the non-adaptive baselines ( H3 ). In the 0th-order condition, task error (Figure 5a) was sig-nificantly reduced in the co-adapted final interface compared to the 0th-order baseline ( p < 0.001 ). For the 1st- and 2nd-order interfaces, while the median task errors showed a slight decrease, these differences did not show statistical significance (1st-order: p = 0 .14 ; 2nd-order: p = 0 .65 ). Given that 1st-and 2nd-order baselines significantly outperformed the pass-through condition in task error, these findings suggest that the 1st- and 2nd-order baselines already yielded relatively good task performance, and that task performance was maintained after co-adaptation. We observed that human effort and interface effort exhibited divergent trends across conditions (Figure 5b, c). Human effort was significantly higher in the co-adapted final interface com-pared to the baselines for the 0th-order condition ( p < 0.01 ), whereas it was significantly reduced in both the 1st- and 2nd-order conditions (1st-order: p < 0.01 ; 2nd-order: p < 0.01 ). In contrast, interface effort was significantly lower in the co-adapted final interface compared to the baselines for the 0th-order condition ( p < 0.001 ), and was significantly higher in both the 1st- and 2nd-order conditions (1st-order: p = 0 .044 ;2nd-order: p = 0 .048 ). Regarding the interface cost (Figure 5d), which was the metric explicitly minimized by our algorithm, we observed               
+
+> .CC-BY-NC-ND 4.0 International license available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint this version posted June 14, 2026. ;https://doi.org/10.1101/2023.07.14.549053 doi: bioRxiv preprint JOURNAL OF L ATEX CLASS FILES, MAY 2026 8
+> Fig. 4. Experiment results on human-interface co-adaptation. Spectral density plots (median and interquartile, N= 11 participants) of (a)magnitudes of pass-through interface ( I= 1 ), non-adaptive baseline interfaces (dashed lines), and co-adapted final interfaces (blue lines) for the 0th-, 1st-, and 2nd-order conditions at the stimulated frequencies. (b)Magnitudes of human transformations in pass-through trials, non-adaptive baseline trials (dashed lines), and the co-adapted final trials (red lines) for the 0th-, 1st-, and 2nd-order interfaces. Statistically significant differences between baselines and co-adapted final transformations are shown with an asterisk ( ∗p < 0.05 , paired t-test at each stimulated frequency).
+
+a significant reduction for the 0th- and 1st-order co-adapted interfaces compared to their respective baselines (0th-order: 
+
+p = 0 .013 ; 1st-order: p = 0 .048 ). No statistically significant difference was observed for the 2nd-order condition ( p = 0 .1). We evaluated robustness by comparing the stability margin of the open-loop transfer function L between the co-adapted final trials and the non-adaptive baselines (Figure 5e). we observed a significantly higher stability margin for the 0th-order co-adapted interface compared to the 0th-order baseline (p < 0.01 ). No significant difference was identified for the 1st-order condition ( p = 0 .29 ). For the 2nd-order condition, however, the co-adapted interface demonstrated a significant reduction in stability margin relative to the baseline ( p = 0 .03 ). In summary, co-adaptation improved or maintained some system performance metrics, including task error and interface cost. The effort between human and interface agents shifted variably across conditions. However, co-adaptation did not necessarily enhance robustness. These findings led us to reject the null hypothesis H3 0.V. C OMPUTATIONAL RESULTS 
+
+Following the system identification procedure (Sec-tion III-G), we modeled the human dynamics using both 1st- and 2nd-order system architectures with sensorimotor delay. We found that the 2nd-order model in (12) fit the empirical distribution well (Figure 6a). The two distributions (magnitudes of Hfit and Hexp ) exhibited Pearson correlation coefficients of at least r > 0.88 at every stimulated frequency (p < 0.001 ). The 1st-order model had a relatively poorer fit than the 2nd-order model, with Pearson correlation coefficients of at least r > 0.77 at every stimulated frequency ( p < 0.01 ). We therefore used the 2nd-order human model with sen-sorimotor delay to simulate a human-like agent interacting with the 1st-order adaptive interface in the experiment. In this simulation, we modeled human behavior by adopting a cost function analogous to the interface agent’s optimization strategy, defined in (13). We simulated the co-adaptation process exclusively for the 1st-order interface. This selection was based on experimental findings that only the 1st-order interface achieved significant improvements in interface cost relative to both the baseline ( p = 0 .048 ) and the pass-through interface ( p < 0.001 ) (Figure 5d). We conducted a parameter sweep over the penalty terms (λI , λ H in (7), and μH in (13)) in range [0 .5, 10] and identified the optimal configuration that minimized the deviation from empirical data ( λI = 1.32 , λ H = 5.5, μ H = 2.04 ). The fit was validated by calculating the standardized distance ( z-score) between the simulated and experimental magnitudes at each stimulated frequency. We found that |z| < 1 across all stimulated frequencies for the interface magnitudes ( ∥I∥, blue in Figure 6b). Similarly, for the human magnitude ( ∥H∥, red in Figure 6b), |z| < 1 across all frequencies except 0.85 Hz. These results indicate that the simulated result consistently remained within one standard deviation of the experimental mean, thus demonstrating good correspondence between the model and empirical outcomes. We analyzed the evolution of the cost function components 
+
+buI , buH , and by, normalized to each trial’s difference to the initial trial (Figure 6c). Simulation results indicate that as interface effort gradually increased and task error decreased, human effort increased and then declined slightly, with the system reaching equilibrium after 15 trials of co-adaptation. These simulation trends demonstrated the effort and error trade-off. With the penalty term for human effort ( μH = 2 .04 ), we computed the inferred human cost for the 1st-order interface condition in our experiment. It is important to note that these values represent model-based inferences rather than direct measurements from the experimental data. We observed that the inferred human cost significantly decreased after co-adaptation compared to the non-adaptive baseline (Figure 6d). This finding demonstrates that our proposed framework with                                     
+
+> .CC-BY-NC-ND 4.0 International license available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint this version posted June 14, 2026. ;https://doi.org/10.1101/2023.07.14.549053 doi: bioRxiv preprint JOURNAL OF L ATEX CLASS FILES, MAY 2026 9
+> Fig. 5. Experiment results on performance . Boxplots (0th, 25th, 50th, 75th, and 100th percentiles, N= 11 participants) of each performance metric for pass-through (average of 12 trials), baselines (average of 6 trials), and adaptive interfaces (average of initial 3 trials and average of final 3 trials). (a)task error ∥by∥(lower values are better), (b)human effort ∥cuH∥,(c)interface effort ∥cuI∥,(d)interface cost cI(H, I )defined in (7) (lower values are better), and (e)stability margin (higher values are better). Statistically significant differences are shown with horizontal lines and asterisks ( ∗for p < 0.05 ,∗∗ for
+> p < 0.01 , and ∗∗∗ for p < 0.001 ; paired t-test).
+
+a specific, simplified human cost function structure replicated the observed experimental outcomes. VI. D ISCUSSION 
+
+Machine learning algorithms are being deployed in-the-loop with people [56]. It is important to predict the outcome of these interactions to guarantee safety and performance in disparate applications including brain-machine interfaces [13], [16], [53], human-robot interaction [6], [22], [23], [33] and assistive devices [8]–[12], [15]. These interactions are in-creasingly viewed through the lens of game theory [4], [7], [19], [20], [32], [33], [37], [39], [53], [57], [58], where it is hypothesized that the human’s behavior arises from the solution of an optimization problem [27]–[30], [59] and the adaptive agent similarly optimizes its own cost. However, prior work makes assumptions on the ability of people to solve these optimization problems that we regard as unreasonable. In this study, we sought to systematically test the outcome of HMI co-adaptation and compare experimental results with predictions from theory and simulations. We adopted a human-in-the-loop control paradigm wherein participants stabilized a complex (nonminimum-phase) control system through a dynamic interface as in Figure 3. This paradigm was in-tended to instantiate the fundamental challenges inherent in more embodied applications involving neural measurements or physical interaction with a robot or assistive device. Our testbed enables complete control over the system dynamics and external disturbances that facilitate precise comparison of experimental results with theoretical and computational predictions. 
+
+A. Limitations of theoretical predictions 
+
+A leading hypothesis in the human motor control literature is that people solve an H2 optimal control problem and implement a linear-quadratic Gaussian (LQG) controller to move their bodies [27], [28]. Prior work on co-adaptation [32]– [34] specialized this model further by considering the full information case where the human is assumed to have noise-free observations of the system state. The full information case has the appeal that it admits a Nash equilibrium defined in terms of static state feedback matrices [45, Sec. 6.2.2], but we argue that it is unrealistic to assume each agent has perfect knowledge of both the environment and the other agent. Considering the more general model without full informa-tion (or full control), we find a different theoretical objection: if both the human and adaptive system solve H2 optimization problems, there can be no Nash equilibrium for the co-adaptive system defined in terms of finite-order LQG controllers. The                                       
+
+> .CC-BY-NC-ND 4.0 International license available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint this version posted June 14, 2026. ;https://doi.org/10.1101/2023.07.14.549053 doi: bioRxiv preprint JOURNAL OF L ATEX CLASS FILES, MAY 2026 10
+> Fig. 6. Computational results with a 1st-order interface. (a)Spectral density plots with distributions (median and interquartile, N= 11 participants) of (top) magnitudes and (bottom) phases of the 2nd-order model fit Hfit and the empirical human transformation Hexp .(b)Spectral density plots of the (left) simulated interface Isim and (right) simulated human Hsim overlaid on empirical data Iexp , H exp of every subject ( N= 11 participants). Each line is the average of 3 co-adapted final trials from one of the subjects. (c)Difference between each trial Tand the first trial T= 1 in simulation, for each element in the interface cost defined in (7): interface effort, human effort, and task error. Trial-wise metrics were plotted as deviations from the first trial, normalized by the maximum deviation, so the largest absolute change from baseline corresponds to ±1.(d)Boxplot (0th, 25th, 50th, 75th, and 100th percentiles, N= 11
+> participants) of the inferred human cost, with the μHvalue found in simulation, of 1st-order baseline and the 1st-order adaptive trials (initial and final). Statistically significant difference is shown with a horizontal line and asterisks ( ∗∗ for p < 0.01 ; paired t-test).
+
+reason for this is a simple counting argument: since an LQG controller generally has the same order as the system it controls, and since the system one agent controls includes the dynamics of the other agent as in Figure 2, it is not possible for these system orders to “add up” to consistent quantities. Of course the Nash equilibrium is not the only candidate outcome [39]. But this thought experiment reveals an even more fundamental objection to this model for human behavior: it is simply not plausible that people are able to implement LQG controllers of arbitrary system order – they must have bounded rationality [59], [60]. These observations motivated us to conduct an experiment with adaptive systems that had fixed system orders toward the goal of understanding how people actually play this class of human-in-the-loop game. 
+
+B. Co-adaptation shaped behavior and performance 
+
+We observed co-adaptation in our experiments: the baseline and final co-adapted human and interface transformations were different for all interface orders in Figure 4. Of course, the interface adapts by design – it repeatedly solves the optimization problem in (9). But there is no guarantee that (i) the human will adapt in response and (ii) the outcome of this interaction will differ from baseline. The fact that we observed both (i) and (ii) is particularly significant since we started with a baseline that was synthesized using prior knowledge of human behavior [55], i.e., our baseline was not na¨ ıve. Our experimental results demonstrate potential advantages – and drawbacks – of deploying adaptive interfaces in-the-loop with humans and dynamic machines. Since our interface sought to minimize the cost in (7), it seems natural to expect this cost to decrease in the experiment. However, this decrease is not guaranteed due to the presence of human adaptation, as co-adaptive interactions may converge to a constellation of equilibrium outcomes [39]. We observed significant decreases in this cost for the 0th- and 1st-order interfaces but not for the 2nd-order interface (Figure 5d), confirming performance gains are not guaranteed. A similar observation holds for the stability margin of the closed-loop system: solving the interface’s H2 optimization problem can yield arbitrarily small margins in theory [44]. Experimentally, we found a significant increase, decrease, or no change in the stability margin across the different interface orders (Figure 5e). Future work may seek to prioritize robustness using H∞ controller synthesis [31], [41], [47], [61]. A consistent finding across the three interface conditions was that the human and interface efforts traded off, as an increase in one was accompanied by a decrease in the other (Figure 5b,c). This outcome comports with other theoretical and experimental findings [37], [53] and supports the hypoth-esis that the human and interface play a game [21], [39] whose outcome represents a tradeoff between competing objectives. 
+
+C. A computational model for human adaptation 
+
+We found that the transformations our human subjects im-plemented in-the-loop with a 1st-order interface could be well-approximated as a second-order system with sensorimotor delay (Figure 6a). Importantly, the dimension of the state for the human’s transformation H in this case ( 2) is less than the combined dimension of the machine M and interface I
+
+(2 + 1 = 3), undermining the hypothesis that the human implements the LQG controller whose state dimension would match that of the combined machine-interface system M/I .This finding is consistent with prior work and supports the hypothesis that humans do not implement transformations of arbitrarily-high order [1], [43].  
+
+> .CC-BY-NC-ND 4.0 International license available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint this version posted June 14, 2026. ;https://doi.org/10.1101/2023.07.14.549053 doi: bioRxiv preprint JOURNAL OF L ATEX CLASS FILES, MAY 2026 11
+
+We found that modeling the human as optimizing a cost function consisting of a linear combination of error and effort – inspired by Emken et al. [30] – can produce similar outcomes to what we observed in our experiment (Figure 6b) and yield an error-effort tradeoff (Figure 6c). We regard this result as provocative but far from definitive. In particular, we do not believe our human subjects literally optimized a cost function with the precise parameterization in (13), as human motor control can be influenced by cognitive load, fatigue, injury, or distractions [62]–[64]. All models are wrong, but some are useful [65]; interrogating the utility of our proposed model is an important goal for future work. 
+
+D. Principles for interface design 
+
+Motivated by the observation that human sensorimotor delay constrains performance in trajectory-tracking tasks [61], we employed high-pass interfaces in our experiments. Indeed, the human brain attempts to compensate for delay inter-nally through feedback projections, but this compensation is imperfect and is subject to speed-accuracy trade-offs [66]. Adding a high-pass interface can supplement this phase-lead mechanism in the human’s internal delay compensation, potentially improving performance of the human-in-the-loop system. Figure 5a,d demonstrates that the high-pass baselines (1st- and 2nd-orders) and co-adapted final interfaces decreased task error and interface cost compared to the pass-through. If human behavior in co-adaptive interactions arises from optimization as corroborated by our simulation results, it opens the possibility of systematically shaping interaction outcomes by modifying the interface cost function. A proof-of-concept of this idea was demonstrated in [53], where it was shown that increasing a penalty term in the interface cost decreased interface effort and increased human effort. This observation has broad implications for the design of both assistive devices, which seek to minimize user effort, and rehabilitation devices, which aim to promote active patient engagement [67], [68]. Game-theoretic methods that explicitly consider the strategic interests of both decision-making agents may enable designers to systematically select from a variety of outcomes [39]. VII. C ONCLUSION 
+
+Our work highlights limitations in prior theory, experiment, and simulation work on co-adaptation between humans and intelligent interfaces interacting in closed loop with dynamic machines in real-world conditions. We demonstrate that a Nash equilibrium does not exist under standard assumptions of optimal adaptation, and explore in experiment and simulation how a human and interface with bounded rationality [59] adapt to improve performance in a disturbance-rejection task. Under-standing how to analyze and synthesize co-adaptive systems, where both human and algorithmic agents adapt to control dynamic systems like vehicles, robots, and prostheses is criti-cally important in current and emerging applications including driver assistance, rehabilitation robotics, and neuroprosthetics. We contribute new theory, experiment, and simulation results that will inform creation of these systems for real-world deployment. ACKNOWLEDGMENTS 
+
+We thank the participants in our experiment. This work was funded by a American Society for Engineering Education Na-tional Defense Science and Engineering Graduate Fellowship (NDSEG) to MMM and National Science Foundation (NSF) awards #2045014,2124608 to SAB. REFERENCES [1] D. T. McRuer and H. R. Jex, “A review of Quasi–Linear pilot models,” 
+
+IEEE Transactions on Human Factors in Electronics , vol. HFE–8, no. 3, pp. 231–249, 1967. [2] X. Zhang, T. M. Seigler, and J. B. Hoagg, “The impact of nonminimum-phase zeros on human-in-the-loop control systems,” IEEE Transactions on Cybernetics , vol. 52, no. 6, pp. 5098–5112, Jun. 2022. [3] M. Yamagami, L. N. Peterson, D. Howell, E. Roth, and S. A. Burden, “Effect of handedness on learned controllers and sensorimotor noise during trajectory-tracking,” IEEE Transactions on Cybernetics , vol. 53, no. 4, pp. 2039–2050, 2023. [4] S. Nikolaidis, S. Nath, A. D. Procaccia, and S. Srinivasa, “Game-theoretic modeling of human adaptation in human-robot collaboration,” in Proceedings of the ACM/IEEE International Conference on Human-Robot Interaction , 2017, pp. 323–331. [5] R. B. Warrier and S. Devasia, “Iterative learning from novice human demonstrations for output tracking,” IEEE Transactions on Human-Machine Systems , vol. 46, no. 4, pp. 510–521, 2016. [6] A. Zemmar, A. M. Lozano, and B. J. Nelson, “The rise of robots in surgical environments during COVID-19,” Nature Machine Intelligence ,vol. 2, no. 10, pp. 566–572, 2020. [7] D. De Santis, “A framework for optimizing co-adaptation in body-machine interfaces,” Frontiers in Neurorobotics , vol. 15, p. 40, 2021. [8] K. Z. Zhuang, N. Sommer, V. Mendez, S. Aryan, E. Formento, E. D’Anna, F. Artoni, F. Petrini, G. Granata, G. Cannaviello et al. ,“Shared human–robot proportional control of a dexterous myoelectric prosthesis,” Nature Machine Intelligence , vol. 1, no. 9, pp. 400–411, 2019. [9] V. Azimi, T. Shu, H. Zhao, R. Gehlhar, D. Simon, and A. D. Ames, “Model-based adaptive control of transfemoral prostheses: Theory, sim-ulation, and experiments,” IEEE Transactions on Systems, Man, and Cybernetics , vol. 51, no. 2, pp. 1174–1191, Feb. 2021. [10] J. Zhang, P. Fiers, K. A. Witte, R. W. Jackson, K. L. Poggensee, C. G. Atkeson, and S. H. Collins, “Human-in-the-loop optimization of exoskeleton assistance during walking,” Science , vol. 356, no. 6344, pp. 1280–1284, Jun. 2017. [11] W. Felt, J. C. Selinger, J. M. Donelan, and C. D. Remy, ““Body-In-The-Loop”: Optimizing device parameters using measures of instantaneous energetic cost,” PloS One , vol. 10, no. 8, p. e0135342, 2015. [12] P. Slade, M. J. Kochenderfer, S. L. Delp, and S. H. Collins, “Personal-izing exoskeleton assistance while walking in the real world,” Nature ,vol. 610, no. 7931, pp. 277–282, Oct. 2022. [13] A. L. Orsborn, S. Dangi, H. G. Moorman, and J. M. Carmena, “Closed-loop decoder adaptation on intermediate time-scales facilitates rapid BMI performance improvements independent of decoder initialization conditions,” IEEE Transactions on Neural Systems and Rehabilitation Engineering , vol. 20, no. 4, pp. 468–477, 2012. [14] F. R. Willett, D. T. Avansino, L. R. Hochberg, J. M. Henderson, and K. V. Shenoy, “High-performance brain-to-text communication via handwriting,” Nature , vol. 593, no. 7858, pp. 249–254, 2021. [15] M. Mahmood, D. Mzurikwao, Y.-S. Kim, Y. Lee, S. Mishra, R. Herbert, A. Duarte, C. S. Ang, and W.-H. Yeo, “Fully portable and wireless universal brain–machine interfaces enabled by flexible scalp electronics and deep learning algorithm,” Nature Machine Intelligence , vol. 1, no. 9, pp. 412–422, 2019. [16] J. Miehlbradt, A. Cherpillod, S. Mintchev, M. Coscia, F. Artoni, D. Flo-reano, and S. Micera, “Data-driven body-machine interface for the accurate control of drones,” Proceedings of the National Academy of Sciences (PNAS) , vol. 115, no. 31, pp. 7913–7918, Jul. 2018. [17] J. A. Taylor, J. W. Krakauer, and R. B. Ivry, “Explicit and implicit contributions to learning in a sensorimotor adaptation task,” Journal of Neuroscience , vol. 34, no. 8, pp. 3023–3032, 2014. [18] J. B. Heald, M. Lengyel, and D. M. Wolpert, “Contextual inference underlies the learning of sensorimotor repertoires,” Nature , vol. 600, no. 7889, pp. 489–493, Dec. 2021. 
+
+.CC-BY-NC-ND 4.0 International license available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint this version posted June 14, 2026. ;https://doi.org/10.1101/2023.07.14.549053 doi: bioRxiv preprint JOURNAL OF L ATEX CLASS FILES, MAY 2026 12 
+
+[19] J. S. M¨ uller, C. Vidaurre, M. Schreuder, F. C. Meinecke, P. Von B¨ unau, and K.-R. M¨ uller, “A mathematical model for the two-learners problem,” 
+
+Journal of Neural Engineering , vol. 14, no. 3, p. 036005, 2017. [20] S. Perdikis and J. d. R. Millan, “Brain-Machine interfaces: A tale of two learners,” IEEE Systems, Man, and Cybernetics Magazine , vol. 6, no. 3, pp. 12–19, Jul. 2020. [21] M. M. Madduri, S. A. Burden, and A. L. Orsborn, “Biosignal-based co-adaptive user-machine interfaces for motor control,” Current Opinion in Biomedical Engineering (COBME) , vol. 27, p. 100462, Apr. 2023. [22] K. Bengler, K. Dietmayer, B. Farber, M. Maurer, C. Stiller, and H. Winner, “Three decades of driver assistance systems: Review and future perspectives,” IEEE Intelligent Transportation Systems Magazine ,vol. 6, no. 4, pp. 6–22, 2014. [23] P. Gomes, “Surgical robotics: Reviewing the past, analysing the present, imagining the future,” Robotics and Computer-Integrated Manufactur-ing , vol. 27, no. 2, pp. 261–266, 2011. [24] L. Marchal-Crespo and D. J. Reinkensmeyer, “Review of control strate-gies for robotic movement training after neurologic injury,” Journal of Neuroengineering and Rehabilitation , vol. 6, no. 1, pp. 1–15, 2009. [25] M. Yamagami, K. M. Steele, and S. A. Burden, “Decoding intent with control theory: Comparing muscle versus manual interface perfor-mance,” in ACM Conference on Human Factors in Computing Systems (CHI) , Apr. 2020, pp. 1–12. [26] A. H. Y. Chou, M. Yamagami, and S. A. Burden, “Evaluating ahuman/machine interface with redundant motor modalities for trajectory-tracking,” IFAC-PapersOnLine , vol. 55, no. 41, pp. 125–130, Jan. 2022. [27] J. Diedrichsen, R. Shadmehr, and R. B. Ivry, “The coordination of movement: Optimal feedback control and beyond,” Trends in Cognitive Sciences , vol. 14, no. 1, pp. 31–39, 2010. [28] E. Todorov and M. I. Jordan, “Optimal feedback control as a theory of motor coordination,” Nature Neuroscience , vol. 5, no. 11, pp. 1226– 1235, 2002. [29] J. C. Selinger, J. D. Wong, S. N. Simha, and J. M. Donelan, “How humans initiate energy optimization and converge on their optimal gaits,” 
+
+The Journal of Experimental Biology , vol. 222, no. Pt 19, Oct. 2019. [30] J. L. Emken, R. Benitez, A. Sideris, J. E. Bobrow, and D. J. Reinkens-meyer, “Motor adaptation as a greedy optimization of error and effort,” 
+
+Journal of Neurophysiology , vol. 97, no. 6, pp. 3997–4006, Jun. 2007. [31] K. Zhou, J. C. Doyle, and K. Glover, Robust and Optimal Control .Prentice Hall, 1996, vol. 40. [32] J. S. Merel, R. Fox, T. Jebara, and L. Paninski, “A multi-agent control framework for co-adaptation in brain-computer interfaces,” Advances in Neural Information Processing Systems (NeuroIPS) , vol. 26, 2013. [33] Y. Li, G. Carboni, F. Gonzalez, D. Campolo, and E. Burdet, “Differential game theory for versatile physical human–robot interaction,” Nature Machine Intelligence , vol. 1, no. 1, pp. 36–43, 2019. [34] A. Hafs, A. Farr, D. Verdel, O. Bruneau, E. Burdet, and B. Berret, “Model predictive game control for personalized and targeted interactive assistance,” Commun Eng , vol. 5, no. 1, p. 57, Feb. 2026. [35] P. Dayan and L. F. Abbott, Theoretical Neuroscience: Computational and Mathematical Modeling of Neural Systems . MIT press, 2005. [36] K. J. Astr¨ om and R. M. Murray, Feedback Systems: An Introduction for Scientists and Engineers . Princeton university press, 2010. [37] M. M. Madduri, S. A. Burden, and A. L. Orsborn, “A game-theoretic model for co-adaptive brain-machine interfaces,” in 2021 10th Interna-tional IEEE/EMBS Conference on Neural Engineering (NER) . IEEE, 2021, pp. 327–330. [38] M. M. Madduri, M. Yamagami, A. X. T. Millevolte, S. J. Li, S. N. Burckhardt, S. A. Burden, and A. L. Orsborn, “Co-adaptive myoelectric interface for continuous control,” in IFAC Workshop on Cyber-Physical-Human Systems (CPHS) , vol. 55(41), Jan. 2022, pp. 95–100. [39] B. J. Chasnov, L. J. Ratliff, and S. A. Burden, “Human adaptation to adaptive machines converges to game-theoretic equilibria,” Scientific reports , vol. 15, no. 1, pp. 1–10, Aug. 2025. [40] J. P. Hespanha, Linear Systems Theory . Princeton University Press, 2009. [41] P. Benner, V. Mehrmann, V. Sima, S. Van Huffel, and A. Varga, “SLICOT—A subroutine library in systems and control theory,” in 
+
+Applied and Computational Control, Signals, and Circuits , B. N. Datta, Ed. Birkh¨ auser Boston, 1999, pp. 499–539. [42] J. Anderson, J. C. Doyle, S. H. Low, and N. Matni, “System level synthesis,” Annual Reviews in Control , vol. 47, pp. 364–393, Jan. 2019. [43] X. Zhang, S. Wang, J. B. Hoagg, and T. M. Seigler, “The roles of feedback and feedforward as humans learn to control unknown dynamic systems,” IEEE Transactions on Cybernetics , vol. 48, no. 2, pp. 543– 555, Feb. 2018. [44] J. Doyle, “Guaranteed margins for LQG regulators,” IEEE Transactions on automatic Control , vol. 23, no. 4, pp. 756–757, 1978. [45] T. Bas ¸ar and G. J. Olsder, Dynamic Noncooperative Game Theory ,2nd ed., ser. Classics in applied mathematics. Philadelphia: SIAM, 1999, no. 23. [46] J. F. Nash, “Equilibrium points in N-Person games,” Proceedings of the National Academy of Sciences (PNAS) , vol. 36, no. 1, pp. 48–49, Jan. 1950. [47] J. C. Doyle, K. Glover, P. P. Khargonekar, and B. A. Francis, “State-space solutions to standard H2 and H∞ control problems,” IEEE Transactions on Automatic Control , vol. 34, no. 8, pp. 831–847, 1989. [48] H. S. Witsenhausen, “A counterexample in stochastic optimum control,” 
+
+SIAM Journal on Control and Optimization , vol. 6, no. 1, pp. 131–147, Feb. 1968. [49] M. Yamagami, D. Howell, E. Roth, and S. A. Burden, “Contributions of feedforward and feedback control in a manual trajectory-tracking task,” in IFAC Conference on Cyber-Physical-Human Systems (CPHS) , vol. 51(34), 2018, pp. 61–66. [50] C. L. Phillips, J. M. Parr, and E. A. Riskin, Signals, systems, and transforms . Prentice Hall, 2003. [51] B. Yu, R. B. Gillespie, J. S. Freudenberg, and J. A. Cook, “Human control strategies in pursuit tracking with a disturbance input,” in 53rd IEEE Conference on Decision and Control . IEEE, 2014, pp. 3795– 3800. [52] K. Ogata, Modern Control Engineering , 5th ed. Upper Saddle River, NJ: Pearson, Aug. 2009. [53] M. M. Madduri, M. Yamagami, S. J. Li, S. Burckhardt, S. A. Burden, and A. L. Orsborn, “Computational framework to predict and shape hu-man–machine interactions in closed-loop, co-adaptive neural interfaces,” 
+
+Nat. Mach. Intell. , vol. 8, no. 3, pp. 372–387, Mar. 2026. [54] A. H. Y. Chou, M. Yamagami, and S. A. Burden, “Co-adaptation of dynamic human-machine interfaces [source code],” https://www. codeocean.com/, Apr. 2026. [55] L. N. Peterson, A. H. Y. Chou, S. A. Burden, and M. Yamagami, “Assessing human feedback parameters for disturbance-rejection,” IFAC-PapersOnLine , vol. 55, no. 41, pp. 1–6, Jan. 2022. [56] W. D. Nothwang, M. J. McCourt, R. M. Robinson, S. A. Burden, and J. W. Curtis, “The human should be part of the control loop?” in IEEE Resilience Week (RWS) , 2016, pp. 214–220. [57] Y. Li, K. P. Tee, R. Yan, W. L. Chan, and Y. Wu, “A framework of human–robot coordination based on game theory and policy iteration,” 
+
+IEEE Transactions on Robotics , vol. 32, no. 6, pp. 1408–1418, 2016. [58] J. T. Isa, L. J. Ratliff, and S. A. Burden, “A learning algorithm that attains the human optimum in a repeated human-machine interaction game,” arXiv [cs.GT] , Jan. 2025. [59] A. Tversky and D. Kahneman, “Judgment under uncertainty: Heuristics and biases,” Science , vol. 185, no. 4157, pp. 1124–1131, Sep. 1974. [60] S. J. Gershman, E. J. Horvitz, and J. B. Tenenbaum, “Computational rationality: A converging paradigm for intelligence in brains, minds, and machines,” Science , vol. 349, no. 6245, pp. 273–278, Jul. 2015. [61] Y. Nakahira, Q. Liu, T. J. Sejnowski, and J. C. Doyle, “Diversity-enabled sweet spots in layered architectures and speed-accuracy trade-offs in sensorimotor control,” Proceedings of the National Academy of Sciences (PNAS) , vol. 118, no. 22, Jun. 2021. [62] C. Hemond, R. M. Brown, and E. M. Robertson, “A distraction can impair or enhance motor performance,” The Journal of Neuroscience ,vol. 30, no. 2, pp. 650–654, Jan. 2010. [63] K. R. Cole and R. K. Shields, “Age and cognitive stress influences motor skill acquisition, consolidation, and dual-task effect in humans,” Journal of Motor Behavior , vol. 51, no. 6, pp. 622–639, Jan. 2019. [64] M. Branscheidt, P. Kassavetis, M. Anaya, D. Rogers, H. D. Huang, M. A. Lindquist, and P. Celnik, “Fatigue induces long-lasting detrimental changes in motor-skill learning,” eLife , vol. 8, no. e40578, Mar. 2019. [65] G. E. Box and N. R. Draper, Empirical model-building and response surfaces . John Wiley & Sons, 1987. [66] J. S. Li, A. A. Sarma, T. J. Sejnowski, and J. C. Doyle, “Internal feedback in the cortical perception-action loop enables fast and accu-rate behavior,” Proc. Natl. Acad. Sci. U. S. A. , vol. 120, no. 39, p. e2300445120, Sep. 2023. [67] J. M. Cha, J. Hong, J. Yoo, and D.-W. Rha, “Wearable robots for rehabilitation and assistance of gait: A narrative review,” Ann. Rehabil. Med. , vol. 49, no. 4, pp. 187–195, Aug. 2025. [68] M. Bonanno, B. Saracino, I. Ciancarelli, G. Panza, A. Manuli, G. Mo-rone, and R. S. Calabr` o, “Assistive technologies for individuals with a disability from a neurological condition: A narrative review on the multimodal integration,” Healthcare (Basel) , vol. 13, no. 13, p. 1580, Jul. 2025. 
+
+.CC-BY-NC-ND 4.0 International license available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint this version posted June 14, 2026. ;https://doi.org/10.1101/2023.07.14.549053 doi: bioRxiv preprint

@@ -1,0 +1,326 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-17T22:11:49.552079+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 4,
+    "deep_cap": 6,
+    "deep_selected": 4,
+    "quick_candidates": 4,
+    "quick_skim_target": 11,
+    "quick_selected": 4
+  },
+  "deep_dive": [
+    {
+      "id": "2606.17377v1",
+      "source": "arxiv",
+      "title": "Performance-Driven Environment Abstraction with Multi-Timescale Learning",
+      "abstract": "We study performance-driven environment abstraction for decision-making in large Markov decision processes. Rather than preserving geometric or topological structure, we seek abstractions that directly optimize decision quality. We model abstraction as a controlled approximation obtained by aggregating the state space and enforcing a shared action distribution within each aggregated state. For a fixed partition, we establish a performance guarantee that separates value-function approximation error from the loss introduced by action sharing. Guided by this analysis, we develop a multi-timescale reinforcement learning framework that jointly adapts the policy and a tree-structured environment abstraction. The resulting algorithm refines and coarsens regions of the state space based on Q-value discrepancies, balancing performance against abstraction size and complexity. Empirical results demonstrate substantial state compression, improved sample efficiency, and faster replanning compared to actor-critic baselines.",
+      "authors": [
+        "Yue Guan",
+        "Dipankar Maity",
+        "Panagiotis Tsiotras"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "eess.SY"
+      ],
+      "published": "2026-06-16T00:19:23+00:00",
+      "link": "https://arxiv.org/pdf/2606.17377v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "develops a multi-timescale reinforcement learning framework for environment abstraction",
+      "llm_evidence_cn": "提出了多时间尺度强化学习框架用于环境抽象",
+      "llm_evidence": "提出了多时间尺度强化学习框架用于环境抽象",
+      "canonical_evidence": "提出了多时间尺度强化学习框架用于环境抽象",
+      "llm_tldr_en": "This paper introduces a performance-driven RL framework that jointly learns a policy and a tree-structured environment abstraction, with theoretical guarantees on decision quality.",
+      "llm_tldr_cn": "大规模马尔可夫决策过程中，传统环境抽象方法保留几何结构但忽略决策质量。本文将抽象建模为受控近似，通过聚合状态空间并共享动作分布来直接优化决策质量。推导了分离值函数近似误差与动作共享损失的性能保障，并据此设计多时间尺度强化学习框架，联合自适应策略和树状抽象结构。算法能够在细化和粗化状态空间之间动态调整，实验证明在多个控制任务上优于固定抽象方法。这项工作为高效强化学习提供了理论基础和实用算法。",
+      "llm_tldr": "大规模马尔可夫决策过程中，传统环境抽象方法保留几何结构但忽略决策质量。本文将抽象建模为受控近似，通过聚合状态空间并共享动作分布来直接优化决策质量。推导了分离值函数近似误差与动作共享损失的性能保障，并据此设计多时间尺度强化学习框架，联合自适应策略和树状抽象结构。算法能够在细化和粗化状态空间之间动态调整，实验证明在多个控制任务上优于固定抽象方法。这项工作为高效强化学习提供了理论基础和实用算法。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.18111v1",
+      "source": "arxiv",
+      "title": "Learning Fair Pareto-Optimal Policies in Multi-Objective Reinforcement Learning",
+      "abstract": "Fairness is an important aspect of decision-making in multi-objective reinforcement learning (MORL), where policies must ensure both optimality and equity across multiple, potentially conflicting objectives. While single-policy MORL methods can learn fair policies for fixed user preferences using welfare functions such as the generalized Gini welfare function (GGF), they fail to provide the diverse set of policies necessary for dynamic or unknown user preferences. To address this limitation, we formalize the fair optimization problem in multi-policy MORL, where the goal is to learn a set of Pareto-optimal policies that ensure fairness across all possible user preferences. Our key technical contributions are threefold: (1) We show that for concave, piecewise-linear welfare functions (e.g., GGF), fair policies remain in the convex coverage set (CCS), which is an approximated Pareto front for linear scalarization. (2) We demonstrate that non-stationary policies, augmented with accrued reward histories, and stochastic policies improve fairness by dynamically adapting to historical inequities. (3) We propose three novel algorithms, which include integrating GGF with multi-policy multi-objective Q-Learning (MOQL), state-augmented multi-policy MOQL for learning non-statoinary policies, and its novel extension for learning stochastic policies. We evaluate our algorithms across various domains and compare our methods against the state-of-the-art MORL baselines. The empirical results show that our methods learn a set of fair policies that accommodate different user preferences.",
+      "authors": [
+        "Umer Siddique",
+        "Peilang Li",
+        "Yongcan Cao"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-16T16:16:54+00:00",
+      "link": "https://arxiv.org/pdf/2606.18111v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Multi-objective reinforcement learning with fairness and Pareto-optimality",
+      "llm_evidence_cn": "多目标强化学习中的公平性和帕累托最优",
+      "llm_evidence": "多目标强化学习中的公平性和帕累托最优",
+      "canonical_evidence": "多目标强化学习中的公平性和帕累托最优",
+      "llm_tldr_en": "Formalizes fair optimization in multi-policy MORL, showing that for concave welfare functions a convex hull approach works, and proposes a method to learn a set of fair Pareto-optimal policies.",
+      "llm_tldr_cn": "多目标强化学习（MORL）在公平决策中需同时考虑最优化与公平性，但现有方法仅针对固定偏好学习单一策略。本文正式定义了多策略MORL中的公平优化问题，证明了对于凹福利函数（如广义基尼福利函数），可以使用凸包方法求解。进一步提出一种学习公平帕累托最优策略集的方法，可服务于动态或未知偏好场景。该理论贡献为MORL的公平性研究提供了数学基础。",
+      "llm_tldr": "多目标强化学习（MORL）在公平决策中需同时考虑最优化与公平性，但现有方法仅针对固定偏好学习单一策略。本文正式定义了多策略MORL中的公平优化问题，证明了对于凹福利函数（如广义基尼福利函数），可以使用凸包方法求解。进一步提出一种学习公平帕累托最优策略集的方法，可服务于动态或未知偏好场景。该理论贡献为MORL的公平性研究提供了数学基础。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.15598v1",
+      "source": "arxiv",
+      "title": "Integrating Reasoning and Generalization in Text-to-SQL via Self-Enhanced Fine-Tuning",
+      "abstract": "Text-to-SQL aims to translate natural language questions into executable SQL queries over structured databases, enabling non-expert users to access data intuitively. While recent advances in large language models (LLMs) have shown promise in this task, existing LLM-based approaches often struggle to strike a balance between strong reasoning capabilities and robust generalization. To address these limitations, we propose CoTE-SQL to enhance the LLM-based text-to-SQL generation with three key innovations: (i) self-enhanced reasoning traces distilled from LLMs without human annotation, (ii) structured chain-of-thought (CoT) prompting with modular decomposition and examples retrieval, and (iii) error-aware revision based on SQL execution feedback. Extensive experiments on the Spider and Bird benchmarks demonstrate that CoTE-SQL achieves new state-of-the-art performance among methods built on open-source LLMs with comparable model sizes on Bird (53.39% EX / 59.02 VES) and strong results on Spider (79.60% EX / 77.19 VES), with especially significant gains on complex queries. Results highlight the effectiveness of combining self-enhancement, structured reasoning, and execution-time feedback within an LLM-based framework for text-to-SQL design.",
+      "authors": [
+        "Feng Lyu",
+        "Jinfeng Cen",
+        "Sijing Duan",
+        "Hao Wu",
+        "Shucheng Li",
+        "Weixu Zhang",
+        "Haolun Wu"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-06-14T04:52:58+00:00",
+      "link": "https://arxiv.org/pdf/2606.15598v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "self-enhanced fine-tuning with structured CoT and error-aware revision",
+      "llm_evidence_cn": "自增强微调与结构化思维链及错误感知修正",
+      "llm_evidence": "自增强微调与结构化思维链及错误感知修正",
+      "canonical_evidence": "自增强微调与结构化思维链及错误感知修正",
+      "llm_tldr_en": "Proposes CoTE-SQL to enhance LLM-based text-to-SQL through self-enhanced reasoning traces, structured CoT prompting, and error-aware revision, improving reasoning and generalization.",
+      "llm_tldr_cn": "针对大语言模型在文本到SQL任务中推理与泛化能力不足的问题，本文提出CoTE-SQL方法。通过自增强推理轨迹、结构化思维链提示和基于SQL执行反馈的错误感知修正，无需人工标注即可提升模型性能。实验表明该方法在多个基准上取得显著改进，为LLM后训练提供了一种创新的微调策略。",
+      "llm_tldr": "针对大语言模型在文本到SQL任务中推理与泛化能力不足的问题，本文提出CoTE-SQL方法。通过自增强推理轨迹、结构化思维链提示和基于SQL执行反馈的错误感知修正，无需人工标注即可提升模型性能。实验表明该方法在多个基准上取得显著改进，为LLM后训练提供了一种创新的微调策略。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.17468v1",
+      "source": "arxiv",
+      "title": "RSRank: Learning Relevance from Representational Shifts",
+      "abstract": "As enterprises deploy RAG-based systems to provide grounded responses to user queries, reranking has become a critical component for the final filtering step that separates relevant from distracting or irrelevant documents. Existing rerankers often rely on heuristic thresholds to achieve optimal filtering. Moreover, for relevance scoring, state-of-the-art methods use a language model's logit signals, which are designed for next-token prediction, not for assessing relevance. To address these limitations, we identify a principled signal for relevance: the representational shift (RS) induced in a query's internal state when conditioned on a document. We observe that the alignment between (a) RS induced by a candidate document and (b) RS induced by an oracle document-set provides a robust indicator of relevance. Building on this insight, we introduce a lightweight training framework that learns projections mapping RS to calibrated relevance scores. Our training objectives naturally filter irrelevant content at a zero threshold, reducing dependence on heuristic tuning. Across diverse retrieval datasets, our method delivers gains over SOTA rerankers.",
+      "authors": [
+        "Archit Gupta",
+        "Sai Sundaresan",
+        "Debabrata Mahapatra"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR"
+      ],
+      "published": "2026-06-16T03:29:23+00:00",
+      "link": "https://arxiv.org/pdf/2606.17468v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "proposes representational shift signal for relevance scoring in reranking",
+      "llm_evidence_cn": "提出表示移位信号用于重排序中的相关性评分",
+      "llm_evidence": "提出表示移位信号用于重排序中的相关性评分",
+      "canonical_evidence": "提出表示移位信号用于重排序中的相关性评分",
+      "llm_tldr_en": "Identifies representational shift induced in query state when conditioned on document as a principled relevance signal, improving reranking in RAG without heuristic thresholds.",
+      "llm_tldr_cn": "针对RAG重排序中相关性信号不准确的问题，本文识别出文档条件化时查询表示产生的移位（RS）作为相关性信号。通过对比候选文档RS与理想文档集RS的一致性，无需启发式阈值即可实现准确重排。实验表明该方法优于基于logit的传统方法，为检索系统提供了新的相关性评估原理。",
+      "llm_tldr": "针对RAG重排序中相关性信号不准确的问题，本文识别出文档条件化时查询表示产生的移位（RS）作为相关性信号。通过对比候选文档RS与理想文档集RS的一致性，无需启发式阈值即可实现准确重排。实验表明该方法优于基于logit的传统方法，为检索系统提供了新的相关性评估原理。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "r",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.13550v1",
+      "source": "arxiv",
+      "title": "Uncertainty-Aware Hybrid Retrieval for Long-Document RAG",
+      "abstract": "Retrieval augmented generation (RAG) depends critically on the quality and granularity of retrieved evidence. Large retrieval units preserve context but often introduce irrelevant content, which can dilute answer bearing evidence and worsen long context utilization. Fine-grained units are more compact, but they may be difficult to retrieve reliably because short chunks can lack semantic, lexical, or bridging cues needed to match the query. We propose Uncertainty-aware Multi-Granularity RAG (UMG-RAG), a training-free hybrid retrieval framework that treats chunk granularity as query-specific reliability estimation. Instead of training a new retriever or modifying the generator, UMG-RAG uses existing dense and sparse retrievers as complementary experts across multiple chunk granularities. For each query, it converts each expert-granularity score list into an evidence distribution, estimates reliability from distribution entropy, and fuses candidates according to query-specific semantic, lexical, and granularity confidence. We further introduce UMGP-RAG, a parent promotion variant that uses fine-grained hits to locate relevant evidence while returning broader non-redundant parent chunks for local coherence. Experiments on question answering benchmarks show that uncertainty-aware fusion and parent promotion improve generation quality while maintaining a lightweight, plug-and-play retrieval pipeline.",
+      "authors": [
+        "Hoin Jung",
+        "Xiaoqian Wang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-06-11T16:30:45+00:00",
+      "link": "https://arxiv.org/pdf/2606.13550v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "hybrid retrieval framework for RAG with uncertainty-aware multi-granularity",
+      "llm_evidence_cn": "不确定性感知多粒度混合检索框架用于RAG",
+      "llm_evidence": "不确定性感知多粒度混合检索框架用于RAG",
+      "canonical_evidence": "不确定性感知多粒度混合检索框架用于RAG",
+      "llm_tldr_en": "Proposes training-free hybrid retrieval using dense and sparse retrievers as complementary experts, with chunk granularity treated as query-specific reliability estimation.",
+      "llm_tldr_cn": "针对RAG中检索单元粒度选择问题，本文提出不确定性感知多粒度RAG（UMG-RAG）框架。通过将块粒度视为查询特定的可靠性估计，利用现有稠密和稀疏检索器作为互补专家，无需训练即可提升检索质量。实验证明该框架在长文档RAG任务中有效改善了证据召回和回答质量。",
+      "llm_tldr": "针对RAG中检索单元粒度选择问题，本文提出不确定性感知多粒度RAG（UMG-RAG）框架。通过将块粒度视为查询特定的可靠性估计，利用现有稠密和稀疏检索器作为互补专家，无需训练即可提升检索质量。实验证明该框架在长文档RAG任务中有效改善了证据召回和回答质量。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "r",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.15971v1",
+      "source": "arxiv",
+      "title": "SAG: SQL-Retrieval Augmented Generation with Query-Time Dynamic Hyperedges",
+      "abstract": "Retrieval-Augmented Generation (RAG) offers an effective approach for large language models to access external knowledge. However, existing methods rely on dense similarity retrieval and face inherent limitations in handling structured constraints and multi-hop reasoning. Incorporating knowledge graphs partially alleviates these issues, but at the cost of semantic fragmentation, high maintenance overhead, and difficult incremental updates. This paper introduces SAG (SQLRetrieval Augmented Generation), a structured architecture for retrieval and agent systems. Instead of pre-building a global static graph, SAG converts each chunk into one semantically complete event and a set of indexing entities, then uses SQL join queries to dynamically link events that share entities into local hyperedges,constructing, at query time, a dynamically instantiated local index structure. This design avoids the need for global graph rebuilding and ongoing maintenance; the system naturally supports incremental writes, concurrent processing, and continuous scaling through its reliance on standard database infrastructure. Across HotpotQA, 2WikiMultiHop, and MuSiQue, three standard multi-hop benchmarks,SAG achieves the best results on 8 out of 9 Recall@K metrics, reaching 80.0% Recall@5 on MuSiQue, the benchmark with the highest multi-hop reasoning demands.SAG has also been deployed at a production scale of hundreds of millions of data items, with online retrieval latency kept within seconds. Project site and code are available at https://github.com/Zleap-AI/SAG-Benchmark.",
+      "authors": [
+        "Yuchao Wu",
+        "Junqin Li",
+        "XingCheng Liang",
+        "Yongjie Chen",
+        "Yinghao Liang",
+        "Linyuan Mo",
+        "Guanxian Li"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-06-14T18:52:26+00:00",
+      "link": "https://arxiv.org/pdf/2606.15971v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "SQL-based retrieval augmented generation with dynamic hyperedges",
+      "llm_evidence_cn": "基于SQL的检索增强生成与动态超边",
+      "llm_evidence": "基于SQL的检索增强生成与动态超边",
+      "canonical_evidence": "基于SQL的检索增强生成与动态超边",
+      "llm_tldr_en": "Introduces SAG which uses SQL join queries to dynamically link event chunks, avoiding static graphs for structured constraints and multi-hop reasoning in RAG.",
+      "llm_tldr_cn": "针对RAG依赖稠密相似检索难以处理结构化约束和多跳推理的问题，本文提出SAG架构。将每个块转换为语义完整事件和索引实体，通过SQL连接查询动态链接事件，无需预建静态图。该方法在结构化知识检索任务中表现出优势。",
+      "llm_tldr": "针对RAG依赖稠密相似检索难以处理结构化约束和多跳推理的问题，本文提出SAG架构。将每个块转换为语义完整事件和索引实体，通过SQL连接查询动态链接事件，无需预建静态图。该方法在结构化知识检索任务中表现出优势。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "r",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.15197v1",
+      "source": "arxiv",
+      "title": "StarOR: Synergizing Tree Search and Test-Time Reinforcement Learning for Optimization Modeling",
+      "abstract": "Optimization modeling is inherently hierarchical, requiring a precise sequence of symbolic commitments. Traditional learning-based automated optimization modeling methods improve modeling policies through large-scale annotated or curated training data, but are costly to adapt to new problem distributions. Meanwhile, one-shot generation remains brittle in hierarchical modeling, where early symbolic errors can propagate into invalid formulations. Test-time scaling offers a promising alternative by enabling structural exploration with additional instance-level computation; however, existing search-based methods typically rely on a fixed policy, causing repeated rollouts to inherit similar modeling biases and providing limited credit assignment for intermediate decisions. To address these limitations, we propose StarOR, a synergistic search-and-adaptation framework that couples MCTS with Test-Time Reinforcement Learning for optimization modeling. StarOR decomposes the modeling process into four stages and updates a transient LoRA adapter via GRPO at each non-terminal node. By using MCTS-generated siblings as local comparison sets, StarOR transforms search-time exploration into instance-specific policy refinement. Moreover, an unsupervised multi-faceted reward system provides fine-grained feedback for intermediate formulation decisions without ground-truth labels. Experiments across five optimization benchmarks show that StarOR achieves state-of-the-art performance even with a 4B backbone, outperforming existing methods and the frontier LLMs.",
+      "authors": [
+        "Jiajun Li",
+        "Yu Ding",
+        "Shisi Guan",
+        "Ran Hou",
+        "Wanyuan Wang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-13T08:46:13+00:00",
+      "link": "https://arxiv.org/pdf/2606.15197v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "test-time reinforcement learning for optimization modeling",
+      "llm_evidence_cn": "测试时强化学习用于优化建模",
+      "llm_evidence": "测试时强化学习用于优化建模",
+      "canonical_evidence": "测试时强化学习用于优化建模",
+      "llm_tldr_en": "Proposes StarOR that synergizes tree search and test-time reinforcement learning for hierarchical optimization modeling, enabling adaptive exploration beyond fixed policies. Demonstrates improved success and generalization.",
+      "llm_tldr_cn": "针对层次化优化建模中早期符号错误传播的问题，本文提出StarOR，将树搜索与测试时强化学习相结合。该方法在推理阶段动态调整策略，避免了固定策略的重复偏差。实验表明，StarOR在多种优化问题上显著提升了建模成功率和泛化能力。该工作展示了强化学习在优化建模中的新应用，对算法改进具有参考价值。",
+      "llm_tldr": "针对层次化优化建模中早期符号错误传播的问题，本文提出StarOR，将树搜索与测试时强化学习相结合。该方法在推理阶段动态调整策略，避免了固定策略的重复偏差。实验表明，StarOR在多种优化问题上显著提升了建模成功率和泛化能力。该工作展示了强化学习在优化建模中的新应用，对算法改进具有参考价值。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "biorxiv-10-1101-2023-07-14-549053-v2",
+      "source": "biorxiv",
+      "title": "Co-adaptation of dynamic human-machine interfaces",
+      "abstract": "Despite the growing prevalence of learning algorithms in daily life, methods for analysis and synthesis of how these systems interact with people are limited. We studied optimization-based algorithms that co-adapt with people in the presence of dynamic machines, finding limitations on current theory that motivated us to conduct an experiment where human subjects interact through a dynamic interface with a machine that has complex dynamics. Experimental results provided evidence of co-adaptation and a trade-off between performance and the \"effort\" of the human and interface, defined as the norm of their output signals. We developed a parsimonious model of the human adaptation strategy observed in our experiments and conducted a simulation study using this model. Our computational results matched the empirical results, suggesting our human subjects adapted to minimize a combination of error and effort. These results demonstrate how co-adaptation between humans and intelligent interfaces shapes behavior and performance, and introduces a modeling framework that can be used in future work to systematically design interaction outcomes.",
+      "authors": [
+        "Chou, A. H. Y.",
+        "Yamagami, M.",
+        "Madduri, M.",
+        "Chasnov, B. J.",
+        "Hutchison, F.",
+        "Peterson, L. N.",
+        "Burden, S. A."
+      ],
+      "primary_category": "bioengineering",
+      "categories": [
+        "bioengineering"
+      ],
+      "published": "2026-06-14T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.1101/2023.07.14.549053v2.full.pdf",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "optimization-based co-adaptation with human, trade-off between performance and effort",
+      "llm_evidence_cn": "基于优化的协同适应，性能与努力权衡",
+      "llm_evidence": "基于优化的协同适应，性能与努力权衡",
+      "canonical_evidence": "基于优化的协同适应，性能与努力权衡",
+      "llm_tldr_en": "Studies optimization-based co-adaptation between humans and dynamic machines, finding a trade-off and modeling human adaptation strategy.",
+      "llm_tldr_cn": "该论文研究人类在与动态机器交互时的协同适应行为。通过实验发现人类和界面之间存在性能与输出信号范数（努力）的权衡。提出了一个简洁的人类适应策略模型，并在仿真中验证。该工作揭示了人机协同适应机制，对奖励建模中的人类偏好学习有启示作用。",
+      "llm_tldr": "该论文研究人类在与动态机器交互时的协同适应行为。通过实验发现人类和界面之间存在性能与输出信号范数（努力）的权衡。提出了一个简洁的人类适应策略模型，并在仿真中验证。该工作揭示了人机协同适应机制，对奖励建模中的人类偏好学习有启示作用。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
