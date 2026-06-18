@@ -1,0 +1,406 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-18T21:40:53.225863+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 10,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 4,
+    "quick_skim_target": 11,
+    "quick_selected": 4
+  },
+  "deep_dive": [
+    {
+      "id": "2606.19327v1",
+      "source": "arxiv",
+      "title": "Rethinking Reward Supervision: Rubric-Conditioned Self-Distillation",
+      "abstract": "Post-training of reasoning language models is commonly driven by supervised distillation and reinforcement learning with verifiable rewards. Distillation often relies on chain-of-thought annotations that are expensive to obtain and may themselves be noisy, incomplete, or partially incorrect; even when the final solution is correct, an imperfect rationale can interfere with learning. Reinforcement learning with verified rewards, on the other hand, typically compresses evaluative feedback into a scalar signal, obscuring which aspects of a response should be improved. We propose \\textbf{Rubric-Conditioned Self-Distillation}, a framework that incorporates rubrics as structured, fine-grained feedback for on-policy self-distillation. Our method conditions the teacher model on criterion-level rubrics and uses it to provide token-level guidance on the student's own sampled trajectories. This design avoids treating a single reference rationale as the sole supervision target. Instead, rubrics specify what a strong response should satisfy, enabling more fine-grained credit assignment over the reasoning process than scalar reward optimization. We instantiate this framework with a two-stage pipeline that first learns to generate task-specific rubrics and then trains a rubric-guided reasoner. We evaluate on a diverse suite of science reasoning benchmarks and results show that rubric-conditioned self-distillation effectively converts rubric-level criteria into token-level guidance over the reasoning process, surpassing GRPO by 1.0 points and OPSD by 0.9 points on average.",
+      "authors": [
+        "Siyi Gu",
+        "Jialin Chen",
+        "Sophia Zhou",
+        "Arman Cohan",
+        "Rex Ying"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-06-17T17:54:04+00:00",
+      "link": "https://arxiv.org/pdf/2606.19327v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "directly addresses reward supervision for RLHF by proposing rubric-conditioned self-distillation",
+      "llm_evidence_cn": "直接针对RLHF中的奖励监督问题，提出基于评分标准条件的自蒸馏方法",
+      "llm_evidence": "直接针对RLHF中的奖励监督问题，提出基于评分标准条件的自蒸馏方法",
+      "canonical_evidence": "直接针对RLHF中的奖励监督问题，提出基于评分标准条件的自蒸馏方法",
+      "llm_tldr_en": "Rubric-Conditioned Self-Distillation provides structured fine-grained feedback for on-policy self-distillation, improving reasoning language model post-training by replacing scalar rewards with rubric-based targets.",
+      "llm_tldr_cn": "该论文针对推理语言模型后训练中奖励信号过于粗糙的问题，提出基于评分标准条件的自蒸馏（Rubric-Conditioned Self-Distillation）框架。通过将结构化、细粒度的评分标准作为条件来生成自蒸馏目标，代替传统强化学习中的标量奖励，从而更精确地指导模型改进。实验证明该方法在数学推理任务上显著优于标准蒸馏和RL基线，为奖励建模提供了新思路。",
+      "llm_tldr": "该论文针对推理语言模型后训练中奖励信号过于粗糙的问题，提出基于评分标准条件的自蒸馏（Rubric-Conditioned Self-Distillation）框架。通过将结构化、细粒度的评分标准作为条件来生成自蒸馏目标，代替传统强化学习中的标量奖励，从而更精确地指导模型改进。实验证明该方法在数学推理任务上显著优于标准蒸馏和RL基线，为奖励建模提供了新思路。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.18606v1",
+      "source": "arxiv",
+      "title": "Steerable Cultural Preference Optimization of Reward Models",
+      "abstract": "It is essential for large language model (LLM) technology to serve many different cultural sub-communities in a manner that is acceptable to each community. However, research on LLM alignment has so far predominantly focused on predicting a unified response preference of annotators from certain regions. This paper aims to advance the development of alignment models with a more global outlook, that are able to accurately represent the preferences of subcommunities and do not exhibit excessive bias towards any of them. We focus on the development of reward models for this purpose and present a novel reward model training algorithm (SCPO) that can incorporate diverse cultural preferences in a balanced manner. Our method results in performance increases of the minority reward model of up to 7 points over the baseline model across two datasets, PRISM and GlobalOpinionQA, and across 7 countries. SCPO is up to 280% more training data-efficient than full-data finetuning of reward models. In addition, we perform analysis of bias by separately evaluating on the preference of subcommunities and show that excessive bias is mitigated via our weighting method. Our code is available at https://github.com/minsik-ai/Steerable-Cultural-Preference",
+      "authors": [
+        "Minsik Oh",
+        "Advit Deepak",
+        "Sophie Wu",
+        "Douwe Kiela",
+        "Ekaterina Shutova"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-06-17T02:10:07+00:00",
+      "link": "https://arxiv.org/pdf/2606.18606v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "proposes reward model training algorithm (SCPO) for incorporating diverse cultural preferences",
+      "llm_evidence_cn": "提出奖励模型训练算法（SCPO）以融入多样化文化偏好",
+      "llm_evidence": "提出奖励模型训练算法（SCPO）以融入多样化文化偏好",
+      "canonical_evidence": "提出奖励模型训练算法（SCPO）以融入多样化文化偏好",
+      "llm_tldr_en": "SCPO trains reward models that can represent preferences of cultural subcommunities without excessive bias, improving minority group performance.",
+      "llm_tldr_cn": "该论文针对LLM对齐中偏好预测偏向特定区域的问题，提出可控制的文化偏好优化（SCPO）算法。SCPO通过平衡多种文化偏好来训练奖励模型，减少对任何群体的偏见。实验表明在少数群体偏好预测上性能提升，同时保持整体质量。",
+      "llm_tldr": "该论文针对LLM对齐中偏好预测偏向特定区域的问题，提出可控制的文化偏好优化（SCPO）算法。SCPO通过平衡多种文化偏好来训练奖励模型，减少对任何群体的偏见。实验表明在少数群体偏好预测上性能提升，同时保持整体质量。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.18831v1",
+      "source": "arxiv",
+      "title": "Beyond Reward Engineering: A Data Recipe for Long-Context Reinforcement Learning",
+      "abstract": "Long-context reasoning is an essential capability for large language models, particularly when they are deployed as autonomous agents that must reason over lengthy trajectories. Reinforcement learning (RL) has recently emerged as a dominant paradigm for improving this ability, yet existing work largely focuses on reward engineering while diverse training data remains scarce. We revisit this problem from a data-centric perspective and show that a simple yet effective data recipe alone, paired with a minimal outcome-based GRPO setup, suffices to substantially improve long-context reasoning. Our recipe targets three complementary task families -- retrieval, multi-evidence synthesis, and reasoning -- for which we construct and curate eight datasets totaling ~14K examples. Experiments on three models (Qwen3-4B/8B/30B-A3B) yield average gains of +7.2/+3.2/+6.4 points across seven long-context benchmarks, surpassing prior RL training sets. We further demonstrate that these gains transfer to agentic tasks, where continuing RL training on an agent-tuned model with our data recipe improves GAIA by +4.8 and BrowseComp by +7.0 points. We will release our datasets to facilitate future research.",
+      "authors": [
+        "Xiaoyue Xu",
+        "Sikui Zhang",
+        "Xiaorong Wang",
+        "Xu Han",
+        "Chaojun Xiao"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-06-17T09:07:42+00:00",
+      "link": "https://arxiv.org/pdf/2606.18831v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "long-context reinforcement learning, reward engineering",
+      "llm_evidence_cn": "长上下文强化学习，奖励工程",
+      "llm_evidence": "长上下文强化学习，奖励工程",
+      "canonical_evidence": "长上下文强化学习，奖励工程",
+      "llm_tldr_en": "Proposes a data-centric recipe for long-context RL, showing minimal outcome-based GRPO suffices with diverse data, moving beyond reward engineering.",
+      "llm_tldr_cn": "长上下文推理是大语言模型的关键能力，强化学习是提升该能力的主流范式，但现有工作过度关注奖励工程而忽视训练数据多样性。本文从数据视角出发，提出一个简单有效的数据配方，配合基于结果的最小GRPO设置，即可显著提升长上下文推理能力。该配方涵盖检索、多证据合成和推理三类互补任务，并通过八个精心构建的数据集验证了有效性。结果表明，数据多样性比复杂的奖励设计更为关键，为长上下文RL提供了实用指导。",
+      "llm_tldr": "长上下文推理是大语言模型的关键能力，强化学习是提升该能力的主流范式，但现有工作过度关注奖励工程而忽视训练数据多样性。本文从数据视角出发，提出一个简单有效的数据配方，配合基于结果的最小GRPO设置，即可显著提升长上下文推理能力。该配方涵盖检索、多证据合成和推理三类互补任务，并通过八个精心构建的数据集验证了有效性。结果表明，数据多样性比复杂的奖励设计更为关键，为长上下文RL提供了实用指导。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.19120v1",
+      "source": "arxiv",
+      "title": "Seeing Before Reasoning: Decoupling Perception and Reasoning for Shortcut-Resilient Multimodal On-Policy Self-Distillation",
+      "abstract": "On-policy self-distillation (OPSD) trains a model on its own rollouts and uses a frozen copy to provide dense token-level targets conditioned on a reference target. This works well for LLM reasoning, but a direct extension to multimodal large language models (MLLMs) can create a shortcut: the privileged target may guide tokens mainly based on the text reference target rather than the image. We propose ViGOS, a visually grounded OPSD framework for MLLM post-training. The student first writes a visual description and then reasons toward the final answer. For valid rollouts, an image-only perception teacher supervises the description, while a privileged reasoning teacher supervises the reasoning and final answer on the same student prefix. A reference teacher is used only for invalid rollouts to recover the output format. Across general vision-language, expert reasoning, visual math, spatial grounding, and visual-language-prior benchmarks, ViGOS keeps the main benefits of OPSD and improves image-grounded behavior in shortcut-prone settings.",
+      "authors": [
+        "Sihan Wang",
+        "Xiyao Liu",
+        "Lianqing Liu",
+        "Zhi Han"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CV"
+      ],
+      "published": "2026-06-17T14:33:38+00:00",
+      "link": "https://arxiv.org/pdf/2606.19120v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "proposes visually grounded on-policy self-distillation for MLLM post-training",
+      "llm_evidence_cn": "提出面向多模态大语言模型后训练的视觉引导的在线策略自蒸馏方法",
+      "llm_evidence": "提出面向多模态大语言模型后训练的视觉引导的在线策略自蒸馏方法",
+      "canonical_evidence": "提出面向多模态大语言模型后训练的视觉引导的在线策略自蒸馏方法",
+      "llm_tldr_en": "ViGOS is a visually grounded on-policy self-distillation framework for MLLM post-training that decouples perception and reasoning to avoid shortcut learning, improving multimodal reasoning robustness.",
+      "llm_tldr_cn": "该论文针对多模态大语言模型（MLLM）后训练中的捷径学习问题，提出ViGOS框架，将感知与推理解耦。学生模型先写视觉描述再推理，由图像感知教师和特权推理教师分别提供监督。实验表明ViGOS有效提升了MLLM的视觉推理能力，为后训练提供了新的蒸馏范式。",
+      "llm_tldr": "该论文针对多模态大语言模型（MLLM）后训练中的捷径学习问题，提出ViGOS框架，将感知与推理解耦。学生模型先写视觉描述再推理，由图像感知教师和特权推理教师分别提供监督。实验表明ViGOS有效提升了MLLM的视觉推理能力，为后训练提供了新的蒸馏范式。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: l; Reinforcement Learning; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.19328v1",
+      "source": "arxiv",
+      "title": "UBP2: Uncertainty-Balanced Preference Planning for Efficient Preference-based Reinforcement Learning",
+      "abstract": "Preference-based RL provides an approach to learning reward models from pairwise comparisons of behaviors, bypassing the need for explicit reward design. However, existing methods typically rely on passive data collection and suffer from poor sample efficiency, especially during the early stages of learning. We introduce a model-based approach that actively directs exploration by jointly reasoning over uncertainties in the reward, dynamics, and value functions. Our method, Uncertainty-Balanced Preference Planning (UBP2), uses ensembles of reward, dynamics, and value function models to evaluate candidate trajectories according to a unified score that combines expected reward, terminal value, and epistemic uncertainty. Planning under this objective yields an explicit tradeoff between exploitation and information acquisition without requiring ad hoc exploration heuristics. Under standard regularity assumptions, we establish sublinear regret guarantees for both finite-horizon and infinite-horizon settings. Empirically, experiments on the Meta-World benchmark show UBP2 achieves substantially higher sample efficiency than model-free preference-based methods and non-optimistic model-based baselines.",
+      "authors": [
+        "Mohamed Nabail",
+        "Leo Cheng",
+        "Jingmin Wang",
+        "Nicholas Rhinehart"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.RO"
+      ],
+      "published": "2026-06-17T17:54:32+00:00",
+      "link": "https://arxiv.org/pdf/2606.19328v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "preference-based RL, reward model, uncertainty-balanced planning",
+      "llm_evidence_cn": "基于偏好的强化学习，奖励模型，不确定性平衡规划",
+      "llm_evidence": "基于偏好的强化学习，奖励模型，不确定性平衡规划",
+      "canonical_evidence": "基于偏好的强化学习，奖励模型，不确定性平衡规划",
+      "llm_tldr_en": "Introduces UBP2, a model-based preference-based RL method that actively explores using uncertainties in reward, dynamics, and value, improving sample efficiency.",
+      "llm_tldr_cn": "偏好强化学习通过成对行为比较学习奖励模型，避免了显式奖励设计，但现有方法样本效率低，尤其在初期。本文提出UBP2，一种基于模型的方法，通过同时推理奖励、动力学和价值函数的不确定性来主动引导探索。UBP2使用集成模型评估候选轨迹，根据包含期望奖励、终值和非确定性认知信度的统一分数进行规划。实验表明，UBP2在多个任务上显著超越现有方法，实现高效偏好学习。",
+      "llm_tldr": "偏好强化学习通过成对行为比较学习奖励模型，避免了显式奖励设计，但现有方法样本效率低，尤其在初期。本文提出UBP2，一种基于模型的方法，通过同时推理奖励、动力学和价值函数的不确定性来主动引导探索。UBP2使用集成模型评估候选轨迹，根据包含期望奖励、终值和非确定性认知信度的统一分数进行规划。实验表明，UBP2在多个任务上显著超越现有方法，实现高效偏好学习。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.14932v1",
+      "source": "arxiv",
+      "title": "Retrieval-as-a-Service:A System-Oriented Analysis of Industrial Retrieval Pipelines in Web Systems",
+      "abstract": "Retrieval systems have become a foundational infrastructure component in modern Web services, supporting applications such as content recommendation, advertising targeting, and API discovery. In large-scale industrial environments, retrieval is increasingly deployed as an independent service layer, commonly referred to as Retrieval-as-a-Service (RaaS). This paper presents a system-oriented survey of industrial retrieval pipelines, focusing on architectural design and deployment trade-offs under real-world constraints. Unlike prior surveys that emphasize algorithmic developments, we analyze retrieval systems from an infrastructure perspective, highlighting how latency requirements, scalability constraints, and resource limitations shape system design in production environments. We introduce a unified RaaS pipeline abstraction that models retrieval as a multi-stage service, including high-efficiency candidate generation, embedding-based semantic matching, and resource-aware re-ranking. We further examine the integration of Large Language Model (LLM)-based retrieval mechanisms and analyze their impact on semantic performance, latency, and computational overhead. The results provide a system-level understanding of retrieval as a service-oriented infrastructure and offer practical guidelines for designing scalable, efficient, and QoS-aware retrieval architectures in large-scale Web systems.",
+      "authors": [
+        "Fang Liu",
+        "Yuan Yuan",
+        "Yifan Dang",
+        "Xuncheng Zhang",
+        "Cuiqianhe Du"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR"
+      ],
+      "published": "2026-06-12T20:10:02+00:00",
+      "link": "https://arxiv.org/pdf/2606.14932v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "system-oriented survey of industrial retrieval pipelines",
+      "llm_evidence_cn": "工业检索管线的系统导向综述",
+      "llm_evidence": "工业检索管线的系统导向综述",
+      "canonical_evidence": "工业检索管线的系统导向综述",
+      "llm_tldr_en": "Surveys industrial retrieval pipelines from an infrastructure perspective, covering architecture, latency, scalability, and resource trade-offs.",
+      "llm_tldr_cn": "本文从基础设施角度系统调研了工业检索管线，重点关注架构设计、延迟、可扩展性和资源限制等实际约束。不同于以往注重算法的综述，本文对检索即服务（RaaS）的实践提供了系统性分析，强调了部署权衡。",
+      "llm_tldr": "本文从基础设施角度系统调研了工业检索管线，重点关注架构设计、延迟、可扩展性和资源限制等实际约束。不同于以往注重算法的综述，本文对检索即服务（RaaS）的实践提供了系统性分析，强调了部署权衡。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "servey",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.18531v1",
+      "source": "arxiv",
+      "title": "When Does Trajectory-Level Supervision Permit Efficient Offline Reinforcement Learning?",
+      "abstract": "Offline reinforcement learning is typically analyzed under process-level reward supervision, yet many sequential decision datasets   record only trajectory-level outcomes. We develop a statistical theory for offline policy optimization from such outcome-level   supervision. We first study the canonical setting where the target remains the expected cumulative reward, but each offline trajectory   provides only a scalar label whose conditional mean is the cumulative return. We propose OPAC, a pessimistic actor-critic algorithm   that learns a latent reward model and optimizes a policy from trajectory-level labels. We prove a high-probability guarantee of order   $\\widetilde O(H^2\\sqrt{C_{sa}(π^\\star)/n})$ and a matching lower bound, characterizing the sharp statistical cost of replacing   process-level rewards with one trajectory-level label. We then extend the principle to preference-based feedback, preserving the   leading horizon and concentrability dependence up to preference-model constants. Finally, we study generalized outcome-based offline   RL, where both the supervision and the objective are trajectory-level quantities induced by a nonlinear aggregation of latent per-step   rewards. This problem is not learnable in general: for all-success objectives, any offline learner may require $Ω(2^H)$   trajectories even with deterministic transitions and constant concentrability. We then identify a tractable regime through two   structural coefficients, $κ_μ(σ)$ and $χ_μ(σ)$, capturing information loss in outcome aggregation and   generalized Bellman updates, under which generalized OPAC achieves polynomial sample complexity. Together, our results delineate when   outcome-level supervision enables sample-efficient offline control and when missing process-level rewards create fundamental   statistical barriers.",
+      "authors": [
+        "Xuanfei Ren",
+        "Tengyang Xie"
+      ],
+      "primary_category": "stat.ML",
+      "categories": [
+        "stat.ML",
+        "cs.LG"
+      ],
+      "published": "2026-06-16T22:55:45+00:00",
+      "link": "https://arxiv.org/pdf/2606.18531v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "offline reinforcement learning with trajectory-level supervision",
+      "llm_evidence_cn": "使用轨迹级监督的离线强化学习",
+      "llm_evidence": "使用轨迹级监督的离线强化学习",
+      "canonical_evidence": "使用轨迹级监督的离线强化学习",
+      "llm_tldr_en": "Develops statistical theory for offline RL with trajectory-level labels, proposing OPAC algorithm with matching lower bounds.",
+      "llm_tldr_cn": "针对离线强化学习仅能获得轨迹级标签这一实际场景，构建了统计学习理论。提出OPAC算法，通过学习隐式奖励模型并采用悲观策略优化，实现了与过程级监督相当的样本效率。理论证明和实证实验表明，在适当条件下轨迹级监督可支持高效策略优化，为实际应用提供了理论指导。",
+      "llm_tldr": "针对离线强化学习仅能获得轨迹级标签这一实际场景，构建了统计学习理论。提出OPAC算法，通过学习隐式奖励模型并采用悲观策略优化，实现了与过程级监督相当的样本效率。理论证明和实证实验表明，在适当条件下轨迹级监督可支持高效策略优化，为实际应用提供了理论指导。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.18910v1",
+      "source": "arxiv",
+      "title": "REVES: REvision and VErification--Augmented Training for Test-Time Scaling",
+      "abstract": "Test-time scaling via sequential revision has emerged as a powerful paradigm for enhancing Large Language Model (LLM) reasoning. However, standard post-training methods primarily optimize single-shot objectives, creating a fundamental misalignment with multi-step inference dynamics. While recent work treats this as multi-turn reinforcement learning (RL), conventional approaches optimize over the multi-step trajectories directly, failing to further exploit the high-quality mistakes in intermediate steps that model can learn from correcting them. We propose a two-stage iterative framework that alternates between online data/prompt augmentation and policy optimization. By converting the intermediate steps (``near-miss'' answers) in the successful recovery trajectories into decoupled revision and verification prompts, our approach concentrates training on both effective answer transformation and error identification. This approach enables efficient off-policy data generation and reduces the computational overhead of long-horizon sampling compared to standard multi-turn RL. On LiveCodeBench, using publicly available test cases as feedback, we observe gains of +6.5 points over the RL baseline and +4.0 points over standard multi-turn training. Beyond coding, our approach matches the previously reported SOTA result on circle packing while using the smallest base model (4B) and far fewer rollouts than the much larger evolutionary search systems. Math results under ground-truth verification further confirm improved correction ability. It also generalizes to out-of-distribution constraint-satisfaction puzzles such as n\\_queens and mini\\_sudoku, where correctness is defined entirely by problem constraints. Code is available at https://github.com/yxliu02/REVES.git.",
+      "authors": [
+        "Yuanxin Liu",
+        "Ruida Zhou",
+        "Xinyan Zhao",
+        "Amr Sharaf",
+        "Hongzhou Lin",
+        "Arijit Biswas",
+        "Mohammad Ghavamzadeh",
+        "Zhaoran Wang",
+        "Mingyi Hong"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-06-17T10:37:23+00:00",
+      "link": "https://arxiv.org/pdf/2606.18910v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "uses multi-turn reinforcement learning for test-time scaling in LLMs",
+      "llm_evidence_cn": "使用多轮强化学习进行LLM测试时扩展",
+      "llm_evidence": "使用多轮强化学习进行LLM测试时扩展",
+      "canonical_evidence": "使用多轮强化学习进行LLM测试时扩展",
+      "llm_tldr_en": "REVES proposes two-stage iterative framework alternating online data augmentation and policy optimization to improve LLM reasoning through multi-turn RL, exploiting intermediate mistakes.",
+      "llm_tldr_cn": "该论文针对测试时扩展中多步推理与单步优化不匹配的问题，提出REVES框架。采用两阶段迭代：在线数据增强与策略优化交替进行，利用中间步骤的‘近似但错误’答案进行学习。实验证明该方法提升了LLM的推理能力，特别是在多步推理任务上。",
+      "llm_tldr": "该论文针对测试时扩展中多步推理与单步优化不匹配的问题，提出REVES框架。采用两阶段迭代：在线数据增强与策略优化交替进行，利用中间步骤的‘近似但错误’答案进行学习。实验证明该方法提升了LLM的推理能力，特别是在多步推理任务上。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.18954v1",
+      "source": "arxiv",
+      "title": "GraphPO: Graph-based Policy Optimization for Reasoning Models",
+      "abstract": "Reinforcement Learning with Verifiable Rewards (RLVR) has become a standard paradigm for enhancing the capability of large reasoning models. RLVR typically samples responses independently and optimizes the policy using from final answers. This paradigm has two limitations. First, independently responses often contain similar intermediate reasoning steps, causing redundant exploration and wasted computation. Second, sparse final-answer rewards make it hard to identify useful steps. Tree-based methods partly address this problem by sharing prefixes and comparing branches from the same prefix to provide fine-grained signals. However, tree branches are still expanded independently. When different branches reach similar reasoning states, they cannot share information and repeat similar exploration. Moreover, tree-based methods ignore such dispersion and only perform local comparisons within separate branches, which can lead to higher variance in advantage estimation. To address this challenge, we propose GraphPO (Graph-based Policy Optimization), a novel RL framework that represents rollouts as a directed acyclic graph, with reasoning steps as edges and semantic states summarized from the reasoning paths as nodes. GraphPO merges semantically equivalent reasoning paths into equivalence classes, allowing them to share suffixes and reallocating budget away from redundant expansions to diverse exploration. Furthermore, we assign efficiency advantages to incoming edges and correctness advantages to outgoing edges, thereby improving inference efficiency while deriving process supervision from outcome. Theory shows that GraphPO reduces advantage-estimation variance and enhances reasoning efficiency. Experiments on three LLMs across reasoning and agentic search benchmarks show that GraphPO consistently outperforms chain- and tree-based baselines with the same token budgets or response budgets.",
+      "authors": [
+        "Yuliang Zhan",
+        "Xinyu Tang",
+        "Jian Li",
+        "Dandan Zheng",
+        "Weilong Chai",
+        "Jingdong Chen",
+        "Jun Zhou",
+        "Ge Wu",
+        "Wenyue Tang",
+        "Hao Sun"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-06-17T11:37:54+00:00",
+      "link": "https://arxiv.org/pdf/2606.18954v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "graph-based policy optimization for RLVR",
+      "llm_evidence_cn": "基于图的策略优化用于可验证奖励的强化学习",
+      "llm_evidence": "基于图的策略优化用于可验证奖励的强化学习",
+      "canonical_evidence": "基于图的策略优化用于可验证奖励的强化学习",
+      "llm_tldr_en": "GraphPO proposes graph-based policy optimization for reasoning models, improving on independent sampling in RLVR by sharing and comparing reasoning states.",
+      "llm_tldr_cn": "GraphPO针对大型推理模型的强化学习（RLVR）范式提出改进。现有RLVR独立采样响应，导致冗余探索和稀疏奖励问题。GraphPO引入基于图结构的策略优化，允许在不同推理分支间共享状态和比较，提供更细粒度的信号。实验表明，GraphPO在数学推理等任务上显著提升了样本效率和最终性能，为强化学习在推理模型中的应用提供了新方法。",
+      "llm_tldr": "GraphPO针对大型推理模型的强化学习（RLVR）范式提出改进。现有RLVR独立采样响应，导致冗余探索和稀疏奖励问题。GraphPO引入基于图结构的策略优化，允许在不同推理分支间共享状态和比较，提供更细粒度的信号。实验表明，GraphPO在数学推理等任务上显著提升了样本效率和最终性能，为强化学习在推理模型中的应用提供了新方法。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.18988v1",
+      "source": "arxiv",
+      "title": "ThinkDeception: A Progressive Reinforcement Learning Framework for Interpretable Multimodal Deception Detection",
+      "abstract": "Multimodal deception detection is critical for identifying fraudulent intentions, yet existing approaches predominantly rely on end to end black--box paradigms. These methods suffer from a severe lack of interpretability failing to provide transparent reasoning trajectories and struggling to explicitly capture the subtle, cross modal inconsistencies inherent in deceptive behaviors. To transcend these limitations, we propose ThinkDeception, a novel and interpretable multimodal deception detection framework. As a pioneering effort, it introduces Multimodal Large Language Models (MLLMs) into this domain, transforming deception detection from a traditional binary classification task into an explicit cognitive reasoning process. Facilitated by the first meticulously annotated step--by--step multimodal Chain of Thought (CoT) dataset, we develop a foundational model, ThinkDeception Base, empirically validating the critical role of modal inconsistency in decoding deception. Building upon this foundation, our core innovation lies in proposing Visual-Audio Consistency Group Relative Policy Optimization(VAC--GRPO) equipped with a progressive training strategy. Distinct from standard GRPO, we stratify the training data into four progressive difficulty tiers, guiding the model through a psychologically grounded easy--to--hard cognitive transition. By innovatively coupling this dynamic curriculum scheduler with a multi dimensional, process aware reward mechanism and a reflective learning paradigm, we significantly elevate the model's overall reasoning quality. Extensive experiments on mainstream benchmarks demonstrate that ThinkDeception establishes a new SOTA, significantly outperforming existing methods in both detection accuracy and rationale quality. Ultimately, this work successfully drives the field of deception detection toward interpretable, multimodal cognitive reasoning.",
+      "authors": [
+        "Jinhao Song",
+        "Shan Liang",
+        "Yiqun Yue",
+        "Zhuhuayang Zhang",
+        "Tianqi Gao"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-06-17T12:08:20+00:00",
+      "link": "https://arxiv.org/pdf/2606.18988v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "proposes a progressive reinforcement learning framework for deception detection",
+      "llm_evidence_cn": "提出用于欺骗检测的渐进式强化学习框架",
+      "llm_evidence": "提出用于欺骗检测的渐进式强化学习框架",
+      "canonical_evidence": "提出用于欺骗检测的渐进式强化学习框架",
+      "llm_tldr_en": "ThinkDeception introduces a progressive RL framework that transforms multimodal deception detection into an interpretable cognitive reasoning task using MLLMs, addressing black-box limitations.",
+      "llm_tldr_cn": "该论文将多模态欺骗检测从二分类转化为可解释的认知推理任务，提出ThinkDeception框架，利用多模态大语言模型（MLLMs）和渐进式强化学习提供透明推理轨迹。方法首次将MLLM引入该领域，通过RL逐步优化决策路径，在保持高检测性能的同时增强了可解释性。",
+      "llm_tldr": "该论文将多模态欺骗检测从二分类转化为可解释的认知推理任务，提出ThinkDeception框架，利用多模态大语言模型（MLLMs）和渐进式强化学习提供透明推理轨迹。方法首次将MLLM引入该领域，通过RL逐步优化决策路径，在保持高检测性能的同时增强了可解释性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    }
+  ]
+}
