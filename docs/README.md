@@ -6,54 +6,63 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-18
-- 运行时间：2026-06-18 21:49:39 UTC
+- 最新运行日期：2026-06-19
+- 运行时间：2026-06-19 20:33:48 UTC
 - 运行状态：成功
-- 本次总论文数：10
-- 精读区：6
-- 速读区：4
+- 本次总论文数：13
+- 精读区：7
+- 速读区：6
 
 ### 今日简报（AI）
-今日精选6篇精读，重点围绕奖励模型优化与离线强化学习效率展开。
+今日精读两篇9.0高分解码LLM推理的路径信用分配与策略稳定性，速读关注推理-摘要协同、模型编辑及环境感知检索。
 
-最值得关注的是两篇高分工作：Rubric-Conditioned Self-Distillation探索奖励监督新范式，Steerable Cultural Preference Optimization实现奖励模型的可控文化偏好对齐。
+最值得关注的两个方向：通过自蒸馏细化推理链中的关键步骤，以及赢家优势策略优化（WAPO）稳定强化学习训练。
 
-建议普通读者优先精读上述两篇，并结合速读中轨迹级离线学习和测试时扩展技术，了解强化学习从训练到推理的全链路改进方向。
-- 详情：[/202606/18/README](/202606/18/README)
+建议聚焦推理路径的信用分配机制与策略优化方法，这两篇精读论文为当前LLM推理增强提供了可落地的技术路线。
+- 详情：[/202606/19/README](/202606/19/README)
 
 ### 精读区论文标签
-1. [Rethinking Reward Supervision: Rubric-Conditioned Self-Distillation](/202606/18/2606.19327v1-rethinking-reward-supervision-rubric-conditioned-self-distillation)  
-   标签：评分：10.0/10、query:lpt
-   evidence：直接针对RLHF中的奖励监督问题，提出基于评分标准条件的自蒸馏方法
-2. [Steerable Cultural Preference Optimization of Reward Models](/202606/18/2606.18606v1-steerable-cultural-preference-optimization-of-reward-models)  
+1. [Localizing Credit at the Divergence: Path-Conditioned Self-Distillation for LLM Reasoning](/202606/19/2606.15576v1-localizing-credit-at-the-divergence-path-conditioned-self-distillation-for-llm-reasoning)  
    标签：评分：9.0/10、query:lpt
-   evidence：提出奖励模型训练算法（SCPO）以融入多样化文化偏好
-3. [Beyond Reward Engineering: A Data Recipe for Long-Context Reinforcement Learning](/202606/18/2606.18831v1-beyond-reward-engineering-a-data-recipe-for-long-context-reinforcement-learning)  
+   evidence：基于可验证奖励的强化学习用于LLM推理，解决信用分配问题
+2. [A Gradient Perspective on RLVR Stability and Winner Advantage Policy Optimization](/202606/19/2606.16154v1-a-gradient-perspective-on-rlvr-stability-and-winner-advantage-policy-optimization)  
    标签：评分：9.0/10、query:lpt
-   evidence：长上下文强化学习，奖励工程
-4. [Seeing Before Reasoning: Decoupling Perception and Reasoning for Shortcut-Resilient Multimodal On-Policy Self-Distillation](/202606/18/2606.19120v1-seeing-before-reasoning-decoupling-perception-and-reasoning-for-shortcut-resilient-multimodal-on-policy-self-distillation)  
+   evidence：通过梯度分析和WAPO算法进行RLHF的奖励建模
+3. [Video-Based Optimal Transport for Feedback-Efficient Offline Preference-Based Reinforcement Learning](/202606/19/2606.16856v1-video-based-optimal-transport-for-feedback-efficient-offline-preference-based-reinforcement-learning)  
    标签：评分：9.0/10、query:lpt
-   evidence：提出面向多模态大语言模型后训练的视觉引导的在线策略自蒸馏方法
-5. [UBP2: Uncertainty-Balanced Preference Planning for Efficient Preference-based Reinforcement Learning](/202606/18/2606.19328v1-ubp2-uncertainty-balanced-preference-planning-for-efficient-preference-based-reinforcement-learning)  
+   evidence：通过人类反馈学习偏好的奖励建模
+4. [ExpRL: Exploratory RL for LLM Mid-Training](/202606/19/2606.17024v1-exprl-exploratory-rl-for-llm-mid-training)  
    标签：评分：9.0/10、query:lpt
-   evidence：基于偏好的强化学习，奖励模型，不确定性平衡规划
-6. [Retrieval-as-a-Service:A System-Oriented Analysis of Industrial Retrieval Pipelines in Web Systems](/202606/18/2606.14932v1-retrieval-as-a-servicea-system-oriented-analysis-of-industrial-retrieval-pipelines-in-web-systems)  
-   标签：评分：8.0/10、query:lpt
-   evidence：工业检索管线的系统导向综述
+   evidence：用于LLM中期训练的强化学习
+5. [WAM-RL: World-Action Model Reinforcement Learning with Reconstruction Rewards and Online Video SFT](/202606/19/2606.17906v1-wam-rl-world-action-model-reinforcement-learning-with-reconstruction-rewards-and-online-video-sft)  
+   标签：评分：9.0/10、query:lpt
+   evidence：强化学习框架用于世界-动作模型
+6. [LLMZero: Discovering Adaptive Training Strategies for RL Post-Training via LLM Agents](/202606/19/2606.18388v1-llmzero-discovering-adaptive-training-strategies-for-rl-post-training-via-llm-agents)  
+   标签：评分：9.0/10、query:lpt
+   evidence：通过LLM代理进行RL后训练策略
+7. [Learning User Simulators with Turing Rewards](/202606/19/2606.19336v1-learning-user-simulators-with-turing-rewards)  
+   标签：评分：9.0/10、query:lpt
+   evidence：使用图灵奖励的强化学习训练用户模拟器，直接建模人类偏好
 
 ### 速读区论文标签
-1. [When Does Trajectory-Level Supervision Permit Efficient Offline Reinforcement Learning?](/202606/18/2606.18531v1-when-does-trajectory-level-supervision-permit-efficient-offline-reinforcement-learning)  
+1. [ReSum: Synergizing LLM Reasoning and Summarization with Reinforcement Learning](/202606/19/2606.13316v1-resum-synergizing-llm-reasoning-and-summarization-with-reinforcement-learning)  
    标签：评分：8.0/10、query:lpt
-   evidence：使用轨迹级监督的离线强化学习
-2. [REVES: REvision and VErification--Augmented Training for Test-Time Scaling](/202606/18/2606.18910v1-reves-revision-and-verification--augmented-training-for-test-time-scaling)  
+   evidence：用于LLM推理的可验证奖励强化学习
+2. [Reinforcement Learning for Neural Model Editing](/202606/19/2606.13461v1-reinforcement-learning-for-neural-model-editing)  
    标签：评分：8.0/10、query:lpt
-   evidence：使用多轮强化学习进行LLM测试时扩展
-3. [GraphPO: Graph-based Policy Optimization for Reasoning Models](/202606/18/2606.18954v1-graphpo-graph-based-policy-optimization-for-reasoning-models)  
+   evidence：强化学习应用于神经模型编辑
+3. [Understanding the Behaviors of Environment-aware Information Retrieval](/202606/19/2606.16817v1-understanding-the-behaviors-of-environment-aware-information-retrieval)  
    标签：评分：8.0/10、query:lpt
-   evidence：基于图的策略优化用于可验证奖励的强化学习
-4. [ThinkDeception: A Progressive Reinforcement Learning Framework for Interpretable Multimodal Deception Detection](/202606/18/2606.18988v1-thinkdeception-a-progressive-reinforcement-learning-framework-for-interpretable-multimodal-deception-detection)  
+   evidence：使用强化学习让LLM根据不同检索器调整查询公式
+4. [Closing the Feedback Loop: From Experience Extraction to Insight Governance in Verbal Reinforcement Learning](/202606/19/2606.17591v1-closing-the-feedback-loop-from-experience-extraction-to-insight-governance-in-verbal-reinforcement-learning)  
    标签：评分：8.0/10、query:lpt
-   evidence：提出用于欺骗检测的渐进式强化学习框架
+   evidence：面向LLM代理的口头强化学习与经验提取及见解治理
+5. [Dense Supervision, Sparse Updates: On the Sparsity and Geometry of On-Policy Distillation](/202606/19/2606.13657v1-dense-supervision-sparse-updates-on-the-sparsity-and-geometry-of-on-policy-distillation)  
+   标签：评分：7.0/10、query:lpt
+   evidence：分析了在策略蒸馏的参数更新稀疏性与几何结构，揭示了可训练子网络，属于后训练算法改进
+6. [Maximum Entropy Inverse Reinforcement Learning for Mean-Field Games with Average Reward](/202606/19/2606.16759v1-maximum-entropy-inverse-reinforcement-learning-for-mean-field-games-with-average-reward)  
+   标签：评分：7.0/10、query:lpt
+   evidence：面向平均场博弈的逆强化学习及其数学公式
 
 
 <div class="dpr-home-promo-card">

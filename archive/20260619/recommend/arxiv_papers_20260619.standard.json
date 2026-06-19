@@ -1,0 +1,530 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-19T20:24:32.548403+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 11,
+    "deep_cap": 6,
+    "deep_selected": 7,
+    "quick_candidates": 6,
+    "quick_skim_target": 11,
+    "quick_selected": 6
+  },
+  "deep_dive": [
+    {
+      "id": "2606.15576v1",
+      "source": "arxiv",
+      "title": "Localizing Credit at the Divergence: Path-Conditioned Self-Distillation for LLM Reasoning",
+      "abstract": "Reinforcement learning from verifiable rewards assigns a single scalar to each rollout, leaving token-level credit assignment underspecified in long reasoning traces. On-policy self-distillation addresses this by letting the same model act as a teacher conditioned on privileged information, producing a dense per-token signal. But the common choice of a ground-truth answer is only an endpoint cue: on terse-answer tasks, the teacher falls silent at the intermediate positions where path-level guidance matters most. We propose Hindsight Self-Distillation (HSD), which conditions the teacher on a successful peer rollout drawn from the current training group. Such a peer is an exact sample from the success-conditioned policy, requiring no additional sampled rollouts. By providing a full successful continuation rather than only the final answer, the resulting credit signal concentrates at the divergence position between a failed rollout and a successful peer. Across Qwen3-8B and Qwen3-32B on math and code benchmarks, HSD obtains the best result against GRPO variants and on-policy distillation baselines, with the largest gains on terse-answer tasks such as AIME.",
+      "authors": [
+        "Yu Li",
+        "Shu Hong",
+        "Tian Lan"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-14T03:37:27+00:00",
+      "link": "https://arxiv.org/pdf/2606.15576v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Reinforcement learning from verifiable rewards for LLM reasoning with credit assignment",
+      "llm_evidence_cn": "基于可验证奖励的强化学习用于LLM推理，解决信用分配问题",
+      "llm_evidence": "基于可验证奖励的强化学习用于LLM推理，解决信用分配问题",
+      "canonical_evidence": "基于可验证奖励的强化学习用于LLM推理，解决信用分配问题",
+      "llm_tldr_en": "Proposes Hindsight Self-Distillation (HSD) for LLM reasoning, a path-conditioned distillation that uses successful peer rollouts as teacher to provide dense token-level credit assignment, improving on-policy self-distillation.",
+      "llm_tldr_cn": "强化学习从可验证奖励中只能给每个轨迹一个标量奖励，导致长推理轨迹中的令牌级信用分配不明确。本文提出事后自蒸馏（HSD），利用当前训练组中成功的同伴轨迹作为教师，在中间位置提供密集的路径级指导。实验证明HSD提升了LLM在数学推理等任务上的性能。",
+      "llm_tldr": "强化学习从可验证奖励中只能给每个轨迹一个标量奖励，导致长推理轨迹中的令牌级信用分配不明确。本文提出事后自蒸馏（HSD），利用当前训练组中成功的同伴轨迹作为教师，在中间位置提供密集的路径级指导。实验证明HSD提升了LLM在数学推理等任务上的性能。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: l; Reinforcement Learning; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.16154v1",
+      "source": "arxiv",
+      "title": "A Gradient Perspective on RLVR Stability and Winner Advantage Policy Optimization",
+      "abstract": "Reinforcement learning with verifiable rewards (RLVR) improves language-model reasoning, but GRPO-style optimization remains prone to collapse. We analyse this instability through token-level gradient dynamics, deriving a taxonomy that predicts how updates affect next-token probabilities and entropy. The taxonomy shows that stability depends jointly on the advantage sign and token distribution under the current policy. Motivated by this finding, we propose Winner Advantage Policy Optimization (WAPO), a simple online clipped policy-gradient objective that updates only on positive-advantage completions. Across mathematical reasoning and multi-hop QA benchmarks, WAPO improves training stability and matches or outperforms baselines across multiple model families. Full code can be found at https://github.com/layer6ai-labs/wapo.",
+      "authors": [
+        "Prasanth YSS",
+        "Zhichen Ren",
+        "Rasa Hosseinzadeh",
+        "Ilan Gofman",
+        "Yuqi Chen",
+        "Zhaoyan Liu",
+        "Guangwei Yu",
+        "Jesse C. Cresswell",
+        "Satya Krishna Gorti"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-15T03:15:27+00:00",
+      "link": "https://arxiv.org/pdf/2606.16154v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "reward modeling for RLHF via gradient analysis and WAPO algorithm",
+      "llm_evidence_cn": "通过梯度分析和WAPO算法进行RLHF的奖励建模",
+      "llm_evidence": "通过梯度分析和WAPO算法进行RLHF的奖励建模",
+      "canonical_evidence": "通过梯度分析和WAPO算法进行RLHF的奖励建模",
+      "llm_tldr_en": "Analyzes RLVR instability via token-level gradient dynamics, proposes Winner Advantage Policy Optimization (WAPO) that updates only on positive-advantage completions, improving training stability and performance.",
+      "llm_tldr_cn": "RLVR（可验证奖励强化学习）在语言模型推理中易出现训练崩塌。本文通过token级别梯度动力学分析，提出胜利者优势策略优化（WAPO），仅更新正优势完成序列。实验证明WAPO在数学推理和多跳QA上提升训练稳定性，匹配或超越基线，并揭示了优势符号与token分布对稳定性的联合影响。",
+      "llm_tldr": "RLVR（可验证奖励强化学习）在语言模型推理中易出现训练崩塌。本文通过token级别梯度动力学分析，提出胜利者优势策略优化（WAPO），仅更新正优势完成序列。实验证明WAPO在数学推理和多跳QA上提升训练稳定性，匹配或超越基线，并揭示了优势符号与token分布对稳定性的联合影响。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.16856v1",
+      "source": "arxiv",
+      "title": "Video-Based Optimal Transport for Feedback-Efficient Offline Preference-Based Reinforcement Learning",
+      "abstract": "Conveying complex objectives to reinforcement learning (RL) agents often requires meticulous reward engineering. Preference-based RL (PbRL) offers a promising alternative by learning reward functions from human feedback, but its scalability is hindered by high labeling costs. Inspired by advances in Video Foundation Models (ViFMs), we present Video-based Optimal Transport Preference (VOTP), a semi-supervised framework that learns effective reward functions from only a handful of labels. By leveraging optimal transport to align visual trajectories within the rich representation space of ViFMs, VOTP effectively generates high-fidelity pseudo-labels for large amounts of unlabeled data, substantially reducing human supervision. Extensive experiments across locomotion and manipulation benchmarks demonstrate the superiority of VOTP, which outperforms state-of-the-art offline PbRL methods under limited feedback budgets. We also showcase the robustness of VOTP in the presence of visual distractors and validate its utility on real robotic tasks, where it learns meaningful rewards with minimal human input.",
+      "authors": [
+        "Tung M. Luu",
+        "Hwanhee Kim",
+        "Younghwan Lee",
+        "Chang D. Yoo"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-06-15T15:31:40+00:00",
+      "link": "https://arxiv.org/pdf/2606.16856v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "reward modeling for learning human preferences in RL from human feedback",
+      "llm_evidence_cn": "通过人类反馈学习偏好的奖励建模",
+      "llm_evidence": "通过人类反馈学习偏好的奖励建模",
+      "canonical_evidence": "通过人类反馈学习偏好的奖励建模",
+      "llm_tldr_en": "VOTP uses optimal transport and video foundation models to learn reward functions from few labels for offline preference-based RL.",
+      "llm_tldr_cn": "偏好强化学习通过人类反馈学习奖励函数，但标注成本高昂。本文提出VOTP，一种半监督框架，利用视频基础模型和最优传输对齐视觉轨迹，仅需少量标签即可生成高质量伪标签，显著减少人工监督。实验表明该方法在反馈高效的离线偏好强化学习中有效。该工作提升了偏好强化学习的可扩展性。",
+      "llm_tldr": "偏好强化学习通过人类反馈学习奖励函数，但标注成本高昂。本文提出VOTP，一种半监督框架，利用视频基础模型和最优传输对齐视觉轨迹，仅需少量标签即可生成高质量伪标签，显著减少人工监督。实验表明该方法在反馈高效的离线偏好强化学习中有效。该工作提升了偏好强化学习的可扩展性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.17024v1",
+      "source": "arxiv",
+      "title": "ExpRL: Exploratory RL for LLM Mid-Training",
+      "abstract": "Sparse reward reinforcement learning (RL) has become a standard tool for improving LLM reasoning, but its success depends critically on the coverage present in the base model. In practice, models are often primed for RL through \\emph{mid-training} on curated reasoning traces that teach useful primitive skills such as decomposition, verification, or self-correction. Although effective, this strategy requires manually specifying what the model should learn, and it remains unclear whether such primitive coverage is enough for much harder problems, which require combining these skills into broader solution strategies. We study a more automated approach: \\emph{RL-based mid-training} using large corpora of human-written question-answer data. Rather than treating reference solutions as targets to imitate, our method, ExpRL, uses them as \\emph{reward scaffolds}: references are hidden from the policy and used only to construct problem-specific grading rubrics for judging on-policy reasoning traces. The policy samples from the original problem prompt, while an LLM judge compares the sampled reasoning trace against the reference solution and assigns outcome-level or process-level dense rewards. This lets ExpRL reinforce partial progress, useful intermediate reductions, and productive reasoning behaviors that sparse final-answer rewards often fail to upweight. On challenging math reasoning tasks, ExpRL yields stronger RL priming than SFT, sparse-reward GRPO, and self-distillation, and provides a better initialization for subsequent sparse-reward RL. Additional mixed-domain experiments further suggest that ExpRL can extend beyond the original math-only setting.",
+      "authors": [
+        "Violet Xiang",
+        "Amrith Setlur",
+        "Chase Blagden",
+        "Nick Haber",
+        "Aviral Kumar"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-15T17:50:44+00:00",
+      "link": "https://arxiv.org/pdf/2606.17024v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Reinforcement Learning for LLM mid-training",
+      "llm_evidence_cn": "用于LLM中期训练的强化学习",
+      "llm_evidence": "用于LLM中期训练的强化学习",
+      "canonical_evidence": "用于LLM中期训练的强化学习",
+      "llm_tldr_en": "ExpRL uses exploratory reinforcement learning to improve LLM reasoning during mid-training, enabling automated skill acquisition without manual specification.",
+      "llm_tldr_cn": "该论文提出ExpRL框架，利用探索性强化学习在LLM中期训练中自动学习推理技能，无需人工指定原始技能。实验表明，基于RL的中期训练能有效提升模型在困难问题上的表现，避免了传统手动设计训练轨迹的局限。",
+      "llm_tldr": "该论文提出ExpRL框架，利用探索性强化学习在LLM中期训练中自动学习推理技能，无需人工指定原始技能。实验表明，基于RL的中期训练能有效提升模型在困难问题上的表现，避免了传统手动设计训练轨迹的局限。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.17906v1",
+      "source": "arxiv",
+      "title": "WAM-RL: World-Action Model Reinforcement Learning with Reconstruction Rewards and Online Video SFT",
+      "abstract": "Recent World-Action (WA) models demonstrate strong generalization ability and data efficiency, but they typically rely on expert trajectories for training. This reliance limits their ability to acquire fine-grained manipulation skills beyond the demonstration distribution and prevents them from continuously improving through real-world interaction. To address these limitations, we propose WAM-RL, a reinforcement learning framework that enables joint optimization of the world model and the action model through online interaction with the environment. By allowing the two components to co-evolve, our approach enhances fine-grained control and adaptability. Specifically, a WA model consists of a world model and an actor. We design a tailored reinforcement learning method with hierarchical optimization to coordinate their improvement. On the methodological side, we systematically investigate the effects of applying reinforcement learning to the action model, as well as online training of the world model within an RL setting. Our experiments reveal a key insight: optimizing only the actor yields improvements on short-horizon tasks, but fails to provide significant gains on long-horizon tasks. In contrast, jointly optimizing both the world model and the actor is critical for achieving strong performance in long-horizon settings. Our work is the first to introduce reinforcement learning into the World-Action paradigm, and provides insights into how online optimization of both the action head and the world model impacts overall performance.",
+      "authors": [
+        "Zezhong Qian",
+        "Xiaowei Chi",
+        "Yu Qi",
+        "Haozhan Li",
+        "Zhi Yang Chen",
+        "Shanghang Zhang"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-06-16T13:29:12+00:00",
+      "link": "https://arxiv.org/pdf/2606.17906v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Reinforcement learning framework for world-action models",
+      "llm_evidence_cn": "强化学习框架用于世界-动作模型",
+      "llm_evidence": "强化学习框架用于世界-动作模型",
+      "canonical_evidence": "强化学习框架用于世界-动作模型",
+      "llm_tldr_en": "Proposes WAM-RL, a reinforcement learning framework that jointly optimizes world model and action model through online interaction, using reconstruction rewards and online video SFT to enhance fine-grained control beyond expert demonstrations.",
+      "llm_tldr_cn": "现有世界-动作模型依赖专家轨迹，限制了细粒度操作技能和持续改进能力。本文提出WAM-RL强化学习框架，通过在线环境交互联合优化世界模型和动作模型，并采用重建奖励和在线视频SFT技术。实验表明该方法在机器人操控任务上显著提升了泛化性和数据效率，使得模型能够获得超出演示分布的精细操作技能。",
+      "llm_tldr": "现有世界-动作模型依赖专家轨迹，限制了细粒度操作技能和持续改进能力。本文提出WAM-RL强化学习框架，通过在线环境交互联合优化世界模型和动作模型，并采用重建奖励和在线视频SFT技术。实验表明该方法在机器人操控任务上显著提升了泛化性和数据效率，使得模型能够获得超出演示分布的精细操作技能。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.18388v1",
+      "source": "arxiv",
+      "title": "LLMZero: Discovering Adaptive Training Strategies for RL Post-Training via LLM Agents",
+      "abstract": "RL post-training strategies are dataset-dependent and reveal a recurring empirical pattern: capacity parameters accumulate monotonically across stages, while regularization parameters predominantly oscillate in response to shifting training dynamics. This distinction matters because fixed schedules commit all parameters to fixed trajectories and therefore cannot express the non-stationary exploration-exploitation tradeoffs that regularization must track; the principle provides actionable design rules for multi-stage training. We discover this through LLMZero, a system where LLM agents search over training trajectories via tree search, diagnosing pathologies at each checkpoint and proposing coordinated multi-parameter transitions. Across 4 diverse GRPO tasks, LLMZero discovers strategies that improve over the base model by 9% to 140% relative and over grid search by 6% to 15% relative, consistently outperforming random search and the skill-based agent. The structural principle transfers across tasks, providing an explanation for why discovered strategies take qualitatively different forms yet share similar parameter dynamics.",
+      "authors": [
+        "Haoyang Fang",
+        "Wei Zhu",
+        "Boran Han",
+        "Alex Zhang",
+        "Zhenyu Pan",
+        "Shuo Yang",
+        "Shuai Zhang",
+        "Jiading Gai",
+        "Peng Tang",
+        "Cuixiong Hu",
+        "Xuan Zhu",
+        "Huzefa Rangwala",
+        "George Karypis",
+        "Bernie Wang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CL",
+        "cs.MA"
+      ],
+      "published": "2026-06-16T18:33:08+00:00",
+      "link": "https://arxiv.org/pdf/2606.18388v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "RL post-training strategy via LLM agents",
+      "llm_evidence_cn": "通过LLM代理进行RL后训练策略",
+      "llm_evidence": "通过LLM代理进行RL后训练策略",
+      "canonical_evidence": "通过LLM代理进行RL后训练策略",
+      "llm_tldr_en": "LLMZero uses LLM agents to search over RL post-training trajectories, discovering adaptive training strategies that improve performance by diagnosing pathologies and proposing coordinated multi-parameter transitions.",
+      "llm_tldr_cn": "现有RL后训练策略依赖固定调度，无法适应非平稳训练动态。LLMZero通过LLM代理树搜索训练轨迹，在每个检查点诊断病理并提出协调的多参数转换。实验表明该方法能自动发现数据集依赖的有效策略，显著提升推理性能，为多阶段RL训练提供了可操作的设计原则。",
+      "llm_tldr": "现有RL后训练策略依赖固定调度，无法适应非平稳训练动态。LLMZero通过LLM代理树搜索训练轨迹，在每个检查点诊断病理并提出协调的多参数转换。实验表明该方法能自动发现数据集依赖的有效策略，显著提升推理性能，为多阶段RL训练提供了可操作的设计原则。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.19336v1",
+      "source": "arxiv",
+      "title": "Learning User Simulators with Turing Rewards",
+      "abstract": "Learning to simulate human users in interactive settings could advance the training of agent assistants, evaluation of personalization systems, research in the social sciences, and more. Existing approaches generally do so by training a large language model (LLM) to match a single ground truth response, either by maximizing the log probability or by using a similarity reward. We instead propose {Turing-RL}: a Turing-Test-based reinforcement learning approach for training user simulator models. {Turing-RL} uses a discriminative Turing reward with an LLM judge to score how indistinguishable a generated response is from the real user's given the user's history, and the user simulator LLM learns to produce responses indistinguishable from what the user could have said with such rewards. Across two different domains--conversational chat and Reddit forum discussion--we find that {Turing-RL} consistently outperforms baseline methods on both LLM and human evaluation metrics. Our study suggests that optimizing for indistinguishability, rather than response matching, is effective for learning user simulators.",
+      "authors": [
+        "Yingshan Susan Wang",
+        "Cedegao E. Zhang",
+        "Linlu Qiu",
+        "Zexue He",
+        "Pengyuan Li",
+        "Alex Pentland",
+        "Roger P. Levy",
+        "Yoon Kim"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-06-17T17:58:48+00:00",
+      "link": "https://arxiv.org/pdf/2606.19336v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "RL with Turing reward for user simulation, directly models human preferences",
+      "llm_evidence_cn": "使用图灵奖励的强化学习训练用户模拟器，直接建模人类偏好",
+      "llm_evidence": "使用图灵奖励的强化学习训练用户模拟器，直接建模人类偏好",
+      "canonical_evidence": "使用图灵奖励的强化学习训练用户模拟器，直接建模人类偏好",
+      "llm_tldr_en": "Turing-RL trains user simulator models via a Turing-test-based reinforcement learning approach, using a discriminative reward to make LLM responses indistinguishable from real users.",
+      "llm_tldr_cn": "该论文提出Turing-RL方法，通过基于图灵测试的强化学习训练用户模拟器。该方法使用LLM判别器作为奖励函数，判断生成响应是否与真实用户不可区分。通过最大化这一图灵奖励，模拟器学习产生逼真的用户行为。在多个交互任务上，Turing-RL生成的用户模拟器显著优于基于最大似然或相似度奖励的方法，为智能体训练、个性化评估等提供了更真实的模拟环境。",
+      "llm_tldr": "该论文提出Turing-RL方法，通过基于图灵测试的强化学习训练用户模拟器。该方法使用LLM判别器作为奖励函数，判断生成响应是否与真实用户不可区分。通过最大化这一图灵奖励，模拟器学习产生逼真的用户行为。在多个交互任务上，Turing-RL生成的用户模拟器显著优于基于最大似然或相似度奖励的方法，为智能体训练、个性化评估等提供了更真实的模拟环境。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.13316v1",
+      "source": "arxiv",
+      "title": "ReSum: Synergizing LLM Reasoning and Summarization with Reinforcement Learning",
+      "abstract": "Reinforcement Learning with Verifiable Rewards (RLVR) is a central technique for improving long-horizon reasoning in Large Language Models (LLMs). However, existing RLVR methods often encourage unnecessarily long reasoning rollouts, which can degrade reasoning coherence and exhaust the available context budget. Existing approaches to long-context organization often depend on external mechanisms to organize rollouts, rather than enabling the model to manage its own reasoning trajectory. To address this limitation, we propose ReSum, a novel RLVR framework that enables LLMs to compress and organize their reasoning trajectories through self-summarization. Our pilot studies show that self-summarization stabilizes generation by lowering token-level entropy, and that introducing a ``summarization'' phrase can substantially mitigate errors propagated from an incorrect rollout prefix. Motivated by these findings, ReSum adopts a summarization-aware adaptive rollout mechanism that contrastively evaluates whether self-summarization benefits the ongoing reasoning process. Specifically, when the model spontaneously triggers self-summarization, ReSum masks the summarization phrase to create a contrastive branch; for non-summarization positions, it instead randomly injects the phrase to create a matched branch. We further design a summarization-aware advantage to enable finer-grained comparison between contrastive rollout trajectories. Extensive experiments show that ReSum improves performance at an average of 4\\% while reducing rollout length by 18.6\\%.",
+      "authors": [
+        "Xucong Wang",
+        "Ziyu Ma",
+        "Yong Wang",
+        "Shidong Yang",
+        "Hailang Huang",
+        "Renda Li",
+        "Pengkun Wang",
+        "Xiangxiang Chu"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-06-11T13:10:48+00:00",
+      "link": "https://arxiv.org/pdf/2606.13316v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Reinforcement Learning with Verifiable Rewards for LLM reasoning",
+      "llm_evidence_cn": "用于LLM推理的可验证奖励强化学习",
+      "llm_evidence": "用于LLM推理的可验证奖励强化学习",
+      "canonical_evidence": "用于LLM推理的可验证奖励强化学习",
+      "llm_tldr_en": "ReSum proposes an RLVR framework enabling LLMs to self-summarize reasoning trajectories, stabilizing generation and improving coherence while reducing token-level entropy.",
+      "llm_tldr_cn": "现有RLVR方法鼓励生成长推理链，导致文本冗长和上下文预算紧张。ReSum提出让LLM通过自摘要压缩和组织推理轨迹，无需外部机制。实验表明自摘要降低了token级熵，稳定了生成过程，在保持推理质量的同时节省上下文空间，为RLVR提供了轻量级改进方案。",
+      "llm_tldr": "现有RLVR方法鼓励生成长推理链，导致文本冗长和上下文预算紧张。ReSum提出让LLM通过自摘要压缩和组织推理轨迹，无需外部机制。实验表明自摘要降低了token级熵，稳定了生成过程，在保持推理质量的同时节省上下文空间，为RLVR提供了轻量级改进方案。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.13657v1",
+      "source": "arxiv",
+      "title": "Dense Supervision, Sparse Updates: On the Sparsity and Geometry of On-Policy Distillation",
+      "abstract": "On-policy distillation (\\textsc{OPD}) has recently become a prominent post-training recipe as it combines two desirable ingredients: on-policy student trajectories and dense teacher supervision, yet how this hybrid changes a model's parameters remains unclear. Across several language and vision-language model pairs and use cases, our analysis yields two main findings. On sparsity, \\textsc{OPD}-style updates are small and coordinate-sparse. They are distributed across layers and are usually FFN-heavy. This sparse structure is operationally useful: training only the discovered subnetwork recovers nearly the same performance as full \\textsc{OPD}. However, the sparsity-inducing SGD optimizer underperforms AdamW in our optimizer ablation, likely because dense teacher supervision preserves heterogeneous coordinate-wise gradient scales where AdamW's adaptive scaling remains useful. On geometry, the updates are numerically full-rank but spectrally concentrated; they lie mostly away from the principal singular subspaces of the source weights and fall disproportionately on coordinates where the source weights are close to zero. These findings suggest that dense teacher supervision does not turn \\textsc{OPD} into ordinary dense parameter rewriting; instead, \\textsc{OPD} retains important geometric signatures of on-policy post-training.",
+      "authors": [
+        "Guo Yu",
+        "Wenlin Liu",
+        "Yulan Hu",
+        "Hao-Xuan Ma",
+        "Jun-Peng Jiang",
+        "Han-Jia Ye"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-11T17:54:09+00:00",
+      "link": "https://arxiv.org/pdf/2606.13657v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "analyzes sparsity and geometry of on-policy distillation updates, revealing trainable subnetwork, which is an algorithm improvement for post-training",
+      "llm_evidence_cn": "分析了在策略蒸馏的参数更新稀疏性与几何结构，揭示了可训练子网络，属于后训练算法改进",
+      "llm_evidence": "分析了在策略蒸馏的参数更新稀疏性与几何结构，揭示了可训练子网络，属于后训练算法改进",
+      "canonical_evidence": "分析了在策略蒸馏的参数更新稀疏性与几何结构，揭示了可训练子网络，属于后训练算法改进",
+      "llm_tldr_en": "Analyzes sparsity and geometry of on-policy distillation updates in LLMs, showing small coordinate-sparse updates that enable training only a subnetwork with similar performance, and finds AdamW outperforms SGD for sparsity.",
+      "llm_tldr_cn": "针对在策略蒸馏（OPD）在后训练中的广泛应用，本文深入分析了其参数更新模式。研究发现OPD更新具有坐标稀疏性且集中在FFN层，利用该稀疏结构仅训练发现子网络即可恢复大部分性能，但稀疏诱导的SGD优化器效果不如AdamW。这为理解后训练的内部机制和设计更高效的微调策略提供了重要指导。",
+      "llm_tldr": "针对在策略蒸馏（OPD）在后训练中的广泛应用，本文深入分析了其参数更新模式。研究发现OPD更新具有坐标稀疏性且集中在FFN层，利用该稀疏结构仅训练发现子网络即可恢复大部分性能，但稀疏诱导的SGD优化器效果不如AdamW。这为理解后训练的内部机制和设计更高效的微调策略提供了重要指导。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.13461v1",
+      "source": "arxiv",
+      "title": "Reinforcement Learning for Neural Model Editing",
+      "abstract": "Editing pretrained neural networks requires specialized algorithms tailored to specific objectives. Designing such algorithms is often time-consuming and demands significant effort. We present an exploratory framework that formulates neural model editing as a reinforcement learning problem, where agents modify models using reward feedback. We introduce two environments: MaskWorld, where agents scale weights multiplicatively, and ShiftWorld, where agents apply additive weight updates. The reward function combines a utility-preservation objective with a task-specific editing objective, enabling agents to learn targeted modifications while maintaining overall model performance. We evaluate the framework on bias mitigation in text classification and machine unlearning in image classification, both of which traditionally rely on specialized algorithms. Our results show that the learned policies reduce forget set accuracy to nearly 0% while preserving over 90% retain set accuracy on the unlearning task. In the bias mitigation setting, the learned policies improve bias-related performance by more than 5% while maintaining general classification utility. Our findings show that neural model editing can be cast as a reinforcement learning problem, allowing editing policies to be learned from reward feedback rather than manually engineered for each task.",
+      "authors": [
+        "Shaivi Malik"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CV"
+      ],
+      "published": "2026-06-11T15:16:42+00:00",
+      "link": "https://arxiv.org/pdf/2606.13461v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Reinforcement Learning applied to neural model editing",
+      "llm_evidence_cn": "强化学习应用于神经模型编辑",
+      "llm_evidence": "强化学习应用于神经模型编辑",
+      "canonical_evidence": "强化学习应用于神经模型编辑",
+      "llm_tldr_en": "Formulates neural model editing as a reinforcement learning problem with reward feedback, enabling targeted modifications such as bias mitigation and unlearning.",
+      "llm_tldr_cn": "该论文将神经模型编辑形式化为强化学习问题，通过奖励反馈训练智能体调整模型权重。在偏见缓解和机器遗忘任务上，该方法能有效保留模型性能的同时实现定向编辑，展示了RL在模型修改中的潜力。",
+      "llm_tldr": "该论文将神经模型编辑形式化为强化学习问题，通过奖励反馈训练智能体调整模型权重。在偏见缓解和机器遗忘任务上，该方法能有效保留模型性能的同时实现定向编辑，展示了RL在模型修改中的潜力。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.16759v1",
+      "source": "arxiv",
+      "title": "Maximum Entropy Inverse Reinforcement Learning for Mean-Field Games with Average Reward",
+      "abstract": "We study inverse reinforcement learning for discrete-time, infinite-horizon mean-field games (MFGs) under an average-reward criterion. Expert demonstrations are assumed to arise from a stationary mean-field equilibrium under an unknown reward, and the goal is to recover a policy explaining the observed behaviour via the maximum causal entropy principle. We formulate the inverse problem by enforcing consistency with the expert mean-field term and long-run feature expectations, treating two reward classes within a unified occupation-measure framework. For finite-dimensional linear rewards, we give a convex dual reformulation with an explicit log-partition objective, and prove smoothness and curvature properties justifying constant-step-size gradient descent. For infinite-dimensional RKHS rewards, we develop a Lagrangian relaxation whose inner-maximising policy is characterised by a soft Bellman equation. The main obstacle is the absence of a discount-factor contraction. We resolve this by introducing a minorisation-based sub-stochastic kernel that yields a strict contraction of the soft Bellman operator. We establish Fréchet differentiability and Lipschitz smoothness of the log-likelihood score, leading to a gradient ascent algorithm with convergence guarantees. Two numerical examples, a malware-spread MFG and an RKHS-based consumer-choice model, show that the recovered policies closely match expert behaviour.",
+      "authors": [
+        "Şevket Kaan Alkır",
+        "Naci Saldı",
+        "Berkay Anahtarcı",
+        "Can Deha Karıksız"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-15T14:13:16+00:00",
+      "link": "https://arxiv.org/pdf/2606.16759v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "inverse reinforcement learning with mathematical formulation for mean-field games",
+      "llm_evidence_cn": "面向平均场博弈的逆强化学习及其数学公式",
+      "llm_evidence": "面向平均场博弈的逆强化学习及其数学公式",
+      "canonical_evidence": "面向平均场博弈的逆强化学习及其数学公式",
+      "llm_tldr_en": "Maximum entropy inverse RL for mean-field games with average reward, featuring convex dual reformulation.",
+      "llm_tldr_cn": "该论文研究平均场博弈下的逆强化学习，假设专家演示来自未知奖励下的平稳均衡。作者通过最大因果熵原理恢复策略，给出有限维线性奖励的凸对偶重构并证明光滑性。该方法为多智能体系统中从演示学习奖励提供了理论基础，但暂未直接关联LLM。该工作属于RL数学公式化的贡献。",
+      "llm_tldr": "该论文研究平均场博弈下的逆强化学习，假设专家演示来自未知奖励下的平稳均衡。作者通过最大因果熵原理恢复策略，给出有限维线性奖励的凸对偶重构并证明光滑性。该方法为多智能体系统中从演示学习奖励提供了理论基础，但暂未直接关联LLM。该工作属于RL数学公式化的贡献。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.16817v1",
+      "source": "arxiv",
+      "title": "Understanding the Behaviors of Environment-aware Information Retrieval",
+      "abstract": "Recent retrieval-augmented generation (RAG) approaches have demonstrated strong capability in handling complex queries, yet current research overlooks a critical challenge: different retrievers require fundamentally different query formulation strategies for optimal performance. In this work, we present the first systematic analysis of how LLMs can learn to adapt their query formulation strategies for different retrievers via reinforcement learning (RL). Our empirical study reveals that RL effectively teaches an LLM to tailor its queries to specific retriever characteristics. We discover that different retrievers exhibit surprisingly distinct optimal query styles (e.g., descriptive vs. question-like), suggesting strategies learned for one retriever ineffective for another. We further show that performance can be enhanced by incorporating retriever-specific human guidance and by scaling model size. To facilitate learning over multi-retrieval-step trajectories, we introduce a branching-based rollout technique that improves training stability. Our work provides the first empirical evidence and actionable insights for building truly retriever-aware RAG systems. Code and resources are available at https://github.com/LCO-Embedding/Envs-aware-Information-Retrieval.",
+      "authors": [
+        "Ruifeng Yuan",
+        "Chaohao Yuan",
+        "David Dai",
+        "Yu Rong",
+        "Hong Cheng",
+        "Hou Pong Chan",
+        "Chenghao Xiao"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.IR"
+      ],
+      "published": "2026-06-15T15:02:52+00:00",
+      "link": "https://arxiv.org/pdf/2606.16817v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Uses reinforcement learning to adapt LLM query formulation for different retrievers",
+      "llm_evidence_cn": "使用强化学习让LLM根据不同检索器调整查询公式",
+      "llm_evidence": "使用强化学习让LLM根据不同检索器调整查询公式",
+      "canonical_evidence": "使用强化学习让LLM根据不同检索器调整查询公式",
+      "llm_tldr_en": "First systematic analysis showing LLMs can learn to adapt query formulation strategies for different retrievers via RL, revealing distinct optimal query styles per retriever.",
+      "llm_tldr_cn": "当前检索增强生成忽视了不同检索器需要不同查询策略的问题。本文首次系统分析了LLM如何通过强化学习为不同检索器定制查询公式。实验发现，不同检索器具有显著不同的最优查询风格（如描述式与问答式），表明为一个检索器学习的策略可能不适用于另一个。",
+      "llm_tldr": "当前检索增强生成忽视了不同检索器需要不同查询策略的问题。本文首次系统分析了LLM如何通过强化学习为不同检索器定制查询公式。实验发现，不同检索器具有显著不同的最优查询风格（如描述式与问答式），表明为一个检索器学习的策略可能不适用于另一个。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.17591v1",
+      "source": "arxiv",
+      "title": "Closing the Feedback Loop: From Experience Extraction to Insight Governance in Verbal Reinforcement Learning",
+      "abstract": "Training-free verbal reinforcement learning enables LLM agents to learn from world feedback -- objective signals such as dynamic task outcomes, market returns, or demand forecasts -- by extracting verbal rules from experience and injecting them as context, updating the agent's behavior without parameter changes. However, in non-stationary environments these agents face a retention-forgetting dilemma: retaining stale insights causes negative transfer, while discarding them causes catastrophic forgetting when conditions recur. We identify four requirements for navigating this dilemma -- outcome-driven evaluation, persistent structured evidence, non-monotonic knowledge lifecycle, and compositional governance -- and show that existing methods invest heavily in experience extraction while underinvesting in insight governance. We propose a three-layer architecture -- rules, evidence, and skills -- connected by a feedback-driven curation loop that closes the governance gap. Rules capture distilled experience from world outcomes; evidence logs track each rule's reliability across episodes; skills govern which rules to apply, how to resolve conflicts, and when to abstain. On financial forecasting as a case study, where world feedback is naturally abundant, noisy, and non-stationary, we show that the same accumulated experience either degrades performance below the zero-shot baseline or dramatically improves accuracy and risk-adjusted returns, depending on whether the curation loop is present.",
+      "authors": [
+        "Yanwei Cui",
+        "Xing Zhang",
+        "Yulong Zhang",
+        "Li Shao",
+        "Xiaofeng Shi",
+        "Guanghui Wang",
+        "Peiyang He"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-06-16T06:55:55+00:00",
+      "link": "https://arxiv.org/pdf/2606.17591v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Verbal reinforcement learning for LLM agents with experience extraction and insight governance",
+      "llm_evidence_cn": "面向LLM代理的口头强化学习与经验提取及见解治理",
+      "llm_evidence": "面向LLM代理的口头强化学习与经验提取及见解治理",
+      "canonical_evidence": "面向LLM代理的口头强化学习与经验提取及见解治理",
+      "llm_tldr_en": "This paper addresses the retention-forgetting dilemma in training-free verbal RL for LLM agents, proposing structured insight governance to handle non-stationary feedback and improve long-term adaptation.",
+      "llm_tldr_cn": "该论文针对无训练口头强化学习中LLM代理在非平稳环境下的保留-遗忘困境，提出通过结构化经验提取和见解治理来平衡旧知识的保留与新知识的适应，从而避免负迁移和灾难性遗忘。实验表明该方法能有效提升代理在动态任务中的长期表现。",
+      "llm_tldr": "该论文针对无训练口头强化学习中LLM代理在非平稳环境下的保留-遗忘困境，提出通过结构化经验提取和见解治理来平衡旧知识的保留与新知识的适应，从而避免负迁移和灾难性遗忘。实验表明该方法能有效提升代理在动态任务中的长期表现。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    }
+  ]
+}

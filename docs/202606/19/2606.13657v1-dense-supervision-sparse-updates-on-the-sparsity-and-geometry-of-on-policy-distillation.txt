@@ -1,0 +1,739 @@
+Title: Dense Supervision, Sparse Updates: On the Sparsity and Geometry of On-Policy Distillation
+
+URL Source: https://arxiv.org/pdf/2606.13657v1
+
+Published Time: Fri, 12 Jun 2026 01:19:39 GMT
+
+Number of Pages: 21
+
+Markdown Content:
+Preprint. 
+
+# Dense Supervision, Sparse Updates: On the Sparsity and Geometry of On-Policy Distillation 
+
+Guo Yu, Hao-Xuan Ma, Jun-Peng Jiang, Han-Jia Ye ∗
+
+School of Artificial Intelligence, Nanjing University National Key Laboratory for Novel Software Technology, Nanjing University 
+
+Wenlin Liu, Yulan Hu ∗
+
+Amap, Alibaba Group 
+
+Abstract 
+
+On-policy distillation (OPD) has recently become a prominent post-training recipe as it combines two desirable ingredients: on-policy student trajecto-ries and dense teacher supervision, yet how this hybrid changes a model’s parameters remains unclear. Across several language and vision-language model pairs and use cases, our analysis yields two main findings. On sparsity, OPD-style updates are small and coordinate-sparse. They are distributed across layers and are usually FFN-heavy. This sparse structure is operationally useful: training only the discovered subnetwork recovers nearly the same performance as full OPD. However, the sparsity-inducing SGD optimizer underperforms AdamW in our optimizer ablation, likely be-cause dense teacher supervision preserves heterogeneous coordinate-wise gradient scales where AdamW’s adaptive scaling remains useful. On geom-etry, the updates are numerically full-rank but spectrally concentrated; they lie mostly away from the principal singular subspaces of the source weights and fall disproportionately on coordinates where the source weights are close to zero. These findings suggest that dense teacher supervision does not turn OPD into ordinary dense parameter rewriting; instead, OPD re-tains important geometric signatures of on-policy post-training. Code is available at https://github.com/SydCS/OPD-Param-Analysis. 
+
+1 Introduction 
+
+On-policy distillation (OPD) is emerging as a third major component in post-training pipelines for large language models, alongside supervised fine-tuning and reinforcement learning (Yang et al., 2025; Li et al., 2026; Xiao et al., 2026; DeepSeek-AI, 2026). Recent practice uses OPD to transfer frontier-model reasoning into smaller students, unify multiple post-training capabilities, or turn privileged information into dense learning signals on student-generated trajectories (Song & Zheng, 2026). The reason for this momentum is conceptually intuitive. Conventional supervised fine-tuning and offline distillation provide dense token-level supervision, but train on fixed demonstrations that may differ from what the model will generate at test time, where distribution shift can cause compounding errors (Ross et al., 2011; Bengio et al., 2015). RLVR trains on the current policy’s own samples, but learns from environment- or verifier-derived outcome rewards that are often sparse, and therefore faces a credit-assignment problem. OPD, motivated by on-policy imitation approaches, combines the attractive parts of both: it keeps the data on-policy from the student model while replacing environmental reward feedback with dense teacher supervision (Agarwal et al., 2024). Table 1 summarizes this conceptual position relative to SFT, offline distillation, and RLVR. 
+
+> ∗
+
+Corresponding authors. 
+
+1
+
+> arXiv:2606.13657v1 [cs.LG] 11 Jun 2026
+
+Preprint. Table 1: Conceptual position of OPD relative to SFT, offline S EQ KD, and RLVR. OPD combines on-policy student samples with dense teacher feedback.                
+
+> Training regime Sample source Learning signal Analogy SFT Fixed data Dense token labels Behavioral Cloning in imitation learning Offline KD Teacher demonstrations Dense token labels Behavioral Cloning in imitation learning RLVR Current policy Sparse trajectory reward Policy-based reinforcement learning OPD Current policy Dense teacher feedback Interactive imitation learning
+
+Despite its empirical success, what OPD does to a model remains less understood. Prior post-training pipelines were often organized as SFT followed by RLVR, and recent work shows that these two stages can behave very differently in weight space. Mukherjee et al. (2026a) find that dense-supervised off-policy fine-tuning produces much denser parameter updates than on-policy sparse-rewarded RLVR, which instead modifies a relatively small subnetwork. Zhu et al. (2025) further argue that RLVR moves away from the principal directions of the source weights. These findings leave a gap precisely where OPD sits: if the data are on-policy, but the learning signal comes from teacher demonstrations rather than environment rewards, and is dense rather than sparse, should the update look more like supervised distillation, more like RLVR, or like a distinct regime? This paper answers that question by analyzing the sparsity and geometry of OPD parameter updates. We compute parameter updates between source models and OPD-trained models, measure their norm and coordinate sparsity, localize their module and layer structure, compare their masks with RLVR updates, and analyze their singular spectra and alignment with source-weight singular subspaces. Results across several model pairs give a coherent picture: OPD-style updates are small in relative norm, sparse at checkpoint precision, FFN-heavy, numerically full-rank yet spectrally concentrated, and strongly biased away from source principal coordinates toward coordinates where the source weights are close to zero. OPD subnetwork masks also overlap with RLVR or teacher-varied OPD masks far above random baselines. We further test whether these signatures matter operationally through two interventions. First, we restart OPD from the source checkpoint and train only coordinates selected by nonzero checkpoint-delta masks. The mask discovered from the full OPD run recovers nearly the same reasoning performance as full training, while density-matched random masks are generally lower. Second, we compare AdamW and SGD under the same JustRL-teacher OPD setting and inspect AdamW optimizer states. SGD lags behind AdamW, suggesting that sparse final-update support does not by itself make adaptive coordinate-wise scaling unnecessary. Together, these results show that dense teacher supervision does not make OPD an ordinary dense parameter-rewriting process. Although OPD lies between supervised fine-tuning and RLVR in objective design, its parameter updates are closer to sparse on-policy editing than to dense supervised rewriting. This points to the on-policy data distribution, not reward sparsity alone, as a major determinant of post-training update geometry. 
+
+2 Background 
+
+2.1 OPD as on-policy dense supervision 
+
+OPD can be formulated as dense teacher supervision applied to on-policy student behavior (Agarwal et al., 2024). In ordinary supervised fine-tuning or offline knowledge distilla-tion, the model is optimized on a fixed dataset of target sequences (Hinton et al., 2015; Kim & Rush, 2016). In RLVR, the model samples from its current policy and receives an environment- or verifier-derived reward signal, often at the sequence level (Shao et al., 2024). In OPD, the student also samples from its current policy, but the teacher supplies token-level feedback on the sampled sequence. This gives OPD the data distribution of on-policy learning and the dense supervision of distillation. 2Preprint. Formally, let πθ be the student policy and πT be the teacher. For a prompt x ∼ D , OPD first samples a response y = ( y1, . . . , yT ) ∼ πθ (·| x), and then minimizes a teacher-student divergence on the student-generated trajectory: 
+
+LOPD (θ) = Ex∼D , y∼πθ (·| x)
+
+" T
+
+# ∑
+
+> t=1
+
+D(πT (·| x, y<t) ∥ πθ (·| x, y<t)) 
+
+#
+
+, (1) where D can be instantiated as forward / reverse KL divergence, JS divergence, or another token-level f -divergence. The key point is that the conditioning prefixes y<t come from the student, not from a fixed teacher trace. This distinction turns OPD into a useful diagnostic for post-training dynamics. If sparse RLVR updates were mainly a consequence of sparse environment rewards, then replacing those rewards with dense teacher-derived feedback might be expected to produce much denser parameter changes. If instead the key ingredient is that the model trains near its own policy distribution, then OPD should retain part of the sparse and off-principal structure observed in RLVR, despite changing both the source and density of the learning signal. 
+
+2.2 Parameter Dynamics in LLM Post-Training 
+
+Recent work has begun to analyze post-training through parameter updates rather than only through reward curves or benchmark scores. Mukherjee et al. (2026a) show that RLVR often changes only a small subnetwork of an LLM, with subnetwork-only fine-tuning recovering the full run. Zhu et al. (2025) argue that this apparent sparsity reflects a model-conditioned geometry: RLVR updates are biased away from the principal directions of the source weights and toward low-curvature, spectrum-preserving regions. Mukherjee et al. (2026b) connect these dynamics to optimization, showing that SGD can be surprisingly competitive with AdamW in RLVR and can induce even sparser visible updates. These findings raise the question of what parameter characteristics OPD induces. 
+
+3 Parameter updates analysis 
+
+We use model checkpoint deltas to ask three complementary questions about what OPD changes in weight space. First, scale and coordinate-support metrics ask whether the final update is globally small and whether it is written into many or few visible coordinates. Second, spectral metrics ask whether 2D weight-matrix updates are low-rank in a strict sense, or instead full-rank with concentrated singular-value energy. Third, source-geometry metrics ask whether updates reuse the dominant singular directions of the source weights or write into different, low-magnitude coordinates. We examine the parameter updates between source and trained checkpoints across ten model pairs for the scale, sparsity, spectral, and source-geometry analyses in Sections 4 and 5. See Appendix A.3 for details. Six are OPD-style targets: DS-Qwen 1 distilled from either the DeepScaleR-1.5B teacher (Luo et al., 2025) or the JustRL teacher (He et al., 2025), MiniCPM5-1B-SFT to MiniCPM5-1B OPD (OpenBMB, 2026), Qwen2.5-VL-3B-Instruct distilled from the NoisyRollout-7B teacher (Bai et al., 2025; Liu et al., 2026), Qwen3-1.7B-Base distilled from the Qwen3-4B-Base-GRPO teacher, and Qwen3-4B to an OPSD checkpoint (Yang et al., 2025; Zhao et al., 2026). We also include three RLVR references: DeepScaleR-1.5B (Luo et al., 2025), JustRL (He et al., 2025), and a Qwen2.5-VL-3B-Instruct GRPO checkpoint. Finally, we include Qwen2.5-Math-1.5B to DS-Qwen as a conventional distillation-style contrast (Yang et al., 2024; Guo et al., 2025). Together, these analyzed model pairs cover both LLM and VLM settings, as well as the three application categories outlined in Appendix A.1: large-to-small distillation, capability consolidation, and self-distillation from privileged information. For each matched floating-point tensor, we calculate the checkpoint delta by subtracting the stored weights loaded as bfloat16, ∆W = Wtrained − Wsrc , and use float32 arithmetic for norms, SVD, projections, and energy statistics. For scale and coordinate support, the 
+
+> 1We use DS-Qwen to denote DeepSeek-R1-Distill-Qwen-1.5B, a DeepSeek-R1 offline distilled model in the Qwen2.5-Math family.
+
+3Preprint. Qwen-Math 
+
+> Distill
+> DeepScaleR
+> RLVR
+> DS-Qwen
+> OPD
+> JustRL
+> RLVR
+> DS-Qwen
+> OPD (JustRL)
+> MiniCPM
+> OPD
+> Qwen2.5-VL
+> GRPO
+> Qwen2.5-VL
+> OPD
+> Qwen3-1.7B
+> OPD
+> Qwen3
+> OPSD
+> 10 −1
+> 10 0
+> 10 1
+> Relative delta norm (%)
+> A. OPD updates are small
+> Qwen-Math
+> Distill
+> DeepScaleR
+> RLVR
+> DS-Qwen
+> OPD
+> JustRL
+> RLVR
+> DS-Qwen
+> OPD (JustRL)
+> MiniCPM
+> OPD
+> Qwen2.5-VL
+> GRPO
+> Qwen2.5-VL
+> OPD
+> Qwen3-1.7B
+> OPD
+> Qwen3
+> OPSD
+> 0
+> 20
+> 40
+> 60
+> 80
+> 100
+> Sparsity at 1e-5 (%)
+> B. Visible updates are coordinate-sparse
+> Qwen-Math
+> Distill
+> DeepScaleR
+> RLVR
+> DS-Qwen
+> OPD
+> JustRL
+> RLVR
+> DS-Qwen
+> OPD (JustRL)
+> MiniCPM
+> OPD
+> Qwen2.5-VL
+> GRPO
+> Qwen2.5-VL
+> OPD
+> Qwen3-1.7B
+> OPD
+> Qwen3
+> OPSD
+> 0
+> 10
+> 20
+> 30
+> 40
+> Median top-16 SVD energy (%)
+> C. Updates are spectrally concentrated
+> Qwen-Math
+> Distill
+> DeepScaleR
+> RLVR
+> DS-Qwen
+> OPD
+> JustRL
+> RLVR
+> DS-Qwen
+> OPD (JustRL)
+> MiniCPM
+> OPD
+> Qwen2.5-VL
+> GRPO
+> Qwen2.5-VL
+> OPD
+> Qwen3-1.7B
+> OPD
+> Qwen3
+> OPSD
+> 0
+> 10
+> 20
+> 30
+> 40
+> 50
+> 60
+> Visible-update coverage (%)
+> D. OPD avoids principal coordinates
+> 10% random
+> Principal mask
+> Low-magnitude mask
+
+Figure 1: Checkpoint deltas show that OPD-style updates are small, coordinate-sparse, spectrally concentrated, and off-principal. Gray bars are reference runs rather than OPD runs: Qwen-Math Distill is an offline distillation-style contrast, and the remaining gray bars are RLVR references. relative delta norm r = ∥∆W∥F /∥Wsrc ∥F measures update size relative to the source tensor, while visible coordinate sparsity sϵ = |{ i : |∆Wi| ≤ ϵ}| /|∆W| measures the fraction of coor-dinates with no threshold-visible movement; we use ϵ = 10 −5 in the main sparsity tables. We also measure coordinate energy concentration with cp = ∑i∈Top p (|∆W|) ∆W2
+
+i /∥∆W∥2
+
+F,where Top p denotes the largest p% coordinates by update magnitude. For spectral struc-ture, we compute singular values σi(∆W) for each 2D update matrix, top-k spectral en-ergy ek = ∑i≤k σ2
+
+i / ∑i σ2
+
+i , stable rank srank (∆W) = ∥∆W∥2
+
+F /∥∆W∥22, and numerical rank rank τ (∆W) = |{ i : σi > τσ 1}| . Higher top-k energy and lower stable or numerical rank indi-cate stronger spectral concentration. For source-geometry alignment, the principal-subspace projection pk = ∥U⊤
+
+k ∆WV k∥2
+
+F /∥∆W∥2
+
+F, where Wsrc = UΣV⊤, measures how much up-date energy lies in the leading source singular directions. The visible-update coverage 
+
+o(M) = ∑i 1{i ∈ M}1{| ∆Wi| > ϵ}/ ∑i 1{| ∆Wi| > ϵ} then measures how much of the visi-ble update falls inside a source-principal coordinate mask or a low-magnitude source-weight mask. Full metric definitions and implementation details are given in Appendix A.4. 
+
+4 Sparsity of OPD updates 
+
+4.1 Global norm and coordinate sparsity 
+
+OPD-style updates are small relative to their source checkpoints. Across the six OPD-style pairs, the relative Frobenius norm ranges from 0.036% for Qwen3 OPSD to 0.142% for Qwen2.5-VL OPD. The visible coordinate sparsity is also high: at the 10 −5 threshold, 66.72% to 89.50% of coordinates have no visible movement. The offline distillation contrast behaves very differently, with 11.94% relative delta norm and only 3.06% sparsity at the same threshold. The strongest reading of these numbers is not that every OPD run has the same sparsity level, but that OPD does not become dense simply because the teacher signal is dense. Qwen2.5-VL OPD has the broadest update among the OPD-style checkpoints, yet it still has nearly two orders of magnitude smaller relative norm than the offline distillation contrast and preserves clear coordinate concentration. This suggests that on-policy training can still keep the update local in weight space. 4Preprint. Table 2: Global delta statistics. Percentages are computed from final checkpoint differences. Sparsity is the percentage of coordinates whose update is numerically indistinguishable from zero at tolerance 10 −5. Top-16 SVD energy and stable rank summarize spectral concentration. Principal and low-magnitude coverage are visible-update coverage scores with 10% source-coordinate masks. Gray text marks non-OPD reference runs.                                                                       
+
+> Pair Rel. norm Sparsity Top-16 SVD Stable rank Principal Low-mag. (%) (%) energy (%) coverage (%) coverage (%) Qwen-Math Distill 11.936 3.06 8.57 82.74 9.95 10.10 DeepScaleR RLVR 0.073 77.89 19.62 16.07 5.29 31.26 DS-Qwen OPD 0.047 82.58 26.92 9.97 4.81 38.04 JustRL RLVR 0.497 34.68 26.94 12.35 8.34 14.70 DS-Qwen OPD (JustRL) 0.108 70.43 40.94 7.25 5.46 23.04 MiniCPM OPD 0.069 81.65 26.81 12.32 5.39 39.42 Qwen2.5-VL GRPO 0.045 86.56 21.75 16.57 4.58 44.46 Qwen2.5-VL OPD 0.142 66.72 30.52 12.58 5.23 24.99 Qwen3-1.7B OPD 0.045 79.03 19.69 20.31 4.45 34.69 Qwen3 OPSD 0.036 89.50 26.19 7.77 4.39 48.57
+
+JustRL provides a useful boundary case for interpreting the RLVR references. Unlike DeepScaleR and Qwen2.5-VL GRPO, the JustRL checkpoint has a larger relative delta norm (0.497%), much lower visible sparsity (34.68%), and weaker source-geometry avoidance: its 10% principal-mask coverage is 8.34%, close to the random-density baseline, while its low-magnitude coverage is only 14.70%. A plausible explanation is that the long, single-stage JustRL training process accumulates a broader and more on-principal displacement than shorter or more localized GRPO runs (He et al., 2025). Even so, JustRL remains spectrally concentrated, with 26.94% median top-16 SVD energy and stable rank 12.35, suggesting that densification in coordinate space does not erase the low-dimensional spectral profile. When the same JustRL checkpoint is used as the OPD teacher, the resulting OPD delta returns to the usual OPD-style pattern: small relative norm (0.108%), high sparsity (70.43%), strong spectral concentration, and off-principal source-geometry behavior. This boundary case suggests that teacher sparsity is not a necessary condition for OPD to produce a sparse student update. 
+
+4.2 Layer and module structure 
+
+OPD update sparsity is distributed across transformer layers rather than isolated to a single depth. Figure 2 shows the DS-Qwen OPD sparsity profile by transformer layer and parameter matrix. The average sparsity decreases from the low-80% range in early layers to around 70% in later layers, but all major projection matrices remain substantially sparse throughout the network. Among individual matrices, oproj stays relatively sparse in later layers, while kproj becomes visibly less sparse near the end of the model. This pattern suggests that OPD does not simply update a single layer block; it writes a sparse subnetwork across many layers and modules. Table 3 shows that OPD update energy is usually concentrated in FFN projections, with at-tention carrying a secondary but sometimes substantial share. For DS-Qwen OPD, MiniCPM OPD, Qwen2.5-VL OPD, and Qwen3-1.7B OPD, FFN modules account for 65.06% to 85.88% of the delta energy. Qwen3 OPSD is the main exception: attention contributes 37.36%, while Qwen3-1.7B OPD also has a substantial attention share of 27.03%, indicating that not all OPD-style runs can be summarized as FFN-only edits. Layer normalization parameters receive negligible update energy in the analyzed checkpoints. Sparsity and energy give complementary views of the same checkpoint delta. The sparsity profile counts how many coordinates in each layer or matrix remain unchanged under the numerical threshold, whereas the energy distribution weights coordinates by squared update magnitude and aggregates this mass by module. In the present checkpoints, the two views together show that OPD writes updates broadly across layers but assigns most of the update magnitude to FFN projections, with attention becoming important in some runs. 5Preprint. 0 5 10 15 20 25 
+
+> Transformer layer
+> 60
+> 65
+> 70
+> 75
+> 80
+> 85
+> 90
+> 95
+> 100
+> Sparsity at 1e-5 (%)
+> Average
+> q_proj
+> k_proj
+> v_proj
+> o_proj
+> gate_proj
+> up_proj
+> down_proj
+
+Figure 2: Layerwise and per-parameter-matrix update sparsity for DS-Qwen OPD. Sparsity counts coordinates whose delta between stored bfloat16 checkpoint weights is numerically indistinguishable from zero at tolerance 10 −5.Table 3: Block-level delta energy distribution. Most OPD-style updates are FFN-heavy, but Qwen3 OPSD shows a much larger attention contribution. 
+
+Pair FFN Attention Embedding LM head Other DeepScaleR RLVR 83.89 11.41 2.06 2.64 0.00 DS-Qwen OPD 85.88 11.11 0.55 2.46 0.00 MiniCPM OPD 65.06 21.01 4.69 9.23 0.00 Qwen2.5-VL OPD 81.40 10.52 3.48 – 4.60 Qwen3-1.7B OPD 69.70 27.03 3.27 – 0.00 Qwen3 OPSD 62.31 37.36 0.33 – 0.00 
+
+The module distribution is useful for two downstream reasons. First, it determines whether sparse masks should be allocated uniformly or according to module energy. Second, it informs future parameter-efficient OPD designs: a uniform adaptation budget may be suboptimal if most update energy is concentrated in FFN projections for one model but shared with attention projections for another. 
+
+4.3 OPD-RLVR mask overlap 
+
+To test whether OPD reuses the same sparse subnetwork as RLVR, we compare visible-update masks from checkpoint deltas using one-sided coverage as the mask densities can differ substantially. See Appendix A.5 for metric definitions. Table 4 shows that the observed coverage is roughly three times the corresponding independent-mask baseline. On DS-Qwen, for example, the DeepScaleR RLVR and DS-Qwen OPD masks cover each other far above random expectation: 53.21% versus 17.50% in the RLVR-to-OPD direction, and 67.20% versus 22.11% in the reverse direction. The same pattern holds in the VLM setting, where the Qwen2.5-VL GRPO mask is much smaller than the OPD mask but 73.53% of its updated coordinates are covered by OPD, compared with a 33.28% baseline. It also holds across DS-Qwen OPD runs distilled from different teachers, DeepScaleR and JustRL (Luo et al., 2025; He et al., 2025), where coverage reaches 80.17% in one direction and 47.45% in the other. These overlaps suggest that OPD, RLVR, and teacher-varied OPD do not merely produce sparse updates of the same density; they preferentially touch intersecting coordinates which may be related to a model’s reasoning capability. 6Preprint. Table 4: Overlap between visible-update subnetworks. o1 and o2 are one-sided coverage scores; Random gives the corresponding independent-mask baseline for that one-sided score.                             
+
+> Model family Setting Random Observed Sparsity DS-Qwen I1: DeepScaleR RLVR o1: 17.50 o1: 53.21 (3.04 ×)77.89 DS-Qwen I2: OPD (DeepScaleR teacher) o2: 22.11 o2: 67.20 (3.04 ×)82.50 Qwen2.5-VL I1: GRPO o1: 33.28 o1: 73.53 (2.21 ×)86.56 Qwen2.5-VL I2: OPD o2: 13.44 o2: 29.69 (2.21 ×)66.72 DS-Qwen I1: OPD (DeepScaleR teacher) o1: 29.57 o1: 80.17 (2.71 ×)82.50 DS-Qwen I2: OPD (JustRL teacher) o2: 17.50 o2: 47.45 (2.71 ×)70.43
+
+4.4 Fine-tuning the subnetwork alone suffices in OPD 
+
+The first functional test asks whether the sparse OPD subnetwork is only a post-hoc descrip-tion or whether it is sufficient for training. Given a source checkpoint θ0 and a full OPD checkpoint θfull , we define the full-OPD mask 
+
+mi = 1{| θfull, i − θ0, i| > τ}, (2) where τ = 10 −5 after subtracting the stored checkpoint weights. We restart OPD from θ0,use the same teacher and training configuration, zero gradients outside a chosen mask, and restore frozen coordinates after each optimizer step so that decoupled weight decay cannot move them. We compare four runs: full OPD, OPD restricted to the full-OPD nonzero mask, OPD restricted to the DeepScaleR RLVR nonzero mask, and OPD restricted to a random mask with the same density as the full-OPD mask. The mask densities come directly from the complement of the sparsity measurements in Table 2: roughly 17.5% for the DS-Qwen OPD mask and random mask, and 22.1% for the DeepScaleR RLVR mask. Figure 3(a) shows that the discovered subnetwork is sufficient for recovering reasoning performance under OPD, using the average validation accuracy over AIME24 and AIME25. Full OPD reaches a peak mean@16 accuracy of 35.52%, while the OPD-mask run reaches 35.10% and has a slightly higher late-training average over the last five evaluation points (34.73% versus 34.27%). The RLVR mask also trains successfully, peaking at 34.69%, which is consistent with the overlap results above: the RLVR subnetwork is related to the OPD subnetwork, but it is not the same mask. The random mask improves over the source model but remains weaker, peaking at 32.92% and showing a lower late-training average. Appendix A.9 shows the same subnetwork-masked pattern in the Qwen2.5-VL OPD setting. Thus, the sparse mask is not merely a budget constraint; the particular coordinates selected by post-training matter. This makes the OPD delta a sparse task vector in the sense of task arithmetic: the delta θfull − θ0 is a direction in weight space that implements a behavioral change (Ilharco et al., 2022). Unlike classical lottery-tickets, which are uncovered by pruning dense networks (Frankle & Carbin, 2018), the OPD task vector is naturally sparse at checkpoint precision. Masked training on this sparse lottery subnetwork is enough to recover full-training performance, suggesting that the visible OPD support is not only descriptive but operationally useful. 
+
+4.5 Do we need AdamW in OPD? 
+
+The second functional test asks whether OPD needs AdamW (Kingma & Ba, 2014; Loshchilov & Hutter, 2017), motivated by recent evidence that SGD can be surprisingly competitive for sparse RLVR updates (Mukherjee et al., 2026b). We run a direct optimizer ablation in the JustRL-teacher OPD setting: AdamW with learning rate 10 −6 versus vanilla SGD with learning rate 10 −2.Figure 3(b) shows that SGD underperforms AdamW on the same reasoning validation suite, averaging mean@16 accuracy over AIME24 and AIME25. AdamW reaches a 43.02% peak and 42.40% final mean@16 accuracy, while SGD reaches a 39.06% peak and 37.92% final 7Preprint. 0 30 60 90 120 150 
+
+> Training Step
+> 0.24
+> 0.26
+> 0.28
+> 0.30
+> 0.32
+> 0.34
+> 0.36
+> Accuracy (mean@16)
+> Average Validation Accuracy
+> Full
+> OPD Mask
+> RLVR Mask
+> Random Mask
+
+(a) Subnetwork-masked OPD 0 40 80 120   
+
+> Training Step
+> 0.250
+> 0.275
+> 0.300
+> 0.325
+> 0.350
+> 0.375
+> 0.400
+> 0.425
+> 0.450
+> Accuracy (mean@16)
+> Average Validation Accuracy
+> AdamW SGD
+
+(b) AdamW versus SGD 
+
+Figure 3: Comparison of OPD reasoning performance along the training process, reported as average validation accuracy over AIME24 and AIME25. Left: full OPD versus OPD trained with the OPD, RLVR, or random masks. Right: AdamW versus SGD in the JustRL-teacher OPD setting. Benchmark-wise curves are shown in Appendix A.7. accuracy. Thus, the fact that OPD produces sparse final deltas is not sufficient to transfer the RLVR conclusion that AdamW’s momentum and adaptive learning rates are largely unnecessary. A likely reason is that OPD changes the optimization signal even though it keeps the data on-policy. Mukherjee et al. (2026b) argue for SGD in RLVR by showing that AdamW’s momentum can become poorly aligned with current gradients and that adaptive second-moment scaling is less load-bearing in their RLVR setting. For OPD, the distillation objective can produce a different gradient geometry: it remains on-policy, but every generated token receives supervision from the same teacher rather than only a sparse and noisy reward signal. Appendix A.8 provides supporting diagnostics for this interpretation in the JustRL-teacher AdamW run. Momentum alignment is relatively high but unstable: it starts at 0.958, remains positive on average (0.280), drops to 0.008 by the end, and briefly becomes negative. This suggests that AdamW’s first moment is not simply useless in OPD, even though its fluctuating alignment makes momentum an incomplete explanation by itself. More importantly, the second-moment coefficient of variation remains large, averaging 4.85, suggesting that AdamW’s coordinate-wise scaling is still useful for OPD. In short, OPD shares sparse final-update structure with on-policy post-training, but its dense teacher signal can preserve enough gradient heterogeneity for AdamW to matter. 
+
+5 Geometry of OPD updates 
+
+5.1 Full-rank but spectrally concentrated 
+
+OPD updates are not low-rank in the strict numerical sense. Figure 1 and Table 2 summarize the main spectral evidence, with full spectral statistics in Appendix Table 9. For the main OPD pairs, the median numerical rank percentage is 100% at 10 −4 times the spectral norm. However, this full-rank property coexists with spectral concentration. The median top-16 singular-value energy ratio is 26.92% for DS-Qwen OPD, 26.81% for MiniCPM OPD, 30.52% for Qwen2.5-VL OPD, 19.69% for Qwen3-1.7B OPD, and 26.19% for Qwen3 OPSD. The corresponding median stable ranks range from 7.77 to 12.58. The offline distillation contrast is also numerically full-rank, but its spectrum is much more diffuse: Qwen-Math Distill has only 8.57% top-16 energy and stable rank 82.74. By contrast, DeepScaleR RLVR is closer to OPD (19.62% top-16 energy and stable rank 16.07), suggesting that spectral concentration is more characteristic of sparse on-policy post-training than of offline distillation. This distinction matters for interpreting low-rank adaptation. If one only reports numerical rank, OPD appears incompatible with low-rank parameterization. If one only reports top-k
+
+energy, OPD appears low-dimensional. The accurate statement is between these extremes: OPD deltas are full-rank matrices with a spectrally concentrated energy profile. Low-rank 8Preprint. methods may therefore capture a meaningful part of the update energy, but they should not be expected to exactly reproduce the full checkpoint delta. 
+
+5.2 Off-principal movement from source weights 
+
+OPD updates have weak alignment with the principal singular directions of the source weights. The main coverage scores are reported in Table 2, and the 1%, 5%, 10%, and 20% source-mask variants are given in Appendix Table 10. For each source matrix Wsrc = UΣV⊤,we measure 
+
+∥U⊤ 
+
+> k
+
+∆WV k∥2
+
+> F
+
+∥∆W∥2
+
+> F
+
+, (3) where Uk and Vk are the leading k left and right singular vectors of Wsrc . At k = 10% of the matrix rank, the median joint principal projection is below 1% for every main OPD-style pair. This means that OPD is not primarily amplifying the high-energy directions already dominant in the source weights. The offline distillation-style contrast shows a weaker version of this effect: Qwen-Math Distill has 2.22% median principal-projection energy, several times larger than DS-Qwen OPD and DeepScaleR RLVR. The coordinate-mask analysis gives the same conclusion in a more local form. At the 10% mask setting, source-principal coordinates cover only 4.39% to 5.46% of visible OPD update coordinates, roughly half of the 10% random-density baseline. By contrast, the bottom 10% source-magnitude coordinates cover 24.99% to 48.57% of visible OPD update coordinates. The distillation-style contrast is close to random on both masks, with 9.95% principal coverage and 10.10% low-magnitude coverage. DeepScaleR RLVR shows the same qualitative bias as OPD, with 5.29% principal and 31.26% low-magnitude coverage. This contrast strengthens the interpretation that off-principal, low-magnitude writing is a signature of the on-policy training process itself, and is precisely where OPD differs most from offline distillation. 
+
+6 Discussion and future work 
+
+The primary message of this paper is that OPD has dense supervision but sparse, off-principal updates. Rather than interpolating linearly between SFT and RLVR in parameter space, OPD remains closer to sparse on-policy post-training. A qualitative explanation is that OPD trains the model near its own behavioral distribution. Unlike offline distillation, which may force the student to fit external trajectories far from what it currently generates, OPD provides teacher feedback on the student’s own rollouts. The student can therefore refine behavior in a familiar region of its policy space rather than broadly rewriting parame-ters to imitate off-policy traces. This offers one reason why dense token-level supervision can still produce small, sparse, and off-principal checkpoint updates. Our experiments mainly study OPD through static final-checkpoint analysis. The delta measurements show that OPD updates are sparse and off-principal, and the masked-subnetwork experiment shows that part of this static structure is operationally useful. The optimizer ablation adds a caution: sparse final deltas do not by themselves imply that the optimization dynamics can discard AdamW’s adaptive scaling. However, we do not trace the full OPD training trajectory, so the learning dynamics that produce the final task vector remain to be revealed. More broadly, this paper focuses on how OPD changes a model in weight space; complementary behavioral analyses of how on-policy training changes model outputs remain an important direction (Shenfeld et al., 2025). Another future direction is scale and coverage. Current observational experiments already include relatively small-scale LLM and VLM checkpoints. And the interventional exper-iments are conducted on DS-Qwen and Qwen2.5-VL for math reasoning. Larger models, additional domains like agentic or embodied tasks, and more OPD applications are needed to determine whether the observed sparsity, module structure, off-principal movement, and optimizer sensitivity are stable properties of OPD or artifacts of the present training recipe. 9Preprint. The third direction is OPD-native adaptation and optimization. The spectral concentration of OPD updates naturally suggests low-rank adaptation methods such as L ORA and its variants (Hu et al., 2021; Schulman & Lab, 2025), while the off-principal geometry suggests testing orthogonal finetuning methods such as OFT/BOFT (Liu et al., 2024). On the optimizer side, OPD’s matrix-level geometry may be incompatible with the spectral normalization used in vanilla Muon, making recent high-pass variants worth testing (Jordan et al., 2024; Liu et al., 2025; Fan et al., 2026). More broadly, these results point toward OPD-native fine-tuning methods and optimizers that allocate capacity according to the sparse, spectrally concentrated, off-principal task vector actually used by on-policy distillation. 
+
+7 Conclusion 
+
+This work studies OPD parameter updates through two complementary properties: sparsity and geometry. Observational studies show that OPD-style updates are small, coordinate-sparse, spectrally concentrated but numerically full-rank, and strongly biased away from source principal coordinates toward low-magnitude source coordinates. Interventional results show both the utility and the limit of this structure: training only the discovered OPD subnetwork is sufficient to recover full-OPD reasoning performance, but vanilla SGD underperforms AdamW in the JustRL-teacher optimizer ablation. Together, these findings place OPD closer to sparse on-policy editing than to dense supervised rewriting, even though its learning signal is dense and teacher-derived. 
+
+References 
+
+Rishabh Agarwal, Nino Vieillard, Yongchao Zhou, Piotr Stanczyk, Sabela Ramos Garea, Matthieu Geist, and Olivier Bachem. On-policy distillation of language models: Learning from self-generated mistakes. In International Conference on Learning Representations ,volume 2024, pp. 21246–21263, 2024. Shuai Bai, Keqin Chen, Xuejing Liu, Jialin Wang, Wenbin Ge, Sibo Song, Kai Dang, Peng Wang, Shijie Wang, Jun Tang, Humen Zhong, Yuanzhi Zhu, Mingkun Yang, Zhaohai Li, Jianqiang Wan, Pengfei Wang, Wei Ding, Zheren Fu, Yiheng Xu, Jiabo Ye, Xi Zhang, Tianbao Xie, Zesen Cheng, Hang Zhang, Zhibo Yang, Haiyang Xu, and Junyang Lin. Qwen2.5-vl technical report, 2025. URL https://arxiv.org/abs/2502.13923 .Samy Bengio, Oriol Vinyals, Navdeep Jaitly, and Noam Shazeer. Scheduled sampling for sequence prediction with recurrent neural networks. Advances in neural information processing systems , 28, 2015. Yuchen Cai, Ding Cao, Xin Xu, Zijun Yao, Yuqing Huang, Zhenyu Tan, Benyi Zhang, Guiquan Liu, and Junfeng Fang. On predictability of reinforcement learning dynamics for large language models, 2025. URL https://arxiv.org/abs/2510.00553 .DeepSeek-AI. DeepSeek-V4: Towards highly efficient million-token context intelligence, 2026. URL https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro .Chongyu Fan, Gaowen Liu, Mingyi Hong, Ramana Rao Kompella, and Sijia Liu. Rethinking muon beyond pretraining: Spectral failures and high-pass remedies for vla and rlvr. arXiv preprint arXiv:2605.19282 , 2026. Jonathan Frankle and Michael Carbin. The lottery ticket hypothesis: Finding sparse, train-able neural networks. arXiv preprint arXiv:1803.03635 , 2018. Yuxian Gu, Li Dong, Furu Wei, and Minlie Huang. Minillm: Knowledge distillation of large language models. In International Conference on Learning Representations , volume 2024, pp. 32694–32717, 2024. Etash Guha, Ryan Marten, Sedrick Keh, Negin Raoof, Georgios Smyrnis, Hritik Bansal, Marianna Nezhurina, Jean Mercat, Trung Vu, Zayne Sprague, et al. Openthoughts: Data recipes for reasoning models. arXiv preprint arXiv:2506.04178 , 2025. 10 Preprint. Daya Guo, Dejian Yang, Haowei Zhang, Junxiao Song, Peiyi Wang, Qihao Zhu, Runxin Xu, Ruoyu Zhang, Shirong Ma, Xiao Bi, et al. Deepseek-r1: Incentivizing reasoning capability in llms via reinforcement learning. arXiv preprint arXiv:2501.12948 , 2025. Bingxiang He, Zekai Qu, Zeyuan Liu, Yinghao Chen, Yuxin Zuo, Cheng Qian, Kaiyan Zhang, Weize Chen, Chaojun Xiao, Ganqu Cui, et al. Justrl: Scaling a 1.5 b llm with a simple rl recipe. arXiv preprint arXiv:2512.16649 , 2025. Geoffrey Hinton, Oriol Vinyals, and Jeff Dean. Distilling the knowledge in a neural network. 
+
+arXiv preprint arXiv:1503.02531 , 2015. Edward J Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, and Weizhu Chen. Lora: Low-rank adaptation of large language models. arXiv preprint arXiv:2106.09685 , 2021. Jonas H ¨ubotter, Frederike L ¨ubeck, Lejs Behric, Anton Baumann, Marco Bagatella, Daniel Marta, Ido Hakimi, Idan Shenfeld, Thomas Kleine Buening, Carlos Guestrin, et al. Rein-forcement learning via self-distillation. arXiv preprint arXiv:2601.20802 , 2026. Gabriel Ilharco, Marco Tulio Ribeiro, Mitchell Wortsman, Suchin Gururangan, Ludwig Schmidt, Hannaneh Hajishirzi, and Ali Farhadi. Editing models with task arithmetic. 
+
+arXiv preprint arXiv:2212.04089 , 2022. Keller Jordan, Yuchen Jin, Vlado Boza, Jiacheng You, Franz Cesista, Laker Newhouse, and Jeremy Bernstein. Muon: An optimizer for hidden layers in neural networks, 2024. URL 
+
+https://kellerjordan.github.io/posts/muon/ .Yoon Kim and Alexander M Rush. Sequence-level knowledge distillation. In Proceedings of the 2016 conference on empirical methods in natural language processing , pp. 1317–1327, 2016. Diederik P Kingma and Jimmy Ba. Adam: A method for stochastic optimization. arXiv preprint arXiv:1412.6980 , 2014. Yaxuan Li, Yuxin Zuo, Bingxiang He, Jinqian Zhang, Chaojun Xiao, Cheng Qian, Tianyu Yu, Huan-ang Gao, Wenkai Yang, Zhiyuan Liu, et al. Rethinking on-policy distilla-tion of large language models: Phenomenology, mechanism, and recipe. arXiv preprint arXiv:2604.13016 , 2026. Jingyuan Liu, Jianlin Su, Xingcheng Yao, Zhejun Jiang, Guokun Lai, Yulun Du, Yidao Qin, Weixin Xu, Enzhe Lu, Junjie Yan, et al. Muon is scalable for llm training. arXiv preprint arXiv:2502.16982 , 2025. Weiyang Liu, Zeju Qiu, Yao Feng, Yuliang Xiu, Yuxuan Xue, Longhui Yu, Haiwen Feng, Zhen Liu, Juyeon Heo, Songyou Peng, et al. Parameter-efficient orthogonal finetuning via butterfly factorization. In International Conference on Learning Representations , volume 2024, pp. 38317–38350, 2024. Xiangyan Liu, Jinjie Ni, Zijian Wu, Chao Du, Longxu Dou, Haonan Wang, Tianyu Pang, and Michael Shieh. Noisyrollout: Reinforcing visual reasoning with data augmentation. 
+
+Advances in Neural Information Processing Systems , 38:2923–2957, 2026. Ilya Loshchilov and Frank Hutter. Decoupled weight decay regularization. arXiv preprint arXiv:1711.05101 , 2017. Pan Lu, Ran Gong, Shibiao Jiang, Liang Qiu, Siyuan Huang, Xiaodan Liang, and Song-Chun Zhu. Inter-gps: Interpretable geometry problem solving with formal language and symbolic reasoning. In Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (Volume 1: Long Papers) , pp. 6774–6786, 2021. Michael Luo, Sijun Tan, Justin Wong, Xiaoxiang Shi, William Y. Tang, Manan Roongta, Colin Cai, Jeffrey Luo, Li Erran Li, Raluca Ada Popa, and Ion Stoica. Deepscaler: Surpassing o1-preview with a 1.5b model by scaling rl. Notion blog, 2025. 11 Preprint. Sagnik Mukherjee, Lifan Yuan, Dilek Hakkani-Tur, and Hao Peng. Reinforcement learning finetunes small subnetworks in large language models. Advances in Neural Information Processing Systems , 38:132119–132138, 2026a. Sagnik Mukherjee, Lifan Yuan, Pavan Jayasinha, Dilek Hakkani-T ¨ur, and Hao Peng. Do we need adam? surprisingly strong and sparse reinforcement learning with sgd in llms. 
+
+arXiv preprint arXiv:2602.07729 , 2026b. OpenBMB. MiniCPM5-1B, 2026. URL https://huggingface.co/openbmb/MiniCPM5-1B .St ´ephane Ross, Geoffrey Gordon, and Drew Bagnell. A reduction of imitation learning and structured prediction to no-regret online learning. In Proceedings of the fourteenth international conference on artificial intelligence and statistics , pp. 627–635. JMLR Workshop and Conference Proceedings, 2011. John Schulman and Thinking Machines Lab. LoRA without regret. Think-ing Machines Lab: Connectionism , 2025. doi: 10.64434/tml.20250929. https://thinkingmachines.ai/blog/lora/. Zhihong Shao, Peiyi Wang, Qihao Zhu, Runxin Xu, Junxiao Song, Xiao Bi, Haowei Zhang, Mingchuan Zhang, YK Li, Yang Wu, et al. Deepseekmath: Pushing the limits of mathe-matical reasoning in open language models. arXiv preprint arXiv:2402.03300 , 2024. Idan Shenfeld, Jyothish Pari, and Pulkit Agrawal. Rl’s razor: Why online reinforcement learning forgets less. arXiv preprint arXiv:2509.04259 , 2025. Guangming Sheng, Chi Zhang, Zilingfeng Ye, Xibin Wu, Wang Zhang, Ru Zhang, Yanghua Peng, Haibin Lin, and Chuan Wu. Hybridflow: A flexible and efficient rlhf framework. In 
+
+Proceedings of the Twentieth European Conference on Computer Systems , pp. 1279–1297, 2025. Mingyang Song and Mao Zheng. A survey of on-policy distillation for large language models. arXiv preprint arXiv:2604.00626 , 2026. Bangjun Xiao, Bingquan Xia, Bo Yang, Bofei Gao, Bowen Shen, Chen Zhang, Chenhong He, Chiheng Lou, Fuli Luo, Gang Wang, et al. Mimo-v2-flash technical report. arXiv preprint arXiv:2601.02780 , 2026. An Yang, Beichen Zhang, Binyuan Hui, Bofei Gao, Bowen Yu, Chengpeng Li, Dayiheng Liu, Jianhong Tu, Jingren Zhou, Junyang Lin, et al. Qwen2.5-math technical report: Toward mathematical expert model via self-improvement. arXiv preprint arXiv:2409.12122 , 2024. An Yang, Anfeng Li, Baosong Yang, Beichen Zhang, Binyuan Hui, Bo Zheng, Bowen Yu, Chang Gao, Chengen Huang, Chenxu Lv, et al. Qwen3 technical report. arXiv preprint arXiv:2505.09388 , 2025. Tianzhu Ye, Li Dong, Xun Wu, Shaohan Huang, and Furu Wei. On-policy context distillation for language models. arXiv preprint arXiv:2602.12275 , 2026. Qiying Yu, Zheng Zhang, Ruofei Zhu, Yufeng Yuan, Xiaochen Zuo, Yu Yue, Weinan Dai, Tiantian Fan, Gaohong Liu, Lingjun Liu, et al. Dapo: An open-source llm reinforcement learning system at scale. Advances in Neural Information Processing Systems , 38:113222– 113244, 2026. Aohan Zeng, Xin Lv, Zhenyu Hou, Zhengxiao Du, Qinkai Zheng, Bin Chen, Da Yin, Chendi Ge, Chenghua Huang, Chengxing Xie, et al. Glm-5: from vibe coding to agentic engineer-ing. arXiv preprint arXiv:2602.15763 , 2026. Siyan Zhao, Zhihui Xie, Mengchen Liu, Jing Huang, Guan Pang, Feiyu Chen, and Aditya Grover. Self-distilled reasoner: On-policy self-distillation for large language models. arXiv preprint arXiv:2601.18734 , 2026. Hanqing Zhu, Zhenyu Zhang, Hanxian Huang, DiJia Su, Zechun Liu, Jiawei Zhao, Igor Fedorov, Hamed Pirsiavash, Zhizhou Sha, Jinwon Lee, et al. The path not taken: Rlvr provably learns off the principals. arXiv preprint arXiv:2511.08567 , 2025. 12 Preprint. 
+
+A Appendix 
+
+A.1 Related work On-policy distillation. Early OPD formulations emphasize the exposure-mismatch prob-lem in offline distillation and train the student on its own sampled trajectories with dense teacher feedback (Agarwal et al., 2024; Gu et al., 2024). Recent work shows that this idea has become a practical post-training component for large language models (Song & Zheng, 2026), including large-to-small distillation (Yang et al., 2025; Li et al., 2026), capability consolidation with multiple teachers or post-training stages (Xiao et al., 2026; Zeng et al., 2026; DeepSeek-AI, 2026; OpenBMB, 2026), and on-policy self-distillation from privileged information (Zhao et al., 2026; H ¨ubotter et al., 2026; Ye et al., 2026). Our work differs from these papers by studying the parameter update induced by OPD, rather than proposing a new OPD objective or training recipe. 
+
+Parameter geometry of post-training. A second line of related work analyzes the parame-ter geometry of post-training. Mukherjee et al. (2026a) show that RLVR fine-tunes small subnetworks in large language models, while Zhu et al. (2025) argue that RLVR learns away from the principal directions of source weights. Cai et al. (2025) further study reinforcement-learning-induced parameter dynamics and find that dominant low-rank directions can predict later reasoning improvements. Mukherjee et al. (2026b) connect this sparse update regime to optimizer choice, showing that SGD can be surprisingly competitive for RLVR. We ask whether these properties persist when the sparse reward signal is replaced by dense teacher supervision, which places OPD between conventional dense-supervised fine-tuning and sparse-reward on-policy training. Our AdamW-versus-SGD result shows that the static sparsity analogy does not automatically carry over to optimizer choice. 
+
+Adaptation and optimization methods. Finally, the spectral and off-principal results relate to parameter-efficient adaptation and optimizer design. Low-rank adaptation methods such as L ORA exploit the concentration of fine-tuning updates in a low-dimensional additive subspace (Hu et al., 2021; Schulman & Lab, 2025). Orthogonal finetuning methods such as OFT/BOFT instead parameterize adaptation through orthogonal transformations, aiming to preserve hyperspherical energy and pretrained representation structure while changing the model’s function (Liu et al., 2024). Muon is relevant from the optimizer side because it treats hidden-layer weights as matrices and orthogonalizes the momentum update before applying it (Jordan et al., 2024; Liu et al., 2025). Recent work argues that this spectral normalization can fail in VLA and RLVR post-training and proposes high-pass remedies, making these variants a more plausible starting point for OPD than vanilla Muon (Fan et al., 2026). These methods motivate future OPD-native optimization strategies. 
+
+A.2 Post-training objectives for LLMs 
+
+We summarize the training objectives that define the regimes compared in this paper. Let x
+
+denote a prompt, y = ( y1, . . . , yT ) a response, πθ the trainable policy, πT a teacher policy, and πref a reference policy used for KL regularization when applicable. 
+
+SFT and sequence-level KD. Supervised fine-tuning (SFT) optimizes the negative log-likelihood of fixed target responses: 
+
+LSFT (θ) = −E(x,y⋆ )∼D 
+
+> T
+
+# ∑
+
+> t=1
+
+log πθ (y⋆ 
+
+> t
+
+| x, y⋆<t). (4) Sequence-level knowledge distillation (S EQ KD) uses the same maximum-likelihood objec-tive, but the target response yT is generated by a teacher rather than drawn from human annotation (Hinton et al., 2015; Kim & Rush, 2016): 
+
+LSeqKD (θ) = −Ex∼D , yT ∼πT (·| x)
+
+> T
+
+# ∑
+
+> t=1
+
+log πθ (yTt | x, yT
+
+> <t
+
+). (5) 13 Preprint. Both objectives are dense in the sense that every target token supplies a supervised learning signal, but the trajectories are offline-collected and fixed before the student update. 
+
+RLVR and GRPO. Reinforcement learning with verifiable rewards (RLVR) samples re-sponses from the current or recent policy and optimizes a scalar reward r(x, y), often with a KL penalty to keep the policy close to πref :
+
+JRLVR (θ) = Ex∼D , y∼πθ (·| x)
+
+"
+
+r(x, y) − β
+
+> T
+
+# ∑
+
+> t=1
+
+DKL (πθ (·| x, y<t) ∥ πref (·| x, y<t)) 
+
+#
+
+. (6) GRPO is a commonly used RLVR optimizer that removes the learned critic by sampling a group of responses {yi}Gi=1 for the same prompt and normalizing their rewards within the group (Shao et al., 2024). With ˆAi = ( ri − mean ({rj}Gj=1)) /(std ({rj}Gj=1) + ϵ) and 
+
+ρi,t(θ) = πθ (yi,t|x, yi,<t)/πold (yi,t|x, yi,<t), a clipped GRPO objective can be written as 
+
+JGRPO (θ) = E 1
+
+G
+
+> G
+
+# ∑
+
+> i=1
+
+1
+
+|yi| 
+
+> |yi|
+
+# ∑
+
+> t=1
+
+[gi,t(θ) − βki,t(θ)] ,
+
+gi,t(θ) = min 
+
+
+
+ρi,t(θ) ˆAi, clip (ρi,t(θ), 1 − ϵ, 1 + ϵ) ˆAi
+
+
+
+,
+
+ki,t(θ) = DKL (πθ (·| x, yi,<t) ∥ πref (·| x, yi,<t)) .(7) RLVR therefore uses on-policy or near-on-policy samples but usually receives sparse sequence-level reward feedback. 
+
+OPD. OPD combines on-policy student rollouts with dense teacher feedback. One style, which we call GKD-style OPD, applies a token-level teacher-student divergence on prefixes generated by the student (Agarwal et al., 2024): 
+
+LOPD-GKD (θ) = Ex∼D , y∼πθ (·| x)
+
+> T
+
+# ∑
+
+> t=1
+
+D(πT (·| x, y<t) ∥ πθ (·| x, y<t)) , (8) where D is typically a f -divergence token distribution loss. Another style, which we call PG-style OPD, treats distillation as policy optimization on student-generated samples (Gu et al., 2024). An abstract form is the reverse-KL sequence objective 
+
+LOPD-PG (θ) = Ex∼D , y∼πθ (·| x)
+
+> T
+
+# ∑
+
+> t=1
+
+[log πθ (yt|x, y<t) − log πT (yt|x, y<t)] , (9) which can be optimized with policy-gradient estimators because the sampled trajectory depends on the student policy. This PG view is connected to reverse-KL distillation through a simple score-function identity. For a fixed prefix c = ( x, y<t), define the sampled-token estimator k1(a; c) = log πθ (a|c) − log πT (a|c). The full-vocabulary reverse KL at this prefix is 
+
+DKL (πθ (·| c) ∥ πT (·| c)) = ∑
+
+> a
+
+πθ (a|c)k1(a; c). (10) Its gradient is 
+
+∇θ DKL (πθ (·| c) ∥ πT (·| c)) = ∇θ ∑
+
+> a
+
+πθ (a|c)k1(a; c)= ∑
+
+> a
+
+[∇θ πθ (a|c)] k1(a; c) + ∑
+
+> a
+
+πθ (a|c)∇θ k1(a; c)= Ea∼πθ (·| c) [k1(a; c)∇θ log πθ (a|c)] + ∑
+
+> a
+
+∇θ πθ (a|c)= Ea∼πθ (·| c) [k1(a; c)∇θ log πθ (a|c)] ,(11) Here we use ∇θ πθ (a|c) = πθ (a|c)∇θ log πθ (a|c) and ∇θ k1(a; c) = ∇θ log πθ (a|c), since the prefix c and the teacher πT are fixed. The final equality uses ∑a πθ (a|c) = 1, so 14 Preprint. 
+
+∑a ∇θ πθ (a|c) = ∇θ 1 = 0. Thus, if k1 is detached and −k1(a; c) is used as the policy-gradient advantage, the score-function loss LPG (a; c) = sg [k1(a; c)] log πθ (a|c) has gradient 
+
+k1(a; c)∇θ log πθ (a|c), giving an unbiased single-sample estimator of the reverse-KL gra-dient up to practical modifications such as clipping, off-policy importance ratios, and advantage normalization. Both OPD styles differ from S EQ KD by training on student-generated trajectories, and differ from RLVR by replacing sparse scalar rewards with dense teacher-derived feedback. 
+
+A.3 Model pairs and training details 
+
+Table 7 lists the checkpoint pairs used in the delta analysis. These pairs cover LLMs with PG-style OPD updates and VLMs with GKD-style OPD updates, and they span the three use cases of OPD discussed in Section A.1. For training and evaluation, we use the public implementations and original configurations from verl /HybridFlow (Sheng et al., 2025), the OPD codebase, and the OPSD codebase where applicable. 2 The DS-Qwen OPD runs use DAPO-Math-17K (Yu et al., 2026), the VLM GRPO and OPD runs use Geo3K (Lu et al., 2021), the Qwen3-1.7B OPD pair is a public checkpoint distilled from Qwen3-4B-Base-GRPO, and the OPSD run uses subsets of OpenThoughts math 30k (Guha et al., 2025). Tables 5 and 6 summarize the core training configurations for the controlled DS-Qwen and Qwen2.5-VL OPD runs. Table 5: Core training configuration for DS-Qwen OPD.                
+
+> Setting Value Student model DeepSeek-R1-Distill-Qwen-1.5B Teacher model DeepScaleR-1.5B or JustRL-DeepSeek-1.5B Training / validation data DAPO-Math-17K / AIME24 and AIME25 Distillation loss k1policy-gradient style OPD; no task rewards Rollout backend vLLM rollout, n=4 responses per prompt Batching train batch size 128; PPO mini-batch size 32 Sequence lengths max prompt 1024; max train response 7168; max validation response 15360 Default optimizer AdamW, learning rate 10 −6; optimizer ablation uses SGD, learning rate 10 −2
+> Distributed setup 1 node, 4 actor GPUs per node, 2 teacher GPUs per node Training schedule 1 epoch; evaluate every 10 steps
+
+Table 6: Core training configuration for Qwen2.5-VL OPD. 
+
+Setting Value Student model Qwen2.5-VL-3B-Instruct Teacher model NoisyRollout-Geo3K-7B Training / validation data Geo3K train / test split Distillation loss Forward-KL top-k OPD; top-k = 32; no task rewards Rollout backend vLLM rollout, n = 1 response per prompt Batching train batch size 128; PPO mini-batch size 32 Sequence lengths max prompt 1024; max response 2048 Optimizer AdamW, learning rate 10 −6
+
+Distributed setup 1 node, 4 actor GPUs per node, 2 teacher GPUs per node Training schedule 10 epochs; evaluate every 10 steps 
+
+A.4 Delta metrics and their interpretation 
+
+This appendix gives the full metric definitions used in the checkpoint analysis introduced in Section 3. For each matched floating-point tensor with identical shape in the source and 
+
+> 2
+
+https://github.com/verl-project/verl , https://github.com/thunlp/OPD , and https: //github.com/siyan-zhao/OPSD .
+
+15 Preprint. Table 7: Model pairs used in the delta analysis. Teacher/source-signal and data identify the training setup when it is part of our controlled OPD/RLVR/OPSD analysis; public reference checkpoints are marked accordingly.                                             
+
+> Pair Source model Trained model Training regime / teacher or signal Data Qwen-Math Distill Qwen2.5-Math-1.5B DS-Qwen Distillation reference; DeepSeek-R1 teacher Public checkpoint DeepScaleR RLVR DS-Qwen DeepScaleR-1.5B RLVR; verifier/reward signal Public RLVR checkpoint DS-Qwen OPD DS-Qwen DS-Qwen OPD OPD; DeepScaleR-1.5B teacher DAPO-Math-17K JustRL RLVR DS-Qwen JustRL RLVR; simple fixed-hyperparameter recipe Public RLVR checkpoint DS-Qwen OPD (JustRL) DS-Qwen DS-Qwen OPD OPD; JustRL teacher DAPO-Math-17K MiniCPM OPD MiniCPM5-1B-SFT MiniCPM5-1B OPD OPD; MiniCPM5 RL+OPD recipe Public OPD checkpoint Qwen2.5-VL GRPO Qwen2.5-VL-3B-Instruct Qwen2.5-VL GRPO checkpoint GRPO; verifier/reward signal Geo3K Qwen2.5-VL OPD Qwen2.5-VL-3B-Instruct Qwen2.5-VL OPD OPD; NoisyRollout-7B teacher Geo3K Qwen3-1.7B OPD Qwen3-1.7B-Base Qwen3-1.7B-Base OPD OPD; Qwen3-4B-Base-GRPO teacher DAPO-Math-17K Qwen3 OPSD Qwen3-4B Qwen3 OPSD checkpoint OPSD; self-distillation with privileged traces Subsets of OpenThoughts math 30k
+
+trained checkpoints, we form 
+
+∆W = Wtrained − Wsrc . (12) The source-relative update scale is 
+
+r(W) = ∥∆W∥F
+
+∥Wsrc ∥F + ϵ0
+
+, (13) where ϵ0 is a small numerical stabilizer. This number measures how large the parameter displacement is relative to the original parameter energy; it does not by itself measure functional importance. Coordinate sparsity measures the fraction of coordinates whose stored-checkpoint update is below a numerical threshold: 
+
+sϵ(W) = |{ i : |∆Wi| ≤ ϵ}| |∆W| . (14) The implementation reports exact-zero sparsity, absolute-threshold sparsity for ϵ ∈{10 −8, 10 −7, 10 −6, 10 −5, 10 −4}, and isclose (∆W, 0, atol = ϵ) sparsity for the same thresholds. The main paper reports isclose sparsity at ϵ = 10 −5, matching the stored-bfloat16 checkpoint-delta analysis used for the mask experiments. We also compute relative-threshold sparsity, 
+
+srel 
+
+τ (W) = |{ i : |∆Wi| ≤ τ · RMS (Wsrc )}| |∆W| , RMS (Wsrc ) = 
+
+s 1
+
+|W| ∑
+
+i
+
+W2src, i, (15) which normalizes the threshold by the source tensor scale and makes the sparsity threshold less sensitive to the absolute scale of a particular tensor. Coordinate energy concentration is 
+
+cp(W) = ∑i∈Top p (|∆W|) ∆W2
+
+i
+
+∑i ∆W2
+
+i + ϵ0
+
+, (16) where Top p(|∆W|) is the set of the largest p% coordinates by update magnitude. High 
+
+cp means that a small subset of coordinates carries a disproportionate amount of update energy. For each 2D update matrix, we analyze the singular values of the update: 
+
+∆W = U∆Σ∆V⊤
+
+∆ , Σ∆ = diag (σ1, . . . , σm), σ1 ≥ · · · ≥ σm ≥ 0. (17) The top-k spectral energy ratio is 
+
+ek(W) = ∑ki=1 σ2
+
+i
+
+∑mi=1 σ2
+
+i + ϵ0
+
+. (18) High ek means that a rank-k approximation captures a large fraction of the update’s Frobe-nius energy. Stable rank is srank (∆W) = ∥∆W∥2
+
+F
+
+∥∆W∥22 + ϵ0
+
+= ∑i σ2
+
+i
+
+σ21 + ϵ0
+
+. (19) 16 Preprint. Stable rank is a continuous proxy for rank based on energy spread: it is close to 1 when the top singular value dominates and increases as energy spreads across many singular directions. Numerical rank at tolerance τ is rank τ (∆W) = |{ i : σi > τσ 1}| . (20) Numerical rank counts how many singular values remain above a relative threshold; lower values indicate a more sharply truncated spectrum at that tolerance. Taken together, higher top-k energy and lower stable or numerical rank indicate stronger spectral concentration. Spectral concentration means that the update is directionally anisotropic and can be well approximated, in Frobenius energy, by a small number of rank-one singular components; it does not imply that the matrix is exactly low-rank or that the update is functionally unimportant. These quantities separate two notions that are often conflated: an update can be numerically full-rank while still having much of its energy concentrated in a small number of singular directions. To measure alignment with the source-weight geometry, we decompose the source matrix as 
+
+Wsrc = UΣV⊤. (21) For a rank fraction ρ, let k = max (1, ⌊ρ min (din , dout )⌋), and let Uk, Vk be the leading source singular vectors. The joint principal-subspace projection is 
+
+pk(W) = ∥U⊤ 
+
+> k
+
+∆WV k∥2
+
+> F
+
+∥∆W∥2 
+
+> F
+
++ ϵ0
+
+. (22) Small pk means that the update is not primarily written into the dominant singular directions of the source weight. The implementation also computes left-only and right-only source-principal projections, source-subspace rotation, and source spectral drift; the paper tables report the joint projection because it is the strictest alignment measure. Finally, the coordinate-mask analysis converts source geometry into coordinate sets. The principal mask Mprin contains the coordinates with largest magnitude in the rank-k source reconstruction UkΣkV⊤ 
+
+> k
+
+, while the low-magnitude mask Mlow contains the coordinates with smallest |Wsrc, i |. For an update mask Aα = {i : |∆Wi| > α}, mask coverage is 
+
+oα(M) = |Aα ∩ M||Aα| + ϵ0
+
+. (23) In the static coordinate-mask tables produced by analyze opd delta.py , the default is α = 0, so the mask contains coordinates with nonzero stored-bfloat16 deltas. If M has density 10%, then 10% is the random-coverage baseline; values below 10% indicate avoidance, and values above 10% indicate enrichment. Low principal-mask coverage means the update avoids coordinates emphasized by the source’s leading singular structure, while high low-magnitude-mask coverage means the update preferentially occupies coordinates where the source weight was small in magnitude. 
+
+A.5 Visible-update mask overlap metrics 
+
+Table 4 compares two visible-update masks. For two checkpoint deltas ∆(1) and ∆(2), we first define their nonzero visible-update sets at threshold ϵ = 10 −5:
+
+A1 = {i : |∆(1) 
+
+> i
+
+| > ϵ}, A2 = {i : |∆(2) 
+
+> i
+
+| > ϵ}. (24) The one-sided coverage scores are 
+
+o1 = |A1 ∩ A2||A1| , o2 = |A1 ∩ A2||A2| . (25) These are asymmetric because each score normalizes by a different subnetwork size. For example, if A1 is much smaller than A2, then A1 can be mostly covered by A2 even when only a modest fraction of A2 is covered by A1.17 Preprint. The Random column reports the independent-mask baseline for the corresponding one-sided score. For o1, the random baseline is the density of the second mask, 
+
+Erand [o1] = |A2|
+
+N , (26) where N is the total number of compared coordinates. Similarly, Erand [o2] = |A1|/N. This is why the two Random values for the same pair can differ: they are determined by the nonzero densities of the opposite masks. 
+
+A.6 Additional static-analysis tables 
+
+Tables 8, 9, and 10 provide fuller static-analysis metrics for the OPD-style targets. All per-centages are computed from final checkpoint deltas. Exact zero and sparsity are computed after subtracting the stored bfloat16 checkpoint weights, while relative-threshold sparsity uses the source tensor RMS as the scale. Spectral and source-geometry metrics are medians over analyzed 2D matrices. Table 8: Additional global sparsity and coordinate-energy statistics for all analyzed model pairs. Sparsity@ ϵ uses isclose (∆W, 0, atol = ϵ). Rel.-thr. sparsity uses the threshold 10 −3 ·
+
+RMS (Wsrc ).                                                                                                           
+
+> Pair Rel. norm Exact zero Sparsity@1e-6 Sparsity@1e-5 Sparsity@1e-4 Rel.-thr. sparsity Top 0.1% coord. Top 1% coord. Top 5% coord. (%) (%) (%) (%) (%) (%) energy (%) energy (%) energy (%) Qwen-Math Distill 11.936 3.06 3.06 3.06 3.52 3.13 1.85 10.18 30.86 DeepScaleR RLVR 0.073 77.36 77.37 77.89 94.21 83.36 3.77 21.18 53.00 DS-Qwen OPD 0.047 82.02 82.04 82.58 98.35 89.34 2.73 19.28 55.41 JustRL RLVR 0.497 34.38 34.39 34.68 49.16 37.33 8.39 27.12 55.98 DS-Qwen OPD (JustRL) 0.108 69.96 69.99 70.43 86.16 74.24 1.66 13.42 39.57 MiniCPM OPD 0.069 80.46 80.49 81.65 98.91 89.05 2.80 22.93 58.05 Qwen2.5-VL GRPO 0.045 83.40 83.66 86.56 99.96 91.67 4.60 26.70 70.13 Qwen2.5-VL OPD 0.142 64.13 64.42 66.72 94.83 70.50 3.09 13.48 45.84 Qwen3-1.7B OPD 0.045 77.94 77.96 79.03 97.78 87.82 3.33 19.09 59.03 Qwen3 OPSD 0.036 86.50 86.67 89.50 100.00 94.52 3.95 27.99 67.21
+
+Table 9: Additional spectral statistics for all analyzed model pairs. Top-k energy, stable rank, numerical rank, and source-principal projection are medians over analyzed 2D matrices. 
+
+Pair Top-1 SVD Top-8 SVD Top-16 SVD Stable rank Rank@1e-5 Principal proj. 10% energy (%) energy (%) energy (%) (%) energy (%) Qwen-Math Distill 1.21 4.99 8.57 82.74 100 2.22 DeepScaleR RLVR 6.22 16.13 19.62 16.07 100 0.37 DS-Qwen OPD 10.03 22.74 26.92 9.97 100 0.37 JustRL RLVR 8.09 20.76 26.94 12.35 100 5.53 DS-Qwen OPD (JustRL) 13.78 34.32 40.94 7.25 100 0.53 MiniCPM OPD 8.11 21.50 26.81 12.32 100 0.38 Qwen2.5-VL GRPO 6.03 17.06 21.75 16.57 100 0.66 Qwen2.5-VL OPD 7.95 23.40 30.52 12.58 100 0.81 Qwen3-1.7B OPD 4.92 14.27 19.69 20.31 100 0.57 Qwen3 OPSD 12.87 23.11 26.19 7.77 100 0.47 
+
+Table 10: Source-geometry mask coverage for all analyzed model pairs. Principal coverage measures the fraction of visible-update coordinates falling in source-principal coordinate masks; low-magnitude coverage measures the fraction falling in the smallest-magnitude source coordinates. Non-prin./low measures the fraction of visible-update coordinates that either avoid the 10% source-principal mask or fall in the 10% low-magnitude source mask.                                                                                                            
+
+> Pair Prin. 1% Prin. 5% Prin. 10% Prin. 20% Low-mag. 1% Low-mag. 5% Low-mag. 10% Low-mag. 20% Non-prin./low 10% (%) (%) (%) (%) (%) (%) (%) (%) (%) Qwen-Math Distill 1.00 4.98 9.95 19.90 1.01 5.05 10.10 20.18 90.53 DeepScaleR RLVR 0.58 2.82 5.29 10.15 3.46 16.56 31.26 55.17 96.16 DS-Qwen OPD 0.57 2.67 4.81 9.03 4.17 20.03 38.04 66.78 96.97 JustRL RLVR 0.86 4.24 8.34 16.57 1.52 7.49 14.70 28.25 92.34 DS-Qwen OPD (JustRL) 0.64 2.95 5.46 10.76 2.43 11.88 23.04 43.24 95.56 MiniCPM OPD 0.67 2.92 5.39 9.45 4.49 21.22 39.42 67.05 96.72 Qwen2.5-VL GRPO 0.58 2.55 4.58 7.83 5.35 24.83 44.46 71.91 97.30 Qwen2.5-VL OPD 0.64 2.87 5.23 9.63 2.69 13.03 24.99 45.84 95.80 Qwen3-1.7B OPD 0.53 2.44 4.45 7.98 3.86 18.41 34.69 60.79 97.09 Qwen3 OPSD 0.52 2.40 4.39 7.46 5.78 26.95 48.57 77.65 97.76
+
+18 Preprint. 
+
+A.7 Benchmark-wise breakdown of interventional experiments 0 30 60 90 120 150         
+
+> Training Step
+> 0.20
+> 0.25
+> 0.30
+> 0.35
+> 0.40
+> 0.45
+> Accuracy (mean@16)
+> AIME24
+> 030 60 90 120 150
+> Training Step
+> AIME25
+> Full OPD Mask RLVR Mask Random Mask
+
+Figure 4: Benchmark-wise breakdown of the subnetwork-masked OPD experiment in Figure 3(a). Left: AIME24. Right: AIME25. The OPD mask tracks the full run closely on both benchmarks, while the random mask remains weaker. 0 40 80 120     
+
+> Training Step
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> Accuracy (mean@16)
+> AIME24
+> 040 80 120
+> Training Step
+> AIME25
+> AdamW SGD
+
+Figure 5: Benchmark-wise breakdown of the AdamW-versus-SGD experiment in Figure 3(b). Left: AIME24. Right: AIME25. In the JustRL-teacher OPD setting, SGD lags behind AdamW on both benchmarks at the final evaluation point. The benchmark-wise curves support the same conclusions as the averaged curves in Figure 3. For the subnetwork intervention, the OPD mask closely tracks full training on both AIME24 and AIME25, while the random mask is generally lower. For the optimizer ablation, SGD improves over the source checkpoint but trails AdamW on both benchmarks by the end of training, indicating that the sparse final-update structure does not by itself make AdamW unnecessary. 
+
+A.8 Optimizer dynamics in JustRL-teacher OPD 
+
+We further inspect the AdamW optimizer state in the JustRL-teacher OPD run, following the same diagnostic perspective used by Mukherjee et al. (2026b): momentum cosine similarity measures whether AdamW’s first moment mt points in the same direction as the current gradient gt, while the second-moment coefficient of variation measures how heterogeneous the adaptive denominator √vt is across parameters. Figure 6 shows that AdamW’s first and second moment statistics behave differently in this OPD run. The momentum cosine is relatively high but unstable: it starts at 0.958, remains 19 Preprint. 0 100 200 300 400 500      
+
+> Optimizer step
+> −0.4
+> −0.2
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> cos( mt, gt)
+> Momentum cosine
+> 0100 200 300 400 500
+> Optimizer step
+> 0
+> 1
+> 2
+> 3
+> 4
+> 5
+> 6
+> std( √ vt )/mean( √ vt )
+> Second-moment CV
+
+Figure 6: AdamW optimizer-state diagnostics for JustRL-teacher OPD. Left: cosine similarity between AdamW momentum and the current gradient. Right: coefficient of variation of √vt,computed as std (√vt)/mean (√vt). Momentum alignment is initially high but unstable, while the second-moment CV remains large throughout training. positive on average with mean 0.280, falls toward zero, and reaches a minimum of −0.351. This supports the view that momentum can retain meaningful directional history in OPD, but its alignment with the current gradient is not stable throughout training. By contrast, the second-moment CV remains high: it starts at 6.49, ends at 3.83, and averages 4.85. This persistent heterogeneity suggests that AdamW’s coordinate-wise adaptive scaling can still be load-bearing in OPD, even when the final checkpoint delta is sparse. 
+
+A.9 Qwen2.5-VL subnetwork 
+
+We repeat the masked-subnetwork intervention in the Qwen2.5-VL OPD setting. All runs use the same Geo3K training configuration and are evaluated on the single Geo3K validation set, reported as mean@1 accuracy over the first 100 optimizer steps. We compare five variants: full OPD, OPD restricted to the full-OPD nonzero mask, OPD restricted to the GRPO nonzero mask, OPD restricted to a random mask with the same density as the full-OPD mask, and OPD restricted to a random mask with the same density as the GRPO mask. The nonzero masks are again defined by |∆| > 10 −5; the full-OPD mask has roughly one-third active coordinates, while the GRPO mask has 9.3% active coordinates. Figure 7 shows the same qualitative pattern as the LLM subnetwork intervention. Full OPD reaches a peak Geo3K accuracy of 55.72% and a final-step accuracy of 54.94%, while the full-OPD-mask run reaches a 54.24% peak and 54.23% final accuracy. The late-training gap is similarly small: averaged over the last five evaluation points, full OPD obtains 54.65%, compared with 53.86% for the full-OPD mask. The random mask with the same density as the full-OPD mask peaks lower at 52.30%, showing that the full-OPD support is not merely a random one-third training budget. The GRPO mask reaches 49.98%, and the density-matched random GRPO mask peaks at 47.40%. Thus, in the VLM setting as well, the sparse coordinates selected by OPD are functionally useful for recovering most of the full-OPD improvement. 20 Preprint. 0 20 40 60 80 100 
+
+Training Step 
+
+0.30 
+
+0.35 
+
+0.40 
+
+0.45 
+
+0.50 
+
+0.55 
+
+> Accuracy (mean@1)
+
+Geo3K Validation Accuracy 
+
+> Full
+> OPD Mask
+> GRPO Mask
+> Random OPD Density
+> Random GRPO Density
+
+Figure 7: Qwen2.5-VL subnetwork-masked OPD on Geo3K. The full-OPD mask closely tracks the full run, while density-matched random masks and the smaller GRPO mask underperform. 21
