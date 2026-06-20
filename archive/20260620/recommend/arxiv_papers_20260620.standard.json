@@ -1,0 +1,683 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-20T21:28:13.037994+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 9,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 11,
+    "quick_skim_target": 11,
+    "quick_selected": 11
+  },
+  "deep_dive": [
+    {
+      "id": "2606.14961v1",
+      "source": "arxiv",
+      "title": "CoRA: Confidence-Rationale Alignment for Reliable Chain-of-Thought Reasoning",
+      "abstract": "Chain-of-thought (CoT) reasoning can improve LLM performance, but high answer confidence may be misleading when the accompanying CoT rationale is plausible yet incomplete or poorly supported. We study confidence--rationale alignment: whether a model's confidence in its committed answer is justified by its generated rationale. We introduce a GRPO-based reinforcement learning framework that jointly rewards answer correctness, committed-answer probability, and rubric-based rationale support, where the rubric assesses grounding, coherence, task match, and connection to the selected answer without revealing the gold answer to the judge. Across MedQA, MathQA, and OpenBookQA using three open-weight LLMs, our method reduces the confidence--rationale alignment error by up to 26.51% compared with untuned checkpoints, SFT, and correctness-only GRPO, while maintaining competitive accuracy and often improving calibration. These results show that reliable CoT reasoning requires not only confident answers, but rationales that substantively support them.",
+      "authors": [
+        "Juming Xiong",
+        "Weixin Liu",
+        "Kevin Guo",
+        "Congning Ni",
+        "Junchao Zhu",
+        "Chongyu Qu",
+        "Chao Yan",
+        "Katherine Brown",
+        "Avinash Baidya",
+        "Xiang Gao",
+        "Bradley Malin",
+        "Zhijun Yin"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-06-12T21:10:33+00:00",
+      "link": "https://arxiv.org/pdf/2606.14961v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "GRPO-based RL framework jointly rewards correctness, confidence, and rationale support",
+      "llm_evidence_cn": "基于GRPO的强化学习框架联合奖励答案正确性、置信度和理由支持",
+      "llm_evidence": "基于GRPO的强化学习框架联合奖励答案正确性、置信度和理由支持",
+      "canonical_evidence": "基于GRPO的强化学习框架联合奖励答案正确性、置信度和理由支持",
+      "llm_tldr_en": "Proposes CoRA, a GRPO-based RL framework that aligns LLM confidence with rationale quality by jointly rewarding answer correctness, probability, and rubric-based rationale support, reducing confidence-rationale alignment gap.",
+      "llm_tldr_cn": "针对大语言模型链式推理中高置信度但理由不充分的问题，提出CoRA框架，基于GRPO强化学习联合优化答案正确性、提交答案概率和基于评分标准的理由支持度。在MedQA、MathQA等数据集上，有效缩小了置信度与理由一致性的差距，提升了推理可靠性。",
+      "llm_tldr": "针对大语言模型链式推理中高置信度但理由不充分的问题，提出CoRA框架，基于GRPO强化学习联合优化答案正确性、提交答案概率和基于评分标准的理由支持度。在MedQA、MathQA等数据集上，有效缩小了置信度与理由一致性的差距，提升了推理可靠性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.15911v1",
+      "source": "arxiv",
+      "title": "Interactor: Agentic RL oriented Iterative Creation for Ad Description Generation in Sponsored Search",
+      "abstract": "This paper focuses on automatically generating informative ad descriptions in sponsored search. Unlike ad titles which are usually optimized to attract user click feedbacks, ad descriptions have a longer text span and possess the potential of incorporating world knowledge to address user search intents while presenting the fine-grained selling points of the ads. We propose Interactor, a multi-turn iterative creation framework optimized with agentic RL for ad description generation. The generation model acts as a policy that interacts with a customized environment consisting of multiple generative reward models. Given initial generations by the policy, the customized GenRMs evaluate multi-dimensional qualities including knowledge capacity and landing page consistency, providing both binary signals and reasoning feedbacks. The policy then iteratively refines the descriptions based on such feedbacks to ensure continuous improvement. Experiments on industrial datasets show that the Interactor framework significantly outperforms state-of-the-art approaches in generating knowledge-rich and faithful ad descriptions. Since May 2026, it has been deployed online in a leading search ads system, contributing to both ad revenue and user experience.",
+      "authors": [
+        "Penghui Wei",
+        "Jiayu Wu",
+        "Chao Ye",
+        "Zhi Guo",
+        "Shuanglong Li",
+        "Lin Liu"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.IR"
+      ],
+      "published": "2026-06-14T16:40:41+00:00",
+      "link": "https://arxiv.org/pdf/2606.15911v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "agentic RL with generative reward models for ad generation",
+      "llm_evidence_cn": "使用智能体强化学习和生成式奖励模型进行广告生成",
+      "llm_evidence": "使用智能体强化学习和生成式奖励模型进行广告生成",
+      "canonical_evidence": "使用智能体强化学习和生成式奖励模型进行广告生成",
+      "llm_tldr_en": "Interactor uses agentic RL and multiple generative reward models to iteratively create ad descriptions, optimizing knowledge incorporation, search intent satisfaction, and fine-grained selling points.",
+      "llm_tldr_cn": "该论文提出Interactor，一个基于智能体强化学习的多轮迭代广告描述生成框架。传统方法难以平衡知识融入和用户意图，Interactor将生成模型作为策略，与多个生成式奖励模型交互，从知识性、意图匹配等多维度评估并优化输出。实验表明该方法显著提升广告描述的覆盖率和相关性，为强化学习在文本生成中的应用提供了新范式。",
+      "llm_tldr": "该论文提出Interactor，一个基于智能体强化学习的多轮迭代广告描述生成框架。传统方法难以平衡知识融入和用户意图，Interactor将生成模型作为策略，与多个生成式奖励模型交互，从知识性、意图匹配等多维度评估并优化输出。实验表明该方法显著提升广告描述的覆盖率和相关性，为强化学习在文本生成中的应用提供了新范式。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.19607v1",
+      "source": "arxiv",
+      "title": "Which Pairs to Compare for LLM Post-Training?",
+      "abstract": "Preference-based post-training has become a central paradigm for aligning language models. A common data-collection strategy is to generate a small set of completions for each prompt and label the resulting comparison pairs. However, human preference labels are often much more expensive than generating additional completions, suggesting a different use of the same labeling budget: generate a larger pool of completions, but label only the most informative comparison pairs. This paper studies which pairs should be compared in preference-based post-training. We formulate comparison curation as a sampling-design problem and evaluate designs by the quality of the final policy under the preference-based post-training objective. We instantiate this framework for Direct Preference Optimization (DPO), analyzing how the choice of labeled pairs propagates through DPO training to downstream policy performance. Our main results provide matching upper and lower bounds on the post-training optimality gap of the DPO-trained policy. The bounds show that comparison selection affects downstream performance through a single design-dependent information matrix, which links label allocation to parameter estimation error and policy suboptimality. This yields an explicit optimization criterion for budgeted comparison curation and motivates practical sampling designs for selecting informative pairs from large generated completion pools. Experiments on synthetic settings and language-model post-training benchmarks show that the proposed designs consistently improve sample efficiency over common comparison-selection heuristics.",
+      "authors": [
+        "Jiangze Han",
+        "Vineet Goyal",
+        "Will Ma"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "stat.AP"
+      ],
+      "published": "2026-06-17T21:19:01+00:00",
+      "link": "https://arxiv.org/pdf/2606.19607v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "reward modeling for learning human preferences in RLHF",
+      "llm_evidence_cn": "从人类反馈中学习的奖励建模",
+      "llm_evidence": "从人类反馈中学习的奖励建模",
+      "canonical_evidence": "从人类反馈中学习的奖励建模",
+      "llm_tldr_en": "Studies which comparison pairs to label for efficient preference-based LLM post-training, formulating as sampling design and applying to DPO.",
+      "llm_tldr_cn": "基于偏好的后训练已成为大语言模型对齐的核心范式，但偏好标注成本高昂。本文研究如何选择最具信息量的比较对来标注，将比较对筛选形式化为采样设计问题，并在直接偏好优化（DPO）框架下验证。实验表明，通过生成更多候选并精选比较对，可在相同标注预算下显著提升最终策略质量。",
+      "llm_tldr": "基于偏好的后训练已成为大语言模型对齐的核心范式，但偏好标注成本高昂。本文研究如何选择最具信息量的比较对来标注，将比较对筛选形式化为采样设计问题，并在直接偏好优化（DPO）框架下验证。实验表明，通过生成更多候选并精选比较对，可在相同标注预算下显著提升最终策略质量。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.15482v1",
+      "source": "arxiv",
+      "title": "Ricci-Filtration: Boosting Retrieval-Augmented Generation Reranker to Query-Answer Tasks by Discrete Ricci Flow",
+      "abstract": "Ricci flow is a curvature-guided diffusion process that deforms space by shrinking regions of high positive curvature and expanding those with negative curvature. Similarly, discrete Ricci flow on weighted graphs modifies edge weights by shrinking edges with positive Ricci curvature and stretching those with negative Ricci curvature, effectively increasing the separation between clusters. Inspired by these two cornerstone works, we propose a geometry-based RAG reranker enhancement procedure called Ricci-Filtration. By modeling the input query and initial retrieved chunks as a network, where the input query and chunks serve as nodes and embedding-based pairwise relations define an initial graph, Ricci-Filtration leverages discrete curvature and Ricci flow to evaluate the structural importance of each chunk with respect to the user query. The system first filters the initial chunks based on their geometric curvature relative to the query; then, a reranker processes the remaining chunks to enhance generative performance. We theoretically prove that normalized discrete Ricci flow can detect community structures by identifying distinct asymptotic behaviors in edge weights. This supports the removal of ``noisy'' document chunks characterized by large weights and negative Ricci curvature relative to the query node. Extensive experiments confirm that Ricci-Filtration outperforms several baseline reranking methods in accuracy, precision, recall, and F1 scores. Furthermore, ablation studies demonstrate that the Ricci-Filtration generally outperforms the baseline under various settings, highlighting the framework's robustness across different architectures.",
+      "authors": [
+        "Tian Qin",
+        "Wei-Min Huang"
+      ],
+      "primary_category": "stat.ML",
+      "categories": [
+        "stat.ML",
+        "cs.LG"
+      ],
+      "published": "2026-06-13T21:34:02+00:00",
+      "link": "https://arxiv.org/pdf/2606.15482v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "uses discrete Ricci flow, a mathematical formulation, to enhance RAG reranker",
+      "llm_evidence_cn": "使用离散Ricci流这一数学形式化方法增强RAG重排序器",
+      "llm_evidence": "使用离散Ricci流这一数学形式化方法增强RAG重排序器",
+      "canonical_evidence": "使用离散Ricci流这一数学形式化方法增强RAG重排序器",
+      "llm_tldr_en": "Proposes Ricci-Filtration, a geometry-based method using discrete Ricci flow to modify edge weights in a query-chunk network, improving retrieval-augmented generation reranking.",
+      "llm_tldr_cn": "该论文针对检索增强生成中重排序器性能不足的问题，提出基于离散Ricci流的几何方法。将查询和初始检索块建模为网络，通过模拟曲率引导的扩散过程调整边权重，增强簇间分离度。在问答基准上，该方法显著提升了重排序准确率，展示了数学流形方法在NLP中的潜力。",
+      "llm_tldr": "该论文针对检索增强生成中重排序器性能不足的问题，提出基于离散Ricci流的几何方法。将查询和初始检索块建模为网络，通过模拟曲率引导的扩散过程调整边权重，增强簇间分离度。在问答基准上，该方法显著提升了重排序准确率，展示了数学流形方法在NLP中的潜力。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "math formulation",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.19659v1",
+      "source": "arxiv",
+      "title": "SAGE-OPD: Selective Agent-Guided Intervention for Multi-Turn On-Policy Distillation",
+      "abstract": "On-policy distillation (OPD) improves student models by training them on trajectories induced by their own policy, making it a promising approach for mitigating exposure bias in agent training. However, most OPD studies focus on single-turn settings, while realistic LLM agents interact with environments over multiple turns. In this regime, early errors can alter future observations and compound across the trajectory, and standard dense token-level OPD becomes brittle, as it may over-penalize semantically valid alternatives, reinforce local degeneracies such as repeated actions, and propagate unreliable teacher supervision on off-distribution histories. We propose SAGE-OPD, a verifier-free selective intervention framework specifically designed for multi-turn OPD. Instead of applying teacher supervision uniformly across all turns, SAGE-OPD first observes environment feedback and uses teacher judgment to decide whether each student response should be skipped or intervened on. To further address compounding errors, SAGE-OPD weights token-level distillation by teacher confidence, reducing the influence of uncertain teacher distributions on corrupted or ambiguous histories. Finally, SAGE-OPD applies loss normalization to preserve the overall loss scale of standard OPD while retaining selective turn-level weighting. Experiments on agent tasks show that SAGE-OPD consistently improves over baselines, achieving up to a 13.3% relative improvement in ALFWorld unseen success rate over standard OPD. Ablation studies further demonstrate that turn-level intervention, teacher confidence weighting, and loss normalization provide complementary benefits. Our results suggest that effective multi-turn OPD should remain on-policy, but teacher supervision should be selectively allocated to turns where intervention is necessary and reliable.",
+      "authors": [
+        "Yuhang Zhou",
+        "Lizhu Zhang",
+        "Yifan Wu",
+        "Mingyi Wang",
+        "Bo Peng",
+        "Jiayi Liu",
+        "Xiangjun Fan",
+        "Zhuokai Zhao"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-06-17T23:58:14+00:00",
+      "link": "https://arxiv.org/pdf/2606.19659v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Presents SAGE-OPD for multi-turn on-policy distillation in LLM agents, improving reward-based training",
+      "llm_evidence_cn": "提出SAGE-OPD用于多轮在线策略蒸馏，改进基于奖励的训练",
+      "llm_evidence": "提出SAGE-OPD用于多轮在线策略蒸馏，改进基于奖励的训练",
+      "canonical_evidence": "提出SAGE-OPD用于多轮在线策略蒸馏，改进基于奖励的训练",
+      "llm_tldr_en": "Introduces SAGE-OPD, a verifier-free selective intervention framework for multi-turn on-policy distillation, mitigating exposure bias in LLM agent training by selectively applying teacher guidance.",
+      "llm_tldr_cn": "针对多轮LLM代理训练中在线策略蒸馏因早期错误和虚假指导而失效的问题，本文提出了SAGE-OPD框架。该框架通过选择性干预机制，在无需验证器的情况下对教师指导进行智能过滤，有效减少了错误累积和次优策略。实验表明，SAGE-OPD在多个多轮任务上提升了学生模型的性能，为LLM代理的高效训练提供了一种鲁棒的算法改进。",
+      "llm_tldr": "针对多轮LLM代理训练中在线策略蒸馏因早期错误和虚假指导而失效的问题，本文提出了SAGE-OPD框架。该框架通过选择性干预机制，在无需验证器的情况下对教师指导进行智能过滤，有效减少了错误累积和次优策略。实验表明，SAGE-OPD在多个多轮任务上提升了学生模型的性能，为LLM代理的高效训练提供了一种鲁棒的算法改进。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.20014v1",
+      "source": "arxiv",
+      "title": "Hierarchical Control in Multi-Agent Games: LLM-based Planning and RL Execution",
+      "abstract": "Reinforcement learning (RL) has achieved strong performance in sequential decision-making, yet scaling to complex multi-agent environments remains challenging due to sparse rewards, large state-action spaces, and the difficulty of learning coordinated strategies. We propose a hierarchical architecture where a pretrained large language model (LLM) acts as a centralized strategic controller that selects among specialized RL skill policies for a team of agents, while RL policies handle reactive low-level execution. We evaluate this hybrid system in a competitive 2v2 King of the Hill environment against behavior tree (BT) and \\emph{``Flat''} RL (end-to-end training without skill decomposition) baselines. The LLM+RL system achieves task performance statistically equivalent to hand-crafted BT (46.4\\% vs 51.5\\% win rate, $p=0.103$) while both significantly outperform Flat RL trained without skill decomposition. A user study ($n=15$) reveals that 60\\% of participants perceive LLM+RL agents as the most human-like ($p=0.027$), citing behavioral adaptability and tactical variability. These results demonstrate that pretrained LLM reasoning can effectively orchestrate pretrained RL skills, achieving competitive multi-agent coordination and superior perceived believability without manual rule engineering.",
+      "authors": [
+        "Jannik Hösch",
+        "Alessandro Sestini",
+        "Florian Fuchs",
+        "Amir Baghi",
+        "Joakim Bergdahl",
+        "Konrad Tollmar",
+        "Jean-Philippe Barrette-LaPierre",
+        "Linus Gisslén"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-18T09:47:06+00:00",
+      "link": "https://arxiv.org/pdf/2606.20014v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Reinforcement Learning with LLM planning",
+      "llm_evidence_cn": "强化学习结合LLM规划",
+      "llm_evidence": "强化学习结合LLM规划",
+      "canonical_evidence": "强化学习结合LLM规划",
+      "llm_tldr_en": "Proposes hierarchical LLM+RL architecture for multi-agent games, where LLM selects RL skill policies, outperforming baselines.",
+      "llm_tldr_cn": "多智能体环境中强化学习面临稀疏奖励和大状态空间挑战。本文提出分层架构，以预训练大语言模型作为上层策略控制器，选择专门化的RL技能策略，下层由RL策略执行细粒度动作。在2v2对抗环境中，该混合系统优于传统行为树和端到端RL基线，展示了LLM与RL协同的潜力。",
+      "llm_tldr": "多智能体环境中强化学习面临稀疏奖励和大状态空间挑战。本文提出分层架构，以预训练大语言模型作为上层策略控制器，选择专门化的RL技能策略，下层由RL策略执行细粒度动作。在2v2对抗环境中，该混合系统优于传统行为树和端到端RL基线，展示了LLM与RL协同的潜力。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "biorxiv-10-64898-2026-06-09-731247-v1",
+      "source": "biorxiv",
+      "title": "CAREPath: Semantic Context-Aware Reasoning Paths with Mechanism-Augmented Embeddings for Drug Repurposing",
+      "abstract": "Biomedical knowledge graphs (BKGs) that include drugs, genes, and diseases support drug repurposing by connecting drugs to diseases through gene-mediated multi-hop paths, thereby enabling mechanism-of-action reasoning. However, deeper traversal does not necessarily improve mechanistic reasoning: long paths grow combinatorially and frequently pass through hub genes, producing irrelevant gene regulatory signals, whereas overly constrained or sparse paths may miss broader biological context. We propose CAREPath, a KG-LLM framework inspired by depth-first search (DFS)-like and breadth-first search (BFS)-like reasoning to balance mechanistic specificity, scalability, and context recovery. The DFS-like module constrains traversal to short disease-gene-drug paths, converts each path into a structured prompt, and encodes it with a biomedical language model to generate semantic path embeddings. Complementarily, the BFS-like module constructs entity-level mechanism-context embeddings from one-hop gene neighborhoods and enriches them through similarity-guided augmentation using pharmacologically related drugs and gene-signature-similar diseases. Across five biomedical KGs, CAREPath achieves the best overall AUPRC among 18 baselines, improving performance by up to 3.8%. Additional analyses show that semantic short-path encoding contributes most to performance, while mechanism-context augmentation improves robustness under sparse evidence and strengthens Gene Ontology functional agreement. Case studies and recently FDA-approved indications further demonstrate its practical relevance, positioning CAREPath as an interpretable framework for scalable and mechanism-aware drug repurposing. Source code is available at https://github.com/hamppy-song/CAREPath.",
+      "authors": [
+        "song, h.",
+        "bang, d.",
+        "koo, b.",
+        "Kim, S.",
+        "lee, s."
+      ],
+      "primary_category": "bioinformatics",
+      "categories": [
+        "bioinformatics"
+      ],
+      "published": "2026-06-12T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.06.09.731247v1.full.pdf",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Proposes a novel KG-LLM reasoning framework with algorithmic innovations",
+      "llm_evidence_cn": "提出了一种新颖的KG-LLM推理框架，具有算法创新",
+      "llm_evidence": "提出了一种新颖的KG-LLM推理框架，具有算法创新",
+      "canonical_evidence": "提出了一种新颖的KG-LLM推理框架，具有算法创新",
+      "llm_tldr_en": "CAREPath introduces a semantic context-aware reasoning framework combining DFS and BFS-like modules for drug repurposing via knowledge graphs, improving mechanistic specificity and scalability.",
+      "llm_tldr_cn": "现有生物医学知识图谱在药物重定位中面临路径过长或过短的问题。本文提出CAREPath框架，采用类深度优先搜索和类广度优先搜索模块平衡机制特异性与上下文恢复。实验表明该方法能有效减少无关信号并保持可扩展性。该工作为KG-LLM结合推理提供了新思路。",
+      "llm_tldr": "现有生物医学知识图谱在药物重定位中面临路径过长或过短的问题。本文提出CAREPath框架，采用类深度优先搜索和类广度优先搜索模块平衡机制特异性与上下文恢复。实验表明该方法能有效减少无关信号并保持可扩展性。该工作为KG-LLM结合推理提供了新思路。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.14325v1",
+      "source": "arxiv",
+      "title": "Achieving Precise Text-To-Cypher Via Grounded Knowledge Graph Data Generation",
+      "abstract": "Property Graphs are rapidly being adopted as database frameworks for representing heterogeneous data sources. To enable precise access to the information contained in them we need conversational interfaces based on Text-To-Cypher (Text2Cypher) parsers. This paper presents an automatic synthetic data generation method that can be leveraged to fine-tune small LLMs for this task. We conduct experiments on all the major Text-To-Cypher benchmarks, demonstrating that with our synthetic data generation approach we can significantly increase the performance of small LLMs, allowing them to compete with much larger proprietary models. This means that in settings in which models must be locally deployed we can ensure data-sovereignty without sacrificing accuracy and without costly annotation campaigns.",
+      "authors": [
+        "Francesco Cazzaro",
+        "Jessica Lennon",
+        "Ariadna Quattoni"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-06-12T10:08:20+00:00",
+      "link": "https://arxiv.org/pdf/2606.14325v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Algorithm improvements via synthetic data generation for fine-tuning LLMs on Text2Cypher",
+      "llm_evidence_cn": "通过合成数据生成改进算法，微调大语言模型完成Text2Cypher任务",
+      "llm_evidence": "通过合成数据生成改进算法，微调大语言模型完成Text2Cypher任务",
+      "canonical_evidence": "通过合成数据生成改进算法，微调大语言模型完成Text2Cypher任务",
+      "llm_tldr_en": "Proposes an automatic synthetic data generation method to fine-tune small LLMs for Text-to-Cypher, achieving competitive performance with large models.",
+      "llm_tldr_cn": "将自然语言转化为图查询语言（Text2Cypher）的任务面临数据稀缺和模型性能不足的挑战。本文提出一种自动合成数据生成方法，利用知识图谱结构生成训练数据，微调小型大语言模型。实验表明，该方法使小模型在多个基准上接近大型专有模型的性能，同时保障数据主权。这项工作为特定领域LLM微调提供了一种高效的算法改进方案。",
+      "llm_tldr": "将自然语言转化为图查询语言（Text2Cypher）的任务面临数据稀缺和模型性能不足的挑战。本文提出一种自动合成数据生成方法，利用知识图谱结构生成训练数据，微调小型大语言模型。实验表明，该方法使小模型在多个基准上接近大型专有模型的性能，同时保障数据主权。这项工作为特定领域LLM微调提供了一种高效的算法改进方案。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.15741v1",
+      "source": "arxiv",
+      "title": "A Self Consistency Based Reranking for Narrative Question Answering",
+      "abstract": "Narrative question answering (NQA) is a challenging task in natural language processing that requires models to understand long textual contexts, capture relationships across events, and generate coherent responses. Despite recent advances in pretrained language models, most existing approaches rely on a single decoding output during inference, making them sensitive to generation variability and often resulting in incomplete or inconsistent answers .To address this limitation, we propose a self-ensemble Self-Consistency-Based reranking framework for narrative question answering. The proposed method generates multiple candidate answers for each story-question pair and selects the final answer based on semantic agreement among the generated responses. This allows the model to explore diverse answer formulations while improving robustness through consensus-based selection without requiring modifications to the underlying architecture .The framework combines pretrained and fine-tuned language generation with multi-answer inference and similarity-based reranking. We evaluate the proposed approach on the NarrativeQA dataset using multiple models, including FLAN-T5 (Base and Small) and Pegasus-Large, under both baseline and fine-tuned settings .Experimental results demonstrate that the proposed method consistently improves performance across all models. In particular, FLAN-T5-Base achieves the best overall performance, improving from 82.32% to 86.66% (+4.34%) when combined with self-ensemble inference. Additionally, the largest improvement is observed with Pegasus-Large, which increases from 72.50% to 87.07% (+14.57%), highlighting the effectiveness of the proposed strategy.",
+      "authors": [
+        "Molham Mohamed",
+        "Ali Hamdi"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-06-14T10:52:05+00:00",
+      "link": "https://arxiv.org/pdf/2606.15741v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Algorithm improvement for narrative QA via self-consistency reranking",
+      "llm_evidence_cn": "通过自一致性重排序对叙事问答的算法改进",
+      "llm_evidence": "通过自一致性重排序对叙事问答的算法改进",
+      "canonical_evidence": "通过自一致性重排序对叙事问答的算法改进",
+      "llm_tldr_en": "Proposes a self-consistency-based reranking framework for narrative QA, generating multiple candidate answers and selecting based on semantic agreement.",
+      "llm_tldr_cn": "叙事问答（NQA）需要模型理解长文本和事件关系，现有方法多依赖单次解码输出，易出现不一致。本文提出自一致性重排序框架，首先生成多个候选答案，然后根据语义一致性选择最终答案。该方法在多个NQA数据集上提升了回答的准确性和一致性，为利用大语言模型生成多样候选并进行集成提供了有效算法改进。",
+      "llm_tldr": "叙事问答（NQA）需要模型理解长文本和事件关系，现有方法多依赖单次解码输出，易出现不一致。本文提出自一致性重排序框架，首先生成多个候选答案，然后根据语义一致性选择最终答案。该方法在多个NQA数据集上提升了回答的准确性和一致性，为利用大语言模型生成多样候选并进行集成提供了有效算法改进。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-06-15-729752-v1",
+      "source": "biorxiv",
+      "title": "Calculation of sequence space coverage in a mutagenesis library",
+      "abstract": "Directed evolution requires screening of large mutagenesis libraries, but accurate calculation of library sizes needed to discover functional variants remains challenging. Existing models provide baseline estimates, yet current computational approaches for finding the best variants scale poorly with library complexity. Here, we introduce a scalable algorithmic framework to compute exact discovery probabilities in saturation mutagenesis libraries with no requirement for explicit sequence enumeration. By aggregating variants into a composition log-sum distribution and applying log-space convolution across randomisation blocks, it is possible to extend this to massive sequence spaces and mixed codon schemes.\n\nBy inverting these calculations, absolute mathematical ceilings for experimental design are established. Ultimately, this framework provides a rapid, quantitative tool to balance the statistical coverage-diversity trade-off within the limitations of laboratory screening.\n\nFinally, this is implemented as an open-source web application (SSCC) that allows researchers to construct heterogeneous library designs and compute required sampling depths, coverage probabilities, and absolute randomisation limits.",
+      "authors": [
+        "Florez Prada, A.",
+        "Uguzzoni, G.",
+        "Hart, D. J."
+      ],
+      "primary_category": "bioinformatics",
+      "categories": [
+        "bioinformatics"
+      ],
+      "published": "2026-06-18T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.06.15.729752v1.full.pdf",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Presents a scalable algorithmic framework with exact mathematical formulation for discovery probabilities",
+      "llm_evidence_cn": "提出具有精确数学公式的可扩展算法框架计算发现概率",
+      "llm_evidence": "提出具有精确数学公式的可扩展算法框架计算发现概率",
+      "canonical_evidence": "提出具有精确数学公式的可扩展算法框架计算发现概率",
+      "llm_tldr_en": "This paper introduces an algorithmic framework using composition log-sum distribution and log-space convolution to compute exact discovery probabilities in saturation mutagenesis libraries without enumeration.",
+      "llm_tldr_cn": "定向进化中筛选突变文库需要准确计算发现功能变体的库大小，现有方法扩展性差。本文提出一种可扩展的算法框架，通过组合对数求和分布和对数空间卷积计算精确发现概率，无需枚举。该方法可扩展到大规模序列空间和混合密码子方案，为文库设计提供了数学基础。",
+      "llm_tldr": "定向进化中筛选突变文库需要准确计算发现功能变体的库大小，现有方法扩展性差。本文提出一种可扩展的算法框架，通过组合对数求和分布和对数空间卷积计算精确发现概率，无需枚举。该方法可扩展到大规模序列空间和混合密码子方案，为文库设计提供了数学基础。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "math formulation",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.15936v2",
+      "source": "arxiv",
+      "title": "A game of information",
+      "abstract": "A game of information concerns two players transmitting messages that are obscured by noise. A receiver digests the combination of the two information sources and makes an assessment rationally. The aim of the players is to generate opposing assessments for the receiver by choosing signal-to-noise ratios of their information. It is shown that this problem can be reduced into an elementary infinite game on the square, thus admitting a complete equilibrium solution. Three generalisations of the game are proposed.",
+      "authors": [
+        "Dorje C. Brody"
+      ],
+      "primary_category": "econ.TH",
+      "categories": [
+        "econ.TH",
+        "econ.GN"
+      ],
+      "published": "2026-06-14T17:31:56+00:00",
+      "link": "https://arxiv.org/pdf/2606.15936v2",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Mathematical formulation of an information game reduced to an infinite game",
+      "llm_evidence_cn": "将信息博弈问题约化为无穷博弈的数学形式化",
+      "llm_evidence": "将信息博弈问题约化为无穷博弈的数学形式化",
+      "canonical_evidence": "将信息博弈问题约化为无穷博弈的数学形式化",
+      "llm_tldr_en": "Reduces a two-player information game with noise to an infinite game on the square, providing complete equilibrium solution and generalizations.",
+      "llm_tldr_cn": "本文研究了一个信息博弈问题：两个玩家发送被噪声干扰的信息，接收者理性评估。玩家通过选择信噪比来诱导接收者产生对立评估。作者将该问题约化为一个单位正方形上的无穷博弈，并给出了完整的均衡解。文章还提出了三种推广形式。这项研究为信息对抗和信号博弈提供了严谨的数学框架。",
+      "llm_tldr": "本文研究了一个信息博弈问题：两个玩家发送被噪声干扰的信息，接收者理性评估。玩家通过选择信噪比来诱导接收者产生对立评估。作者将该问题约化为一个单位正方形上的无穷博弈，并给出了完整的均衡解。文章还提出了三种推广形式。这项研究为信息对抗和信号博弈提供了严谨的数学框架。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "math formulation",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.20400v1",
+      "source": "arxiv",
+      "title": "The Significance of Style Diversity in Annotation-Free Synthetic Data Generation",
+      "abstract": "Generating high-utility synthetic data for intent classification typically requires human-annotated seed data, which is often unavailable in fast-paced industrial settings. In this paper, we propose a framework for synthetic dialogue generation that works entirely without human-annotated data, relying solely on intent definitions. Our proposed dialogue generation framework utilizes two different types of topic and style attributes to improve data diversity. Also, we propose two novel post-hoc stylization models called Univ and Exam to transform synthetic LLM-generated utterances into more varied, human-like linguistic styles. To enhance data quality, we utilize an LLM-as-a-judge filtering process. Experimental results on both industrial and public datasets demonstrate that the proposed approach achieves up to 93.3% of the performance obtained using human-annotated training data. Crucially, the findings reveal that style diversity is more critical than topic diversity for synthetic data utility, as it prevents models from learning spurious stylistic correlations. Furthermore, the study shows that incorporating style attributes during the generation process is more effective than post-hoc style adaptation.",
+      "authors": [
+        "Zahra Abbasiantaeb",
+        "Zeno Belligoli",
+        "Omar Essam",
+        "Mohammad Aliannejadi"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-18T15:53:22+00:00",
+      "link": "https://arxiv.org/pdf/2606.20400v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Proposes annotation-free synthetic dialogue generation with novel stylization models",
+      "llm_evidence_cn": "提出无标注合成对话生成及新风格化模型",
+      "llm_evidence": "提出无标注合成对话生成及新风格化模型",
+      "canonical_evidence": "提出无标注合成对话生成及新风格化模型",
+      "llm_tldr_en": "This paper proposes a framework for synthetic dialogue generation without human annotation, using topic and style attributes and post-hoc stylization models Univ and Exam to enhance diversity, validated on industrial tasks.",
+      "llm_tldr_cn": "针对工业场景缺乏人工标注数据的问题，本文提出无需标注的合成对话生成框架。通过引入主题和风格属性以及两种后处理风格化模型Univ和Exam，提升了生成数据的多样性。采用LLM作为评判的过滤机制保证质量。实验表明该方法在意图分类等任务上有效。",
+      "llm_tldr": "针对工业场景缺乏人工标注数据的问题，本文提出无需标注的合成对话生成框架。通过引入主题和风格属性以及两种后处理风格化模型Univ和Exam，提升了生成数据的多样性。采用LLM作为评判的过滤机制保证质量。实验表明该方法在意图分类等任务上有效。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-06-15-732293-v1",
+      "source": "biorxiv",
+      "title": "Nonlinear influence of reward volatility on arbitration between multiple learning strategies reflects cost-benefit optimization",
+      "abstract": "Action selection involves two systems: a model-free reinforcement learning strategy, which relies on experience with action-outcome pairs, and a model-based reinforcement learning strategy, which enables more flexible behavior via inference using a model of the invariant environmental structure. Although environmental change requires more flexible behavior, the ability of volatility, a higher-order statistic that captures how rapidly or frequently the environment changes, to systematically modulate these strategies remains unclear. We examined the effects of reward volatility on arbitration between model-free and model-based reinforcement learning strategies using two modified two-step decision tasks. In Experiment 1, participants performed tasks with different levels of reward volatility and time pressure. In Experiment 2, we systematically manipulated reward volatility across a broader range to assess the relationship between volatility and learning strategy. Behavioral data were analyzed using model-agnostic one-trial and multitrial back analyses, reinforcement learning simulations, and hierarchical Bayesian model fitting. Across experiments, reward volatility exerted an inverse U-shaped nonlinear effect on the arbitration between model-free and model-based reinforcement learning strategies, as the model-based learning strategy was strongly driven at intermediate levels of reward volatility. These modulation effects were observed only in individuals who had learned the transition structure in the task, whereas those who had not learned the transition structure relied on the model-free learning strategy regardless of reward volatility. Reinforcement learning simulations revealed that the relative advantage of the model-based learning strategy over the model-free learning strategy peaked at intermediate levels of reward volatility. Additionally, increased time pressure shifted behavior toward the model-free learning strategy. These results demonstrated that, humans do not always use the model-based reinforcement learning strategy in uncertain and dynamic environments, even when they are aware of the task structure, supporting cost-benefit optimization.",
+      "authors": [
+        "Yamada, T.",
+        "Samejima, K."
+      ],
+      "primary_category": "animal behavior and cognition",
+      "categories": [
+        "animal behavior and cognition"
+      ],
+      "published": "2026-06-19T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.06.15.732293v1.full.pdf",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "studies reinforcement learning strategies under reward volatility",
+      "llm_evidence_cn": "研究奖励波动下强化学习策略的选择",
+      "llm_evidence": "研究奖励波动下强化学习策略的选择",
+      "canonical_evidence": "研究奖励波动下强化学习策略的选择",
+      "llm_tldr_en": "Using modified two-step decision tasks, the paper examines how reward volatility influences the arbitration between model-free and model-based reinforcement learning strategies, revealing a cost-benefit optimization mechanism.",
+      "llm_tldr_cn": "该论文针对环境变化如何影响人类在模型无关和模型依赖强化学习策略间切换的问题，通过修改的两步决策任务，首次系统揭示了奖励波动对策略选择的影响。研究发现个体根据奖励波动调整两种策略的使用比例，反映了成本-收益优化机制。这一结果深化了对强化学习策略仲裁的理解，为自适应学习算法设计提供了认知依据。",
+      "llm_tldr": "该论文针对环境变化如何影响人类在模型无关和模型依赖强化学习策略间切换的问题，通过修改的两步决策任务，首次系统揭示了奖励波动对策略选择的影响。研究发现个体根据奖励波动调整两种策略的使用比例，反映了成本-收益优化机制。这一结果深化了对强化学习策略仲裁的理解，为自适应学习算法设计提供了认知依据。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-03-26-714584-v2",
+      "source": "biorxiv",
+      "title": "A run-length-compressed skiplist data structure for dynamic GBWTs supports time and space efficient pangenome operations over syncmers",
+      "abstract": "Skiplists (Pugh, 1990) are probabilistic data structures over ordered lists supporting [O] (log N) insertion and search, which share many properties with balanced binary trees. Previously we introduced the graph Burrows-Wheeler transform (GBWT) to support efficient search over pangenome path sets, but current implementations are static and cumbersome to build and use. Here we introduce a doubly-linked skiplist variant over run-length-compressed BWTs that supports [O] (log N) rank and access operations, and a dynamic version of this that supports [O] (log N + S) rank and insert operations, where S is the number of symbols in the alphabet. We use these to store and search over paths through a syncmer graph built from Edgars closed syncmers, equivalent to a sparse de Bruijn graph. Code is available in rskip.[ch] within the syng package at github.com/richarddurbin/syng. This builds a 5.8 GB lossless GBWT representation of 92 full human genomes, single-threaded in 52 minutes, on top of a 4GB 63bp syncmer set built in 37 minutes. Arbitrarily long maximal exact matches (MEMs) can then be found as seeds for sequence matches to the graph at a search rate of approximately 1Gbp per 10 seconds per thread.",
+      "authors": [
+        "Durbin, R."
+      ],
+      "primary_category": "bioinformatics",
+      "categories": [
+        "bioinformatics"
+      ],
+      "published": "2026-06-15T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.03.26.714584v2.full.pdf",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Introduces a novel skiplist-based dynamic data structure for efficient pangenome operations",
+      "llm_evidence_cn": "提出基于跳表的新型动态数据结构实现高效泛基因组操作",
+      "llm_evidence": "提出基于跳表的新型动态数据结构实现高效泛基因组操作",
+      "canonical_evidence": "提出基于跳表的新型动态数据结构实现高效泛基因组操作",
+      "llm_tldr_en": "This paper proposes a run-length-compressed skiplist variant for dynamic GBWTs, supporting O(log N) rank and access operations, enabling time and space efficient pangenome searching.",
+      "llm_tldr_cn": "现有的图形Burrows-Wheeler变换（GBWT）实现是静态的，构建和使用不便。本文提出一种基于游程压缩跳表的动态数据结构，支持对数时间等级查询和插入操作。该结构用于存储和搜索泛基因组路径，实现了时间和空间高效的操作。为泛基因组分析提供了可扩展的数据结构。",
+      "llm_tldr": "现有的图形Burrows-Wheeler变换（GBWT）实现是静态的，构建和使用不便。本文提出一种基于游程压缩跳表的动态数据结构，支持对数时间等级查询和插入操作。该结构用于存储和搜索泛基因组路径，实现了时间和空间高效的操作。为泛基因组分析提供了可扩展的数据结构。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "biorxiv-10-1101-2025-08-26-672486-v2",
+      "source": "biorxiv",
+      "title": "Fast Multi-objective RNA Optimization with Autoregressive Reinforcement Learning",
+      "abstract": "Codon optimization is essential in mRNA vaccine development, while existing tools face limitations in the computational efficiency, sequence diversity and universality. To address these challenges, we develop RNAJog (RNA Joint Optimization with autoregressive Generative model), a framework integrating autoregressive generation with reinforcement learning to optimize codon sequences for minimum free energy (MFE), codon adaptation index (CAI) and GC content, even enabling sequence design without requiring annotated training data. Evaluations in both in silico and wet-lab experiments have confirmed RNAJog's effectiveness and efficiency, with two orders of magnitude faster than traditional algorithm (LinearDesign) for long RNA sequence and about a 10-fold increase in antibody titer compared to the wild-type mRNA for Influenza virus hemagglutinin (HA) mRNA vaccine design in mouse. RNAJog also supports biological constraints for sequence optimization. Using this feature, we minimized m6A modification motifs in Bmp2 coding sequence for enhancing the translational efficiency and RNA stability, which are validated in cell-based experiments.",
+      "authors": [
+        "Huang, J.",
+        "Feng, N.",
+        "Bai, H.",
+        "Fang, Y.",
+        "Liu, X.",
+        "Wang, S.",
+        "Yan, J.",
+        "Shen, H.-B.",
+        "Qiu, Z.",
+        "Yuan, Y.",
+        "Hu, R.",
+        "Pan, X."
+      ],
+      "primary_category": "bioinformatics",
+      "categories": [
+        "bioinformatics"
+      ],
+      "published": "2026-06-20T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.1101/2025.08.26.672486v2.full.pdf",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Reinforcement Learning applied to RNA optimization",
+      "llm_evidence_cn": "强化学习应用于RNA优化",
+      "llm_evidence": "强化学习应用于RNA优化",
+      "canonical_evidence": "强化学习应用于RNA优化",
+      "llm_tldr_en": "Develops RNAJog, combining autoregressive generation and RL to optimize RNA sequences for multiple objectives, achieving speed and diversity.",
+      "llm_tldr_cn": "现有的密码子优化工具在计算效率、序列多样性和通用性上存在局限。本文提出RNAJog框架，融合自回归生成和强化学习，同时优化最小自由能、密码子适应指数和GC含量，无需标注数据。实验表明，RNAJog在长RNA序列上比传统算法快两个数量级，且湿实验验证了有效性。",
+      "llm_tldr": "现有的密码子优化工具在计算效率、序列多样性和通用性上存在局限。本文提出RNAJog框架，融合自回归生成和强化学习，同时优化最小自由能、密码子适应指数和GC含量，无需标注数据。实验表明，RNAJog在长RNA序列上比传统算法快两个数量级，且湿实验验证了有效性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-06-10-731311-v1",
+      "source": "biorxiv",
+      "title": "Goal-dependent resource-rational compression of attribute differences explains nonlinearities in multi-attribute decision making",
+      "abstract": "Why do multi-attribute choices so often depart from classical weighted-additive decision rules? Rather than attributing such deviations solely to biases or heuristics, we propose a resource-rational account in which value differences are encoded via capacity-limited information channels. Under resource-rational compression, these difference representations are systematically distorted, such that behavior deviates from weighted-additive predictions because value differences are not represented veridically. This theoretical account makes testable predictions about power-law relationships between true and internally represented differences. The amount of power-law-like compression is determined by information-processing capacity, emergent long-tailed prior distributions over attribute differences, and, in choice contexts, goal-dependent subjective weights that govern the allocation of limited capacity across attribute channels. We test and find support for these predictions in an attribute difference-estimation task and by reanalyzing existing food- and social-choice datasets. These results provide converging evidence for a normative, information-theoretic account of systematic nonlinearities in multi-attribute decision making. Together they show how goals can interact with cognitive capacity and priors to shape representational precision in ways that may facilitate or impair decision making.",
+      "authors": [
+        "Bao, S. D.",
+        "Bedi, S.",
+        "Li, D.",
+        "Ruff, C. C.",
+        "Hare, T. A."
+      ],
+      "primary_category": "neuroscience",
+      "categories": [
+        "neuroscience"
+      ],
+      "published": "2026-06-12T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.06.10.731311v1.full.pdf",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Proposes a resource-rational model with power-law compression mathematics",
+      "llm_evidence_cn": "提出资源理性模型，包含幂律压缩数学公式",
+      "llm_evidence": "提出资源理性模型，包含幂律压缩数学公式",
+      "canonical_evidence": "提出资源理性模型，包含幂律压缩数学公式",
+      "llm_tldr_en": "This paper explains multi-attribute choice nonlinearities by a resource-rational compression model with power-law relationships between true and internally represented differences.",
+      "llm_tldr_cn": "多属性选择为何偏离加权加法规则？本文提出资源理性压缩理论，认为价值差异通过容量有限的信息通道编码导致系统性失真。模型预测真实差异与内部表示之间存在幂律关系。通过行为实验证实了理论预测，为决策偏差提供了计算解释。",
+      "llm_tldr": "多属性选择为何偏离加权加法规则？本文提出资源理性压缩理论，认为价值差异通过容量有限的信息通道编码导致系统性失真。模型预测真实差异与内部表示之间存在幂律关系。通过行为实验证实了理论预测，为决策偏差提供了计算解释。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "math formulation",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-06-12-732007-v1",
+      "source": "biorxiv",
+      "title": "Incorporation of single-neuron projectome-based connectivity motifs enhances the cortex-specific performance of artificial neural networks",
+      "abstract": "The organizational principles of natural neural networks could inspire the new architecture design of artificial neural networks (ANNs). Analysis of single-neuron connectomes of mouse brains revealed distinct profiles of three-node connectivity motifs in various cortical areas and hippocampal formation. A connectome-informed neural network algorithm (\"CINA\") was developed to incorporate natural connectivity motifs into ANN algorithms represented by recurrent neural network (RNN) and transformer-based large language model (LLM). We found that incorporation of the average profile of cortical motifs improved the RNNs performance in noise-resistant categorization and motor learning benchmark tasks, as compared with RNNs with random connectivity. Notably, incorporating cortex-specific motifs further elevated the RNNs performance in tasks related to the cortical function, and this effect was enhanced by artificially increasing the bias in the motif profile. Similar experimental results were verified on an LLM using Motif-Transformer for natural language question answering and brain-signal decoding tasks. Graph-theoretic analyses showed that incorporating natural motifs drove the emergence of modular and small-world properties in ANNs. Together, we demonstrated not only connectome-inspired optimization of ANN architecture but also functional significance of specific motif profiles in various cortices.",
+      "authors": [
+        "Sun, Y.",
+        "Yao, W.",
+        "Zhang, J.",
+        "Song, W.",
+        "Zhao, X.",
+        "Hao, C.",
+        "Chen, X.",
+        "Zeng, S.",
+        "Jia, S.",
+        "Yang, Y.",
+        "Xiao, X.",
+        "Poo, M.-m.",
+        "Xu, B.",
+        "Zhang, T."
+      ],
+      "primary_category": "neuroscience",
+      "categories": [
+        "neuroscience"
+      ],
+      "published": "2026-06-17T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.06.12.732007v1.full.pdf",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Innovative bio-inspired connectivity motifs to improve ANN performance including LLMs",
+      "llm_evidence_cn": "创新的生物启发连接模体提升人工神经网络包括大语言模型的性能",
+      "llm_evidence": "创新的生物启发连接模体提升人工神经网络包括大语言模型的性能",
+      "canonical_evidence": "创新的生物启发连接模体提升人工神经网络包括大语言模型的性能",
+      "llm_tldr_en": "Incorporates single-neuron projectome-based connectivity motifs from mouse brains into ANNs, improving robustness and motor learning performance.",
+      "llm_tldr_cn": "人工神经网络（ANN）的设计可从生物神经网络的组织原则中获得启发。本文分析了小鼠大脑单神经元连接组中的三节点连接模体，并开发了CINA算法将这些模体融入RNN和Transformer。实验证明，皮质模体平均分布提升了RNN在噪声抵抗分类和运动学习中的表现，为ANN架构创新提供了生物学灵感。",
+      "llm_tldr": "人工神经网络（ANN）的设计可从生物神经网络的组织原则中获得启发。本文分析了小鼠大脑单神经元连接组中的三节点连接模体，并开发了CINA算法将这些模体融入RNN和Transformer。实验证明，皮质模体平均分布提升了RNN在噪声抵抗分类和运动学习中的表现，为ANN架构创新提供了生物学灵感。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "innovation",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

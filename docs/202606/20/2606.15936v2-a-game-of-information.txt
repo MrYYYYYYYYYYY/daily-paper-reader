@@ -1,0 +1,822 @@
+Title: A game of information
+
+URL Source: https://arxiv.org/pdf/2606.15936v2
+
+Published Time: Thu, 18 Jun 2026 00:54:30 GMT
+
+Number of Pages: 10
+
+Markdown Content:
+# A game of information 
+
+Dorje C. Brody 
+
+School of Mathematics and Physics, University of Surrey, Guildford GU2 7XH, UK, and Department of Mathematics, Imperial College London, London SW7 2BZ, UK 
+
+(Dated: June 18, 2026) A game of information concerns two players transmitting messages that are ob-scured by noise. A receiver digests the combination of the two information sources and makes an assessment rationally. The aim of the players is to generate opposing assessments for the receiver by choosing signal-to-noise ratios of their information. It is shown that this problem can be reduced into an elementary infinite game on the square, thus admitting a complete equilibrium solution. Three generalisations of the game are proposed. 
+
+I. INTRODUCTION 
+
+In today’s society equipped with a “radically new technology of information dissemination through social media” [1], achieving an objective that involves a shift in public perception will have to rely in some ways on a game of information. To explain what I mean by a “game of information” let me consider a simple example involving two players, A and B. Both players reveal noisy information about a binary topic of interest to the public. The latter digest the combination of two information sources rationally (that is, following the Bayes rule) and make an inference on the topic. The two players must preselect the flow rates (signal-to-noise ratios) of their information, subject to budget constraints, so as to achieve their opposing objectives: player A wishes to sway the public in one direction, while player B wishes to sway them in the other direction, on a specific future date. However, they do not know which choice the other player will make. The question then is to determine optimal strategies for the players to choose their information flow rates. The main purpose of the present paper is to show, in the case of time-independent information flow rates, that the problem can be translated into a standard infinite game on the unit square [2], thus admitting a Nash equilibrium for any parameter choice. It should be evident that the game of information constructed here, and its generali-sations, have many practical applications. Perhaps the most apparent example is a two-candidate electoral competition [3]. The two players are the two campaign teams, and the objective is to maximise the public support for their candidates on the future election day. Another application is in marketing whereby two leading companies of a product wish to maximise their market shares over a given financial period, and wish to decide on optimal advertisement strategies. Yet another example concerns a situation such as player A rep-resenting climate scientists and player B representing fossil fuel industry, and they wish to influence public opinion on climate policies over a given time period. It is often the case that information is contaminated with disinformation, for example, player A plays a fair game but player B cheats by spreading disinformation. Here, by disin-formation I mean a false information that is disseminated with an intension of misguiding the public [4]. Hence genuine rumours, speculations, and misunderstandings are counted as noise, not disinformation. In this respect, the third example mentioned above fits well: 
+
+> arXiv:2606.15936v2 [econ.TH] 17 Jun 2026
+
+2Climate forecasting is prone to errors, but these errors can be viewed as noise, whereas messages from climate sceptics are often contaminated with disinformation. My main focus here is to introduce a game of information in the context of genuine “fair” information, free of disinformation, and show how in a simple situation it can be reduced to an elementary exercise in game theory. Nevertheless, I shall pay attention to the effect of disinformation and show how the presence of disinformation can complicate the strategies. With this in mind, the present paper is organised as follows. In Section II, I briefly review how different information sources can be combined, and how they interact for a receiver of two information sources. I then define a concrete example of a game of information involving two players. Then in Section III, I show how this information game can be reduced to a simple infinite game on the unit square, and work out the solution in closed form. In particular, one finds that depending on the value of the correlation of the noise terms in the two information sources, there is either a pure strategy Nash equilibrium or a mixed strategy. In Section IV, I introduce a disinformation term in one of the players and show how the game is modified. Although a complete analytic solution is inaccessible here, in Section V a detailed preliminary analysis of a game of disinformation is presented. I conclude in Section VI with two other open challenges in the game of information.  
+
+> II. INFORMATION FUSION AND THE STATEMENT OF THE PROBLEM
+
+In communication theory, transmission of information through a channel is modelled by a combination of a signal term, a noise term, and a signal-to-noise ratio. Noise that obscures the signal is typically modelled by an additive Gaussian process. The signal can itself be a time series, but here I consider a simpler case where it is given by a fixed (in time) binary random variable X. Without loss of generality we can assume that X takes the value 0 with the a priori probability p and the value 1 with the a priori probability 1 − p. The 
+
+a priori probabilities can be viewed as the current proportion of rational population who would choose the alternatives labelled by the two values that X can take. If one assumes, as is commonly done, that signal contamination is modelled by an additive Gaussian noise ϵt,and if we let σ be the (time-independent) signal-to-noise ratio, then information reaching the receiver is given by the time series ξt = σXt + ϵt, where X and ϵt are assumed independent. In the present consideration we have two players, A and B, both disseminating information about X in a noisy environment. Writing σA and σB for the respective information flow rates, a receiver (public) obtains the combination of 
+
+ξAt = σAXt + ϵAt and ξBt = σB Xt + ϵBt , (1) where the two noise terms ϵAt and ϵBt will be modelled by standard Brownian motions, with correlation ρ ∈ [−1, 1]. It is known [5] that when two information sources of the form (1) for the same signal X are available, they can be combined into a single effective information 
+
+ξt = σXt + ϵt , (2) where 
+
+σ =
+
+s
+
+σ2 
+
+> A
+
+− 2ρσ AσB + σ2
+
+> B
+
+1 − ρ2 (3) 3is the effective information flow rate, and 
+
+ϵt = σA − ρσ B
+
+σ(1 − ρ2) ϵAt + σB − ρσ A
+
+σ(1 − ρ2) ϵBt (4) is the effective noise. When a rational receiver detects the combined information (3), the prior probability 
+
+p = P(X = 0) will be updated to the posterior probability πt = P(X = 0 |{ ξt}) according to the Bayes rule, which in the present example is given by 
+
+πt = pp + (1 − p)e σξ t− 12 σ2t . (5) In the theory of signal detection, this is known as the Wonham filter [6]. In a Gibbsian ensemble interpretation, we can regard the posterior probability πt as the proportion of the population who would make the choice X = 0 at time t, based on the prior proportion p
+
+at time zero, and on the information strategy (1). As an example system modelled by this framework, consider a two candidate electoral competition. In this case, {ξAt } represents the information strategy of the campaign team of candidate A, and similarly {ξBt } for candidate B. If the election were to take place at t = T , then the likelihood of candidate A winning the future election, as of time zero, given the informational strategy (1), is given by P(πT > 12 ). Player (candidate) A therefor wishes to maximise P(πT > 12 ), while player B wishes to minimise it. The game of information in this example is then for the two players to choose, at time zero, the information flow rates σA and σB so as to achieve their objectives, without the knowledge of the choice of the other player. Needless to add, disseminating information (e.g., advertisement) is costly, so it will be desirable to impose budget constraints, which, for simplicity, will be imposed in the form σA ≤ 1 and σB ≤ 1.  
+
+> III. SOLUTION TO THE SIMPLE INFORMATION GAME
+
+The solution to the simple game of information specified in the previous section can be summarised as follows. 
+
+Proposition 1 . Assuming that p > 1/2, the Nash equilibrium solution to the game of information takes the following form. (i) For −1 < ρ < 0 the optimal pure strategies are 
+
+σ∗ 
+
+> A
+
+= 0 and σ∗ 
+
+> B
+
+= 1 ; (ii) For 0 ≤ ρ < 1/√2 the optimal pure strategies are σ∗ 
+
+> A
+
+= ρ and 
+
+σ∗ 
+
+> B
+
+= 1 ; (iii) For 1/√2 ≤ ρ < 1 the optimal mixed strategies are σ∗ 
+
+> A
+
+= 1 /2ρ, while σ∗ 
+
+> B
+
+= 0 
+
+with probability 1 − 1/2ρ2 and σ∗ 
+
+> B
+
+= 1 with probability 1/2ρ2. When p < 1/2, the strategies of the two players are flipped around. Proof . From (5) we find, on account of the monotonicity of πT on ξT , that the condition 
+
+πT > K for any K ∈ [0 , 1] is equivalent to the condition that 
+
+ξT <
+
+log 
+
+hp(1 −K)
+
+> K(1 −p)
+
+i
+
++ 12 σ2Tσ ≡ ξ∗ . (6) Because the density function for the sum of two independent random variables σXT and 
+
+ϵT is just the convolution of the densities of individual random variables, we find that the density function for ξT = σXT + ϵT is given by the convolution 
+
+ρ(ξ) = 1
+
+√2πT 
+
+h
+
+p e− 12T ξ2
+
++ (1 − p) e − 12T (ξ−σT )2 i
+
+. (7) 4A calculation then shows [3, 7] that for any K ∈ [0 , 1] we have 
+
+P (πT > K ) = 
+
+Z ξ∗
+
+> −∞
+
+ρ(ξ) d ξ = p N (d+) + (1 − p) N (d−) , (8) where 
+
+N (x) = 12π
+
+Z x
+
+> −∞
+
+e− 12 z2
+
+dz (9) is the cumulative normal distribution function, and 
+
+d± =log 
+
+hp(1 −K)
+
+> K(1 −p)
+
+i
+
+± 12 σ2Tσ√T . (10) Recall that the objective of player A is to maximise P (πT > K ) and the objective of player B is to minimise P (πT > K ). It is straightforward to check that the expression for P (πT > K )in (8), as a function of σ, which is the only variable from which the dependencies on σA
+
+and σB enter through (3), is monotonically increasing in σ if p < K and monotonically decreasing in σ if p > K . This means that if p < K , player A wishes to maximise σ and player B wishes to minimise σ, whereas if p > K , player A wishes to minimise σ and player B wishes to maximise σ; in both cases, under the constraints σA ≤ 1 and σB ≤ 1. Consider the latter case p > K so that the objective is for player A to minimise and player B to maximise σ under the constraints. The game of information has therefore been transformed into an elementary continuous two-player infinite game on the unit square [2]. In particular, we have 
+
+∂2σ∂σ 2
+
+> A
+
+= σ2
+
+> B
+
+σ3(1 − ρ2) ≥ 0 and ∂2σ∂σ 2
+
+> B
+
+= σ2
+
+> A
+
+σ3(1 − ρ2) ≥ 0 , (11) hence σ is a convex function of the two variables. Consider first the case (i) where −1 < ρ ≤
+
+0. Because the maximum value of a convex function over a finite interval [0 , 1] is necessarily located at the boundary, player B who wishes to maximise σ will choose either σB = 0 or 
+
+σB = 1. In either case, σ|σB =0 = σA/p1 − ρ2 and σ|σB =1 = p(σ2 
+
+> A
+
+− 2ρσ A + 1) /(1 − ρ2)for ρ < 0 are both increasing in σA, so player A who wishes to minimise σ will choose the smallest possible value σ∗ 
+
+> A
+
+= 0. Therefore, to maximise σ|σA=0 = σB /p1 − ρ2, player B must choose σ∗ 
+
+> B
+
+= 1. Next, consider the case (ii) where 0 < ρ < 1/√2. In this case, on account of convexity player B will again choose one of the boundary values σB = 0 or σB = 1. If player B chooses 
+
+σB = 0, then to minimise σ, player A will choose σA = 0, but then we have σ = 0, which is suboptimal for player B so player B will not choose σB = 0. Instead, player B chooses 
+
+σ∗ 
+
+> B
+
+= 1. In this case, to minimise σ|σB =1 , player A will choose σ∗ 
+
+> A
+
+= ρ.Finally, in case (iii) where 1 /√2 ≤ ρ < 1, a mixed strategy becomes feasible. Player B, the maximiser, continues to choose either σB = 0 or σB = 1, but this time with probabilities 
+
+r and 1 − r, respectively. Player A therefore must find a strategy that is indifferent to the random choice made by player B. That is, the choice σA of player A must satisfy 
+
+s
+
+σ2
+
+> A
+
+1 − ρ2 =
+
+s
+
+σ2 
+
+> A
+
+− 2ρσ A + 1 1 − ρ2 , (12) 5the solution to which gives σ∗ 
+
+> A
+
+= 1 /2ρ. Now we observe that the minimiser of σ also minimises its expectation 
+
+E[σ] = r
+
+s
+
+σ2
+
+> A
+
+1 − ρ2 + (1 − r)
+
+s
+
+σ2 
+
+> A
+
+− 2ρσ A + 1 1 − ρ2 (13) over the random strategy of player B. Differentiating this with respect to σA and setting the result to zero, we obtain 
+
+r + (1 − r) σA − ρ
+
+pσ2 
+
+> A
+
+− 2ρσ A + 1 = 0 . (14) Because (14) must hold for σA = σ∗ 
+
+> A
+
+= 1 /2ρ, solving it for r we deduce that r∗ = 1 − 1/2ρ2.A probabilistic strategy, however, is available to player B only if r∗ ≥ 0, that is, only if 
+
+ρ ≥ 1/√2. Hence for 0 < ρ < 1/√2 the strategy reduces to a pure strategy. Finally, we remark that if p < K , player A becomes maximiser and player B becomes minimiser, but σ
+
+is symmetric in σA and σB , so all the results are flipped. □
+
+It is worth noting that the actual gain, or loss, of the two players is not the change in the value of σ, but change in the probability P  πT > 12
+
+. As a function of the prior p, however, 
+
+P  πT > 12
+
+ is antisymmetric about p = 12 . Hence any gain in the probability for one player matches exactly the loss for the other player, so this version of information game is indeed a zero-sum game.  
+
+> IV. INFORMATION GAME WITH DISINFORMATION
+
+It is often the case in practice that some players tend to cheat when playing games. In a game of information this means an act of disseminating disinformation. Disinformation is defined here to be a bias in the noise that is intended to misguide the receiver of information [4]. Hence rumours, speculations, or genuine misunderstandings that possess no intent will count as noise and not disinformation. Here we consider the case whereby player B releases information that is contaminated with disinformation, released at constant rate μ. Hence we have the information strategies 
+
+ξAt = σAXt + ϵAt and ξBt = σB Xt + ϵBt + μt . (15) The assumption is that player A knows the existence of the drift term in the information transmitted from player B, but not the value of μ. The receiver of the combined informa-tion (the public), on the other hand, are unaware of the existence of μ, and therefore are misguided as a result. This is indeed not an uncommon situation — take, for example, a “game” between those who disseminate online disinformation with an intent to generate violent social unrest and a government trying to restore order and calm — making the game worthwhile analysing. To investigate the effect of disinformation, it is an easy exercise to check [5] that the combined information (2) can alternatively be expressed in the form 
+
+ξt = σA − ρσ B
+
+σ(1 − ρ2) ξAt + σB − ρσ A
+
+σ(1 − ρ2) ξBt . (16) 6It follows that the existence of disinformation in ξAt induces the following bias 
+
+ξt → ξt + (σB − ρσ A)
+
+σ(1 − ρ2) μt . (17) Note that the intention of player B in choosing a positive bias is to enhance the probability for the choice X = 1, whereas if μ < 0 then the intension is to enhance the probability for the choice X = 0. However, because two information sources interact in a nontrivial manner to reach the receiver, if ρ > 0, then (17) shows that the intended effect can be reversed if σB < ρσ A. In other words, player A can reverse the effect of disinformation simply by increasing their information flow rate [5]. This observation makes the game somewhat nontrivial, because there can be counterintuitive situations. The fact that receivers of the combined information are unaware of the existence of μ
+
+(otherwise the effect of μ will be disregarded) means that they will follow exactly the same analysis leading to (8), except that their assessments will be skewed by the shift 
+
+d± →
+
+log 
+
+hp(1 −K)
+
+> K(1 −p)
+
+i
+
+± 12 σ2T − σB −ρσ A 
+
+> 1−ρ2
+
+μT σ√T . (18) With this in mind, a “game of disinformation” can be stated as follows. The objective of player A is to maximise, and that of player B is to minimise P (πT > K ) of (8), with d±
+
+given by (18). Player A must choose σA, and player B must choose both σB and μ, to meet their objectives, subject to the budget constraints σA ≤ 1, σB ≤ 1, and |μ| ≤ 1.  
+
+> V. ANALYSIS OF DISINFORMATION GAME
+
+The existence of the drift μ breaks the symmetry so that there is no complete solution to the game of disinformation in closed form. Nevertheless, a preliminary analysis yields the following observation. 
+
+Conjecture 1 . Assume that p > 1/2. (i) For −1 < ρ < 0 the optimal pure strategies are 
+
+μ∗ = 1 , σ∗ 
+
+> A
+
+= 0 , and σ∗ 
+
+> B
+
+= 1 ; (ii) For 0 ≤ ρ the optimal pure strategy for the disinformation is μ∗ = sgn( σB − ρσ A). The optimal information flow rates σ∗ 
+
+> A
+
+and σ∗ 
+
+> B
+
+may be determined numerically. Argument . Consider first the case ρ < 0. In this case, σB − ρσ A > 0, so the best strategy for player B, for the parameter μ, is to set μ∗ = 1. For player A, on the other hand, the disadvantage of having nonzero μ can be minimised by choosing σA = 0. This choice also minimise σ, which, in the absence of μ will be optimal. Hence the optimal strategy for player A is to set σ∗ 
+
+> A
+
+= 0. In this case, player B wishes to minimise P (πT > 1/2). By setting 
+
+σ∗ 
+
+> B
+
+= 1, it simultaneously maximises the impact of μ and maximises σ. Indeed, making use of the relation   
+
+> (σB−ρσ A)1−ρ2
+
+μT σ√T =
+
+q
+
+σ2 − σ2 
+
+> A
+
+μ√T (19) one sees that for μ = 1 the function P (πT > 1/2) is monotonically decreasing in both σA
+
+and σB , thus justifying σ∗ 
+
+> A
+
+= 0 and σ∗ 
+
+> B
+
+= 1. 7For ρ ≥ 0 the analysis becomes intricate. Player B for sure wishes to maximise the impact of disinformation, and this is achieved by setting μ∗ = sgn( σB − ρσ A). To proceed, it will be convenient to change the variable σB → uB according to 
+
+uB = |σB − ρσ A|
+
+p1 − ρ2 . (20) Then we have σ2 = u2 
+
+> B
+
++ σ2
+
+> A
+
+. For simplicity of notation define Λ = log[ p/ (1 − p)] and 
+
+α = T / p1 − ρ2. Then we have 
+
+d± = Λ ± 12 (u2 
+
+> B
+
++ σ2
+
+> A
+
+)T − αu B
+
+p(u2 
+
+> B
+
++ σ2
+
+> A
+
+)T . (21) Player B seeks to find uB that minimises P (πT > 1/2). By differentiation, making use of the identity (1 − p) n(d−) = p n (d+) e −αu B valid for the standard normal density function 
+
+n(x), and equating the result to zero, we find 2(Λ uB + ασ 2
+
+> A
+
+)
+
+uB T (u2 
+
+> B
+
++ σ2
+
+> A
+
+) = tanh 
+
+αu B
+
+2
+
+
+
+. (22) Player A, on the other hand, seeks to maximise P (πT > 1/2). In view of the envelope theorem, taking the partial derivative with respect to σA and setting the result to zero, we find the relation 2(Λ − αu B )
+
+T (u2 
+
+> b
+
++ σ2
+
+> A
+
+) = tanh 
+
+αu B
+
+2
+
+
+
+. (23) Comparing (22) and (23) we find that if there is a simultaneous Nash equilibrium solution then it has to be that u2 
+
+> B
+
+= −σ2
+
+> A
+
+, which is not possible unless σA = σB = 0. It follows that there is no such equilibrium solution in the interior region σA > 0 and uB > 0. The solution 
+
+uB = 0, however, is not optimal for player B because the derivative of P (πT > 1/2) at u → 0is negative. Player B therefore seeks to move as far away from uB = 0 as possible, and this implies that possible solutions are either σ∗ 
+
+> B
+
+= 0 or σ∗ 
+
+> B
+
+= 1. Player A now may determine the optimal σA if σ∗ 
+
+> B
+
+= 0, the optimal σA if σ∗ 
+
+> B
+
+= 1, and the indifferent σA either σ∗ 
+
+> B
+
+= 0 or 
+
+σ∗ 
+
+> B
+
+= 1, and choose the one that maximises P (πT > 1/2). □
+
+The game of disinformation therefore is rather intricate and subtle even in the simplest model setup. The matter is further complicated by the fact that if player A let σA approach the indifferent σ∗ 
+
+> A
+
+from below, then σ∗ 
+
+> B
+
+= 0, but if the value exceeds σ∗ 
+
+> A
+
+then player B must choose σ∗ 
+
+> B
+
+= 1, and this may also flip the sign of μ∗. It would be of interest therefore to further develop the analysis, especially in view of its importance in potential practical applications, for example, in a “game” between a government (player A) and spreaders of disinformation that are harmful to the society (player B).  
+
+> VI. OTHER OPEN PROBLEMS IN INFORMATION GAMES
+
+There are other generalisations of the information game one can consider. One such generalisation is to study a game involving more than two players. For example, if there are three players with three information sources, their combined information flow rate σ8becomes a little more complicated [5]. Writing σA = σ1, σB = σ2, and σC = σ3 for the three control parameters, the overall information flow rate is determined by 
+
+σ2 =
+
+> 3
+
+X
+
+> i,j =1
+
+σiρ−1 
+
+> ij
+
+σj , (24) where 
+
+ρ−1 
+
+> ij
+
+= ∆ −1
+
+ 1 − ρ223 ρ23 ρ31 − ρ12 ρ12 ρ23 − ρ31 
+
+ρ23 ρ31 − ρ12 1 − ρ231 ρ31 ρ12 − ρ23 
+
+ρ12 ρ23 − ρ31 ρ31 ρ12 − ρ23 1 − ρ212 
+
+ , (25) with ∆ = 1 + 2 ρ12 ρ23 ρ31 − ρ212 − ρ223 − ρ231 , is the inverse correlation matrix of the three noise terms ϵAt , ϵBt , and ϵCt . Thus the overall σ2 remains a quadratic form of the individual control variables, but the way in which the probability of one of the choices dominating the other two at future time T , for example the winning probability of one of the candidates in an election, will depend on σ in a nontrivial way [8]. It would be of interest to explore whether an equilibrium solution can be found in closed form in a three-player information game. Another generalisation of a two-player information game concerns a situation in which the players must choose entire temporal information flow rates over the time period [0 , T ]. In this case, the two information sources take the form 
+
+ξAt = X
+
+Z t
+
+> 0
+
+σAs ds + ϵAt and ξBt = X
+
+Z t
+
+> 0
+
+σBs ds + ϵBt . (26) In such a time-dependent scenario, we have the following: 
+
+Proposition 2 . When the two information sources of (26) are combined, the resulting information can be expressed in the form 
+
+ξt = X
+
+Z t
+
+> 0
+
+σs ds + ϵt , (27) 
+
+where 
+
+σt = 1
+
+p1 − ρ2
+
+σAt
+
+R t 
+
+> 0
+
+σAs ds + σBt
+
+R t 
+
+> 0
+
+σBs ds − ρ
+
+
+
+σAt
+
+R t 
+
+> 0
+
+σBs ds + σBt
+
+R t 
+
+> 0
+
+σAs ds
+
+rR t 
+
+> 0
+
+σAs ds
+
+2
+
+− 2ρ
+
+R t 
+
+> 0
+
+σAs ds
+
+  R t 
+
+> 0
+
+σBs ds
+
+
+
++
+
+R t 
+
+> 0
+
+σBs ds
+
+2 (28) 
+
+is the combined information flow rate, with ρ the correlation between ϵAt and ϵBt , and 
+
+ϵt = 1
+
+p1 − ρ2
+
+R t 
+
+> 0
+
+σAs ds − ρ R t 
+
+> 0
+
+σBs ds
+
+
+
+ϵAt +
+
+R t 
+
+> 0
+
+σBs ds − ρ R t 
+
+> 0
+
+σAs ds
+
+
+
+ϵBt
+
+rR t 
+
+> 0
+
+σAs ds
+
+2
+
+− 2ρ
+
+R t 
+
+> 0
+
+σAs ds
+
+  R t 
+
+> 0
+
+σBs ds
+
+
+
++
+
+R t 
+
+> 0
+
+σBs ds
+
+2 (29) 
+
+is a standard Brownian motion, independent of X.Proof . We begin by defining a Brownian motion ¯ ϵt, independent of ϵAt , such that we have 
+
+ϵBt = ρϵ At + p1 − ρ2 ¯ϵt, and analogously define an information flow ¯ξt by the relation ξBt =
+
+ρξ At + p1 − ρ2 ¯ξt. Then we have ¯ξt = ξBt − ρξ At
+
+p1 − ρ2 = X
+
+Z t
+
+> 0
+
+σBs − ρσ As
+
+p1 − ρ2 ds + ¯ ϵt ≡ X
+
+Z t
+
+> 0
+
+¯σs ds + ¯ ϵt . (30) 9Next, define a “pure-noise” process {δt}, independent of X, according to 
+
+δt = ξAt
+
+R t 
+
+> 0
+
+σAs ds − ¯ξt
+
+R t 
+
+> 0
+
+¯σsds = ϵAt
+
+R t 
+
+> 0
+
+σAs ds − ¯ϵt
+
+R t 
+
+> 0
+
+¯σsds . (31) Our objective now is to identify a standard Brownian motion {ϵt} that is independent of 
+
+{δt}. Writing ϵt = αtϵAt + βtϵBt , the two unknowns {αt} and {βt} can be determined by the two conditions E[ϵtδt] = 0 and E[ϵ2 
+
+> t
+
+] = t. Working out these unknowns we obtain {ϵt} of (29). In terms of {αt} and {βt} thus obtained in (29), we define ξt = αtξAt + βtξBt , and set 
+
+{σt} by the relation 
+
+Z t
+
+> 0
+
+σsds = αt
+
+Z t
+
+> 0
+
+σAs ds + βt
+
+Z t
+
+> 0
+
+σBs ds . (32) Taking the derivative, we find that two of the terms cancel and we obtain σt = αtσAt + βtσBt ,which gives (28). It should be evident that information contained jointly in {ξAt } and {ξBt } is equivalent to information contained jointly in {ξt} and {δt}. However, the pure noise process 
+
+{δt} is independent of X, so it drops out in calculation for the conditional probability law of 
+
+X. It follows that the two information sources (26) can be combined into a single effective information source (27). □
+
+In the case of time-dependent strategies σAt and σBt , the expression for the initial likelihood 
+
+P (πT > K ) remains to be given by (8), but d± now takes the form 
+
+d± =log 
+
+hp(1 −K)
+
+> K(1 −p)
+
+i
+
+± 12
+
+R T 
+
+> 0
+
+σ2 
+
+> s
+
+ds
+
+qR T 
+
+> 0
+
+σ2 
+
+> s
+
+ds. (33) Therefore, a time-dependent game of information reduces to a simpler problem of either maximising or minimising R T 
+
+> 0
+
+σ2 
+
+> s
+
+ds, where {σt} is given by (28) in terms of the two control variables σAt and σBt . Hence we arrive at not merely a two-person infinite game, but rather a two-person functional game, where optimisation is over functional degrees of freedom. In summary, I have introduced the concept of information game, and showed that in the simplest model setup the game reduces to a more familiar case in standard game theory. I also considered a game of disinformation, and provided a preliminary analysis that can be developed further. I then introduced two concrete generalisations of a simple game of information — readers may come up with other generalisations and applications to explore. 
+
+[1] Rycroft, P. 2026 Report of the independent review into countering foreign financial influ-ence and interference in UK politics. Ministry of Housing, Communities & Local Govern-ment Independent Report HC 1787. https://assets.publishing.service.gov.uk/media/ 69c29f84b920af63be1c7777/The_Rycroft_Review_Report_standard_version.pdf 
+
+[2] Karlin, S. 1959 Mathematical Methods and Theory in Games, Programming, and Economics 
+
+(London: Pergamon Press). [3] Brody, D. C. 2019 Modelling election dynamics and the impact of disinformation. Information Geometry 2, 209-230. doi.org/10.1007/s41884-019-00021-2 10 
+
+[4] Brody, D. C. & Meier, D. M. 2022 Mathematical models for fake news. In Financial Informatics .(Singapore: World Scientific Publishing), p. 405-423. doi.org/10.1142/9789811246494_0018 
+
+[5] Brody, D. C. & Yuasa, T. 2025 How fake news can turn against its spreader. Plos One 20 ,0331608. doi.org/10.1371/journal.pone.0339315 
+
+[6] Wonham, W. M. 1965 Some applications of stochastic differential equations to optimal nonlinear filtering. Journal of the Society for Industrial and Applied Mathematics A2, 347-369. doi.org/ 10.1137/0302028 
+
+[7] Brody, D. C. 2026 Mathematical politics. To appear in Simplicity Behind Absurdity: The Power of Quantum Thinking , A. Iriki & A. Khrennikov (eds), Str¨ ungmann Forum Reports (Boston: The MIT Press). doi.org/10.48550/arXiv.2505.11540 
+
+[8] Brody, D. C. & Yuasa, T. 2023 Three-candidate election strategy. Royal Society Open Science 
+
+10 , 230584. doi.org/10.1098/rsos.230584
