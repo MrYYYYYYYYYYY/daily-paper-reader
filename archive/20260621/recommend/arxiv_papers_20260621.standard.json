@@ -1,0 +1,135 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-21T21:19:02.040432+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [
+    {
+      "id": "2606.20008v1",
+      "source": "arxiv",
+      "title": "VIMPO: Value-Implicit Policy Optimization for LLMs",
+      "abstract": "Reinforcement learning with verifiable rewards has become a central tool for improving the reasoning ability of large language models, but current methods face a trade-off between simplicity and credit assignment. Group-relative methods such as GRPO avoid training a critic, but typically assign a trajectory-level advantage to every token. Actor-critic methods provide denser learning signals, but require a learned value function with its own training instability. We introduce VIMPO, a critic-free policy optimization method that derives a policy-implied value function from the optimality conditions of KL-regularized reinforcement learning. For autoregressive generation, the resulting value recurrence can be written in terms of policy-reference log-ratios and anchored by the terminal condition that no future reward remains at the end of a trajectory. This gives a simple value loss that incorporates outcome-level verifiable rewards without training a critic. The same derivation also yields a critic-free actor advantage, allowing VIMPO to separate reward incorporation through the value loss from policy improvement through a PPO-style actor update. On mathematical RLVR benchmarks, VIMPO improves over GRPO across MATH-500, AIME 2024, AIME 2025, and OlympiadBench, with especially larger gains on competition-style evaluations. Under noisy rewards, VIMPO retains a consistent advantage over GRPO, suggesting that policy-implied value optimization can provide finer credit assignment while preserving the practical simplicity of critic-free training.",
+      "authors": [
+        "Zhewei Kang",
+        "Aosong Feng",
+        "Sergey Levine",
+        "Dawn Song",
+        "Xuandong Zhao"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-18T09:44:12+00:00",
+      "link": "https://arxiv.org/pdf/2606.20008v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "reinforcement learning policy optimization for LLMs",
+      "llm_evidence_cn": "面向大语言模型的强化学习策略优化",
+      "llm_evidence": "面向大语言模型的强化学习策略优化",
+      "canonical_evidence": "面向大语言模型的强化学习策略优化",
+      "llm_tldr_en": "VIMPO introduces a critic-free policy optimization method for LLMs that derives a value function from KL-regularized RL optimality conditions, providing dense credit assignment without separate critic training, outperforming GRPO and PPO on reasoning tasks.",
+      "llm_tldr_cn": "现有强化学习方法在提升LLM推理能力时面临简单性与信用分配之间的权衡：GRPO避免训练价值网络但分配稀疏，Actor-Critic方法则不稳定。本文提出VIMPO，一种无批评家的策略优化方法，从KL正则化强化学习的最优条件中推导出策略隐含的价值函数。自回归生成中的价值递归可用策略-参考对数比率表示，并由可选奖励项锚定。实验表明，VIMPO在推理任务上优于GRPO和PPO，同时保持了实现的简洁性。",
+      "llm_tldr": "现有强化学习方法在提升LLM推理能力时面临简单性与信用分配之间的权衡：GRPO避免训练价值网络但分配稀疏，Actor-Critic方法则不稳定。本文提出VIMPO，一种无批评家的策略优化方法，从KL正则化强化学习的最优条件中推导出策略隐含的价值函数。自回归生成中的价值递归可用策略-参考对数比率表示，并由可选奖励项锚定。实验表明，VIMPO在推理任务上优于GRPO和PPO，同时保持了实现的简洁性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.15080v1",
+      "source": "arxiv",
+      "title": "AdaMame: A Training Recipe for Adaptive Multilingual Reasoning",
+      "abstract": "While Large Reasoning Models (LRMs) show strong performance in English, they often fail to reason in the language of the query, a phenomenon known as language collapse. Existing RL-based fixes typically add a binary language fidelity reward to the accuracy objective, yet still incur trade-off in accuracy, mid-trace code-switching, and excessive token usage. In this work, we propose AdaMame, a two-stage training recipe for multilingual mathematical reasoning that addresses these limitations by adaptively aligning the reasoning language to the query language without compromising accuracy. The first SFT stage fine-tunes on naturally occurring reasoning traces across five languages to establish multilingual reasoning capability. In the subsequent RL stage, we introduce AdaMame-GRPO, an adaptation of Group Relative Policy Optimization (GRPO) in which a query-conditioned alignment factor grows progressively during training, guiding the model to first explore diverse reasoning languages before exploiting reasoning in the query language. Evaluated across two benchmarks, two LRMs, and 12 languages, AdaMame-GRPO achieves Pareto-optimal performance across reasoning accuracy, language fidelity, and token efficiency over all baselines, with the strongest gains on out-of-domain, lower-resource languages.",
+      "authors": [
+        "Dayeon Ki",
+        "Kevin Duh",
+        "Marine Carpuat"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-06-13T03:22:35+00:00",
+      "link": "https://arxiv.org/pdf/2606.15080v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Reinforcement Learning stage in multilingual reasoning training",
+      "llm_evidence_cn": "多语言推理训练的强化学习阶段",
+      "llm_evidence": "多语言推理训练的强化学习阶段",
+      "canonical_evidence": "多语言推理训练的强化学习阶段",
+      "llm_tldr_en": "AdaMame addresses language collapse in LRMs by a two-stage recipe with SFT then RL, using adaptive alignment of reasoning language to query without accuracy loss.",
+      "llm_tldr_cn": "大型推理模型在多语言推理时存在语言崩溃问题。本文提出AdaMame，通过两阶段训练：先SFT建立多语言能力，再RL自适应对齐推理语言与查询语言，在保持准确率的同时避免了准确率下降和词汇切换。实验表明该方法有效提升了多语言数学推理性能。",
+      "llm_tldr": "大型推理模型在多语言推理时存在语言崩溃问题。本文提出AdaMame，通过两阶段训练：先SFT建立多语言能力，再RL自适应对齐推理语言与查询语言，在保持准确率的同时避免了准确率下降和词汇切换。实验表明该方法有效提升了多语言数学推理性能。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.18147v1",
+      "source": "arxiv",
+      "title": "WEQA: Wearable hEalth Question Answering with Query-Adaptive Agentic Reasoning",
+      "abstract": "Language models are remarkably capable at medical question answering, in some cases surpassing the accuracy of general physicians. However, answering questions about wearable health data remains challenging and understudied, as these ubiquitous sensors produce continuous, high-dimensional, and longitudinal data, which is non-trivial to align with text-centric distributions in LLM pretraining. The diversity of sensor modalities and user intents cannot be effectively handled by a fixed reasoning workflow or a single pretrained foundation model. To address these challenges, we propose WEQA, a query-adaptive agent framework that unifies LLM reasoning with specialized wearable analytical and modeling tools. An LLM controller is employed to synthesize execution plans and dynamically route each query to the appropriate combination of sensor analysis and pretrained models, and perform grounded response auditing with external knowledge. We also curate a benchmark spanning four open wearable datasets comprising analytic and predictive tasks in three different health domains. Experiments show that our framework is 24% more accurate than LLM and agentic baselines, and a blinded study with 12 medical experts and 8 users shows substantial gains in usefulness and clinical soundness.",
+      "authors": [
+        "Yuwei Zhang",
+        "Tong Xia",
+        "Bianca Emmerich",
+        "Yu Yvonne Wu",
+        "Dimitris Spathis",
+        "Xin Liu",
+        "Daniel McDuff",
+        "Cecilia Mascolo"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-06-16T16:45:56+00:00",
+      "link": "https://arxiv.org/pdf/2606.18147v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "LLM agent with query-adaptive reasoning",
+      "llm_evidence_cn": "具有查询自适应推理的LLM智能体",
+      "llm_evidence": "具有查询自适应推理的LLM智能体",
+      "canonical_evidence": "具有查询自适应推理的LLM智能体",
+      "llm_tldr_en": "WEQA proposes a query-adaptive agent framework for wearable health QA, unifying LLM reasoning with specialized analytical tools.",
+      "llm_tldr_cn": "针对可穿戴健康数据问答，本文提出WEQA框架，采用查询自适应的智能体，将LLM推理与专用分析工具结合。该框架能处理多模态、高维数据，避免了固定工作流的局限性。",
+      "llm_tldr": "针对可穿戴健康数据问答，本文提出WEQA框架，采用查询自适应的智能体，将LLM推理与专用分析工具结合。该框架能处理多模态、高维数据，避免了固定工作流的局限性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "l",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

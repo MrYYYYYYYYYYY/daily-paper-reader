@@ -1,0 +1,54 @@
+{
+  "label": "2026-06-21",
+  "date": "2026-06-21",
+  "generated_at": "2026-06-21T21:21:46",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202606/21/2606.20008v1-vimpo-value-implicit-policy-optimization-for-llms",
+      "section": "deep",
+      "title_en": "VIMPO: Value-Implicit Policy Optimization for LLMs",
+      "authors": "Zhewei Kang, Aosong Feng, Sergey Levine, Dawn Song, Xuandong Zhao",
+      "date": "2026-06-18",
+      "pdf": "https://arxiv.org/pdf/2606.20008v1",
+      "score": "9.0",
+      "evidence": "面向大语言模型的强化学习策略优化",
+      "tldr": "当前基于可验证奖励的强化学习在提升大模型推理能力时面临简单性与信用分配的矛盾。VIMPO从KL正则化强化学习的最优性条件出发，推导出策略隐含的价值函数，无需训练评论家网络即可进行密集奖励分配。在数学推理基准上，VIMPO在MATH-500、AIME 2024/2025及OlympiadBench上均超越GRPO，特别是在竞赛级评测上提升显著。该方法在保持无评论家训练简洁性的同时，实现了更细粒度的信用分配。",
+      "tags": "query:lpt",
+      "abstract_en": "Reinforcement learning with verifiable rewards has become a central tool for improving the reasoning ability of large language models, but current methods face a trade-off between simplicity and credit assignment. Group-relative methods such as GRPO avoid training a critic, but typically assign a trajectory-level advantage to every token. Actor-critic methods provide denser learning signals, but require a learned value function with its own training instability. We introduce VIMPO, a critic-free policy optimization method that derives a policy-implied value function from the optimality conditions of KL-regularized reinforcement learning. For autoregressive generation, the resulting value recurrence can be written in terms of policy-reference log-ratios and anchored by the terminal condition that no future reward remains at the end of a trajectory. This gives a simple value loss that incorporates outcome-level verifiable rewards without training a critic. The same derivation also yields a critic-free actor advantage, allowing VIMPO to separate reward incorporation through the value loss from policy improvement through a PPO-style actor update. On mathematical RLVR benchmarks, VIMPO improves over GRPO across MATH-500, AIME 2024, AIME 2025, and OlympiadBench, with especially larger gains on competition-style evaluations. Under noisy rewards, VIMPO retains a consistent advantage over GRPO, suggesting that policy-implied value optimization can provide finer credit assignment while preserving the practical simplicity of critic-free training.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/21/2606.15080v1-adamame-a-training-recipe-for-adaptive-multilingual-reasoning",
+      "section": "quick",
+      "title_en": "AdaMame: A Training Recipe for Adaptive Multilingual Reasoning",
+      "authors": "Dayeon Ki, Kevin Duh, Marine Carpuat",
+      "date": "2026-06-13",
+      "pdf": "https://arxiv.org/pdf/2606.15080v1",
+      "score": "7.0",
+      "evidence": "多语言推理训练的强化学习阶段",
+      "tldr": "大型推理模型在多语言推理中常出现语言崩溃，现有RL修复存在准确率损失和token浪费。本文提出AdaMame两阶段训练：SFT建立多语言推理能力，RL阶段引入AdaMame-GRPO，通过查询条件对齐因子渐进增长自适应对齐推理语言。在2个基准、2个模型、12种语言上，AdaMame-GRPO在准确率、语言忠实度和token效率上达到Pareto最优，尤其显著提升低资源语言性能。该方法无需牺牲准确率即可解决语言崩溃。",
+      "tags": "query:lpt",
+      "abstract_en": "While Large Reasoning Models (LRMs) show strong performance in English, they often fail to reason in the language of the query, a phenomenon known as language collapse. Existing RL-based fixes typically add a binary language fidelity reward to the accuracy objective, yet still incur trade-off in accuracy, mid-trace code-switching, and excessive token usage. In this work, we propose AdaMame, a two-stage training recipe for multilingual mathematical reasoning that addresses these limitations by adaptively aligning the reasoning language to the query language without compromising accuracy. The first SFT stage fine-tunes on naturally occurring reasoning traces across five languages to establish multilingual reasoning capability. In the subsequent RL stage, we introduce AdaMame-GRPO, an adaptation of Group Relative Policy Optimization (GRPO) in which a query-conditioned alignment factor grows progressively during training, guiding the model to first explore diverse reasoning languages before exploiting reasoning in the query language. Evaluated across two benchmarks, two LRMs, and 12 languages, AdaMame-GRPO achieves Pareto-optimal performance across reasoning accuracy, language fidelity, and token efficiency over all baselines, with the strongest gains on out-of-domain, lower-resource languages.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/21/2606.18147v1-weqa-wearable-health-question-answering-with-query-adaptive-agentic-reasoning",
+      "section": "quick",
+      "title_en": "WEQA: Wearable hEalth Question Answering with Query-Adaptive Agentic Reasoning",
+      "authors": "Yuwei Zhang, Tong Xia, Bianca Emmerich, Yu Yvonne Wu, Dimitris Spathis, Xin Liu, Daniel McDuff, Cecilia Mascolo",
+      "date": "2026-06-16",
+      "pdf": "https://arxiv.org/pdf/2606.18147v1",
+      "score": "6.0",
+      "evidence": "具有查询自适应推理的LLM智能体",
+      "tldr": "可穿戴健康问答面临传感器数据高维连续、与LLM文本分布不对齐的挑战，固定流程难以应对多样意图。本文提出WEQA，一个查询自适应代理框架，利用LLM控制器动态规划执行路径，组合传感器分析和预训练模型，并借助外部知识进行响应审计。在涵盖心率、活动、睡眠等三个领域的四个数据集上，WEQA比LLM和代理基线准确率提升24%。12名医学专家和8名用户的盲评显示其回答在实用性和临床合理性上显著更优。",
+      "tags": "query:lpt",
+      "abstract_en": "Language models are remarkably capable at medical question answering, in some cases surpassing the accuracy of general physicians. However, answering questions about wearable health data remains challenging and understudied, as these ubiquitous sensors produce continuous, high-dimensional, and longitudinal data, which is non-trivial to align with text-centric distributions in LLM pretraining. The diversity of sensor modalities and user intents cannot be effectively handled by a fixed reasoning workflow or a single pretrained foundation model. To address these challenges, we propose WEQA, a query-adaptive agent framework that unifies LLM reasoning with specialized wearable analytical and modeling tools. An LLM controller is employed to synthesize execution plans and dynamically route each query to the appropriate combination of sensor analysis and pretrained models, and perform grounded response auditing with external knowledge. We also curate a benchmark spanning four open wearable datasets comprising analytic and predictive tasks in three different health domains. Experiments show that our framework is 24% more accurate than LLM and agentic baselines, and a blinded study with 12 medical experts and 8 users shows substantial gains in usefulness and clinical soundness.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
