@@ -1,0 +1,216 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-22T22:13:56.748917+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 3,
+    "deep_cap": 6,
+    "deep_selected": 3,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [
+    {
+      "id": "2606.19771v1",
+      "source": "arxiv",
+      "title": "Beyond Entropy: Learning from Token-Level Distributional Deviations for LLM Reasoning",
+      "abstract": "Reinforcement Learning with Verifiable Rewards (RLVR) has significantly advanced Large Language Model (LLM) reasoning; however, it faces a fundamental optimization instability: uniform token updates precipitate entropy collapse, leading to premature convergence to suboptimal strategies, whereas excessive Shannon Entropy maximization can cause entropy explosion, driving blind exploration toward incoherent reasoning chains. To resolve this dichotomy, we introduce the Independent Combinatorial Tokens (ICT) framework, which shifts the optimization focus from scalar uncertainty to the distributional properties of token logits. By leveraging the Jensen-Shannon (JS) divergence between token logits distributions, ICT identifies tokens with distinctive distributional patterns as critical branching points for guiding effective exploration in LLM reasoning. Our theoretical analysis, grounded in both Shannon and second-order Rényi entropy, proves that selectively updating on these tokens regulates policy concentration: it reduces the overall distribution uncertainty measured by Shannon entropy, while controlling probability concentration captured by second-order Rényi entropy. This dual effect prevents over-concentrated token generation from weakening exploration and effectively stabilizes the training landscape. Empirical results demonstrate that updating only the top 10% of unique tokens on Qwen2.5 (0.5B/1.5B/7B) models yields an average pass@4 improvement of 4.58%, with a maximum gain of 14.9%, over GRPO, 20-Entropy, and STAPO baselines across seven benchmarks spanning math, commonsense, and Olympiad-level problems.",
+      "authors": [
+        "Xuanzhi Feng",
+        "Zhengyang Li",
+        "Zeyu Liu",
+        "Haoxi Li",
+        "Yuming Jiang",
+        "Bing Guo",
+        "Jingcai Guo",
+        "Jie Zhang",
+        "Song Guo"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-06-18T04:11:56+00:00",
+      "link": "https://arxiv.org/pdf/2606.19771v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "proposes ICT framework using JS divergence to improve RLVR training for LLM reasoning",
+      "llm_evidence_cn": "提出ICT框架利用JS散度改进LLM推理的RLVR训练",
+      "llm_evidence": "提出ICT框架利用JS散度改进LLM推理的RLVR训练",
+      "canonical_evidence": "提出ICT框架利用JS散度改进LLM推理的RLVR训练",
+      "llm_tldr_en": "Beyond Entropy introduces the Independent Combinatorial Tokens (ICT) framework that uses Jensen-Shannon divergence to stabilize RLVR training for LLM reasoning, preventing entropy collapse and explosion, leading to more robust optimization.",
+      "llm_tldr_cn": "针对强化学习可验证奖励（RLVR）训练LLM推理时遇到的熵坍缩或爆炸问题，本文提出独立组合Token（ICT）框架，将优化焦点从标量不确定性转移到Token logits的分布特性，利用JS散度识别分布偏离的Token。实验表明ICT有效稳定了训练过程，提升了推理链的连贯性和收敛质量。该工作为RLVR训练提供了新的理论视角和实用方法。",
+      "llm_tldr": "针对强化学习可验证奖励（RLVR）训练LLM推理时遇到的熵坍缩或爆炸问题，本文提出独立组合Token（ICT）框架，将优化焦点从标量不确定性转移到Token logits的分布特性，利用JS散度识别分布偏离的Token。实验表明ICT有效稳定了训练过程，提升了推理链的连贯性和收敛质量。该工作为RLVR训练提供了新的理论视角和实用方法。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.20002v1",
+      "source": "arxiv",
+      "title": "Connect the Dots: Training LLMs for Long-Lifecycle Agents with Cross-Domain Generalization Via Reinforcement Learning",
+      "abstract": "This work presents a general framework for training large language models (LLMs) to \"Connect the Dots\" (CoD), a meta-capability required by long-lifecycle agents: as an LLM-based AI agent gets deployed in an environment, it solves a long sequence of tasks while continuously exploring the environment, learning from its own experiences, and iteratively self-updating its context about the environment, thereby achieving progressively better performance on future tasks conditioned on the updated context. Major components of the CoD framework include: (1) algorithm design and infrastructure for end-to-end reinforcement learning (RL) with long rollout sequences interleaving solve-task and update-context episodes; (2) tasks and environments for incentivizing and eliciting the targeted meta-capability in LLMs during training, as well as for faithfully measuring progress during evaluation. We present proof-of-concept implementations of the CoD framework, including a GRPO-style RL algorithm with fine-grained credit assignment, as well as tasks and environments tailored to the targeted meta-capability (rather than domain-specific LLM capabilities or standard task-by-task RL). Empirical results validate the efficacy of end-to-end RL training in the CoD setting, and demonstrate the potential for out-of-distribution generalization -- within the training domains, across different domains, and from CoD to Ralph-loop settings -- of the elicited meta-capability. Our investigation of CoD connects several lines of prior works, and opens up new opportunities for advancing LLMs and AI agents. To facilitate further research and applications, we release our implementations at \\url{https://github.com/agentscope-ai/Trinity-RFT/tree/research/cod/examples/research_cod}.",
+      "authors": [
+        "Yanxi Chen",
+        "Weijie Shi",
+        "Yuexiang Xie",
+        "Boyi Hu",
+        "Yaliang Li",
+        "Bolin Ding",
+        "Jingren Zhou"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-06-18T09:38:45+00:00",
+      "link": "https://arxiv.org/pdf/2606.20002v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Uses reinforcement learning to train LLMs for long-lifecycle agents",
+      "llm_evidence_cn": "使用强化学习训练大语言模型以实现长期生命周期智能体",
+      "llm_evidence": "使用强化学习训练大语言模型以实现长期生命周期智能体",
+      "canonical_evidence": "使用强化学习训练大语言模型以实现长期生命周期智能体",
+      "llm_tldr_en": "This paper presents a framework for training LLMs as long-lifecycle agents via end-to-end reinforcement learning, enabling cross-domain generalization and self-updating capabilities.",
+      "llm_tldr_cn": "现有大语言模型智能体在长期部署中难以持续学习和泛化到新领域。本文提出Connect the Dots框架，利用端到端强化学习训练LLM，使其能够交替执行任务和更新上下文，从而在长期序列任务中提升性能。实验表明该方法有效增强了跨域泛化能力，为开发自适应长期AI智能体提供了新范式。",
+      "llm_tldr": "现有大语言模型智能体在长期部署中难以持续学习和泛化到新领域。本文提出Connect the Dots框架，利用端到端强化学习训练LLM，使其能够交替执行任务和更新上下文，从而在长期序列任务中提升性能。实验表明该方法有效增强了跨域泛化能力，为开发自适应长期AI智能体提供了新范式。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.20206v1",
+      "source": "arxiv",
+      "title": "Off-Policy Evaluation for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random",
+      "abstract": "In offline Reinforcement Learning, immediate rewards in logged batch data are often unobserved due to sparse or irregular record-keeping, or censored beyond certain reward values. This issue arises in practical settings, including health care and marketing. We investigate off-policy evaluation (OPE) in finite-horizon Markov decision processes when rewards are missing not at random (MNAR), which breaks ignorability and induces selection bias even after conditioning on states and actions. To address this, we formalize a reward-dependent propensity model and use future states as shadow variables to identify the full-data conditional mean reward. We further introduce a bridge function that recovers the conditional mean reward without explicitly modeling the MNAR mechanism, and estimate it via a min-max procedure to avoid double sampling. Building upon these identification results, we propose an Fitted-Q-Evaluation-style estimator that propagates the recovered rewards while allowing target policies to depend on past missingness indicators. Finally, we establish consistency and finite-sample error bounds for our OPE estimator, and show through experiments the strong performance of our method compared to existing methods on simulated and MIMIC-III Sepsis data.",
+      "authors": [
+        "Ziheng Wei",
+        "Annie Qu",
+        "Rui Miao"
+      ],
+      "primary_category": "stat.ML",
+      "categories": [
+        "stat.ML",
+        "cs.LG"
+      ],
+      "published": "2026-06-18T13:19:43+00:00",
+      "link": "https://arxiv.org/pdf/2606.20206v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Off-policy evaluation in RL with missing rewards",
+      "llm_evidence_cn": "强化学习中缺失奖励的离线策略评估",
+      "llm_evidence": "强化学习中缺失奖励的离线策略评估",
+      "canonical_evidence": "强化学习中缺失奖励的离线策略评估",
+      "llm_tldr_en": "Proposes off-policy evaluation method for MDPs with rewards missing not at random, using shadow variables and bridge function to correct selection bias.",
+      "llm_tldr_cn": "本文针对离线强化学习中奖励数据缺失且缺失机制非随机的问题，提出了一个形式化的奖励依赖倾向模型，利用未来状态作为阴影变量识别条件均值奖励，并引入桥函数恢复完整数据条件均值。实验表明该方法有效纠正了选择偏差，为实际应用中的策略评估提供了理论基础。",
+      "llm_tldr": "本文针对离线强化学习中奖励数据缺失且缺失机制非随机的问题，提出了一个形式化的奖励依赖倾向模型，利用未来状态作为阴影变量识别条件均值奖励，并引入桥函数恢复完整数据条件均值。实验表明该方法有效纠正了选择偏差，为实际应用中的策略评估提供了理论基础。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Reinforcement Learning",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.18508v1",
+      "source": "arxiv",
+      "title": "MCompassRAG: Topic Metadata as a Semantic Compass for Paragraph-Level Retrieval",
+      "abstract": "Retrieval-augmented generation (RAG) systems depend critically on how documents are chunked and searched. Fine-grained chunks can improve retrieval precision but expand the search space, increasing latency and cost; larger chunks reduce the number of candidates but make dense similarity less reliable, as the representation for each chunk mixes multiple topics and introduces more semantic noise. This trade-off becomes especially limiting in deep research tasks, where retrieval must be both fast and precise across large, heterogeneous corpora. We introduce MCompassRAG, a metadata-guided retrieval framework that uses topic-level signals as a semantic compass for selecting relevant evidence. Instead of relying only on cosine similarity between queries and noisy chunk embeddings, MCompassRAG enriches chunk representations with topic metadata in the same embedding space and trains a lightweight retriever through LLM-teacher distillation. At inference time, MCompassRAG performs topic-aware retrieval without additional LLM calls, improving both efficiency and evidence quality. Across six complex retrieval benchmarks, MCompassRAG improves information efficiency (IE) by 8.24% on average with over 5 times lower latency than the strongest efficient RAG baselines. Code is available on https://github.com/AmirAbaskohi/MCompassRAG.",
+      "authors": [
+        "Amirhossein Abaskohi",
+        "Raymond Li",
+        "Gaetano Cimino",
+        "Peter West",
+        "Giuseppe Carenini",
+        "Issam H. Laradji"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.IR"
+      ],
+      "published": "2026-06-16T21:50:01+00:00",
+      "link": "https://arxiv.org/pdf/2606.18508v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "metadata-guided retrieval algorithm improvement",
+      "llm_evidence_cn": "元数据引导的检索算法改进",
+      "llm_evidence": "元数据引导的检索算法改进",
+      "canonical_evidence": "元数据引导的检索算法改进",
+      "llm_tldr_en": "MCompassRAG uses topic metadata as a semantic compass for paragraph-level retrieval, improving precision and speed.",
+      "llm_tldr_cn": "RAG系统在细粒度分块时语义噪声大，且搜索空间膨胀。MCompassRAG提出元数据引导的检索框架，利用主题级信号作为语义罗盘选择相关证据，取代单纯依赖余弦相似度。在多样化语料上的实验表明，该方法在保持召回率的同时显著提升了检索精度和速度，是一种有效的检索算法改进。",
+      "llm_tldr": "RAG系统在细粒度分块时语义噪声大，且搜索空间膨胀。MCompassRAG提出元数据引导的检索框架，利用主题级信号作为语义罗盘选择相关证据，取代单纯依赖余弦相似度。在多样化语料上的实验表明，该方法在保持召回率的同时显著提升了检索精度和速度，是一种有效的检索算法改进。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-06-12-731250-v1",
+      "source": "biorxiv",
+      "title": "AutoZyme: An Autonomous Agentic Framework to Optimize Bioinformatics Software",
+      "abstract": "Performance bottlenecks in widely used genomics and bioinformatics software present a substantial and growing burden as biological datasets continue to increase in size and number. Relieving these bottlenecks relies largely on expert manual optimization and therefore remains difficult to scale. Here we present AutoZyme, an agentic framework for scientific software optimization. Given a target function, AutoZyme builds benchmarks, identifies bottlenecks, and iteratively tests code changes, retaining only those that improve runtime while preserving output. We evaluated AutoZyme on 45 functions, improving runtime without substantial memory increases in over 95% of cases considered. Across 38 functions from Seurat, Scanpy and related packages in genomics and bioinformatics, AutoZyme reduced runtime by a median of 8.52-fold, with the largest reductions exceeding 676-fold. The optimized functions are distributed through AutoZyme-Library as drop-in replacements for existing analysis pipelines. We also release AutoZyme as a reusable framework for optimizing additional user-specified packages and functions.",
+      "authors": [
+        "Xie, E.",
+        "Cheng, L.",
+        "Cai, Y.",
+        "Shireman, J.",
+        "Kendziorski, C."
+      ],
+      "primary_category": "bioinformatics",
+      "categories": [
+        "bioinformatics"
+      ],
+      "published": "2026-06-16T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.06.12.731250v1.full.pdf",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "autonomous framework for algorithm improvement in bioinformatics",
+      "llm_evidence_cn": "生物信息学算法改进的自主框架",
+      "llm_evidence": "生物信息学算法改进的自主框架",
+      "canonical_evidence": "生物信息学算法改进的自主框架",
+      "llm_tldr_en": "AutoZyme autonomously optimizes bioinformatics software by identifying bottlenecks and iteratively testing code changes, improving runtime in 95% of cases.",
+      "llm_tldr_cn": "生物信息学软件性能瓶颈依赖人工优化难以扩展。AutoZyme是一个智能体框架，可自动构建基准、识别瓶颈并迭代测试代码修改，保留提升运行时的变更。在45个函数上的评估显示，超过95%的案例运行时提升且无显著内存增加。该算法改进方法显著提升了优化可扩展性。",
+      "llm_tldr": "生物信息学软件性能瓶颈依赖人工优化难以扩展。AutoZyme是一个智能体框架，可自动构建基准、识别瓶颈并迭代测试代码修改，保留提升运行时的变更。在45个函数上的评估显示，超过95%的案例运行时提升且无显著内存增加。该算法改进方法显著提升了优化可扩展性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

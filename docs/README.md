@@ -6,31 +6,37 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-21
-- 运行时间：2026-06-21 21:21:38 UTC
+- 最新运行日期：2026-06-22
+- 运行时间：2026-06-22 22:17:42 UTC
 - 运行状态：成功
-- 本次总论文数：3
-- 精读区：1
+- 本次总论文数：5
+- 精读区：3
 - 速读区：2
 
 ### 今日简报（AI）
-1) 今日荐读：VIMPO 提出隐式价值策略优化，助 LLM 高效对齐；速读自适应多语言推理与可穿戴问答。  
-2) 最值精读：VIMPO（9.0/10）为 LLM 训练提供新范式，AdaMame（7.0/10）拓展多语言推理能力。  
-3) 建议关注 VIMPO 代码与实验细节，后续可结合自身任务测试价值隐式优化效果。
-- 详情：[/202606/21/README](/202606/21/README)
+今日精读2篇、速读2篇，论文聚焦于LLM推理机制、长周期智能体泛化、段落级检索优化及生物信息学自动化。  
+最值得看的是《Beyond Entropy》从token分布偏差解析LLM推理，以及《Connect the Dots》用强化学习训练跨域通用长周期智能体。  
+下一步可重点追踪LLM推理可解释性及智能体长期自主决策的前沿，同时关注段落检索与生物信息学自动化工具的实际应用。
+- 详情：[/202606/22/README](/202606/22/README)
 
 ### 精读区论文标签
-1. [VIMPO: Value-Implicit Policy Optimization for LLMs](/202606/21/2606.20008v1-vimpo-value-implicit-policy-optimization-for-llms)  
+1. [Beyond Entropy: Learning from Token-Level Distributional Deviations for LLM Reasoning](/202606/22/2606.19771v1-beyond-entropy-learning-from-token-level-distributional-deviations-for-llm-reasoning)  
    标签：评分：9.0/10、query:lpt
-   evidence：面向大语言模型的强化学习策略优化
+   evidence：提出ICT框架利用JS散度改进LLM推理的RLVR训练
+2. [Connect the Dots: Training LLMs for Long-Lifecycle Agents with Cross-Domain Generalization Via Reinforcement Learning](/202606/22/2606.20002v1-connect-the-dots-training-llms-for-long-lifecycle-agents-with-cross-domain-generalization-via-reinforcement-learning)  
+   标签：评分：8.0/10、query:lpt
+   evidence：使用强化学习训练大语言模型以实现长期生命周期智能体
+3. [Off-Policy Evaluation for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random](/202606/22/2606.20206v1-off-policy-evaluation-for-missingness-aware-policies-in-mdps-with-rewards-missing-not-at-random)  
+   标签：评分：8.0/10、query:lpt
+   evidence：强化学习中缺失奖励的离线策略评估
 
 ### 速读区论文标签
-1. [AdaMame: A Training Recipe for Adaptive Multilingual Reasoning](/202606/21/2606.15080v1-adamame-a-training-recipe-for-adaptive-multilingual-reasoning)  
+1. [MCompassRAG: Topic Metadata as a Semantic Compass for Paragraph-Level Retrieval](/202606/22/2606.18508v1-mcompassrag-topic-metadata-as-a-semantic-compass-for-paragraph-level-retrieval)  
    标签：评分：7.0/10、query:lpt
-   evidence：多语言推理训练的强化学习阶段
-2. [WEQA: Wearable hEalth Question Answering with Query-Adaptive Agentic Reasoning](/202606/21/2606.18147v1-weqa-wearable-health-question-answering-with-query-adaptive-agentic-reasoning)  
-   标签：评分：6.0/10、query:lpt
-   evidence：具有查询自适应推理的LLM智能体
+   evidence：元数据引导的检索算法改进
+2. [AutoZyme: An Autonomous Agentic Framework to Optimize Bioinformatics Software](/202606/22/biorxiv-10-64898-2026-06-12-731250-v1-autozyme-an-autonomous-agentic-framework-to-optimize-bioinformatics-software)  
+   标签：评分：7.0/10、query:lpt
+   evidence：生物信息学算法改进的自主框架
 
 
 <div class="dpr-home-promo-card">

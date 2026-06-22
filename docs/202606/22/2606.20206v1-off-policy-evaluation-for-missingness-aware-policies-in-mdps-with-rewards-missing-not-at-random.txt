@@ -1,0 +1,4335 @@
+Title: Off-Policy Evaluation for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random
+
+URL Source: https://arxiv.org/pdf/2606.20206v1
+
+Published Time: Fri, 19 Jun 2026 00:58:33 GMT
+
+Number of Pages: 31
+
+Markdown Content:
+# Off-Policy Evaluation for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random 
+
+Ziheng Wei 1 Annie Qu 2 Rui Miao 3
+
+## Abstract 
+
+In offline Reinforcement Learning, immediate re-wards in logged batch data are often unobserved due to sparse or irregular record-keeping, or cen-sored beyond certain reward values. This issue arises in practical settings, including health care and marketing. We investigate off-policy eval-uation (OPE) in finite-horizon Markov decision processes when rewards are missing not at ran-dom (MNAR), which breaks ignorability and in-duces selection bias even after conditioning on states and actions. To address this, we formal-ize a reward-dependent propensity model and use future states as shadow variables to identify the full-data conditional mean reward. We further introduce a bridge function that recovers the con-ditional mean reward without explicitly model-ing the MNAR mechanism, and estimate it via a min-max procedure to avoid double sampling. Building upon these identification results, we pro-pose an Fitted-Q-Evaluation-style estimator that propagates the recovered rewards while allowing target policies to depend on past missingness in-dicators. Finally, we establish consistency and finite-sample error bounds for our OPE estimator, and show through experiments the strong perfor-mance of our method compared to existing meth-ods on simulated and MIMIC-III Sepsis data. 
+
+## 1. Introduction 
+
+Reinforcement Learning (RL) has achieved remarkable suc-cesses in sequential decision-making domains ranging from robotics to healthcare, and most recently in large language 
+
+> 1
+
+Department of Statistics, University of Michigan at Ann Arbor 
+
+> 2
+
+Department of Statistics and Applied Probability, University of California at Santa Barbara 3Department of Mathematical Sciences, University of Texas at Dallas. Correspondence to: Rui Miao 
+
+<rui.miao@utdallas.edu >.
+
+Proceedings of the 43 rd International Conference on Machine Learning , Seoul, South Korea. PMLR 306, 2026. Copyright 2026 by the author(s). 
+
+models and AI agents (Ouyang et al., 2022; Rafailov et al., 2023; Achiam et al., 2023). However, learning optimal policies often requires vast amounts of interaction with the environment, which can be costly, risky, and even unethical in high-stakes real-world applications such as healthcare and education (Tsiatis et al., 2019; Murphy, 2003; Mandel et al., 2014). In these applications, we often have interaction data collected according to some behavior policy, e.g., stan-dard care or usual strategy. Estimating the value of a target policy using historical datasets collected under a different behavior policy, a problem known as Off-Policy Evaluation (OPE), is essential in offline RL (Levine et al., 2020; Ue-hara et al., 2022; Voloshin et al., 2019; Wang et al., 2024). Accurate OPE is critical for deploying safe and effective policies without the need for dangerous online exploration. However, in many practical scenarios, such as medical treat-ment or digital advertising, the data is plagued by unob-served factors or missing values (Little & Rubin, 2019; Kallus & Zhou, 2020). A particularly pervasive challenge arises when rewards are missing not at random (MNAR), under which the probability of observing a reward depends on the latent value of the reward itself. For instance, in health care with scheduled chronic-disease management, pa-tient outcomes such as patient-reported quality-of-life scores may be missing due to incomplete questionnaires or skipped follow-ups, while subsequent clinical states (lab results, vital signs, encounter records) are still recorded in the elec-tronic health record (EHR). The recording of the outcome may itself depend on its value: patients with worsening symptoms are more likely to skip self-reported assessments, while those feeling well may also under-report. Similarly, in multi-touch digital marketing, attribution is frequently dis-rupted by privacy limitations. While non-conversions (zero rewards) are trivially observable, high-value purchases often involve cross-device journeys, such as a user clicking on mo-bile but converting on a desktop, or trigger manual review flows that break attribution links. Consequently, high-value conversions go missing while low-value or null outcomes remain fully observed, creating a dataset that systemati-cally biases the learning process against the most desirable outcomes. Similar MNAR feedback has been systemati-cally studied in recommender systems, where popularity and exposure biases make logged interactions MNAR and 1
+
+> arXiv:2606.20206v1 [stat.ML] 18 Jun 2026 OPE for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random
+
+consequently distort offline evaluations (Yang et al., 2018). Standard OPE methods, such as Fitted Q-evaluation (FQE) and Importance Sampling (IS), rely on fully observed tra-jectories. Failing to account for the missingness could lead to biased OPE and hence sub-optimal decision-making. In the OPE literature, scheme of missingness has been studied in various aspects. Partially Observable Markov Decision Processes (POMDPs, Kaelbling et al., 1998; Jaakkola et al., 1995) consider the case where the state is partially observed, which can be viewed as a special case of missingness. How-ever, most existing POMDP methods assume that certain state variables are totally unobserved. In general, off-policy value in POMDPs are often unidentifiable without strong assumptions (Tennenholtz et al., 2020; Bennett et al., 2021; Shi et al., 2022; Uehara et al., 2023). Some works define the missingness of certain status (e.g., hitting wall in Gridworld environment (Sutton et al., 1998)) in the reward function by assigning it to be some large negative values to discourage certain actions, which lead to certain states with voided re-wards (Ng et al., 1999; Devlin & Kudenko, 2012). However, this approach may not accurately reflect the true reward structure and can introduce bias. Chu et al. (2023); Park et al. (2025) study the OPE problem with truncated trajec-tories, where they treat missingness as certain constraints. However, by penalizing on the missingness, these methods may shift the policy evaluation away from the true potential reward without missingness. Wang et al. (2025) propose an inverse probability weighting method for OPE with non-ignorable truncation, but their method relies on an extra shadow variable, or requires expert knowledge to select such a variable from observed states. In this paper, we study the OPE problem in MDPs with MNAR rewards to estimate values of target policies account-ing for the past missingness. MNAR rewards break standard ignorability assumptions as the reward-dependent missing-ness induces selection bias and confounds state-action re-turns. The challenge is to recover the value of a target policy when the observed trajectories systematically underreport high or low rewards and when the missingness itself can depend on the past action and state, all without online data to re-collect or intervene. We address these issues by formalizing the reward MNAR mechanism via a reward-dependent propensity score model and leveraging future states as shadow variables. Un-der mild completeness conditions, the shadow variables allow us to identify the full-data conditional mean re-ward even when the reward is MNAR. In addition, we introduce a bridge function bt(St, A t, S t+1 ) satisfying 
+
+E {bt(St, A t, S t+1 ) | Rt, S t, A t} = Rt, enabling recovery of the conditional mean reward without explicitly estimating the MNAR mechanism. This avoids the variance blow-up in inverse propensity weighting. We propose the min-max optimization to estimate the bridge function and the value function, which avoids the double sampling issue. Building on these identification results, we further develop an FQE-style estimator that integrates the bridge function and allows target policies to depend on the previous miss-ingness indicators. The procedure propagates the recovered rewards through the Bellman recursion of the target policy, yielding stable value estimates. We further establish the consistency and finite-sample error bounds of the proposed estimator in nonparametric settings. Extensive experiments on simulated data and a MIMIC-III dataset demonstrate the effectiveness of our method compared to existing bench-marks. 
+
+## 2. Preliminaries 
+
+We consider an episodic Markov Decision Process (MDP) 
+
+M = {S , A, P, r, T }, where S and A denote the state and action spaces, respectively. The horizon length T is finite, and we assume the terminal state ST +1 is observed. The transition kernels P = {Pt}Tt=1 govern the state dynamics, where Pt : S × A → ∆( S) maps state-action pairs to distributions over next states. The reward functions r =
+
+{rt}Tt=1 are defined as conditional expectations given the next state: rt(s, a, s ′) = E[Rt | St = s, A t = a, S t+1 =
+
+s′] for any (s, a, s ′) ∈ S × A × S . We assume bounded rewards Rt ∈ R ⊆ [−1, 1] .We introduce an observation indicator Ot ∈ { 0, 1}, where 
+
+Ot = 1 indicates that the reward Rt is observed at time 
+
+t, and Ot = 0 otherwise. Importantly, we allow the re-wards to be missing not at random (MNAR), that is, even after conditioning on current states and actions, the miss-ingness probability may depend on the possibly unobserved reward itself. We formalize this through the propensity score et(s, a, r ) = P (Ot = 1 | St = s, A t = a, R t = r)
+
+for t = 1 , . . . , T .
+
+Assumption 2.1 (No Future Dependence) . For all t =1, . . . , T − 1,
+
+Ot ⊥ (St+1: T , R t+1: T ) | St, A t, R t.
+
+This assumption states that the current missingness indi-cator Ot, given the current state, action, and reward, is independent of all future states and rewards. For example, in healthcare, whether a patient’s health outcome is recorded typically depends on their current condition, not on future events that have not yet occurred. Our goal is to evaluate the performance of a target pol-icy π = {πt}Tt=1 . We allow πt to depend on the previous reward missingness, which is practically relevant when de-cisions adapt based on whether prior outcomes were ob-served. For example, in healthcare, a clinician may choose 2OPE for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random 
+
+a more conservative treatment when the previous lab re-sult is missing, whereas the historical standard-care be-havior policy acts only on the current clinical state. The two policies thus share the same underlying causal struc-ture but differ in which variables they condition on at de-cision time. Formally, πt : S × { 0, 1} → ∆( A) with 
+
+πt(a | s, o −) = P (At = a | St = s, O t−1 = o−). To accommodate this dependence, we define an augmented state eSt = ( St, O t−1) ∈ eS = S × { 0, 1}, so that the target policy can be written as πt(a | eSt). The augmented process must satisfy the Markov property below. 
+
+Assumption 2.2 (Markov Property for Augmented Pro-cess) . The augmented process {( eSt, A t)}Tt=1 with eSt =(St, O t−1) is an MDP 
+
+P ( eSt+1 | eS1: t, A 1: t) = P ( eSt+1 | eSt, A t), t = 1 , . . . , T. 
+
+This assumption ensures that augmenting the state with the previous missingness indicator preserves the Markov property, and allows the value function recursion to hold with augmented state. The augmented transition kernel is 
+
+P ( eSt+1 | eSt, A t) = P (( St+1 , O t) | St, A t). We set O0 =0 and let S1 ∼ ρ1 denote the initial state distribution. The Q-function and value function satisfy the Bellman equation 
+
+Qπt (s, a ) = Ert(s, a, S t+1 ) + V πt+1 (St+1 , O t) | St = s, At = a,V πt (s, o −) = X
+
+> a
+
+πt(a | s, o −)Qπt (s, a ), V πT +1 ≡ 0.
+
+(1) The policy value is defined as V (π) ≡ E eS1∼ ˜ρ1
+
+V π 
+
+> 1
+
+( eS1) =
+
+ES1∼ρ1
+
+V π 
+
+> 1
+
+(S1, 0) .In OPE, data are collected under a behavior policy πb =
+
+{πbt }Tt=1 , where πbt : S → ∆( A) does not depend on the missingness indicators. The observed dataset D consists of 
+
+n i.i.d. trajectories τi = {St,i , A t,i , O t,i , R obs  
+
+> t,i
+
+, S t+1 ,i }Tt=1 
+
+for i = 1 , . . . , n , where Robs  
+
+> t,i
+
+= Ot,i · Rt,i denotes the observed reward (zero when missing). See Figure 1 for a di-rected acyclic graph (DAG) illustrating the data-generating process. To deal with distribution shift in OPE, concentrability co-efficients are often introduced (Munos, 2003; 2007; Chen & Jiang, 2019; Le et al., 2019; Duan et al., 2021). We de-fine concentrability coefficient κt at time t in the following assumption. 
+
+Assumption 2.3 (Concentrability) . Given target policy π
+
+and behavior policy πb, for each t = 1 , . . . , T , assume there exist finite constants {κt}Tt=1 such that 
+
+∥ πt(a | s, o −)
+
+πbt (a | s) ∥∞ ≤ κt.St At St+1 At+1 St+2    
+
+> RtOtRt+1 Ot+1
+
+Figure 1. DAG for the data-generating process. Black arrows represent the standard MDP dynamics and the MNAR reward mechanism, shared by both policies. The blue arrow Ot → At+1 
+
+is specific to the target policy, which is allowed to depend on the previous missingness indicator at decision time; the behavior policy depends only on the current state. 
+
+Equivalently, for all (s, o −, a ) with πbt (a | s) > 0, πt(a |
+
+s, o −) ≤ κt πbt (a | s).
+
+Assumption 2.4. Assume there exist constants a > 0 and 
+
+αt ≥ α > 1 such that for all t ∈ { 1, . . . , T },
+
+κt ≤ 1 + atαt .
+
+Assumption 2.4 is an enhanced version for Assumption 2.3, which controls the cumulative growth of the concentrability coefficients so that the action mismatch does not compound over time. A structurally similar decay condition appears in Assumption 2 of Miao et al. (2022) in a POMDP setting. 
+
+Corollary 2.5 (Bounded cumulative concentrability) . Un-der Assumptions 2.3 and 2.4, for t = 1 , . . . , T ,
+
+(
+
+> t
+
+Y
+
+> j=1
+
+κj )1/2 ≤ exp 
+
+ 12
+
+> t
+
+X
+
+> j=1
+
+ajαj
+
+
+
+≤ exp   a
+
+2 ζ(α) := K, 
+
+where ζ(·) is the Riemann zeta function. 
+
+## 3. Identification 
+
+In this section, we establish identification results for the policy value, and formalize the conditions required for our approach. To address the challenges posed by MNAR data in causal inference, Miao et al. (2015); Miao & Tchetgen Tchetgen (2016) propose identification methods with the help of aux-iliary variables called shadow variables . Inspired by this line of research, we establish a nonparametric value-based approach for policy value identification. Our key insight is to adopt the next state St+1 as the shadow variable, which serves as a proxy that helps recover information about the unobserved rewards. The shadow variable must satisfy two conditions that govern its relationship with the reward and missingness indicator. 
+
+Assumption 3.1 (Exclusion Restriction) . Suppose for all 
+
+t = 1 , . . . , T , St+1 satisfies 
+
+St+1 ⊥ Ot | Rt, S t, A t.
+
+3OPE for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random 
+
+Assumption 3.2 (Relevance Condition) . Suppose for all 
+
+t = 1 , . . . , T , St+1 satisfies 
+
+St+1 ̸ ⊥ Rt | St, A t, O t = 1 .
+
+The two assumptions above are basic conditions for St+1 
+
+to be a valid shadow variable at time t. Assumption 3.1 is a direct consequence of Assumption 2.1, which shows that conditional on the current state-action pair and the (possibly unobserved) reward, St+1 provides no additional informa-tion about whether the reward is observed. Assumption 3.2 ensures that on the observed subset, St+1 remains informa-tive about Rt beyond what is already captured by (St, A t).This condition guarantees that the shadow variable carries useful information about the reward. In the causal graph in Figure 1, Assumption 3.1 is consistent with d-separation: conditioning on (Rt, S t, A t) blocks all paths from St+1 to 
+
+Ot. For subsequent analysis, we define the extended propen-sity score of non-missingness et(s, a, r, s ′) = P (Ot = 1 |
+
+St = s, A t = a, R t = r, S t+1 = s′). The choice of St+1 
+
+aligns with the recurring idea in POMDPs, i.e., leveraging future states or observations to serve as proxy latent state in-formation (Singh et al., 2003; Uehara et al., 2023; Xu et al., 2023; Zhang & Jiang, 2024). Moreover, St+1 is endogenous to the MDP and already recorded in the logged transitions, so it requires no auxiliary measurement beyond the standard offline data, in contrast to approaches that specify an extra shadow variable (Wang et al., 2025). For identification, rather than explicitly modeling the miss-ingness mechanism under MNAR, our goal is to recover the full-data conditional mean reward E[Rt | St, A t] using only observable quantities. Under MNAR, the observed reward conditional expectation ERt | St = s, A t = a, O t = 1 
+
+generally differs from the target ERt | St = s, A t = a,and directly using observed rewards would lead to a biased policy evaluation. We adopt a bridge-based imputation strategy for missing rewards motivated by proximal causal inference (Tchet-gen Tchetgen et al., 2020; Cui et al., 2024). Related bridge constructions also appear in the literature on confounded POMDPs (Miao et al., 2022; Shi et al., 2022; Hong et al., 2023; Li et al., 2025). The core idea is to construct functions that can learn the missing rewards in an unbiased manner by exploiting the relationship between rewards and next states. Specifically, we introduce a sequence of bridge functions 
+
+{bt : S × A × S → R}Tt=1 satisfying the moment condi-tion that 
+
+E[bt(St, A t, S t+1 ) | Rt, S t, A t] = Rt, a.s. (2) Equation (2) links the target quantity of interest to the ob-servable offline distribution, and converts the recovery of 
+
+E[Rt | St, A t] into an estimable conditional moment prob-lem. Taking conditional expectation of (2) given (St, A t) yields 
+
+E[bt(s, a, S t+1 ) | St = s, A t = a]=E(Rt | St = s, A t = a) := ¯ rt(s, a ). (3) Thus, the bridge function reproduces the correct one-step conditional mean reward required by the Bellman recursion. Moreover, a crucial observation which enables practical estimation is that 
+
+P (St+1 | Rt, S t, A t, O t = 1) = P (St+1 | Rt, S t, A t),
+
+by Assumption 2.1. This implies that the bridge moment condition in Equation (2) can be identified from the observed subset {Ot = 1 }. This means we can estimate the bridge function bt using only samples where rewards are observed, and then evaluate it at samples with Ot = 0 to impute the missing rewards. We further introduce the following assumptions for the iden-tification of the policy value. 
+
+Assumption 3.3 (Positivity) . For all t = 1 , . . . , T , and for all (s, a, r ) ∈ S × A × R , 0 < e t(s, a, r ) < 1.The positivity assumption ensures that every state-action-reward triple has a positive probability of being both ob-served and unobserved, which is commonly used in causal inference literature. 
+
+Assumption 3.4 (Completeness) . For all (s, a ) ∈ S × A ,
+
+t = 1 , . . . , T ,(1) For any square-integrable function h,
+
+E[h(Rt) | St = s, A t = a, S t+1 ]=
+
+Z
+
+h(Rt)p(Rt | s, a, S t+1 )dR t = 0 , a.s. 
+
+if and only if h(Rt) = 0 , a.s. ;(2) For any square-integrable function g,
+
+E[g(St+1 ) | Rt, S t = s, A t = a]=
+
+Z
+
+g(St+1 )p(St+1 | Rt, s, a )dS t+1 = 0 , a.s. 
+
+if and only if g(St+1 ) = 0 , a.s. 
+
+Assumption 3.4 guarantees the existence and uniqueness of the bridge functions bt, for t = 1 , . . . , T . Completeness assumptions are standard in the proximal causal inference (Tchetgen Tchetgen et al., 2020; Cui et al., 2024), where they ensure that the conditional expectations are sufficiently rich to identify the target functional. To provide concrete intuition, we characterize completeness in the tabular setting. 4OPE for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random 
+
+Example 3.5 (Completeness in tabular set-ting) . Assume S, R are tabular. Let ma-trix Mt,s,a ∈ R|S|×|R| where Mt,s,a (s′, r ) := 
+
+P (St+1 = s′ | Rt = r, S t = s, A t = a) , s′ ∈ S , r ∈ R .Then 1. If for all (t, s, a ), rank (Mt,s,a ) = |R| , then Assump-tion 3.4 (1) holds, and hence the bridge exists; 2. If for all (t, s, a ), rank (Mt,s,a ) = |S| , then Assump-tion 3.4 (2) holds, and hence the bridge is unique; 3. If |S| = |R| , then Mt,s,a is invertible for all (t, s, a )
+
+if and only if both Assumption 3.4 (1) and Assump-tion 3.4 (2) hold. 
+
+Then we give the identification results for policy value as follows: 
+
+Theorem 3.6 (Policy value identification) . For an aug-mented MDP satisfying Assumptions 2.1, 2.2 and 3.2 to 3.4 and some regularity conditions, there always exist bridges 
+
+{bt}Tt=1 that satisfy Equation (2) , and the policy value then can be identified using {bt}Tt=1 .
+
+See Appendix D for other regularity conditions and proof. Based on Theorem 3.6, we develop a value-based approach for policy value identification, which circumvents modeling the missing mechanism explicitly, in contrast to approaches such as Miao & Tchetgen Tchetgen (2016); Miao & Tchet-gen (2018); Wang et al. (2025). This is practically signif-icant as it can avoid the high variance induced from IPW methods or requires strong parametric assumptions about the missingness. Our identification procedure consists of three steps. 
+
+Step 1 (Learn bt). For each t = 1 , . . . , T , learn bt from 
+
+Ebt(s, a, S t+1 ) | Rt = r, S t = s, A t = a = r, 
+
+using the observed subset with Ot = 1 . This step leverages the shadow variable structure to extract reward information from state transitions. 
+
+Step 2 (Identify Qπ and V π ). Define the imputed reward 
+
+eRt := OtRt + (1 − Ot)bt(St, A t, S t+1 ), (4) and solve the Bellman recursion 
+
+Qπt (s, a ) = E[ eRt + V πt+1 (St+1 , O t) | St = s, A t = a],V πt (s, o −) = X
+
+> a
+
+πt(a | s, o −)Qπt (s, a ), V πT +1 ≡ 0.
+
+It is trivial to verify that 
+
+E[ eRt | Rt, S t, A t] = Rt, a.s. (5) 
+
+Step 3 (Identify the policy value). Compute V (π) = 
+
+E eS1∼eρ1 [V π 
+
+> 1
+
+( eS1)] by backward induction. 
+
+## 4. Estimation 
+
+In this section, we discuss estimation of policy value and propose a FQE-style estimation method. To estimate the policy value, it suffices to estimate the bridge functions {bt}
+
+from conditional moment models 
+
+E[bt(St, A t, S t+1 ) − Rt | Rt, S t, A t, O t = 1] = 0 , a.s., 
+
+(6) which can be viewed as nonparametric instrumental variable (NPIV) problems. A natural approach would be to directly minimize the squared conditional moment 
+
+min 
+
+> bt∈B (t)
+
+E
+
+h E[bt(St, A t, S t+1 )−Rt | Rt, S t, A t, O t = 1] 2i
+
+.
+
+However, this is not implementable for a single batch of trajectories because the squared conditional moments can lead to the double-sampling issue (Baird et al., 1995; Sutton et al., 1998). To circumvent the double-sampling problem, we adopt a min-max estimator for bt (Dikkala et al., 2020). The key insight is to replace the squared conditional moment with a saddle-point formulation that can be estimated from a single batch of samples. For each time step t, we solve 
+
+min 
+
+> bt∈B (t)
+
+sup 
+
+> g∈G (t)
+
+1
+
+nt
+
+X
+
+> i∈I obs
+> t
+
+(bt(St,i , A t,i , S t+1 ,i ) − Rt,i )gt(Rt,i ,St,i , A t,i ) − λ(∥gt∥2 
+
+> G(t)
+
++ Uδ2 ∥gt∥22) + λμ ∥bt∥2 
+
+> B(t)
+
+,
+
+(7) where Iobs  
+
+> t
+
+= {i ∈ { 1, . . . , n } : Ot,i = 1 } denotes the observed dataset at time t, and nt = |I obs  
+
+> t
+
+|. We denote the function classes of gt and bt by G(t), B(t), which can be chosen as finite dimensional linear spaces, and infinite dimensional spaces like RKHSs, neural networks, etc. We focus on RKHSs in this paper. Let Q(t) be the RKHS con-taining function Qt. The term λ Uδ2 ∥gt∥22 is the L2 penalty on the critic function gt. The norms ∥ · ∥ 2 
+
+> G(t)
+
+, ∥ · ∥ 2 
+
+> B(t)
+
+, ∥ · ∥ 2
+
+> Q(t)
+
+denote the functional norm associated with G(t), B(t), Q(t).
+
+λ, U, δ, μ > 0 are tuning parameters for the penalties. Then, we can substitute the estimates into fitted-Q-evaluation (FQE) algorithm and obtain the estimate of policy value bV (π). See Algorithm 1 for the point-estimated pol-icy value estimation algorithm, where we use penalized nonparametric least squares to learn Qt:
+
+bQt = arg min  
+
+> f∈Q (t)
+
+1
+
+n
+
+> n
+
+X
+
+> i=1
+
+ f (St,i , A t,i )−yt,i 
+
+2+λQ,t ∥f ∥2 
+
+> Q(t)
+
+,
+
+(8) where yt,i is defined in Algorithm 1. 5OPE for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random 
+
+Algorithm 1 Proximal FQE algorithm 
+
+Input: Offline dataset D = {τi}ni=1 , where τi =
+
+{(St,i , A t,i , O t,i , R obs  
+
+> t,i
+
+, S t+1 ,i )}Tt=1 , target policy π =
+
+{πt}Tt=1 , horizon T , function classes {B (t), G(t), Q(t)}.
+
+Initialize: bV πT +1 (·, ·) ← 0.
+
+for t = T down to 1 do Bridge fitting: Obtain ˆbt by solving Equation (7) on 
+
+Iobs  
+
+> t
+
+.
+
+Imputation: for all i = 1 , . . . , n set beRt,i ← Robs  
+
+> t,i
+
++(1 − Ot,i )ˆbt(St,i , A t,i , S t+1 ,i ).
+
+Targets for Bellman regression: if t < T then 
+
+yt,i ← beRt,i + bV πt+1 (St+1 ,i , O t,i ), i = 1 , . . . , n .
+
+else 
+
+yt,i ← beRt,i , i = 1 , . . . , n .
+
+end if Fit Qt: regress yt,i on (St,i , A t,i ) by Equation (8) to obtain bQt.
+
+Define V πt : bV πt (s, o −) ← P 
+
+> a
+
+πt(a | s, o −) bQt(s, a ).
+
+end for Output: bV (π) ← 1
+
+> n
+
+Pni=1 bV π 
+
+> 1
+
+(S1,i , 0) .
+
+## 5. Theoretical results 
+
+In this section, we establish consistency and finite-sample estimation error bounds for bridges ˆbt and the policy value. 
+
+5.1. Preliminaries Definition 5.1 (Local Rademacher Complexity (Bartlett et al., 2005)) . For any function class G defined over ran-dom variable X and radius δ > 0, the local Rademacher complexity is 
+
+Rn(G, δ ) = Eε,X 
+
+h
+
+sup 
+
+> g∈G :∥g∥2≤δ
+
+1
+
+n
+
+> n
+
+X
+
+> i=1
+
+εig(Xi)
+
+i
+
+,
+
+where {Xi} are i.i.d. samples of X and {εi} are Rademacher random variables. ∥g∥22 := E[g(X)2] is the L2
+
+norm of function g.Suppose the function class G satisfies 1. symmetric , if g ∈ G then −g ∈ G ;2. star-shaped , if g ∈ G then rg ∈ G for all r ∈ [0 , 1] ;3. b-uniformly bounded , ∥g∥∞ := sup x∈X |g(x)| ≤ b
+
+for all g ∈ G .Then, the critical radius of such function class G, denoted by 
+
+δn, is the smallest solution to the inequality Rn(G, δ ) ≤ δ2 
+
+> b
+
+.
+
+5.2. Bridge function estimation error bound 
+
+For notational simplicity, define the projection operator Tt :
+
+L2{S × A × S} → L 2{R × S × A} , which satisfies 
+
+Ttbt = E[bt(St, A t, S t+1 )|Rt, S t, A t].
+
+Assumption 5.2 (Boundedness of Tt). For any bt ∈ B (t),
+
+Ttbt ∈ G (t), and there exists L > 0 such that 
+
+∥T tbt∥G(t) ≤ L∥bt∥B(t) .
+
+Assumption 5.3 (Realizability) . Suppose the true bridge function b∗ 
+
+> t
+
+lies in function class B(t). Similarly, we also assume Qπt ∈ Q (t).In practice, the boundedness assumption often holds when the conditional distribution of St+1 given (Rt, S t, A t) is sufficiently smooth. Also, Realizability is a standard as-sumption in nonparametric estimation, requiring that the function classes are rich enough to contain the true targets. Next, we define the Bt-bounded norm subset of B(t) as 
+
+B(t) 
+
+> B
+
+:= {bt ∈ B (t) : ∥bt∥B(t) ≤ Bt} and Ut-bounded norm subset of G(t) as G(t) 
+
+> U
+
+:= {gt ∈ G (t) : ∥gt∥G(t) ≤ Ut}.
+
+Assumption 5.4 (Richness of test function class) . We sup-pose the test function approximation error within subset 
+
+G(t) 
+
+> L2∥(b−b∗
+> t)∥2
+> B(t)
+
+is bounded by 
+
+sup 
+
+> b∈B (t)
+> B
+
+inf  
+
+> gt∈G (t)
+> L2∥b−b∗
+> t∥2
+> B(t)
+
+∥gt − T t(b − b∗ 
+
+> t
+
+)∥2 ≤ ηt < ∞.
+
+This shows that function class G(t) is rich enough so that Tt(b − b∗ 
+
+> t
+
+) admits an L2-approximation within 
+
+G(t) 
+
+> L2∥(b−b∗
+> t)∥2
+> B(t)
+
+uniformly over b ∈ B (t) 
+
+> B
+
+.Now we are ready to analyze min-max estimator ˆbt esti-mated by Equation (7). 
+
+Theorem 5.5 (Projected bridge estimation error bound (Dikkala et al., 2020; Miao et al., 2022)) . For any t =1, . . . , T , suppose function class G(t) is star-shaped and symmetric. Suppose G(t) and B(t) are 1-uniformly bounded. Define product class 
+
+J (t) 
+
+> B,U
+
+:= 
+
+n
+
+(( s, a, s ′), (r, s, a )) 7 → α(bt(s, a, s ′) − b∗ 
+
+> t
+
+(s, a, s′)) gUb,t (r, s, a ) | bt − b∗ 
+
+> t
+
+∈ B (t) 
+
+> B
+
+, α ∈ [0 , 1] 
+
+o
+
+,
+
+where gUb,t = arg min gt∈G (t)
+
+> U
+
+∥gt − T t(b − b∗ 
+
+> t
+
+)∥2. De-fine the two critical radii for function class G(t)3U and 
+
+J (t) 
+
+> B,L 2B
+
+, namely δG 
+
+> t
+
+and δJ 
+
+> t
+
+, and their maximum δnt := max {δG 
+
+> t
+
+, δ J 
+
+> t
+
+}. Let δt = δnt + c0
+
+q log( c1/ζ ) 
+
+> nt
+
+. Assume 
+
+ηt ≲ δt, then if λ ≍ δ2 
+
+> t
+> U
+
+and μ ≥ 43 L2 + 36  
+
+> Btλ
+
+δ2 
+
+> t
+
+, we have with probability 1 − 3ζ, the following bound holds 
+
+Tt
+
+ ˆbt − b∗
+
+> t
+
+ 
+
+> 2
+
+≲ δt max {1, ∥b∗ 
+
+> t
+
+∥2 
+
+> B(t)
+
+}.
+
+6OPE for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random 
+
+Corollary 5.6 (RKHS cases with polynomial eigen decay) .
+
+We further suppose B(t) and G(t) are RKHSs for all t =1, . . . , T . KB,t and KG,t are the kernels of B(t) and G(t)
+
+with non-increasing eigenvalues {μB 
+
+> t,j
+
+}∞ 
+
+> j=1
+
+and {μG 
+
+> t,j
+
+}∞
+
+> j=1
+
+.We assume polynomial decay on eigenvalues, i.e., for some 
+
+αB , α G > 12 , μB 
+
+> t,j
+
+≲ j−2αB , μG 
+
+> t,j
+
+≲ j−2αG , j → ∞ .Let αmin := min {αB , α G}. Then the critical radius in The-orem 5.5 satisfy δnt ≲ max {√Ut, LB t}n− αmin 2αmin +1  
+
+> t
+
+log nt.Consequently, under the conditions of Theorem 5.5, for all 
+
+t = 1 , . . . , T , with probability at least 1 − 3ζ,
+
+∥T t(ˆbt − b∗ 
+
+> t
+
+)∥2 ≲ plog( c1/ζ )n− αmin 2αmin +1  
+
+> t
+
+log nt.
+
+Theorem 5.5 provides a finite-sample bound for the pro-jected error ∥T t(ˆbt − b∗ 
+
+> t
+
+)∥2, where linear operator Tt
+
+maps a bridge function to a conditional expectation given 
+
+(Rt, S t, A t). However, for downstream analysis we also need control of the rooted mean-squared error (RMSE) 
+
+∥ˆbt − b∗ 
+
+> t
+
+∥2.In general, converting projected error bounds into L2 error bounds is nontrivial because conditional moment problems are typically ill-posed inverse problems: the operator Tt is often compact and hence may not admit a stable inverse on an unrestricted function class. This phenomenon and the role of regularization in such conditional moment mod-els are well-studied in the semi-/nonparametric literature; see, e.g., (Chen & Reiss, 2011; Chen & Pouzo, 2012). We introduce an ill-posedness measure for the conditional ex-pectation operator Tt, following the definition in Dikkala et al. (2020). Since the true bridge b∗ 
+
+> t
+
+is not assumed to lie in B(t) 
+
+> B
+
+, we define the best approximation within the ball 
+
+bt, ∗ := arg min 
+
+> b∈B (t)
+> B
+
+∥b − b∗ 
+
+> t
+
+∥2, εt(Bt) := inf 
+
+> b∈B (t)
+> B
+
+∥b − b∗ 
+
+> t
+
+∥2.
+
+Definition 5.7 (Measure of ill-posedness) . Define the ill-posedness coefficient τt(Bt) := sup b∈B (t) 
+
+> B
+> ∥b−bt, ∗∥2
+> ∥T t(b−bt, ∗)∥2
+
+,
+
+and assume τt(Bt) < ∞.By combining Theorem 5.5 with Definition 5.7, we obtain an L2 error bound for the bridge estimator: 
+
+∥ˆbt − b∗ 
+
+> t
+
+∥2 ≤ τt(Bt)δt + ( τt(Bt) + 1) εt(Bt).
+
+The choice of Bt trades off the approximation bias εt(Bt)
+
+and the ill-posedness factor τt(Bt). Consider the whole function class B(t), where bt, ∗ = b∗ 
+
+> t
+
+and εt(Bt) = 0 under Assumption 5.3, this gives the global ill-posedness 
+
+τt := sup 
+
+> b∈B (t)
+
+∥b − bt, ∗∥2
+
+∥T t(b − bt, ∗)∥2
+
+,
+
+where we assume τt < ∞. The RMSE is given by ∥ˆbt −
+
+b∗ 
+
+> t
+
+∥2 ≲ τtδt.
+
+Theorem 5.8 (Bridge estimation error bound) . For any 
+
+t = 1 , . . . , T , suppose function class G(t) is star-shaped and symmetric. Suppose G(t) and B(t) are 1-uniformly bounded. Consider min-max estimator ˆbt estimated by Equation (7) . Define function classes star  B(t) − b∗
+
+> t
+
+ =
+
+{r(b−b∗ 
+
+> t
+
+) : b−b∗ 
+
+> t
+
+∈ B (t) 
+
+> B
+
+, r ∈ [0 , 1] }, and star  Tt(B(t) −
+
+b∗ 
+
+> t
+
+) = {r g Ub,t : b − b∗ 
+
+> t
+
+∈ B(t) 
+
+> B
+
+, r ∈ [0 , 1] }, where 
+
+gUb,t = arg min gt∈G (t)
+
+> U
+
+∥gt − T t(b − b∗ 
+
+> t
+
+)∥2. Define the δnt
+
+as the upper bound on the critical radii of G(t)3U and the two function classes. Let δt = δnt + c0
+
+q log( c1/ζ ) 
+
+> nt
+
+. Assume 
+
+ηt ≲ δt, then if λ ≍ δ2 
+
+> t
+> U
+
+and μ ≥ 43 L2 + 36  
+
+> Btλ
+
+δ2 
+
+> t
+
+, then with probability 1 − 3ζ, the following bound holds 
+
+ˆbt − b∗  
+
+> t2
+
+≲ τtδt max {1, ∥b∗ 
+
+> t
+
+∥2 
+
+> B(t)
+
+}.
+
+5.3. Policy value estimation error bound 
+
+Based on Theorem 5.8, we can further bound the OPE error of the policy value bV (π) estimated from Algorithm 1.
+
+Theorem 5.9 (Policy value estimation error bound) . Sup-pose RKHSs Q(t), B(t), G(t) have polynomial eigen-decay rate 
+
+μQ 
+
+> t,j
+
+≲ j−2αQ , μ B 
+
+> t,j
+
+≲ j−2αB , μ G 
+
+> t,j
+
+≲ j−2αG ,
+
+where αQ, α B , α G > 1/2. Define αmin =min {αQ, α B , α G} > 12 . Denote δt, ∗ = ¯δt, ∗ +
+
+c0
+
+q log( c1T /ζ ) 
+
+> n
+
+for some c0, c 1 > 0 where ¯δt, ∗ is the up-per bound of the critical radii of difference classes ∆Q(t),
+
+∆Q(t+1) , ∆B(t) and G(t) 
+
+> U
+
+defined in Appendix G. Suppose 
+
+λQ,t ≍ (δ∆(t)
+
+> Q
+
+)2 and let τmax = max t≤T τt. Under As-sumptions 2.3, 2.4, 5.2 and 5.3 and assumptions for The-orem 3.6, with probability at least 1 − ζ, the policy value estimation error is bounded by 
+
+bV (π) − V (π) ≲ Kτ max T 2plog( c1T /ζ )n− αmin 2αmin +1 log n. 
+
+Without considering the ill-posedness, our OPE error bound achieves the optimal rate in n in the classical nonparamet-ric regression (Stone, 1982). Our error bound exhibits a T 2
+
+dependence on the horizon, which arises from error propaga-tion through the Bellman recursion and the additional com-plexity introduced by estimating bridge functions under the MNAR setting. For comparison, Wang et al. (2024) provide a fine-grained analysis of FQE under fully observed rewards. Under the completeness assumption for Q-functions alone, they establish an error bound of order O(T 1.5p1/n ) for both parametric and nonparametric settings, improving upon the O(T 2pκ/n ) bounds in prior work (Duan et al., 2020; Zhang et al., 2022). With an additional realizability assump-tion on the probability ratio functions wπt , the rate further 7OPE for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random 
+
+improves to O(T ˜κp1/n ), matching the sharpest known bound under the tabular setting (Yin & Wang, 2020). The additional T factor in our bound compared to the T 1.5 rate in Wang et al. (2024) partially reflects the cost of correcting for MNAR rewards through the bridge function mechanism. 
+
+## 6. Experiments 
+
+In this section, we evaluate the performance of the proposed OPE estimator with rewards MNAR on both simulated and real-world data. We compare our method with four base-lines: an IPW-based OPE method (Wang et al., 2025), a naive FQE baseline, an imputation-based OPE method and a reward-shaping-based OPE method (Parbhoo et al., 2020). The naive FQE estimator ignores the MNAR mechanism and applies FQE directly to the observed rewards. The IPW baseline adapts the weighting scheme of Wang et al. (2025), which was originally developed for a trajectory dropout model. The imputation-based baseline learns the reward function by regression and imputes the unobserved reward using the fitted model. The reward-shaping baseline, named SCOPE, uses per-step importance sampling with potential-based reward shaping. We present results on simulation studies and a real-data application below. Our code is available at https:// github.com/NAIVlab/ShadOPE .
+
+6.1. Simulation studies 
+
+We conduct simulation studies in finite-horizon episodic MDPs to evaluate the proposed method under varying miss-ingness levels and reward generation mechanisms. We com-pare ProxFQE against four baselines, naive FQE, IPW-FQE, Impute-FQE, and SCOPE, over 50 random seeds. We set state St = ( St, 1, S t, 2)⊤ ∈ S = R2 as a two-dimensional vector. The action space is binary, A =
+
+{− 1, 1}. Let O = {0, 1} and R = R. The propensity score is set as 
+
+et(St, A t, R t) = expit  c0−0.1At+0 .2(1 , −2) ⊤St+2 .5Rt
+
+
+
+where c0 is calibrated to attain target missing rates ranging from 20% to 80% . The target policy we want to evaluate is given by 
+
+Pπ (At = 1 | St, O t−1) = expit 3[(1 , 0.3) ⊤St + 0 .5
+
+− 0.8(2 Ot−1 − 1)] 
+
+See Figure 4 in Appendix C for visualization of the gener-ated data. For function classes, we choose Gaussian kernels for G(t)
+
+and B(t). We report MSE under three settings: varying the sample size, varying the horizon length, and varying the reward generation mechanism. Specifically, we consider 
+
+n ∈ { 64 , 128 , 256 , 512 , 1024 , 2048 } with T = 8 , and T ∈{2, 4, 8, 16 , 32 } with n = 512 . More simulation details can be found in Appendix C.1. Figure 2 shows the MSE of prox (our method), and four baselines naive (naive FQE), ipw (IPW-FQE), impute 
+
+(Impute-FQE), and scope (SCOPE) under three MNAR missingness levels, approximately 20% , 40% , and 80% .Across all three panels, prox achieves the fastest error decay in n and consistently the smallest MSE, with its ad-vantage growing under heavier missingness. The baselines plateau at non-vanishing bias floors ( naive , ipw ), am-plify selection bias ( impute ), or degrade under high miss-ingness ( scope ), consistent with our theoretical analysis. Overall, the results demonstrate that prox is the most accu-rate and stable estimator in this setting. Additional simulation results for varying horizon lengths and different reward generation mechanisms are reported in Appendix C in the Supplemental Materials. 
+
+6.2. Application: MIMIC-III Sepsis data 
+
+We evaluate our method on a real-world clinical dataset from the MIMIC-III database (Johnson et al., 2016), using the sepsis cohort and pre-processing pipeline of Raghu et al. (2017). The dataset consists of ICU patients meeting the Sepsis-3 criteria, where physiological measurements, lab values, and treatment records are aggregated into 4-hour windows. Each patient’s state at time t is represented by a 48-dimensional feature vector comprising demographics and static indices (e.g., age, SOFA score, SIRS), laboratory values, vital sign, and intake/output variables. The action space consists of 25 discrete treatment options formed by 5 vasopressor dose levels × 5 IV fluid dose levels, where non-zero dosages are discretized into quartiles. We retain patients with at least 10 recorded time steps and truncate to the first 10, yielding a horizon of T = 10 
+
+with 13,943 patients. The reward at each step is defined as Rt = −(SOF A t+1 − SOF A t). Since the MIMIC-III rewards are fully observed, we introduce synthetic MNAR missingness to evaluate our method. The target policy is constructed by training a Double DQN on the fully-observed data and then applying a conservative dose reduction, yield-ing a missingness-aware policy π(a | st, o t−1). Additional setups are provided in Appendix C.4. We compare prox against oracle (oracle FQE), which uses fully observed rewards as a reference), naive ,
+
+impute , ipw , and scope .Figure 3 presents the results (full numerical results are pro-vided in Table 1 in Appendix C.4). prox attains the lowest bias across all missing rates and remains close to oracle 
+
+even under severe missingness, while all baselines exhibit substantially larger and growing bias as the missing rate 8OPE for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random 26 27 28 29 210 211                             
+
+> n
+> 28
+> 26
+> 24
+> 22
+> 20
+> 22
+> 24
+> 26
+> 28
+> MSE (log2 scale)
+> MSE vs n (missingness ~20%)
+> 26272829210 211
+> n
+> 28
+> 26
+> 24
+> 22
+> 20
+> 22
+> 24
+> 26
+> MSE (log2 scale)
+> MSE vs n (missingness ~40%)
+> 26272829210 211
+> n
+> 25
+> 23
+> 21
+> 21
+> 23
+> MSE (log2 scale)
+> MSE vs n (missingness ~80%)
+> method
+> naive prox ipw impute scope
+
+Figure 2. MSE vs. sample size ( n) under three MNAR missingness percentages ( ∼20% , ∼40% , ∼80% ). prox consistently achieves the lowest MSE across all sample sizes and missingness levels, with MSE decreasing steadily as n grows. 20% 40% 60% 80%          
+
+> MNAR Missing Rate
+> 0.0
+> 2.5
+> 5.0
+> 7.5
+> 10.0
+> 12.5
+> 15.0
+> 17.5
+> 20.0
+> V( )
+> (a) Estimated Policy Value V()
+> 20% 40% 60% 80%
+> MNAR Missing Rate
+> 0.0
+> 2.5
+> 5.0
+> 7.5
+> 10.0
+> 12.5
+> 15.0
+> 17.5
+> |V( ) VOracle |
+> (b) Absolute Bias vs Oracle
+> oracle prox ipw naive impute
+
+Figure 3. OPE results on MIMIC-III sepsis data under MNAR missing rates from 20% to 80%. (a) Estimated policy value ˆV (π) with standard error bars. oracle FQE (gray) uses fully observed rewards as a reference. (b) Absolute bias relative to oracle FQE. SCOPE is excluded due to degenerate estimates. 
+
+increases. scope produces degenerate estimates due to near-zero importance weight overlap and is excluded from the figure. 
+
+## 7. Conclusion and Discussion 
+
+We study OPE in MDPs with MNAR rewards, proposing a bridge function approach that recovers the conditional mean reward without explicitly modeling the missingness mechanism. Unlike IPW-based methods (Wang et al., 2025) that require external auxiliary variables, our method uses the next state as an endogenous shadow variable, avoiding additional data requirements and IPW variance inflation. A limitation of our framework is that the reward missingness process may still be influenced by unobserved confounding factors that are not fully captured by the observed trajecto-ries. While our identification relies on assumptions through the bridge function, violations of these assumptions may lead to biased policy value estimates in practice. To address this concern, an important future direction is to incorporate sensitivity analysis into the proposed OPE framework. By parameterizing deviations from the bridge moment conditions or the completeness assumptions, one can assess the robustness of policy value estimates to poten-tial unobserved confounding in the missingness mechanism. Such sensitivity analyses have been studied in proximal causal inference and POMDPs, and adapting their frame-works from proximal causal inference and POMDPs to the reward-missingness mechanism in MDPs is an important direction for future work. 
+
+## Acknowledgement 
+
+Qu’s research is partially supported by NSF Grant DMS 2515275, NCI grant 1R01CA297869, NSF Grant CDS&E-MSS 2401271. Miao’s research is partially supported by Texas Artificial Intelligence Institute at University of Texas at Dallas. 
+
+## Impact Statement 
+
+This paper presents work whose goal is to advance the field of machine learning. There are many potential societal consequences of our work, none of which we feel must be specifically highlighted here. 9OPE for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random 
+
+## References 
+
+Achiam, J., Adler, S., Agarwal, S., Ahmad, L., Akkaya, I., Aleman, F. L., Almeida, D., Altenschmidt, J., Altman, S., Anadkat, S., et al. Gpt-4 technical report. arXiv preprint arXiv:2303.08774 , 2023. Baird, L. et al. Residual algorithms: Reinforcement learn-ing with function approximation. In Proceedings of the twelfth international conference on machine learning , pp. 30–37, 1995. Bartlett, P. L., Bousquet, O., and Mendelson, S. Local rademacher complexities. 2005. Bennett, A. and Kallus, N. Proximal reinforcement learning: Efficient off-policy evaluation in partially observed markov decision processes. arXiv preprint arXiv:2110.15332 , 2021. Bennett, A., Kallus, N., Li, L., and Mousavi, A. Off-policy evaluation in infinite-horizon reinforcement learning with latent confounders. In International Conference on Artifi-cial Intelligence and Statistics , pp. 1999–2007. PMLR, 2021. Chen, J. and Jiang, N. Information-theoretic considera-tions in batch reinforcement learning. In International conference on machine learning , pp. 1042–1051. PMLR, 2019. Chen, X. and Pouzo, D. Estimation of nonparametric condi-tional moment models with possibly nonsmooth general-ized residuals. Econometrica , 80(1):277–321, 2012. Chen, X. and Reiss, M. On rate optimality for ill-posed inverse problems in econometrics. Econometric Theory ,27(3):497–521, 2011. Chu, J., Yang, S., and Lu, W. Multiply robust off-policy evaluation and learning under truncation by death. In 
+
+International Conference on Machine Learning , pp. 6195– 6227. PMLR, 2023. Cui, Y., Pu, H., Shi, X., Miao, W., and Tchetgen Tchetgen, E. Semiparametric proximal causal inference. Journal of the American Statistical Association , 119(546):1348–1359, 2024. Devlin, S. and Kudenko, D. Dynamic potential-based re-ward shaping. Proceedings of the 11th International Con-ference on Autonomous Agents and Multiagent Systems ,pp. 433–440, 2012. Dikkala, N., Lewis, G., Mackey, L., and Syrgkanis, V. Mini-max estimation of conditional moment models. Advances in Neural Information Processing Systems , 33:12248– 12262, 2020. Duan, Y., Jia, Z., and Wang, M. Minimax-optimal off-policy evaluation with linear function approximation. In 
+
+International Conference on Machine Learning , pp. 2701– 2709. PMLR, 2020. Duan, Y., Jin, C., and Li, Z. Risk bounds and rademacher complexity in batch reinforcement learning. In Interna-tional Conference on Machine Learning , pp. 2892–2902. PMLR, 2021. Enders, C. K. Applied missing data analysis . Guilford Publications, 2022. Finn, C., Yu, T., Fu, J., Abbeel, P., and Levine, S. General-izing skills with semi-supervised reinforcement learning. 
+
+arXiv preprint arXiv:1612.00429 , 2016. Fischer, S. and Steinwart, I. Sobolev norm learning rates for regularized least-squares algorithms. Journal of Machine Learning Research , 21(205):1–38, 2020. Foster, D. J. and Syrgkanis, V. Orthogonal statistical learn-ing. The Annals of Statistics , 51(3):879–908, 2023. Fukumizu, K., Gretton, A., Lanckriet, G., Sch ¨olkopf, B., and Sriperumbudur, B. K. Kernel choice and classifia-bility for rkhs embeddings of probability distributions. 
+
+Advances in neural information processing systems , 22, 2009. Harutyunyan, A., Brys, T., Vrancx, P., and Now ´e, A. Off-policy reward shaping with ensembles. arXiv preprint arXiv:1502.03248 , 2015. Hong, M., Qi, Z., and Xu, Y. A policy gradient method for confounded pomdps. arXiv preprint arXiv:2305.17083 ,2023. Jaakkola, T., Singh, S. P., and Jordan, M. I. Reinforce-ment learning algorithm for partially observable markov decision problems. Advances in Neural Information Pro-cessing Systems , pp. 345–352, 1995. Johnson, A. E., Pollard, T. J., Shen, L., Lehman, L.-w. H., Feng, M., Ghassemi, M., Moody, B., Szolovits, P., An-thony Celi, L., and Mark, R. G. Mimic-iii, a freely ac-cessible critical care database. Scientific data , 3(1):1–9, 2016. Kaelbling, L. P., Littman, M. L., and Cassandra, A. R. Plan-ning and acting in partially observable stochastic do-mains , volume 101. Elsevier, 1998. Kallus, N. and Uehara, M. Double reinforcement learning for efficient off-policy evaluation in markov decision pro-cesses. In International Conference on Machine Learning ,pp. 5078–5088. PMLR, 2020. 10 OPE for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random 
+
+Kallus, N. and Zhou, A. Confounding-robust policy evalua-tion in infinite-horizon reinforcement learning. Advances in Neural Information Processing Systems , 33:22293– 22304, 2020. Kress, R. Linear integral equations , volume 82. Springer, 1989. Krieg, D. Tensor power sequences and the approximation of tensor product operators. Journal of Complexity , 44: 30–51, 2018. Kuang, Q., Wang, J., Zhou, F., and Qi, Z. Breaking the order barrier: Off-policy evaluation for confounded pomdps. 
+
+Advances in Neural Information Processing Systems , 38: 49491–49538, 2026. Le, H. M., Voloshin, C., and Yue, Y. Batch policy learning under constraints. International Conference on Machine Learning , pp. 3703–3712, 2019. Levine, S., Kumar, A., Tucker, G., and Fu, J. Offline rein-forcement learning: Tutorial, review, and perspectives on open problems. arXiv preprint arXiv:2005.01643 , 2020. Li, A., Boots, B., and Cheng, C.-A. Mahalo: Unifying offline reinforcement learning and imitation learning from observations. In International Conference on Machine Learning , pp. 19360–19384. PMLR, 2023. Li, Y., Han, E., Hu, Y., Zhou, W., Qi, Z., Cui, Y., and Zhu, R. Reinforcement learning with continuous actions under unmeasured confounding. Journal of the American Statistical Association , (just-accepted):1–26, 2025. Little, R. J. and Rubin, D. B. Statistical analysis with miss-ing data. John Wiley & Sons , 2019. Littman, M. and Sutton, R. S. Predictive representations of state. Advances in neural information processing systems ,14, 2001. Liu, Q., Li, L., Tang, Z., and Zhou, D. Breaking the curse of horizon: Infinite-horizon off-policy estimation. Advances in Neural Information Processing Systems , 31, 2018. Majumdar, R., Teversham, J., and Parbhoo, S. Concept-based off-policy evaluation. In Reinforcement Learning Conference , 2025. Mandel, T., Liu, Y.-E., Levine, S., Brunskill, E., and Popovic, Z. Offline policy evaluation across representa-tions with applications to educational games. Proceedings of AAMAS , 2014. Miao, R., Qi, Z., and Zhang, X. Off-policy evaluation for episodic partially observable markov decision processes under non-parametric models. Advances in Neural Infor-mation Processing Systems , 35:593–606, 2022. Miao, W. and Tchetgen, E. T. Identification and infer-ence with nonignorable missing covariate data. Statistica Sinica , 28(4):2049, 2018. Miao, W. and Tchetgen Tchetgen, E. J. On varieties of doubly robust estimators under missingness not at random with a shadow variable. Biometrika , 103(2):475–482, 2016. Miao, W., Tchetgen Tchetgen, E., and Geng, Z. Identifica-tion and doubly robust estimation of data missing not at random with an ancillary variable. 2015. Miao, W., Geng, Z., and Tchetgen Tchetgen, E. J. Identify-ing causal effects with proxy variables of an unmeasured confounder. Biometrika , 105(4):987–993, 2018. Mohan, K. and Pearl, J. Graphical models for processing missing data. Journal of the American Statistical Associ-ation , 116(534):1023–1037, 2021. Munos, R. Error bounds for approximate policy iteration. In Proceedings of the Twentieth International Conference on International Conference on Machine Learning , pp. 560–567, 2003. Munos, R. Performance bounds in l p-norm for approximate value iteration. SIAM journal on control and optimization ,46(2):541–561, 2007. Murphy, S. A. Optimal dynamic treatment regimes. Jour-nal of the Royal Statistical Society: Series B (Statistical Methodology) , 65(2):331–355, 2003. Ng, A. Y., Harada, D., and Russell, S. Policy invariance under reward transformations: Theory and application to reward shaping. In International Conference on Machine Learning , pp. 278–287, 1999. Ouyang, L., Wu, J., Jiang, X., Almeida, D., Wainwright, C., Mishkin, P., Zhang, C., Agarwal, S., Slama, K., Ray, A., et al. Training language models to follow instructions with human feedback. Advances in Neural Information Processing Systems , 35:27730–27744, 2022. Parbhoo, S., Gottesman, O., and Doshi-Velez, F. Shaping control variates for off-policy evaluation. In Offline Re-inforcement Learning Workshop at Neural Information Processing Systems (NeurIPS) , pp. 93, 2020. Park, S., Lu, W., and Yang, S. Evaluating and learning optimal dynamic treatment regimes under truncation by death. arXiv preprint arXiv:2510.07501 , 2025. Rafailov, R., Sharma, A., Mitchell, E., Manning, C. D., Ermon, S., and Finn, C. Direct preference optimiza-tion: Your language model is secretly a reward model. 
+
+Advances in neural information processing systems , 36: 53728–53741, 2023. 11 OPE for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random 
+
+Raghu, A., Komorowski, M., Ahmed, I., Celi, L., Szolovits, P., and Ghassemi, M. Deep reinforcement learning for sepsis treatment. arXiv preprint arXiv:1711.09602 , 2017. Rashidinejad, P., Zhu, B., Ma, C., Jiao, J., and Russell, S. Bridging offline reinforcement learning and imitation learning: A tale of pessimism. In Advances in Neural Information Processing Systems , volume 34, pp. 11702– 11716, 2021. Shao, J. and Wang, L. Semiparametric inverse propensity weighting for nonignorable missing data. Biometrika ,103(1):175–187, 2016. Shi, C., Uehara, M., Huang, J., and Jiang, N. A minimax learning approach to off-policy evaluation in confounded partially observable markov decision processes. In Inter-national Conference on Machine Learning , pp. 20057– 20094. PMLR, 2022. Shi, L., Li, G., Wei, Y., Chen, Y., and Chi, Y. Pessimistic q-learning for offline reinforcement learning: Towards optimal sample complexity. In International Conference on Machine Learning , pp. 31335–31385. PMLR, 2023. Singh, S. P., Littman, M. L., Jong, N. K., Pardoe, D., and Stone, P. Learning predictive state representations. In 
+
+Proceedings of the 20th International Conference on Ma-chine Learning (ICML-03) , pp. 712–719, 2003. Stone, C. J. Optimal global rates of convergence for nonpara-metric regression. The annals of statistics , pp. 1040–1053, 1982. Sun, B. and Tchetgen Tchetgen, E. J. Semiparametric esti-mation with data missing not at random using an instru-mental variable. Statistica Sinica , 28(4):1965, 2018. Sutton, R. S., Barto, A. G., et al. Reinforcement learning: An introduction , volume 1. MIT press Cambridge, 1998. Tchetgen Tchetgen, E. J., Ying, A., Cui, Y., Shi, X., and Miao, W. An introduction to proximal causal learning. 
+
+arXiv preprint arXiv:2009.10982 , 2020. Tennenholtz, G., Shalit, U., and Mannor, S. Off-policy eval-uation in partially observable environments. Proceedings of the AAAI Conference on Artificial Intelligence , 34(06): 10276–10283, 2020. Tsiatis, A. A., Davidian, M., Holloway, S. T., and Laber, E. B. Dynamic Treatment Regimes: Statistical Methods for Precision Medicine . CRC press, 2019. Uehara, M., Shi, C., and Kallus, N. A review of off-policy evaluation in reinforcement learning. arXiv preprint arXiv:2212.06355 , 2022. Uehara, M., Kiyohara, H., Bennett, A., Chernozhukov, V., Jiang, N., Kallus, N., Shi, C., and Sun, W. Future-dependent value-based off-policy evaluation in pomdps. 
+
+Advances in neural information processing systems , 36: 15991–16008, 2023. Voloshin, C., Le, H. M., Jiang, N., and Yue, Y. Empirical study of off-policy policy evaluation for reinforcement learning. arXiv preprint arXiv:1911.06854 , 2019. Wainwright, M. J. High-dimensional statistics: A non-asymptotic viewpoint , volume 48. Cambridge university press, 2019. Wang, H., Xu, Y., Lu, W., and Song, R. Off-policy evalu-ation under nonignorable missing data. arXiv preprint arXiv:2507.06961 , 2025. Wang, J., Qi, Z., and Wong, R. K. A fine-grained analysis of fitted q-evaluation: beyond parametric models. arXiv preprint arXiv:2406.10438 , 2024. Xie, T., Cheng, C.-A., Jiang, N., Mineiro, P., and Agar-wal, A. Bellman-consistent pessimism for offline rein-forcement learning. In Advances in Neural Information Processing Systems , volume 34, pp. 6683–6694, 2021. Xu, Y., Zhu, J., Shi, C., Luo, S., and Song, R. An instrumen-tal variable approach to confounded off-policy evaluation. In International Conference on Machine Learning , pp. 38848–38880. PMLR, 2023. Yang, L., Cui, Y., Xuan, Y., Wang, C., Belongie, S., and Estrin, D. Unbiased offline recommender evaluation for missing-not-at-random implicit feedback. In Proceedings of the 12th ACM conference on recommender systems , pp. 279–287, 2018. Yin, M. and Wang, Y.-X. Asymptotically efficient off-policy evaluation for tabular reinforcement learning. In Inter-national Conference on Artificial Intelligence and Statis-tics , volume 108 of Proceedings of Machine Learning Research , pp. 3948–3958. PMLR, 2020. Zhan, W., Huang, B., Huang, A., Jiang, N., and Lee, J. D. Of-fline reinforcement learning with realizability and single-policy concentrability. In Conference on Learning Theory ,pp. 2730–2775. PMLR, 2022. Zhang, R., Zhang, X., Ni, C., and Wang, M. Off-policy fitted q-evaluation with differentiable function approximators: Z-estimation and inference theory. In International Con-ference on Machine Learning , pp. 26713–26749. PMLR, 2022. Zhang, Y. and Jiang, N. On the curses of future and his-tory in future-dependent value functions for off-policy evaluation. Advances in Neural Information Processing Systems , 37:124756–124790, 2024. 12 OPE for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random 
+
+Zhang, Y. and Jiang, N. Statistical tractability of off-policy evaluation of history-dependent policies in pomdps. arXiv preprint arXiv:2503.01134 , 2025. Zheng, Q., Henaff, M., Amos, B., and Grover, A. Semi-supervised offline reinforcement learning with action-free trajectories. In International conference on machine learning , pp. 42339–42362. PMLR, 2023. 13 OPE for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random 
+
+## A. Related Work 
+
+OPE. Off-policy evaluation has been extensively studied in the RL literature. Classical methods include IS and its variants (Liu et al., 2018), FQE (Le et al., 2019), and doubly robust estimators that combine both (Kallus & Uehara, 2020). Recent advances in offline RL have developed pessimistic approaches (Xie et al., 2021; Rashidinejad et al., 2021; Shi et al., 2023; Zhan et al., 2022) that achieve near-optimal sample complexity. For comprehensive reviews, see Uehara et al. (2022) and Levine et al. (2020). OPE in POMDPs has received growing attention, with works addressing latent confounding (Bennett et al., 2021; Kallus & Zhou, 2020), partial observability (Tennenholtz et al., 2020; Shi et al., 2022; Miao et al., 2022), and future-dependent estimation (Uehara et al., 2023; Zhang & Jiang, 2024). More recent extensions study OPE of history-dependent policies through model-based methods (Zhang & Jiang, 2025), confounded POMDPs (Kuang et al., 2026), and concept-based representations (Majumdar et al., 2025). These works tackle partial observability in the state process, while our work addresses a complementary challenge: MNAR missingness in the reward process under a fully observed MDP. 
+
+Missing Data. Missing data problems have been extensively studied in statistics (Little & Rubin, 2019; Enders, 2022). Under missing at random (MAR) assumptions, inverse probability weighting and doubly robust methods are well-established. For MNAR, identification typically requires additional structure such as instrumental variables (Sun & Tchetgen Tchetgen, 2018), shadow variables (Shao & Wang, 2016; Miao & Tchetgen Tchetgen, 2016; Miao et al., 2018), or graphical constraints (Mohan & Pearl, 2021). Proximal causal inference (Tchetgen Tchetgen et al., 2020; Bennett & Kallus, 2021; Cui et al., 2024) has emerged as a powerful framework for handling unmeasured confounding using proxy variables. Our work extends these ideas to the OPE setting with MNAR rewards, leveraging future states as shadow variables for identification. 
+
+Reward Shaping. Potential-based reward shaping augments rewards with a potential difference to densify sparse feedback while preserving the optimal policy (Ng et al., 1999), with later extensions to dynamic shaping and off-policy settings (Devlin & Kudenko, 2012; Harutyunyan et al., 2015; Parbhoo et al., 2020). These methods are designed to accelerate policy learning or reduce variance under fully observed rewards, whereas our work targets identification under MNAR rewards via a bridge function. 
+
+Semi-supervised RL. Our setting also relates to semi-supervised RL and partially reward-labeled sequential decision-making, including semi-supervised RL with rewards available only in labeled MDPs (Finn et al., 2016), semi-supervised offline RL with mixed labeled and unlabeled trajectories (Zheng et al., 2023), and offline policy learning with partially reward-labeled trajectories (Li et al., 2023). These works focus on policy learning or reward modeling under label scarcity, whereas we target off-policy evaluation under an MNAR missingness mechanism that depends on the latent reward. 
+
+## B. Discussion on shadow variables 
+
+In the causal inference literature on missing data, identification typically requires additional assumptions, most commonly instantiated through either instrumental variables or shadow variables. Shadow-variable approaches (Miao et al., 2015; Miao & Tchetgen Tchetgen, 2016) leverage a fully observed variable that is informative about the outcome while being conditionally independent of the missingness mechanism given covariates and the (possibly unobserved) outcome. In contrast, instrumental-variable approaches (Sun & Tchetgen Tchetgen, 2018) posit a variable that shifts the missingness mechanism but has no direct effect on the outcome. In sequential decision making, Wang et al. (2025) develop an approach that requires specifying a stage-wise shadow variable 
+
+Zt that satisfies conditional independence with dropout given (St, A t, R t+1 , S t+1 ) while remaining informative about 
+
+(Rt+1 , S t+1 ) on the observed subset, effectively providing the identifying leverage needed to learn the dropout model. While such a choice can be plausible, it may rely on additional measurements or domain knowledge to select a valid Zt. In contrast, we adopt an endogenous choice of shadow variable, which is the next state St+1 . Under the exclusion restriction and relevance condition in Assumptions 3.1 and 3.2, St+1 provides a readily available proxy for the MNAR reward without introducing an extra auxiliary variable. Moreover, a natural extension of St+1 is a multi-step future variable, or a low-dimensional summary thereof. This aligns with a broader predictive-state perspective in POMDPs, where future observations are used to encode information about the latent state (Littman & Sutton, 2001; Singh et al., 2003). More recently, Xu et al. (2023); Uehara et al. (2023) use multi-step 14 OPE for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random 
+
+futures to stand in for the unobserved state: instead of conditioning on the latent state, they condition on a future window and learn quantities from it, using the future window as a proxy that carries latent-state information. In missing data problems in MDPs, using longer futures can carry richer information about the missing rewards, and may make relevance and completeness-type conditions more plausible, but it also increases the statistical and computational burden as the future window grows. In practice, these tradeoffs motivate using compact summaries of multi-step futures. 
+
+## C. Additional Experiment Details 
+
+C.1. Additional simulation setups 
+
+We set the behavior policy that generates the offline trajectories as 
+
+Pπb (At = 1 | St) = expit  0.3 + (0 .8, −0.3) ⊤St
+
+.
+
+The next state St+1 is generated by transition kernel St+1 = 0 .9St + 0 .2At12 + N (0 , 0.12I2) where 12 = (1 , 1) ⊤ and initial state S1 ∼ N (0 , I 2). We consider two reward generation mechanisms. The first is the sigmoid reward model used in other simulations: 
+
+Rt = expit([0 .9 − 0.6At, −0.7] ⊤St + [1 .3, 2] ⊤St+1 − 0.4At) + Ut, Ut ∼ Unif[ −0.1, 0.1] ,
+
+and the second is a linear reward model: 
+
+Rt = clip([0 .5, −0.3] ⊤St + [0 .8, 0.6] ⊤St+1 − 0.3At + ϵt, −1, 1) , ϵt ∼ N (0 , 0.01) .
+
+The true policy value is estimated by Monte Carlo using 5000 independent trajectories generated under the target policy. We visualize the generated data for the setting n = 1000 , T = 10 , and random seed 44 ; see Figure 4 for an overview. For all the RKHSs, the bandwidths are selected by median heuristic trick (Fukumizu et al., 2009); parameter δ is set to 
+
+δt = 5 n−0.4 
+
+> t
+
+according to (Dikkala et al., 2020). The penalty parameter λrkhs is chosen by cross-validation. 
+
+Figure 4. Data overview. Left : histogram of the true reward rtrue with three overlays: overall (blue), observed O=1 (orange), and missing O=0 (red). The total missing rate is 11 .60% . Missing mass is relatively larger in the low–reward region. Middle : state value 
+
+St = ( s1, s 2) colored by action (blue: a= − 1, red: a= + 1 ) according to target policy, showing both actions across the state space without obvious coverage gaps. Right : state value St = ( s1, s 2) colored by missingness (yellow: O=1 , purple: O=0 ); the non-uniform placement of missing points indicates observation probability varies with state. 
+
+C.2. Baseline methods for simulation 
+
+C.2.1. N AIVE FQE In naive FQE baseline, we ignore the missingness mechanism, and perform FQE only on observed samples: 
+
+bQnaive  
+
+> t
+
+= arg min 
+
+> Q∈Q (t)
+
+1
+
+nt
+
+X
+
+> i∈I obs
+> t
+
+
+
+Q(St,i , A t,i ) − ynaive 
+
+> t,i
+
+2
+
++ λrkhs ∥Q∥2 
+
+> Q(t)
+
+,
+
+15 OPE for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random 
+
+where 
+
+ynaive  
+
+> t,i
+
+=
+
+(
+
+Rt,i , t = T, Rt,i + P 
+
+> a∈A
+
+π(a | St+1 ,i , O t,i ) bQnaive  
+
+> t+1
+
+(St+1 ,i , a ), t < T. 
+
+As discussed in Section 3, under reward MNAR we generally have 
+
+E[Rt | St = s, A t = a, O t = 1] ̸ = E[Rt | St = s, A t = a] for some (s, a ),
+
+so naive FQE, which regresses on observed rewards, can be biased. C.2.2. IPW-FQE We adapt the IPW-based FQE method of Wang et al. (2025) to our reward MNAR setting. Since the true reward Rt is unobserved when Ot = 0 , we cannot directly condition the propensity score on Rt. Instead, we first fit an RKHS bridge function ˆbt on observed samples (Ot = 1) to obtain eRt, and then estimate the extended propensity score via logistic regression on features (St, A t, ˆbt):
+
+ˆet(St, A t, ˆbt) = ˆP (Ot = 1 | St, A t, ˆbt).
+
+At each stage t, IPW-FQE solves a weighted kernel ridge regression on the observed subset Iobs  
+
+> t
+
+:
+
+bQipw  
+
+> t
+
+= arg min 
+
+> Q∈Q (t)
+
+1
+
+nt
+
+X
+
+> i∈I obs
+> t
+
+wt,i 
+
+
+
+Q(St,i , A t,i ) − yipw 
+
+> t,i
+
+2
+
++ λrkhs ∥Q∥2 
+
+> Q(t)
+
+,
+
+where wt,i = 1ˆet,i and 
+
+yipw  
+
+> t,i
+
+=
+
+(
+
+Rt,i , t = T, Rt,i + P 
+
+> a∈A
+
+π(a | St+1 ,i , O t,i ) bQipw 
+
+> t+1
+
+(St+1 ,i , a ), t < T. 
+
+C.2.3. I MPUTE -FQE At each step t, we fit a kernel ridge regression on the observed subset to learn the conditional mean of the reward function 
+
+mt(St, A t). The imputed rewards are then constructed as 
+
+eRimp  
+
+> t,i
+
+= Ot,i · Rt,i + (1 − Ot,i ) · ˆmt(St,i , A t,i ),
+
+and FQE proceeds on all nt samples using eRimp  
+
+> t,i
+
+in place of Rt,i :
+
+bQimp  
+
+> t
+
+= arg min 
+
+> Q∈Q (t)
+
+1
+
+n
+
+> n
+
+X
+
+> i=1
+
+
+
+Q(St,i , A t,i ) − yimp 
+
+> t,i
+
+2
+
++ λrkhs ∥Q∥2 
+
+> Q(t)
+
+,
+
+where 
+
+yimp  
+
+> t,i
+
+=
+
+( eRimp  
+
+> t,i
+
+, t = T, 
+
+eRimp  
+
+> t,i
+
++ P 
+
+> a∈A
+
+π(a | St+1 ,i , O t,i ) bQimp 
+
+> t+1
+
+(St+1 ,i , a ), t < T. 
+
+Since ˆmt is trained only on the observed subset {i : Ot,i = 1 }, it estimates E[Rt | St, A t, O t = 1] rather than E[Rt | St, A t].Under MNAR, the imputed values inherit the selection bias from the observed subsample, leading to biased Q-function estimates. C.2.4. SCOPE SCOPE (Parbhoo et al., 2020) is a per-step importance sampling estimator designed for sparse reward settings, which incorporates potential-based reward shaping (Ng et al., 1999) as a control variate to reduce variance. To apply SCOPE in our MNAR setting, we replace unobserved rewards with zero. This introduces bias because under MNAR, missingness is informative and zero-imputation does not recover the true expected reward. 16 OPE for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random 
+
+C.3. Other simulation results 
+
+Figure 5 reports MSE as the horizon T varies from 2 to 32 . Error compounding in backward induction affects all methods, but the growth rate differs markedly. prox remains below MSE ≈ 1 for T ≤ 16 across all missingness levels, whereas 
+
+ipw already exceeds 10 2 at T = 16 under ∼40% missingness. impute is the worst-performing method at longer horizons, with MSE exceeding 10 8 at T = 32 under ∼20% missingness, because imputation errors at each step feed into subsequent Q-function fits and amplify exponentially. scope is the most competitive baseline for short horizons ( T ≤ 4) but its per-step IS weights accumulate variance as T grows. These results highlight that the bridge-function approach in prox is particularly advantageous in long-horizon problems. 21 22 23 24 25                      
+
+> T
+> 28
+> 23
+> 22
+> 27
+> 212
+> 217
+> 222
+> 227
+> 232
+> MSE (log2 scale)
+> MSE vs T (missingness ~20%)
+> 2122232425
+> T
+> 29
+> 25
+> 21
+> 23
+> 27
+> 211
+> 215
+> MSE (log2 scale)
+> MSE vs T (missingness ~40%)
+> 2122232425
+> T
+> 27
+> 23
+> 21
+> 25
+> 29
+> 213
+> 217
+> MSE (log2 scale)
+> MSE vs T (missingness ~80%)
+> method
+> naive prox ipw impute scope
+
+Figure 5. MSE vs. horizon length ( T ) under three MNAR missingness percentages ( ∼20% , ∼40% , ∼80% ). prox scales most gracefully as T grows, maintaining orders-of-magnitude lower MSE than all baselines. ipw and impute explode at large T due to variance blow-up and compounding imputation errors, respectively. naive grows steadily as MNAR bias compounds at each backward step. 
+
+scope remains more stable than ipw but degrades sharply under high missingness. 
+
+For the reward type comparison, we fix n = 512 and T = 8 and evaluate under the two reward generation mechanisms: a bounded sigmoid reward and a clipped linear reward. Figure 6 compares MSE across the two reward generation mechanisms. Under the sigmoid reward, prox achieves MSE on the order of 10 −2, while the best baseline ( naive ) is above 10 −1 even at ∼20% missingness. The nonlinearity of the sigmoid function makes regression-based imputation particularly difficult, explaining the poor performance of impute on this reward type. Under the linear reward, all methods improve and the gap between prox and baselines narrows. Notably, impute and scope become competitive with prox at ∼80% missingness for the linear reward, suggesting that simpler reward structures are more amenable to naive correction strategies. sigmoid linear                   
+
+> Reward Type
+> 25
+> 23
+> 21
+> 21
+> 23
+> 25
+> 27
+> MSE
+> MSE by Reward Type (missingness ~20%)
+> sigmoid linear
+> Reward Type
+> 26
+> 24
+> 22
+> 20
+> 22
+> 24
+> 26
+> 28
+> MSE
+> MSE by Reward Type (missingness ~40%)
+> sigmoid linear
+> Reward Type
+> 25
+> 23
+> 21
+> 21
+> 23
+> 25
+> 27
+> MSE
+> MSE by Reward Type (missingness ~80%)
+> method
+> naive prox ipw impute scope
+
+Figure 6. MSE by reward type (sigmoid vs. linear) under three MNAR missingness percentages ( ∼20% , ∼40% , ∼80% ). For the sigmoid reward, prox achieves MSE orders of magnitude lower than all baselines. For the linear reward, the gap narrows but prox still leads. 
+
+impute performs comparably on the linear reward but poorly on sigmoid. scope degrades sharply under high missingness for sigmoid. 
+
+17 OPE for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random 
+
+C.4. Additional real data experiment setups 
+
+The propensity score is set as 
+
+et(St, A t, R t) = expit( c0 + 2 .0 · Rstd  
+
+> t
+
++ 0 .3 · Ssignal  
+
+> t
+
+− 0.1 · Anorm  
+
+> t
+
+),
+
+where Rstd  
+
+> t
+
+= ( Rt − ¯R)/sd( R) is the standardized reward, Anorm  
+
+> t
+
+is the standardized total treatment intensity (sum of vasopressor and IV fluid dose levels, then z-scored), and Ssignal  
+
+> t
+
+is a clinical severity signal defined as the normalized arterial lactate minus half the normalized mean blood pressure. The positive coefficient on the reward ( cr = 2 .0) ensures that higher rewards are more likely to be observed while lower rewards tend to be missing, reflecting a clinically plausible scenario where SOFA-based outcomes depend on lab measurements that may be ordered less frequently for deteriorating patients. The intercept c0 is calibrated via bisection to achieve target missing rates of 20%, 40%, 60%, and 80%. The target policy is constructed in two stages. First, we train a Double DQN with two hidden layers of size 128 on the original fully-observed data using the 48-dimensional state and γ = 1 .0. This produces a greedy base policy πDQN (st) over the 25 actions. Second, we construct a missingness-aware policy π(a | st, o t−1) by applying a conservative dose reduction when the previous reward is unobserved: if Ot−1 = 0 , both the vasopressor and IV fluid dose levels recommended by the DQN are reduced by one (clipped at zero). This adjustment reflects a clinically natural response—reducing treatment intensity when the previous outcome is unknown—and produces a target policy whose action distribution depends on Ot−1,consistent with the policy class in our framework. We split patients 60/40 by ID for model fitting and evaluation, respectively. On the fitting set, we train all OPE models including bridge functions, Q-networks, and auxiliary models for the baselines. Due to the high-dimensional state space and large action space, all methods use neural network function approximation, with architectures of (512 , 512 , 256) for Q-networks and bridge networks and (256 , 256) for auxiliary networks (imputation regressor, propensity classifier). On the held-out 40% test set, we compute the per-patient estimated value ˆVi(π) and report the mean and standard error. See detailed experiment results in Table 1.                                                                                                                    
+
+> Table 1. OPE results on MIMIC-III sepsis data. We report the estimated policy value ˆV(π)with standard errors and absolute bias relative to oracle FQE. 20% MNAR 40% MNAR 60% MNAR 80% MNAR Method ˆV(π)Bias ˆV(π)Bias ˆV(π)Bias ˆV(π)Bias oracle 2.94 ±0.03 —2.81 ±0.03 —2.46 ±0.03 —2.32 ±0.03 —Prox 2.99 ±0.03 0.05 3.39 ±0.03 0.58 3.81 ±0.03 1.35 4.98 ±0.03 2.66 IPW 4.15 ±0.03 1.20 5.58 ±0.03 2.77 7.10 ±0.03 4.64 11.91 ±0.04 9.59 naive 4.54 ±0.03 1.59 5.81 ±0.03 3.00 7.33 ±0.03 4.87 11.76 ±0.03 9.44 impute 6.22 ±0.03 3.27 9.55 ±0.04 6.74 13.17 ±0.04 10.71 20.02 ±0.06 17.70 scope 10408.2 ±1991.0 10405.3 −4089.2 ±786.8 4092.0 10667.9 ±2037.3 10665.4 −7096.6 ±1373.6 7099.0
+
+## D. Proof of Theorem 3.6 
+
+In this section we provide the proof of identification result in Theorem 3.6. 
+
+Part A: Identification by bridge functions 
+
+We first show that the policy value can be identified by the bridge functions {bt}Tt=1 if the bridges exist. Fix t ∈ { 1, . . . , T } and suppose there exists a measurable function bt : S × A × S → R satisfying the Equation (2). By Assumptions 2.1 and 3.3, conditioning on the event Ot = 1 is well-defined and 
+
+E[bt(St, A t, S t+1 ) | Rt, S t, A t, O t = 1] = E[bt(St, A t, S t+1 ) | Rt, S t, A t].
+
+So Equation (2) holds if and only if Equation (6) holds. For the imputed reward eRt defined by Equation (4), Equation (5) implies that it has the same conditional mean reward as Rt
+
+given (St, A t):
+
+E[ eRt | St = s, A t = a] = E[bt(s, a, S t+1 ) | St = s, A t = a] = E[Rt | St = s, A t = a] := ¯ rt(s, a ).
+
+18 OPE for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random 
+
+Now consider the augmented process. By Assumption 2.2, the augmented process is Markov, and the Bellman recursion holds with one-step reward ¯rt(St, A t):
+
+Qπt (s, a ) = E¯rt(s, a ) + V πt+1 (St+1 , O t) | St = s, A t = a,V πt (s, o −) = X
+
+> a
+
+πt(a | s, o −)Qπt (s, a ), V πT +1 ≡ 0,
+
+which is equivalent to Equation (1). Therefore, the policy value V (π) = E[V π 
+
+> 1
+
+( eS1)] is identified. 
+
+Part B: Existence of bridge functions 
+
+We now establish existence of the bridges. For a probability measure μ, let L2(μ) denote the space of all squared integrable functions of x with respect to measure μ(x), which is a Hilbert space endowed with the inner product ⟨g1, g 2⟩ =R g1(x)g2(x)dμ (x). For any s, a, t , we define operator 
+
+Tt|(s,a ) : L2 PSt+1 |s,a 
+
+ → L 2 PRt|s,a 
+
+,
+
+where (Tt|(s,a )h)( r) := Eh(St+1 ) | Rt = r, S t = s, A t = a. Its adjoint operator is defined by 
+
+T ∗ 
+
+> t|(s,a )
+
+: L2 PRt|s,a 
+
+ → L 2 PSt+1 |s,a 
+
+,
+
+where (T ∗
+
+> t|(s,a )
+
+g)( s′) = Eg(Rt) | St+1 = s′, S t = s, A t = a. Then, the bridge equation (2) can be written as a first-kind Fredholm integral equation 
+
+(Tt|(s,a )h)( r) = g(r),
+
+where the unknown functions are h(·) = bt(s, a, ·) ∈ L 2 PSt+1 |s,a 
+
+ and the right hand side is g(r) = r ∈ L 2(PRt|s,a ).
+
+Assumption D.1 (Hilbert-Schmidt property) . For any (s, a ) ∈ S × A , for all t = 1 , . . . , T , denote conditional densities 
+
+pSt+1 |Rt (s′ | r, s, a ), pRt|St+1 (r | s′, s, a ). We have 
+
+Z
+
+> R
+
+Z
+
+> S
+
+pSt+1 |Rt (s′ | r, s, a )pRt|St+1 (r | s′, s, a )ds ′dr < ∞.
+
+This ensures that the operator Tt|(s,a ) is Hilbert–Schmidt and thus admits a singular system {(σs,a,t,ν , φ s,a,t,ν , ψ s,a,t,ν )}ν≥1
+
+satisfying Tt|(s,a )φs,a,t,ν = σs,a,t,ν ψs,a,t,ν and T ∗
+
+> t|(s,a )
+
+ψs,a,t,ν = σs,a,t,ν φs,a,t,ν .
+
+Assumption D.2. Suppose {(σs,a,t,ν , φ s,a,t,ν , ψ s,a,t,ν )}ν≥1 is a singular system of Tt|(s,a ). Then for all (s, a ) ∈ S × A 
+
+and t = 1 , . . . , T ,
+
+X
+
+> ν≥1
+
+g, ψ s,a,t,ν 
+
+> 2
+> L2(PRt|s,a )
+
+σ2
+
+> s,a,t,ν
+
+< ∞,
+
+where g, ψ s,a,t,ν L2(PRt|s,a ) = R 
+
+> R
+
+g(r) · ψs,a,t,ν (r)pRt|s,a (r)dr .
+
+Lemma D.3 (Picard’s Theorem (Kress, 1989)) . Let H1, H2 be real Hilbert spaces and K : H1 → H 2 a compact linear operator with adjoint K∗ : H2 → H 1. Then, there exists a singular system {(λν , ϕ ν , ψ ν )}∞ 
+
+> ν=1
+
+of K, with singular values 
+
+λν > 0 and orthonormal sequences {ϕν } ⊂ H 1, {ψν } ⊂ H 2 satisfying 
+
+Kϕ ν = λν ψν , K∗ψν = λν ϕν .
+
+Given g ∈ H 2, the first–kind Fredholm equation Kh = g has a solution h ∈ H 1 if and only if (a) g ∈ ker( K∗)⊥;(b) P∞ 
+
+> ν=1
+
+λ−2 
+
+> ν
+
+|⟨ g, ψ ν ⟩H2 |2 < ∞,where ker( K∗) = {h : K∗h = 0 } is the null space of K∗, and ⊥ denotes the orthogonal complement to a set. 
+
+19 OPE for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random 
+
+Proposition D.4 (Existence of bridges) . Under Assumption 3.4 (1), Assumptions D.1 and D.2, for all (s, a ) ∈ S × A and 
+
+t = 1 , . . . , T , there exists a solution h to equation 
+
+Tt|(s,a )h = g, 
+
+where h := bt(s, a ; ·) ∈ L 2 PSt+1 |s,a 
+
+ and g(r) = r ∈ L 2(PRt|s,a ). Equivalently, for any fixed (s, a ) and t, there exists a function bt(s, a, ·) satisfying Equation (2) .Proof. By Assumption D.1, for all (s, a ) ∈ S × A and t = 1 , . . . , T , the operator Tt|(s,a ) is Hilbert–Schmidt and thus compact. Suppose there exists function f ∈ ker( T ∗
+
+> t|(s,a )
+
+), then by definition, T ∗
+
+> t|(s,a )
+
+f = 0 . By Assumption 3.4 (1), we have 
+
+f (Rt) = 0 , a.s. Therefore, ker( T ∗
+
+> t|(s,a )
+
+) = {0}, and hence ker( T ∗
+
+> t|(s,a )
+
+)⊥ = L2 PRt|s,a 
+
+. Because reward Rt is bounded, then g ∈ L 2 PRt|s,a 
+
+. So the condition (a) in Lemma D.3 is satisfied. Additionally, condition (b) is also satisfied by Assumption D.2. By Lemma D.3, there exists a solution h ∈ L 2(PSt+1 |s,a ) to 
+
+Tt|(s,a )h = g where g(r) = r, i.e., there exists function bt(s, a, ·) such that: 
+
+Ebt(s, a, S t+1 ) | Rt = r, S t = s, A t = a = r. 
+
+Part C: Uniqueness of bridge functions 
+
+Next we study the uniqueness of the bridge functions. 
+
+Proposition D.5 (Uniqueness of bridges) . Under Assumption 3.4 (2), any bridge function bt satisfying 
+
+E[bt(St, A t, S t+1 ) | Rt, S t, A t] = Rt, a.s. 
+
+is unique. Proof. Suppose there exist different bridge functions b1,t and b2,t satisfying the equation above for any t. Then, 
+
+E[b1,t (St, A t, S t+1 ) − b2,t (St, A t, S t+1 ) | Rt, S t, A t] = 0 , a.s. 
+
+By Assumption 3.4 (2), we have 
+
+b1,t − b2,t = 0 , a.s., ∀t = 1 , . . . , T, 
+
+which contradicts b1,t ̸ = b2,t . Thus uniqueness holds. 
+
+## E. Proof of Theorem 5.5 
+
+For a function class G and radius δ > 0, given sample {Xi}, the local empirical Rademacher complexity is defined by 
+
+bRn(G, δ ) = Eε
+
+h
+
+sup 
+
+> g∈G :∥g∥2,n ≤δ
+
+1
+
+n
+
+> n
+
+X
+
+> i=1
+
+εig(Xi) {Xi}
+
+i
+
+where ∥g∥22,n = 1
+
+> n
+
+Pni=1 g(Xi)2. The empirical critical radius ˆδn is the smallest solution to the inequality bRn(G, δ ) ≤ δ2 
+
+> b
+
+.Wainwright (2019) gives the relationship of critical radius and empirical critical radius: with probability at least 1 − ζ,
+
+δn ≤ O (ˆδn +
+
+r log(1 /ζ )
+
+n ),
+
+which enables us to study on empirical critical radius ˆδn.Define 
+
+Ψtn(b, g ) = 1
+
+nt
+
+X
+
+> i∈I obs
+> t
+
+(bt(St,i , A t,i , S t+1 ,i ) − Robs  
+
+> t,i
+
+)gt(Robs  
+
+> t,i
+
+, S t,i , A t,i ),
+
+20 OPE for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random 
+
+and population level version 
+
+Ψt(b, g ) = E
+
+h
+
+(bt(St, A t, S t+1 ) − Rt)gt(Rt, S t, A t) Ot = 1 
+
+i
+
+.
+
+Moreover, Let 
+
+Ψt,λ n (b, g ) = Ψ tn(b, g ) − λ
+
+
+
+∥gt∥2 
+
+> G(t)
+
++ Uδ2 ∥gt∥22,n t
+
+
+
+,
+
+Ψt,λ (b, g ) = Ψ t(b, g ) − λ
+
+ 23 ∥gt∥2 
+
+> G(t)
+
++ U
+
+2δ2 ∥gt∥22
+
+
+
+.
+
+So the minimizer ˆbt can be written as 
+
+ˆbt = arg min 
+
+> bt∈B (t)
+
+sup 
+
+> gt∈G (t)
+
+Ψt,λ n (b, g ) + λμ ∥bt∥2 
+
+> B(t)
+
+.
+
+By Lemma H.2, with probability at least 1 − ζ, for any function gt ∈ G (t)3U ,
+
+∥gt∥22,n t − ∥ gt∥22 ≤ 12 ∥gt∥22 + ( δG 
+
+> t
+
+)2,
+
+where δG 
+
+> t
+
+= δG 
+
+> nt
+
++ c0
+
+q log( c1/ζ ) 
+
+> nt
+
+, and δG 
+
+> nt
+
+is the upper bound of the empirical critical radii of function class G(t)3U . For any 
+
+∥gt∥2 
+
+> G(t)
+
+≥ 3U , consider rescaling gt by √3U 
+
+> ∥gt∥G(t)
+
+gt ∈ G (t)3U , and we have 
+
+∥gt∥22,n t − ∥ gt∥22 ≤ 12 ∥gt∥22 + ( δG 
+
+> t
+
+)2 ∥gt∥2
+
+> G(t)
+
+3U .
+
+Combine the above inequalities, 
+
+∥gt∥22,n t − ∥ gt∥22 ≤ 12 ∥gt∥22 + ( δG 
+
+> t
+
+)2 max 
+
+(
+
+1, ∥gt∥2
+
+> G(t)
+
+3U
+
+)
+
+. (9) Thus, 
+
+∥gt∥2 
+
+> G(t)
+
++ Uδ2 ∥gt∥22,n t ≥ ∥ gt∥2 
+
+> G(t)
+
++ U
+
+(δG 
+
+> t
+
+)2
+
+"
+
+12 ∥gt∥22 − (δG 
+
+> t
+
+)2 max 
+
+(
+
+1, ∥gt∥2
+
+> G(t)
+
+3U
+
+)# 
+
+≥ 23 ∥gt∥2 
+
+> G(t)
+
++ U
+
+2( δG 
+
+> t
+
+)2 ∥gt∥22 − U. 
+
+(10) Next, we study the upper and lower bounds of the centered empirical sup-loss 
+
+sup 
+
+> gt∈G (t)
+
+Ψtn(ˆbt, g ) − Ψtn(b∗ 
+
+> t
+
+, g ) − 2λ
+
+
+
+∥gt∥2 
+
+> G(t)
+
++ U
+
+(δG 
+
+> t
+
+)2 ∥gt∥22,n t
+
+
+
+.
+
+For simplicity we omit t and write it as 
+
+sup 
+
+> g∈G
+
+Ψn(ˆb, g ) − Ψn(b∗, g ) − 2λ
+
+
+
+∥g∥2 
+
+> G
+
++ Uδ2 ∥g∥22,n 
+
+
+
+. (11) 
+
+E.1. Upper bounding the centered empirical sup-loss 
+
+We first decompose Ψλn(b, g ) by 
+
+Ψλn(b, g ) = Ψ n(b, g ) − Ψn(b∗, g ) + Ψ n(b∗, g ) − λ
+
+
+
+∥g∥2 
+
+> G
+
++ Uδ2 ∥g∥22,n 
+
+
+
+≥ Ψn(b, g ) − Ψn(b∗, g ) − 2λ
+
+
+
+∥g∥2 
+
+> G
+
++ Uδ2 ∥g∥22,n 
+
+
+
+− sup 
+
+> g∈G
+
+Ψλn(b∗, g ),
+
+21 OPE for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random 
+
+where the last inequality holds by symmetry of G. Then we have 
+
+sup 
+
+> g∈G
+
+Ψn(ˆb, g ) − Ψn(b∗, g ) − 2λ
+
+
+
+∥g∥2 
+
+> G
+
++ Uδ2 ∥g∥22,n 
+
+
+
+≤ sup 
+
+> g∈G
+
+Ψλn(b∗, g ) + Ψ λn(ˆb, g )
+
+≤ sup 
+
+> g∈G
+
+Ψλn(b∗, g ) + sup 
+
+> g∈G
+
+Ψλn(b∗, g ) + λμ  ∥b∗∥2 
+
+> B
+
+− ∥ ˆb∥2
+
+> B
+
+ 
+
+≤ 2 sup 
+
+> g∈G
+
+Ψλn(b∗, g ) + λμ  ∥b∗∥2 
+
+> B
+
+− ∥ ˆb∥2
+
+> B
+
+.
+
+(12) By Lemma H.3, for all g ∈ G , similarly, with probability at least 1 − ζ we have 
+
+Ψn(b∗, g ) − Ψ( b∗, g ) ≤ 36 δ∥g∥2 + δ max 
+
+
+
+1, ∥g∥G
+
+√3U
+
+ 
+
+≤ 36 δ∥g∥2 + δ(1 + ∥g∥G
+
+√3U ).
+
+(13) Combine Equation (10) and Equation (13), we have with probability at least 1 − 2ζ, for all b ∈ B and g ∈ G ,
+
+Ψλn(b∗, g ) = Ψ n(b∗, g ) − λ
+
+
+
+∥g∥2 
+
+> G
+
++ Uδ2 ∥g∥22,n 
+
+
+
+≤ Ψ( b∗, g ) + |Ψn(b∗, g ) − Ψ( b∗, g )| − λ
+
+
+
+∥g∥2 
+
+> G
+
++ Uδ2 ∥g∥22,n 
+
+
+
+≤ Ψ( b∗, g ) + 36 δ∥g∥2 + δ(1 + ∥g∥G
+
+√3U ) − λ
+
+
+
+∥g∥2 
+
+> G
+
++ Uδ2 ∥g∥22,n 
+
+
+
+≤ Ψ( b∗, g ) + 36 δ∥g∥2 + δ(1 + ∥g∥G
+
+√3U ) − λ
+
+ 23 ∥g∥2 
+
+> G
+
++ U
+
+2δ2 ∥g∥22,n 
+
+
+
++ λU 
+
+≤ Ψ( b∗, g ) − λ
+
+ 13 ∥g∥2 
+
+> G
+
++ U
+
+4δ2 ∥g∥22,n 
+
+
+
++ 36 δ2 + λU + 36 δ∥g∥2 + 36 δ2 ∥g∥G
+
+√3U − λ U
+
+4δ2 ∥g∥22,n − λ
+
+3 ∥g∥2
+
+> G
+
+= Ψ λ/ 2(b∗, g ) + 36 δ2 + λU +  36 δ∥g∥2 − λ U
+
+4δ2 ∥g∥22,n 
+
+ +  36 δ2 ∥g∥G
+
+√3U − λ
+
+3 ∥g∥2
+
+> G
+
+.
+
+Using the fact that for any a, b > 0 and any norm, sup g∈G (a∥g∥ − b∥g∥2) ≤ a2 
+
+> 4b
+
+, suppose λ ≥ C1δ2 
+
+> U
+
+, and then 
+
+sup 
+
+> g∈G
+
+ 36 δ∥g∥2 − λ U
+
+4δ2 ∥g∥22,n 
+
+ ≤ 36 2δ4
+
+λU ≤ 36 2δ2
+
+C1
+
+;sup 
+
+> g∈G
+
+ 36 δ2 ∥g∥G
+
+√3U − λ
+
+3 ∥g∥2
+
+> G
+
+ ≤ 18 2δ4
+
+λU ≤ 18 2δ2
+
+C1
+
+.
+
+Therefore, 
+
+Ψλn(b∗, g ) ≤ Ψλ/ 2(b∗, g ) + 36 δ2 + λU + 5 × 18 2δ2
+
+C1
+
+Combine this with Equation (12) we get 
+
+sup 
+
+> g∈G
+
+Ψn(ˆb, g ) − Ψn(b∗, g ) − 2λ
+
+
+
+∥g∥2 
+
+> G
+
++ Uδ2 ∥g∥22,n 
+
+
+
+≤ 2 sup 
+
+> g∈G
+
+Ψλn(b∗, g ) + λμ  ∥b∗∥2 
+
+> B
+
+− ∥ ˆb∥2
+
+> B
+
+
+
+≤ 2 sup 
+
+> g∈G
+
+Ψλ/ 2(b∗, g ) + 2 λU + (72 + 10 × 18 2
+
+C1
+
+)δ2 + λμ  ∥b∗∥2 
+
+> B
+
+− ∥ ˆb∥2
+
+> B
+
+
+
+= 2 λU + (72 + 10 × 18 2
+
+C1
+
+)δ2 + λμ  ∥b∗∥2 
+
+> B
+
+− ∥ ˆb∥2
+
+> B
+
+.
+
+(14) 22 OPE for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random 
+
+E.2. Lower bounding the centered empirical sup-loss 
+
+By Assumption 5.4, we write gb = arg inf g∈G L2∥b−b∗∥2
+
+> B
+
+∥g − T (b − b∗)∥2 where 
+
+sup 
+
+> b∈B
+
+inf 
+
+> g∈G L2∥b−b∗∥2
+> B
+
+∥g − T (b − b∗)∥2 ≤ η < ∞.
+
+Also, let gˆb = arg inf g∈G L2∥ˆb−b∗∥2
+
+> B
+
+∥g − T (ˆb − b∗)∥2.When ∥gˆb∥2 ≤ δ, then 
+
+∥T (ˆb − b∗)∥2 ≤ ∥ gˆb∥ + ∥g − T (b − b∗)∥2 ≤ δ + η;
+
+if ∥gˆb∥2 ≥ δ, let r = δ 
+
+> 2∥gˆb∥2
+
+∈ [0 , 12 ], and rg ˆb ∈ G L2∥ˆb−b∗∥2
+
+> B
+
+since G is star-shaped. Hence, 
+
+sup 
+
+> g∈G
+
+Ψn(ˆb, g ) − Ψn(b∗, g ) − 2λ
+
+
+
+∥g∥2 
+
+> G
+
++ Uδ2 ∥g∥22,n 
+
+
+
+≥ Ψn(ˆb, rg ˆb) − Ψn(b∗, rg ˆb) − 2λ
+
+
+
+∥rg ˆb∥2 
+
+> G
+
++ Uδ2 ∥rg ˆb∥22,n 
+
+
+
+= r
+
+
+
+Ψn(ˆb, g ˆb) − Ψn(b∗, g ˆb)
+
+| {z }
+
+> (i)
+
+−2λ r 2
+
+
+
+∥gˆb∥2 
+
+> G
+
++ Uδ2 ∥gˆb∥22,n 
+
+| {z }
+
+> (ii )
+
+.
+
+For (ii ),
+
+r2
+
+
+
+∥gˆb∥2 
+
+> G
+
++ Uδ2 ∥gˆb∥22,n 
+
+
+
+≤ 14 ∥gˆb∥2 
+
+> G
+
++ r2Uδ2 ∥gˆb∥22,n . (15) By Equation (9), with probability at least 1 − ζ,
+
+r2Uδ2 ∥gˆb∥22,n ≤ r2Uδ2
+
+h
+
+∥gˆb∥22 + ∥gˆb∥22,n − ∥ gˆb∥22
+
+i
+
+≤ r2Uδ2
+
+  32 ∥gˆb∥22 + δ2(1 + ∥gˆb∥2
+
+> G
+
+3U ).
+
+Substitute this into Equation (15) and we get 
+
+r2
+
+
+
+∥gˆb∥2 
+
+> G
+
++ Uδ2 ∥gˆb∥22,n 
+
+
+
+≤ 14 ∥gˆb∥2 
+
+> G
+
++ r2Uδ2
+
+  32 ∥gˆb∥22 + δ2(1 + ∥gˆb∥2
+
+> G
+
+3U )
+
+≤ ( 14 ∥gˆb∥2 
+
+> G
+
++ 112 ∥gˆb∥2 
+
+> G
+
+) + 3U r 2
+
+2δ2 ∥gˆb∥22 + 14 U
+
+= 13 ∥gˆb∥2 
+
+> G
+
++ ( 38 + 14 )U
+
+≤ 13 L2∥ˆb − b∗∥2 
+
+> B
+
++ 58 U. 
+
+(16) For (i), we consider function class 
+
+JB,L 2B =
+
+n
+
+(( s, a, s ′), (r, s, a )) 7 → α(b(s, a, s ′) − b∗(s, a, s ′)) gL2Bb (r, s, a ) | b − b∗ ∈ B B , α ∈ [0 , 1] 
+
+o
+
+,
+
+where gL2Bb (r, s, a ) = arg inf g∈G L2B ∥g − T (b − b∗)∥2. Choose δ = δJ 
+
+> n
+
++ c0
+
+q log( c1/ζ ) 
+
+> n
+
+, where δJ 
+
+> n
+
+is the upper bound of the empirical critical radii of function class JB,L 2B . Choose loss function L = ( b − b∗)f , then by Lemma H.3, we have with probability at least 1 − ζ, for all b ∈ B and g ∈ G ,
+
+|(Ψ n(b, g b) − Ψn(b∗, g b)) − (Ψ( b, g b) − Ψ( b∗, g b)) | ≤ 18 δ(∥(b∗ − b)gb∥2 + δ)
+
+≤ 18 δ(∥gb∥2 + δ),
+
+since b − b∗ ∈ B B , which is 1-uniformly bounded. 23 OPE for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random 
+
+When ∥b − b∗∥2 
+
+> B
+
+> B , we rescale the function by √B 
+
+> ∥b−b∗∥B
+
+(b − b∗), and similarly, we obtain that with probability at least 
+
+1 − ζ,
+
+|(Ψ n(b, g b) − Ψn(b∗, g b)) − (Ψ( b, g b) − Ψ( b∗, g b)) | ≤ 18 δ(∥gb∥2 + δ) max 
+
+n
+
+1, ∥b − b∗∥2
+
+> B
+
+B
+
+o
+
+.
+
+Therefore, with probability at least 1 − ζ, for any g ∈ G ,
+
+r
+
+
+
+Ψn(ˆb, g ˆb) − Ψn(b∗, g ˆb)
+
+
+
+≥ r
+
+
+
+Ψ( ˆb, g ˆb) − Ψ( b∗, g ˆb)
+
+
+
+− r|(Ψ n(b, g ˆb) − Ψn(b∗, g ˆb)) − (Ψ( b, g ˆb) − Ψ( b∗, g ˆb)) |≥ r
+
+
+
+Ψ( ˆb, g ˆb) − Ψ( b∗, g ˆb)
+
+| {z }
+
+> (A)
+
+− 18 δr (∥gˆb∥2 + δ) max 
+
+n
+
+1, ∥ˆb − b∗∥2
+
+> B
+
+B
+
+o| {z }
+
+> (B)
+
+.
+
+For (A),
+
+r
+
+
+
+Ψ( ˆb, g ˆb) − Ψ( b∗, g ˆb)
+
+
+
+= δ
+
+2∥gˆb∥2
+
+E
+
+h
+
+(ˆb(S, A, S ′) − b∗(S, A, S ′)) gˆb(R, S, A ) Ot = 1 
+
+i
+
+= δ
+
+2∥gˆb∥2
+
+E
+
+h
+
+gˆb(R, S, A )E
+
+ˆb(S, A, S ′) − b∗(S, A, S ′) | R, S, A, O t = 1 
+
+
+
+Ot = 1 
+
+i
+
+= δ
+
+2∥gˆb∥2
+
+E
+
+n
+
+gˆb(R, S, A )T (ˆb − b∗)( R, S, A )o
+
+= δ
+
+2∥gˆb∥2
+
+E(gˆb(R, S, A )) 2 − gˆb(R, S, A )[ gˆb(R, S, A ) − T (ˆb − b∗)( R, S, A )] 
+
+= δ
+
+2∥gˆb∥2
+
+n
+
+∥gˆb∥22 − Egˆb(R, S, A )[ gˆb(R, S, A ) − T (ˆb − b∗)( R, S, A )] 
+
+o
+
+≥ δ
+
+2∥gˆb∥2
+
+n
+
+∥gˆb∥22 − ∥ gˆb∥2∥gˆb − T (ˆb − b∗)) ∥2
+
+o
+
+= δ
+
+2
+
+n
+
+∥gˆb∥2 − ∥ gˆb − T (ˆb − b∗)) ∥2
+
+o
+
+≥ δ
+
+2
+
+n
+
+∥T (ˆb − b∗)∥2 − 2∥gˆb − T (ˆb − b∗)) ∥2
+
+o
+
+≥ δ
+
+2
+
+n
+
+∥T (ˆb − b∗)∥2 − 2η
+
+o
+
+.
+
+For (B),
+
+18 δr (∥gˆb∥2 + δ) max 
+
+n
+
+1, ∥ˆb − b∗∥2
+
+> B
+
+B
+
+o
+
+= 18 δr ( δ
+
+2r + δ) max 
+
+n
+
+1, ∥ˆb − b∗∥2
+
+> B
+
+B
+
+o
+
+= (9 δ2 + 18 rδ 2) max 
+
+n
+
+1, ∥ˆb − b∗∥2
+
+> B
+
+B
+
+o
+
+≤ 18 δ2 + 18 δ2∥ˆb − b∗∥2
+
+> B
+
+B .
+
+So when ∥gˆb∥2 ≥ δ, with probability at least 1 − 2ζ,
+
+(i) = r
+
+
+
+Ψn(ˆb, g ˆb) − Ψn(b∗, g ˆb)
+
+
+
+≥ (A) − (B)
+
+≥ δ
+
+2
+
+n
+
+∥T (ˆb − b∗)∥2 − 2η
+
+o
+
+− 18 δ2 − 18 δ2∥ˆb − b∗∥2
+
+> B
+
+B .
+
+24 OPE for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random 
+
+Therefore the lower bound of sup g∈G Ψn(ˆb, g ) − Ψn(b∗, g ) − 2λ  ∥g∥2 
+
+> G
+
++ Uδ2 ∥g∥22,n 
+
+ is given by 
+
+sup 
+
+> g∈G
+
+Ψn(ˆb, g ) − Ψn(b∗, g ) − 2λ
+
+
+
+∥g∥2 
+
+> G
+
++ Uδ2 ∥g∥22,n 
+
+
+
+≥(i) − 2λ(ii )
+
+≥ δ
+
+2
+
+n
+
+∥T (ˆb − b∗)∥2 − 2η
+
+o
+
+− 18 δ2 − 18 δ2∥ˆb − b∗∥2
+
+> B
+
+B − 2λ  13 L2∥ˆb − b∗∥2 
+
+> B
+
++ 58 U 
+
+≥ δ
+
+2 ∥T (ˆb − b∗)∥2 − ηδ − 18 δ2 − ( 18 δ2
+
+B + 2λL 2
+
+3 )∥ˆb − b∗∥2 
+
+> B
+
+− 54 λU. 
+
+E.3. Combining the upper and lower bounds 
+
+Combine the upper bound and lower bound, and then we have either ∥gˆb∥2 ≤ δ, or with probability at least 1 − 3ζ, for all 
+
+b ∈ B ,
+
+δ
+
+2 ∥T (ˆb − b∗)∥2 − ηδ − 18 δ2 − ( 18 δ2
+
+B + 2λL 2
+
+3 )∥ˆb − b∗∥2 
+
+> B
+
+− 54 λU ≤ 2λU + (72 + 10 × 18 2
+
+C1
+
+)δ2 + λμ  ∥b∗∥2 
+
+> B
+
+− ∥ ˆb∥2
+
+> B
+
+.
+
+So 
+
+δ
+
+2 ∥T (ˆb − b∗)∥2 ≤ 13 4 λU + ηδ + λμ  ∥b∗∥2 
+
+> B
+
+− ∥ ˆb∥2
+
+> B
+
+ + (90 + 10 × 18 2
+
+C1
+
+)δ2 + ( 18 δ2
+
+B + 2λL 2
+
+3 )∥ˆb − b∗∥2
+
+> B
+
+≤ 13 4 λU + ηδ + λμ  ∥b∗∥2 
+
+> B
+
+− ∥ ˆb∥2
+
+> B
+
+ + (90 + 10 × 18 2
+
+C1
+
+)δ2 + 2 λ( 18 δ2
+
+λB + 2L2
+
+3 ) ∥b∗∥2 
+
+> B
+
++ ∥ˆb∥2
+
+> B
+
+.
+
+If μ ≥ 36 δ2 
+
+> λB
+
++ 4L2 
+
+> 3
+
+, then 
+
+∥T (ˆb − b∗)∥2 ≤ 2
+
+δ
+
+ 13 4 λU + ηδ + λμ  ∥b∗∥2 
+
+> B
+
+− ∥ ˆb∥2
+
+> B
+
+ + (90 + 10 × 18 2
+
+C1
+
+)δ2 + λμ  ∥b∗∥2 
+
+> B
+
++ ∥ˆb∥2
+
+> B
+
+
+
+= 2
+
+δ
+
+ 13 4 λU + ηδ + 2 λμ ∥b∗∥2 
+
+> B
+
++ (90 + 10 × 18 2
+
+C1
+
+)δ2
+
+≤ 13 2
+
+λU δ + 2 η + 4 λμ δ ∥b∗∥2 
+
+> B
+
++ (180 + 20 × 18 2
+
+C1
+
+)δ. 
+
+Suppose λ ≤ C2δ2 
+
+> U
+
+, then with probability at least 1 − 4ζ,
+
+∥T (ˆb − b∗)∥2 ≤ 13 2
+
+λU δ + 2 η + 4 λμ δ ∥b∗∥2 
+
+> B
+
++ (180 + 20 × 18 2
+
+C1
+
+)δ
+
+≤ 13 2 C2δ + 2 η + 4 C2μδ ∥b∗∥2 
+
+> B
+
++ (180 + 20 × 18 2
+
+C1
+
+)δ
+
+≤ 4C2μδ ∥b∗∥2 
+
+> B
+
++   13 2 C2 + 180 + 20 × 18 2
+
+C1
+
+δ + 2 η
+
+≲ δ max 
+
+n
+
+1, ∥b∗∥2
+
+> B
+
+o
+
+.
+
+## F. Proof of Corollary 5.6 
+
+Recall that the product class is denoted by 
+
+J (t) 
+
+> B,L 2B
+
+:= 
+
+n
+
+(( s, a, s ′), (r, s, a )) 7 → α(bt(s, a, s ′) − b∗ 
+
+> t
+
+(s, a, s ′)) gL2Bb,t (r, s, a ) | bt − b∗ 
+
+> t
+
+∈ B (t) 
+
+> B
+
+, α ∈ [0 , 1] 
+
+o
+
+.
+
+Define the tensor product of two RKHSs B(t) and G(t) as H(t) 
+
+> ⊗
+
+endowed with kernel K⊗,t 
+
+ (x, y ), (x′, y ′) := 
+
+KB,t (x, x ′) KG,t (y, y ′). Then, one can verify that J (t) 
+
+> B,L 2B
+
+satisfies 
+
+J (t) 
+
+> B,L 2B
+
+⊆
+
+n
+
+f ∈ H (t) 
+
+> ⊗
+
+: ∥f ∥H(t)
+
+> ⊗
+
+≤ pBt
+
+pL2Bt
+
+o
+
+=: H(t) 
+
+> ⊗,LB
+
+.
+
+25 OPE for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random 
+
+By Lemma H.5, we have that 
+
+Rnt (J (t) 
+
+> B,L 2B
+
+, δ ) ≤ LB 
+
+r 2
+
+nt
+
+vuut
+
+> ∞
+
+X
+
+> i=1
+> ∞
+
+X
+
+> j=1
+
+min μB
+
+> t,i
+
+μG 
+
+> t,j
+
+, δ 2 . (17) Under the polynomial eigen decay assumptions μB 
+
+> t,i
+
+≲ i−2αB and μG 
+
+> t,j
+
+≲ j−2αG with αmin := min {αB , α G}, by Lemma H.6, the tensor-product spectrum admits the bound 
+
+> ∞
+
+X
+
+> i=1
+> ∞
+
+X
+
+> j=1
+
+min {μB
+
+> t,i
+
+μG 
+
+> t,j
+
+, δ 2} ≲ δ2− 1 
+
+> αmin
+
+log 1
+
+δ .
+
+plugging this into Equation (17) yields 
+
+δJ 
+
+> nt
+
+≲ LB n − αmin 2αmin +1  
+
+> t
+
+log nt.
+
+Similarly, we have 
+
+δG 
+
+> nt
+
+≲ pUt n− αG 
+
+> 2αG+1
+> t
+
+log nt.
+
+Therefore, δnt = max {δG 
+
+> nt
+
+, δ J 
+
+> nt
+
+} satisfies 
+
+δnt ≲ max {pUt, LB } n− αmin 2αmin +1  
+
+> t
+
+log nt,
+
+and the claim follows by Theorem 5.5. The min-max estimation problem of bt has a closed-form solution, which is discussed in Dikkala et al. (2020) Appendix E.3. 
+
+## G. Proof of Theorem 5.9 
+
+G.1. Error Decomposition 
+
+The estimation error bound can be decomposed as 
+
+|E[V π 
+
+> 1
+
+] − bV (π)| ≤ | E[V π 
+
+> 1
+
+] − En[V π 
+
+> 1
+
+]|
+
+| {z }
+
+> (I)
+
++ |E[V π 
+
+> 1
+
+] − E[ bV π 
+
+> 1
+
+]|
+
+| {z }
+
+> (II )
+
++ |E(V π 
+
+> 1
+
+− bV π 
+
+> 1
+
+) − En(V π 
+
+> 1
+
+− bV π 
+
+> 1
+
+)|
+
+| {z }
+
+> (III )
+
+,
+
+where En[V π 
+
+> 1
+
+] := 1
+
+> n
+
+Pni=1 V π 
+
+> 1
+
+(S1,i , 0) .
+
+G.2. Bound of (I)
+
+For (I), since rewards are bounded in [−1, 1] , by Hoeffding inequality, with probability at least 1 − ζ,
+
+|E[V π 
+
+> 1
+
+] − En[V π 
+
+> 1
+
+]| ≲ ∥V π 
+
+> 1
+
+∥∞
+
+r log( c1/ζ )
+
+n ≤ T
+
+r log( c1/ζ )
+
+n ,
+
+where constant c1 > 0.
+
+G.3. Bound of (II )
+
+For (II ),
+
+|E[V π 
+
+> 1
+
+] − E[ bV π 
+
+> 1
+
+]| ≤ ∥ V π 
+
+> 1
+
+− bV π 
+
+> 1
+
+∥2
+
+= ∥ X
+
+> a
+
+π1(a | S1, O 0)( Qπ 
+
+> 1
+
+(S1, a ) − bQ1(S1, a )) ∥2
+
+=
+
+
+
+E  X 
+
+> a
+
+π1(a | S1, O 0 = 0)( Qπ 
+
+> 1
+
+(S1, a ) − bQ1(S1, a )) 21/2
+
+≤
+
+
+
+E X 
+
+> a
+
+π1(a | S1, O 0 = 0)( Qπ 
+
+> 1
+
+(S1, a ) − bQ1(S1, a )) 21/2
+
+:= ∥Qπ 
+
+> 1
+
+− bQ1∥2,π ,
+
+26 OPE for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random 
+
+where Qπt (s, a ) = E(Rt + V πt+1 | s, a ). Since there is no shift on marginal distributions of states ˜dπt and ˜dbt when t = 1 , by Assumption 2.3, 
+
+∥Qπ 
+
+> 1
+
+− bQ1∥22,π = E(S1,O 0)∼ ˜dπ
+
+> 1
+
+ X 
+
+> a
+
+π1(a | S1, O 0 = 0)( Qπ 
+
+> 1
+
+(S1, a ) − bQ1(S1, a )) 2
+
+= E(S1,O 0)∼ ˜db
+
+> 1
+
+ X 
+
+> a
+
+π1(a | S1, O 0 = 0)( Qπ 
+
+> 1
+
+(S1, a ) − bQ1(S1, a )) 2
+
+≤ κ1E(S1,O 0)∼ ˜db
+
+> 1
+
+ X 
+
+> a
+
+πb
+
+> 1
+
+(a | S1)( Qπ 
+
+> 1
+
+(S1, a ) − bQ1(S1, a )) 2
+
+:= κ1∥Qπ 
+
+> 1
+
+− bQ1∥22,π b ,
+
+and for simplicity we write ∥Qπ 
+
+> 1
+
+− bQ1∥22 instead of ∥Qπ 
+
+> 1
+
+− bQ1∥22,π b . bQt is estimated from penalized nonparametric least square problem Equation (8). 
+
+∥ bQt − Qπt ∥2 involves the estimation error of the fitted Q-functions produced by FQE. Unlike standard supervised regression, the regression targets in FQE are pseudo-labels that depend on nuisance estimates and on future-stage fitted values. Concretely, at stage t < T , the target takes the form 
+
+yt,i = beRt,i + bV πt+1 (St+1 ,i , O t,i ),
+
+where beRt,i depends on the estimated bridge ˆbt and bV πt+1 depends on bQt+1 . Therefore, the regression noise and the regression function are statistically coupled through the common data, and a direct analysis of ∥ bQt − Qπt ∥2 typically leads to non-negligible cross terms that are difficult to control without additional device such as sample splitting or cross-fitting. To decouple the effect of nuisance estimation from the intrinsic regression error, we introduce an oracle comparator bQ∗ 
+
+> t
+
+,defined as the solution of the same penalized regression problem as bQt but trained on an oracle pseudo-label y∗ 
+
+> t
+
+, in which the nuisance components are replaced by their population counterparts. 
+
+bQ∗ 
+
+> t
+
+= arg min  
+
+> f∈Q (t)
+
+1
+
+n
+
+> n
+
+X
+
+> i=1
+
+ f (St,i , A t,i ) − y∗
+
+> t,i
+
+2 + λQ,t ∥f ∥2 
+
+> Q(t)
+
+, (18) where 
+
+y∗ 
+
+> t,i
+
+=
+
+( eRt,i , t = T, 
+
+eRt,i + V πt+1 (St+1 ,i , O t,i ), t < T, 
+
+and V πt+1 (St+1 ,i , O t,i ) = P 
+
+> a
+
+πt+1 (a | St+1 , O t)Qπt+1 (St+1 , a ).Then we have 
+
+∥ bQt − Qπt ∥2 = ∥( bQt − bQ∗ 
+
+> t
+
+) + ( bQ∗ 
+
+> t
+
+− Qπt )∥2
+
+≤ ∥ bQt − bQ∗ 
+
+> t
+
+∥2
+
+| {z }
+
+> (a)
+
++ ∥ bQ∗ 
+
+> t
+
+− Qπt ∥2
+
+| {z }
+
+> (b)
+
+.
+
+For (a), since bQt, bQ∗ 
+
+> t
+
+are estimated from Equation (8) and Equation (18), it can be verified that 
+
+∥ bQt − bQ∗ 
+
+> t
+
+∥2,n ≤ ∥ yt − y∗ 
+
+> t
+
+∥2,n ≤ √2∥ beRt − eRt∥2,n + √2∥ bV πt+1 − V πt+1 ∥2,n .
+
+Since 
+
+∥ beRt − eRt∥2,n = ∥(1 − Ot)( ˆbt − b∗ 
+
+> t
+
+)∥2,n ≤ ∥ ˆbt − b∗ 
+
+> t
+
+∥2,n ,
+
+27 OPE for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random 
+
+and 
+
+∥ bV πt+1 − V πt+1 ∥2,n := X
+
+> a
+
+πt+1 (a | St+1 , O t)  bQt+1 (St+1 , a ) − Qπt+1 (St+1 , a )
+
+> 2,n
+
+=
+
+ 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+ X 
+
+> a
+
+πt+1 (a | St+1 ,i , O t,i )  bQt+1 (St+1 ,i , a ) − Qπt+1 (St+1 ,i , a ) 21/2
+
+≤
+
+ 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+X
+
+> a
+
+πt+1 (a | St+1 ,i , O t,i )  bQt+1 (St+1 ,i , a ) − Qπt+1 (St+1 ,i , a )21/2
+
+:= ∥ bQt+1 − Qπt+1 ∥2,n,π ,
+
+then 
+
+∥ bQt − bQ∗ 
+
+> t
+
+∥2,n ≤ √2∥ˆbt − b∗ 
+
+> t
+
+∥2,n + √2∥ bQt+1 − Qπt+1 ∥2,n,π . (19) Since Q(t) is (T − t + 1) -uniformly bounded, we consider scaling Q(t) by (T − t + 1) for convenience. According to Fischer & Steinwart (2020), under mild conditions, the RKHS norm of kernel ridge regression estimators is bounded with high probability. and construct RKHS ball Q(t) 
+
+> RQ
+
+= {Q ∈ Q (t) : ∥Q∥Q(t) ≤ RQ} for all t = 1 , . . . , T .Denote difference class ∆Q(t) := {∆Q | ∆Q = Q1 − Q2, Q1, Q 2 ∈ Q (t) 
+
+> RQ
+
+}. Let ¯δ∆(t)  
+
+> Q,n
+
+be the upper bound of the empirical critical radii of scaled function class ∆Q(t).For RKHS B(t), Proposition 9 in Dikkala et al. (2020) gives the closed form of the inner maximization, which implies that ∥ˆbt∥B(t) can be bounded by a constant RB . Thus, consider RKHS ball B(t) 
+
+> RB
+
+= {bt ∈ B (t), ∥bt∥B(t) ≤ RB }. Define difference class ∆B(t) = {∆b = b1 − b2, b1, b 2 ∈ B (t) 
+
+> RB
+
+} and let ¯δ∆(t)  
+
+> b,n
+
+be the upper bound of the empirical critical radii of ∆B(t). Then, we define ¯δ∆t = max {¯δ∆(t) 
+
+> Q,n
+
+, ¯δ∆(t+1)  
+
+> Q,n
+
+, ¯δ∆(t) 
+
+> b,n
+
+} where δ∆t = ¯δ∆t + c0
+
+q log( c1/ζ ) 
+
+> n
+
+for some c0, c 1 > 0.Let ∥ bQt+1 − Qπt+1 ∥22,b,π := E(St+1 ,O t)∼ ˜dbt+1 
+
+h P 
+
+> a∈A
+
+πt+1 (a | St+1 , O t)  bQt+1 (St+1 , a ) − Qπt+1 (St+1 , a )2i
+
+.Applying Lemma H.2 on both sides of Equation (19), we have with probability at least 1 − ζ,
+
+∥ bQt − bQ∗ 
+
+> t
+
+∥2 ≲∥ˆbt − b∗ 
+
+> t
+
+∥2 + ∥ bQt+1 − Qπt+1 ∥2,b,π + ( T − t + 1) δ∆t
+
+(Assumption 2.3 (2)) ≲∥ˆbt − b∗ 
+
+> t
+
+∥2 + √κt+1 ∥ bQt+1 − Qπt+1 ∥2 + ( T − t + 1) δ∆t . (20) 
+
+(b) corresponds to a standard penalized least square estimation error. Since ∥Q∗ 
+
+> t
+
+∥Q(t) is bounded, by Lemma H.7, with probability at least 1 − ζ, (b) is bounded by 
+
+∥ bQ∗ 
+
+> t
+
+− Qπt ∥2 ≲ (δ∆(t)
+
+> Q
+
++ pλQ,t )( T − t + 1) ,
+
+where δ∆(t)
+
+> Q
+
+= δ∆(t)  
+
+> Q,n
+
++ c0
+
+q log( c1T /ζ ) 
+
+> n
+
+for some c0, c 1 > 0.Therefore, with probability at least 1 − ζ/T ,
+
+∥ bQt − Qπt ∥2 ≤ ∥ bQt − bQ∗ 
+
+> t
+
+∥2 + ∥ bQ∗ 
+
+> t
+
+− Qπt ∥2
+
+≲ ∥ˆbt − b∗ 
+
+> t
+
+∥2 + √κt+1 ∥ bQt+1 − Qπt+1 ∥2 + ( T − t + 1) δ∆t + ( δ∆(t)
+
+> Q
+
++ pλQ,t )( T − t + 1) .
+
+28 OPE for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random 
+
+Applying backward induction from t = T down to t = 1 yields the bound for (II ) with probability at least 1 − ζ:
+
+|E[V π 
+
+> 1
+
+] − E[ bV π 
+
+> 1
+
+]| ≤∥ V π 
+
+> 1
+
+− bV π 
+
+> 1
+
+∥2
+
+≤√κ1∥ bQ1 − Qπ 
+
+> 1
+
+∥2
+
+≲
+
+> T
+
+X
+
+> t=1
+
+ TY
+
+> j=1
+
+√κj
+
+h 
+
+∥ˆbt − b∗ 
+
+> t
+
+∥2 + ( T − t + 1) δ∆t + ( δ∆(t)
+
+> Q
+
++ pλQ,t )( T − t + 1) 
+
+i
+
+≲K
+
+> T
+
+X
+
+> t=1
+
+h
+
+τtδt(1 + ∥b∗ 
+
+> t
+
+∥2 
+
+> B(t)
+
+) + ( δ∆t + δ∆(t)
+
+> Q
+
++ pλQ,t )( T − t + 1) 
+
+i
+
+.
+
+G.4. Bound of (III )
+
+For (III ), we first define function class ∆V(t) = ∆ = V1 − V2 | V1, V 2 ∈ V (t) 
+
+> RV
+
+, where V(t) 
+
+> RV
+
+is a (T − t + 1) -uniformly bounded function class of value functions at time t, induced from Q(t) under operator Πt: V(t) 
+
+> RV
+
+= {ΠtQ : Q ∈ Q (t) 
+
+> RQ
+
+}. Here linear operator Πt is defined as (Π tQ)( s, o −) = P πt(a | s, o −)Q(s, a ). We choose the cost function as L(f (X), Y ) = 
+
+f (X) and apply Lemma H.1. We here also scale V(t) 
+
+> RV
+
+by (T − t + 1) .Then, with probability at least 1 − ζ,
+
+|E(V π 
+
+> 1
+
+− bV π 
+
+> 1
+
+) − En(V π 
+
+> 1
+
+− bV π 
+
+> 1
+
+)| ≲ δ∆(1) 
+
+> V
+
+(∥V π 
+
+> 1
+
+− bV π 
+
+> 1
+
+∥2 + T δ ∆(1) 
+
+> V
+
+),
+
+where δ∆(1) 
+
+> V
+
+= ¯δ∆(1)   
+
+> V,n
+
++ c0
+
+q log( c1/ζ ) 
+
+> n
+
+, and ¯δ∆(1)   
+
+> V,n
+
+is the upper bound of the empirical critical radii of scaled function class 
+
+∆V(1) . Moreover, δ∆(1) 
+
+> V
+
+≤ δ∆(1) 
+
+> Q
+
+.
+
+G.5. Policy value error bound 
+
+Combine the above inequalities, we obtain the policy value estimation error bound with probability at least 1 − ζ:
+
+bV (π) − V (π) ≤(I) + ( II ) + ( III )
+
+≲T
+
+r log( c1T /ζ )
+
+n + ( δ∆(1) 
+
+> V
+
++ 1) ∥V π 
+
+> 1
+
+− bV π 
+
+> 1
+
+∥2 + T (δ∆(1) 
+
+> V
+
+)2
+
+≲T
+
+r log( c1T /ζ )
+
+n + T (δ∆(1) 
+
+> V
+
+)2 + K(δ∆(1) 
+
+> V
+
++ 1) 
+
+h
+
+τtδt(1 + ∥b∗ 
+
+> t
+
+∥2 
+
+> B(t)
+
+)+ (δ∆t + δ∆(t)
+
+> Q
+
++ pλQ,t )( T − t + 1) 
+
+i
+
+≲T
+
+r log( c1T /ζ )
+
+n + T (δ∆(1) 
+
+> V
+
+)2 + K(δ∆(1) 
+
+> V
+
++ 1) 
+
+h
+
+τtδt(1 + ∥b∗ 
+
+> t
+
+∥2 
+
+> B(t)
+
+)+ (T − t + 1) δt, ∗
+
+i
+
+≲T
+
+r log( c1T /ζ )
+
+n + Kτ max T
+
+> T
+
+X
+
+> t=1
+
+δt, ∗,
+
+where δt, ∗ as the maximum of the critical radii of difference classes ∆Q(t), ∆Q(t+1) , ∆B(t), and G(t) 
+
+> U
+
+for t = 1 , . . . , T ,namely δ∆(t)
+
+> Q
+
+, δ∆(t+1) 
+
+> Q
+
+, δ∆(t)
+
+> B
+
+and δG(t) .With polynomial decay 
+
+μQ 
+
+> t,j
+
+≲ j−2αQ , μB 
+
+> t,j
+
+≲ j−2αB , μG 
+
+> t,j
+
+≲ j−2αG , αQ, α B , α G > 1/2,
+
+29 OPE for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random 
+
+the corresponding critical radii satisfy 
+
+δ∆(t)
+
+> Q
+
+, δ ∆(t+1) 
+
+> Q
+
+≲ R 
+
+> 12αQ+1
+> Q
+
+n− αQ 
+
+> 2αQ+1
+
+log n, δ∆(t)
+
+> B
+
+≲ R  
+
+> 12αB+1
+> B
+
+n− αB  
+
+> 2αB+1
+
+log n, δG(t) ≲ U 
+
+> 12αG+1
+> t
+
+n− αG 
+
+> 2αG+1
+
+log n. 
+
+Thus, the critical radius δt, ∗ satisfies 
+
+δt, ∗ ≲ max {pRQ, pRB , pUt}n− αmin 2αmin +1 log n, 
+
+where αmin = min {αQ, α B , α G}. Therefore, with probability at least 1 − ζ, the policy value is bound by 
+
+bV (π) − V (π) ≲ Kτ max T 2plog( c1T /ζ )n− αmin 2αmin +1 log n. 
+
+## H. Auxiliary lemmas 
+
+Lemma H.1 (Wainwright (2019), Theorem 14.20) . Suppose function class F is symmetric, 1-uniformly bounded, and star-shaped around f ∗. Let δ2 
+
+> n
+
+≥ cn be any solution to the inequality Rn(F∗, δ ) ≤ δ2, where F∗ = {f − f ∗ | f ∈ F} .Suppose the cost function L(f (X), Y ) is L-Lipschitz in its first argument f (X). Then for all f ∈ F , with probability at least 1 − c1e−c2nδ 2 
+
+> n
+
+, we have 
+
+|En
+
+ L(f (x), y ) − L (f ∗(x), y ) − E L(f (x), y ) − L (f ∗(x), y )| ≤ 10 Lδ n
+
+ ∥f − f ∗∥2 + δn
+
+.
+
+Lemma H.2 (Wainwright (2019), Theorem 14.1) . Given a star-shaped and b-uniformly bounded function class F, set 
+
+δn > 0 be any solution to R(F, δ ) ≤ δ2 
+
+> b
+
+. Then for any t ≥ δn, with probability at least 1 − c1 exp( −c2 nt 2 
+
+> b2
+
+), we have 
+
+∥f ∥22,n − ∥ f ∥22 ≤ 12 ∥f ∥22 + 12 t2
+
+for all f ∈ F .
+
+Lemma H.3 (Foster & Syrgkanis (2023), Lemma 14) . Consider a 1-uniformly bounded and star-shaped function class 
+
+F, and pick any f ∗ ∈ F . Let δ2 
+
+> n
+
+≥ c1 log(log n) 
+
+> n
+
+be any solution to the inequalities Rn(F∗ 
+
+> t
+
+, δ ) ≤ δ2 for all t ∈ { 1, . . . , d },where F∗ 
+
+> t
+
+= {ft − f ∗ 
+
+> t
+
+| ft ∈ F| t}. Assume Lf is L-Lipschitz in its first argument f with respect to its ℓ2 norm. Then for all 
+
+f ∈ F , for some universal constants c2, c 3 > 0, with probability at least 1 − c2e−c3nδ 2 
+
+> n
+
+, we have 
+
+|En
+
+ Lf − L f ∗ ) − E Lf − L f ∗
+
+| ≤ 18 Ldδ n
+
+ ∥f − f ∗∥2 + δn
+
+.
+
+The outcome ˆf of constrained ERM satisfies that with the same probability, 
+
+En
+
+ L ˆf − L f ∗ ) ≤ 18 Ldδ n
+
+ ∥ ˆf − f ∗∥2 + δn
+
+.
+
+Lemma H.4 (Wainwright (2019), Example 3.5) . Let ε = ( ε1, . . . , ε n) be i.i.d. Rademacher variables taking values in 
+
+{− 1, +1 } with equal probability. Let A ⊂ Rn be any (possibly infinite) bounded set, and define 
+
+Z(A) := sup 
+
+> a∈A
+
+⟨a, ε ⟩ = sup 
+
+> a∈A
+> n
+
+X
+
+> k=1
+
+akεk.
+
+Let W (A) := sup a∈A ∥a∥2. Then for all t > 0,
+
+P
+
+
+
+Z(A) ≥ E[Z(A)] + t
+
+
+
+≤ exp 
+
+
+
+− t2
+
+16 W (A)2
+
+
+
+.
+
+Moreover, since −Z(A) = inf a∈A ⟨a, ε ⟩ and the same argument applies, 
+
+P
+
+
+
+|Z(A) − E[Z(A)] | ≥ t
+
+
+
+≤ 2 exp 
+
+
+
+− t2
+
+16 W (A)2
+
+
+
+.
+
+30 OPE for Missingness-Aware Policies in MDPs with Rewards Missing Not at Random 
+
+Lemma H.5 (Wainwright (2019), Corollary 14.5) . Let H be an RKHS with reproducing kernel K and let F := {f ∈ H :
+
+∥f ∥H ≤ 1} be the unit ball. Let {μj }∞ 
+
+> j=1
+
+denote the non-increasing eigenvalues. Then the local Rademacher complexity satisfies, for any δ > 0,
+
+Rn(F, δ ) ≤
+
+r 2
+
+n
+
+
+
+> ∞
+
+X
+
+> j=1
+
+min {μj , δ 2}
+
+
+
+> 1/2
+
+.
+
+Moreover, let {ˆμj }nj=1 denote the eigenvalues of the renormalized kernel matrix K ∈ Rn×n with entries Kij = K(xi, x j )/n .Then the local empirical Rademacher complexity satisfies, for any δ > 0,
+
+bRn(F, δ ) ≤
+
+r 2
+
+n
+
+
+
+> n
+
+X
+
+> j=1
+
+min {bμj , δ 2}
+
+
+
+> 1/2
+
+.
+
+Lemma H.6 (Krieg (2018), Theorem 1(i)) . Let σ : N → R+ be a non-increasing sequence with σ(n) → 0. For d ∈ N,define its d-th tensor power 
+
+σd(n1, . . . , n d) = 
+
+> d
+
+Y
+
+> k=1
+
+σ(nk), (n1, . . . , n d) ∈ Nd,
+
+and let τ : N → R+ be the non-increasing rearrangement of {σd(n1, . . . , n d)}(n1,...,n d)∈Nd . If for some s > 0 one has 
+
+σ(n) ≲ n−s, then 
+
+τ (n) ≲ n−s(log n)s(d−1) .
+
+Lemma H.7 (Rademacher analogue of Wainwright (2019), Theorem 13.17) . Let (xi, y i)ni=1 be i.i.d. with yi = f ∗(xi) + ξi,where E[ξi | xi] = 0 and ξi is conditionally σ-sub-Gaussian. Let F be a symmetric, star-shaped class equipped with a Hilbert norm ∥ · ∥ F . Consider the penalized least squares estimator 
+
+ˆf ∈ arg min  
+
+> f∈F
+
+(
+
+12n
+
+> n
+
+X
+
+> i=1
+
+(yi − f (xi)) 2 + λn∥f ∥2
+
+> F
+
+)
+
+.
+
+Suppose f ∗ ∈ F and ∥f ∗∥F ≤ R. Define the localized difference class 
+
+G := {∆ = f − f ∗ : f ∈ F , ∥f ∥F ≤ R}.
+
+and the local empirical Rademacher complexity 
+
+bRn(G, δ ) := Eε
+
+"
+
+sup 
+
+> ∆∈G :∥∆∥2,n ≤δ
+
+1
+
+n
+
+> n
+
+X
+
+> i=1
+
+εi∆( xi) x1: n
+
+#
+
+.
+
+Let ¯δn be the upper bound of the critical radii satisfying bRn(G, ¯δn) ≤ ¯δ2 
+
+> n
+> 32 σ
+
+, and define δn = ¯δn + c0σ
+
+q log( c1/ζ ) 
+
+> n
+
+for some numerical constants c0, c 1 > 0. Assume that λn ≥ 34 δ2
+
+> n
+
+, then there exist constant C1 > 0 such that, with probability at least 
+
+1 − ζ,
+
+∥ ˆf − f ∗∥22 ≤ C1R2 δ2 
+
+> n
+
++ λn
+
+.
+
+31
