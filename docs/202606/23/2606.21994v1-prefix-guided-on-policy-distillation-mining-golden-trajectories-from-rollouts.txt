@@ -1,0 +1,585 @@
+Title: Prefix-Guided On-Policy Distillation: Mining Golden Trajectories from Rollouts
+
+URL Source: https://arxiv.org/pdf/2606.21994v1
+
+Published Time: Tue, 23 Jun 2026 01:37:54 GMT
+
+Number of Pages: 10
+
+Markdown Content:
+# Prefix-Guided On-Policy Distillation: Mining Golden Trajectories from Rollouts 
+
+## Qingfei Zhao 1,2 Huan Song 1 Shuyu Tian 1 Jiawei Shao 1 Xuelong Li 1
+
+> 1
+
+TeleAI 2Shanghai Jiao Tong University 
+
+Abstract 
+
+On-policy distillation (OPD) improves reasoning mod-els by applying dense teacher supervision on student-sampled trajectories. However, scaling OPD to long-horizon mathematical reasoning exposes a reliability and efficiency problem: standard OPD assigns every sampled candidate the same long rollout budget, even though some trajectories may quickly become weakly aligned with the teacher and provide less useful super-vision. Prior analyses suggest that successful OPD de-pends on local teacher–student compatibility, which can be measured by top-k overlap on student-visited pre-fixes. When this overlap is low, continuing to generate or train on long suffixes may waste computation and in-troduce noisy learning signal. To address this, we intro-duce Prefix-Guided On-Policy Distillation (PG-OPD), a simple rollout-allocation framework that uses fixed-length prefixes to estimate trajectory value before ex-pensive long-horizon generation. PG-OPD first decodes every sampled candidate to the same prefix length, computes teacher–student top-k overlap within an early probe window of that prefix, and selectively continues high-overlap candidates to a fixed long length. Low-overlap candidates stop at the fixed prefix, avoiding unnecessary suffix generation. Across diverse teacher– student combinations on AMC, AIME, and HMMT benchmarks, PG-OPD improves average accuracy by up to 4.80 points while reducing training time by up to 2.46 ×. These results suggest that prefix-level compati-bility provides a practical signal for directing OPD com-putation toward trajectories that remain learnable from the teacher. 
+
+## Introduction 
+
+On-policy distillation (OPD) has become an increasingly important post-training paradigm for language-model rea-soning. Classical knowledge distillation transfers the behav-ior of a strong teacher to a smaller student by matching soft output distributions or teacher-generated sequences (Hinton, Vinyals, and Dean, 2015; Kim and Rush, 2016; Sanh et al., 2019; Jiao et al., 2020; Wang et al., 2020). However, off-policy distillation trains the student on fixed teacher tra-jectories, which can introduce exposure bias: at inference time, the student must condition on prefixes produced by its own policy rather than by the teacher (Bengio et al., 
+
+Figure 1: Overview of PG-OPD. Prefix-guided selection identifies high-value trajectories from early prefixes and al-locates long-rollout budget to them, improving both avg@16 accuracy and training efficiency. 2015). OPD addresses this mismatch by sampling trajec-tories from the current student and applying teacher super-vision on the same student-visited states (Gu et al., 2024; Agarwal et al., 2024). This makes OPD especially attrac-tive for long-horizon mathematical reasoning, where dense token-level supervision can provide richer learning signals than sparse final-answer rewards (Lu and Lab, 2025; Yang et al., 2025; Guo et al., 2025; Yu et al., 2025). Despite its effectiveness, OPD is computationally expen-sive. A typical OPD update samples multiple candidate tra-jectories for every prompt and decodes each candidate to a long response budget. For mathematical reasoning, where solutions can span thousands of tokens, rollout generation becomes one of the dominant costs of training. Existing rea-soning post-training pipelines often rely on large-scale roll-outs to obtain exploration and dense supervision (Shao et al., 2024; Guo et al., 2025; He et al., 2025; Yu et al., 2025). In OPD, this cost is further amplified because teacher feedback is evaluated on student-generated prefixes. As a result, full OPD spends comparable computation on all sampled trajec-tories, even though different trajectories may have very dif-
+
+> arXiv:2606.21994v1 [cs.LG] 20 Jun 2026
+
+ferent values for distillation. Recent analyses suggest that the success of OPD depends not only on teacher strength, but also on local compatibil-ity between the teacher and student on student-visited pre-fixes (Li et al., 2026; Fu et al., 2026; Jang et al., 2026; Jin et al., 2026). A useful diagnostic is teacher–student top-
+
+k overlap: when the student and teacher assign probabil-ity mass to similar candidate tokens, the teacher is more likely to provide locally exploitable supervision. Conversely, low-overlap prefixes may indicate that the student’s trajec-tory has drifted away from the teacher’s reasoning process. Training on such low-compatibility regions can waste roll-out computation and may even introduce noisy or mislead-ing dense supervision. This issue is particularly important in long-horizon reasoning, because even trajectories that begin with high overlap can gradually diverge as generation pro-ceeds. This motivates a different view of efficient OPD: the central question is not only how to shorten rollouts, but how to allocate rollout budget according to prefix-level dis-tillation value. Uniformly decoding every sampled trajec-tory to the same maximum length assumes that all candi-dates are equally worth continuing, even though their early prefixes may already exhibit very different teacher–student compatibility. Some prefixes remain close to the teacher’s high-probability token region and are likely to receive lo-cally exploitable dense supervision if continued, while oth-ers quickly move into low-overlap regions where additional decoding mainly produces long suffixes whose teacher sig-nal is weak, noisy, or difficult for the student to learn from. Treating these two types of trajectories identically wastes computation and may dilute the useful on-policy signal in the training batch. A fixed prefix therefore provides a natural opportunity to decide whether a candidate deserves expen-sive long-horizon generation before the full response is pro-duced. By evaluating teacher–student overlap on this prefix, OPD can obtain a lightweight estimate of whether the trajec-tory remains aligned with the teacher’s local action space. What OPD lacks is a simple rollout-allocation mechanism: instead of assigning the same response budget to every sam-pled candidate, it should use prefix-level compatibility to de-cide which trajectories deserve long continuations. We propose Prefix-Guided On-Policy Distillation (PG-OPD), a rollout-allocation framework for efficient OPD. PG-OPD first generates a short prefix for each sampled candi-date, computes teacher–student top-k overlap on the prefix, and then selectively allocates long continuations to trajecto-ries with higher prefix-level compatibility. In this way, PG-OPD avoids blindly spending the same long rollout budget on every candidate and instead directs computation toward trajectories that are more likely to provide useful distillation signal. The method is simple, model-agnostic, and can be implemented as a lightweight modification to standard OPD. We evaluate PG-OPD across diverse teacher–student combinations on challenging mathematical reasoning benchmarks, including AMC, AIME, and HMMT. Across these settings, PG-OPD consistently reduces training time while preserving, and often improving, downstream accu-racy. These results suggest that long-horizon OPD should not be governed by a uniform rollout budget alone. Instead, prefix-level compatibility provides a practical signal for reallocating computation toward trajectories that are more learnable for the student. Our contributions are summarized as follows: • We identify rollout allocation as a key efficiency bottle-neck in long-horizon OPD and propose using fixed-length prefix compatibility to estimate trajectory value. • We introduce PG-OPD, a simple prefix-guided rollout al-location method that selectively continues high-value tra-jectories while keeping the standard OPD objective un-changed. • We validate PG-OPD across multiple teacher–student combinations and mathematical reasoning benchmarks, showing consistent average-accuracy improvements and substantial wall-clock speedups. • We provide ablations on prefix length, random pruning, prompt-minimum allocation, and prefix-based ranking to analyze why PG-OPD works. 
+
+## Related Work 
+
+On-Policy Distillation 
+
+Knowledge distillation transfers knowledge from a teacher model to a student model through distribution matching or teacher-generated trajectories (Hinton, Vinyals, and Dean, 2015; Kim and Rush, 2016). Recent work extends this paradigm to on-policy distillation (OPD), where supervision is computed on trajectories sampled from the current student policy rather than on fixed teacher-generated data (Gu et al., 2024; Agarwal et al., 2024). By evaluating teacher distribu-tions on student-visited states, OPD reduces train–inference mismatch and provides dense token-level learning signals throughout generation. This formulation has become an im-portant component of modern post-training pipelines for rea-soning models (Lu and Lab, 2025; Yang et al., 2025; Guo et al., 2025; Yu et al., 2025). OPD has also been extended to self-distillation and online learning settings, where models improve through their own generated trajectories and feed-back signals (H¨ ubotter and others, 2026; Shenfeld and oth-ers, 2026; Zhao and others, 2026). Our work focuses on im-proving the efficiency of OPD while preserving its on-policy learning advantages. 
+
+Trajectory Value in OPD 
+
+Recent studies have begun to investigate why OPD succeeds or fails under different teacher–student configurations. Li et al. (2026) show that successful OPD depends on thinking-pattern consistency between the student and teacher, and that benchmark performance alone does not determine distilla-tion effectiveness. They further identify overlap ratio be-tween teacher and student top-k distributions as a key in-dicator of successful distillation, demonstrating that high-probability overlap tokens contribute most of the optimiza-tion signal. Subsequent work reports similar observations regarding teacher–student compatibility, reward quality, and learning dynamics in OPD (Fu et al., 2026; Jang et al., 2026; Jin et al., 2026). These analyses suggest that different trajec-tories contribute unequally to distillation. In particular, tra-jectories with high teacher–student overlap are more likely to provide useful learning signals, whereas low-overlap tra-jectories may offer limited benefit. Moreover, the value of a trajectory can change throughout generation, as initially aligned prefixes may gradually drift away from the teacher’s reasoning process. Our work builds on these observations and studies how trajectory value can be used to allocate roll-out computation more effectively. 
+
+Efficient OPD 
+
+As OPD becomes increasingly important for long-horizon reasoning, several works have explored reducing its compu-tational cost. Recent approaches improve efficiency through modified objectives, adaptive targets, or alternative super-vision strategies (Ko et al., 2026; Jang et al., 2026; Jin et al., 2026). Most closely related to our work, PRUNE-OPD dynamically truncates rollouts when teacher supervision be-comes unreliable under prefix drift, reducing computation spent on low-quality suffixes (Yang et al., 2026). While these methods primarily focus on improving supervision quality or controlling rollout length during training, our approach addresses a complementary problem: how to allocate rollout budgets across sampled trajectories before expensive long continuations are generated. PG-OPD uses short prefixes as a lightweight estimate of trajectory value and selectively al-locates continuation budgets according to teacher–student overlap, thereby reducing rollout cost while preserving use-ful distillation signal. 
+
+## Method 
+
+On-Policy Distillation 
+
+Let πθ and πT denote the student and teacher policies. Given a prompt x, OPD samples a response from the current stu-dent: 
+
+y = ( y1, . . . , y T ) ∼ πθ (· | x). (1) At position t, both models are evaluated on the same student-generated context ct = ( x, y <t ):
+
+pt(v) = πθ (v | ct), qt(v) = πT(v | ct). (2) OPD minimizes the reverse KL divergence from the stu-dent to the teacher (Gu et al., 2024; Agarwal et al., 2024): 
+
+LOPD = Ex, y ∼πθ (·| x)
+
+" TX
+
+> t=1
+
+DKL (pt∥qt)
+
+#
+
+, (3) where 
+
+DKL (pt∥qt) = X
+
+> v∈V
+
+pt(v) log pt(v)
+
+qt(v) . (4) For a batch of M prompts with K trajectories per prompt, the practical objective is 
+
+bLOPD = 1
+
+Z
+
+> M
+
+X
+
+> i=1
+> K
+
+X
+
+> j=1
+> L
+
+X
+
+> t=1
+
+mi,j,t ℓOPD  
+
+> i,j,t
+
+, (5) where mi,j,t is the valid-token mask and Z is the total number of valid response tokens. Standard OPD decodes every candidate to the full response budget L, whereas PG-OPD retains the same objective but selectively allocates long continuations. 
+
+Truncated On-Policy Distillation 
+
+Consider a batch containing M prompts. For each prompt 
+
+xi, the student policy πθ samples K candidate trajectories. At response position t of candidate j, the student and teacher next-token distributions are 
+
+pi,j,t (v) = πθ (v | xi, y i,j,<t ),qi,j,t (v) = πT (v | xi, y i,j,<t ). (6) Let ℓOPD  
+
+> i,j,t
+
+denote the standard token-level OPD loss com-puted from pi,j,t and qi,j,t . With a maximum response bud-get L, full OPD optimizes 
+
+LOPD = 1
+
+ZLMX
+
+> i=1
+> K
+
+X
+
+> j=1
+> L
+
+X
+
+> t=1
+
+mi,j,t ℓOPD  
+
+> i,j,t
+
+, (7) where mi,j,t is the valid-token mask and ZL =P 
+
+> i,j,t
+
+mi,j,t is the number of valid response tokens. A direct way to reduce rollout cost is to truncate every trajectory to a fixed prefix length P < L . The resulting trun-cated OPD objective is 
+
+LTrunc = 1
+
+ZPMX
+
+> i=1
+> K
+
+X
+
+> j=1
+> P
+
+X
+
+> t=1
+
+mi,j,t ℓOPD  
+
+> i,j,t
+
+. (8) This reduces the generation budget from M KL to M KP .However, uniform truncation treats all sampled candidates identically. It discards the suffixes of potentially valuable trajectories together with those of low-value trajectories, without considering whether a candidate remains compati-ble with the teacher. 
+
+Prefix-Based Trajectory Scoring 
+
+PG-OPD estimates trajectory value using teacher–student compatibility on a short scoring window. For candidate j
+
+of prompt xi, define the student and teacher next-token dis-tributions at prefix position t as 
+
+pi,j,t = πθ (· | xi, y i,j,<t ), qi,j,t = πT (· | xi, y i,j,<t ).
+
+(9) We measure local compatibility by the top-k overlap be-tween the two distributions: 
+
+ovlp( p, q ) = |TopK( p, k ) ∩ TopK( q, k )|
+
+k . (10) For each valid scoring position t ≤ R, the local overlap of candidate (i, j ) is therefore 
+
+oi,j,t = ovlp ( pi,j,t , q i,j,t ) . (11) The trajectory score is the mask-normalized mean overlap over the first R probe tokens: 
+
+si,j =
+
+PRt=1 mi,j,t oi,j,t 
+
+PRt=1 mi,j,t 
+
+. (12) 1 Rollout Collection                         
+
+> Prompt batch
+> {x i}i=1 M
+> Student policy
+> πθ
+> Sample Kcandidate trajectories per prompt
+> prefix P(shared) suffix (up to length L)score s
+> y1
+> y2
+> y3
+> ⋮
+> yK
+> prefix P continue s = 0.83
+> prefix P continue s = 0.74
+> prefix P stop s = 0.45
+> ⋮⋮⋮
+> prefix P stop s = 0.31
+> length Pup to length L- P
+> Teacher policy
+> πT
+> Prefix scoring
+> Top-k overlap
+> |S t∩Qt| / k
+> Selected continuations
+> ...
+> ...
+> selected rollouts enter OPD
+
+2 Complete OPD T raining Step         
+
+> Selected rollout batch
+> kept prefixes + continuations
+> ...
+> Build visited states
+> states from selected trajectories
+> xprefix c1 c2 ...
+> visited state: s t= (x, y <t )
+> Evaluate policies
+> student p θ(. | s t)
+> teacher q T(. | s t)
+> OPD KL objective
+
+LOPD = ∑ t DKL (p t || q t)
+
+> same OPD loss
+> Backprop + optimizer
+> update student policy
+> next iteration
+
+Figure 2: Overview of PG-OPD. The method uses fixed-length prefixes to estimate trajectory value through teacher–student top-k overlap, selectively continues high-value candidates, and then applies the standard OPD objective on the allocated rollout batch. In our default setting, R = 128 . Previous OPD analysis shows that successful distillation is associated with align-ment on shared high-probability tokens (Li et al., 2026). We therefore use si,j as a lightweight proxy for continuation value. A high score indicates that the student and teacher assign probability mass to similar candidate regions in the prefix, whereas a low score indicates greater local mismatch. The score is used only for rollout allocation and does not change the OPD objective. Given the active rollout length 
+
+Ti,j ∈ { P, L }, PG-OPD optimizes the standard OPD loss on the allocated rollout batch: 
+
+LPG -OPD = 1
+
+ZPG 
+
+X
+
+i,j Ti,j 
+
+X
+
+t=1 
+
+mi,j,t ℓOPD 
+
+i,j,t , (13) where 
+
+ZPG = X
+
+i,j Ti,j 
+
+X
+
+t=1 
+
+mi,j,t . (14) Thus, prefix scoring determines which candidates receive long continuations, while the distillation loss remains the same as standard OPD on the generated active tokens. 
+
+Prefix-Guided On-Policy Distillation 
+
+PG-OPD combines fixed-prefix generation with selective long continuation. Every candidate is first decoded to the same prefix length P and assigned a score si,j . Given a bud-get of B long continuations, PG-OPD allocates this budget in two stages. First, each prompt receives one continuation by selecting its highest-scoring candidate: 
+
+j∗
+
+i = arg max 
+
+1≤j≤K si,j , S0 = {(i, j ∗
+
+i )}Mi=1 . (15) This minimum-coverage rule prevents a purely global ranking from assigning all long continuations to a small sub-set of prompts. If B > M , the remaining B − M contin-uation slots are assigned to the highest-scoring candidates among those not already contained in S0. The final selected set is 
+
+S = S0 ∪ TopIdx B−M ({si,j : ( i, j ) /∈ S 0}) , (16) where TopIdx r returns the indices of the r largest scores. Candidates in S are continued from the prefix length P to the full response budget L. All remaining candidates stop at 
+
+P . Thus, the effective response length of candidate (i, j ) is 
+
+Ti,j =
+
+L, (i, j ) ∈ S ,P, (i, j ) /∈ S . (17) PG-OPD retains the generated prefixes of all candidates for training. Consequently, unselected candidates contribute OPD supervision over their first P tokens, while selected candidates additionally contribute supervision over their long continuations. The resulting objective is 
+
+LPG = 1
+
+ZPG 
+
+MX
+
+i=1 
+
+KX
+
+j=1 
+
+Ti,j 
+
+X
+
+t=1 
+
+mi,j,t ℓOPD 
+
+i,j,t , (18) where 
+
+ZPG =
+
+MX
+
+i=1 
+
+KX
+
+j=1 
+
+Ti,j 
+
+X
+
+t=1 
+
+mi,j,t . (19) Therefore, PG-OPD changes only the rollout-collection process and does not introduce a new distillation loss. Its response-generation budget is Algorithm 1 Prefix-Guided On-Policy Distillation                                                                 
+
+> Require: Prompts {xi}Mi=1 , student πθ, teacher πT, candidates per prompt K, scoring window R, prefix length P, full length L,continuation budget B
+> 1: Sample fixed prefixes {yi,j, ≤P}Kj=1 ∼πθ(·| xi)for each prompt xi
+> 2: Compute prefix score si,j for every candidate using teacher– student top-koverlap over the first Rprobe tokens 3: Select one candidate per prompt:
+> Smin ={(i, arg max
+> jsi,j )}Mi=1
+> 4: Select remaining candidates by global ranking:
+> S=Smin ∪Top B−M
+>  {(i, j )} \ S min ;si,j
+> 
+> 5: for each candidate (i, j )do
+> 6: if (i, j )∈ S then
+> 7: Continue yi,j, ≤Pto length Land set Ti,j =L
+> 8: else
+> 9: Stop at the fixed prefix and set Ti,j =P
+> 10: end if
+> 11: end for
+> 12: Update πθwith the standard OPD loss on active tokens t≤
+> Ti,j
+> 13: return Updated student policy πθ
+
+CPG = M KP + B(L − P ), (20) compared with M KL for full OPD. PG-OPD therefore preserves broad prefix-level on-policy supervision while concentrating expensive long generation on candidates with higher prefix-level teacher–student compatibility. 
+
+## Experiments 
+
+Setup 
+
+We evaluate PG-OPD on five mathematical reasoning benchmarks: AIME24, AIME25, AMC23, HMMT24, and HMMT25. The main setting uses DeepSeek-R1-Distill-Qwen-1.5B as the student and JustRL-DeepSeek-1.5B as the teacher. To evaluate whether the proposed rollout-allocation strategy generalizes across different model fam-ilies and teacher–student relationships, we further test three additional settings: OpenMath-1.5B distilled from JustRL-Nemotron-1.5B, DeepSeek-R1-Distill-Qwen-1.5B distilled from DeepSeek-R1-Distill-Qwen-7B, and Qwen3-4B-Base distilled from Qwen3-4B. All methods are trained on the same DAPO-Math-17K data under the same optimizer, sampling configuration, and number of optimization steps. Unless otherwise specified, we train for 1 epoch with a training mini-batch size of 64 and sample 4 responses per prompt during training. Roll-outs use temperature 1.0, teacher temperature 1.0, repetition penalty 1.0, and top-k = 16 log-probability extraction. We use the student-probability weighting variant for token-level distillation rewards and disable KL regularization and for-mat rewards. The maximum prompt length is 1024 tokens. For 1.5B and Qwen3 experiments, the maximum training response length is 7168 tokens unless a method explicitly changes the effective rollout budget. Unless otherwise specified, PG-OPD uses a prefix length of P = 5000 and an overlap-scoring window of R = 128 
+
+probe tokens. We evaluate pruning ratios of 25%, 50%, and 75%, where the pruning ratio denotes the fraction of sampled candidates that are not continued after the prefix-selection stage. Prefix tokens from all candidates are re-tained for training, while only selected candidates are de-coded beyond the prefix stage. For evaluation, we sample 16 solutions per problem with temperature 0.7, top-p = 0 .95 , and a maximum generation length of 31744 tokens. We report mean rollout accuracy over the 16 sampled solutions. Training time is measured as wall-clock time in seconds under the same training setup for each teacher–student pair. Speedup is computed relative to the OPD baseline under the same teacher–student setting. 
+
+Compared Methods 
+
+OPD. The baseline follows standard on-policy distillation. It samples trajectories from the current student policy, de-codes every sampled trajectory to the full response budget, and trains on all generated tokens. 
+
+PRUNE-OPD. PRUNE-OPD (Yang et al., 2026) monitors teacher–student top-k overlap during generation and trun-cates a rollout once the overlap falls below a threshold. It re-duces OPD cost through online trajectory truncation, rather than prefix-stage candidate selection. 
+
+PG-OPD. Prefix-Guided OPD first generates a short pre-fix for each sampled candidate, uses teacher–student top-k
+
+overlap on the prefix to estimate trajectory value, and then allocates long continuations only to selected candidates. Un-less otherwise specified, all candidates contribute their pre-fix tokens to training, while only selected candidates are de-coded beyond the prefix stage. 
+
+## Results 
+
+Main Results 
+
+Table 1 reports the main results across four teacher–student combinations. Overall, PG-OPD consistently improves the compute–performance tradeoff of OPD: the best PG-OPD configuration improves the average score over OPD in all four settings while also reducing wall-clock training time. In the main DeepSeek-R1-Distill-Qwen-1.5B / JustRL-DeepSeek-1.5B setting, PG-OPD with 75% pruning im-proves the average score from 41.97 to 42.81 and re-duces training time from 38,221 seconds to 17,265 sec-onds, yielding a 2.21 × speedup. Similar trends appear in the other settings: PG-OPD improves the average score from 59.40 to 64.20 on OpenMath-1.5B / JustRL-Nemotron-1.5B, from 30.65 to 34.25 on DeepSeek-R1-Distill-Qwen-1.5B / DeepSeek-R1-Distill-Qwen-7B, and from 18.28 to 22.01 on Qwen3-4B-Base / Qwen3-4B. These results show that prefix-guided rollout allocation is effective across dif-ferent model families and teacher–student relationships. The comparison with PRUNE-OPD further highlights the benefit of prefix-guided allocation. PRUNE-OPD often achieves stronger speedups because it aggressively truncates Method Pruned AIME24 AIME25 AMC23 HMMT24 HMMT25 Avg. Training Time (s) Speedup 
+
+DeepSeek-R1-Distill-Qwen-1.5B / JustRL-DeepSeek-1.5B 
+
+OPD 0% 47.92 35.42 85.47 18.75 22.29 41.97 38221 1.00 ×
+
+PRUNE-OPD – 47.08 31.46 82.65 20.21 18.33 39.95 15838 2.41 ×
+
+PG-OPD 25% 47.92 34.38 82.03 21.25 19.58 41.03 21883 1.75 ×
+
+PG-OPD 50% 42.71 36.25 85.47 23.75 17.92 41.22 20926 1.83 ×
+
+PG-OPD 75% 52.08 33.96 82.81 21.67 23.54 42.81 17265 2.21 ×
+
+OpenMath-1.5B / JustRL-Nemotron-1.5B 
+
+OPD 0% 68.96 60.21 96.56 30.83 40.42 59.40 31815 1.00 ×
+
+PRUNE-OPD – 66.88 62.50 95.00 34.38 40.16 59.78 19933 1.60 ×
+
+PG-OPD 25% 70.83 61.04 97.34 33.54 37.92 60.14 21905 1.45 ×
+
+PG-OPD 50% 76.25 67.08 95.78 36.88 45.00 64.20 19757 1.61 ×
+
+PG-OPD 75% 69.17 57.08 96.72 39.17 40.21 60.47 17008 1.87 ×
+
+DeepSeek-R1-Distill-Qwen-1.5B / DeepSeek-R1-Distill-Qwen-7B 
+
+OPD 0% 30.63 24.58 70.94 10.42 16.67 30.65 38896 1.00 ×
+
+PRUNE-OPD – 28.96 23.75 68.91 12.71 11.29 29.12 12868 3.02 ×
+
+PG-OPD 25% 33.75 27.08 74.38 13.75 22.29 34.25 23181 1.68 ×
+
+PG-OPD 50% 38.96 26.25 70.00 12.08 17.71 33.00 20516 1.90 ×
+
+PG-OPD 75% 26.46 24.38 73.12 11.04 18.12 30.63 18294 2.13 ×
+
+Qwen3-4B-Base / Qwen3-4B 
+
+OPD 0% 16.46 16.04 48.91 5.83 4.17 18.28 62476 1.00 ×
+
+PRUNE-OPD – 14.58 13.54 46.56 10.00 3.96 17.73 15143 4.13 ×
+
+PG-OPD 25% 17.08 16.88 57.32 11.25 7.50 22.01 36246 1.72 ×
+
+PG-OPD 50% 13.12 15.00 53.28 7.08 7.71 19.24 30609 2.04 ×
+
+PG-OPD 75% 16.25 12.08 54.84 5.00 8.33 19.30 25351 2.46 ×
+
+Table 1: Main results across four teacher–student combinations. Each block is formatted as student / teacher. Accuracy is reported as avg@16 on five mathematical reasoning benchmarks. “Pruned” denotes the fraction of candidates that are not decoded beyond the prefix stage. Speedup is computed relative to OPD under the same teacher–student setting. trajectories during generation, but this can remove useful learning signal and lead to lower accuracy. For example, in the main setting, PRUNE-OPD reaches a 2.41 × speedup but decreases the average score to 39.95, whereas PG-OPD achieves 42.81 with a still substantial 2.21 × speedup. Simi-larly, in other settings, PRUNE-OPD obtains faster training but underperforms OPD in average accuracy. These results suggest that simply shortening rollouts can discard useful supervision, while PG-OPD uses fixed-prefix overlap to al-locate long-continuation budget toward high-value trajecto-ries, reducing low-value or harmful supervision while pre-serving distillation quality. 
+
+Prefix Length Ablation 
+
+Figure 3 studies fixed-prefix truncation by training on only the first P tokens of each trajectory. The average score im-proves from 36.69 at P = 1000 to 42.00 at P = 5000 ,and remains similar at P = 6000 with 41.99, close to full-trajectory OPD at 41.97. This suggests that sufficiently long prefixes capture most useful OPD signal, while later suffix tokens may introduce noisier supervision as student trajecto-ries drift from the teacher. The result also motivates using a fixed prefix as a decision point: once enough prefix evidence is available, continuing every trajectory to full length is not always necessary, especially under a limited rollout budget where unnecessary suffix generation can dominate training cost and introduce noisy learning signals into the optimiza-tion process. 35      
+
+> 36
+> 37
+> 38
+> 39
+> 40
+> 41
+> 42
+> 43
+> 1000 2000 3000 4000 5000 6000
+> Prefix Length
+> Average Score
+> Avg.
+> Full avg.
+
+Figure 3: Prefix-length ablation. Models are trained using fixed prefix truncation with different prefix lengths P .Random Pruning Ablation                      
+
+> Method Pruned AIME24 AIME25 AMC23 HMMT24 HMMT25 Avg. Random 75% 40.00 36.67 84.84 22.50 14.58 39.72 PG-OPD 75% 52.08 33.96 82.81 21.67 23.54 42.81
+
+Table 2: Comparison between PG-OPD and random prun-ing. Random pruning removes the same fraction of trajecto-ries without using prefix-level teacher–student overlap. Table 2 compares PG-OPD with random pruning under the same 75% pruning ratio. Random pruning removes the same fraction of trajectories without using prefix-level teacher– student overlap, while PG-OPD uses the overlap score to decide which candidates should receive long continuations. PG-OPD improves the average score from 39.72 to 42.81, with large gains on AIME24 and HMMT25. This shows that the benefit of PG-OPD does not come merely from reducing the number of long continuations; rather, prefix-based rank-ing helps allocate rollout budget to more valuable trajecto-ries. 
+
+Prompt-Minimum Allocation Ablation 
+
+Table 3 ablates the prompt-minimum allocation rule under 75% pruning. Both variants retain all prefix trajectories for training, but only Prompt-Min1 guarantees that each prompt keeps at least one continued trajectory. This design improves the average score from 40.66 to 42.81, with clear gains on AIME24 and HMMT24. The result suggests that purely global ranking may concentrate long continuations on a sub-set of easier prompts, while leaving some prompts without any long-rollout supervision. By ensuring at least one con-tinued response per problem, Prompt-Min1 preserves more diverse sample gradients across prompts and makes prefix-guided allocation more stable under aggressive pruning.                   
+
+> Method AIME24 AIME25 AMC23 HMMT24 HMMT25 Avg. w/o Prompt-Min1 45.00 33.96 83.28 19.17 21.88 40.66 w/ Prompt-Min1 52.08 33.96 82.81 21.67 23.54 42.81
+
+Table 3: Ablation of prompt-minimum allocation under 75% pruning. Both variants retain all prefix trajectories for train-ing; Prompt-Min1 guarantees at least one continued trajec-tory per prompt. 
+
+Effect of Prefix-Based Ranking 
+
+To better understand whether the prefix-overlap ranking is meaningful, we analyze the utility of trajectories at different ranks under the 75% pruning setting. Figure 4 shows the av-erage benchmark accuracy when long-continuation budget is allocated only to trajectories at a fixed rank. Rank-1 tra-jectories achieve the best performance, while rank-2, rank-3, and rank-4 trajectories all lead to lower average scores. This result suggests that the prefix-based ranking captures meaningful differences in trajectory value: trajectories with higher prefix overlap are indeed more useful for distillation. The result further supports that the gains of PG-OPD come not only from reducing rollout cost, but from allocating long continuations to higher-value candidates. 41.0 41.5 42.0 42.5 43.0 42.81 
+
+Rank 1 
+
+> 42.01
+
+Rank 2 
+
+> 41.39
+
+Rank 3 
+
+> 41.35
+
+Rank 4 
+
+> Average score (%)
+
+Figure 4: Effect of prefix-based ranking under 75% prun-ing. Each bar reports the average benchmark accuracy when long-continuation budget is allocated only to trajectories at a fixed prefix-overlap rank. 
+
+Overlap Scoring Window Ablation 
+
+Table 4 studies how many prefix tokens should be used to compute the teacher–student overlap score for pruning de-cisions. A very short scoring window, such as 32 tokens, provides insufficient evidence for estimating trajectory value and leads to lower average performance. Increasing the win-dow to 64 or 128 tokens substantially improves the aver-age score, with 128 tokens achieving the best overall result of 42.81. However, using 256 tokens degrades performance, suggesting that overly long scoring windows may include noisier or less stable prefix states and weaken the quality of the selection signal. We therefore use 128 probe tokens as the default overlap-scoring window.                               
+
+> Probe Tokens AIME24 AIME25 AMC23 HMMT24 HMMT25 Avg. 32 44.58 31.46 82.19 18.96 16.88 38.81 64 44.38 35.42 85.47 22.71 22.29 42.05 128 52.08 33.96 82.81 21.67 23.54 42.81
+> 256 39.17 32.71 82.66 20.21 23.12 39.57
+
+Table 4: Ablation on the number of probe tokens used to compute the prefix-level overlap score. Probe Tokens de-notes the number of initial tokens used for teacher–student top-k overlap estimation before making pruning decisions. 
+
+## Conclusion 
+
+Existing OPD methods provide dense teacher supervision on student-sampled trajectories, but they usually assign the same long rollout budget to every sampled candidate. This uniform strategy becomes inefficient in long-horizon rea-soning: rollout generation dominates training cost, and tra-jectories with low teacher–student compatibility may pro-vide weak or even harmful distillation signal, especially as student-generated prefixes drift away from the teacher’s reasoning process. Motivated by these limitations, Prefix-Guided On-Policy Distillation (PG-OPD) uses short prefixes to estimate trajectory value via teacher–student top-k over-lap and selectively allocates long continuations to promis-ing candidates. This design keeps the standard OPD ob-jective unchanged while reducing unnecessary long-horizon generation. Across multiple teacher–student combinations and five mathematical reasoning benchmarks, PG-OPD im-proves the compute–performance tradeoff of OPD, achiev-ing up to 4.80 points of average-score improvement and up to 2.46 × wall-clock speedup across all settings. Ablation studies further show that prefix length, prefix-guided selec-tion, and prompt-level continuation coverage all contribute to stable performance under aggressive pruning. These re-sults suggest that efficient OPD should not blindly decode every sampled trajectory to full length; instead, prefix-level compatibility provides a practical signal for reallocating computation toward trajectories that are more useful for dis-tillation. 
+
+## Limitations 
+
+PG-OPD relies on prefix-level top-k overlap as a proxy for trajectory value. Although the ranking analysis shows that this signal is useful in our settings, it may be less reliable when teacher and student use substantially different reason-ing styles or tokenization behaviors. The method also intro-duces hyperparameters such as prefix length and continu-ation budget, whose optimal values may vary across mod-els and tasks. Finally, our experiments focus on mathemati-cal reasoning benchmarks; extending PG-OPD to multi-turn, tool-use, or agentic settings remains future work. 
+
+## References 
+
+Agarwal, R.; Vieillard, N.; Zhou, Y.; Stanczyk, P.; Ramos Garea, S.; Geist, M.; and Bachem, O. 2024. On-policy distillation of language models: Learning from self-generated mistakes. In ICLR .Bengio, S.; Vinyals, O.; Jaitly, N.; and Shazeer, N. 2015. Scheduled sampling for sequence prediction with recur-rent neural networks. In NeurIPS .Fu, Y.; Huang, H.; Jiang, K.; Zhu, Y.; and Zhao, D. 2026. Revisiting on-policy distillation: Empirical failure modes and simple fixes. arXiv preprint .Gu, Y.; Dong, L.; Wei, F.; and Huang, M. 2024. Minillm: Knowledge distillation of large language models. In 
+
+ICLR .Guo, D.; Yang, D.; Zhang, H.; Song, J.; Wang, P.; Zhu, Q.; Xu, R.; et al. 2025. Deepseek-r1: Incentivizing reason-ing capability in llms via reinforcement learning. arXiv preprint arXiv:2501.12948 .He, B.; Qu, Z.; Liu, Z.; Chen, Y.; Zuo, Y.; Qian, C.; Zhang, K.; Chen, W.; Xiao, C.; Cui, G.; et al. 2025. Justrl: Scaling a 1.5b llm with a simple rl recipe. arXiv preprint .Hinton, G.; Vinyals, O.; and Dean, J. 2015. Distill-ing the knowledge in a neural network. arXiv preprint arXiv:1503.02531 .H¨ ubotter, J., et al. 2026. Reinforcement learning via self-distillation. arXiv preprint .Jang, I.; Yeom, J.; Yeo, J.; Lim, H.; and Kim, T. 2026. Sta-ble on-policy distillation through adaptive target reformu-lation. arXiv preprint .Jiao, X.; Yin, Y.; Shang, L.; Jiang, X.; Chen, X.; Li, L.; Wang, F.; and Liu, Q. 2020. Tinybert: Distilling bert for natural language understanding. In Findings of EMNLP ,4163–4174. Jin, W.; Min, T.; Yang, Y.; Kadhe, S. R.; Zhou, Y.; Wei, D.; Baracaldo, N.; and Lee, K. 2026. Entropy-aware on-policy distillation of language models. arXiv preprint .Kim, Y., and Rush, A. M. 2016. Sequence-level knowledge distillation. In Proceedings of EMNLP , 1317–1327. Ko, J.; Abdali, S.; Kim, Y. J.; Chen, T.; and Cameron, P. 2026. Scaling reasoning efficiently via relaxed on-policy distillation. arXiv preprint .Li, Y.; Zuo, Y.; He, B.; Zhang, J.; Xiao, C.; Qian, C.; Yu, T.; Gao, H.-a.; Yang, W.; Liu, Z.; et al. 2026. Re-thinking on-policy distillation of large language models: Phenomenology, mechanism, and recipe. arXiv preprint arXiv:2604.13016 .Lu, K., and Lab, T. M. 2025. On-policy distillation. Blog post. Sanh, V.; Debut, L.; Chaumond, J.; and Wolf, T. 2019. Dis-tilbert, a distilled version of bert: Smaller, faster, cheaper and lighter. arXiv preprint arXiv:1910.01108 .Shao, Z.; Wang, P.; Zhu, Q.; Xu, R.; Song, J.; Bi, X.; Zhang, H.; Zhang, M.; Li, Y. K.; Wu, Y.; et al. 2024. Deepseek-math: Pushing the limits of mathematical reasoning in open language models. arXiv preprint arXiv:2402.03300 .Shenfeld, I., et al. 2026. Self-distillation enables continual learning. arXiv preprint .Wang, W.; Wei, F.; Dong, L.; Bao, H.; Yang, N.; and Zhou, M. 2020. Minilm: Deep self-attention distillation for task-agnostic compression of pre-trained transformers. In 
+
+NeurIPS .Yang, A.; Li, A.; Yang, B.; Zhang, B.; Hui, B.; Zheng, B.; Yu, B.; Gao, C.; Huang, C.; Lv, C.; et al. 2025. Qwen3 technical report. arXiv preprint .Yang, Z.; Guo, Z.; Song, Y.; Xu, M.; Wang, Y.; Wang, Y.; Liang, X.; and Tang, J. 2026. Prune-opd: Efficient and reliable on-policy distillation for long-horizon reasoning. 
+
+arXiv preprint arXiv:2605.07804 .Yu, Q.; Zhang, Z.; Zhu, R.; Yuan, Y.; Zuo, X.; Yue, Y.; Dai, W.; Fan, T.; Liu, G.; Liu, L.; et al. 2025. Dapo: An open-source llm reinforcement learning system at scale. arXiv preprint .Zhao, S., et al. 2026. Self-distilled reasoner: On-policy self-distillation for large language models. arXiv preprint .A Prompt Templates 
+
+In this section, we provide the prompt templates used for mathematical reasoning evaluation. The placeholder 
+
+Question is replaced by the corresponding problem state-ment from each benchmark. All models are prompted to pro-duce a reasoning trace followed by a final answer. 
+
+Template for AIME, AMC, and HMMT benchmarks 
+
+A conversation between User and Assistant. The user asks a question, and the Assistant solves it. The assistant first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning process and answer are enclosed within <think> </think> and 
+
+<answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> \n<answer> answer here </answer> . User: Question . Assistant: 
+
+Table 5: Prompt template used for mathematical reasoning benchmarks. 
+
+## B Training and Implementation Details 
+
+We train all methods under the same optimization and sam-pling setup unless otherwise specified. Table 6 summarizes the main training hyperparameters, and Table 7 summarizes the evaluation configuration. 
+
+Hyperparameter Value 
+
+Training dataset DAPO-Math-17K Number of training steps 279 Mini-batch size 64 Responses per prompt 4Maximum prompt length 1024 Maximum response length 7168 Optimizer learning rate 1 × 10 −6
+
+Rollout temperature 1.0 Teacher temperature 1.0 Repetition penalty 1.0 Top-k log-prob extraction 16 Reward weighting mode Student probability Loss aggregation Token mean KL regularization Disabled Format reward Disabled Checkpoint frequency Final checkpoint only Evaluation during training Disabled 
+
+Table 6: Training hyperparameters used for OPD, PG-OPD, and PRUNE-OPD. For PG-OPD, we use a prefix-based rollout allocation strategy. Each sampled candidate is first decoded for a short probe, and the teacher–student top-k overlap over this prefix is used as the selection score. Unless otherwise specified, the probe length is 128 tokens and the continuation prefix bud-get is P = 5000 . We evaluate pruning ratios of 25%, 50%, and 75%, corresponding to the fraction of sampled candi-dates that are not continued after the selection stage. Prefix tokens from all sampled candidates are retained for training, while only selected candidates are decoded beyond the pre-fix stage. 
+
+Hyperparameter Value 
+
+Evaluation benchmarks AIME24, AIME25, AMC23, HMMT24, HMMT25 Solutions per problem 16 Evaluation temperature 0.7 Top-p 0.95 Maximum generation length 31744 Metric avg@16 accuracy Thinking mode Disabled when evaluating non-thinking models 
+
+Table 7: Evaluation configuration used for all reported benchmark results. For PRUNE-OPD, we use teacher–student top-k overlap as the pruning signal. The pruning threshold is set to 0.7, with drop weight 0.01, base weight 0.5, and hit-ratio thresh-old 0.1. The dynamic response-length controller starts from 2048 tokens, uses a minimum length of 1024 tokens, a max-imum length of 12288 tokens, and adjusts the response bud-get in increments of 100 tokens. 
+
+## C Additional Results 
+
+C.1 Generalization to Additional Model Pairs 
+
+Table 8 reports additional results on Qwen teacher–student combinations. These results further evaluate whether PG-OPD generalizes beyond the main DeepSeek-based settings. On Qwen3-1.7B-Base / Qwen3-4B, PG-OPD improves the average score from 10.85 to 13.67 under 50% pruning while achieving a 1.44 × speedup. We also include the Qwen3-4B-Base / Qwen3-8B setting to provide an additional scale-up comparison. 
+
+C.2 Student Performance Before Distillation 
+
+Table 9 reports the initial performance of the student models before OPD training. These results provide the starting point for interpreting the gains obtained after distillation.                             
+
+> Student Model AIME24 AIME25 AMC23 HMMT24 HMMT25 Avg. DeepSeek-R1-Distill-Qwen-1.5B 29.17 25.21 69.06 13.12 12.92 29.90 Qwen3-1.7B-Base 3.12 0.00 14.53 0.00 0.00 3.53 Qwen3-4B-Base 8.75 9.79 27.50 3.33 1.67 10.21 OpenMath-Nemotron-1.5B 53.12 48.12 88.12 29.58 32.92 50.38
+
+Table 9: Student avg@16 performance before OPD training. 
+
+C.3 Prefix Length 
+
+Table 10 provides the detailed results for the prefix-length ablation. Models are trained using only the first P tokens of each trajectory. The results show that performance improves as P increases to around 5K–6K tokens, while further using the full trajectory brings little additional benefit. Method Pruned AIME24 AIME25 AMC23 HMMT24 HMMT25 Avg. Training Time (s) Speedup 
+
+Qwen3-1.7B-Base / Qwen3-4B 
+
+OPD 0% 8.96 3.96 37.81 3.54 0.00 10.85 46441 1.00 ×
+
+PG-OPD 25% 11.46 6.25 40.62 4.17 0.00 12.50 38100 1.22 ×
+
+PG-OPD 50% 13.12 7.29 43.12 4.79 0.00 13.67 32282 1.44 ×
+
+PG-OPD 75% 7.29 4.38 34.69 4.17 0.00 10.10 20341 2.28 ×
+
+Qwen3-4B-Base / Qwen3-8B 
+
+OPD 0% 16.67 14.58 53.91 3.75 1.25 18.03 66486 1.00 ×
+
+PG-OPD 25% 16.67 11.25 53.91 8.33 2.50 18.53 36922 1.80 ×
+
+PG-OPD 50% 18.33 12.92 51.25 4.38 4.79 18.33 31017 2.14 ×
+
+PG-OPD 75% 14.17 18.10 52.97 7.71 1.67 18.92 25906 2.57 ×
+
+Table 8: Additional results on Qwen teacher–student combinations. Each block is formatted as student / teacher. Accuracy is reported as avg@16 on five mathematical reasoning benchmarks. “Pruned” denotes the fraction of candidates that are not decoded beyond the prefix stage. Speedup is computed relative to OPD under the same teacher–student setting.                                                 
+
+> Prefix Length AIME24 AIME25 AMC23 HMMT24 HMMT25 Avg. 1000 37.92 34.17 77.19 17.92 16.25 36.69 2000 48.75 27.56 81.07 18.54 17.08 38.60 3000 48.54 33.75 81.09 18.13 22.71 40.84 4000 47.50 33.13 84.38 21.04 17.50 40.71 5000 47.71 35.83 85.63 22.50 18.33 42.00
+> 6000 46.88 34.17 83.91 22.71 22.29 41.99 Full 47.92 35.42 85.47 18.75 22.29 41.97
+
+Table 10: Detailed prefix-length ablation. Models are trained using only the first P tokens of each trajectory. Full denotes standard OPD with full trajectories. 
+
+C.4 Prefix-Based Rank 
+
+Table 11 provides the detailed results for the prefix-based rank analysis. Rank 1 denotes the candidate with the high-est fixed-prefix overlap score. The results show that Rank-1 candidates obtain the best average performance, supporting the use of prefix-overlap ranking for continuation allocation.                               
+
+> Rank AIME24 AIME25 AMC23 HMMT24 HMMT25 Avg. 152.08 33.96 82.81 21.67 23.54 42.81
+> 246.25 38.33 84.84 21.46 19.17 42.01 344.38 36.25 83.59 23.13 19.58 41.39 444.17 36.46 85.31 18.54 22.29 41.35
+
+Table 11: Detailed prefix-based rank analysis. Rank 1 de-notes the highest-overlap candidate according to the fixed-prefix score. Each row reports the result when long continu-ations are allocated to candidates at a specific rank.

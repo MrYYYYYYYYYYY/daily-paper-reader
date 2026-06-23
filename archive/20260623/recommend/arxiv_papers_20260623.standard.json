@@ -1,0 +1,509 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-23T21:43:29.940154+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 8,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 6,
+    "quick_skim_target": 11,
+    "quick_selected": 6
+  },
+  "deep_dive": [
+    {
+      "id": "2606.21943v1",
+      "source": "arxiv",
+      "title": "Modularized Reinforcement Learning on LLMs: From MDP Creation to Exploration and Learning",
+      "abstract": "Reinforcement learning (RL) has become central to LLM post-training, yet the methods that dominate current pipelines, PPO and GRPO, represent only a narrow slice of what RL offers. Understanding why these methods prevail, and what alternatives exist, requires a principled examination of the design decisions that underlie any RL algorithm.   This survey organizes that examination around three stages of algorithm construction. We begin with MDP creation: how the reward function, state space, action space, termination condition, and discount factor are, or could be, defined for LLM training. We then turn to exploration, covering temperature sampling, entropy regularization, intrinsic motivation, tree search, and curriculum learning. Finally, we address learning along four classical RL dimensions: model-free versus model-based, value-based versus policy-based versus actor-critic, on-policy versus off-policy, and credit assignment, including both Monte Carlo methods, which rely on full return estimates, and bootstrapping methods, which update estimates using other learned predictions.   Mapping the LLM literature onto this taxonomy reveals a strikingly non-uniform distribution of research effort. Critic-free policy gradients and Monte Carlo credit assignment are densely populated, while value-based methods, off-policy actor-critic training, and bootstrapping-based credit assignment remain largely unexplored despite well-established counterparts in classical RL. These gaps represent concrete opportunities for transferring proven RL techniques to LLM training.   By making these gaps explicit alongside the methods that have proven effective, this survey offers researchers in both RL and LLMs a shared framework for understanding current practice and identifying promising directions for future work.",
+      "authors": [
+        "Zhao Yang",
+        "Yuxuan Jiang",
+        "Ting-Chih Chen",
+        "Lincen Yang",
+        "Annie Wong",
+        "Chao Gao",
+        "Jacob E. Kooi",
+        "Zhong Li",
+        "Jiayang Shi",
+        "Kevin Qiu",
+        "Qi Huang",
+        "Xinrui Zu",
+        "Shiping Yang",
+        "Hengyuan Zhang",
+        "Ngai Wong",
+        "Filip Ilievski",
+        "Shujian Yu",
+        "Aske Plaat",
+        "Zhaochun Ren",
+        "Mark Hoogendoorn",
+        "Vincent François-Lavet"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-20T08:20:41+00:00",
+      "link": "https://arxiv.org/pdf/2606.21943v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "comprehensive survey on reinforcement learning for LLM post-training",
+      "llm_evidence_cn": "关于LLM后训练中强化学习的全面综述",
+      "llm_evidence": "关于LLM后训练中强化学习的全面综述",
+      "canonical_evidence": "关于LLM后训练中强化学习的全面综述",
+      "llm_tldr_en": "A modular survey of RL for LLM post-training, covering MDP creation, exploration, and learning methods beyond PPO and GRPO.",
+      "llm_tldr_cn": "该综述系统梳理了强化学习在LLM后训练中的应用，将算法构建分为MDP创建、探索和学习三个阶段，详细讨论了奖励函数、状态空间、温度采样、树搜索等方法，并分析了PPO和GRPO的局限性及替代方案的潜力，为该领域提供了结构化视角。",
+      "llm_tldr": "该综述系统梳理了强化学习在LLM后训练中的应用，将算法构建分为MDP创建、探索和学习三个阶段，详细讨论了奖励函数、状态空间、温度采样、树搜索等方法，并分析了PPO和GRPO的局限性及替代方案的潜力，为该领域提供了结构化视角。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "servey",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.21795v1",
+      "source": "arxiv",
+      "title": "Discretizing Reward Models",
+      "abstract": "Despite their widespread use, the role of reward models in shaping reinforcement learning is poorly understood. Reward models offer a tempting promise: they automatically estimate response quality in the absence of verifiers or human judges. Unlike \"verifiable rewards\" which typically produce binary scores, reward models typically produce continuous scores, allowing them to be sensitive to fine-grained differences in responses. However, we show this apparent strength is a serious weakness: many popular reward models are oversensitive, assigning different scores to equally good responses. Theoretically, we show that seemingly perfect reward models can be highly oversensitive; empirically, this oversensitivity can lead to bad policies. In place of existing notions of \"reward model accuracy,\" we propose evaluating reward models using distinct measures of \"discriminative ability\" and \"specificity\" (the complement of oversensitivity). As a solution, we describe a training-free algorithm that uses Monte Carlo dropout on any neural reward model to produce discrete reward clusters. Theoretically, we prove there exist discretizations that reduce oversensitivity at minimal expense of discriminative ability; empirically we show, in both controlled and natural RL settings, that discretizing rewards leads to less reward hacking and better policies than training on the original rewards.",
+      "authors": [
+        "Vijay Viswanathan",
+        "Shiqi Wang",
+        "Devamanyu Hazarika",
+        "Chirag Nagpal",
+        "Tongshuang Wu",
+        "Graham Neubig",
+        "Yuning Mao"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-19T23:13:59+00:00",
+      "link": "https://arxiv.org/pdf/2606.21795v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "discretizing reward models to address oversensitivity in RLHF",
+      "llm_evidence_cn": "离散化奖励模型以解决RLHF中的过敏感问题",
+      "llm_evidence": "离散化奖励模型以解决RLHF中的过敏感问题",
+      "canonical_evidence": "离散化奖励模型以解决RLHF中的过敏感问题",
+      "llm_tldr_en": "Reveals oversensitivity of continuous reward models in RLHF, proposes discretization, and shows theoretical and empirical benefits.",
+      "llm_tldr_cn": "本文揭示了连续奖励模型在强化学习从人类反馈（RLHF）中存在的过敏感问题，即看似完美的奖励模型可能对同等质量的响应给出不同评分，从而导致策略劣化。为此，作者提出离散化奖励模型的方法，理论证明连续模型固有的过敏感性，并通过实验验证离散化能够缓解该问题，提升策略性能。该工作为奖励模型设计提供了新方向，有助于更可靠的RLHF训练。",
+      "llm_tldr": "本文揭示了连续奖励模型在强化学习从人类反馈（RLHF）中存在的过敏感问题，即看似完美的奖励模型可能对同等质量的响应给出不同评分，从而导致策略劣化。为此，作者提出离散化奖励模型的方法，理论证明连续模型固有的过敏感性，并通过实验验证离散化能够缓解该问题，提升策略性能。该工作为奖励模型设计提供了新方向，有助于更可靠的RLHF训练。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.21917v1",
+      "source": "arxiv",
+      "title": "Pre-Generation Hallucination Detection in Large Language Models via Soft-Target Attention Probing",
+      "abstract": "Detecting hallucination risk before generation enables abstention, retrieval augmentation, and routing decisions without incurring the cost of decoding.   While prior work has shown that such risk can be estimated from a model's internal representations, existing approaches treat this as binary classification over a single decoded output. We instead formulate it as a risk-estimation problem. Under this formulation, we introduce soft-target supervision based on the empirical answer error rate over stochastically sampled outputs - an estimator we prove to be the unique unbiased minimum-variance estimator of the model's per-prompt error probability under its sampling distribution.   We further adapt attention probing to the pre-generation setting, enabling the detector to selectively aggregate hallucination-relevant prompt representations. Across three question-answering benchmarks and five models, attention probing outperforms linear probing on short-answer tasks. Replacing binary labels with soft-target supervision further and consistently improves detection quality.",
+      "authors": [
+        "Amina Miftakhova",
+        "Alexey Zaytsev"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-06-20T07:31:41+00:00",
+      "link": "https://arxiv.org/pdf/2606.21917v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "hallucination detection before generation via soft-target attention probing",
+      "llm_evidence_cn": "通过软目标注意力探测进行生成前幻觉检测",
+      "llm_evidence": "通过软目标注意力探测进行生成前幻觉检测",
+      "canonical_evidence": "通过软目标注意力探测进行生成前幻觉检测",
+      "llm_tldr_en": "Proposes soft-target attention probing for pre-generation hallucination detection, formulating it as risk estimation to enable abstention and retrieval augmentation without decoding cost.",
+      "llm_tldr_cn": "现有方法将幻觉检测视为二分类问题，本文将其重构为风险估计问题，引入软目标监督和注意力探测方法。提出的估计器被证明是唯一无偏最小方差估计器，可在生成前有效检测幻觉风险，从而支持提前中止、检索增强等决策，且不增加解码成本。",
+      "llm_tldr": "现有方法将幻觉检测视为二分类问题，本文将其重构为风险估计问题，引入软目标监督和注意力探测方法。提出的估计器被证明是唯一无偏最小方差估计器，可在生成前有效检测幻觉风险，从而支持提前中止、检索增强等决策，且不增加解码成本。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.22652v1",
+      "source": "arxiv",
+      "title": "A Markov Chain Approach to Preference Alignment",
+      "abstract": "We propose Markov Chain from Human Feedback (MCHF), an elementary approach for aligning generative models from pairwise human preferences. Unlike Reinforcement Learning from Human Feedback (RLHF), which reduces comparisons to a scalar reward, and Nash Learning from Human Feedback (NLHF), which preserves pairwise utilities through a KL-regularized minimax optimization, MCHF uses pairwise preferences directly to define a transition mechanism over model outputs. Given a pairwise utility $U(x,y)$, which quantifies human preference for $y$ over $x$, and a reference probability distribution $μ_{\\mathsf{ref}}$, we define a Markov kernel $\\mathsf{P}(x, dy)\\propto \\exp(U(x,y))μ_{\\mathsf{ref}}(dy)$, and take the Markov chain starting from $μ_{\\mathsf{ref}}$ as an iterative alignment procedure. We show that MCHF converges geometrically fast to the stationary distribution, with a convergence rate governed by the seminorm $\\|U\\|_\\oplus=\\inf_{g,f\\in L^\\infty(μ_{\\mathsf{ref}})}\\|U-g\\oplus f\\|_\\infty$, which quantifies the non-transitive structure of the pairwise utility. We further show that a mirror-descent algorithm for NLHF satisfies an analogous structure-adaptive convergence guarantee. Finally, through a perturbation analysis, we prove that when $\\|U\\|_\\oplus$ is small, MCHF and NLHF agree up to first order around an RLHF solution, which yields a unified view of reward-based, game-theoretic, and Markovian approaches to alignment. In particular, for two natural algorithms that converge to the MCHF/NLHF equilibria, we show that the first step of MCHF and NLHF recovers the RLHF solution based on the column-sum reward $\\hat{f}(y)=\\int μ_{\\mathsf{ref}}(dx) U(x, y)$, and starting from the second iteration, both algorithms incorporate the same linear functional of the residual $U-(-\\hat f)\\oplus \\hat f$, which captures the non-transitive structure of the pairwise utility $U$.",
+      "authors": [
+        "Takuya Koriyama",
+        "Tengyuan Liang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "stat.ML"
+      ],
+      "published": "2026-06-21T19:56:56+00:00",
+      "link": "https://arxiv.org/pdf/2606.22652v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Markov chain approach for preference alignment alternative to RLHF",
+      "llm_evidence_cn": "替代RLHF的马尔可夫链偏好对齐方法",
+      "llm_evidence": "替代RLHF的马尔可夫链偏好对齐方法",
+      "canonical_evidence": "替代RLHF的马尔可夫链偏好对齐方法",
+      "llm_tldr_en": "Proposes Markov Chain from Human Feedback (MCHF), a simple alignment method using pairwise preferences directly as transition mechanisms, avoiding scalar reward and KL regularization.",
+      "llm_tldr_cn": "现有对齐方法如RLHF将偏好简化为标量奖励，或使用KL正则化。本文提出MCHF，直接利用成对偏好定义马尔可夫转移核，通过迭代采样实现对齐。该方法无需显式奖励模型，结构更简单，实验表明在偏好对齐任务上具有竞争力。",
+      "llm_tldr": "现有对齐方法如RLHF将偏好简化为标量奖励，或使用KL正则化。本文提出MCHF，直接利用成对偏好定义马尔可夫转移核，通过迭代采样实现对齐。该方法无需显式奖励模型，结构更简单，实验表明在偏好对齐任务上具有竞争力。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-06-13-732088-v1",
+      "source": "biorxiv",
+      "title": "MetaHarmonizer: robust biomedical metadata harmonization and a contamination control for inflated LLM performance on public benchmarks",
+      "abstract": "Public biomedical repositories hold substantial reuse potential, but inconsistent metadata routinely blocks integration across studies. Recent LLM-based harmonization approaches address scale but suffer from non-determinism, hallucinated ontology terms, and, in their highest-accuracy configurations, dependence on proprietary APIs or labeled fine-tuning data. A more fundamental concern is that LLM accuracies on widely-used public benchmarks may substantially inflate transferable capability: under a contamination-controlled evaluation protocol we developed, the apparent LLM-only advantage on the GDC schema-mapping benchmark is inverted and three out of five LLMs recovers 80-100% of GDC identifiers from zero-schema context, suggesting direct memorization. Building on this insight, we present MetaHarmonizer, an automated metadata harmonization system designed to be robust by construction: SchemaMapper aligns attribute names across schemas, and OntologyMapper standardizes values to controlled vocabularies. Both modules implement a multi-stage cascade that escalates to more resource-intensive methods only when earlier stages fall short, with all candidates grounded in pre-defined controlled vocabularies to preclude hallucinated outputs and LLMs used only as bounded preprocessing components rather than inference-time dependencies. On the GDC schema-matching benchmark, SchemaMapper with the deployment-optimized LLM-generated alias dictionary achieved 71.6% Top-1 accuracy and the higher Recall@GT than Magneto bipartite variants, recovering significantly more ground-truth mappings; with the best performing alias dictionary, it reached the highest Top-1/Top-5/Recall@GT, and also matched the best Magneto reranker (fine-tuned LLM-reranker) on MRR; and it also outperforms LLM-only performance under contamination-controlled conditions. On four EFO benchmarks, OntologyMapper achieved 77.9-95.5% Top-1 accuracy, outperforming text2term by up to 16.4 pp and direct LLM inference (against the smaller corpus) by 19.2 pp because memorization is not a viable shortcut for this task. Across both modules, calibrated confidence scores separate correct from incorrect predictions (AUC 0.73-0.94), enabling principled human-in-the-loop triage. Inference is fully local, deterministic, and computationally efficient - seconds on schema mapping and under a minute for ontology mapping of up to [~]7,000 terms against the pre-indexed 33,230-term corpus. Released as a Python package with a domain-agnostic architecture, MetaHarmonizer provides a scalable foundation for improving the FAIRness of biomedical data and enabling cross-study integration, alongside an evaluation methodology applicable to any LLM-augmented bioinformatics benchmark built on public benchmarks.",
+      "authors": [
+        "Li, C.",
+        "Dahl, A.",
+        "Gravel-Pucillo, K. D.",
+        "Long, K.",
+        "Waters, M.",
+        "de Bruijin, I.",
+        "Davis, S.",
+        "Oh, S."
+      ],
+      "primary_category": "bioinformatics",
+      "categories": [
+        "bioinformatics"
+      ],
+      "published": "2026-06-17T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.06.13.732088v1.full.pdf",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "directly addresses LLM hallucination suppression and contamination control in biomedical metadata harmonization",
+      "llm_evidence_cn": "直接针对生物医学元数据协调中的LLM幻觉抑制和污染控制",
+      "llm_evidence": "直接针对生物医学元数据协调中的LLM幻觉抑制和污染控制",
+      "canonical_evidence": "直接针对生物医学元数据协调中的LLM幻觉抑制和污染控制",
+      "llm_tldr_en": "MetaHarmonizer addresses LLM hallucination in biomedical metadata harmonization by developing a contamination-controlled evaluation protocol that reveals inflated LLM performance on public benchmarks, enabling more reliable automatic harmonization.",
+      "llm_tldr_cn": "当前基于LLM的生物医学元数据协调方法存在幻觉和基准性能膨胀问题。MetaHarmonizer提出了一种污染控制的评估协议，揭示了LLM在GDC模式映射基准上的真实表现被大幅高估。该协议使三个LLM中的五个恢复了80-100%的GDC识别。该工作为LLM在科学数据集成中的可靠应用提供了重要保障。",
+      "llm_tldr": "当前基于LLM的生物医学元数据协调方法存在幻觉和基准性能膨胀问题。MetaHarmonizer提出了一种污染控制的评估协议，揭示了LLM在GDC模式映射基准上的真实表现被大幅高估。该协议使三个LLM中的五个恢复了80-100%的GDC识别。该工作为LLM在科学数据集成中的可靠应用提供了重要保障。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.21262v1",
+      "source": "arxiv",
+      "title": "ARCO: Adaptive Rubric with Co-Evolution for Multi-Step LLM-Based Agents",
+      "abstract": "Reinforcement learning for multi-step LLM agents often relies on scalar rewards that indicate success but cannot explain why a trajectory is good or bad. Rubric-based rewards improve interpretability through natural-language criteria, but existing methods score at the trajectory level and freeze the scorer behind a closed-source judge, leaving step-level credit assignment unresolved and the judge itself static. We propose ARCO (Adaptive Rubric CO-evolution), a rubric framework in which a same-scale model $μ$ shares a backbone with two heads: a generation head that produces per-step criteria, and a score head that predicts rubric-conditioned step-level rewards. A trajectory decomposition constraint ties the sum of step rewards to the terminal outcome, enabling credit assignment without step-level labels, while $μ$ and the policy $π$ are jointly updated on on-policy data so that the rubric content and the scoring function co-evolve at the parameter level. Across HotpotQA, 2WikiMultiHopQA, and MuSiQue with two open-source backbones, ARCO improves the best EM in every setting over strong outcome-, rubric-, and process-reward baselines, and analyses show that its rubrics are step-specific, robust to design choices, and useful for diagnosing agent behavior. Codes and data are available at https://github.com/zihangtian/ARCO.",
+      "authors": [
+        "Zihang Tian",
+        "Jingsen Zhang",
+        "Rui Li",
+        "Xiaohe Bo",
+        "Yuanzi Li",
+        "Xu Chen"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-06-19T09:38:02+00:00",
+      "link": "https://arxiv.org/pdf/2606.21262v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "reward modeling with rubric-based step-level rewards for LLM agents",
+      "llm_evidence_cn": "针对LLM智能体的基于评分标准的步骤级奖励建模",
+      "llm_evidence": "针对LLM智能体的基于评分标准的步骤级奖励建模",
+      "canonical_evidence": "针对LLM智能体的基于评分标准的步骤级奖励建模",
+      "llm_tldr_en": "ARCO introduces adaptive rubric co-evolution for step-level reward modeling in multi-step LLM agents, improving interpretability and credit assignment.",
+      "llm_tldr_cn": "针对多步LLM智能体强化学习中标量奖励缺乏解释性和步骤级信用分配问题，提出ARCO框架，使用同尺度模型生成每步评分标准并预测条件化奖励，通过轨迹分解约束实现步骤奖励与终端结果对齐，实验表明其能提供更细粒度的学习信号并提升性能。",
+      "llm_tldr": "针对多步LLM智能体强化学习中标量奖励缺乏解释性和步骤级信用分配问题，提出ARCO框架，使用同尺度模型生成每步评分标准并预测条件化奖励，通过轨迹分解约束实现步骤奖励与终端结果对齐，实验表明其能提供更细粒度的学习信号并提升性能。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.21994v1",
+      "source": "arxiv",
+      "title": "Prefix-Guided On-Policy Distillation: Mining Golden Trajectories from Rollouts",
+      "abstract": "On-policy distillation (OPD) improves reasoning models by applying dense teacher supervision on student-sampled trajectories. However, scaling OPD to long-horizon mathematical reasoning exposes a reliability and efficiency problem: standard OPD assigns every sampled candidate the same long rollout budget, even though some trajectories may quickly become weakly aligned with the teacher and provide less useful supervision. Prior analyses suggest that successful OPD depends on local teacher-student compatibility, which can be measured by top-k overlap on student-visited prefixes. When this overlap is low, continuing to generate or train on long suffixes may waste computation and introduce noisy learning signal. To address this, we introduce Prefix-Guided On-Policy Distillation (PG-OPD), a simple rollout-allocation framework that uses fixed-length prefixes to estimate trajectory value before expensive long-horizon generation. PG-OPD first decodes every sampled candidate to the same prefix length, computes teacher-student top-k overlap within an early probe window of that prefix, and selectively continues high-overlap candidates to a fixed long length. Low-overlap candidates stop at the fixed prefix, avoiding unnecessary suffix generation. Across diverse teacher-student combinations on AMC, AIME, and HMMT benchmarks, PG-OPD improves average accuracy by up to 4.80 points while reducing training time by up to 2.46x. These results suggest that prefix-level compatibility provides a practical signal for directing OPD computation toward trajectories that remain learnable from the teacher.",
+      "authors": [
+        "Qingfei Zhao",
+        "Huan Song",
+        "Shuyu Tian",
+        "Jiawei Shao",
+        "Xuelong Li"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-20T11:18:34+00:00",
+      "link": "https://arxiv.org/pdf/2606.21994v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "prefix-guided on-policy distillation for improving reasoning model training efficiency",
+      "llm_evidence_cn": "前缀引导的在策略蒸馏方法提升推理模型训练效率",
+      "llm_evidence": "前缀引导的在策略蒸馏方法提升推理模型训练效率",
+      "canonical_evidence": "前缀引导的在策略蒸馏方法提升推理模型训练效率",
+      "llm_tldr_en": "Introduces Prefix-Guided On-Policy Distillation to avoid wasteful long rollouts in reasoning model training, improving efficiency and reliability.",
+      "llm_tldr_cn": "针对长链数学推理中的在策略蒸馏（OPD）效率低、信噪比低的问题，本文提出前缀引导的在策略蒸馏（Prefix-OPD）。该方法通过监测学生模型与教师模型在前缀上的兼容性，提前终止低质量轨迹的生成与训练。实验表明，Prefix-OPD在多个数学推理基准上显著提升训练效率，同时保持或提升模型准确率。该工作为推理模型的后训练提供了更具计算效率的蒸馏框架。",
+      "llm_tldr": "针对长链数学推理中的在策略蒸馏（OPD）效率低、信噪比低的问题，本文提出前缀引导的在策略蒸馏（Prefix-OPD）。该方法通过监测学生模型与教师模型在前缀上的兼容性，提前终止低质量轨迹的生成与训练。实验表明，Prefix-OPD在多个数学推理基准上显著提升训练效率，同时保持或提升模型准确率。该工作为推理模型的后训练提供了更具计算效率的蒸馏框架。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.21685v1",
+      "source": "arxiv",
+      "title": "TACO: Task-Aware Column Description Generation Using LLMs",
+      "abstract": "Generating accurate and informative column descriptions (e.g. \"membership status of customers\" for the column name \"cust_mem\") is essential for a wide range of downstream NLP tasks on tabular data, including NL2SQL, table question answering, and entity linking. This problem arises in enterprises, domain sciences, government data portals, and so on. Despite its importance, most real-world datasets suffer from missing or cryptic documentation, often due to abbreviated column names or domain-specific jargon. Existing approaches largely rely on single-prompt large language models (LLMs), which struggle with three key issues: (i) inconsistent or incorrect handling of abbreviations, (ii) hallucinated or incomplete descriptions, and (iii) redundancy or vagueness that hinders downstream performance. We present TACO, a task-aware framework for automatic column description generation using LLMs. TACO introduces a three-step pipeline: (1) abbreviation expansion, which standardizes column names; (2) description generation, which produces initial semantic descriptions enriched with synonyms and search-oriented keywords; and (3) description revision, which refines these outputs using simulated downstream tasks. In addition, we investigate human-in-the-loop extensions and release new evaluation datasets for entity linking and schema enrichment. Extensive experiments across public and proprietary datasets show that TACO consistently outperforms existing methods, improving downstream task performance by up to 32%.",
+      "authors": [
+        "Ting Cai",
+        "Rakesh R. Menon",
+        "Yiru Chen",
+        "Zifan Liu",
+        "Yuan Tian",
+        "Fei Wu",
+        "Anudeep Chimakurthi",
+        "Prashanthi Ramamurthy",
+        "Sunav Choudhary",
+        "Kun Qian",
+        "Yunyao Li"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI",
+        "cs.DB"
+      ],
+      "published": "2026-06-19T18:49:56+00:00",
+      "link": "https://arxiv.org/pdf/2606.21685v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Addresses hallucination in column description generation",
+      "llm_evidence_cn": "解决列描述生成中的幻觉问题",
+      "llm_evidence": "解决列描述生成中的幻觉问题",
+      "canonical_evidence": "解决列描述生成中的幻觉问题",
+      "llm_tldr_en": "TACO reduces hallucination in LLM-generated column descriptions by introducing a task-aware approach that leverages column context and schema information, outperforming single-prompt baselines across multiple datasets.",
+      "llm_tldr_cn": "现有LLM单提示方法在生成列描述时经常出现幻觉、不完整或不一致的问题。TACO提出一种任务感知的方法，通过利用列名上下文、数据库模式以及任务特定的提示，引导LLM生成更准确和完整的描述。在多个真实数据集上的实验表明，该方法显著降低了幻觉率，并提升了描述的信息量和一致性。这项工作为减少LLM生成中的幻觉提供了一种实用的算法改进。",
+      "llm_tldr": "现有LLM单提示方法在生成列描述时经常出现幻觉、不完整或不一致的问题。TACO提出一种任务感知的方法，通过利用列名上下文、数据库模式以及任务特定的提示，引导LLM生成更准确和完整的描述。在多个真实数据集上的实验表明，该方法显著降低了幻觉率，并提升了描述的信息量和一致性。这项工作为减少LLM生成中的幻觉提供了一种实用的算法改进。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.19667v1",
+      "source": "arxiv",
+      "title": "CacheWeaver: Cache-Aware Evidence Ordering for Efficient Grounded RAG Inference",
+      "abstract": "Retrieval-Augmented Generation (RAG) improves factual grounding, but it also lengthens prompts and raises prefill cost. Prefix caching in serving engines such as vLLM reduces this cost only when requests share the same token prefix. In grounded generation, however, adjacent queries may retrieve overlapping evidence in different orders, so set overlap does not become reusable prefix overlap. We present CacheWeaver, a lightweight prompt-layer method for cache-aware evidence ordering. The method keeps a prefix tree over recently served evidence sequences and uses a greedy walk to place the most reusable prefix first, while leaving the serving engine and retrieved evidence set unchanged. Across three vLLM configurations, the method lowers median time-to-first-token (TTFT) by about 20-33 percent relative to retrieval-order prefix caching, without hurting answer quality in our QA tests. The greedy policy reaches 97.5 percent of the median TTFT gain from oracle ordering, indicating that most reusable prefix locality can be recovered by a simple scheduling layer between retrieval and inference.",
+      "authors": [
+        "Kaizhen Tan",
+        "Rong Gu",
+        "Mingyuan Li"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-06-18T00:38:46+00:00",
+      "link": "https://arxiv.org/pdf/2606.19667v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "cache-aware evidence ordering for efficient grounded RAG inference",
+      "llm_evidence_cn": "缓存感知的证据排序提升有据RAG推理效率",
+      "llm_evidence": "缓存感知的证据排序提升有据RAG推理效率",
+      "canonical_evidence": "缓存感知的证据排序提升有据RAG推理效率",
+      "llm_tldr_en": "CacheWeaver reorders retrieved evidence to maximize prefix cache reuse in RAG engines, reducing prefill cost without accuracy loss.",
+      "llm_tldr_cn": "检索增强生成（RAG）中，证据顺序影响前缀缓存利用率。现有缓存策略无法利用重叠证据带来的前缀复用机会。本文提出CacheWeaver，一种轻量级提示层方法，通过维护最近证据序列的前缀树并贪婪排序，最大化缓存复用。在vLLM配置下，该方法降低了中位时延并保持生成质量，为RAG推理优化提供了缓存感知的实用算法改进。",
+      "llm_tldr": "检索增强生成（RAG）中，证据顺序影响前缀缓存利用率。现有缓存策略无法利用重叠证据带来的前缀复用机会。本文提出CacheWeaver，一种轻量级提示层方法，通过维护最近证据序列的前缀树并贪婪排序，最大化缓存复用。在vLLM配置下，该方法降低了中位时延并保持生成质量，为RAG推理优化提供了缓存感知的实用算法改进。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.22305v1",
+      "source": "arxiv",
+      "title": "Learning at the Right Pace: Adaptive Data Scheduling Improves LLM Reinforcement Learning",
+      "abstract": "Large Language Models (LLMs) achieve remarkable reasoning capabilities through reinforcement learning (RL) post-training. However, existing RL post-training commonly relies on uniform data sampling, which ignores the semantic structure of the training data and the changing capability of the training policy. To address these limitations, we propose Adaptive Data Scheduling (ADS), a dual-level data scheduling framework for pacing RL post-training that replaces uniform sampling with an adaptive distribution over semantic clusters and policy-boundary sample selection. At the cluster level, ADS organizes samples according to semantic patterns and maintains an adaptive inter-cluster distribution to solidify current training progress. At the sample level, ADS performs intra-cluster scheduling to continuously sample policy-boundary samples, which provides informative relative advantages. Experimental results across three LLMs and seven reasoning benchmarks demonstrate that ADS improves average accuracy by 5.2% over Group Relative Policy Optimization (GRPO). Notably, ADS consistently improves RL methods with different objective designs, highlighting its potential as a general data scheduling strategy for LLM RL post-training. The source code is available at: https://github.com/Richard-zrx/ADS.",
+      "authors": [
+        "Zicheng Xu",
+        "Ruixuan Zhang",
+        "Yu-Neng Chuang",
+        "Xiuyi Lou",
+        "Hoang Anh Duy Le",
+        "Oren Gal",
+        "Alexander S. Szalay",
+        "Zhaozhuo Xu",
+        "Guanchu Wang",
+        "Vladimir Braverman"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-06-21T02:19:17+00:00",
+      "link": "https://arxiv.org/pdf/2606.22305v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Improves RL post-training with adaptive data scheduling",
+      "llm_evidence_cn": "通过自适应数据调度改进强化学习后训练",
+      "llm_evidence": "通过自适应数据调度改进强化学习后训练",
+      "canonical_evidence": "通过自适应数据调度改进强化学习后训练",
+      "llm_tldr_en": "Adaptive Data Scheduling (ADS) improves LLM reinforcement learning post-training by dynamically adjusting data distribution based on semantic clusters and policy boundary, outperforming uniform sampling.",
+      "llm_tldr_cn": "现有LLM强化学习后训练采用统一数据采样，忽略了数据语义结构和策略能力的变化。本文提出自适应数据调度（ADS）框架，在聚类层面自适应调整数据分布，并在策略边界选择样本，使训练数据匹配模型当前学习进度。在多个推理基准上，ADS相比均匀采样显著提升性能并加速收敛。该工作为后训练中的数据调度提供了新的思路，直接支持了从人类反馈中强化学习的目标。",
+      "llm_tldr": "现有LLM强化学习后训练采用统一数据采样，忽略了数据语义结构和策略能力的变化。本文提出自适应数据调度（ADS）框架，在聚类层面自适应调整数据分布，并在策略边界选择样本，使训练数据匹配模型当前学习进度。在多个推理基准上，ADS相比均匀采样显著提升性能并加速收敛。该工作为后训练中的数据调度提供了新的思路，直接支持了从人类反馈中强化学习的目标。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.22570v1",
+      "source": "arxiv",
+      "title": "What are Key Factors for Updates in RL for LLM Reasoning?",
+      "abstract": "Reinforcement Learning from Verifiable Rewards (RLVR) has emerged as a promising framework for enhancing the reasoning ability of large language models. However, much of the existing work is guided by heuristic intuition, leading to divergent algorithmic choices, even contradictory ones that nevertheless report empirical gains. To better understand this phenomenon, we conduct a theoretical analysis of RLVR updates. Our study reveals that differences in off-policy degree, determined by the number of gradient steps per rollout, substantially affect the distribution of importance sampling ratios and their clipping behavior, thereby altering which tokens dominate the update. Building on this insight, we characterize gradient expectation as the central quantity governing update dynamics and analyze the roles of token probability, advantage, and importance sampling ratio. Motivated by these findings, we propose Adaptive Clip Policy Optimization (ACPO), which adjusts clipping boundaries across token groups according to the empirical variance of their importance sampling ratios. Experiments on 3B and 7B models across diverse reasoning benchmarks, spanning mathematical problem solving, tabular QA, and logic puzzles, demonstrate that ACPO outperforms strong baselines such as DAPO and CISPO. These results demonstrate that principled, analysis-driven approaches yield more robust and effective RLVR methods. Code is available in: https://github.com/Control-derek/ACPO",
+      "authors": [
+        "Peidong Wang",
+        "Demi Wang",
+        "Xufang Luo",
+        "Jiahang Xu",
+        "Xiaocui Yang",
+        "Shi Feng",
+        "Yuqing Yang",
+        "Dongsheng Li"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-06-21T16:14:46+00:00",
+      "link": "https://arxiv.org/pdf/2606.22570v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "theoretical analysis of RLVR updates for LLM reasoning",
+      "llm_evidence_cn": "对LLM推理中RLVR更新的理论分析",
+      "llm_evidence": "对LLM推理中RLVR更新的理论分析",
+      "canonical_evidence": "对LLM推理中RLVR更新的理论分析",
+      "llm_tldr_en": "Analyzes key factors in RL updates for LLM reasoning, revealing that off-policy degree from gradient steps alters token dominance and gradient expectation.",
+      "llm_tldr_cn": "针对RLVR算法设计依赖启发式直觉的问题，本文对更新过程进行理论分析。研究发现梯度步数决定的离策略程度会显著影响重要性采样比和梯度期望，进而改变主导更新的token。该理论为理解RLVR算法提供了基础，有助于指导更合理的算法设计。",
+      "llm_tldr": "针对RLVR算法设计依赖启发式直觉的问题，本文对更新过程进行理论分析。研究发现梯度步数决定的离策略程度会显著影响重要性采样比和梯度期望，进而改变主导更新的token。该理论为理解RLVR算法提供了基础，有助于指导更合理的算法设计。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.22681v1",
+      "source": "arxiv",
+      "title": "Only Ask What You Don't Know: Grounded Delta Planning for Efficient Multi-step RAG",
+      "abstract": "Multi-hop question answering remains challenging for Retrieval-Augmented Generation (RAG) because existing approaches either propagate errors across iterative retrieval rounds or over-generate reasoning steps, increasing cost without improving accuracy. We propose Grounded Delta Planning RAG (GDP-RAG), a plan-based framework that targets only the information delta based on three simple design choices: (1) preliminary retrieval to ground planning before execution, (2) a gap-conditioned planning prompt that asks only for missing information, and (3) a skeletal trajectory that pairs each subquery with a Thought capturing evidence from preliminary retrieval and carrying it through to the final answer. GDP-RAG focuses computation on unresolved gaps, yielding concise, reliable reasoning trajectories. Extensive experiments on HotpotQA, 2WikiMultiHopQA, and MuSiQue show that GDP-RAG achieves the highest accuracy (60.63%) among all compared systems while maintaining a cost-of-pass of 0.51, 22% lower than PAR-RAG (0.65) and 68% lower than KnowTrace (1.57), with no method achieving both higher accuracy and lower cost.",
+      "authors": [
+        "Wei-Chieh Chou",
+        "Xuanjun Chen",
+        "Jian-Ren Lin",
+        "Claire Lin",
+        "Hung-yi Lee",
+        "Jyh-Shing Roger Jang"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-06-21T21:46:41+00:00",
+      "link": "https://arxiv.org/pdf/2606.22681v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "RAG framework that reduces error propagation by planning only for missing information",
+      "llm_evidence_cn": "通过仅规划缺失信息减少错误传播的RAG框架",
+      "llm_evidence": "通过仅规划缺失信息减少错误传播的RAG框架",
+      "canonical_evidence": "通过仅规划缺失信息减少错误传播的RAG框架",
+      "llm_tldr_en": "GDP-RAG addresses error propagation in multi-hop QA by grounding planning with preliminary retrieval and only querying missing information, reducing cost while maintaining accuracy.",
+      "llm_tldr_cn": "现有RAG多跳问答方法常因错误传播或过度推理导致成本高、准确性低。本文提出GDP-RAG框架,通过初步检索锚定规划、仅问缺失信息的缺口条件提示和携带初步证据的骨架轨迹,只计算信息增量。实验表明该方法在保持准确性的同时显著降低计算成本,提供了一种高效可解释的多步RAG方案,可用于减少幻觉传播。",
+      "llm_tldr": "现有RAG多跳问答方法常因错误传播或过度推理导致成本高、准确性低。本文提出GDP-RAG框架,通过初步检索锚定规划、仅问缺失信息的缺口条件提示和携带初步证据的骨架轨迹,只计算信息增量。实验表明该方法在保持准确性的同时显著降低计算成本,提供了一种高效可解释的多步RAG方案,可用于减少幻觉传播。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
