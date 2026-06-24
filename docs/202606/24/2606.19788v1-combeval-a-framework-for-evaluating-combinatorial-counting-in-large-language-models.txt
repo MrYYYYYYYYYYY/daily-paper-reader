@@ -1,0 +1,787 @@
+Title: CombEval: A Framework for Evaluating Combinatorial Counting in Large Language Models
+
+URL Source: https://arxiv.org/pdf/2606.19788v1
+
+Published Time: Fri, 19 Jun 2026 00:27:13 GMT
+
+Number of Pages: 23
+
+Markdown Content:
+# CombEval: A Framework for Evaluating Combinatorial Counting in Large Language Models 
+
+Yuxu Zhou 1, Ondˇ rej Kuželka 2, Yuyi Wang 3,4 , Yuanhong Wang 1*, Yi Chang 1,5,6 *1School of Artificial Intelligence, Jilin University, Changchun, China 
+
+> 2
+
+Czech Technical University in Prague, Prague, Czech Republic 
+
+> 3
+
+CRRC Zhuzhou Institute, Zhuzhou, China 4Tengen Intelligence Institute, China 
+
+> 5
+
+International Center of Future Science, Jilin University 
+
+> 6
+
+Engineering Research Center of Knowledge-Driven Human-Machine Intelligence, MOE, China  
+
+> Correspondence: lucienwang@jlu.edu.cn
+
+Abstract 
+
+We present CombEval, a dynamic benchmark for evaluating combinatorial counting in large language models. CombEval represents each problem as a typed Cofola specification over entities, combinatorial objects, object depen-dencies, and constraints, enabling controlled generation of natural-language counting prob-lems with exact solver-verified answers. Unlike static collections, CombEval supports system-atic variation of object type, entity scale, con-straint count, and reasoning depth. We evalu-ate 11 LLMs under direct and code-augmented settings and find that models remain brittle on ordered objects, indistinguishable elements, rel-atively positional constraints, and nested object dependencies. Error analysis further identifies failures in constraint interpretation and count-ing principles. CombEval provides a diagnos-tic testbed for studying when and why LLMs fail at combinatorial reasoning. The code and generated benchmark suites are publicly avail-able at https://github.com/YuxuZhou-CN/ combination-problem-generation .
+
+1 Introduction 
+
+Combinatorial counting (CO ) or enumeration is a fundamental branch of mathematics (Stanley, 2011), with one of its most critical functions lies in calculating probability. For most equiprobable events, probability is derived by using CO to count the number of favorable outcomes and the total number of possible outcomes, then computing the ratio of these two values. CO is also crucial in key domains such as finance, logistics, and health-care, where it empowers constraint-driven decision optimization by quantifying viable options amid complex requirements. Yet its complexity stems primarily from the intricate nature of these con-straints, which are often interdependent, dynamic, and multi-faceted, making it challenging to develop 
+
+> *Corresponding authors.
+
+one-size-fits-all systematic solutions that adapt to diverse real-world scenarios. This is where large language models (LLMs) emerge as a promising approach to CO problems. The strength of LLMs in abstract reasoning and processing unstructured, complex constraints allows them to tackle CO prob-lems without relying on rigid, scenario-specific al-gorithms. LLMs have demonstrated remarkable capabili-ties in tasks such as natural language processing (Zhao et al., 2023; Kalyan, 2024), code genera-tion (Jiang et al., 2024), and question answering (Kuang et al., 2025), with their superior perfor-mance on mathematical reasoning benchmarks be-ing particularly noteworthy (Xu et al., 2025). Cur-rent mainstream models (OpenAI, 2025; Qwen Team, 2025; DeepSeek-AI, 2025) have achieved or even surpassed human-average accuracy on widely used mathematical reasoning datasets like GSM8K (Cobbe et al., 2021) and MATH (Hendrycks et al., 2021), sparking widespread interest in exploring the potential of LLMs to tackle more complex mathematical problems and reasoning tasks (Yang et al., 2025). Current benchmarks for evaluating the CO capa-bilities of LLMs are often contained within broader mathematical reasoning datasets (Hendrycks et al., 2021; Zheng et al., 2021; Veeraboina, 2023; Xu et al.; Xuejun et al., 2025). For example, the MATH dataset (Hendrycks et al., 2021) includes 
+
+1245 problems in the "Counting and Probability" category, covering topics such as basic counting principles, permutations and combinations, and probability calculations. There are also limited benchmarks specifically targeting CO problems, such as CombiBench (Liu et al., 2025), where 100 
+
+CO problems are collected spanning from middle school to International Mathematical Olympiad lev-els. Though facilitating initial assessment of LLMs’ CO capabilities, these static benchmarks usually face the data contamination and spurious reason-
+
+> arXiv:2606.19788v1 [cs.AI] 18 Jun 2026
+
+ing issues prevalent in mathematics benchmarks. The data contamination issue arises when test questions or their variants are present in the train-ing data of LLMs (Balloccu et al., 2024; Golchin and Surdeanu, 2023; Zhou et al., 2025). This is-sue makes models potentially able to achieve high scores through memorization rather than genuine reasoning, leading to overestimation of their true reasoning capabilities (Deng et al., 2024). On the other hand, even when the benchmark problems are not directly present in the training data, mod-els may still exploit superficial textual patterns to arrive at correct answers without engaging in deep logical reasoning (Mirzadeh et al., 2024; Lai et al., 2025; Boye and Moell, 2025). In scenarios re-quiring structural abstraction like combinatorics, models might memorize the superficial associa-tion that "choosing k items from n" corresponds to binomial coefficients, but their reasoning ability collapses rapidly when additional constraints are applied (Shrestha et al., 2025). Therefore, this paper proposes CombEval, a dynamic evaluation framework for CO in LLMs. CombEval synthesizes CO instances from a typed formal specification rather than from a fixed ques-tion bank, as outlined in Figure 1. This construction makes it possible to sample fresh problems after benchmark design time, while also controlling the structural variables that affect difficulty. Moreover, because every instance is grounded in a formal program and solved exactly before evaluation, the benchmark can test whether models reason about the underlying structure rather than merely match-ing familiar surface templates. At the core of CombEval is Cofola (Wang et al., 2026), a typed declarative language and solver for combinatorial counting. Following Cofola, we rep-resent a problem as ⟨D, O, C ⟩, where D is a finite entity domain, O is a set of combinatorial objects defined over D (e.g., sets, sequences, partitions) with potential dependencies between them, and C
+
+is a set of constraints over these objects. Cofola pro-vides seven object types including sets, bags, tuples, sequences, circles, partitions, and compositions, to-gether with constraints for membership, subset and disjointness, multiplicity and cardinality, absolute tuple positions, relative order patterns, and group-level conditions (see Tables 1 and 2). Its solver compiles the formal specification into weighted first-order model counting (WFOMC) instances, which can be solved efficiently with off-the-shelf WFOMC solvers (van Bremen and Kuzelka, 2021; Kuzelka, 2021; Zou et al., 2025), enabling exact an-swer verification for a wide range of combinatorial problems. Using CombEval, we construct several solver-verified evaluation suites, and conduct a system-atic evaluation of 11 mainstream general-purpose, math-specialized, and thinking-specialized LLMs, including both open-source models (e.g., Qwen, DeepSeek, LLaMA, and gpt-oss) and closed-source models (e.g., GPT-5 and Gemini-3). The main observations are: • Model scale and advanced reasoning tech-niques lead to improved overall accuracy un-der both zero-shot and code-augmented set-tings. However, all evaluated models still show clear degradation on typed objects that require indistinguishable elements, ordered structures, or multi-step dependencies. • CombEval enables fine-grained difficulty con-trol. Increasing entity size, constraint count, or object-dependency depth predictably low-ers model accuracy, showing that the gener-ated suites support granular model compar-isons rather than only a single aggregate score. • Surface template variations can cause perfor-mance fluctuations to some extent, especially for less capable (but still strong) models. How-ever, the latest gpt-5.5 , one of the strongest models, show greater robustness to these vari-ations, suggesting that their reasoning capabil-ities are not tightly coupled to specific prompt formulations. 
+
+2 Related Work 
+
+Mathematical reasoning benchmarks such as GSM8K (Cobbe et al., 2021) and MATH (Hendrycks et al., 2021) have established a founda-tion for evaluating arithmetic and algebraic capa-bilities including combinatorial counting in LLMs, but they also face significant limitations. Primarily, these static datasets are highly susceptible to data contamination. As pre-training corpora expand, test questions are increasingly memorized rather than solved, distorting evaluation results (Balloccu et al., 2024; Golchin and Surdeanu, 2023; Zhou et al., 2025). While researchers have attempted to mitigate this through dynamic generation in other reasoning fields (Shi et al., 2022; Saparov et al., 2023; Wan et al., 2024; Opedal et al., 2024; Wang et al., 2025; Ariyani et al., 2025), constructing Figure 1: Overview of the CombEval generation framework with the current Cofola backend. The generator samples a typed object DAG P = ⟨D, O, C ⟩, attaches compatible constraints, verbalizes the resulting formal specification with templates, and verifies the exact answer using the Cofola solver. 
+
+benchmarks specifically for CO presents unique challenges. First, CO problems possess high struc-tural and semantic diversity, making it difficult to design a unified framework that covers the full spec-trum of problem types. Second, efficient solutions often require specialized mathematical tools, such as generating functions and inclusion-exclusion principles (Stanley, 2011; Pak, 2019; Ferraris et al., 2015), which complicates the design of automated answer verification. Finally, as many CO problems go beyond polynomial-time complexity (Valiant, 1979), generation and evaluation frameworks must be carefully designed to ensure scalability without resorting to brute-force enumeration. Solver-backed benchmark generation therefore depends not only on natural-language templates, but also on the expressiveness and reliability of the formal backend. There are various existing methods for automatically solving CO problems, ranging from Constraint Satisfaction Programming (CSP) (Akgün et al., 2022), Answer Set Program-ming (ASP) (Gebser et al., 2022), to lifted infer-ence techniques (Van Den Broeck et al., 2011; Taghipour et al., 2012; Kuzelka, 2021). We pro-vide a brief overview of these methods in Section B. Recently, Totis et al. (2023) proposed CoLa/CoSo, a lifted framework for modeling and solving CO problems. CoLa/CoSo provides an important lifted approach to combinatorial counting, but it is cen-tered on a more restricted single-configuration lan-guage, where only one combinatorial object can be defined and solved per problem. The updated Co-fola language and solver (Wang et al., 2026) used in CombEval extends this line with typed object de-pendencies, sets and bags, ordered objects, grouped objects, and WFOMC-based solving. This broader formal layer allows CombEval to generate larger and more structurally varied suites while retaining exact answer verification. 
+
+3 Formalization of Combinatorial Counting Problems 
+
+CombEval follows the updated Cofola semantics and formalizes each CO problem as a triple P =
+
+⟨D, O, C ⟩. Here D is a finite domain of entities, 
+
+O is a set of typed combinatorial objects over D,and C is a set of constraints over these objects. The answer is the number of valid combinatorial structures, i.e., assignments of concrete instances to every object in O that respect the object dependen-cies and satisfy all constraints in C. We introduce the components below with the following running example. 
+
+Example 1 I have seven books on a shelf. Two are math books and one is a physics book. How many ways can I select 5 books and arrange them if 1) the two math books and one physics book must be included, 2) the math books must be adjacent, and 3) both math books must be to the left of the physics book? 
+
+Entity domain The entity domain D contains the atomic objects that may appear in the count. In Example 1, D contains seven book entities, includ-ing two math books M1, M 2, one physics book P ,and four other books O1, . . . , O 4. Entities may be distinguishable, as in ordinary sets, or may appear with multiplicity inside bags (multisets), where in-distinguishable copies must not be over-counted. 
+
+Combinatorial objects The object set O con-tains the combinatorial structures defined over 
+
+D that are relevant to the problem. Each ob-ject is defined either directly from D or derived from other objects through combinatorial opera-tions. For instance, for the problem in Exam-ple 1, O contains a set object defined as S =
+
+set (M1, M 2, P, O 1, . . . , O 4), a subset object de-fined as S′ = choose (S, 5) , and a sequence object defined as T = sequence (S′). Table 1 summa-rizes the object types and representative operators available in Cofola. 
+
+Constraints The constraint set C restricts the valid configurations of objects in O. Cofola sup-ports constraints over basic, ordered, and grouped objects, as summarized in Table 2. For Example 1, the constraints include subset constraints to en-sure the required books are included, a together 
+
+constraint to enforce adjacency, and a precedence 
+
+constraint to ensure the math books are to the left of the physics book. The language also allows log-ical combinations of atomic constraints, enabling negated or disjunctive conditions when needed. Putting these components together, Example 1 can be expressed as the following Cofola program:                                         
+
+> 1math_books =set ( math1 , math2 )
+> 2physics_book =set ( physics )
+> 3books =set ( math1 , math2 , physics , book4 , book5 , book6 , book7 )
+> 4choice =choose ( books , 5)
+> 5math_books subset choice
+> 6physics_book subset choice
+> 7shelf =sequence ( choice )
+> 8together ( math_books ) in shelf
+> 9math_books <physics_book in shelf
+
+We do not expect that CombEval covers all CO problems. More complex domains, such as graph objects, grid placements, arithmetic over entity-level numeric attributes, and arbitrary sym-metry groups, would require additional language constructs and hand-crafted approaches; some of these extensions run into known # P-hard barriers (Valiant, 1979). 
+
+4 Combinatorial Counting Instance Generation 
+
+This section details the generation method for CO instances that we use in this work. 
+
+Problem Generation The generation of a CO problem follows from its formalization P =
+
+⟨D, O, C ⟩. As shown in Figure 1, our framework generates problems through a typed object-DAG pipeline. First, we initialize a finite entity domain with 
+
+n entities and sample m initial set or bag ob-jects, forming the reusable source pool. Next, we construct a Cofola object DAG by repeat-edly sampling type-compatible operators, such as choose , choose_replace , set/bag operations, 
+
+tuple , sequence , circle , compose , partition ,and indexing. The maximum dependency depth 
+
+d and operator count on control the length and breadth of the generated reasoning chain. Finally, we sample k constraints whose types match the selected objects, covering structural constraints, cardinality and multiplicity constraints, absolute-position constraints, relative-position patterns, and group-level constraints. 
+
+Natural Language Translation We use atemplate-based method to convert the generated CO problem into natural language. Each Cofola object declaration and constraint is verbalized by a template associated with its type. For example, a choose declaration becomes a sentence describ-ing a selection without replacement, a sequence 
+
+declaration becomes an arrangement in a line, and a compose declaration becomes a distribution into labeled groups. The final query is generated from the target object or object set being counted, e.g., "How many different ways can we obtain the result-ing objects?" The full template library is provided in Section E. 
+
+Problem Solving We use the Cofola solver as our backend because it supports a broader typed object language, multiple dependent objects, and a WFOMC-based compilation pipeline. For each generated instance, Cofola computes the exact an-swer under a timeout budget; instances with solver failures, unsupported features, or unstable answers are filtered out before LLM evaluation. Table 1: Cofola object types and representative operators used by CombEval. Sets and bags are basic objects that can be defined directly from the entity domain, while tuples, sequences, circles, partitions, and compositions are derived from existing set or bag objects.                                   
+
+> Object Type Representative Operators Description
+> Set set ,choose ,union ,intersect ,diff ,supp Unordered entities and set operations. Bag bag ,choose ,choose_replace ,add_union ,union ,intersect ,diff Multisets and replacement-based choices. Tuple tuple ,choose_tuple ,choose_replace_tuple Ordered arrangements supporting absolute-position constraints. Sequence sequence ,choose_sequence ,choose_replace_sequence Linear arrangements supporting relative-position patterns. Circle circle ,choose_circle ,choose_replace_circle Circular arrangements, optionally identifying reflection. Partition partition Unordered grouping into disjoint parts. Composition compose ,index Ordered grouping into disjoint parts and access to a specific group.
+
+Table 2: Representative constraint families supported by the updated Cofola backend.                    
+
+> Object Scope Constraint Family Description
+> Set/Bag Membership, subset, equality, disjointness Require entities or objects to be included, excluded, equal, nested, or disjoint. Set/Bag Cardinality and multiplicity Constraints over cardinalities and multiset multiplicities. Tuple Absolute-position constraints Constrain a fixed tuple position, e.g., T[i] == e or T[i] in S .Tuple Count and deduplicated-count constraints Count positions occupied by elements, or count distinct appearing elements. Sequence/Circle Relative-position patterns Express together, precedence, immediate predecessor, and adjacency patterns. Sequence/Circle Pattern-count constraints Count occurrences of relative-position patterns. Partition/Composition Group-level and indexed constraints Constrain every group, or constrain a specific indexed group in a composition.
+
+5 Experiments 
+
+In this section, we present experiments evaluating the performance of various LLMs on the CombEval dataset generated using the proposed framework. Our experimental evaluation is systematically de-signed to address the following three primary re-search questions: • RQ1: Capabilities of LLMs in Combinato-rial Reasoning. Can the generated combina-torial counting problems in CombEval faith-fully reflect the capability hierarchy of current LLMs, producing performance trends consis-tent with existing benchmarks where stronger models achieve higher accuracy? • RQ2: Controllability of Problem Difficulty. 
+
+Can our generation framework effectively and predictably regulate the reasoning difficulty of problem instances by tuning multiple struc-tural parameters? • RQ3: Impact of Prompt Templates on LLM Reasoning. Does the surface form of custom problem templates bias or constrain the models’ mathematical reasoning perfor-mance when underlying logical structures are kept strictly identical? 
+
+5.1 Experimental Setup Models. We evaluate a set of LLMs on the CombEval dataset, including both open-source and closed-source systems. The open-source models comprise Meta-Llama-3-8B-Instruct, DeepSeek-Math-7B-Instruct (Shao et al., 2024), DeepSeek-V3.2 (DeepSeek-AI, 2025), Qwen2.5-Math-7B-Instruct (Yang et al., 2024), Qwen3-4B-Thinking-2507, Qwen3-30B-Thinking-2507 (Qwen Team, 2025), gpt-oss-20B (OpenAI, 2025), and LLaMA-3.3-70B-Instruct (Dubey et al., 2024), covering math-specialized, instruction-tuned, and reasoning-enhanced architectures across different scales. For closed-source models, we evaluate the state-of-the-art models gpt-5.1, gpt-5.5 and gemini-3-flash-preview-thinking. Closed-source models are eval-uated through their official APIs, while open-source models are run locally on a machine with 4 NVIDIA A40 GPUs. All models are used under their licensed terms for research purposes. 
+
+Evaluation Protocol. We use a zero-shot setting with only the problem description and the required output format. Temperature is set to 0 for determin-istic outputs, with a maximum generation length of 4096 tokens. The full prompt templates used for evaluation are provided in Appendix C.2. 
+
+Metrics. Accuracy is the primary metric. We use regular expressions to extract the final numerical answer; failure or mismatch is counted as an error. For ease of analysis, we categorize the Co-fola objects into four main types: C HOOSE (ob-jects derived from choose or choose_replace ), GROUP (objects derived from compose or 
+
+partition ), T UPLE (objects derived from tuple 
+
+or choose_tuple ), and S EQUENCE (objects de-rived from sequence or choose_sequence ). 
+
+5.2 RQ1: Capabilities of LLMs in Combinatorial Reasoning 
+
+Using CombEval, we vary the key difficulty param-eters: constraint count k from 0 to 3, entity size 
+
+n over {6,8,10,12}, and number of combinatorial operations on from 1 to 4. We fix m = 1 and leave the DAG depth d unconstrained, allowing the num-ber of operations per layer to vary freely. With a 2000-second Cofola timeout to filter unstable in-stances, we construct 1,500 high-quality CombEval problems, whose type distribution is reported in the appendix C.1. For a sanity check, we also use Co-La/CoSo to solve the same problem set, where 705 
+
+problems are solvable by CoLa/CoSo that produce the same answers as Cofola. To comprehensively assess reasoning capabil-ities, we evaluate the models under two distinct paradigms: standard natural language reasoning (Zero-shot) and code-augmented reasoning, where models are prompted to return executable Python code to compute the final answer. The Python set-ting is designed to test whether models can leverage programmatic reasoning to handle complex combi-natorial structures. As shown in Figure 2, the generated evaluation problems exhibit strong discriminative power and clearly characterize the capability hierarchy of cur-rent LLMs. Stronger models with larger parameter scales or advanced reasoning mechanisms, such as gpt-5.5 and gemini-3-flash-preview-thinking ,achieve substantial performance advantages in both settings, whereas smaller models show clear limita-tions. This performance ladder not only validates CombEval as an effective benchmark, but also di-rectly reveals the capability boundaries of different LLM tiers when facing structured mathematical reasoning. 
+
+5.3 RQ2: Controllability of Problem Difficulty 
+
+To verify whether the generation parameters se-lected in our framework can effectively and pre-dictably regulate problem difficulty, we adopt a controlled-variable design and analyze the impact of entity size, constraint count, and reasoning depth on LLM performance. We also conduct experi-ments on the runtime of the backend CO solver under different d, n, k . The results, shown in Sec-tion C.3, indicate that n and k have a significant impact on the solving time, while d has a moder-
+
+> Figure 2: Overall accuracy comparison of evaluated LLMs on CombEval. Models were tested using stan-dard natural language reasoning (Zero-shot) and code-augmented reasoning (Python). Due to the exceedingly weak coding capabilities of smaller models, which fre-quently fail to return compliant and executable code, they were not evaluated under the Python setting.
+
+ate effect. Though, the impact of d may be more pronounced when considering the basic combinato-rial reasoning ability of LLMs, deeper depth often requires more complex multi-step reasoning. 
+
+5.3.1 Impact of Operation Type and Difficulty Parameters 
+
+We analyze operation type, constraint count, and entity scale on the same controlled subset. To iso-late these effects, we fix m = 1 , on = 1 , and d = 1 
+
+(i.e., a single non-nested operation) and vary en-tity size n ∈ { 6, 8, 10 , 12 , 14 } and constraint count 
+
+k ∈ { 0, 1, 2, 3}. For each configuration, we gener-ate 25 valid instances under the same 2000-second Cofola timeout, resulting in 2,000 problems. As shown in Figure 3, both factors consistently increase problem difficulty. Adding more con-straints leads to a clear accuracy drop for most mod-els, indicating that membership, positional, and relative-order constraints effectively disrupt simple counting patterns. Similarly, increasing n enlarges the combinatorial search space and places greater pressure on numerical calculation and symbolic rea-soning. These trends confirm that CombEval can control difficulty in a fine-grained and predictable way through structural generation parameters. Table 3 further shows that operation type sub-stantially affects model performance. Across models, S EQUENCE is the most challenging cat-egory, with the lowest overall average accu-racy, suggesting that ordered selections with relative-position constraints are particularly dif-ficult for current LLMs, likely because they re-quire more precise state tracking and constraint handling. CHOOSE is comparatively easier, Figure 3: Impact of entity size and constraint count on model performance. Table 3: Accuracy across combinatorial operation types. Gray cells indicate the best open-source result, and blue cells indicate the best closed-source result.                                                                  
+
+> Model CHOOSE GROUP TUPLE SEQUENCE Avg.
+> Open-source Models
+> Meta_Llama_3_8B_Instruct 0.026 0.008 0.028 0.018 0.020 deepseek_math_7b_instruct 0.074 0.010 0.054 0.040 0.045 Qwen2.5_Math_7B_Instruct 0.252 0.166 0.316 0.316 0.263 llama_3.3_70b_instruct 0.462 0.254 0.368 0.380 0.366 Qwen3_4B_Thinking_2507 0.518 0.408 0.380 0.242 0.387 Qwen3_30B_A3B_Thinking_2507 0.636 0.256 0.428 0.254 0.394 gpt_oss_20b 0.672 0.630 0.616 0.458 0.594 DeepSeek_V3.2 0.840 0.744 0.730 0.540 0.714
+> Closed-source Models
+> gpt_5.1 0.920 0.744 0.802 0.498 0.741 gemini_3_flash_preview_thinking 0.978 0.908 0.906 0.668 0.865 gpt_5.5 0.996 0.992 0.992 0.764 0.936 Overall Average 0.579 0.465 0.511 0.380 0.484
+
+while G ROUP and T UPLE fall between these ex-tremes. The same model hierarchy remains visible across operation types: stronger models such as 
+
+gpt_5.5 , gemini_3_flash_preview_thinking , and 
+
+DeepSeek_V3.2 consistently outperform smaller models, but their performance still varies substan-tially by operator. This confirms that CombEval not only separates model tiers overall, but also exposes fine-grained weaknesses tied to specific combina-torial operations. 
+
+5.3.2 Impact of Reasoning Depth 
+
+Beyond horizontal constraint accumulation, an-other key source of difficulty is multi-step operator nesting, which requires chain-structured reasoning. To study this factor in isolation, we use a minimally nested linear execution chain (e.g., CHOOSE →
+
+CHOOSE → TUPLE ). We eliminate confounding factors by fixing n = 10 , m = 1 , and k = 0 , while strictly enforcing that the nesting depth equals the number of operations ( d = on). We systematically vary this depth across {1, 2, 3, 4}. For each depth level, we generate 300 instances, resulting in 1,200 depth-controlled problems. As illustrated in Figure 4, model accuracy de-grades substantially as the nesting depth d in-creases. Even in the absence of additional con-straints and within a restricted entity space, each successive operation forces the model to track ex-tended intermediate state chains, thereby exacer-bating the risk of reasoning drift and error accumu-lation. This monotonic performance degradation quantitatively demonstrates CombEval’s efficacy in modulating the difficulty of long-chain com-binatorial reasoning via depth adjustments. Fur-thermore, while frontier models equipped with ad-vanced reasoning paradigms (e.g., DeepSeek-V3.2 ,
+
+gpt-5.5 , and gemini-3-flash-preview-thinking ) ex-hibit greater resilience, they are not immune to this degradation. 
+
+5.4 RQ3: Impact of Prompt Templates on LLM Reasoning 
+
+A central question is whether LLMs fail on CombE-val because they lack deep combinatorial reasoning ability, or because they are unfamiliar with our au-tomatically generated custom templates. To isolate the influence of surface wording, we compare each original template problem with a solver-verified natural-language rewrite that preserves the same Cofola structure. The full rewrite-and-verification protocol is described in Appendix D. In total, we Figure 4: Impact of reasoning depth on model perfor-mance.                                          
+
+> Model Setting Acc. ∆vs. Template 95% CI DeepSeek-V3.2
+> Template 80.42% –[77.41%, 83.52%] ReStory 79.56% −0.86 [76.41%, 82.26%] Both 72.51% −7.91 [68.89%, 75.92%]
+> gpt-5.1
+> Template 82.25% –[79.08%, 85.59%] ReStory 80.25% −2.00 [77.74%, 83.26%] Both 74.23% −8.02 [71.08%, 77.85%]
+> gemini-3-flash -preview-thinking
+> Template 87.38% –[84.74%, 89.33%] ReStory 89.28% +1 .90 [87.67%, 91.33%] Both 84.33% −3.05 [81.48%, 86.92%]
+> gpt-5.5
+> Template 92.59% –[89.89%, 94.33%] ReStory 94.55% +1 .96 [92.74%, 96.00%] Both 91.83% −0.76 [88.82%, 93.67%]
+
+Table 4: Prompt-template robustness of DeepSeek-V3.2 ,
+
+gemini-3-flash-preview-thinking , gpt-5.1 , and gpt-5.5 .Template is the baseline; ∆ reports percentage-point changes relative to Template. ReStory reports accuracy on rewritten prompts, and Both requires both formula-tions to be correct. 
+
+obtain 661 verified isomorphic pairs and randomly sample 300 pairs for this analysis. We report both single-prompt accuracy and paired consistency, where the latter requires the model to answer both logically equivalent formulations correctly. As shown in Table 4, all models perform simi-larly on original templates and rewritten prompts. This suggests that CombEval’s custom templates do not artificially depress model performance. However, paired consistency of relatively weaker models DeepSeek-V3.2 , gpt-5.1 , and gemini-3-flash-preview-thinking is lower than single-prompt accuracy (outside the confidence intervals of the original/rephrased template), indicating that some correct answers are not preserved under su-perficial rewrites. This gap becomes negligible for 
+
+gpt-5.5 , dropping only 0.76% compared to the orig-inal template. Taken together, these results indicate that surface template variations can cause some performance fluctuations, especially for less capa-ble (but still strong) models. The latest stronger models, however, show greater robustness to these variations, suggesting that their reasoning capa-bilities are not tightly coupled to specific prompt formulations. 
+
+5.5 Error Analysis and Qualitative Case Studies 
+
+We manually analyze the 208 wrong answers of 
+
+gpt-5.5 , of which 15 are zero predictions and 193 
+
+disagree on a non-zero value. Errors span all ma-jor operators including S EQUENCE : 121 , G ROUP :
+
+62 , T UPLE : 55 and constraints together : 35 ,
+
+indexequalmember : 34 , lessthan : 29 , next_to :
+
+27 (note that one problem can have multiple op-erators and constraints, so these counts are not mutually exclusive). They can be broadly catego-rized into: (i) collapsing a together block to one fixed internal order, missing its k! permutations; (ii) reading “ together(A) not in seq ” as “no two of A adjacent” instead of “ A not contiguous”; (iii) treating multiple choose_tuple on the same bag as one deal rather than independent draws; (iv) dropping the (n−1)! quotient for multiset cir-cles; (v) collapsing chains formed by together 
+
+that share an entity; and (vi) collapsing internal or-dering and direction of together +next_to blocks in circles. Patterns (i)–(ii) reflect a semantic gap be-tween natural-language and Cofola, while (iii)–(vi) are classical combinatorial slips. Representative examples are in Section F. 
+
+6 Conclusion 
+
+We present CombEval, an framework for dynami-cally generating diverse and difficulty-controllable combinatorial counting problems, used to evaluate the combinatorial counting capabilities of large lan-guage models. Experimental results on CombEval reveal that current LLMs, including state-of-the-art closed-source models, still struggle with vari-ous combinatorial counting challenges, particularly those involving indistinguishable elements, com-plex sequencing constraints, and deep reasoning chains. We anticipate that CombEval could serve as a valuable resource for advancing research in combinatorial counting and reasoning with LLMs, inspiring the development of more robust and capa-ble models in this domain. In future work, we plan to scale the LLM-facing suites to additional combi-natorial object types, such as circular arrangements, partitions, graph objects, and numeric attributes, and to explore agentic techniques to enhance com-binatorial reasoning performance. Limitations 
+
+While CombEval provides a structured benchmark for combinatorial reasoning, it has several limi-tations. The benchmark currently supports only English, and extending it to other languages would require additional template development and val-idation. In addition, verification with the Cofola solver is constrained by computational time and memory, which prevents the generation of more complex problem instances. Finally, human vali-dation was performed only on a subset of samples, motivating future human-in-the-loop evaluation. 
+
+Ethical considerations 
+
+This work introduces CombEval, a benchmark for evaluating combinatorial counting capabilities of large language models. CombEval is intended for research purposes to advance understanding of LLM reasoning abilities. We do not foresee direct ethical concerns arising from the use of CombEval itself. 
+
+Acknowledgements 
+
+Yuanhong Wang and Yuxu Zhou are supported by the National Natural Science Foundation of China (No.62506141). Ondˇ rej Kuželka is supported by the Czech Science Foundation project “The Auto-matic Combinatorialist” (24-11820S). Additionally, this work is funded by the New Cornerstone Sci-ence Foundation via the XPLORER PRIZE. 
+
+References 
+
+Özgür Akgün, Alan M Frisch, Ian P Gent, Christopher Jefferson, Ian Miguel, and Peter Nightingale. 2022. Conjure: Automatic generation of constraint models from problem specifications. Artificial Intelligence ,310:103751. Nurul Fajrin Ariyani, Zied Bouraoui, Richard Booth, and Steven Schockaert. 2025. There’s no such thing as simple reasoning for llms. In Findings of the As-sociation for Computational Linguistics: ACL 2025 ,pages 4503–4514. Simone Balloccu, Patrícia Schmidtová, Mateusz Lango, and Ondˇ rej Dušek. 2024. Leak, cheat, repeat: Data contamination and evaluation malpractices in closed-source llms. arXiv preprint arXiv:2402.03927 .Johan Boye and Birger Moell. 2025. Large language models and mathematical reasoning failures. arXiv preprint arXiv:2502.11574 .Karl Cobbe, Vineet Kosaraju, Mohammad Bavarian, Mark Chen, Heewoo Jun, Lukasz Kaiser, Matthias Plappert, Jerry Tworek, Jacob Hilton, Reiichiro Nakano, and 1 others. 2021. Training verifiers to solve math word problems. arXiv preprint arXiv:2110.14168 .DeepSeek-AI. 2025. Deepseek-v3.2: Pushing the fron-tier of open large language models. Chunyuan Deng, Yilun Zhao, Xiangru Tang, Mark Ger-stein, and Arman Cohan. 2024. Investigating data contamination in modern benchmarks for large lan-guage models. In Proceedings of the 2024 Confer-ence of the North American Chapter of the Associ-ation for Computational Linguistics: Human Lan-guage Technologies (Volume 1: Long Papers) , pages 8706–8719, Mexico City, Mexico. Association for Computational Linguistics. Abhimanyu Dubey, Abhinav Jauhri, Abhinav Pandey, Abhishek Kadian, Ahmad Al-Dahle, Aiesha Letman, Akhil Mathur, Alan Schelten, Amy Yang, Angela Fan, and 1 others. 2024. The llama 3 herd of models. 
+
+arXiv preprint arXiv:2407.21783 .Sebastiano Ferraris, Alex Mendelson, Gerardo Balle-sio, and Tom Vercauteren. 2015. Counting sub-multisets of fixed cardinality. arXiv preprint arXiv:1511.06142 .Alan M Frisch, Warwick Harvey, Chris Jefferson, Bernadette Martínez-Hernández, and Ian Miguel. 2008. Essence: A constraint language for specify-ing combinatorial problems. Constraints , 13(3):268– 306. Luyu Gao, Aman Madaan, Shuyan Zhou, Uri Alon, Pengfei Liu, Yiming Yang, Jamie Callan, and Gra-ham Neubig. 2023a. Pal: Program-aided language models. In International Conference on Machine Learning , pages 10764–10799. PMLR. Yunfan Gao, Yun Xiong, Xinyu Gao, Kangxiang Jia, Jinliu Pan, Yuxi Bi, Yixin Dai, Jiawei Sun, Haofen Wang, and Haofen Wang. 2023b. Retrieval-augmented generation for large language models: A survey. arXiv preprint arXiv:2312.10997 , 2(1). Martin Gebser, Roland Kaminski, Benjamin Kaufmann, and Torsten Schaub. 2022. Answer set solving in practice . Springer Nature. Ian P Gent and Chris Jefferson. 2006. Minion: A fast, scalable, constraint solver 1. In ECAI 2006: 17th Eu-ropean Conference on Artificial Intelligence, August 29-September 1, 2006, Riva del Garda, Italy: includ-ing Prestigious Applications of Intelligent Systems (PAIS 2006): proceedings , volume 141, page 98. Ios Press. Shahriar Golchin and Mihai Surdeanu. 2023. Time travel in llms: Tracing data contamination in large language models. arXiv preprint arXiv:2308.08493 .Dan Hendrycks, Collin Burns, Saurav Kadavath, Akul Arora, Steven Basart, Eric Tang, Dawn Song, and Jacob Steinhardt. 2021. Measuring mathematical problem solving with the math dataset. In Proceed-ings of NeurIPS .Juyong Jiang, Fan Wang, Jiasi Shen, Sungju Kim, and Sunghun Kim. 2024. A survey on large lan-guage models for code generation. arXiv preprint arXiv:2406.00515 .Katikapalli Subramanyam Kalyan. 2024. A survey of gpt-3 family large language models including chatgpt and gpt-4. Natural Language Processing Journal ,6:100048. Jiayi Kuang, Ying Shen, Jingyou Xie, Haohao Luo, Zhe Xu, Ronghao Li, Yinghui Li, Xianfeng Cheng, Xika Lin, and Yu Han. 2025. Natural language un-derstanding and inference with mllm in visual ques-tion answering: A survey. ACM Computing Surveys ,57(8):1–36. Ondrej Kuzelka. 2021. Weighted first-order model counting in the two-variable fragment with count-ing quantifiers. Journal of Artificial Intelligence Re-search , 70:1281–1307. Zhejian Lai, Xiang Geng, Zhijun Wang, Yang Bai, Ji-ahuan Li, Rongxiang Weng, Jingang Wang, Xuezhi Cao, Xunliang Cai, and Shujian Huang. 2025. Mak-ing mathematical reasoning adaptive. arXiv preprint arXiv:2510.04617 .Junqi Liu, Xiaohan Lin, Jonas Bayer, Yael Dillies, Wei-jie Jiang, Xiaodan Liang, Roman Soletskyi, Haim-ing Wang, Yunzhou Xie, Beibei Xiong, and 1 oth-ers. 2025. Combibench: Benchmarking llm capabil-ity for combinatorial mathematics. arXiv preprint arXiv:2505.03171 .Iman Mirzadeh, Keivan Alizadeh, Hooman Shahrokhi, Oncel Tuzel, Samy Bengio, and Mehrdad Farajtabar. 2024. Gsm-symbolic: Understanding the limitations of mathematical reasoning in large language models. 
+
+arXiv preprint arXiv:2410.05229 .Andreas Opedal, Haruki Shirakami, Bernhard Schölkopf, Abulhair Saparov, and Mrinmaya Sachan. 2024. Mathgap: Out-of-distribution evaluation on problems with arbitrarily complex proofs. arXiv preprint arXiv:2410.13502 .OpenAI. 2025. gpt-oss-120b & gpt-oss-20b model card. 
+
+Preprint , arXiv:2508.10925. Igor Pak. 2019. COMPLEXITY PROBLEMS IN ENU-MERATIVE COMBINATORICS. In Proceedings of the International Congress of Mathematicians (ICM 2018) , Rio de Janeiro, Brazil. WORLD SCI-ENTIFIC. Qwen Team. 2025. Qwen3 technical report. Preprint ,arXiv:2505.09388. Abulhair Saparov, Richard Yuanzhe Pang, Vishakh Pad-makumar, Nitish Joshi, Mehran Kazemi, Najoung Kim, and He He. 2023. Testing the general deductive reasoning capacity of large language models using ood examples. Advances in Neural Information Pro-cessing Systems , 36:3083–3105. Zhihong Shao, Peiyi Wang, Qihao Zhu, Runxin Xu, Junxiao Song, Xiao Bi, Haowei Zhang, Mingchuan Zhang, Y. K. Li, Y. Wu, and Daya Guo. 2024. Deepseekmath: Pushing the limits of mathemati-cal reasoning in open language models. Preprint ,arXiv:2402.03300. Zhengxiang Shi, Qiang Zhang, and Aldo Lipani. 2022. Stepgame: A new benchmark for robust multi-hop spatial reasoning in texts. In Proceedings of the AAAI conference on artificial intelligence , volume 36, pages 11321–11329. Safal Shrestha, Minwu Kim, and Keith Ross. 2025. Mathematical reasoning in large language models: Assessing logical and arithmetic errors across wide numerical ranges. arXiv preprint arXiv:2502.08680 .Richard P Stanley. 2011. Enumerative combinatorics volume 1 second edition. Cambridge studies in ad-vanced mathematics .Nima Taghipour, Daan Fierens, Jesse Davis, and Hen-drik Blockeel. 2012. Lifted variable elimination with arbitrary constraints. In Artificial Intelligence and Statistics , pages 1194–1202. PMLR. Marc Thurley. 2006. sharpsat–counting models with advanced component caching and implicit bcp. In 
+
+International Conference on Theory and Applications of Satisfiability Testing , pages 424–429. Springer. Jan Tóth and Ondˇ rej Kuželka. 2022. Lifted inference with linear order axiom. Proceedings of the AAAI Conference on Artificial Intelligence , 37(10):12295– 12304. Pietro Totis, Jesse Davis, Luc De Raedt, and Angelika Kimmig. 2023. Lifted Reasoning for Combinatorial Counting. Journal of Artificial Intelligence Research ,76:1–58. Leslie G. Valiant. 1979. The Complexity of Enumer-ation and Reliability Problems. SIAM Journal on Computing , 8(3):410–421. Timothy van Bremen and Ondrej Kuzelka. 2021. Faster lifting for two-variable logic using cell graphs. In 
+
+Proceedings of the Thirty-Seventh Conference on Un-certainty in Artificial Intelligence, UAI 2021, Virtual Event, 27-30 July 2021 , volume 161 of Proceedings of Machine Learning Research , pages 1393–1402. AUAI Press. Guy Van Den Broeck, Nima Taghipour, Wannes Meert, Jesse Davis, and Luc De Raedt. 2011. Lifted Proba-bilistic Inference by First-Order Knowledge Compi-lation. In IJCAI 2011, Proceedings of the 22nd Inter-national Joint Conference on Artificial Intelligence, Barcelona, Catalonia, Spain, July 16-22, 2011 , vol-ume 29 of IJCAI 2011 , pages 2178–2185. Hemish Veeraboina. 2023. Aime problem set 1983-2024. Yuxuan Wan, Wenxuan Wang, Yiliu Yang, Youliang Yuan, Jen-tse Huang, Pinjia He, Wenxiang Jiao, and Michael Lyu. 2024. Logicasker: Evaluating and im-proving the logical reasoning ability of large lan-guage models. In Proceedings of the 2024 Confer-ence on Empirical Methods in Natural Language Processing , pages 2124–2155. Junling Wang, Anna Rutkiewicz, April Wang, and Mrin-maya Sachan. 2025. Generating pedagogically mean-ingful visuals for math word problems: A new bench-mark and analysis of text-to-image models. In Find-ings of the Association for Computational Linguistics: ACL 2025 , pages 11229–11257. Yuanhong Wang, Juhua Pu, Yuxu Zhou, Yuyi Wang, and Ondˇ rej Kuželka. 2026. Solving combinatorial counting problems with weighted first-order model counting. Preprint , arXiv:2605.24845. Cheng Xu, Shuhao Guan, Derek Greene, and M-Tahar Kechadi. Benchmark data contamination of large language models: A survey, 2024. URL https://arxiv. org/abs/2406.04244 .Fengli Xu, Qianyue Hao, Zefang Zong, Jingwei Wang, Yunke Zhang, Jingyi Wang, Xiaochong Lan, Jiahui Gong, Tianjian Ouyang, Fanjin Meng, and 1 others. 2025. Towards large reasoning models: A survey of reinforced reasoning with large language models. 
+
+arXiv preprint arXiv:2501.09686 .Yu Xuejun, Jianyuan Zhong, Zijin Feng, Pengyi Zhai, Roozbeh Yousefzadeh, Wei Chong Ng, Haoxiong Liu, Ziyi Shou, Jing Xiong, Yudong Zhou, and 1 others. 2025. Mathesis: Towards formal theorem proving from natural languages. arXiv preprint arXiv:2506.07047 .An Yang, Beichen Zhang, Binyuan Hui, Bofei Gao, Bowen Yu, Chengpeng Li, Dayiheng Liu, Jian-hong Tu, Jingren Zhou, Junyang Lin, Keming Lu, Mingfeng Xue, Runji Lin, Tianyu Liu, Xingzhang Ren, and Zhenru Zhang. 2024. Qwen2.5-math tech-nical report: Toward mathematical expert model via self-improvement. arXiv preprint arXiv:2409.12122 .Kaiyu Yang, Gabriel Poesia, Jingxuan He, Wenda Li, Kristin E Lauter, Swarat Chaudhuri, and Dawn Song. 2025. Position: Formal mathematical reasoning—a new frontier in ai. In Forty-second International Con-ference on Machine Learning Position Paper Track .Wayne Xin Zhao, Kun Zhou, Junyi Li, Tianyi Tang, Xiaolei Wang, Yupeng Hou, Yingqian Min, Beichen Zhang, Junjie Zhang, Zican Dong, and 1 others. 2023. A survey of large language models. arXiv preprint arXiv:2303.18223 , 1(2). Kunhao Zheng, Jesse Michael Han, and Stanislas Polu. 2021. Minif2f: a cross-system benchmark for for-mal olympiad-level mathematics. arXiv preprint arXiv:2109.00110 .Xin Zhou, Martin Weyssow, Ratnadira Widyasari, Ting Zhang, Junda He, Yunbo Lyu, Jianming Chang, Beiqi Zhang, Dan Huang, and David Lo. 2025. Lessleak-bench: A first investigation of data leakage in llms across 83 software engineering benchmarks. arXiv preprint arXiv:2502.06215 .Kuncheng Zou, Jiahao Mai, Yonggang Zhang, Yuyi Wang, Ondrej Kuzelka, Yuanhong Wang, and Yi Chang. 2025. Faster lifting for ordered domains with predecessor relations. CoRR , abs/2507.19182. A Problem Examples 
+
+CHOOSE Set set 0 contains: e4, e1, e5, e3, e2, e6,
+
+e7, e8. From set 0, we repeatedly select 16 elements (with replacement) to form choose 0. choose 0 con-tains e4. The element e5 must appear at most 11 times in choose 0. choose 0 is disjoint from 
+
+{e1, e 2, e 6}. How many different ways can we ob-tain choose 0? Count each distinct combination of 
+
+choose 0 as one way. (Answer: 3841) 
+
+GROUP Set set 0 contains: e6, e2, e9, e10 , e3,
+
+e7, e4, e8, e5, e1. We divide set 0 into 4 groups (allowing empty groups and groups are labeled), storing the result in group 0. The 4th division group of group 0 is a subset of {e1, e 10 , e 2, e 3, e 5, e 6, e 8}.The 3rd division group of group 0 is disjoint from 
+
+{e8}. How many different ways can we ob-tain group 0? Count each distinct combination of 
+
+group 0 as one way. (Answer: 331776) 
+
+SEQUENCE Set set 0 contains: e5, e1, e11 ,
+
+e3, e2, e8, e10 , e4, e12 , e6, e9, e7, e13 ,
+
+e14 . We draw 4 elements from set _0 and arrange them in sequence choose _sequence 0.Sequence choose _sequence 0 must contain e8
+
+and e10 such that e8 is immediately before 
+
+e10 . How many different ways can we obtain 
+
+choose _sequence 0? Count each distinct combina-tion of choose _sequence 0 as one way. (Answer: 396) 
+
+TUPLE Set set 0 contains: e3, e2, e4, e6, e1, e8,
+
+e5, e7. We draw 4 elements from set 0 (with re-placement) and arrange them in choose _tuple 0.The element at index 4 of choose _tuple 0 must not be e4. The element e5 must appear at most 3 times in choose _tuple 0. The element at index 2 of choose _tuple 0 must be e6. How many different ways can we obtain choose _tuple 0? Count each distinct combination of choose _tuple 0 as one way. (Answer: 448) 
+
+B Solvers for Combinatorial Counting 
+
+We briefly review the existing solvers for combina-torial counting (CO) problems. These algorithmic approaches can be broadly categorized into Con-straint Satisfaction Problems (CSPs), propositional logic frameworks (including Answer Set Program-ming and #SAT), and lifted inference methods. 
+
+Constraint Satisfaction Problems (CSPs) 
+
+Constraint-based frameworks typically employ a two-step approach: modeling and solving. In modeling, problems are defined using high-level constraint languages, such as ESSENCE (Frisch et al., 2008; Akgün et al., 2022), which allow users to specify combinatorial objects using primitives like sets, multisets, and partitions, along with constraints on valid configurations. Then, these high-level models are refined into lower-level representations (e.g., ESSENCE ′) and compiled into a counting constraint satisfaction problem (#CSP). Finally, specialized solvers (e.g., Minion (Gent and Jefferson, 2006)) are used to count the number of solutions satisfying all constraints, answering the original combinatorial counting question. 
+
+Propositional Logic and Answer Set Program-ming (ASP) Logic-based solvers approach count-ing by finding the number of "models" (sat-isfying truth assignments) for a given logi-cal theory, i.e., via #SAT (Thurley, 2006) or 
+
+#count {l1, l 2, . . . , l n} queries (which count the number of true literals among l1, l 2, . . . , l n) (Geb-ser et al., 2022). The main limitation of these meth-ods is that they do not natively support high-level combinatorial constructs, e.g., sets or multisets, re-quiring explicit encoding of such structures into propositional variables and clauses. 
+
+Lifted Inference Methods Lifted inference frameworks, such as Forclift (Van Den Broeck et al., 2011), GC-FOVE (Taghipour et al., 2012), WFOMC (Kuzelka, 2021; van Bremen and Kuzelka, 2021; Tóth and Kuželka, 2022), aim to count solutions without exhaustively enumerating every individual state. These methods rely on the principle of exchangeability (symmetries of the do-main constants), reasoning about groups of individ-uals together rather than unique constants. This is very similar to how combinatorial counting formu-las operate on groups of indistinguishable objects, making lifted inference a natural fit for CO prob-lems. Recently, Totis et al. (2023) attempted to bridge lifted inference and #CSP, proposing a lifted reasoning framework specifically designed for com-binatorial counting tasks. This framework, con-taining a Domain-Specific Language (DSL) called 
+
+CoLa and the solver CoSo , showed promising re-sults on modeling and solving various CO problems (Totis et al., 2023). Cofola (Wang et al., 2026) used in this work extends this direction with a typed ob-ject language and a WFOMC compilation pipeline, supporting multiple dependent objects, sets and bags, tuples, sequences, circles, partitions, compo-Evaluation Prompt for Zero-Shot Rea-soning                                            
+
+> You are an expert in combinatorics. Your task is to solve combinatorics problems by providing astep-by-step reasoning process followed by a single, exact numerical answer. Instructions: 1. First, reason step-by-step to solve the problem. Show all intermediate steps, including the use of standard combinatorial notation and formulas. 2. Compute the exact numerical value; do not leave expressions unevaluated. 3. After completing the reasoning, report the final answer as asingle number enclosed in \boxed{} .4. Do not include any text after the boxed answer. Question: {question}
+
+Figure 5: The prompt template used during evaluation. The placeholder {question} is instantiated with a spe-cific problem instance at inference time. 
+
+sitions, and relative or group-level constraints. 
+
+C Experimental Details 
+
+C.1 Capabilities of LLMs in Combinatorial Reasoning dataset distribution 
+
+For RQ1 (Capabilities of LLMs in Combinatorial Reasoning), we construct an evaluation dataset across the four operation groups sampled in the main CombEval suite: CHOOSE , G ROUP , S E-
+
+> QUENCE
+
+, and T UPLE . The final dataset comprises 1,500 problem instances in total. By operation type, instances are distributed as follows: T UPLE (589, 39.3%), G ROUP (337, 22.5%), S EQUENCE (297, 19.8%), and C HOOSE (277, 18.5%). Instance difficulty varies across multiple axes. By reasoning depth, most instances involve a sin-gle operator application (depth-1: 1,272, 84.8%), with decreasing numbers at deeper nesting levels (depth-2: 193, 12.9%; depth-3: 32, 2.1%; depth-4: 3, 0.2%). By constraint count, 574 instances (38.3%) contain no constraints, 413 (27.5%) con-tain one constraint, 303 (20.2%) contain two con-straints, and 210 (14.0%) contain three constraints. By operator count, the majority of problems use a single combinatorial operator (858, 57.2%), with 441 (29.4%) using two operators, 146 (9.7%) using three operators, and 55 (3.7%) using four operators. All instances are verified against the Cofola solver 
+
+Evaluation Prompt for Code Aug-mented Reasoning                                        
+
+> You are an expert in combinatorics and Python programming. Your task is to solve combinatorics problems by writing Python code. Instructions: 1. You must ONLY output executable Python code. Do not include any natural language explanations, introduction, text, or mathematical derivation. 2. The code must be self-contained and calculate the exact numerical answer to the problem. 3. Print or return the final result within the code. Do not add any text or formatting (like \boxed{}) outside the code block. Question: {question}
+
+Figure 6: The prompt template used during code-augmented evaluation (Python setting). The placeholder 
+
+{question} is instantiated with a specific problem in-stance at inference time. 
+
+to ensure ground-truth answers exist. 
+
+C.2 Evaluation Prompts 
+
+All models are evaluated using a standardized prompt template designed to elicit step-by-step chain-of-thought reasoning followed by a clearly marked final answer. This prompt engineering ap-proach serves two purposes: (1) it encourages mod-els to show their reasoning process, enabling error analysis and identification of failure modes, and (2) it enforces a consistent output format that facilitates automatic answer extraction and evaluation. Figure 5 presents the complete prompt template used across all experiments. The prompt explicitly instructs models to act as combinatorics experts, decompose problems into intermediate steps using standard notation (e.g.,  nk
+
+, permutations, factorial expressions), and compute exact numerical values rather than leaving symbolic expressions unevalu-ated. Critically, the final answer must be enclosed in \boxed{} delimiters with no additional text af-terward, allowing reliable extraction via regex pat-tern matching. During evaluation, the {question} placeholder is replaced with individual problem instances from the dataset. We apply this template uniformly to all problem types (C HOOSE , G ROUP , S EQUENCE ,TUPLE ) without type-specific modifications, ensur-ing fair comparison across tasks. Models receive 1 2 3 4         
+
+> 0
+> 200
+> 400
+> 600
+> 800
+> 1000
+> 1200
+> Count
+> 1272
+> 193
+> 32 3
+> (a) Depth
+> 0123
+> 0
+> 100
+> 200
+> 300
+> 400
+> 500
+> 600 574
+> 413
+> 303
+> 210
+> (b) Constraint Count
+> 1234
+> 0
+> 200
+> 400
+> 600
+> 800
+> Count
+> 858
+> 441
+> 146
+> 55
+> (c) Operator Count
+> TUPLE
+> GROUP
+> SEQUENCE
+> CHOOSE
+> 0
+> 100
+> 200
+> 300
+> 400
+> 500
+> 600
+> Count
+> 589
+> 337
+> 297 277
+> (d) Group Count
+> 6
+> 8
+> 10
+> 12
+> 0
+> 100
+> 200
+> 300
+> 400
+> 500
+> Count
+> 517
+> 395
+> 330
+> 258
+> (e) Entity Count
+
+Figure 7: Distribution of problem instances across operation types and difficulty parameters for the RQ1 dataset. 
+
+no few-shot examples or additional context beyond the problem statement itself, constituting a pure zero-shot evaluation setting. 
+
+C.3 Runtime as Difficulty Indicator 
+
+To validate that generated problems exhibit gen-uine computational complexity, we analyze the re-lationship between problem parameters and solver runtime, which serves as an objective measure of in-trinsic difficulty independent of model-specific bi-ases.The scaling of solver performance with depth, entity size, and constraint count on a logarithmic scale is shown in Figure 8. The results reveal several important patterns that support our difficulty parameterization. Notably, solver runtime exhibits a marginal decrease as the reasoning depth scales from 1 to 4. This counter-intuitive behavior stems from our isolated experi-mental design for depth evaluation, where the con-straint count is strictly fixed to k = 0 to eliminate confounding factors. Without the overhead of pro-cessing complex constraint interactions, the solver can efficiently traverse the nested chain-structured operators (e.g., CHOOSE → SEQUENCE → . . . ), bypassing intensive filtering or backtracking. Con-sequently, deeper nesting under zero-constraint set-tings effectively simplifies the solver’s localized search paths, resulting in a slight reduction in exe-cution time. In contrast, entity size and constraint count lead to substantial, exponential increases in solver runtime, reflecting their dominant impact on expanding the combinatorial search space and complicating constraint satisfaction. 
+
+D Experimental Details for RQ3 
+
+D.1 Dataset 
+
+We construct the evaluation dataset for RQ3 di-rectly from the problem instances used in our main experiments (RQ1 and RQ2). Each problem is orig-inally synthesized by the CombEval framework in the formal Cofola representation, then automati-cally translated into natural language using a struc-tured template, producing a baseline natural lan-guage formulation. To obtain a linguistically di-versified variant while strictly preserving semantic equivalence, we apply a closed-loop verification pipeline to rewrite each problem into a MATH-style natural language formulation, as detailed in the next subsection. As shown in Figure 12, the same underlying combinatorial structure can be ex-pressed in both the template-based and rewritten natural-language forms while maintaining semantic equivalence. 
+
+D.2 Closed-Loop Verification for Semantic Preservation 
+
+A core challenge in evaluating prompt sensitivity is ensuring that rewritten problems are mathemat-ically isomorphic to the originals—i.e., any ob-served performance variation must be attributable solely to surface-level linguistic changes, not to unintended semantic drift. To this end, we design a 
+
+closed-loop verification pipeline comprising three stages: Style Transfer, Formal Back-translation, and Solver Verification. 
+
+Step 1: Style Transfer. We leverage gemini-3-flash-preview-thinking to rewrite each template-generated problem into a MATH-style natural lan-guage formulation. The rewriting is conducted in a retrieval-augmented generation (RAG) setting (Gao et al., 2023b): reference examples are retrieved from the “Counting and Probability” category of the MATH dataset (Hendrycks et al., 2021) (Fig-ure 11) and provided as few-shot stylistic guid-ance. The rewriting prompt (Figure 9) explicitly conditions generation on the underlying Cofola representation,separating mathematical logic from surface-level language to encourage diverse narra-tive reformulations without altering the solution space. Figure 8: Performance analysis of solver runtime across different problem parameters. 
+
+Step 2: Formal Back-translation. To guard against condition omission or semantic shift intro-duced during rewriting, we employ the same LLM to translate the rewritten problem back into Cofola code using a dedicated NL-to-Cofola translation prompt (Figure 10). This prompt provides exhaus-tive one-to-one mappings between natural language patterns and Cofola constructs, enforcing a deter-ministic, line-by-line translation that recovers the formal structure from the paraphrased text. 
+
+Step 3: Solver Verification. The back-translated Cofola expression is fed into the Cofola constraint solver to compute its exact solution.If and only if the solver’s output matches the ground-truth an-swer of the original problem exactly—across all valid combinatorial configurations—is the rewrit-ten instance accepted as a semantically lossless paraphrase.Instances that fail this verification are discarded and re-generated (with different random seeds for the style transfer stage) until conver-gence or a maximum retry budget is exhausted. This closed-loop protocol guarantees that every accepted Rewritten variant encodes precisely the same combinatorial enumeration problem as its Math and Cards counterparts,enabling a rigorous, confounding-free evaluation of model robustness to paraphrasing in RQ3. 
+
+D.3 Prompt for Problem Rewriting 
+
+Figure 9 presents the prompt template used for problem rewriting. The prompt instructs the model to generate diverse, story-like reformulations while strictly preserving the underlying combinatorial logic specified in the Cofola representation. By ex-plicitly separating mathematical constraints from surface-level language and providing reference problems as stylistic guidance, this design enables controlled variation in problem phrasing without altering the solution space. Figure 10 presents the prompt template used for natural-language-to-Cofola back-translation. This prompt asks the model to recover the formal Cofola program from a rewritten natural-language problem using an explicit dictionary of mappings between linguistic patterns and Cofola constructs. The gen-erated Cofola program is then executed by the solver and compared against the original ground-truth answer. Together, the rewriting prompt and the back-translation prompt form a closed verifica-tion loop, allowing us to study reasoning robustness under paraphrasing while avoiding confounding changes to problem structure. 
+
+E Template 
+
+We list the template system we design to verbal-ize generated Cofola instances as natural-language problems. The template system separates prob-lem statements into four components: entity/object declarations, set and bag construction steps, typed combinatorial-object operations, and constraints. This separation allows the generator to preserve the formal structure of each instance while producing readable natural-language descriptions. Templates are parameterized by placehold-ers enclosed in braces, such as {set_name}, {source_name}, {node_name}, and {k}. During generation, these placeholders are filled with sam-pled entities, intermediate variable names, oper-ation parameters, and constraint values. For ex-ample, the template “From {source_name}, we select {k} elements without replacement to form {node_name}.” can be instantiated as “From aux_0, we select 3 elements without replacement to form aux_1.” The same mechanism is used for set/mul-tiset construction, sequence constraints, tuple con-Prompt Template for Problem Rewriting                   
+
+> You are an expert in creating combinatorics math problems. Your task is to rewrite a given math problem to make it more engaging, story-like, or similar in style to the provided reference problems, while STRICTLY preserving the underlying mathematical logic and constraints.
+> Here are some reference problems that have a similar mathematical structure or style. Use them as inspiration for the tone and narrative style: — {references_text} —
+> Here is the mathematical logic of the original problem (represented in Cofola language):
+> {original_cofola}
+> (Note: The rewritten problem MUST correspond exactly to this logic. Do not change numbers, constraints, or the type of combinatorial object being counted.)
+> Original Problem Text: “{original_question}”
+> Task: Rewrite the “Original Problem Text” above. 1. Keep the mathematical core exactly the same (same numbers, same conditions). 2. You can change the setting (e.g., from balls in boxes to students in classrooms) if it fits the logic, or just improve the narrative of the current setting. 3. Ensure the question is clear and unambiguous.
+> Output Format: Just provide the rewritten problem text. Do not include explanations or the Cofola code.
+> Rewritten Problem:
+
+Figure 9: The prompt used to generate rewritten variations of combinatorial problems. Placeholders in blue are replaced with reference examples, the Cofola logic representation, and the original problem text for each instance. 
+
+straints, and final counting questions. Table 5 gives templates for entity declarations and set/bag construction; Table 6 lists typed object-operation templates; Tables 7, 8, and 9 summa-rize constraint templates; and Table 10 reports the question, comparator, polarity, and entity-pool tem-plates. 
+
+F Error Examples of gpt-5.5 
+
+We present representative error examples generated by gpt-5.5 in Errors 1 to 6. The text in red indi-cates the parts where the model made a mistake. We note that we do not cover all error types here as exhaustive manual inspection is labor-intensive. Now, let us analyze these error examples in detail. • Error 1 shows a circle arrangement where the model treats a “together” block as a fixed or-dered chunk, omitting the k! internal permu-tations of the block and undercounting by a factor of 3! .• Error 2 shows a sequence problem where the model reads “ together not in seq” as “no two elements of the set are adjacent”, a much stricter condition than the intended “the ele-ments do not all form one contiguous block”. • Error 3 illustrates a case where two indepen-dent choose_tuple operators on the same bag are treated by the model as a single joint deal that depletes the bag, rather than two in-dependent draws from the original bag. • Error 4 shows a multiset circular arrange-ment where the model uses the linear for-mula n!/ Q mi! instead of the circular for-mula (n−1)! / Q mi!, overcounting by a fac-tor of n.• Error 5 shows a circle problem with two 
+
+together constraints sharing an entity. The model correctly identifies the forced chain but treats it as a single fixed orientation, missing the four internal orientations that the chain admits. • Error 6 shows a circle problem combining 
+
+together (over three entities) with next_to .The combined block has four distinct configu-rations (two internal orderings × two chain di-rections in a rotation-only circle), all of which the model collapses to one. The first two patterns reflect a systematic gap be-tween the natural-language reading of Cofola con-straints and their formal semantics over multisets, particularly the symmetry of “together” blocks. The remaining patterns reflect classical combinato-rial slips that scale with the structure of compound Prompt Template for Natural Language to Cofola Translation 
+
+# Role You are an expert combinatorial problem solver and an assistant strictly trained to translate natural language combinatorial questions into a specialized domain-specific language (DSL) called 
+
+Cofola .
+
+# Task Your task is to read a combinatorics problem described in English and map it line-by-line or step-by-step into Cofola code. You must use ONLY the mappings provided in the dictionary below. 
+
+# Dictionary: Cofola to Natural Language Mapping 
+
+[The full dictionary defines exhaustive one-to-one mappings between natural language patterns and Cofola constructs across the following categories: (1) Types & Declarations; (2) Operations (Set & Bag Math, Choice & Arrangement, Partitions & Groupings); (3) Constraints (comparators, general constraint mappings, and sequence/tuple-specific constraints); (4) Question Template (target output format). See the supplementary material for the complete dictionary.] 
+
+Here are some reference examples showing the expected input-output format: — {references_text} — 
+
+Important requirements: 
+
+• Analyze the reference examples carefully to understand the expected code structure and style 
+
+• Generate code that exactly matches the format shown in the examples 
+
+• Output only the program code (Cofola DSL) without any explanations, comments or additional markdown text like “‘cofola 
+
+• Ensure the code follows proper syntax and can be executed correctly 
+
+Task: Translate the following natural language problem into a Cofola program. 
+
+Problem: {original_question} 
+
+Program: 
+
+Figure 10: The prompt template used for translating natural language combinatorial problems into Cofola DSL code. The Dictionary section (summarized above) provides exhaustive one-to-one mappings between natural language patterns and Cofola constructs; the full dictionary is available in the supplementary material. Placeholders in blue are replaced with retrieved reference examples and the target problem. 
+
+constraints. We anticipate that explicitly formaliz-ing these semantic edge cases in the prompt tem-plate, or pairing the LLM with a symbolic verifier, would mitigate a substantial fraction of these er-rors (Gao et al., 2023a). Example 1: Choose (Level 2) 
+
+Problem: My school’s math club has 6 boys and 8 girls. I need to select a team to send to the state math competition. We want 6 people on the team. In how many ways can I select the team without restrictions? 
+
+Cofola Encoding: 
+
+boys = set(boy0...6) girls = set(girl0...8) team = choose(boys + girls, 6) 
+
+Example 2: Group (Level 5) 
+
+Problem: How many ways are there to put 4 balls in 3 boxes if two balls are indistin-guishably green, two are indistinguishably red, and the boxes are distinguishable? 
+
+Cofola Encoding: 
+
+balls = bag(gree: 2, red: 2) boxes = Group(balls, 3) 
+
+Figure 11: Example problems from the MATH dataset with their formal Cofola encodings used as references during the rewriting process, where bag is the Cofola construct for multisets. 
+
+Template-based 
+
+Set set 0 contains: e8, e6, e2, e9, e7, e4,
+
+element 5, e1, e3, e10 .From set 0, we select 7 elements without replacement to form choose 0.How many different ways can we obtain 
+
+choose 0?Count each distinct combination of choose 0
+
+as one way. 
+
+Rewritten *
+
+A school’s debate team consists of 10 stu-dents. For an upcoming national competi-tion, the coach needs to select a group of 7 students to represent the school. In how many different ways can the coach choose the 7-member team from the 10 available students? 
+
+> *
+
+Rewritten by gemini-3-flash-preview-thinking .
+
+Figure 12: An example of a generated combinatorial problem in its template-based and rewritten natural-language forms. Both formulations encode the same underlying combinatorial structure (Choose from a set of 10 elements without replacement, selecting 7). Table 5: Math templates for entity type declarations and universe construction.                                      
+
+> Category Template Entity Type Declarations
+> Set Set {set_name} contains: {description}.
+> Bag (Multiset) {set_name} contains: {description}.
+> Tuple {set_name} contains: {description}.
+> Sequence {set_name} contains: {description}.
+> Universe Construction Operations
+> SET_UNION We take the union of {left_name} and {right_name} , calling the result {node_name} .
+> SET_INTERSECTION We take the intersection of {left_name} and {right_name} , calling the result {node_name} .
+> SET_DIFFERENCE Starting from {left_name} , we remove elements of {right_name} to get {node_name} .
+> BAG_UNION We merge {left_name} and {right_name} by adding their quantities to obtain {node_name} .
+> BAG_INTERSECTION We combine {left_name} and {right_name} by taking the minimum quantity of each element to get {node_name} .
+> BAG_DIFFERENCE Starting from {left_name} , we subtract the quantities in {right_name} to get {node_name} , ensur-ing no element’s quantity becomes negative.
+
+Table 6: Math templates for combinatorial operations. 
+
+Operation Template CHOOSE 
+
+CHOOSE From {source_name} , we select {k} elements without replacement to form {node_name} .
+
+CHOOSE_REPLACE From {source_name} , we repeatedly select {k} elements (with replacement) to form 
+
+{node_name} .
+
+Group 
+
+COMPOSE We divide {source_name} into {k} groups (allowing empty groups and groups are labeled), storing the result in {node_name} .
+
+PARTITION We split {source_name} into {k} groups (allowing empty groups and groups are not labeled), storing the result in {node_name} .
+
+TUPLE 
+
+CHOOSE_REPLACE_TUPLE We draw {k} elements from {source_name} (with replacement) and arrange them in 
+
+{node_name} .
+
+CHOOSE_TUPLE From {source_name} , we pick {k} elements and arrange them in order to form 
+
+{node_name} .
+
+TUPLE We convert {source_name} into an ordered sequence {node_name} .
+
+SEQUENCE 
+
+SEQUENCE We arrange all elements from {source_name} to form an ordered sequence {node_name} .
+
+CHOOSE_REPLACE_SEQUENCE We draw {k} elements from {source_name} with replacement and arrange them in sequence 
+
+{node_name} .
+
+CIRCLE We arrange all elements from {source_name} around a circle called 
+
+{node_name}{reflection} .
+
+Table 7: Math templates for constraints (Part 1): General and Group constraints. 
+
+Constraint Name Template General Constraints 
+
+MemberConstraint {target} {positive}contains {entity}. DisjointConstraint {second_set} is disjoint from ({first_set}). SubsetConstraint {first_set} is a subset of ({second_set}). EqualityConstraint {left_name} must be the same as {right_name}. CardinalityConstraint {target} must contain {comparator} {value} elements. CountConstraint The element {entity} must appear {comparator} {value} times in {target} .
+
+NonEmptyConstraint {target} must not be empty. LinearCardinalityConstraint The total size of {left} and {right} must be {comparator} {value} .
+
+IndexMemberConstraint The set at index {index} of {target} {positive} belong to {container} .
+
+IndexEqualMemberConstraint The element at index {index} of {target} {positive} be {entity} .
+
+Group Constraints 
+
+ComposeSizeConstraint The size of the {index} th subset must be {comparator} {param} .
+
+QuantifiedConstraint For each group in the {target} , the number of entities it contains must {comparator} {value} .
+
+Error 1: Missing internal permutations of a “together” block 
+
+Question: 
+
+Set set 0 contains: element7, element5, element8, element6, element2, element4, element1, element3. We arrange all elements from set 0 around a circle called circle 0.Entities (element2, element3, element5) must be together in sequence circle 0 if any are present. How many different ways can we obtain circle 0? Count each distinct combination of circle 0 as one way. 
+
+Reference: ‘720‘ Prediction: 
+
+Treat (element2, element3, element5) as one fixed consecutive block, since they must be together in that sequence. So we arrange the following 6 objects around a circle: 
+
+[element2 , element3 , element5 ], element1 , element4 , element6 , element7 , element8 .
+
+The number of circular arrangements of 6 distinct objects is (6 − 1)! = 5! = 120 .
+
+120 Table 8: Math templates for constraints (Part 2): Sequence ordering constraints. 
+
+Constraint Name Template Sequence Ordering Constraints (Standard) 
+
+PredecessorConstraint (pos) Sequence {target} must contain {entity1} and {entity2} such that {entity1} 
+
+is immediately before {entity2} .
+
+PredecessorConstraint (neg) Sequence {target} does not have {entity1} immediately before {entity2} if both are present. 
+
+LessThanConstraint (pos) Sequence {target} must contain {entity1} and {entity2} such that {entity1} 
+
+comes before {entity2} (not necessarily immediately). 
+
+LessThanConstraint (neg) Sequence {target} does not have {entity1} before {entity2} (immediately or not) if both are present. 
+
+NextToConstraint (pos) Sequence {target} must contain {entity1} and {entity2} such that they are adjacent. 
+
+NextToConstraint (neg) Sequence {target} does not have {entity1} and {entity2} adjacent if both are present. 
+
+TogetherConstraint (pos) Entities ( {group} ) must be together in sequence {target} if any are present. 
+
+TogetherConstraint (neg) Sequence {target} contains the entities ( {group} ) and they are not together. 
+
+Sequence Ordering Constraints (Bag Semantics) 
+
+PredecessorBagConstraint (pos) There is a pair of {entity1} and {entity2} in sequence {target} such that 
+
+{entity1} is immediately before {entity2} .
+
+PredecessorBagConstraint (neg) Sequence {target} does not have any {entity1} immediately before any {entity2} 
+
+({target} that contain only {entity1} or only {entity2} or none of them are also allowed). 
+
+LessThanBagConstraint (pos) There is a pair of {entity1} and {entity2} in sequence {target} such that 
+
+{entity1} comes before {entity2} (not necessarily immediately). 
+
+LessThanBagConstraint (neg) Sequence {target} does not have any {entity1} before any {entity2} (immedi-ately or not) ( {target} that contain only {entity1} or only {entity2} or none of them are also allowed). 
+
+NextToBagConstraint (pos) There is a pair of {entity1} and {entity2} in sequence {target} such that they are adjacent. 
+
+NextToBagConstraint (neg) Sequence {target} does not have any {entity1} and {entity2} adjacent ({target} that contain only {entity1} or only {entity2} or none of them are also allowed). 
+
+Complex Sequence Count Constraints 
+
+SequenceCountConstraint In sequence {target} , {count_type} .
+
+next_to {entity1} and {entity2} are adjacent (in any order) {comparator} {value} times 
+
+predecessor {entity1} is immediately followed by {entity2} {comparator} {value} times 
+
+less_than {entity1} is followed by {entity2} (allowing gaps) {comparator} {value} times 
+
+Table 9: Math templates for constraints (Part 3): Tuple-specific constraints. 
+
+Constraint Name Template 
+
+TupleMembershipConstraint {target} {positive} contains {entity}. TupleIndexMembershipConstraint The element at position {index} of {target} must {positive}be {entity} .
+
+TupleAllMembersInConstraint All elements in {target} must belong to {target_set} .
+
+TupleCountSizeConstraint The number of {count_obj} in {target} must be {comparator} {param} .
+
+TupleIndexEqConstraint The {index} th element of {target} {positive}is {entity} .
+
+TupleDedupCountSizeConstraint In {target} , the number of distinct elements belonging to {count_obj} must be 
+
+{comparator} {param} .
+
+PositionConstraint The {ordinal} position in {target} must be {entity} .Table 10: Question templates and comparator mappings for natural language generation. 
+
+Category Template / Mapping Default Question Template 
+
+Counting question How many different ways can we obtain {uncertain_node_name} ? Count each distinct combination of {uncertain_node_name} as one way. 
+
+Comparator to Natural Language ( comparator2str )
+
+== exactly 
+
+<= at most 
+
+< less than 
+
+>= at least 
+
+> greater than 
+
+!= not exactly 
+
+Positive/Negative Boolean Mapping ( positive_bool2txt )
+
+true (empty string) 
+
+false not 
+
+Special Tokens 
+
+entity_type element entity_unit (single space) 
+
+empty_entity no {entity_type} at all 
+
+Error 2: Misreading negated “together” as “no two adjacent” 
+
+Question: 
+
+bag 0 contains: element3:2, element5:2, element6:2. We arrange all elements from bag 0 to form an ordered sequence sequence 0.Sequence sequence 0 contains the entities (element3, element5) and they are not together. How many different ways can we obtain sequence 0? Count each distinct combination of sequence 0 as one way. 
+
+Reference: ‘72‘ Prediction: 
+
+Let A = element3, B = element5, C = element6. We arrange the multiset {A, A, B, B, C, C } with the condition that A and B are not together, meaning no A is adjacent to any B.Use the two C’s as separators: _ C _ C _. There are 3 gaps where the A’s and B’s may be placed. To avoid adjacency between A and B, each gap can contain only A’s, only B’s, or be empty. We distribute 2 copies of A and 2 copies of B among these 3 gaps: 
+
+• A’s in 1 gap and B’s in 1 gap: 3 × 2 = 6 .
+
+• A’s in 1 gap and B’s split across 2 gaps: 3.
+
+• A’s split across 2 gaps and B’s in 1 gap: 3.Total: 6 + 3 + 3 = 12 .
+
+12 Error 3: Joint vs. independent sampling from the same bag 
+
+Question: 
+
+bag 0 contains: element2:2, element5:1, element6:3. From bag 0, we pick 2 elements and arrange them in order to form choose _tuple 0.From bag 0, we pick 3 elements and arrange them in order to form choose _tuple 1.How many different ways can we obtain choose _tuple 0, choose _tuple 1? Count each distinct combination as one way. 
+
+Reference: ‘152‘ Prediction: 
+
+The bag contains a multiset of 6 elements: {2, 2, 5, 6, 6, 6}.Together, the two tuples use 2 + 3 = 5 elements from the bag, so this is equivalent to forming an ordered sequence of length 5 from the bag (first 2 positions = choose _tuple 0, last 3 = choose _tuple 1). Since we use 5 out of 6 elements, exactly one element is left unused. 
+
+• Leave out one 2: counts (1 , 1, 3) ⇒ 5! /(1! 1! 3!) = 20 .
+
+• Leave out the 5: counts (2 , 0, 3) ⇒ 5! /(2! 3!) = 10 .
+
+• Leave out one 6: counts (2 , 1, 2) ⇒ 5! /(2! 1! 2!) = 30 .Total: 20 + 10 + 30 = 60 .
+
+60 
+
+Error 4: Missing rotational quotient for a multiset circle 
+
+Question: 
+
+bag 0 contains: element1:1, element2:1, element5:3, element6:1, element7:1, element9:1, element10:2. We arrange all elements from bag 0 around a circle called circle 0.How many different ways can we obtain circle 0? Count each distinct combination of circle 0 as one way. 
+
+Reference: ‘30240‘ Prediction: 
+
+The bag has 10 elements with multiplicities {1, 1, 3, 1, 1, 1, 2}.The number of distinguishable circular arrangements of the multiset equals the multinomial coefficient  
+
+> 10! 1! 1! 3! 1! 1! 1! 2!
+
+= 3,628 ,800 12 = 302 ,400 .
+
+302400 
+
+Error 5: Chained “together” constraints sharing an entity 
+
+Question: 
+
+Set set 0 contains: element7, element5, element8, element6, element2, element4, element1, element3. We arrange all elements from set 0 around a circle called circle 0, two arrangements are considered the same if one can be rotated or reflected (flipped) to match the other. Entities (element6, element7) must be together in sequence circle 0 if any are present. Entities (element5, element2, element7) must be together in sequence circle 0 if any are present. How many different ways can we obtain circle 0? Count each distinct combination of circle 0 as one way. 
+
+Reference: ‘48‘ Prediction: 
+
+The required “together” of (element5, element2, element7) means these three elements must be consecutive around the circle. Also, (element6, element7) must be consecutive, so element7 must be adjacent to both element2 and element6. So the forced block is the chain element5–element2–element7–element6 up to reflection. Treating this chain as one single block, we need to arrange the following 5 objects around acircle: [element5 , element2 , element7 , element6 ], element1, element3, element4, element8. The number of circular arrangements of 5 distinct objects up to rotation and reflection is (5 −1)! /2 = 12 .
+
+12 Error 6: Compound block from together and next_to in a circle 
+
+Question: 
+
+Set set 0 contains: element7, element5, element8, element6, element11, element12, element9, element2, element4, element1, element3, element10. We arrange all elements from set 0 around a circle called circle 0.Entities (element12, element6, element9) must be together in circle 0 if any are present. 
+
+circle 0 must contain element12 and element11 such that they are adjacent. 
+
+circle 0 does not have element2 and element3 adjacent if both are present. How many different ways can we obtain circle 0?
+
+Reference: ‘120960‘ Prediction: 
+
+We treat (element12, element6, element9) as a required consecutive sequence. Since element12 must also be adjacent to element11, and element12 is already adjacent to element6 in the required sequence, element11 must be on the other side of element12. Thus we form one block (element11, element12, element6, element9). Now we arrange this block together with the remaining 8 elements, giving 9 objects around a circle: 
+
+(9 − 1)! = 8! = 40320 . Subtract arrangements where element2 and element3 are adjacent (treat them as one block of size 2): 2! · 7! = 10080 .Valid arrangements: 40320 − 10080 = 30240 .
+
+30240

@@ -1,0 +1,246 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-24T21:44:06.042362+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 5,
+    "quick_skim_target": 11,
+    "quick_selected": 5
+  },
+  "deep_dive": [
+    {
+      "id": "2606.22600v1",
+      "source": "arxiv",
+      "title": "On the Position Bias of On-Policy Distillation",
+      "abstract": "On-Policy Distillation (OPD) improves the learning efficiency of standard reinforcement learning through dense, token-level supervision from teachers. In the standard KL objective of OPD, token-level losses are uniformly averaged, implying equal weights for all tokens. However, we discover that not all tokens are created equal: as student rollouts grow longer, they deviate further from the teacher's distribution, leading to degraded supervision quality at later positions. As a result, OPD using only the first 30% of tokens can perform comparably to using all tokens, whereas OPD using only the last 30% of tokens barely learns anything. In this work, we provide a principled understanding of this issue through the lens of constrained optimization. Based on these insights, we derive Importance-Weighted On-Policy Distillation (IW-OPD), in which the weight assigned to each token depends on the accumulated discrepancy between the student's and teacher's distributions, naturally upweighting earlier tokens and downweighting later ones with larger deviations. We show that IW-OPD converges significantly faster than OPD, with better learning efficiency, and achieves better final performance than standard OPD in both same-size and cross-scale settings, improving performance up to 6.9 points on AIME-2025.",
+      "authors": [
+        "Yan Xie",
+        "Sijie Zhu",
+        "Tiansheng Wen",
+        "Bo Chen",
+        "Yifei Wang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-21T17:20:21+00:00",
+      "link": "https://arxiv.org/pdf/2606.22600v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Analyzes token-level supervision in on-policy distillation, relevant to RLHF reward modeling",
+      "llm_evidence_cn": "分析同策略蒸馏中的token级监督，与RLHF奖励建模相关",
+      "llm_evidence": "分析同策略蒸馏中的token级监督，与RLHF奖励建模相关",
+      "canonical_evidence": "分析同策略蒸馏中的token级监督，与RLHF奖励建模相关",
+      "llm_tldr_en": "Discovers position bias in on-policy distillation where later tokens degrade supervision, and provides a constrained optimization perspective to improve distillation.",
+      "llm_tldr_cn": "发现同策略蒸馏中存在位置偏差：随着学生轨迹变长，后续token的监督质量下降。通过约束优化视角提供理论理解，并基于此改进蒸馏方法，提升学习效率。该方法直接适用于RLHF中的偏好学习。",
+      "llm_tldr": "发现同策略蒸馏中存在位置偏差：随着学生轨迹变长，后续token的监督质量下降。通过约束优化视角提供理论理解，并基于此改进蒸馏方法，提升学习效率。该方法直接适用于RLHF中的偏好学习。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.22600v2",
+      "source": "arxiv",
+      "title": "On the Position Bias of On-Policy Distillation",
+      "abstract": "On-Policy Distillation (OPD) improves the learning efficiency of standard reinforcement learning through dense, token-level supervision from teachers. In the standard KL objective of OPD, token-level losses are uniformly averaged, implying equal weights for all tokens. However, we discover that not all tokens are created equal: as student rollouts grow longer, they deviate further from the teacher's distribution, leading to degraded supervision quality at later positions. As a result, OPD using only the first 30% of tokens can perform comparably to using all tokens, whereas OPD using only the last 30% of tokens barely learns anything. In this work, we provide a principled understanding of this issue through the lens of constrained optimization. Based on these insights, we derive Importance-Weighted On-Policy Distillation (IW-OPD), in which the weight assigned to each token depends on the accumulated discrepancy between the student's and teacher's distributions, naturally upweighting earlier tokens and downweighting later ones with larger deviations. We show that IW-OPD converges significantly faster than OPD, with better learning efficiency, and achieves better final performance than standard OPD in both same-size and cross-scale settings, improving performance up to 6.9 points on AIME-2025.",
+      "authors": [
+        "Yan Xie",
+        "Sijie Zhu",
+        "Tiansheng Wen",
+        "Bo Chen",
+        "Yifei Wang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-21T17:20:21+00:00",
+      "link": "https://arxiv.org/pdf/2606.22600v2",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "The paper uses constrained optimization to analyze and improve on-policy distillation, a mathematical formulation technique.",
+      "llm_evidence_cn": "本文利用约束优化分析策略蒸馏中的位置偏差，属于数学公式化方法。",
+      "llm_evidence": "本文利用约束优化分析策略蒸馏中的位置偏差，属于数学公式化方法。",
+      "canonical_evidence": "本文利用约束优化分析策略蒸馏中的位置偏差，属于数学公式化方法。",
+      "llm_tldr_en": "Identifies position bias in on-policy distillation using constrained optimization, showing that later tokens degrade supervision, and derives improved weighting schemes.",
+      "llm_tldr_cn": "策略蒸馏中的标准KL目标对所有token一视同仁，但本文发现随着学生轨迹变长，后面token的监督质量下降。通过约束优化的视角，本文提出了对该问题的原则性理解，并基于此推导出更优的权重方案。实验表明仅使用前30%的token即可达到全量训练的效果。",
+      "llm_tldr": "策略蒸馏中的标准KL目标对所有token一视同仁，但本文发现随着学生轨迹变长，后面token的监督质量下降。通过约束优化的视角，本文提出了对该问题的原则性理解，并基于此推导出更优的权重方案。实验表明仅使用前30%的token即可达到全量训练的效果。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "math formulation",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.19788v1",
+      "source": "arxiv",
+      "title": "CombEval: A Framework for Evaluating Combinatorial Counting in Large Language Models",
+      "abstract": "We present CombEval, a dynamic benchmark for evaluating combinatorial counting in large language models. CombEval represents each problem as a typed Cofola specification over entities, combinatorial objects, object dependencies, and constraints, enabling controlled generation of natural-language counting problems with exact solver-verified answers. Unlike static collections, CombEval supports systematic variation of object type, entity scale, constraint count, and reasoning depth. We evaluate 11 LLMs under direct and code-augmented settings and find that models remain brittle on ordered objects, indistinguishable elements, relatively positional constraints, and nested object dependencies. Error analysis further identifies failures in constraint interpretation and counting principles. CombEval provides a diagnostic testbed for studying when and why LLMs fail at combinatorial reasoning. The code and generated benchmark suites are publicly available at \\url{https://github.com/YuxuZhou-CN/combination-problem-generation}.",
+      "authors": [
+        "Yuxu Zhou",
+        "Ondřej Kuželka",
+        "Yuyi Wang",
+        "Yuanhong Wang",
+        "Yi Chang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-06-18T04:47:49+00:00",
+      "link": "https://arxiv.org/pdf/2606.19788v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "evaluates LLM combinatorial counting via formal specification",
+      "llm_evidence_cn": "通过形式化规格评估LLM组合计数能力",
+      "llm_evidence": "通过形式化规格评估LLM组合计数能力",
+      "canonical_evidence": "通过形式化规格评估LLM组合计数能力",
+      "llm_tldr_en": "CombEval is a dynamic benchmark that uses typed Cofola specifications to generate combinatorial counting problems for LLMs, enabling systematic variation and exact verification; evaluation of 11 LLMs reveals brittleness in ordered objects and nested constraints.",
+      "llm_tldr_cn": "现有基准无法系统评估LLM在组合计数任务上的能力。本文提出CombEval，一个动态基准测试框架，利用类型化的Cofola规格生成具有精确可验证答案的自然语言计数问题，支持对对象类型、实体规模和约束数量进行系统变化。在11个LLM上的评估表明，模型在处理有序对象、不可区分元素和嵌套依赖时表现出脆弱性。该工作为LLM的数学推理能力提供了细致的评估工具，揭示了当前模型的局限性。",
+      "llm_tldr": "现有基准无法系统评估LLM在组合计数任务上的能力。本文提出CombEval，一个动态基准测试框架，利用类型化的Cofola规格生成具有精确可验证答案的自然语言计数问题，支持对对象类型、实体规模和约束数量进行系统变化。在11个LLM上的评估表明，模型在处理有序对象、不可区分元素和嵌套依赖时表现出脆弱性。该工作为LLM的数学推理能力提供了细致的评估工具，揭示了当前模型的局限性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "math formulation",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.20047v1",
+      "source": "arxiv",
+      "title": "PACMS: Submodular Context Selection as a Pluggable Engine for LLM Agents",
+      "abstract": "Conversational and tool-using LLM agents operate over a context window that fills from several directions simultaneously. As a session proceeds, the agent accumulates user and assistant turns, entries drawn from a persistent memory store, and often largest of all, the verbatim outputs of tool calls such as file reads, search results, and API responses. Once the cumulative context exceeds the model's token budget, the framework must decide what to keep.   The prevailing mechanism is recency truncation, sometimes paired with periodic summarization. This is topic-blind: a fact established early in a session is discarded simply because it is old, even when the current user query is about exactly that fact; conversely, verbose but irrelevant recent material is retained. Agents that must recall information across many turns, the defining case for memory, are precisely where recency truncation fails.   Existing alternatives sit outside the agent's assembly step. Retrieval augmented generation fetches external documents into the prompt but does not arbitrate the agent's \\emph{already-present} pooled context. Context-compression methods reduce token count by rewriting or pruning text, but operate query-blind and lossily. Neither treats memory entries, conversation turns, and tool outputs as a single candidate pool to be selected from by relevance at the moment the prompt is assembled.",
+      "authors": [
+        "Manu Ghulyani",
+        "Arunabh Singh",
+        "Karan Bharadwaj",
+        "Ankit Nath",
+        "Suranjan Goswami"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR"
+      ],
+      "published": "2026-06-18T10:22:57+00:00",
+      "link": "https://arxiv.org/pdf/2606.20047v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "submodular context selection for LLM agents, algorithm improvement for post-training",
+      "llm_evidence_cn": "用于LLM代理的次模上下文选择算法改进",
+      "llm_evidence": "用于LLM代理的次模上下文选择算法改进",
+      "canonical_evidence": "用于LLM代理的次模上下文选择算法改进",
+      "llm_tldr_en": "Proposes PACMS, a pluggable submodular context selection engine for LLM agents that intelligently retains relevant information and discards irrelevant content from the context window, overcoming limitations of recency truncation.",
+      "llm_tldr_cn": "针对LLM代理中上下文窗口填满后简单截断丢失关键信息的问题，提出了PACMS，一种可插拔的次模上下文选择引擎。该方法基于次模函数优化，智能地保留与当前查询相关的早期信息并丢弃无关内容。实验表明相比截断基线显著提升了代理任务性能。该方法为改进LLM后训练中的上下文管理提供了新思路。",
+      "llm_tldr": "针对LLM代理中上下文窗口填满后简单截断丢失关键信息的问题，提出了PACMS，一种可插拔的次模上下文选择引擎。该方法基于次模函数优化，智能地保留与当前查询相关的早期信息并丢弃无关内容。实验表明相比截断基线显著提升了代理任务性能。该方法为改进LLM后训练中的上下文管理提供了新思路。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.21553v1",
+      "source": "arxiv",
+      "title": "Dissecting Agentic RAG: A Component Ablation for Multi-Hop QA with a Local 7B Model",
+      "abstract": "Agentic retrieval-augmented generation (RAG) systems combine iterative reasoning loops, query decomposition, and adaptive retrieval to tackle multi-hop question answering. However, the contribution of each component remains poorly understood, particularly under resource-constrained settings using only local language models. Many agentic designs add adaptive retrieval routing and deeper retrieval loops on the assumption that the added complexity helps. To test whether it does, we run a controlled ablation study of a full agentic RAG pipeline evaluated on 5,000 questions from the HotpotQA distractor development set using a local 7B parameter model (Qwen2.5-7B-Instruct). Our full pipeline achieves EM=53.2% and F1=61.6%, compared to a single-pass dense-retrieval baseline of EM=43.1% and F1=54.0%. Across eight ablation conditions, we find that: (1) fixed hybrid retrieval via reciprocal rank fusion consistently outperforms rule-based adaptive routing (+1.8 EM, +1.9 F1), as the routing heuristic over-routes to BM25 by firing on named entities present in nearly all multi-hop sub-questions; (2) two retrieval iterations over the decomposed sub-questions capture 95% of the gains of five, with no meaningful benefit from deeper loops; and (3) query decomposition and cross-encoder reranking each contribute statistically significant but smaller gains (p<0.01 and p<0.001 respectively). Taken together, on a fixed local-model budget, the simpler and fixed choices turn out to be competitive with or better than their adaptive versions: most of the gain comes from running a short retrieval loop, not from adaptive routing or from many iterations. We use no proprietary APIs or large-scale compute.",
+      "authors": [
+        "Sheroz Shaikh"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.IR"
+      ],
+      "published": "2026-06-19T15:50:35+00:00",
+      "link": "https://arxiv.org/pdf/2606.21553v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "agentic RAG ablation study, relates to hallucination suppression via retrieval",
+      "llm_evidence_cn": "代理RAG消融研究，通过检索抑制幻觉",
+      "llm_evidence": "代理RAG消融研究，通过检索抑制幻觉",
+      "canonical_evidence": "代理RAG消融研究，通过检索抑制幻觉",
+      "llm_tldr_en": "Controlled ablation of agentic RAG components for multi-hop QA shows that simpler retrieval can match complex pipelines, informing efficient hallucination mitigation.",
+      "llm_tldr_cn": "当前代理RAG系统为处理多跳问答引入了迭代推理和自适应检索等复杂组件，但各组件贡献不明。该论文使用本地7B模型在HotpotQA上进行了系统消融，发现完整管道相比单次检索仅有微小提升，且自适应检索路由贡献甚微，提示简化设计可在保持性能的同时降低幻觉风险，对幻觉抑制有参考价值。",
+      "llm_tldr": "当前代理RAG系统为处理多跳问答引入了迭代推理和自适应检索等复杂组件，但各组件贡献不明。该论文使用本地7B模型在HotpotQA上进行了系统消融，发现完整管道相比单次检索仅有微小提升，且自适应检索路由贡献甚微，提示简化设计可在保持性能的同时降低幻觉风险，对幻觉抑制有参考价值。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.23875v1",
+      "source": "arxiv",
+      "title": "On the Semantics of Generative SPARQL",
+      "abstract": "We extend SPARQL with a generative query construct, called \\tx{GenOp}, whose evaluation calls a language model and produces typed solution mappings. We define the semantics of the GenOp in the query in a way that maintains the fixed-dataset assumption, on which formal semantics of SPARQL build, and extend solution mappings with values generated by the language model. We formalize the semantics of the extended language over these mappings using a compatibility relation that generalizes equality and supports similarity-based matching between RDF terms and generated values. We analyze the semantic consequences of generative query patterns, focusing on mapping-level recursion induced by the reuse of generated bindings. Under deterministic bounded generation and finite candidate coverage assumptions, we characterize acyclic and stratified fragments with fixpoint semantics, establish algebraic equivalence and semantics-preserving rewrite rules, and provide an executable evaluation method; and we show that data and combined complexity coincide with those of standard SPARQL.",
+      "authors": [
+        "Ratan Bahadur Thapa",
+        "Steffen Staab"
+      ],
+      "primary_category": "cs.DB",
+      "categories": [
+        "cs.DB"
+      ],
+      "published": "2026-06-22T19:21:41+00:00",
+      "link": "https://arxiv.org/pdf/2606.23875v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "formal semantics for generative queries integrating LLMs",
+      "llm_evidence_cn": "为集成LLM的生成式查询形式化语义",
+      "llm_evidence": "为集成LLM的生成式查询形式化语义",
+      "canonical_evidence": "为集成LLM的生成式查询形式化语义",
+      "llm_tldr_en": "Extends SPARQL with a generative query construct that calls LLMs, defines semantics under fixed-dataset assumption, and analyzes recursion and compatibility relations.",
+      "llm_tldr_cn": "现有SPARQL无法利用语言模型生成的值。本文扩展SPARQL，引入生成式查询构造GenOp，其求值调用语言模型并产生类型化的解映射。在保持固定数据集假设的前提下，形式化了扩展语言的语义，通过兼容关系支持基于相似性的匹配。进一步分析了由生成绑定重用导致的映射级递归，并讨论了有界生成和有限候选覆盖下的语义后果。该工作为将LLM集成到数据库查询中奠定了理论基础。",
+      "llm_tldr": "现有SPARQL无法利用语言模型生成的值。本文扩展SPARQL，引入生成式查询构造GenOp，其求值调用语言模型并产生类型化的解映射。在保持固定数据集假设的前提下，形式化了扩展语言的语义，通过兼容关系支持基于相似性的匹配。进一步分析了由生成绑定重用导致的映射级递归，并讨论了有界生成和有限候选覆盖下的语义后果。该工作为将LLM集成到数据库查询中奠定了理论基础。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "math formulation",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

@@ -6,56 +6,40 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-23
-- 运行时间：2026-06-23 21:52:07 UTC
+- 最新运行日期：2026-06-24
+- 运行时间：2026-06-24 21:48:19 UTC
 - 运行状态：成功
-- 本次总论文数：12
-- 精读区：6
-- 速读区：6
+- 本次总论文数：6
+- 精读区：1
+- 速读区：5
 
 ### 今日简报（AI）
-今日聚焦模块化强化学习与奖励模型离散化两项高分研究，速读涉及策略蒸馏、自适应数据调度及列描述生成。最值得细读的是《Modularized Reinforcement Learning on LLMs》和《Discretizing Reward Models》两篇精读文章。建议优先掌握模块化RL框架构建与奖励离散化技巧，再通过速读中的策略蒸馏方法拓展实践。
-- 详情：[/202606/23/README](/202606/23/README)
+今日精读1篇、速读5篇，聚焦大模型蒸馏位置偏差与评估方法。  
+重点推荐《On the Position Bias of On-Policy Distillation》（8.0分），揭示策略蒸馏中位置偏差对模型性能的影响。  
+建议优先精读该文理解偏差机制，并结合CombEval与PACMS扩展对LLM计数推理与智能体上下文选择的认知。
+- 详情：[/202606/24/README](/202606/24/README)
 
 ### 精读区论文标签
-1. [Modularized Reinforcement Learning on LLMs: From MDP Creation to Exploration and Learning](/202606/23/2606.21943v1-modularized-reinforcement-learning-on-llms-from-mdp-creation-to-exploration-and-learning)  
-   标签：评分：10.0/10、query:lpt
-   evidence：关于LLM后训练中强化学习的全面综述
-2. [Discretizing Reward Models](/202606/23/2606.21795v1-discretizing-reward-models)  
-   标签：评分：9.0/10、query:lpt
-   evidence：离散化奖励模型以解决RLHF中的过敏感问题
-3. [Pre-Generation Hallucination Detection in Large Language Models via Soft-Target Attention Probing](/202606/23/2606.21917v1-pre-generation-hallucination-detection-in-large-language-models-via-soft-target-attention-probing)  
-   标签：评分：9.0/10、query:lpt
-   evidence：通过软目标注意力探测进行生成前幻觉检测
-4. [A Markov Chain Approach to Preference Alignment](/202606/23/2606.22652v1-a-markov-chain-approach-to-preference-alignment)  
-   标签：评分：9.0/10、query:lpt
-   evidence：替代RLHF的马尔可夫链偏好对齐方法
-5. [MetaHarmonizer: robust biomedical metadata harmonization and a contamination control for inflated LLM performance on public benchmarks](/202606/23/biorxiv-10-64898-2026-06-13-732088-v1-metaharmonizer-robust-biomedical-metadata-harmonization-and-a-contamination-control-for-inflated-llm-performance-on-public-benchmarks)  
-   标签：评分：9.0/10、query:lpt
-   evidence：直接针对生物医学元数据协调中的LLM幻觉抑制和污染控制
-6. [ARCO: Adaptive Rubric with Co-Evolution for Multi-Step LLM-Based Agents](/202606/23/2606.21262v1-arco-adaptive-rubric-with-co-evolution-for-multi-step-llm-based-agents)  
+1. [On the Position Bias of On-Policy Distillation](/202606/24/2606.22600v1-on-the-position-bias-of-on-policy-distillation)  
    标签：评分：8.0/10、query:lpt
-   evidence：针对LLM智能体的基于评分标准的步骤级奖励建模
+   evidence：分析同策略蒸馏中的token级监督，与RLHF奖励建模相关
 
 ### 速读区论文标签
-1. [Prefix-Guided On-Policy Distillation: Mining Golden Trajectories from Rollouts](/202606/23/2606.21994v1-prefix-guided-on-policy-distillation-mining-golden-trajectories-from-rollouts)  
-   标签：评分：8.0/10、query:lpt
-   evidence：前缀引导的在策略蒸馏方法提升推理模型训练效率
-2. [Learning at the Right Pace: Adaptive Data Scheduling Improves LLM Reinforcement Learning](/202606/23/2606.22305v1-learning-at-the-right-pace-adaptive-data-scheduling-improves-llm-reinforcement-learning)  
-   标签：评分：8.0/10、query:lpt
-   evidence：通过自适应数据调度改进强化学习后训练
-3. [TACO: Task-Aware Column Description Generation Using LLMs](/202606/23/2606.21685v1-taco-task-aware-column-description-generation-using-llms)  
+1. [On the Position Bias of On-Policy Distillation](/202606/24/2606.22600v2-on-the-position-bias-of-on-policy-distillation)  
    标签：评分：7.0/10、query:lpt
-   evidence：解决列描述生成中的幻觉问题
-4. [What are Key Factors for Updates in RL for LLM Reasoning?](/202606/23/2606.22570v1-what-are-key-factors-for-updates-in-rl-for-llm-reasoning)  
-   标签：评分：7.0/10、query:lpt
-   evidence：对LLM推理中RLVR更新的理论分析
-5. [Only Ask What You Don't Know: Grounded Delta Planning for Efficient Multi-step RAG](/202606/23/2606.22681v1-only-ask-what-you-dont-know-grounded-delta-planning-for-efficient-multi-step-rag)  
-   标签：评分：7.0/10、query:lpt
-   evidence：通过仅规划缺失信息减少错误传播的RAG框架
-6. [CacheWeaver: Cache-Aware Evidence Ordering for Efficient Grounded RAG Inference](/202606/23/2606.19667v1-cacheweaver-cache-aware-evidence-ordering-for-efficient-grounded-rag-inference)  
+   evidence：本文利用约束优化分析策略蒸馏中的位置偏差，属于数学公式化方法。
+2. [CombEval: A Framework for Evaluating Combinatorial Counting in Large Language Models](/202606/24/2606.19788v1-combeval-a-framework-for-evaluating-combinatorial-counting-in-large-language-models)  
    标签：评分：6.0/10、query:lpt
-   evidence：缓存感知的证据排序提升有据RAG推理效率
+   evidence：通过形式化规格评估LLM组合计数能力
+3. [PACMS: Submodular Context Selection as a Pluggable Engine for LLM Agents](/202606/24/2606.20047v1-pacms-submodular-context-selection-as-a-pluggable-engine-for-llm-agents)  
+   标签：评分：6.0/10、query:lpt
+   evidence：用于LLM代理的次模上下文选择算法改进
+4. [Dissecting Agentic RAG: A Component Ablation for Multi-Hop QA with a Local 7B Model](/202606/24/2606.21553v1-dissecting-agentic-rag-a-component-ablation-for-multi-hop-qa-with-a-local-7b-model)  
+   标签：评分：6.0/10、query:lpt
+   evidence：代理RAG消融研究，通过检索抑制幻觉
+5. [On the Semantics of Generative SPARQL](/202606/24/2606.23875v1-on-the-semantics-of-generative-sparql)  
+   标签：评分：6.0/10、query:lpt
+   evidence：为集成LLM的生成式查询形式化语义
 
 
 <div class="dpr-home-promo-card">
