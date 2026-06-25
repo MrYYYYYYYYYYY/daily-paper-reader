@@ -1,0 +1,689 @@
+Title: OPERA: Aligning Open-Ended Reasoning via Objective Perplexity-based Reinforcement Learning
+
+URL Source: https://arxiv.org/pdf/2606.25757v1
+
+Published Time: Thu, 25 Jun 2026 00:57:03 GMT
+
+Number of Pages: 21
+
+Markdown Content:
+# OPERA: Aligning Open-Ended Reasoning via Objective Perplexity-based Reinforcement Learning 
+
+Wenxuan Jiang 1,2 *, Zining Fan 3, Zijian Zhang 2†, Xuecheng Wu 4,Hongming Tan 3, Haoyang Dai 5, Xiaoyu Li 2, Xuezhi Cao 2, Ninghao Liu 1†,
+
+> 1
+
+The Hong Kong Polytechnic University 2Meituan Longcat Team 3Peking University 
+
+> 4
+
+Xi’an Jiaotong University 5Nanjing University of Science and Technology 
+
+pangxuan022@gmail.com , zhangzijian14@meituan.com , ninghliu@polyu.edu.hk 
+
+Abstract 
+
+Reinforcement Learning (RL) has enabled LLMs to excel in objective reasoning tasks such as mathematics and code generation. How-ever, applying RL to open-ended tasks, such as creative writing, remains challenging be-cause LLM-as-a-judge reward models often exhibit stylistic biases and positional inconsis-tencies, leading to unstable supervision. To address this, we propose OPERA (Objective Perplexity-based Reflective Alignment), which replaces unreliable external judges with intrin-sic rewards derived from perplexity dynam-ics. Specifically, we derive an intrinsic re-ward signal from perplexity dynamics, quanti-fying uncertainty reduction at critical reflective states. During the cold-start phase, we intro-duce a data synthesis method that leverages carefully designed guiding words to generate diverse reasoning traces, along with perplexity-prioritized rollouts that utilize internal log-probabilities to identify logically consistent reasoning branches. This pipeline yields a large-scale dataset comprising 20,000 high-quality reasoning trajectories. Empirical eval-uations consistently demonstrate the scalabil-ity and efficacy of our approach in alignment for open-ended tasks. Implementing OPERA on Qwen3-8B establishes a new state-of-the-art among open-source models, achieving par-ity with or surpassing proprietary models like Gemini2.5 and MiniMax-M2.5 in some open-ended tasks. The code is available at https: //github.com/pangpang-xuan/OPERA .
+
+1 Introduction 
+
+Recent breakthroughs in LLMs have been driven by Reinforcement Learning with Verifiable Rewards (RLVR) (Guo et al., 2025; Team et al., 2025; Zhang et al., 2025a). RLVR is particularly effective in logical with objective evaluation, such as mathe-matics and programming (Zeng et al., 2025) where   
+
+> *Work done during an internship at Meituan.
+> †Corresponding author.
+
+model outputs can be verified against binary feed-back. Reward-based training has been extended to creative writing, where evaluation is inherently open-ended. Existing methods use pairwise writ-ing supervision (Jia et al., 2025; Li et al., 2026) and pairwise comparison rewards (Lei et al., 2025; Zhang et al., 2025b; Cao et al., 2026; Wu et al., 2025a) to refine adaptive outputs. Other approaches adopt rubric-based rewards (Gunjal et al., 2025) to decompose writing quality into interpretable di-mensions, and provide structured, expert-aligned feedback. This design helps bridge the gap between binary correctness and coarse preference rankings. Despite these improvements, the subjective re-ward mechanisms still faces major challenges. A common issue is self-enhancement bias (Ye et al., 2024), where models favor responses that resem-ble their own stylistic preferences, such as specific structural patterns, rather than responses that are more creative or factually accurate. Another limita-tion is positional bias (Zheng et al., 2023), where the judge systematically favors a response based on its position within the context window rather than its actual quality. More fundamentally, LLM-based judges remain subjective and poorly cali-brated, which limits their reliability as evaluation tools. These weaknesses make it difficult to build robust reward models for open-ended tasks. Estab-lishing a more objective evaluation framework is therefore essential for advancing performance in open-ended domains. To address these limitations, we introduce OPERA (Objective Perplexity-based Reflective Alignment) , a framework that bridges the gap be-tween objective evaluation metrics and open-ended task performance, as illustrated in Figure 1. Un-like traditional approaches that rely on LLM-based judges, OPERA uses a more objective reward func-tion grounded in perplexity dynamics. More specif-ically, we propose a composite reward function that integrates local uncertainty reduction at reflec-1                   
+
+> arXiv:2606.25757v1 [cs.CL] 24 Jun 2026 LLM
+> y1
+> y2
+> Yn-1
+> Yn
+> GenRM /Rubric
+> R1
+> R2
+> Rn-1
+> Rn
+> Policy Optimization
+> (a) Human -Heuristic Reward RL
+> Query
+> r1
+> <think>…
+> …</think>
+> r*
+> rn
+> But
+> r1
+> r*
+> rn
+> Wait
+> (b) Perplexity -Guided Iterative Trace Synthesis
+> Base Model
+> SFT data
+> <think> \nOkay …Wait , …</think>…
+> <think> \nOkay …Let me think , …</think>…
+> <think> \nI …But …</think>…
+> <think> \nI …But …Wait … </think>… (c) OPERA (Objective Perplexity -
+> based Reflective Alignment)
+> Yref
+> R1
+> R2
+> Rn-1
+> Rn
+> 𝓡 =𝜶 ⋅𝓡 𝒑𝒑𝒍 +𝟏 −𝜶 ⋅𝓡 self
+> R1
+
+# …
+
+> RN
+> R1
+
+# …
+
+> RN
+> 𝓡 self
+> 𝓡 𝒑𝒑𝒍
+> Final
+> Model
+
+Figure 1: Overview of OPERA and cold-start reasoning trace synthesis. (a) Traditional reinforcement learning with LLM-based rewards. (b) Cold-start reasoning trace synthesis via perplexity-guided iterative generation. (c) OPERA (Objective Perplexity-based Reflective Alignment) for open-ended tasks. 
+
+tive tokens with a global, group-relative reward, creating a robust reward signal especially suitable for domains where verifiable ground truth is in-herently unavailable. By measuring the differen-tial change in PPL immediately before and after reflection tokens and optimizing for the intrinsic utility of its own deliberation, the model ensures that each reasoning step contributes to a more sta-ble, high-likelihood response. This approach ef-fectively mitigates unstable reward by tokening the alignment process in the model’s internal log-probability, shifting the optimization target to the structural of the reasoning trajectory. Consequently, OPERA fundamentally transitions reward func-tions from high-variance, LLM-based judgments to the internal logical consistency and predictive confidence of the model’s own reasoning. During cold-start training, we propose a novel data synthesis pipeline called perplexity-guided iterative trace synthesis , which shifts evaluation from external judgment to internal statistical con-sistency. Our data synthesis is built upon two core components. First, we introduce a cognitive braking interruption that leverages reflection to-kens (e.g., “wait” or “but”) as heuristic indicators of cognitive conflict. This mechanism prompts the model to pause its initial generation and en-gage in recursive System 2 deliberation (Li et al., 2025), enabling a deeper and more careful rea-soning process. Second, we employ perplexity-prioritized rollouts, leveraging the model’s inter-nal log-probabilities as an objective scoring metric to identify the most logically consistent reason-ing branches. This pipeline produces a large-scale dataset of 20,000 high-quality reasoning trajecto-ries, which we use to perform SFT (Ouyang et al., 2022) as a cold start. We evaluate the efficacy of OPERA across five benchmarks, demonstrating its scalability. When applied to Llama-3.1-8B, OPERA boosts average benchmark performance by 125% , including a 22.54-point gain on WritingBench. On Qwen3-8B, it sets a new open-source state-of-the-art and matches or even surpasses proprietary models like GPT-4o, Gemini2.5, and MiniMax-M2.5 on cre-ative writing tasks. These empirical results vali-date OPERA as a robust and scalable framework for open-ended reinforcement learning, providing a path toward high-fidelity reasoning without the need for external LLM-based judges. Our contribu-tions can be summarized as follows: • We present OPERA (Objective Perplexity-based Reflective Alignment), an objective re-ward function that leverages perplexity as a proxy for quality in open-ended tasks. • In the cold-start training phase, we introduce Perplexity-Guided Iterative Trace Synthesis, which shifts evaluation from external valida-tion to the model’s internal statistical consis-2tency. • We evaluate our method on two LLMs across five benchmarks and conduct detailed anal-yses to explain why perplexity serves as an effective proxy for human preferences. 
+
+2 OPERA: Objective Perplexity-based Reflective Alignment 
+
+In contrast to objective tasks (e.g., maths or pro-gramming) where rewards are typically verifiable, open-end tasks lack an objective success criterion. Existing approaches (Jia et al., 2025; Li et al., 2026; Zhang et al., 2026) rely on LLM-based judges or heuristic rewards, which introduce bias and insta-bility. We address this challenge by defining an intrinsic reward as a proxy, based on the model’s internal perplexity dynamics. that quantifies the functional gain of internal reflection by utilizing perplexity (PPL) (Han et al., 2025) as a proxy for latent semantic quality. This enables supervision of the latent strategy space, encouraging reasoning paths that proactively support error correction and stylistic alignment. 
+
+2.1 Preliminary: Open-Ended Tasks Benefit from Reasoning Processes 
+
+We conduct a preliminary experiment to demon-strate that the quality of reasoning influences the performance in open-ended tasks. Specifically, we replace the reasoning traces of a baseline model (Qwen3-8B) with those generated by stronger teacher models (DeepSeek, LongCat, and Qwen3-32B). Table 1 shows that this substitution consis-tently improves baseline model performance on creative writing benchmarks. This result indicates that, although reasoning traces are commonly used to improve performance in objective tasks such as maths and programming, they could also benefit open-ended tasks .Motivated by this observation, we propose im-proving reasoning as a proxy for enhancing open-ended generation. For LLMs operating in reason-ing mode (Guo et al., 2025; Team et al., 2026; Yang et al., 2025) , the output typically contains two parts: a thought process (within <think>...</think> tags) and a final response. In addition, we intro-duce a set of predefined self-reflection tokens K,such as “wait”, “but”, and “let me think” (Wang et al., 2025), and encourage the model to generate them during reasoning. These tokens provide an      
+
+> Table 1: Performance on Arena Hard V2 Creative Writ-ing. "Replace w/" denotes a stronger model’s reasoning trace is injected into the prompt to guide the baseline model.
+> Model Arena Hard V2
+> Qwen3-8B 25.7 Replace w/ DeepSeek (Guo et al., 2025) 26.3 Replace w/ LongCat (Team et al., 2026) 31.8 Replace w/ Qwen3-32B (Yang et al., 2025) 27.6
+
+explicit signal that the model is revising or recon-sidering its current reasoning state. Without this constraint, improvements in log-probability may simply reflect normal token generation rather than genuine self-correction. 
+
+2.2 Self-Reflection Reward 
+
+We introduce a self-reflection reward to encourage the model to reduce output uncertainty through the appropriate use of predefined self-reflection tokens. Here, x denotes the input prompt, yref denotes the reference response, and ⟨think ⟩ represents the open-ing token of the reasoning process. We define the baseline log-probability as Lbase = log P (yref |
+
+x, ⟨think ⟩) which measures the model’s initial ex-pectation of the reference response before substan-tial reasoning occurs. Then, to quantify internal reflection dynamics, we decompose the thinking process into sequential steps S = {s1, s 2, . . . , s n}.At each step sj , we compute the conditional log-probability: log Pj = log P (yref | x, s 1: j ), where 
+
+s1: j denotes the reasoning trajectory up to step j.A reflection step sj is considered productive only if it satisfies two conditions: (1) it contains a pre-defined self-reflection token from the keyword set 
+
+K; (2) increases the log-probability of the refer-ence response. The raw progress score Rraw is then defined as the cumulative count of productive reflections. Formally: 
+
+Rraw =
+
+> n
+
+X
+
+> j=1
+
+I ((log Pj − log Pj−1 > 0)) , (1) This formulation considers only whether a reflec-tion step improves the target likelihood, rather than the magnitude of the improvement, which prevents reward hacking caused by local log-probability fluc-tuations. To mitigate the risk of reward hacking by gen-erating excessively long and redundant reasoning traces, we normalize the accumulated reward with 3a tangent function: 
+
+Rself = tanh 
+
+ Rraw 
+
+τ
+
+
+
+, (2) where τ is a temperature hyperparameter that con-trols the saturation threshold. This normalization provides strong incentives for the first few success-ful self-corrections while gradually diminishing re-wards for additional reasoning steps. Consequently, the model learns to perform concise and meaning-ful self-correction instead of generating unneces-sarily long reasoning traces. 
+
+2.3 IGRP: In-Group Relative Perplexity Reward 
+
+To evaluate the overall quality of both the reasoning trace and the final response, we further introduce the In-Group Relative Perplexity Reward (IGRP). This metric follows the core principle of Group Relative Policy Optimization (GRPO) (Guo et al., 2025), which improves the policy through com-parisons among multiple outputs generated from the same prompt x. For a peer group of N com-pletions, we compute the joint log-probability of the reference response yref conditioned on the full generated sequence: 
+
+Lihybrid = log P (yref | x, z i, y i), (3) where zi represents the reasoning trace and yi the fi-nal response for the i-th completion. We define the IGRP reward Rppl as the normalized relative rank of a completion within its peer group. Specifically, for a given sample x within a group of size N , the self-reflection reward Rippl for the i-th completion is: 
+
+Rippl = 1
+
+N − 1
+
+> N
+
+X 
+
+> j=1 ,j ̸=i
+
+I(Lihybrid > L jhybrid ). (4) where I(·) denotes the indicator function. This for-mulation quantifies the model’s relative confidence by calculating the fraction of peer completions outperformed by the current sample, mapping cer-tainty to a normalized reward score Rppl ∈ [0 , 1] .By utilizing a relative ranking rather than absolute log-probability values, the reward signal becomes less sensitive to variations in prompt difficulty. The model is penalized only when its predictive likeli-hood is lower than the completions generated by its peers. This formulation provides a stable optimiza-tion signal and encourages the model to produce efficient reasoning trajectories that lead to high-likelihood outputs. 
+
+2.4 Hybrid Reward Function 
+
+To improve open-ended reasoning while preserving performance on objective tasks, we introduce a hy-brid reward function. The overall reward function, 
+
+R, is formulated as a task-specific objective condi-tioned on the task domain D ∈ {O , E} , where O
+
+and E respectively denote objective reasoning and 
+
+open-ended reasoning. 
+
+R =
+
+(
+
+I(parse (y) = ygt ), if D = O,α · R ppl + (1 − α) · R self , if D = E.
+
+(5) 
+
+2.4.1 Objective Reasoning 
+
+For objective tasks such as math problems, we use binary rewards based on ground-truth accuracy. Us-ing a curriculum of verifiable math problems pro-vides a stable guide during reinforcement learning. 
+
+2.4.2 Open-ended Reasoning 
+
+For open-ended domains such as creative writing, where a unique ground truth is absent, we utilize a weighted ensemble of Rppl and Rself . It is de-signed to catalyze the emergence of autonomous self-correction behaviors by rewarding the model not only for the quality of the final output but for the utility of its internal reasoning trajectory. 
+
+3 Perplexity-Guided Iterative Reasoning Trace Synthesis for Cold Start 
+
+Directly applying RL to a base model often results in unstable optimization, reward hacking, and su-perficial alignment (Wang et al., 2026; Fu et al., 2025). To provide a stable initialization for RL training, we develop an iterative synthesis method 
+
+for cold-start supervised fine-tuning. The pipeline combines two components: (1) cognitive braking, which induces reflective reasoning; (2) perplexity-prioritized rollouts, which select coherent continu-ations during search. 
+
+3.1 Cognitive Braking 
+
+To construct cold-start supervision traces with ex-plicit reflective structure, we introduce a cognitive braking mechanism during reasoning generation. Specifically, upon generating a predefined reflec-tion token (e.g., “wait”, “let me think”), as intro-duced in Section 2, the model exits the current trajectory and revisits its intermediate reasoning before continuing. Within our synthesis method, cognitive braking serves as the structural controller of the reasoning 4process. It determines where reflective branching occurs and provides the starting states for subse-quent candidate rollout generation. As a result, the generated trajectories naturally contain explicit revision patterns and intermediate reconsideration behaviors, forming structured reasoning traces suit-able for cold-start supervised fine-tuning. 
+
+3.2 Perplexity-Prioritized Rollouts 
+
+A key challenge in synthesizing cold-start rethink-ing data is maintaining the logical coherence dur-ing self-correction. At each reflection token, the model is prompted to generate k parallel candi-date steps, C = {c1, c 2, . . . , c k}, each extending the current reasoning trace. We must then se-lect the continuation that preserves consistency. For a candidate ci, we construct the full sequence 
+
+X(i) = prompt ⊕ x<t ⊕ ci. This candidate is then scored by perplexity (PPL), which averages log-likelihood of generating X(i), defined as: PPL (ci) = exp( − 1
+
+|X(i)|
+
+> |X(i)|
+
+X
+
+> t=1
+
+log P (X(i))) , (6) We then select the candidate with minimum per-plexity: c∗ = arg min ci∈C PPL (ci). By prioritiz-ing paths with lower perplexity, we ensure that the synthetic trace represents the most statistically probable and thus logically consistent progression according to the model’s learned distribution. This selection process effectively filters out noisy, low-confidence, or divergent rethinking steps, resulting in a high-quality trajectory for further fine-tuning. The synthesis process proceeds recursively. Given a prompt x, the model alternates between generation and selection, extending the reason-ing trace y until it produces the terminal </think> token. The final response is then generated as 
+
+z = LLM (|x, y ). This procedure generates self-correcting reasoning trajectories that capture reflec-tive revision processes and provide high-quality supervision signals for the SFT stage, enabling the model to learn robust reasoning and self-reflective behaviors. However, since SFT alone is limited on open-ended tasks due to the gap between static supervision and dynamic exploration, we further apply RL to improve the model’s inference capa-bilities, reasoning adaptability, and generalization performance. 
+
+4 Experiments 
+
+4.1 Experimental Setup Models. To evaluate the efficacy of our proposed method, we conduct extensive experiments using Llama3.1-8B (Grattafiori et al., 2024) and Qwen3-8B (Yang et al., 2025) as our base models. 
+
+Benchmarks. To ensure a comprehensive evalu-ation, we evaluate our method on five benchmarks: AlignBench (Liu et al., 2024), HelloBench (Que et al., 2024), EQ-Bench creative writing (Paech, 2023), WritingBench (Wu et al., 2025b), and MATH500 (Hendrycks et al., 2021). Our evalu-ation on AlignBench focuses on one primary do-main: writing ability ( AB-W ). These writing tasks are chosen to test not only language skills but also creativity. They require the model to produce more complex and expressive content, such as poems and fictional stories. On HelloBench, we evalu-ate two primary domains: text completion ( HB-C ), which assesses the model’s capacity for long-form generation, and heuristic text generation ( HB-G ), which focuses on content creation following spe-cific stylistic or structural constraints. 
+
+Training Data. To construct the cold start SFT dataset, we used semantic clustering (Kuhn et al., 2007) to ensure diversity. This process yielded a curated set of 20,000 raw entries filtered from LongWriter-6k (Bai et al., 2024), WildChat (Zhao et al., 2024), LitBench-Train (Fein et al., 2026) and OpenThought (Guha et al., 2025). We then utilized Qwen3-32B-Instruct (Yang et al., 2025) as the generator model. For the RL data, we subsam-pled GSM8K (Cobbe et al., 2021) and DeepWrit-ing (Wang et al., 2025). Detailed implementations are shown in Appendix B.1. 
+
+Evaluation Protocols. Due to the inherent sub-jectivity of open-ended tasks, we follow established protocols by employing high-capacity LLMs as au-tomated evaluators for our benchmarks. While we recognize that this approach may introduce sys-temic biases, it currently provides the most scalable and consistent framework for assessing nuanced generative quality at scale. On HelloBench, we ap-ply the rescaling formula S = ( score − 0.75) × 4.
+
+Baselines. Proprietary LLMs: GPT-4o-0513 (Hurst et al., 2024), Gemini 2.5-pro (Co-manici et al., 2025), and MiniMax-M2.5 1.
+
+> 1https://huggingface.co/MiniMaxAI/MiniMax-M2.5
+
+5Open-source LLMs: LongWriter-8B (Bai et al., 2024), an open-source model optimized for ultra-long text generation; DeepWriter-8B (Wang et al., 2025), featuring iterative planning and self-reflection mechanisms; LongWriter-Zero-32B (Wu et al., 2025a), a purely RL-based model capable of generating coherent passages. 
+
+Implementation Details. We employ ms-swift (Zhao et al., 2025) as our SFT framework, training for 5 epochs with a learning rate of 
+
+1 × 10 −5. For the RL phase, we utilize the verl (Sheng et al., 2025) framework to implement GRPO (Shao et al., 2024). Training is conducted with a batch size of 64, with a response of 10,240 tokens. We trained the actor model for one epoch using 32 × NVIDIA H800 GPUs, using a learning rate of 1 × 10 −6 and 16 rollouts at a temperature of 1.0. More details are detailed in Appendix C.1. 
+
+4.2 Main Results 
+
+The detailed experimental results in Table 2 reveal several key insights: 
+
+OPERA performs well on most tasks and mod-els. We evaluated OPERA across two models, observing consistent and substantial improvements across four creative writing benchmarks and one mathematical task. Qwen3-8B-OPERA signifi-cantly outperformed the strong open-source base-line in all categories. This performance gap is most evident in the Creative Writing V3 benchmark, where Qwen3-8B-OPERA achieved an average im-provement of over 10 points relative to DeepWriter-8B. Furthermore, Llama3.1-8B-OPERA achieved an average score of 40.97, representing a 121.8 %improvement over the base model’s score of 18.47. Notably, Llama3.1-8B-OPERA surpassed DeepWriter-8B and LongWriter-Zero-32B on Hel-loBench, suggesting that the OPERA objective ef-fectively guides reinforcement learning toward su-perior reasoning and synthesis. Furthermore, our results demonstrate that performance on math tasks remained uncompromised by the hybrid reward function. This show that indicates that OPERA avoids the typical alignment tax, preserving core reasoning capabilities while simultaneously en-hancing generalization across diverse domains. We also extended our experiments to Qwen3-32B, as shown in Appendix E. 
+
+OPERA performs comparable with state-of-the-art proprietary models. We evaluated our models against state-of-the-art proprietary mod-els. Across multiple creative writing benchmarks, Llama3.1-8B-OPERA demonstrates parity with or superiority over GPT-4o. Notably, Llama3.1-8B-OPERA achieves a score of 30.08 on HB-C and 49.83 on HB-G, significantly outperforming GPT-4o-0513 (21.52 and 38.02, respectively). On spe-cialized benchmarks including Creative Writing V3 and WritingBench, Qwen3-8B-OPERA achieves performance competitive with Gemini-2.5-pro, ef-fectively bridging the parameter gap between open-source models and proprietary frontier models. 
+
+4.3 Ablation Studies Perplexity-Guided Iterative Trace Synthesis. 
+
+We set up four ablation experiments for data syn-thesis, and the specific settings can be shown in Appendix C.4.1 and the result as shown in Table 3. Removing the synthesized data causes a huge drop in performance, most notably, a 43-point fall in Cre-ative Writing V3 (71.92 → 28.64). This shows that standard public datasets don’t provide enough struc-ture for advanced reasoning. Furthermore, we find that explicit reflection tokens and iterative search mechanisms are not merely structural; they act as a workspace and a filter that helps the model think clearly, producing consistent and accurate results instead of mistakes. We also reveal a key trade-off between search efficiency and peak performance. Although limiting local search to the first five re-flection tokens gives a fast and reliable baseline, the best performance is achieved only by expand-ing across all reflection tokens. This shows that every step of deliberation adds unique value to the reasoning process. 
+
+Reward functions in OPERA. We also con-ducted an ablation study to test how sensitive OPERA is to the reward function, as summarized in Table 3, with detailed settings provided in Ap-pendix C.4.2. Relying solely on Rself leads to a performance regression across all metrics, notably a drop in Creative Writing V3 (72.89 → 68.56) sug-gesting that process-only rewards risk incentivizing superficial overthinking. This confirms that while 
+
+Rself successfully catalyzes self-correction, it re-quires an outcome-based global signal to ensure these cognitive efforts translate into tangible gener-ative gains. Conversely, isolating the IGRP reward triggers a sharp decline in HelloBench-G, indicat-ing that outcome-based likelihoods alone are insuf-ficient for tasks requiring complex creative synthe-6Table 2: Main performance comparison on creative writing and mathematical benchmarks. OPERA demonstrates competitive performance against leading proprietary models and significantly outperforms other open-source models.                                                                                            
+
+> Model AB-W HB-C HB-G Creative Writing V3 WritingBench MATH500 Avg
+> Proprietary LLMs
+> GPT-4o-0513 6.37 21.52 38.02 61.76 66.19 78.00 45.31 Gemini-2.5-pro 7.24 52.98 62.89 77.19 76.35 98.60 62.54 MiniMax-M2.5 6.84 26.80 59.33 80.80 80.39 98.40 58.76
+> Open-source LLMs
+> LongWriter-8B 4.67 -48.50 -88.45 35.99 44.57 20.40 -5.22 DeepWriter-8B 6.63 26.33 0.25 62.22 73.70 80.40 41.59 LongWriter-Zero-32B 6.95 21.26 -55.48 51.11 77.44 73.40 29.11
+> Our Methods
+> Llama3.1-8B 5.15 6.59 -26.07 37.79 49.58 52.40 20.91 Llama3.1-8B-SFT 5.89 29.68 37.53 63.21 71.30 58.20 44.30 Llama3.1-8B-OPERA 6.15 30.08 49.83 67.09 72.12 56.80 47.01
+> Qwen3-8B 6.64 35.77 37.12 65.25 75.08 95.60 52.58 Qwen3-8B-SFT 7.00 38.70 41.96 71.92 76.63 94.80 55.17 Qwen3-8B-OPERA 7.13 38.91 49.79 72.89 78.19 96.20 57.19
+
+Table 3: Ablation study of OPERA. We compare the full model against variants with key components removed. Numbers in parentheses denote the performance drop relative to the full OPERA model. 
+
+Model HelloBench-C HelloBench-G Creative Writing V3 WritingBench 
+
+Qwen3-8B-SFT 38.70 41.96 71.92 76.63 - w/o Synthesis Data 11.49 (↓27.21) -79.92 (↓121.88) 28.64 (↓43.28) 60.68 (↓15.95) 
+
+- w/o Iterative Search 34.20 (↓4.50) 42.69 (↑0.73) 67.77 (↓4.15) 70.55 (↓6.08) 
+
+- w/o Reflection Tokens 35.39 (↓3.31) 40.54 (↓1.42) 69.25 (↓2.67) 71.70 (↓4.93) 
+
+- Top-5 Token Rollout 36.22 (↓2.48) 45.93 (↑3.97) 69.84 (↓2.08) 70.78 (↓5.58) 
+
+Qwen3-8B-OPERA 38.91 49.79 72.89 78.19 - w/o IGRP 33.69 (↓5.22) 46.60 (↓3.19) 68.56 (↓4.33) 77.01 (↓1.18) 
+
+- w/o Self-Reflection 38.92 (↑0.01) 41.63 (↓8.16) 71.29 (↓1.60) 77.15 (↓1.04) 
+
+sis. This divergence highlights that while IGRP effectively optimizes the final response relative to the distribution, it lacks the fine-grained incentive required to navigate the nuanced, mid-course rea-soning paths that Rself facilitates. 
+
+5 Analysis and Discussions 
+
+5.1 Why OPERA can work? 
+
+This section presents an analysis of the reward cal-culation in OPERA to achieve effective RL under objective perplexity, and more detail as shown in Appendix D. In the self-reflection reward, the presence of a self-reflection token is essential because it provides an explicit and observable signal that the model has entered a reflective phase and attempted to re-vise or reconsider its reasoning process. Without this constraint, improvements in log-probability could simply arise from ordinary token generation dynamics rather than genuine reflective behavior, making individual reflection steps difficult to iden-tify or quantify. By requiring self-reflection tokens, each step corresponds to a deliberate shift in rea-soning strategy, enabling more consistent measure-ment and optimization of reflective capability. A central challenge in open-ended reinforce-ment learning is designing an objective reward function that faithfully captures the preferences of a reward model. To justify the use of IGRP as such an objective, we evaluate its alignment with high-capacity models, achieving a mean Kendall’s score of 54.01 and a mean Spearman’s score of 
+
+57.70 . The Kendall (McLeod, 2005) and Spear-man (De Winter et al., 2016) correlations are par-ticularly informative for open-ended generation tasks because they emphasize relative ranking qual-ity rather than absolute likelihood. Unlike stan-7Table 4: Comparative Analysis of Perplexity Guidance vs. LLM-as-a-Judge across SFT and RL Pipelines.                     
+
+> Model HB-C HB-G Creative Writing V3 WritingBench
+> Qwen3-8B-SFT 38.70 41.96 71.92 76.63
+> - LLM-as-judge 37.34 43.76 65.79 72.12 Qwen3-8B-OPERA 38.91 49.79 72.89 78.19
+> - Rubric as Reward 32.52 45.06 71.47 76.40
+
+dard perplexity, which is often biased by sequence length or surface-level fluency, IGRP evaluates re-sponses relative to alternative generations under the same prompt, thereby isolating the logical con-tribution of the reasoning trace. The strong corre-lation with high-capacity evaluators suggests that minimizing conditional perplexity against expert references is well-aligned with semantic quality. These results support IGRP as a stable and objec-tive reward proxy, effectively bridging raw likeli-hood optimization and human-aligned evaluation while avoiding the noise commonly associated with absolute perplexity metrics in non-deterministic generation tasks. 
+
+5.2 Alignment: Perplexity vs. Judgment 
+
+To carefully assess OPERA’s effectiveness com-pared to LLM-as-a-judge, we conduct a controlled study across two key stages of the alignment pipeline: (i) cold-start SFT data curation, where an LLM-as-a-judge is used to select optimal reason-ing steps; (ii) reinforcement learning, where we use rubric-as-rewards as contrast our objective reward, the result as shown in Table 4. 
+
+Cold-start SFT data curation. Substituting PPL with an LLM-as-judge mechanism resulted in a performance regression across the evaluated bench-marks. This consistent degradation suggests that while LLM judges are capable of assessing high-level semantic correctness, they are often blind to the distributional consistency required for a model to internalize a stable reasoning policy. In con-trast, our PPL-guided approach finds trajectories that naturally align with the model’s internal prob-ability structure. This alignment speeds up training and improves generalization, especially for long-generation tasks typical in open-ended writing. 
+
+Rubric as Rewards. Within the RL, the rubric-as-reward baseline underperforms the OPERA framework by a significant margin. This dispar-ity underscores a fundamental limitation of dis-crete, LLM-based evaluations: they often provide a coarse-grained signal that lacks the resolution required to guide a model through complex, long-horizon reasoning trajectories. In contrast, our pro-posed reward mechanism offers a more continuous and nuanced signal, effectively preserving reason-ing depth by rewarding the structural and statistical integrity of each cognitive step. 
+
+6 Related Works 
+
+6.1 Test-Time Computation 
+
+Recent work has shown that increasing test-time computation can substantially improve language model performance. Early progress was driven by Chain-of-Thought (CoT) prompting (Wei et al., 2022), which encourages models to generate inter-mediate reasoning steps for more accurate problem solving. Building on CoT, Tree-of-Thoughts (Yao et al., 2023) extends linear reasoning into a multi-branch search process, enabling models to explore, evaluate, and revise multiple reasoning paths. More recently, organizations such as DeepSeek AI (Guo et al., 2025) and OpenAI (Jaech et al., 2024) have further demonstrated the effectiveness of scaling test-time reasoning for improving model capability. 
+
+6.2 Reinforcement Learning 
+
+Reinforcement Learning (Wen et al., 2025) has become a key paradigm for aligning LLMs with objective correctness. Unlike RLHF (Ouyang et al., 2022), RLVR relies on deterministic verifiers, such as answer matching or unit tests, to provide sparse but reliable feedback signals. Recent advances, including DeepSeek-R1 (Guo et al., 2025), demon-strate that RLVR can effectively induce long chain-of-thought reasoning (Wei et al., 2022). More recent studies have further extended RLVR be-yond deterministic domains, with methods such as Writing-Zero (Jia et al., 2025) exploring self-principled rewards and reference-based matching for creative and open-ended generation tasks. 
+
+7 Conclusion 
+
+We introduce OPERA (Objective Perplexity-based Reflective Alignment) , a framework that shifts the alignment of open-ended reasoning from fallible external LLM-based judge toward intrin-sic perplexity dynamics. We derive a composite reward that combines an intrinsic self-reflection sig-nal quantifying uncertainty reduction at reflective tokens with a reward based on relative predictive confidence. During cold-start training, we intro-duce Perplexity-Guided Iterative Trace Synthesis, 8which leverages cognitive braking to trigger Sys-tem 2 deliberation, uses perplexity-prioritized roll-outs to ensure structural consistency, and generates 20,000 high-quality reasoning trajectories. Overall, our method provides a scalable reinforcement learn-ing objective for open-ended tasks where verifiable ground-truth feedback is not available. 
+
+Limitations 
+
+While we acknowledge that LLM-based evaluation may introduce inherent model-specific biases, it re-mains a robust and widely adopted framework for scalable benchmarking. Furthermore, although this current study primarily focuses on writing tasks, future iterations will extend to open-ended QA and multi-turn dialogue These expansions will provide a more comprehensive assessment of the frame-work’s generative versatility and its performance in dynamic conversational contexts. 
+
+References 
+
+Yushi Bai, Jiajie Zhang, Xin Lv, Linzhi Zheng, Siqi Zhu, Lei Hou, Yuxiao Dong, Jie Tang, and Juanzi Li. 2024. Longwriter: Unleashing 10,000+ word generation from long context llms. arXiv preprint arXiv:2408.07055 .Qian Cao, Yahui Liu, Wei Bi, Yi Zhao, Ruihua Song, Xiting Wang, Ruiming Tang, Guorui Zhou, and Han Li. 2026. Dpwriter: Reinforcement learning with di-verse planning branching for creative writing. arXiv preprint arXiv:2601.09609 .Jianlv Chen, Shitao Xiao, Peitian Zhang, Kun Luo, Defu Lian, and Zheng Liu. 2024. Bge m3-embedding: Multi-lingual, multi-functionality, multi-granularity text embeddings through self-knowledge distillation. 
+
+arXiv preprint arXiv:2402.03216 , 4(5). Karl Cobbe, Vineet Kosaraju, Mohammad Bavarian, Mark Chen, Heewoo Jun, Lukasz Kaiser, Matthias Plappert, Jerry Tworek, Jacob Hilton, Reiichiro Nakano, and 1 others. 2021. Training verifiers to solve math word problems. arXiv preprint arXiv:2110.14168 .Gheorghe Comanici, Eric Bieber, Mike Schaekermann, Ice Pasupat, Noveen Sachdeva, Inderjit Dhillon, Mar-cel Blistein, Ori Ram, Dan Zhang, Evan Rosen, and 1 others. 2025. Gemini 2.5: Pushing the frontier with advanced reasoning, multimodality, long context, and next generation agentic capabilities. arXiv preprint arXiv:2507.06261 .Joost CF De Winter, Samuel D Gosling, and Jeff Potter. 2016. Comparing the pearson and spearman corre-lation coefficients across distributions and sample sizes: A tutorial using simulations and empirical data. 
+
+Psychological methods , 21(3):273. Daniel Fein, Sebastian Russo, Violet Xiang, Kabir Jolly, Rafael Rafailov, and Nick Haber. 2026. Litbench: A benchmark and dataset for reliable evaluation of creative writing. In Proceedings of the 19th Confer-ence of the European Chapter of the Association for Computational Linguistics (Volume 1: Long Papers) ,pages 7740–7755. Jiayi Fu, Xuandong Zhao, Chengyuan Yao, Heng Wang, Qi Han, and Yanghua Xiao. 2025. Reward shaping to mitigate reward hacking in rlhf. arXiv preprint arXiv:2502.18770 .Aaron Grattafiori, Abhimanyu Dubey, Abhinav Jauhri, Abhinav Pandey, Abhishek Kadian, Ahmad Al-Dahle, Aiesha Letman, Akhil Mathur, Alan Schelten, Alex Vaughan, and 1 others. 2024. The llama 3 herd of models. arXiv preprint arXiv:2407.21783 .Etash Guha, Ryan Marten, Sedrick Keh, Negin Raoof, Georgios Smyrnis, Hritik Bansal, Marianna Nezhu-rina, Jean Mercat, Trung Vu, Zayne Sprague, and 1 others. 2025. Openthoughts: Data recipes for reason-ing models. arXiv preprint arXiv:2506.04178 .Anisha Gunjal, Anthony Wang, Elaine Lau, Vaskar Nath, Yunzhong He, Bing Liu, and Sean Hendryx. 2025. Rubrics as rewards: Reinforcement learn-ing beyond verifiable domains. arXiv preprint arXiv:2507.17746 .Daya Guo, Dejian Yang, Haowei Zhang, Junxiao Song, Peiyi Wang, Qihao Zhu, Runxin Xu, Ruoyu Zhang, Shirong Ma, Xiao Bi, and 1 others. 2025. Deepseek-r1: Incentivizing reasoning capability in llms via reinforcement learning. arXiv preprint arXiv:2501.12948 .Peixuan Han, Adit Krishnan, Gerald Friedland, Jiaxuan You, and Chris Kong. 2025. Self-aligned reward: Towards effective and efficient reasoners. arXiv preprint arXiv:2509.05489 .Dan Hendrycks, Collin Burns, Saurav Kadavath, Akul Arora, Steven Basart, Eric Tang, Dawn Song, and Ja-cob Steinhardt. 2021. Measuring mathematical prob-lem solving with the math dataset. arXiv preprint arXiv:2103.03874 .John Horgan. 1995. From complexity to perplexity. 
+
+Scientific American , 272(6):104–109. Aaron Hurst, Adam Lerer, Adam P Goucher, Adam Perelman, Aditya Ramesh, Aidan Clark, AJ Ostrow, Akila Welihinda, Alan Hayes, Alec Radford, and 1 others. 2024. Gpt-4o system card. arXiv preprint arXiv:2410.21276 .Aaron Jaech, Adam Kalai, Adam Lerer, Adam Richard-son, Ahmed El-Kishky, Aiden Low, Alec Helyar, Aleksander Madry, Alex Beutel, Alex Carney, and 1 others. 2024. Openai o1 system card. arXiv preprint arXiv:2412.16720 .
+
+9Ruipeng Jia, Yunyi Yang, Yongbo Gai, Kai Luo, Shihao Huang, Jianhe Lin, Xiaoxi Jiang, and Guanjun Jiang. 2025. Writing-zero: Bridge the gap between non-verifiable tasks and verifiable rewards. arXiv preprint arXiv:2506.00103 .Adrian Kuhn, Stéphane Ducasse, and Tudor Gîrba. 2007. Semantic clustering: Identifying topics in source code. Information and software technology ,49(3):230–243. Xuanyu Lei, Chenliang Li, Yuning Wu, Kaiming Liu, Weizhou Shen, Peng Li, Ming Yan, Ji Zhang, Fei Huang, and Yang Liu. 2025. Writing-rl: Advancing long-form writing via adaptive curriculum reinforce-ment learning. arXiv preprint arXiv:2506.05760 .Zhaoyan Li, Hang Lei, Yujia Wang, Lanbo Liu, Hao Liu, and Liang Yu. 2026. Rewarding creativity: A human-aligned generative reward model for rein-forcement learning in storytelling. arXiv preprint arXiv:2601.07149 .Zhong-Zhi Li, Duzhen Zhang, Ming-Liang Zhang, Ji-axin Zhang, Zengyan Liu, Yuxuan Yao, Haotian Xu, Junhao Zheng, Pei-Jie Wang, Xiuyi Chen, and 1 oth-ers. 2025. From system 1 to system 2: A survey of reasoning large language models. arXiv preprint arXiv:2502.17419 .Xiao Liu, Xuanyu Lei, Shengyuan Wang, Yue Huang, Andrew Feng, Bosi Wen, Jiale Cheng, Pei Ke, Yifan Xu, Weng Lam Tam, and 1 others. 2024. Alignbench: Benchmarking chinese alignment of large language models. In Proceedings of the 62nd Annual Meet-ing of the Association for Computational Linguistics (Volume 1: Long Papers) , pages 11621–11640. A Ian McLeod. 2005. Kendall rank correlation and mann-kendall trend test. R package Kendall , 602:1– 10. Long Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida, Carroll Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, and 1 others. 2022. Training language models to follow in-structions with human feedback. Advances in neural information processing systems , 35:27730–27744. Samuel J Paech. 2023. Eq-bench: An emotional intelli-gence benchmark for large language models. arXiv preprint arXiv:2312.06281 .Haoran Que, Feiyu Duan, Liqun He, Yutao Mou, Wangchunshu Zhou, Jiaheng Liu, Wenge Rong, Zekun Moore Wang, Jian Yang, Ge Zhang, and 1 others. 2024. Hellobench: Evaluating long text gen-eration capabilities of large language models. arXiv preprint arXiv:2409.16191 .Zhihong Shao, Peiyi Wang, Qihao Zhu, Runxin Xu, Junxiao Song, Xiao Bi, Haowei Zhang, Mingchuan Zhang, YK Li, Yang Wu, and 1 others. 2024. Deepseekmath: Pushing the limits of mathematical reasoning in open language models. arXiv preprint arXiv:2402.03300 .Guangming Sheng, Chi Zhang, Zilingfeng Ye, Xibin Wu, Wang Zhang, Ru Zhang, Yanghua Peng, Haibin Lin, and Chuan Wu. 2025. Hybridflow: A flexible and efficient rlhf framework. In Proceedings of the Twentieth European Conference on Computer Sys-tems , pages 1279–1297. Kimi Team, Angang Du, Bofei Gao, Bowei Xing, Changjiu Jiang, Cheng Chen, Cheng Li, Chenjun Xiao, Chenzhuang Du, Chonghua Liao, and 1 others. 2025. Kimi k1. 5: Scaling reinforcement learning with llms. arXiv preprint arXiv:2501.12599 .Meituan LongCat Team, Anchun Gui, Bei Li, Bingyang Tao, Bole Zhou, Borun Chen, Chao Zhang, Chen Gao, Chen Zhang, Chengcheng Han, and 1 others. 2026. Longcat-flash-thinking-2601 technical report. 
+
+arXiv preprint arXiv:2601.16725 .Haozhe Wang, Haoran Que, Qixin Xu, Minghao Liu, Wangchunshu Zhou, Jiazhan Feng, Wanjun Zhong, Wei Ye, Tong Yang, Wenhao Huang, and 1 others. 2025. Reverse-engineered reasoning for open-ended generation. arXiv preprint arXiv:2509.06160 .Xiaohua Wang, Muzhao Tian, Yuqi Zeng, Zisu Huang, Jiakang Yuan, Bowen Chen, Jingwen Xu, Mingbo Zhou, Wenhao Liu, Muling Wu, and 1 others. 2026. Reward hacking in the era of large models: Mech-anisms, emergent misalignment, challenges. arXiv preprint arXiv:2604.13602 .Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Fei Xia, Ed Chi, Quoc V Le, Denny Zhou, and 1 others. 2022. Chain-of-thought prompting elic-its reasoning in large language models. Advances in neural information processing systems , 35:24824– 24837. Xumeng Wen, Zihan Liu, Shun Zheng, Shengyu Ye, Zhirong Wu, Yang Wang, Zhijian Xu, Xiao Liang, Junjie Li, Ziming Miao, and 1 others. 2025. Rein-forcement learning with verifiable rewards implicitly incentivizes correct reasoning in base llms. arXiv preprint arXiv:2506.14245 .Yuhao Wu, Yushi Bai, Zhiqiang Hu, Roy Ka-Wei Lee, and Juanzi Li. 2025a. Longwriter-zero: Mastering ultra-long text generation via reinforcement learning. 
+
+arXiv preprint arXiv:2506.18841 .Yuning Wu, Jiahao Mei, Ming Yan, Chenliang Li, Shaopeng Lai, Yuran Ren, Zijia Wang, Ji Zhang, Mengyue Wu, Qin Jin, and 1 others. 2025b. Writing-bench: A comprehensive benchmark for generative writing. arXiv preprint arXiv:2503.05244 .An Yang, Anfeng Li, Baosong Yang, Beichen Zhang, Binyuan Hui, Bo Zheng, Bowen Yu, Chang Gao, Chengen Huang, Chenxu Lv, and 1 others. 2025. Qwen3 technical report. arXiv preprint arXiv:2505.09388 .Shunyu Yao, Dian Yu, Jeffrey Zhao, Izhak Shafran, Tom Griffiths, Yuan Cao, and Karthik Narasimhan. 2023. Tree of thoughts: Deliberate problem solving 
+
+10 with large language models. Advances in neural information processing systems , 36:11809–11822. Jiayi Ye, Yanbo Wang, Yue Huang, Dongping Chen, Qihui Zhang, Nuno Moniz, Tian Gao, Werner Geyer, Chao Huang, Pin-Yu Chen, and 1 others. 2024. Jus-tice or prejudice? quantifying biases in llm-as-a-judge. arXiv preprint arXiv:2410.02736 .Weihao Zeng, Yuzhen Huang, Qian Liu, Wei Liu, Ke-qing He, Zejun Ma, and Junxian He. 2025. Simplerl-zoo: Investigating and taming zero reinforcement learning for open base models in the wild. arXiv preprint arXiv:2503.18892 .Dan Zhang, Sining Zhoubian, Ziniu Hu, Yisong Yue, Yuxiao Dong, and Jie Tang. 2024. Rest-mcts*: Llm self-training via process reward guided tree search.        
+
+> Advances in Neural Information Processing Systems ,37:64735–64772. Kaiyan Zhang, Yuxin Zuo, Bingxiang He, Youbang Sun, Runze Liu, Che Jiang, Yuchen Fan, Kai Tian, Guoli Jia, Pengfei Li, and 1 others. 2025a. A survey of reinforcement learning for large reasoning models.
+> arXiv preprint arXiv:2509.08827 .Mengyu Zhang, Siyu Ding, Weichong Yin, and Yu Sun. 2025b. Extending rlvr to open-ended tasks via veri-fiable multiple-choice reformulation. arXiv preprint arXiv:2511.02463 .Zheng Zhang, Ao Lu, Yuanhao Zeng, Ziwei Shan, Jin-jin Guo, Lufei Li, Yexin Li, and Kan Ren. 2026. Grad2reward: From sparse judgment to dense re-wards for improving open-ended llm reasoning.
+> arXiv preprint arXiv:2602.01791 .Wenting Zhao, Xiang Ren, Jack Hessel, Claire Cardie, Yejin Choi, and Yuntian Deng. 2024. Wildchat: 1m chatgpt interaction logs in the wild. arXiv preprint arXiv:2405.01470 .Yuze Zhao, Jintao Huang, Jinghan Hu, Xingjun Wang, Yunlin Mao, Daoze Zhang, Zeyinzi Jiang, Zhikai Wu, Baole Ai, Ang Wang, and 1 others. 2025. Swift: a scalable lightweight infrastructure for fine-tuning. In Proceedings of the AAAI Conference on Artificial Intelligence , volume 39, pages 29733–29735. Lianmin Zheng, Wei-Lin Chiang, Ying Sheng, Siyuan Zhuang, Zhanghao Wu, Yonghao Zhuang, Zi Lin, Zhuohan Li, Dacheng Li, Eric Xing, and 1 others. 2023. Judging llm-as-a-judge with mt-bench and chatbot arena. Advances in neural information pro-cessing systems , 36:46595–46623.
+
+A Influence of Reasoning Traces on Generative Performance 
+
+To isolate the impact of thought process on task performance, we conducted a preliminary ablation study where the thought process of baseline LRMs were replaced with those generated by more capa-ble teacher models. The result as shown in Table 5. This demonstrates that, the thought process of an LRM is crucial to the quality of the final output; a higher quality thought process corresponds to a higher quality final output. Therefore, for creative tasks, our goal is to use SFT or RL to improve the quality of the model’s reasoning process, shifting the focus from enhancing the quality of the final output to enhancing the thought process itself. 
+
+B Training Data 
+
+B.1 Data Curation 
+
+To construct the cold-start SFT dataset, we em-ployed semantic clustering (Kuhn et al., 2007) to ensure broad task diversity, followed by stratified random sampling across the identified categories. Specifically, we utilized the BGE-M3 (Chen et al., 2024) to generate high-dimensional embeddings for the initial prompt pool. After clustering these embeddings, we performed proportional sampling from each cluster to maintain the original distri-bution while curating a representative subset. The dataset was synthesized by filtering and aggregat-ing high-quality examples from a diverse array of established sources, specifically LongWriter-6k (Bai et al., 2024), WildChat (Zhao et al., 2024), LitBench-Train (Fein et al., 2026) and OpenThought (Guha et al., 2025). This balanced distribution ensures the model develops both the creative linguistic fluidity required for long-form generation and the rigorous logical precision neces-sary for multi-step mathematical problem-solving. To curate high-quality training samples for both mathematical reasoning and open-ended genera-tion in RL phase, we performed a filtering pro-cess. For our mathematical training set, we selec-tively retained only those prompts where the model achieved a correct solution in exactly one out of 
+
+eight independent rollouts. For creative writing tasks, we utilized an LLM-as-a-judge framework to evaluate the model’s output against a gold-standard reference, employing a scoring scale of 0 to 5. We specifically targeted samples with scores in the 2–3 
+
+range to facilitate effective error-correction training. This rigorous selection process ultimately yielded a high-quality training corpus consisting of 1,165 writing entries and 509 mathematical reasoning samples. 
+
+B.2 Differences with other methods 
+
+It is important to distinguish our iterative trace syn-thesis from methods like Monte Carlo Tree Search 11 Table 5: Performance comparison on AIME 2025 and Arena Hard V2. Replace denotes a configuration where a high-capacity LRM’s reasoning trace is injected into the prompt to guide the baseline model’s response. 
+
+Model AIME 2025 Arena Hard V2 (Score) (Pass@1) Hard Prompt (G/P) † Creative Writing 
+
+Qwen3-8B 0.67 23.3 / 18.7 25.7 Replace DeepSeek (Guo et al., 2025) 0.80 51.7 / 46.9 26.3 Replace LongCat (Team et al., 2026) 0.83 51.3 / 50.6 31.8 
+
+Replace Qwen3-32B (Yang et al., 2025) 0.76 46.4 / 44.0 27.6 
+
+> †
+
+G/P refers to Gemini and GPT as judges, respectively. Perplexity -Guided Iterative Trace Synthesis     
+
+> Prompt <think>
+> Okay, so I
+> need to
+> write an
+> argumentati
+> ve essay
+> on …
+> First, I
+> should figure
+> out my
+> thesis.
+> Maybe I
+> can …
+> Wait
+> Cognitive Braking :
+> Rollout 1
+> Rollout 2
+> Rollout 3
+> Rollout 4
+> ✅
+> Also,
+> need to
+> addres
+> s…
+> But wait,
+> Rollout 1 Rollout 4
+> ✅
+
+# …</think> 
+
+> **Are Super Strict
+> Schools Good for
+> Students?** \n\…
+
+# ...                   
+
+> Perplexity -Prioritized Rollout :
+> ℒr!=1
+> 𝑇 &
+> "
+> #
+> log 𝑃 𝑥 $𝑥 %$,prompt
+> 𝑃𝑃𝐿 r!=exp −ℒr!
+> r∗=arg min
+> '!∈𝒞 PPL r!
+> Start Thinking
+> End Thinking
+> Cold Start SFT
+
+Figure 2: The overview of Perplexity-Guided Iterative Trace Synthesis in Cold Start SFT. 
+
+(MCTS) (Zhang et al., 2024) and REER (Wang et al., 2025). Unlike REER, which performs local surgery on an existing, fixed trajectory to mini-mize the perplexity of a ground-truth answer, our method grows a trajectory autoregressively from left to right. As illustrated in Figure 2, the approach employs an asynchronous interruption mechanism in which designated reflection tokens serve as trig-gers for System 2 deliberation, enabling the model to adaptively allocate additional computational re-sources only when cognitive conflict is detected. While MCTS relies on complex process reward models to navigate a global search tree, our method prioritizes internal logical consistency by select-ing parallel candidate rollouts that minimize the model’s own log-probabilities. This recursive pro-cess results in a high-density, self-correcting gold standard trajectory that captures the meta-cognitive process of error detection and rectification, provid-ing a more efficient and inspired foundation for subsequent fine-tuning than either static refinement or exhaustive tree search. 
+
+B.3 Global PPL Landscape 
+
+We employ a sliding-window perplexity analysis to monitor the model’s internal confidence during the chain-of-thought generation. Using a window size of W = 25 , we calculate the local PPL to capture the dynamic shifts in the model’s transition prob-abilities. To identify critical reasoning junctions, we define significant clusters as tokens that: (1) be-long to a predefined set of reflexive keywords ( e.g. ,’but’, ’wait’), and (2) exhibit a local PPL exceeding the global median by a threshold of τ = 1 .15 , the result as shown in Figure 3. The blue curve repre-senting the median PPL remains remarkably stable and low throughout the majority of the reasoning process. This indicates that the model maintains high structural confidence across most tokens, a hall-mark of successful SFT on the dataset. Moreover, we observe that as the token index increases (par-ticularly beyond 12,500 tokens), the variance in local PPL begins to expand. This visualizes the ac-cumulation of uncertainty in ultra-long reasoning 12 0 2000 4000 6000 8000 10000 12000 14000 
+
+> Token Index
+> 10 0
+> 10 1
+> 10 2
+> Perplexity
+> Global PPL Landscape
+> PPL
+> Significant Clusters
+
+Figure 3: Global PPL Landscape of Reasoning Traces. 
+
+chains, where minor logical drifts can lead to signif-icant predictive entropy. A high density of clusters is observed in the initial reasoning phase (tokens 0–2,500). This suggests the model frequently en-gages in cognitive braking to calibrate its initial logic path before proceeding to stable derivation. Isolated clusters appearing in the middle of a stable trajectory ( e.g. , around index 10,000 and 13,000) serve as objective signals for over-trust Penalty. These points indicate where the model successfully identified a potential reasoning error and attempted a linguistic re-alignment. 
+
+B.4 Analysis of Perplexity-Guided Iterative Trace Synthesis 
+
+Analysis of the synthesis process, as illustrated in Figure 4, confirms its empirical effectiveness. Following the synthesis stage, the perplexity distri-bution exhibits a significant downward shift, with a vast majority of samples demonstrating marked improvement in PPL. Concurrently, we observe a systematic increase in the token length of the reasoning trajectories. This trend indicates that the synthesis process successfully expands initial, skeletal plans into more detailed and elaborate rea-soning chains, effectively bridging the gap between high-level intent and granular logical execution. 
+
+C More detail in experiment 
+
+C.1 Implementation Details 
+
+We implement the SFT phase using the ms-swift framework (Zhao et al., 2025), training the model for 5 epochs with a learning rate of 1 × 10 −5 and a warmup ratio of 0.05. The training was conducted on a cluster of 8 × NVIDIA H800 GPUs. We uti-lized a per-device batch size of 1 with gradient accumulation set to 2, resulting in a total training duration of approximately 8 hours and 45 minutes .For the reinforcement learning phase, we utilize the Verl (Sheng et al., 2025) to implement GRPO (Shao et al., 2024). The configuration utilized a factor of 
+
+α = 0 .3 in reward function and a setting of τ = 2 .Training was executed on a high-performance clus-ter comprising 32 × NVIDIA H800 GPUs. To ensure stability during the initial phases of opti-mization, the actor-model utilized a learning rate of 1 × 10 −6 paired with a warmup ratio of 0.4. To manage the high dimensionality of long-form reasoning, we configured the system to support a maximum prompt length of 6,144 tokens and a generated response length of 10,240 tokens. We uti-lized 16 rollouts per prompt at a temperature of 1.0, with a KL-divergence coefficient of 0.001 to ensure policy stability. To optimize memory throughput, we applied a tensor model parallelism size of 2 for the rollouts. The final model was trained for one epoch over 26 steps, with a total wall-clock time of approximately 6 hours and 10 minutes .13 10 20 30 40                     
+
+> Perplexity (PPL)
+> 0
+> 500
+> 1000
+> 1500
+> 2000
+> 2500
+> 3000
+> 3500
+> 4000
+> Frequency
+> PPL Distribution
+> Before
+> After
+> 0510 15 20 25 30 35
+> PPL Difference (Before - After)
+> 0
+> 1000
+> 2000
+> 3000
+> 4000
+> 5000
+> Frequency
+> PPL Improvement
+> 01000 2000 3000 4000 5000 6000 7000
+> Token Length
+> 0
+> 200
+> 400
+> 600
+> 800
+> 1000
+> 1200
+> 1400
+> Frequency
+> Token Length Distribution
+> Before
+> After
+> 01000 2000 3000 4000 5000 6000
+> Length Difference (After - Before)
+> 0
+> 200
+> 400
+> 600
+> 800
+> 1000
+> 1200
+> 1400
+> Frequency
+> Token Length Increase
+
+Figure 4: Analysis of Token Length & Perplexity Before and After the Synthesis. 
+
+C.2 Evaluation Protocols 
+
+To address the inherent subjectivity of open-ended generation, we adopted the established protocol of utilizing frontier Large Language Models as auto-mated judges across our evaluation benchmarks. 
+
+While we acknowledge the potential for model-specific biases in this paradigm, it currently rep-resents the most scalable and consistent method-ology for quantifying nuanced generative qual-ity. 
+
+For AlignBench and HelloBench, we employed GPT-4o (2024-08-06) as the primary evaluator. For WritingBench, we utilized Claude-3.7 to capture the stylistic intricacies of the outputs. In Cre-ative Writing V3, we implemented a dual-judge ensemble consisting of Gemini-2.5-Pro and GPT-4.1; scores were derived via uniform sampling and weighted averaging to mitigate individual model variance. Finally, to enhance the resolution of com-parative performance on HelloBench, we applied a linear rescaling formula: S = ( score − 0.75) × 4.This transformation maps the original outputs to a standardized range of [−300 , 100] , effectively am-plifying the delta between high-performing models. During the inference phase, for the open-ended and creative benchmarks including AlignBench, Creative Writing V3, and WritingBench we utilized a temperature of 0.7. For HelloBench, we use a temperature of 0.6. Conversely, for the MATH500 benchmark, we employed greedy decoding (temper-ature = 0) to ensure deterministic reasoning paths for verifiable mathematical problems. For our comparative evaluation, we selected three prominent open-source baselines: Long-Writer, DeepWriter, and LongWriter-Zero-32b. We utilized the official LongWriter-Llama-3.1-8B 2
+
+and LongWriter-Zero-32B 3. In contrast, Deep-
+
+> 2
+
+https://huggingface.co/zai-org/LongWriter-llama3.1-8b 
+
+> 3
+
+https://huggingface.co/THU-KEG/LongWriter-Zero-
+
+Writer only released the training corpus rather than a pre-trained model, we independently trained a variant using their provided dataset and their im-plementation parameter to ensure a consistent ex-perimental environment. All models were then sub-jected to the same evaluation protocol as OPERA to facilitate a rigorous and direct performance com-parison. 
+
+C.3 Experiment Results 
+
+To establish the statistical significance of our find-ings, we report the variance across our experimen-tals. These metrics, provided in Table 6, demon-strate the stability of the OPERA framework and ensure that the observed performance gains are con-sistent and reproducible. 
+
+C.4 Ablation Studies 
+
+We provides a detailed introduction and analysis under different ablation settings. 
+
+C.4.1 Perplexity-Guided Iterative Trace Synthesis 
+
+• Remove Synthesis Data : Removing our syn-thesized trajectories and training only on pub-lic datasets. We observed that applying public datasets directly to SFT resulted in a precip-itous performance degradation. Specifically, in the Creative Writing V3 benchmark, perfor-mance plummeted by nearly 43 points (71.92 
+
+→ 28.64), with similarly drastic declines ob-served in Hellobench. These results validate a central hypothesis of this work: explicit re-flection tokens and structured reasoning tra-jectories are not merely decorative, but essen-tial catalysts for enhancing the model’s down-stream capabilities. 
+
+32B 
+
+14 Table 6: Main Performance Comparison (Mean ± Standard Deviation) on Creative Writing and Mathematical Benchmarks                                                                                                                                                                                                                               
+
+> Model AB-W HB-C HB-G Creative Writing V3 WritingBench MATH500
+> Proprietary LLMs
+> GPT-4o-0513 6.37 ±0.00 21 .52 ±6.62 38 .02 ±10 .10 61 .76 ±3.44 66 .19 ±0.51 78 .00 ±0.00
+> Gemini-2.5-pro 7.24 ±0.00 52 .98 ±6.73 62 .89 ±8.56 77 .19 ±1.62 76 .35 ±0.71 98 .60 ±0.00
+> MiniMax-M2.5 6.84 ±0.00 26 .80 ±9.83 59 .33 ±9.01 80 .80 ±1.75 80 .39 ±0.68 98 .40 ±0.00
+> Open-source LLMs
+> LongWriter-8B 4.67 ±0.00 −48 .50 ±20 .43 −88 .45 ±27 .94 35 .99 ±4.64 44 .57 ±1.16 20 .40 ±0.00
+> DeepWriter-8B 6.63 ±0.00 26 .33 ±8.84 0.25 ±21 .29 62 .22 ±3.20 73 .70 ±0.67 80 .40 ±0.00
+> LongWriter-Zero-32B 6.95 ±0.00 21 .26 ±10 .52 −55 .48 ±22 .99 51 .11 ±4.75 77 .44 ±0.73 73 .40 ±0.00
+> Our Methods
+> Llama3.1-8B 5.15 ±0.00 6.59 ±8.10 −26 .07 ±16 .48 37 .79 ±4.15 49 .58 ±0.80 52 .40 ±0.00
+> Llama3.1-8B-SFT 5.89 ±0.00 29 .68 ±8.37 37 .53 ±9.58 63 .21 ±3.75 71 .30 ±0.72 58.20 ±0.00
+> Llama3.1-8B-OPERA 6.15 ±0.00 30.08 ±7.67 49.83 ±10 .91 67.09 ±3.32 72.12 ±0.74 56 .80 ±0.00
+> Qwen3-8B 6.64 ±0.00 35 .77 ±6.62 37 .12 ±9.73 65 .25 ±3.11 75 .08 ±0.60 95 .60 ±0.00
+> Qwen3-8B-SFT 7.00 ±0.00 38 .70 ±7.24 41 .96 ±11 .39 71 .92 ±2.25 76 .63 ±0.57 94 .80 ±0.00
+> Qwen3-8B-OPERA 7.13 ±0.00 38.91 ±6.58 49.79 ±9.67 72.89 ±1.75 78.19 ±0.58 96.20 ±0.00
+
+• Remove Iterative Search : During the gen-eration of sequences containing reflective to-kens, we bypass the rollout-based selection mechanism. Specifically, we observe that reflection alone is insufficient; if the spe-cific step at which reflection occurs is sub-optimal, model capability diminishes signifi-cantly. This finding validates the efficacy of perplexity-prioritized rollouts, demonstrating that the discovery of superior reasoning paths is essential for translating latent thinking into concrete generative gains. • Remove Reflection Tokens : When these lin-guistic markers were removed maintaining only the local search, model performance con-sistently degraded across open-ended bench-marks ( e.g. , WritingBench: 76.63 → 71.70). This suggests that explicit tokens for cognitive exploration and self-correction are not merely structural artifacts; rather, they provide a criti-cal representational workspace that facilitates the creative divergence necessary for complex, artistic writing tasks. • Top-5 Token Rollouts : While restricting ex-pansion to the first five reflection tokens yields significant efficiency gains, our experiments demonstrate that comprehensive expansion across all reflection tokens provides the supe-rior performance ceiling. This indicates that while the perplexity metric is highly precise in the early stages of reasoning, the cumulative effect of local search across every cognitive marker is essential for reaching peak model ca-pability. This finding suggests that each stage of deliberation contributes unique structural value to the trajectory. 
+
+C.4.2 Reward functions in OPERA 
+
+• Only Self-Reflection Reward : The model ex-periences a significant performance decline across all metrics when relying solely on the self-reflection reward, with particularly sharp drops in Creative Writing V3 ( 72 .89 →
+
+68 .56 ). Because the self-reflection reward focuses primarily on the reasoning process specifically internal pivots and keyword trig-gers, it risks incentivizing the model to over-think without ensuring that this latent effort translates into a superior final response. This suggests that while Rref successfully cat-alyzes self-correction behaviors, it requires a grounding mechanism like IGRP to provide a global quality signal. Without IGRP, the model may optimize for the appearance of rea-soning while failing to achieve the semantic alignment necessary for high-quality creative and constrained generation. • Only IGRP : The removal of the self-reflection reward leads to a sharp decline in HelloBench-G performance ( 49 .79 → 41 .63 ), while other benchmarks remain stable or show marginal improvements. This divergence sug-gests that while the IGRP reward effectively optimizes the final outcome’s likelihood rel-ative to peers, it is insufficient for tasks re-quiring complex creative synthesis. The drop 15 Table 7: Main Performance Comparison (Mean ± Variance) of ablation studies in Perplexity-Guided Iterative Trace Synthesis.                                                                 
+
+> Model HelloBench-C HelloBench-G Creative Writing V3 WritingBench
+> Qwen3-8B-SFT 38.70 ±7.24 41 .96 ±11 .39 71.92 ±2.25 76.63 ±0.57
+> - Remove Synthesis Data 11 .49 ±7.80 −79 .92 ±27 .06 28 .64 ±4.42 60 .68 ±0.82
+> - Remove Iterative Search 34 .20 ±6.89 42 .69 ±12 .61 67 .77 ±3.62 70 .55 ±0.63
+> - Remove Reflection Tokens 35 .39 ±8.78 40 .54 ±9.42 69 .25 ±3.56 71 .70 ±0.67
+> - Top5-token Rollout 36 .22 ±7.19 45.93 ±12 .18 69 .84 ±2.90 70 .78 ±0.61
+
+in performance indicates that without the ex-plicit incentive provided by Rref to catalyze mid-course corrections, the model struggles to navigate the nuanced reasoning paths nec-essary for high-level creative generation. 
+
+C.4.3 Without SFT phase 
+
+We observed that omitting the SFT phase and per-forming OPERA directly on the base model led to a significant degradation in performance. This is likely attributable to the cold-start problem in latent strategy exploration. Without a supervised initialization to align the model with the reason-ing syntax, the RL algorithm faces a sparse reward landscape. The resulting gradients, derived largely from low-quality rollouts, induce distributional in-stability and catastrophic forgetting of pre-trained capabilities. This underscores the necessity of SFT as a structural prior that constrains the search space to a regime of high-fidelity reasoning. 
+
+D Why Perplexity work? 
+
+A central challenge in open-ended reinforcement learning is the design of reward functions that faith-fully recover human preferences without relying on external discriminators or computationally expen-sive reward models. We argue that internal model uncertainty, captured through perplexity, serves as a latent proxy for alignment quality. By leveraging In-Group Relative Perplexity, we shift the optimiza-tion objective from fallible external oversight to an intrinsic, information-theoretic measure of reason-ing consistency. This approach treats the model’s own predictive confidence as a signal for policy refinement, bypassing the noise often introduced by proxy reward models. 
+
+D.1 Mathematical analysis 
+
+In language modeling, perplexity (Horgan, 1995) is a measurement of how well a probability distri-bution predicts a sample. Mathematically, mini-mizing PPL is equivalent to maximizing the Log-Likelihood ( LL ). For a reference response ygt , the model’s goal is to minimize: P P L (ygt |context ) = exp 
+
+
+
+− 1
+
+> N
+
+PNi=1 log P (yi|y<i , context )
+
+
+
+. A better reasoning trace (the <think> block) acts as latent information that reduces the entropy of the final answer. If the thought process is high-quality, it shifts the probability mass toward the ground truth ygt , making the target less surprising to the model. Therefore, a drop in PPL is a direct math-ematical proxy for the functional utility of the reasoning steps. The core of OPERA is the self-reflection reward ( Rref ). It rewards the model when log Pj − log Pj−1 > 0. Let S1: j be the rea-soning trace up to step j. The information gain provided by step sj can be viewed as: 
+
+∆I = log P (ygt |x, s 1: j ) − log P (ygt |x, s 1: j−1),
+
+(7) If ∆I > 0, the reasoning step sj has successfully disambiguated the path to the solution. If ∆I < 0,the step has introduced noise or logical "hallucina-tion" that makes the correct target appear less likely. By rewarding only positive ∆I, we are mathemati-cally enforcing that the model’s internal monologue must serve the objective of variance reduction in the output space. Using absolute PPL as a reward is notoriously difficult because some prompts are inherently "harder" (higher baseline entropy). The use of In-Group Relative Perplexity solves this. By defining Rippl as the normalized rank: 
+
+Rippl = 1
+
+N − 1
+
+X 
+
+> j̸=i
+
+I(Lihybrid > L jhybrid ). (8) we transform the optimization problem from mini-mizing absolute error to maximizing relative mar-gin. This is feasible because: It removes the need to calculate the true minimum PPL for a creative prompt. In RL, absolute log-probs can have mas-sive swings. Percentile ranking provides a bounded 16 Table 8: Main Performance Comparison (Mean ± Variance) of ablation studies in OPERA reward functions. 
+
+Model HelloBench-C HelloBench-G Creative Writing V3 WritingBench 
+
+Qwen3-8B-OPERA 38 .91 ± 6.58 49.79 ± 9.67 72.89 ± 1.75 78.19 ± 0.58 
+
+- w/o IGRP 33 .69 ± 7.17 46 .60 ± 12 .80 68 .56 ± 3.53 77 .01 ± 0.52 
+
+- w/o self-reflection 38.92 ± 7.18 41 .63 ± 10 .68 71 .29 ± 2.15 77 .15 ± 0.57 
+
+Table 9: Ablation Analysis of the SFT-RL Pipeline. Performance benchmarks for models trained via direct Reinforcement Learning on the base model versus the standard SFT+RL pipeline. The "Base + RL" configuration demonstrates a performance collapse, highlighting the "cold start" challenge in autonomous reasoning discovery. 
+
+Model HelloBench-C HelloBench-G Creative Writing V3 WritingBench 
+
+Qwen3-8B-OPERA 38.91 ± 6.58 49.79 ± 9.67 72.89 ± 1.75 78.19 ± 0.58 
+
+- Just OPERA 35 .35 ± 7.74 36 .10 ± 15 .28 67 .20 ± 3.53 76 .08 ± 0.66 
+
+Table 10: Impact of Training Data Composition on Cross-Domain Logical Rigor.                 
+
+> Model HB-C HB-G Creative Writing V3 WritingBench
+> Qwen3-8B-OPERA 38.91 49.79 72.89 78.19
+> Only Math data 36.04 42.47 69.69 77.91 Only Writing data 38.45 42.50 72.54 78.03
+
+reward [0 , 1] , which stabilizes the advantage func-tion in algorithms like GRPO. A common fear in RL is that the model will learn to output I am thinking very hard just to get a reward. OPERA mitigates this through two constraints: The tanh 
+
+Satiation: The reward Rref = tanh( Rraw /τ ) en-sures that after a certain amount of reflection, the marginal utility drops to near zero. The Hybrid Re-quirement: Because the reward is tied to the PPL of the target ygt , the model cannot simply babble in the <think> tags. If the "thinking" does not actually make the final answer more statistically probable, the Rppl component will penalize it. 
+
+D.2 Experiment analysis 
+
+To justify the use of In-Group Relative Perplex-ity as an objective function, we evaluate its align-ment with high-capacity models specifically GPT-4o which serve as a proxy human-like reasoning. We sampled N = 50 prompts from the AlignBench-Writing dataset, covering diverse open-ended writing. For each prompt, we gener-ated k = 8 candidate trajectories {z1, z 2, . . . , z k}.We calculated the IGRP for each trajectory by mea-suring the conditional log-likelihood of a fixed, high-quality expert reference ygt given the reason-ing trace: log P (ygt | x, z i). To establish a gold-standard baseline, we employed GPT-4o as an au-tomated judge to provide multidimensional quality scores using evluation prompt in AlignBench. We then conducted a correlation analysis between the IGRP-derived rewards and the GPT-4o composite scores. These results provide empirical evidence that the objective of minimizing conditional per-plexity against an expert reference is well-aligned with the goal of semantic quality. The high de-gree of correlation suggests that IGRP serves as a reliable, unsupervised proxy for reward, bridging the gap between raw likelihood maximization and human-centric value alignment. This validates our use of IGRP as a stable training signal that circum-vents the noise typically associated with absolute perplexity metrics in non-deterministic domains. 
+
+D.3 Data distribution 
+
+Removing the open-ended training data led to a noticeable decline across all evaluation metrics, as shown in Table 10. These results suggest that open-ended data is a critical component of the reinforce-ment learning process. While mathematical data provides the structured rules that guide the model’s behavior, excluding open-ended data causes learn-ing progress to stagnate. Relying solely on rewards derived from the final output limits the model’s ability to develop step-by-step reflective reasoning throughout the inference process. OPERA can re-ward the model’s reasoning process, enabling it to learn how to handle writing tasks by adapting its internal uncertainty throughout generation. At the same time, if only open-ended datas are retained, the model’s capabilities will also decrease slightly. 17 Table 11: Scalability to Larger Models in OPERA.                                                                 
+
+> Model HelloBench-C HelloBench-G Creative Writing V3 WritingBench
+> LongWriter-Zero-32B 21 .26 ±10 .52 −55 .48 ±22 .99 51 .11 ±4.75 77 .44 ±0.73
+> Llama3.1-70B 6.59 ±8.11 −26 .06 ±16 .48 37 .79 ±4.15 49 .59 ±0.80
+> Qwen3-32B 39 .26 ±6.88 51 .98 ±8.18 73 .09 ±3.99 79 .31 ±0.53
+> Qwen3-8B-OPERA 38 .91 ±6.58 49 .79 ±9.67 72 .89 ±1.75 78 .19 ±0.58
+> Qwen3-32B-OPERA 46.16 ±6.81 58.84 ±9.35 76.20 ±1.59 78.95 ±0.50
+
+E Scalability to Larger Models 
+
+To evaluate the scalability of our approach, we ex-tended our experiments to a larger parameter model using Qwen3-32B. Our results demonstrate that Qwen3-32B-OPERA achieves consistent perfor-mance gains over the significantly larger Llama3.1-70B baseline, confirming that the OPERA frame-work scales effectively with model capacity, as shown in Table 11. However, we observed an asymptotic saturation in absolute performance across specific benchmarks; notably, improvements on WritingBench were marginal. ince the train-ing data was synthesized using Qwen3-32B, the model is constrained by the knowledge boundaries of the teacher model, likely limiting its capacity for further gains These findings indicate that while OPERA scales effectively to larger parameter mod-els, performance is increasingly bottlenecked by the existing training distribution. This suggests that surpassing current performance ceilings will require concurrent scaling of data diversity along-side model capacity. 
+
+F Figures of Prompts 
+
+The prompts utilized across our experiments are de-tailed below. We illustrate the prompt of Perplexity-Guided Iterative Trace Synthesis process in Fig-ure 5. Furthermore, the selection criteria for writing data during reinforcement learning is depicted in Figure 6, while the substituting PPL with an LLM-as-judge in iterative trace synthesis and rubrics as rewards are detailed in Figures 7 and 8, respec-tively. 18 You are an expert in many fields. Suppose you will give a specific final response, I need you to also write down the thought process behind this solution. Here is a question: 
+
+{prompt} 
+
+Now, you need to think aloud and brainstorm in the mind. The thinking process involves thoroughly exploring questions through a systematic long thinking process. This requires engaging in a com-prehensive cycle of analysis, summarizing, exploration, reassessment, reflection, backtracing, and iteration to develop well-considered thinking process. Present your complete thought process within a single and unique ‘<think></think>‘ tag. Your thought process must adhere to the following requirements: 1. **Narrate in the first-person as if you are thinking aloud and brainstorming** Stick to the narrative of "I". Imagine you are brainstorming and thinking in the mind. Use verbalized, simple language. 2. **Unify the thinking process and the final solution:** Your thought process must precisely correspond to a part of the final solution. Your thoughts progres-sively "grew" into the finished solution, making the solution feel like the inevitable product of your thinking. 3. **Tone of Voice: Planning, Sincere, Natural, and Accessible** Imagine you are analyzing and planning what to do before you start to give the solution. Your language should be plain and easy to understand, avoiding obscure professional jargon to explain complex thought processes clearly. 4. **Logical Flow: Clear and Progressive** 5. **Thinking Framework for deep thinking** To ensure your thinking is clear and deep, to showcase your thinking and planning to fulfill the task, below is what you might cover when you are thinking aloud and brainstorming. Understanding the user intent and the task: Before giving the solution, I need to thoroughly consider the fundamental purpose of the question. Establishing the content: I need to brainstorm a core creative idea and communication strategy centered around my objective. 6. Throughout the thinking process, I want to involve deep thinking and planning, and use deliberate self-critique/self-reflection in my thinking process. Trigger these by frequently using patterns such as ‘wait‘, ‘maybe‘, ‘let me‘, etc. For example: - Hmm, maybe .. (other concrete thinking regarding the given request) - Let me think .. - Wait no .. - But wait ..(might find something wrong with your previous thoughts) - Wait, that’s a bit ..(reflections about previous decisions). Let me think .. (are thinking of other possibilities) - Wait, the user said ..(backtracking of previous information). So .. - Hmm...Alternatively, maybe ..(branching on other possibilities) - But .. Now record your clear, complete, and logical thinking process within ‘<think></think>‘ tags. In the thinking process, make sure NO PAST TENSES, NO PAST TENSES, because this is the thought process before you are to write a final solution. You are planning what you will and you need to do. Imagine you’re thinking aloud and brainstorming. Write it as an internal monologue or a stream of consciousness. Do not use bullet points, numbers, or formal section headings. 
+
+> Figure 5: Prompt for Perplexity-Guided Iterative Trace Synthesis.
+
+19 You are a Senior Editorial Judge and Data Curator for LLM Training. Your goal is to critically evaluate a "Model Output" against a "Standard Answer" (Reference) to determine their relative quality for preference learning. ### Evaluation Dimensions (Score each 1-5) 1. **Constraint Strictness:** Did the text follow ALL prompt instructions (word counts, formatting, prohibited words, persona)? 2. **Structural Integrity:** Is there a logical progression, especially in long-form content? Check for repetitive loops or abrupt endings. 3. **Lexical & Stylistic Sophistication:** Does it use diverse vocabulary and natural phrasing, or does it fall into "AI-clichés" ( e.g. , "In the rapidly evolving landscape...", "Moreover/Furthermore" overuse)? 4. **Contextual Utility:** If the prompt provides background info, how accurately and efficiently is that info synthesized? ### Scoring Scale (Per Dimension) - **5 (Exemplary):** Flawless; indistinguishable from professional human writing. - **4 (Strong):** Clear and effective; minor stylistic choices could be improved. - **3 (Passable):** Correct but "dry" or slightly repetitive. - **2 (Weak):** Missed a minor constraint or has noticeable flow issues. - **1 (Failed):** Significant instruction failure, hallucination, or incoherent structure. ### Input Data 
+
+[Writing Prompt] : {prompt} [Standard Answer] : {reference} [Model Output] : {prediction} 
+
+### Response Format (Strictly Follow) #### 1. Evaluation for Model Output - **Dimensional Scores:** [Constraint: X/5, Structure: X/5, Style: X/5, Utility: X/5] 
+
+- **Reasoning:** (Focus on where it differs from the Standard Answer) - **Model Final Score:** \boxed{} . (The final score is the **average of the four dimensional scores**) 
+
+> Figure 6: Prompt for Selecting writing data during reinforcement learning.
+
+You are given a question, the reasoning process up to the current step, and several candidate reasoning steps. Your task is to determine which step is the most appropriate. For each candidate, evaluate it according to the following criteria: 1. Relevance: How well does it address and advance the given question? 2. Coherence: Does it logically and consistently follow from the prior reasoning process? 3. Effectiveness: How effective is it in leading toward a correct and complete solution? Provide a concise but thorough analysis of each candidate. Put your choice in the form \boxed{N} , where N is the choice number. 
+
+> Figure 7: Prompt for Substituting PPL with an LLM-as-judge in Iterative Trace Synthesis.
+
+20 You are a Senior Editorial Judge and Data Curator. Your goal is to evaluate a "Model Output" against a "Standard Answer" (Reference) to determine quality for preference learning. ### Phase 1: Task Classification & Rule Selection Determine if the prompt is a **Mathematical/Logic Task** or a **Creative/Editorial Writing Task**. #### OPTION A: Mathematical & Logic Tasks * **Rule:** Strict Binary Comparison. * **Protocol:** 1. Extract the final result from the Model Output. 2. Normalize both the Model Answer and Standard Answer (remove LaTeX formatting, units, and trailing whitespace). 3. Compare the core numerical value or expression. * **Scoring:** - **1.0 (Match):** The final results are mathematically identical. - **0.0 (Discrepancy):** The values do not align, the calculation is incomplete, or the final answer is missing. #### OPTION B: Creative & Editorial Writing Tasks * **Evaluation Dimensions (Score 0-1):** 1. **Constraint Strictness:** Adherence to word counts, formatting, and persona. 2. **Structural Integrity:** Logical progression without repetitive loops or abrupt endings. 3. **Lexical Sophistication:** Diverse vocabulary; avoidance of AI. 4. **Contextual Utility:** Accurate synthesis of provided background info. —### Input Data 
+
+[Standard Answer] : {reference} [Model Output] : {prediction} 
+
+### Response Format (Strictly Follow) #### 1. Evaluation for Model Output - **Task Type Identified:** [Math / Writing] 
+
+- **Dimensional Scores:** [Score: X/1] (For Math: use binary 0 or 1. For Writing: provide 
+
+[Constraint: X/1, Structure: X/1, Style: X/1, Utility: X/1] )- **Reasoning:** (For Math: Compare the extracted values. For Writing: Focus on differences from the Standard Answer.) - **Model Final Score:** \boxed{} .*(Note: For Math, the final score is the binary result. For Writing, it is the average of the four dimensional scores.)* 
+
+> Figure 8: Prompt for Rubric as rewards.
+
+21

@@ -1,0 +1,437 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-25T22:13:38.128260+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 5,
+    "deep_cap": 6,
+    "deep_selected": 5,
+    "quick_candidates": 6,
+    "quick_skim_target": 11,
+    "quick_selected": 6
+  },
+  "deep_dive": [
+    {
+      "id": "2606.26080v1",
+      "source": "arxiv",
+      "title": "Neglected Free Lunch from Post-training: Progress Advantage for LLM Agents",
+      "abstract": "Process reward models enable fine-grained, step-level evaluation of LLMs, yet building them for agentic settings remains prohibitively difficult: long-horizon interactions, irreversible actions, and stochastic environment feedback make both human annotation and Monte Carlo estimation infeasible at scale. In this work, we show that reinforcement learning (RL) post-training already provides the ingredients for effective step-level scoring, eliminating the need for dedicated reward model training altogether. Concretely, we derive an implicit advantage under a general stochastic Markov decision process, which we term progress advantage -- log-probability ratio between the RL-trained policy and its reference policy exactly recovers the optimal advantage function. This formulation makes the resulting signal annotation-free, domain-agnostic, and available as a byproduct of the standard RL post-training pipeline. We validate the effectiveness of the progress advantage across three different applications: test-time scaling, uncertainty quantification, and failure attribution on five benchmarks and four model families. Across all settings, it consistently outperforms confidence-based baselines and, despite requiring no task-specific training, surpasses dedicated trained reward models. We complement these results with deeper analyses on characteristics of progress advantage, offering practical guidance for adoption in real-world agentic systems.",
+      "authors": [
+        "Changdae Oh",
+        "Wendi Li",
+        "Seongheon Park",
+        "Samuel Yeh",
+        "Tanwi Mallick",
+        "Sharon Li"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-24T17:54:08+00:00",
+      "link": "https://arxiv.org/pdf/2606.26080v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "Eliminates need for reward model by deriving progress advantage from RL policy log-probability ratio",
+      "llm_evidence_cn": "通过RL策略的对数概率比推导出进步优势，无需额外训练奖励模型",
+      "llm_evidence": "通过RL策略的对数概率比推导出进步优势，无需额外训练奖励模型",
+      "canonical_evidence": "通过RL策略的对数概率比推导出进步优势，无需额外训练奖励模型",
+      "llm_tldr_en": "Proposes progress advantage derived from RL policy log-probability ratio as effective step-level scoring for LLM agents, eliminating dedicated reward model training and addressing scalability issues in process reward models.",
+      "llm_tldr_cn": "针对代理场景中过程奖励模型难以构建的问题，该工作发现RL后训练本身已包含步骤级评分所需的信息。通过从RL策略及其参考策略的对数概率比推导出进步优势，无需额外训练奖励模型即可实现有效的步骤级评估。该方法在随机马尔可夫决策过程中具有理论保证，为LLM代理的强化学习训练提供了简洁高效的方案。",
+      "llm_tldr": "针对代理场景中过程奖励模型难以构建的问题，该工作发现RL后训练本身已包含步骤级评分所需的信息。通过从RL策略及其参考策略的对数概率比推导出进步优势，无需额外训练奖励模型即可实现有效的步骤级评估。该方法在随机马尔可夫决策过程中具有理论保证，为LLM代理的强化学习训练提供了简洁高效的方案。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.21121v1",
+      "source": "arxiv",
+      "title": "Answer Engineering: Local Trajectory Editing for Protocol-Constrained Decision Making in Large Language Models",
+      "abstract": "Large language models can produce confident but protocol-invalid answers in domains where procedural compliance is critical. This paper presents Answer Engineering, a deterministic runtime and authoring layer that applies localized rule-guided interventions to the visible reasoning trajectory during standard autoregressive generation, without retraining, modifying model weights, or performing global search. The method is evaluated on a controlled clinical benchmark for sudden sensorineural hearing loss (SSNHL), where correct management depends on protocol-consistent interpretation of symptom timing, Weber/Rinne tuning-fork findings, and otoscopic findings. In the benchmark, step-by-step reasoning shifted rather than eliminated errors: compliant outcomes for SSNHL decreased from 54.5% under unguided generation to 25.1%, while acceptance on the conductive contrast condition increased from 1.6% to 58.9%. Local trajectory editing increased SSNHL compliance to 83.5% and conductive-case adherence to 77.9%, raising balanced accuracy from 42.0% under reasoning-only generation to 80.7%. The results support a systems-level view in which protocol adherence can be improved through auditable runtime control of reasoning trajectories, while also identifying limitations caused by rule coverage, trigger reliability, and persistent diagnosis-first generation dynamics.",
+      "authors": [
+        "Victor Lavrenko",
+        "Anastasiia Molodnitskaia"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-06-19T05:47:44+00:00",
+      "link": "https://arxiv.org/pdf/2606.21121v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "protocol-constrained decision making reduces hallucination",
+      "llm_evidence_cn": "协议约束决策减少幻觉",
+      "llm_evidence": "协议约束决策减少幻觉",
+      "canonical_evidence": "协议约束决策减少幻觉",
+      "llm_tldr_en": "Answer Engineering edits LLM trajectories at runtime to enforce protocol compliance, reducing confident but invalid answers.",
+      "llm_tldr_cn": "大语言模型在需要程序合规的领域可能产生自信但无效的答案。本文提出Answer Engineering，一种在自动回归生成过程中进行局部规则引导干预的方法，无需重训练或修改权重。在临床听力损失基准上，该方法有效提升了协议一致性。该工作为减少LLM幻觉提供了一种轻量级运行时解决方案。",
+      "llm_tldr": "大语言模型在需要程序合规的领域可能产生自信但无效的答案。本文提出Answer Engineering，一种在自动回归生成过程中进行局部规则引导干预的方法，无需重训练或修改权重。在临床听力损失基准上，该方法有效提升了协议一致性。该工作为减少LLM幻觉提供了一种轻量级运行时解决方案。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.25338v1",
+      "source": "arxiv",
+      "title": "Hybrid-IR: Dual-Path Hybrid Retrieval with Iterative Reasoning for Complex Medical Question Answering",
+      "abstract": "Large language models (LLMs) have shown promising performance across a wide range of biomedical applications, including medical question answering (QA), yet they remain prone to hallucinations and outdated knowledge. Although retrieval-augmented generation (RAG) can alleviate this issue by incorporating external documents, there still exist two fundamental limitations. First, medical knowledge is often fragmented across documents, while most RAG methods rely on a single retrieval path, which makes it challenging to jointly preserve fine-grained semantic information and structured global associations. Second, static retrieval strategies are typically insufficient to support deep reasoning that is important in complex medical QA. In this paper, we present a dual-path retrieval framework with an iterative retrieval-reasoning mechanism termed \"Hybrid-IR\" for complex medical QA. The proposed Hybrid-IR integrates graph-based retrieval for exploration of structured knowledge and dense retrieval for fine-grained semantic matching. Moreover, the reasoning trajectory can be progressively refined through an iterative retrieve-reason loop. Experiments on three widely used medical QA benchmarks demonstrate the effectiveness of our Hybrid-IR.",
+      "authors": [
+        "Sheng Wan",
+        "Jiahui Zhang",
+        "Zicheng Zhao",
+        "Shougang Ren"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-06-24T03:09:50+00:00",
+      "link": "https://arxiv.org/pdf/2606.25338v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Addresses LLM hallucination in medical QA via dual-path hybrid retrieval and iterative reasoning",
+      "llm_evidence_cn": "针对医学问答中的LLM幻觉问题，提出双路径混合检索与迭代推理方法",
+      "llm_evidence": "针对医学问答中的LLM幻觉问题，提出双路径混合检索与迭代推理方法",
+      "canonical_evidence": "针对医学问答中的LLM幻觉问题，提出双路径混合检索与迭代推理方法",
+      "llm_tldr_en": "Proposes Hybrid-IR with dual-path retrieval (semantic and structured) and iterative reasoning to reduce hallucinations in medical question answering, outperforming standard RAG methods.",
+      "llm_tldr_cn": "针对大型语言模型在医学问答中容易产生幻觉和依赖过时知识的问题，本文提出混合检索增强生成框架Hybrid-IR。该框架采用双路径检索策略，同时保留细粒度语义信息和结构化全局关联，并通过迭代推理机制支持深度理解。在复杂医学问答任务上，Hybrid-IR有效减少了幻觉，提升了回答的准确性和可靠性。",
+      "llm_tldr": "针对大型语言模型在医学问答中容易产生幻觉和依赖过时知识的问题，本文提出混合检索增强生成框架Hybrid-IR。该框架采用双路径检索策略，同时保留细粒度语义信息和结构化全局关联，并通过迭代推理机制支持深度理解。在复杂医学问答任务上，Hybrid-IR有效减少了幻觉，提升了回答的准确性和可靠性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.25757v1",
+      "source": "arxiv",
+      "title": "OPERA: Aligning Open-Ended Reasoning via Objective Perplexity-based Reinforcement Learning",
+      "abstract": "Reinforcement Learning (RL) has enabled LLMs to excel in objective reasoning tasks such as mathematics and code generation. However, applying RL to open-ended tasks, such as creative writing, remains challenging because LLM-as-a-judge reward models often exhibit stylistic biases and positional inconsistencies, leading to unstable supervision. To address this, we propose OPERA (Objective Perplexity-based Reflective Alignment), which replaces unreliable external judges with intrinsic rewards derived from perplexity dynamics. Specifically, we derive an intrinsic reward signal from perplexity dynamics, quantifying uncertainty reduction at critical reflective states. During the cold-start phase, we introduce a data synthesis method that leverages carefully designed guiding words to generate diverse reasoning traces, along with perplexity-prioritized rollouts that utilize internal log-probabilities to identify logically consistent reasoning branches. This pipeline yields a large-scale dataset comprising 20,000 high-quality reasoning trajectories. Empirical evaluations consistently demonstrate the scalability and efficacy of our approach in alignment for open-ended tasks. Implementing OPERA on Qwen3-8B establishes a new state-of-the-art among open-source models, achieving parity with or surpassing proprietary models like Gemini2.5 and MiniMax-M2.5 in some open-ended tasks. The code is available at https://github.com/pangpang-xuan/OPERA.",
+      "authors": [
+        "Wenxuan Jiang",
+        "Zining Fan",
+        "Zijian Zhang",
+        "Xuecheng Wu",
+        "Hongming Tan",
+        "Haoyang Dai",
+        "Xiaoyu Li",
+        "Xuezhi Cao",
+        "Ninghao Liu"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-06-24T12:31:14+00:00",
+      "link": "https://arxiv.org/pdf/2606.25757v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "intrinsic reward from perplexity for open-ended RL alignment",
+      "llm_evidence_cn": "基于困惑度的内在奖励用于开放推理RL对齐",
+      "llm_evidence": "基于困惑度的内在奖励用于开放推理RL对齐",
+      "canonical_evidence": "基于困惑度的内在奖励用于开放推理RL对齐",
+      "llm_tldr_en": "OPERA replaces unreliable external reward models with intrinsic rewards derived from perplexity dynamics, enabling stable RL alignment for open-ended LLM tasks.",
+      "llm_tldr_cn": "本文提出OPERA方法，针对开放推理任务中LLM作为裁判的奖励模型存在偏差和不一致的问题，利用困惑度动态推导内在奖励。通过量化反思状态的不确定性降低，提供稳定监督。冷启动阶段还引入数据合成方法。实验表明在创造性写作等任务中取得更好对齐效果。",
+      "llm_tldr": "本文提出OPERA方法，针对开放推理任务中LLM作为裁判的奖励模型存在偏差和不一致的问题，利用困惑度动态推导内在奖励。通过量化反思状态的不确定性降低，提供稳定监督。冷启动阶段还引入数据合成方法。实验表明在创造性写作等任务中取得更好对齐效果。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.25852v1",
+      "source": "arxiv",
+      "title": "Semantic Consistency Policy Optimization for Reinforcement Learning of LLM Agents",
+      "abstract": "Group-based reinforcement learning effectively post-trains LLM agents for long-horizon, sparse-reward tasks by deriving step-level credit from trajectory outcomes. However, this ties a step's credit to its rollout's final outcome: semantically near-identical intermediate steps receive opposite credit depending on whether their trajectory eventually succeeded or failed. Such semantic credit inconsistency sends conflicting gradients to similar actions and wastes the partially-correct progress inside failed rollouts. Motivated by this, we propose Semantic Consistency Policy Optimization (SCPO), a value-free reward-shaping method that mitigates this inconsistency by recovering step-level credit from successful siblings in the same rollout group. Concretely, SCPO scores each failed step against a successful sibling and adds positive step-level credit for new progress along that sibling. On ALFWorld and WebShop, SCPO matches or exceeds strong group-based baselines, reaching 93.7+/-4.1 percent success on ALFWorld and 74.8+/-2.0 percent on WebShop at 1.5B parameters, with gains concentrated on the hardest multi-step tasks.",
+      "authors": [
+        "Peng Xu",
+        "Sijia Chen",
+        "Junzhuo Li",
+        "Xuming Hu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-24T14:02:13+00:00",
+      "link": "https://arxiv.org/pdf/2606.25852v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "reward shaping for semantic consistency in LLM RL",
+      "llm_evidence_cn": "LLM强化学习中的语义一致性奖励塑造",
+      "llm_evidence": "LLM强化学习中的语义一致性奖励塑造",
+      "canonical_evidence": "LLM强化学习中的语义一致性奖励塑造",
+      "llm_tldr_en": "SCPO mitigates semantic credit inconsistency in group-based RL for LLM agents by recovering step-level credit from successful siblings, improving learning efficiency.",
+      "llm_tldr_cn": "本文针对组基强化学习中语义一致的中步因最终结果不同而获得相反信用的问题，提出SCPO方法。该方法通过从同组成功轨迹中恢复步级信用，对部分正确的失败轨迹给予合理奖励。实验表明SCPO提升了长程稀疏奖励任务的性能，无需额外价值函数。",
+      "llm_tldr": "本文针对组基强化学习中语义一致的中步因最终结果不同而获得相反信用的问题，提出SCPO方法。该方法通过从同组成功轨迹中恢复步级信用，对部分正确的失败轨迹给予合理奖励。实验表明SCPO提升了长程稀疏奖励任务的性能，无需额外价值函数。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.25398v1",
+      "source": "arxiv",
+      "title": "MAPL: Multi-Objective Preference Learning for Robot Locomotion",
+      "abstract": "Reward design remains a major bottleneck in reinforcement learning for robot locomotion, where successful policies often depend on carefully tuned, task-specific reward functions. Preference-based reinforcement learning offers an alternative, but existing LLM-based methods typically ask for a single overall judgment between behaviors, making it difficult to capture the multiple competing objectives that underlie high-quality locomotion. We present Multi-Objective AI-Informed Preference Learning (MAPL), a framework that learns locomotion rewards from high-level natural language objectives rather than manually engineered reward equations. MAPL prompts a large language model to compare trajectories independently along semantically meaningful criteria, using generic language descriptions that are terrain-invariant and require little domain expertise. These objective-wise preferences are used to train a multi-head preference scoring model, whose outputs are aggregated to form a scalar reward for policy optimization. Across four quadruped locomotion environments, MAPL trains policies using only LLM-generated preferences and achieves performance comparable to or better than expert-designed rewards, while eliminating task-specific reward engineering.",
+      "authors": [
+        "Xiyue Chen",
+        "Muhan Lin",
+        "Shuyang Shi",
+        "Joseph Campbell"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-06-24T04:52:04+00:00",
+      "link": "https://arxiv.org/pdf/2606.25398v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "multi-objective preference learning using LLM",
+      "llm_evidence_cn": "利用大语言模型进行多目标偏好学习",
+      "llm_evidence": "利用大语言模型进行多目标偏好学习",
+      "canonical_evidence": "利用大语言模型进行多目标偏好学习",
+      "llm_tldr_en": "MAPL learns locomotion rewards from natural language objectives using LLM to compare trajectories along multiple criteria, avoiding manual reward engineering. Demonstrates effective reward learning from preferences.",
+      "llm_tldr_cn": "为了解决机器人强化学习中奖励设计瓶颈，本文提出MAPL框架，通过大语言模型根据自然语言目标对轨迹进行多准则比较，来学习奖励函数。该方法无需手动设计奖励方程，能够捕获多种竞争性目标。实验表明在机器人运动任务上取得了有效结果。",
+      "llm_tldr": "为了解决机器人强化学习中奖励设计瓶颈，本文提出MAPL框架，通过大语言模型根据自然语言目标对轨迹进行多准则比较，来学习奖励函数。该方法无需手动设计奖励方程，能够捕获多种竞争性目标。实验表明在机器人运动任务上取得了有效结果。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.21378v1",
+      "source": "arxiv",
+      "title": "Enhancing Creativity in 3D Generative Design via a TRIZ-Inspired Text-to-CAD Framework",
+      "abstract": "Recent advances in large language models (LLMs) have demonstrated significant potential in supporting engineering design tasks, including computer-aided design (CAD) automation. However, most existing LLM-based 3D CAD generation approaches primarily focus on geometric precision and instruction-following performance, often overlooking the fundamental aspect of creative design exploration. This study presents a TRIZ-inspired text-to-CAD framework that leverages LLMs to generate high-quality, editable CAD models while systematically exploring creative design alternatives. The framework integrates the Theory of Inventive Problem Solving (TRIZ)-embedding deep human insights from extensive patent records-into LLM prompting strategies, enabling autonomous generation of innovative CAD variants that address technical contradictions. Through a comprehensive three-stage pipeline of design generation, enhancement, and optimization, the framework produces structurally diverse CAD models from well-crafted prompts. The present study implements and evaluates the first two stages, while positioning the design optimization stage as future work. A product design case study (chair) demonstrates that the TRIZ-inspired text-to-CAD framework generates multiple creative design alternatives by systematically applying TRIZ inventive principles such as segmentation, anti-weight, dynamics, and composite materials, achieving 4.0-14.7% mass reduction across all enhanced designs while maintaining structural integrity. The key findings suggest that integrating systematic innovation methodologies with LLM-based 3D CAD generation bridges the gap between precision-focused synthesis and creativity-focused exploration, advancing toward autonomous design systems where AI makes design decisions independently, supporting human decision-making in human-AI collaborative design for engineering applications.",
+      "authors": [
+        "Dongeon Lee",
+        "Leekyo Jeong",
+        "Soyoung Yoo",
+        "Sunwoong Yang",
+        "Namwoo Kang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-19T12:35:10+00:00",
+      "link": "https://arxiv.org/pdf/2606.21378v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "TRIZ-inspired creativity innovation for LLM-based CAD generation",
+      "llm_evidence_cn": "TRIZ启发的LLM驱动CAD生成创造力创新",
+      "llm_evidence": "TRIZ启发的LLM驱动CAD生成创造力创新",
+      "canonical_evidence": "TRIZ启发的LLM驱动CAD生成创造力创新",
+      "llm_tldr_en": "TRIZ-inspired framework leverages LLMs to generate creative 3D CAD models by embedding patent insights into prompts.",
+      "llm_tldr_cn": "现有LLM驱动的CAD生成主要关注几何精度而忽略创造力。本文提出TRIZ启发的文本到CAD框架，将发明问题解决理论中的深层人类洞察嵌入LLM提示策略，从而系统探索创造性设计方案。该方法生成高质量可编辑模型的同时增强创造力。",
+      "llm_tldr": "现有LLM驱动的CAD生成主要关注几何精度而忽略创造力。本文提出TRIZ启发的文本到CAD框架，将发明问题解决理论中的深层人类洞察嵌入LLM提示策略，从而系统探索创造性设计方案。该方法生成高质量可编辑模型的同时增强创造力。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "innovation",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-06-10-731380-v1",
+      "source": "biorxiv",
+      "title": "biomeStat: Using Agentic AI for Scalable Genomic Epidemiology Demonstrated Through End-to-End Analysis of 1,000 Asian Dengue Virus Genomes",
+      "abstract": "Genomic epidemiology workflows typically require expert curation of multiple specialized tools, extensive manual parameter tuning, and access to heterogeneous compute infrastructure. While standard generative AI models often hallucinate in complex biological domains, we introduce biomeStat: an autonomous AI agent that functions as a strict deterministic orchestrator. By automatically writing code to execute established bioinformatics tools in sandboxed environments, biomeStat dynamically provisions compute resources (CPU and GPU) and guarantees reproducibility, making it immediately useful for scientists without requiring command-line expertise.\n\nTo demonstrate the platform, we performed a fully autonomous genomic epidemiology and structural analysis of 1,000 Dengue virus (DENV) genomes sampled from 16 Asian countries between 2000 and 2025. The agent seamlessly orchestrated phylogenetic reconstruction (IQ-TREE, TreeTime), Bayesian phylodynamics (BEAST2 via NVIDIA H200 GPU), selection pressure analysis (HyPhy), and structural mapping (PyMOL). The analysis was completed in under 24 hours of wall-clock time, revealing endemic stability (R_e [~]1.0) and identifying 1,869 candidate immune escape sites structurally colocalized with B-cell and T-cell epitopes. Furthermore, the agent validated 176 highly conserved drug target residues across the viral replication complex, confirming that resistance-associated positions for emerging antivirals JNJ-1802 and NITD-688 remain absolutely conserved across all four serotypes. By bridging the gap between natural language intent and deterministic computational execution, biomeStat reduces weeks of expert effort into a single-session analysis with full methodological transparency.",
+      "authors": [
+        "Ariyaratne, D.",
+        "Somaratna, N.",
+        "Malavige, G. N."
+      ],
+      "primary_category": "bioinformatics",
+      "categories": [
+        "bioinformatics"
+      ],
+      "published": "2026-06-23T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.06.10.731380v1.full.pdf",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "addresses hallucination in generative AI for biological domains via deterministic orchestration",
+      "llm_evidence_cn": "通过确定性编排解决生物领域生成AI的幻觉问题",
+      "llm_evidence": "通过确定性编排解决生物领域生成AI的幻觉问题",
+      "canonical_evidence": "通过确定性编排解决生物领域生成AI的幻觉问题",
+      "llm_tldr_en": "Introduces biomeStat, an autonomous AI agent that replaces generative model hallucination with strict deterministic orchestration by writing code to execute established tools, ensuring reproducibility and scalability for genomic epidemiology.",
+      "llm_tldr_cn": "生成式AI在复杂生物领域常出现幻觉，限制了其在基因组流行病学中的应用。biomeStat通过自动编写代码执行已验证的生物信息学工具，以确定性编排器替代生成模型，从而完全消除幻觉。在1000个登革热病毒基因组分析中展示了其可扩展性和可重复性。",
+      "llm_tldr": "生成式AI在复杂生物领域常出现幻觉，限制了其在基因组流行病学中的应用。biomeStat通过自动编写代码执行已验证的生物信息学工具，以确定性编排器替代生成模型，从而完全消除幻觉。在1000个登革热病毒基因组分析中展示了其可扩展性和可重复性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.22236v1",
+      "source": "arxiv",
+      "title": "The generalized quantifiers of natural language are predicatively definable",
+      "abstract": "This paper studies the definability of natural language generalized quantifiers. The semantics of generalized quantifiers are provided by a collection of subsets of the underlying domain. However, the generalized quantifiers appearing in natural language are definable either by first-order quantification or by cardinality notions. This paper provides an explanation for this observed phenomenon. The explanation is that the famous constraints of domain independence and conservativity, when extended to Henkin models, suffice to ensure low-level definability, namely $Δ^1_1$-definability or at least $Σ^1_1$-definability; and in most cases this definability can be made to be bounded. This is basically a consequence of Feferman's Preservation Theorem, which Marker has provided a short model-theoretic proof of. Further, we verify that the paradigmatic cardinality quantifiers are indeed $Δ^1_1$-definable for a reasonable choice of background theory. Finally, in many other cases, we show that this definability can be lowered to first-order definability.",
+      "authors": [
+        "Sean Walsh"
+      ],
+      "primary_category": "math.LO",
+      "categories": [
+        "math.LO"
+      ],
+      "published": "2026-06-20T21:36:12+00:00",
+      "link": "https://arxiv.org/pdf/2606.22236v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "mathematical formulation of definability of generalized quantifiers",
+      "llm_evidence_cn": "广义量词可定义性的数学公式化",
+      "llm_evidence": "广义量词可定义性的数学公式化",
+      "canonical_evidence": "广义量词可定义性的数学公式化",
+      "llm_tldr_en": "Proves that natural language generalized quantifiers are predicatively definable in Henkin models using domain independence and conservativity constraints, a result in mathematical logic.",
+      "llm_tldr_cn": "自然语言广义量词的语义通常用子集族表示，但其可定义性长期以来未得到满意解释。本文证明，在Henkin模型中，领域独立性和守恒性约束足以保证量词在低层次（Δ1_1或Σ1_1）可定义，这是基于Feferman守恒定理的结论。该工作为自然语言语义的数学基础提供了新见解。",
+      "llm_tldr": "自然语言广义量词的语义通常用子集族表示，但其可定义性长期以来未得到满意解释。本文证明，在Henkin模型中，领域独立性和守恒性约束足以保证量词在低层次（Δ1_1或Σ1_1）可定义，这是基于Feferman守恒定理的结论。该工作为自然语言语义的数学基础提供了新见解。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "math formulation",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.22807v1",
+      "source": "arxiv",
+      "title": "KaLM-Reranker-V1: Fast but Not Late Interaction for Compressed Document Reranking",
+      "abstract": "As retrieval systems scale, high-quality reranking becomes increasingly important. However, most existing rerankers, whether encoder-based or decoder-based, jointly encode the query and passage, tightly coupling their computation and limiting deployment efficiency as well as flexibility. We present KaLM-Reranker-V1, a fast but not late-interaction (FBNL) reranker that decouples query and passage computation while retaining expressive relevance modeling. Built on an encoder-decoder architecture, KaLM-Reranker-V1 uses the encoder to pre-encode passages with Matryoshka embedding pooling, while the decoder models the system instruction, user instruction, and query intent; cross-attention then captures relevance between the query context and passage representations. This design makes KaLM-Reranker-V1 efficient through decoupled passage encoding, yet not late interaction, by preserving rich relevance modeling through cross-attention. We instantiate KaLM-Reranker-V1 in three sizes, Nano, Small, and Large, with 0.27B, 1B, and 4B activated parameters, respectively. Extensive experiments on BEIR, MIRACL, and LMEB demonstrate that KaLM-Reranker-V1 achieves strong reranking performance with superior efficiency. On BEIR, KaLM-Reranker-V1 achieves state-of-the-art performance, on par with strong industrial models such as the Qwen3-Reranker series; on MIRACL, despite not being extensively trained on multilingual data, KaLM-Reranker-V1 still shows excellent reranking performance. Moreover, on LMEB, reranking models demonstrate a clear advantage, with even the 0.27B Nano model remaining competitive with 7-12B embedding models.",
+      "authors": [
+        "Xinping Zhao",
+        "Jiaxin Xu",
+        "Ziqi Dai",
+        "Xin Zhang",
+        "Shouzheng Huang",
+        "Danyu Tang",
+        "Xinshuo Hu",
+        "Meishan Zhang",
+        "Baotian Hu",
+        "Min Zhang"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-06-22T03:36:31+00:00",
+      "link": "https://arxiv.org/pdf/2606.22807v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "novel reranking architecture decoupling query and passage computation",
+      "llm_evidence_cn": "解耦查询和段落计算的新型重排序架构",
+      "llm_evidence": "解耦查询和段落计算的新型重排序架构",
+      "canonical_evidence": "解耦查询和段落计算的新型重排序架构",
+      "llm_tldr_en": "Proposes KaLM-Reranker-V1, a fast but not late-interaction reranker that pre-encodes passages with Matryoshka embedding and models query intent in decoder, improving efficiency while maintaining relevance.",
+      "llm_tldr_cn": "现有重排序器耦合查询和段落计算，限制了部署效率。本文提出KaLM-Reranker-V1，采用编码器-解码器架构，编码器预编码段落并池化，解码器建模查询意图，通过交叉注意力计算相关性。实验表明其在效率与精度之间取得了更好平衡，适合大规模检索系统。",
+      "llm_tldr": "现有重排序器耦合查询和段落计算，限制了部署效率。本文提出KaLM-Reranker-V1，采用编码器-解码器架构，编码器预编码段落并池化，解码器建模查询意图，通过交叉注意力计算相关性。实验表明其在效率与精度之间取得了更好平衡，适合大规模检索系统。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.25249v1",
+      "source": "arxiv",
+      "title": "Adaptive Re-Ranking",
+      "abstract": "Modern Information Retrieval (IR) systems typically use a \"retrieve-then-rerank\" pipeline, where a computationally expensive, pre-determined cross-encoder re-ranks the top results from a fast initial retriever. While effective, this approach often applies heavy re-ranking models regardless of query complexity, resulting in high latency and wasted computational resources on simple queries. We propose Adaptive Re-Ranking, an utility-based labeling framework for cost-aware routing and present empirical evidence (via oracle analysis and a trained baseline router) that per-query routing offers large potential gains but is non-trivial to learn from limited supervision. We train a routing classifier with 3 strategies: sparse retrieval (BM25), dense re-ranking (MiniLM-L6-v2), and heavy neural re-ranking (BGE-v2-m3). Compared to BGE our method achieves 1.15-53x lower median latency and 1.11-5.22x lower mean latency across all datasets we have tested, while delivering -17.5% to +4.0% nDCG@10, which is competitive in some datasets. Our findings show that routing queries based on our novel utility function offers a scalable solution for reducing computational costs and latency in a variety of IR systems.",
+      "authors": [
+        "Ata Cinar Genc",
+        "Emir Kaan Korukluoglu",
+        "James Allan"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR"
+      ],
+      "published": "2026-06-24T00:12:44+00:00",
+      "link": "https://arxiv.org/pdf/2606.25249v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "adaptive routing algorithm for retrieval",
+      "llm_evidence_cn": "适应性路由算法用于检索重排序",
+      "llm_evidence": "适应性路由算法用于检索重排序",
+      "canonical_evidence": "适应性路由算法用于检索重排序",
+      "llm_tldr_en": "Proposes Adaptive Re-Ranking, a cost-aware routing framework that selects between sparse retrieval, dense reranking, and heavy neural reranking per query, improving efficiency.",
+      "llm_tldr_cn": "现代信息检索系统通常对所有查询统一使用昂贵的重排序模型，造成资源浪费。本文提出适应性重排序框架，根据查询复杂度动态选择稀疏检索、密集重排序或深度神经网络重排序，从而在保持精度的同时大幅降低延迟。通过oracle分析和训练的路由分类器，验证了每查询路由的潜力，但学习难度较大。",
+      "llm_tldr": "现代信息检索系统通常对所有查询统一使用昂贵的重排序模型，造成资源浪费。本文提出适应性重排序框架，根据查询复杂度动态选择稀疏检索、密集重排序或深度神经网络重排序，从而在保持精度的同时大幅降低延迟。通过oracle分析和训练的路由分类器，验证了每查询路由的潜力，但学习难度较大。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

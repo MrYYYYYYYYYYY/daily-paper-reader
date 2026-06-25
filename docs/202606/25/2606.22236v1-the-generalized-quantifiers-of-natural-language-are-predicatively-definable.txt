@@ -1,0 +1,1445 @@
+Title: The generalized quantifiers of natural language are predicatively definable
+
+URL Source: https://arxiv.org/pdf/2606.22236v1
+
+Published Time: Tue, 23 Jun 2026 01:53:17 GMT
+
+Number of Pages: 45
+
+Markdown Content:
+THE GENERALIZED QUANTIFIERS OF NATURAL LANGUAGE ARE PREDICATIVELY DEFINABLE 
+
+SEAN WALSH 
+
+Abstract. This paper studies the definability of natural language generalized quantifiers. The semantics of generalized quantifiers are provided by a collec-tion of subsets of the underlying domain. However, the generalized quantifiers appearing in natural language are definable either by first-order quantification or by cardinality notions. This paper provides an explanation for this observed phenomenon. The explanation is that the famous constraints of domain in-dependence and conservativity, when extended to Henkin models, suffice to ensure low-level definability, namely ∆ 11-definability or at least Σ 11-definability; and in most cases this definability can be made to be bounded. This is ba-sically a consequence of Feferman’s Preservation Theorem [14], which Marker [44] has provided a short model-theoretic proof of. Further, we verify that the paradigmatic cardinality quantifiers are indeed ∆ 11-definable for a reasonable choice of background theory. Finally, in many other cases, we show that this definability can be lowered to first-order definability. 
+
+Contents 
+
+1. Introduction 22. Henkin models of second-order logic and its subsystems 33. Generalized quantifiers: definition and examples 64. Substructures and Henkin domain independence 85. Henkin conservativity 10 6. The disjunctive examples 11 7. Definability, bounded definability, and absoluteness 12 8. Statement of main results 16 9. Applications to explanatory projects in formal semantics 18 10. Motivations for semantic constraints extend to Henkin models 20 11. Lowering to first-order definability 22 12. Quantifiers defined in terms of cardinality 23 13. Applications to upper bounds on complexity 24 14. Proofs of Theorem 7.7, Theorem 7.8 26 15. Henkin models and faithfulness 27 16. Proof of Theorems 8.1, 8.3 30 17. Proof of Theorems 11.2-11.3 35 18. Proof of Theorem 12.1 39 19. Further Questions 42 Acknowledgments and funding 43 Acknowledgments 43 Funding 43 References 43  
+
+> 1
+> arXiv:2606.22236v1 [math.LO] 20 Jun 2026 2SEAN WALSH
+
+1. Introduction 
+
+Generalized quantifiers are a major topic of study at the intersection of seman-tics and logic. 1 Linguists have isolated several semantic constraints, like domain independence and conservativity, which appear to hold of all generalized quanti-fiers which appear in natural language. This paper shows that these constraints, when extended to Henkin models, have deep consequences for how difficult it is to define these quantifiers: namely, these constraints require that the quantifiers are ∆11-definable, or in some limiting cases Σ 11-definable; and further in many cases this definability can be made to be bounded (see Theorems 8.1, 8.3, 11.2, 11.3 below). As we will see, this is basically a consequence of Feferman’s Preservation Theorem, 2
+
+which Marker has provided a short model-theoretic proof of. 3
+
+This is important because if one accepts these semantic constraints of domain independence and conservativity and their extensions to Henkin models, then these Theorems entail that natural language quantifiers are low-level definable, and this explains why so few of the theoretically possible options for generalized quantifiers are realized in natural language, and why they all seem to expressible with simple combinations of first-order existential quantifiers, first-order universal quantifiers, and cardinality notions. Or, if one takes the task to be to explain both (i) the semantic constraints of domain independence and conservativity, and (ii) why so few of the theoretically possible options for generalized quantifiers are realized in natural language, then this paper is important because it shows that a solution to (i) provides a solution to (ii), once one extends to Henkin models. Finally, the results of this paper are important because on finite models, low-level second-order definability is highly correlated with grades of infeasibility by Fagin’s Theorem; there is a similar lesson for Borel sets from Souslin’s Theorem, the setting of much ordinary infinitary mathematics (cf. Corollary 13.1). Hence the mathematical theorems in this paper isolate upper bounds on the complexity of natural language quantifiers under two natural measures of complexity. This forms a natural complement to empirical work which tries to assay more precisely the extent of the feasibility and learnability of natural language quantifiers. 4
+
+There are two more minor reasons why these results are important. First, they suggests a certain moderation is in order when discussing the significance of non-first-definability of some generalized quantifiers. To be sure, this is important, and no doubt was more important in earlier periods when first-order logic occupied a more dominant place in philosophical and logical theorizing. But the theorems tells us that the definability is to be had at the immediate next stage beyond first-order logic. Second, the theorems lends plausibility to the idea that approaches to formal  
+
+> 1The standard references are Keenan-Westerst˚ ahl [41], Westerst˚ ahl [65], Peters-Westerst˚ ahl [50], and Szabolcsi [57]. See these references for more of the history, but much of the work orig-inated in Barwise-Cooper [5] and Keenan-Stavi [40]. Generalized quantifiers were studied earlier in mathematical logic by Mostowski [48]; see Feferman-Barwise [6] for more on this tradition.
+> 2[14]. As Feferman discusses [14, 32], his results generalized the earlier-announced results [17] which were joint with Kreisel.
+> 3[44].
+> 4[31], [58], [55]. NATURAL LANGUAGE QUANTIFIERS ARE PREDICATIVELY DEFINABLE 3
+
+semantics are possible even in the absence of full comprehension. 5 ,6 For, at least in introductory treatments of formal semantics, the only items in the lexicon whose logical forms have any logical complexity are the generalized quantifiers. 7 The main Theorems 8.1, 8.3, 11.2, 11.3 tell us that the amount of comprehension we need for the generalized quantifiers is limited. This paper is organized as follows. In §2 we introduce Henkin models and nota-tion for them. In §3 we define generalized quantifiers in a way that applies to Henkin models and recall some paradigmatic examples of generalized quantifiers. In §§ 4-5 we describe how to define domain independence and conservativity so that they apply to Henkin models. In §6 we describe some disjunctive examples which are ruled out by domain independence. In §7, we formalize our predicative definabil-ity and bounded definability notions and state some basic results on absoluteness of these definitions (Theorem 7.7, Theorem 7.8). In §8 we state our two main Theorems (Theorems 8.1, 8.3). In §9 we discuss the significance of our results for explanatory projects in formal semantics. In §10 we argue that the motivations for domain independence and conservativity extend from standard models to Henkin models. In §11 we describe how sometimes first-order definability rather than ∆ 11-definability can be achieved, and we state Theorems 11.2, 11.3. In §12 we identify a background theory which is apt to handle quantifiers whose truth-conditions are given by recourse to cardinality notions (cf. Theorem 12.1). In §13 we discuss the aforementioned applications to computational complexity and descriptive set theory and note how Corollary 13.1 follows immediately from Theorem 8.1. The remainder of the paper is more technical and in §§ 14-18 we turn to the detailed work of proving the theorems. Namely, in §14 we prove Theorem 7.7 and Theorem 7.8. In §15 we introduce Marker’s notion of faithful embeddings and relate this to Henkin models as well as to the models we get out of the Compactness Theorem. In §16 we prove Theorems 8.1, 8.3, in §17 we prove Theorems 11.2-11.3, and in §18 we prove Theorem 12.1. Finally, in §19 we remark on a few directions for further research. 2. Henkin models of second-order logic and its subsystems 
+
+We work with Henkin models of second-order logic and its subsystems. These are an important class of models since the Completeness Theorem holds for them and their validity relation is recursively enumerable. 8 In this section, we introduce notation for Henkin models. 9 Readers familiar with second-order logic may safely skip this section and come back to it as needed.     
+
+> 5See (2.1) for a formal statement of the comprehension schema. Intuitively it says that formulas with free first-order variables determine second-order entities.
+> 6The paper [64] sets out a predicative intensional theory of types on which one could build such an approach.
+> 7This is so at least for the lexicon used in [21, Chapter 6]. It is not presently clear to me whether this holds more generally. This paper grew out of an attempt to understand whether the lexicon in [21, Chapter 6] had denotations in the models studied in [64]. The first question in §19 records that, in this, I have at best met with partial success.
+> 8See any treatment of second-order logic, such as [43], [13].
+> 9While the main results of this paper are all explicable using Henkin models, the proofs of these results require fluidity in moving back and forth between Henkin models and a more general class of models, which we review in §15. 4SEAN WALSH
+
+Henkin models have the form A = ( A, S 1[A], S 2[A], . . . ) where A is a non-empty set and Sn[A] is a non-empty collection of subsets of the n-th Cartesian product 
+
+An of A. The idea is that A is the first-order domain and that Sn[A] is the domain reserved for the n-ary second-order entities. The membership relation is stipulated to be interpreted absolutely, i.e. A | = Ra iff a is in R, for an element R of Sn[A] and an n-tuple a = ( a1, . . . , a n) from An. A Henkin model A = ( A, S 1[A], S 2[A], . . . ) is 
+
+standard if for all n ≥ 1 one has Sn[A] = P (An), i.e. the interpretation Sn[A] of the range of quantifiers over n-ary relation is the full powerset of the n-th Carte-sian product An of the underlying first-order domain A, as judged by the ambient metatheory. The standard models satisfy all instances of the following comprehen-sion schema :
+
+∃ R ∀ x (Rx ↔ φ(x)) (2.1) wherein φ(x1, . . . , x n) has free first-order variables x1, . . . , x n, along with perhaps other free variables (called parameters ), and wherein the n-ary second-order variable 
+
+R does not appear free in φ(x1, . . . , x n). Some minimal set-theoretic apparatus is available in any Henkin model A which satisfies the comprehension schema (2.1) for formulas φ which do not contain second-order quantifiers. First, Sn[A] is a Boolean algebra using the obvious for-mulas: e.g. treating X, Y in S1[A] as parameters and using the formula Xx ∧ Y x ,we have a Z such that: for all x in A, one has Zx iff Xx ∧ Y x ; and we write this as 
+
+Z = X ∩ Y . We likewise freely use the operations X ∪ Y, X \ Y, X × Y, X n with their usual meaning in the object-language, and for each n ≥ 1 we use ∅ for the empty 
+
+n-ary relation (and let context determine which n ≥ 1 is intended). To sometimes avoid having to display arities, if R is n-ary and X is unary, we stipulate 
+
+R ∩ X := R ∩ Xn (2.2) To this we add the projection functions: for n-ary R and 1 ≤ i ≤ n we have: 
+
+πiR = {xi : ∃ x1, . . . , x i−1, x i+1 , . . . , x n R(x1, . . . , x i−1, x i, x i+1 , . . . , x n)} (2.3) as well as the field U R = Sni=1 πiR of the n-ary relation R, where the scripted U
+
+is a mnemonic for ‘union.’ We similarly define, for a tuple R = ( R1, . . . , R m), the union of its fields U R = Smj=1 U Rj . Further, for each ( n + m)-ary R and tuple 
+
+x of length n, we have the function ( R, x ) 7 → R[x] given by R[x] := {y : Rx y }.10 
+
+In addition to these operations, we use the subset relation R ⊆ R′ with its usual meaning. A further aspect of this minimal set theoretic apparatus is that it is absolute between Henkin models and the metatheory and hence also between two Henkin models, a theme to which we will return to in §7. 
+
+Proposition 2.1. (Absoluteness of minimal set theoretic apparatus). Suppose that A is a Henkin model which satisfies the Comprehension Schema (2.1) for all formulas with no second-order quantifiers. Suppose that X, Y, Z are in S1[A]. Then one has X ⊆ Y iff A | = X ⊆ Y , and one has X ∩ Y = Z iff A | = X ∩ Y = Z.The same result holds for Sn[A] for n > 1 and for the operations X ∪ Y , X \ Y ,
+
+X × Y , Xn, πiR, U R, and R[x]. 
+
+Proof. For subset, we argue as follows:    
+
+> 10 This is used in the definition of the theory Σ11-AC −
+> 0. See (2.6) below. NATURAL LANGUAGE QUANTIFIERS ARE PREDICATIVELY DEFINABLE 5
+
+– First suppose X ⊆ Y . Then for all x, if x in X, then x in Y . Then for all x in 
+
+A, if x in X, then x in Y . Then A | = X ⊆ Y .– Second suppose A | = X ⊆ Y . Then for all x in A, if x in X, then x in Y . Since 
+
+X is a subset of A, this implies X ⊆ Y .For intersection, we argue as follows: – First suppose that X ∩ Y = Z. Then for all x: x is in both X, Y iff x in Z. Then for all x in A: x is in both X, Y iff x in Z. Then A | = X ∩ Y = Z.– Second suppose A | = X ∩ Y = Z. Then for all x in A: x is in both X, Y iff x in 
+
+Z. Since X, Y, Z are subsets of A, we have that for all x: x is in both X, Y iff x
+
+in Z. Then X ∩ Y = Z.The proofs for n > 1 and the other operations listed are similar. □
+
+Due to their absoluteness and their definability in systems which have compre-hension for formulas without second-order quantifiers, we may regard ourselves as working in a definitional expansion of second-order logic which has constant, rela-tion, and function symbols for all this minimal set-theoretic apparatus, namely: ∅,
+
+X ⊆ Y , X ∩ Y , X ∪ Y , X \ Y , X × Y , Xn, πiR, U R, and R[x]. However, occasionally we avail ourselves of non-absolute definitions. For in-stance, we occasionally use V := {x : x = x} as an abbreviation for the universal unary relation. Likewise, we sometimes use Y c := V \ Y as an abbreviation for the relative complement of Y . But since these are not absolute, we do not add constants and function symbols for these and regard them as mere abbreviations. As in other areas, it is convenient to allow constant symbols, both for individuals and for n-ary relations. As usual, what constant symbols are available in a given context is specified by the signature. For instance, in a setting where one wants names for individuals, one works in a signature with constants c, d, . . . , and any model A in this signature comes equipped with interpretations cA, d A, . . . from A.Likewise, in a setting where one wants named binary relations for e.g. orders or graphs of functions, one simply works in a signature with binary relation symbols 
+
+⪯, g, . . . on individuals, and any model A in this signature comes equipped with interpretations ⪯A, g A which are subsets of A2. And similarly for n-ary relations for values besides n = 2. Since we always work with at least comprehension for formulas with no second-order quantifiers, the interpretation CA of an n-ary re-lation symbol C in a Henkin model A is identical to an element of Sn[A], and in particular CA is identical to the set of n-tuples x from An which satisfy the n-ary relation C on A. Hence even though we allow extra-logical relation symbols be-yond membership, all atomics are equivalent to those formed from membership and identity. As a deductive theory, second-order logic SOL just consists of the comprehension schema (2.1) and the extensionality axioms, one for each n ≥ 1, where R, S are n-ary: 
+
+∀ R ∀ S
+
+
+
+R = S ↔ ∀ x (Rx ↔ Sx )
+
+
+
+(2.4) together with the explicit definitions of the minimal set-theoretic apparatus de-scribed above. One generates subsystems of second-order logic by keeping ex-tensionality and restricting the comprehension schema. A Σ 11-formula is one of the form ∃ R1, . . . , R ℓ φ, where φ does not contain any second-order quantifiers. A Π 11-formula is one of the form ∀ R1, . . . , R ℓ φ, where φ does not contain any 6 SEAN WALSH 
+
+second-order quantifiers. A formula φ of second-order logic is first-order if it does not contain any second-order quantifiers. Since the minimal set-theoretic appara-tus is all first-order definable, its inclusion does not impact what is Σ 11-definable, Π11-definable, and first-order definable. A traditional predicative subsystem is ∆ 11-comprehension , abbreviated ∆11-CA − 
+
+> 0
+
+,which consists of the extensionality axioms and the following ∆ 11-comprehension schema :
+
+∀ x (φ(x) ↔ ψ(x)) → ∃ R ∀ x (Rx ↔ φ(x)) (2.5) wherein φ is Σ 11 and ψ is Π 11. Another traditional predicative system is Σ 11-choice ,abbreviated Σ11-AC − 
+
+> 0
+
+which consists of the extensionality axioms, the comprehension schema (2.1) restricted to first-order formulas, and the following Σ 11-choice schema :
+
+∀ x ∃ R φ (x, R ) → ∃ R′ ∀ x φ (x, R ′[x]) (2.6) wherein φ(x, R ) is Σ 11 and R′ is ( n + m)-ary and x is n-ary and R is m-ary. Fi-nally, the system ACA − 
+
+> 0
+
+is simply the extensionality axioms and all instances of the comprehension schema (2.1) such that the formula φ does not contain second-order quantifiers. In addition to these three predicative theories, a traditional interme-diary impredicative system is Σ11-CA − 
+
+> 0
+
+, which consists of the extensionality axioms and the comprehension schema (2.1) for Σ 11-formulas. The names of these subsys-tems of SOL are taken from the corresponding well-studied theories of second-order arithmetic ([53]), but we have added a minus superscript to them to disambiguate and to indicate that they are logical rather than arithmetical in nature. In any of these systems of second-order logic, one can readily regiment statements about cardinality. Whereas in ordinary set-theoretic mathematics, the cardinality operator |·| is function from sets to cardinals, in second-order logic one defines the comparative notions |X| ≤ | Y | and |X| < |Y | explicitly as follows: 
+
+Definition 2.2. (Cardinality notions in second-order logic). One defines |X| ≤ | Y | if there is an injection f : X → Y .One defines |X| < |Y | if both |X| ≤ | Y | and not |Y | ≤ | X|.One says that X is Dedekind infinite if there is a function f : X → X which is injective but not surjective. One says that X is Dedekind finite if X is not Dedekind infinite. Of course, functions f : X → Y are identified with their graph as a subrelation of 
+
+X × Y . Being able to define such notions is one of the chief advantages of working with polyadic as opposed to monadic second-order logic: namely, quantification over binary relations allows one to quantify over functions between different unary second-order entities in addition to being able to quantify over the second-order entities themselves. That said, there are other perspectives from which polyadic second-order quantification is a disadvantage. For instance, plurals are thought to be monadic and not polyadic, 11 and there are many decidability methods for monadic second-order theories which have no polyadic analogue. 12 
+
+3. Generalized quantifiers: definition and examples 
+
+Second-order logic is an extremely expressive system, even when comprehension is restricted. It is thus a good framework to study generalize quantifiers, since  
+
+> 11 [20, 117 ff].
+> 12 [6, Chapter 13]. NATURAL LANGUAGE QUANTIFIERS ARE PREDICATIVELY DEFINABLE 7
+
+the truth-conditions for these quantifiers are often given by a set-theoretic formula which can be readily transcribed into the object-language of second-order logic. Thus, in this paper, we define: 
+
+Definition 3.1. (Generalized quantifier). A generalized quantifier is a formula 
+
+Q(R1, . . . , R ℓ) of second-order logic whose only free variables are the displayed second-order variables R1, . . . R ℓ with respective arities n1, . . . , n ℓ.This is abbreviated by saying that the generalized quantifier Q(R1, . . . , R ℓ) is of type ( n1, . . . , n ℓ). If the particular values of n1, . . . , n ℓ are not important, such as when one is just stating general claims about all generalized quantifiers, one further abbreviates this by saying that Q(R) is of type ( n), or for simplicity that Q(R) is of type n. Note that the type n specifies both the length of the sequence R as well as the arities of its individual entries. In a Henkin model A, one correspondingly works with elements ( R1, . . . , R ℓ) of Sn1 [A] × · · · × Snℓ [A], and we similarly just abbreviate this as the element R of S n [A]. The tradition of generalized quantifiers typically works with standard models. If 
+
+Q(R1, . . . , R ℓ) is a generalized quantifier in the sense of Definition 3.1 and M is a standard model, then the interpretation of Q(R1, . . . , R ℓ) on M is simply given by a subset of P (M n1 ) × · · · × P (M nℓ ). Indeed, this is the traditional understanding of the semantic value of a generalized quantifier within linguistics, namely, it is a collection of tuples of subsets of Cartesian products of the underlying domain. In restricting to collections which are defined by second-order formulas, Definition 3.1 is more restrictive than this tradition; although, as the subsequent list of examples suggests, nothing is lost by this restriction. In being applicable to Henkin models which are not standard models, Definition 3.1 is more expansive than this tradition. It is a chief burden of this paper to make a case that this is a fruitful expansion. Here are some famous examples of generalized quantifiers of type (1 , 1), where we list their truth-conditions followed by an example: 
+
+Example 3.2. All (G, H ) iff ∀ x (Gx → Hx ). All Geography majors are happy. 
+
+Example 3.3. Some (G, H ) iff ∃ x (Gx ∧ Hx ). Some Geography majors are happy. Of course, in the tradition of Aristotelian logic, one defines the universal so that it has existential import: 13 
+
+Example 3.4. All ∗(G, H ) iff ∀ x (Gx → Hx ) ∧ ∃ x Gx . All Geography majors are happy. Other familiar type (1 , 1) generalized quantifiers are the following: 14 
+
+Example 3.5. Two (F, G ) iff ∃ y1 ∃ y2 F y 1 ∧ F y 2 ∧ y1̸ = y2 ∧ Gy 1 ∧ Gy 2 ∧ ∀ z (( F z ∧
+
+Gz ) → (z = y1 ∨ z = y2)). Two French majors are Geography majors. 
+
+Example 3.6. Most (F, G ) iff |F ∩ G| > |F \ G|. Most French majors go to study abroad. In this, we use the regimentation of |X| > |Y | from Definition 2.2.      
+
+> 13 [50, 24]. See the conversions in the Prior Analytics I.2.25 a10 ([1]).
+> 14 [50, 121, 62]. For discussion of why ‘two’ means ‘exactly two’ rather than ‘at least two’, see [57, §9.2]. For discussion of how ‘most’ can be understood as a superlative, see [23], [57, §5.6]. 8SEAN WALSH
+
+But there are many examples of natural quantifiers of different type than (1 , 1). Here is an example of a type (1) quantifier associated to Montagovian individuals: 15 
+
+Example 3.7. Christopher (G) iff Gc , where c is an individual constant symbol for the individual Christopher. If most French majors go to study abroad then Christopher goes to study abroad. Here is an example of type (1 , 1, 1): 16 
+
+Example 3.8. More -than (F, G, H ) iff |F ∩ H| > |G ∩ H|. More French majors than German majors are honors students. Here is an example of type (2 , 2): 17 
+
+Example 3.9. Usually (R, R ′) iff |R ∩ R′| > |R \ R′|. Cats usually like dogs, which is regimented as: there are more ordered pairs R of cats and dogs that stand in the like relation R′ than there are ordered pairs of R of cats and dogs that stand in the dislike relation ¬R′.Lastly, consider the following generalized quantifier of type (1 , 1, 2): 18 
+
+Example 3.10. Branching -most (F, G, R ) iff ∃ F0 ⊆ F ∃ G0 ⊆ G Most (F, F 0) ∧
+
+Most (G, G 0) ∧ F0 × G0 ⊆ R. Most French majors and most Geography majors all respect one another. This is Barwise’s template for Hintikka’s branching quantifiers, where the gener-alization emerges by replacing one or both instances of Most by other type (1 , 1) generalized quantifiers and perhaps adding more than two of them or just one of them (cf. (7.4)). Barwise’s example is intended to have the stated truth conditions, and hence it is distinct from Usually (F × G, R ). However, it seems plausible that the truth conditions of Barwise’s example derives from the reciprocal “one another” or the “all” in the verb phrase, 19 and hence for reasons ultimately extrinsic to the generalized quantifier in the noun phrase. There is then some reason to regard Example 3.10 as slightly set apart from the previous examples. 20 
+
+4. Substructures and Henkin domain independence 
+
+In formal semantics, one of the main conditions on natural language quantifiers is the domain independence condition ,21 which says that the quantifier is both upwards and downwards invariant under expansions of the first-order domain. The natural notion of expansion in Henkin models is the model-theoretic notion of substructure:     
+
+> 15 [50, 93-94]. See [22, 806-807] for a balanced discussion of the importance of including this example.
+> 16 [50, 154].
+> 17 [50, 352], [36, 1080]. See [10, Chapter 3] for a general study of adverbs using ideas from generalized quantifiers.
+> 18 [4, 60 equation (19), 63 equation (t)], [50, 71, 363], [58, 110].
+> 19 [29, 78 ff], [54, 165], [46, 432], [42, 258]. But it has been argued that the reciprocal itself has the semantics of a generalized quantifier (cf. [58, Chapter 8]).
+> 20 In this connection, it should be noted that branching quantification is mentioned only in passing, or not at all, in many recent surveys ([22], [57], [36], [39], [49], [56]).
+> 21 For the original notion on standard models, see [41, 855-856], [21, 250, Definition 17], [65, 279], [50, 101, 108], [57, §4.2.2.1], [36, 1067]. The concept is originally due to van Benthem, see [36, 1067] and [61, 8]. NATURAL LANGUAGE QUANTIFIERS ARE PREDICATIVELY DEFINABLE 9
+
+Definition 4.1. (Substructure). Suppose that A, B are two Henkin models. Then A is a substructure of B if 
+
+A ⊆ B and Sn[A] ⊆ Sn[B] for all n ≥ 1, and if for all individual constant symbols 
+
+c in the signature, cB = cA and for all n-ary relation symbols C in the signature, 
+
+CB ∩ An = CA.If the two models are standard and one is working in signature with no extra-logical constants, then this happens iff A ⊆ B. But note that if A is merely a Henkin model, then specifying an extension requires not only specifying a superset 
+
+B of A but also an associated sequence of supersets Sn[B] of Sn[A] which satisfy 
+
+Sn[B] ⊆ P (Bn). 
+
+Definition 4.2. (The standard superstructure). Suppose A is a Henkin model, which may or may not be standard. Let B be the Henkin model given by B = A and Sn[B] = P (An) for all n ≥ 1 and by interpreting the constant symbols the same. We call B the standard superstructure of A.In this case, the superstructure is formed by keeping the first-order domain the same and by expanding the domains associated to the higher-order objects by recourse to a metatheoretic operation. Another kind of example is where we shrink the first-order domain and correspondingly take the second-order objects to be their intersection with the new first-order domain: 
+
+Definition 4.3. (Internal substructures). Let B be a Henkin model. Let A be a non-empty set in S1[B] which contains cB
+
+for all constant symbols c. Then the internal substructure A of B associated to A is the Henkin model with first-order domain A and with Sn[A] = Sn[B] ∩ P (An) for all n ≥ 1, and with cA = cB for all individual constant symbols c in the signature and with CA = CB ∩ An for all n-ary relation symbols C in the signature. Note that in this case, if B is standard then A is standard. For some concrete examples of pairs of Henkin models A, B where A is a sub-structure of B and A = B while Sn[A] ⊊ Sn[B] for n ≥ 1, see Examples 6.2-6.3 in §6. One can also produce such examples by using the Downward L¨ owenheim-Skolem Theorem. 22 
+
+We draw attention to a feature of many theories which is related to internal substructures: 
+
+Definition 4.4. (Closed downwards under internal substructures). A theory T is closed downward under internal substructures if for all Henkin models B of T and all internal substructures A of B, one has that A is a model of 
+
+T as well. Many logical theories, including ACA − 
+
+> 0
+
+, ∆11-CA − 
+
+> 0
+
+, Σ11-AC − 
+
+> 0
+
+, Σ11-CA − 
+
+> 0
+
+and SOL , are closed downward under internal substructures. This is because the formula φ in the Comprehension Schema (2.1) is allowed to use A as a parameter and hence one can bind all the quantifiers in φ to A without increasing the relevant kinds of complexity (cf. Definition 7.2 for the definition of binding). We now define the generalization of domain independence to Henkin models: 
+
+Definition 4.5. (Henkin independence notions).  
+
+> 22 Followed by an application of Proposition 15.3. 10 SEAN WALSH
+
+Suppose that T is a theory and Q(R) is a generalized quantifier. Then we say that Q is Henkin upwards independent relative to T if for all pairs of Henkin models 
+
+A, B of T , if A is a substructure of B, then for all R from S n [A]: 
+
+A | = Q(R) = ⇒ B | = Q(R) (4.1) If the arrow is reversed, we say that Q is Henkin downwards independent relative to T . If the biconditional holds, then we say that Q is Henkin domain independent relative to T . If T is clear from context, then we omit “relative to T ” for brevity. We look at simple examples which violate Henkin domain independence in §6. We discuss the motivations for Henkin domain independence in §10. 5. Henkin conservativity 
+
+In order to define conservativity, 23 one has to work with generalized quantifiers 
+
+Q(R, R ′) where the free variables are split into two non-empty parts R, R ′. To avoid a great deal of notational clutter, we are going to suppose that the tuple R comes before the tuple R′ in the enumeration of the free variables in Q(R, R ′), although as one will see that nothing in what follows depends on this. 24 We define: 
+
+Definition 5.1. (Henkin conservative). Suppose that T is a theory and Q(R, R ′) is a generalized quantifier. Then we say that Q is Henkin conservative relative to T if T proves: 
+
+∀ R ∀ R′  Q(R, R ′) ↔ Q(R, U R ∩ R′) (5.1) If T is clear from context, then we omit “relative to T ” for brevity. In equation (5.1), the notation U R ∩ R′ means the tuple of the same length as 
+
+R′ = ( R′
+
+> 1
+
+, . . . , R ′ 
+
+> ℓ′
+
+) whose i-th component is U R ∩ R′
+
+> i
+
+, where we use the convention from (2.2). The content of Henkin conservation is best understood by way of example: 
+
+Example 5.2. If Q(X, Y ) is of type (1 , 1), such as in Examples 3.2- 3.6, then (5.1) is simply the universal closure of Q(X, Y ) ↔ Q(X, X ∩ Y ). To spell this out with the sentence from Example 3.6, the biconditional Q(X, Y ) ↔
+
+Q(X, X ∩ Y ) is: most French majors go to study abroad iff most French majors are French majors who go to study abroad. The intuitiveness of biconditionals like this is some of the primary evidence for conservativity. 25 
+
+Example 5.3. If Q(X, Y, Z ) is of type (1 , 1, 1) as in Example 3.8 with the partition between X, Y and Z, then (5.1) is simply the universal closure of Q(X, Y, Z ) ↔
+
+Q(X, Y, (X ∪ Y ) ∩ Z). 
+
+Example 5.4. If Q(R, R ′) is of type (2 , 2) as in Example 3.9, then (5.1) is simply the universal closure of Q(R, R ′) ↔ Q(R, (U R)2 ∩ R′).    
+
+> 23 For the original notion on standard models, see [41, 852-853], [65, 255], [50, 138], [57, §4.2.2.1], [36, 1066] for the case of type (1 ,1), and see [38, 77] for the general case. Conservativity was first defined by Keenan [35, 371, Definition 9]; see also [40, 275]. See Barwise-Cooper [5, 170, 178-179] for the closely related notion of “living on.”
+> 24 Some flexibility as to the placement of the tuple has proven useful in the linguistics literature as well, and is one of the responses to the apparent non-conservativity of “only.” See the discussion of weak conservativity in [66, 578].
+> 25 [41, 853], [50, 138-139], [22, 801]. NATURAL LANGUAGE QUANTIFIERS ARE PREDICATIVELY DEFINABLE 11
+
+We discuss further the motivations for Henkin conservativity in §10. Henkin conservativity has the following consequence for the empty relation: 
+
+Remark 5.5. (Henkin conservativity and the empty relation). Suppose that Q(R, R ′) is Henkin conservative relative to T . Then T proves all three of the following: 
+
+∀ R′  Q(∅, R ′) ↔ Q(∅, ∅), Q(∅, ∅) ↔ ∀ R′ Q(∅, R ′), Q(∅, ∅) ↔ ∃ R′ Q(∅, R ′)The first of these follows because R is empty iff its field U R is empty, and the intersection of anything with the empty relation is the empty relation. The other two follow from the first by elementary quantifier manipulations. 6. The disjunctive examples 
+
+Below are three examples of quantifiers that are not domain independent but are Henkin conservative. This kind of example is well-known. 26 We elaborate on it by producing examples where the disjunctive behavior pertains to both the first-and second-order part. 
+
+Example 6.1. (Disjunctive Example 1). Let Q(X, Y ) be ( ¬φ3 → X ∩Y̸ = ∅)∧(φ3 → X ⊆ Y ), where φ3 is ∃ x ∃ y ∃ z x ̸ =
+
+y∧y̸ = z∧x̸ = z. That is, Q(X, Y ) is the type (1 , 1) quantifier which is the existential quantifier if there are fewer than three elements in the domain, and which is the universal quantifier if there are at least three elements in the domain. Consider a two element standard model A and a three element standard model B
+
+such that A is a substructure of B.Choose X, Y in S1[A] such that X ∩ Y̸ = ∅ but not X ⊆ Y . Then A | = Q(X, Y )but B | = ¬Q(X, Y ). Hence Q(X, Y ) is not upwards Henkin independent relative to any theory T which is true on all finite standard models. Choose Z in S1[A]. Then B | = Q(∅, Z ) but A | = ¬Q(∅, Z ). Hence Q(X, Y ) is not downwards Henkin independent relative to any theory T which is true on all finite standard models. But Q(X, Y ) is Henkin conservative relative to any theory extending ACA − 
+
+> 0
+
+since both the existential quantifier and universal quantifier are Henkin conservative. 
+
+Example 6.2. (Disjunctive Example 2). Let Q(X, Y ) be ( φf in → X ∩ Y̸ = ∅) ∧ (¬φf in → X ⊆ Y ), where φf in says that the domain is Dedekind finite. That is, Q(X, Y ) is the type (1 , 1) quantifier which is the existential quantifier if the domain is Dedekind finite, and which is the universal quantifier if the domain is Dedekind infinite (cf. Definition 2.2 for the definition of Dedekind finitude and infinitude). Consider the Henkin model A such that A is the the complex numbers C with constant symbols for the field structure and with Sn[A] being the first-order defin-able subsets of the n-th Cartesian product Cn of the complex field. Consider the standard model B such that B is the the complex numbers C with constant symbols for the field structure. Then A is a model of ∆11-CA − 
+
+> 0
+
++ φf in ,27 while B is a model of ∆11-CA − 
+
+> 0
+
++ ¬φf in .     
+
+> 26 See Keenan [37, §4, immediately below (37), p. 56]; and [10, 152], [21, 251].
+> 27 It is a model of ∆11-CA −
+> 0since the complex field has theory which is uncountably categorical and hence saturated (cf. [59, Theorem 5.2.11], [30, Theorem VI.1.12]) and hence recursively saturated, and the Barwise-Schlipf method shows that the second-order models associated to 12 SEAN WALSH
+
+At a certain level of idealization, A is the setting of algebraic geometry, and B is the setting of complex analysis. Hence, this is very much a real-life example of two adjacent disciplines which differ from one another not in terms of their first-order objects but in terms of the second-order entities which they countenance. Choose X, Y in S1[A] such that X ∩ Y̸ = ∅ but not X ⊆ Y . Then A | = Q(X, Y )but B | = ¬Q(X, Y ). Hence Q(X, Y ) is not upwards Henkin independent relative to 
+
+∆11-CA − 
+
+> 0
+
+.Choose Z in S1[A]. Then B | = Q(∅, Z ) but A | = ¬Q(∅, Z ). Hence Q(X, Y ) is not downwards domain independent relative to ∆11-CA − 
+
+> 0
+
+.Further, Q(X, Y ) is Henkin conservative relative to any theory extending ACA −
+
+> 0
+
+since both the existential quantifier and universal quantifier are Henkin conserva-tive. 
+
+Example 6.3. (Disjunctive Example 3). Let φP A 2 say that there is a model of second-order Peano arithmetic: 
+
+∃ z ∃ N ∃ S
+
+& ∀ x (N x → ∃ ! y (N y ∧ Sxy )) & ∀ x ∀ y ∀ w  (N x ∧ N y ∧ N w ∧ Sxw ∧ Syw ) → x = y
+
+& ∀ x (N x → ¬ Sxz )& ∀ X
+
+ X ⊆ N & Xz &  ∀ x ∀ y (( N x & N y & Sxy & Xx ) → Xy ) → N ⊆ X
+
+
+
+Let Q(X, Y ) be ( ¬φP A 2 → X ∩ Y̸ = ∅) ∧ (φP A 2 → X ⊆ Y ). That is, Q(X, Y )is the type (1 , 1) quantifier which is the existential quantifier if the domain does not contain a model of second-order Peano arithmetic, and which is the universal quantifier if the domain does contain a model of second-order Peano arithmetic. Consider the Henkin model A such that A is uncountable and Sn[A] is the collection of first-order definable subsets of A as a first-order structure in empty signature. Consider the standard model B such that B is A. Then A is a model of 
+
+∆11-CA − 
+
+> 0
+
++ ¬φP A 2 ,28 while B is a model of ∆11-CA − 
+
+> 0
+
++ φP A 2 .The model A is the setting where the only properties are finite and cofinite collections of objects, and B is the setting where a richer array of properties exist. As in the previous example, Q(X, Y ) is neither upwards nor downwards Henkin independent relative to ∆11-CA − 
+
+> 0
+
+, but it is Henkin conservative relative to any theory extending ACA − 
+
+> 0
+
+.7. Definability, bounded definability, and absoluteness 
+
+In this short section, we say what it means for a generalized quantifier itself to be definable and bounded definable, and we discuss the absoluteness of certain definitions.                  
+
+> recursively saturated structures satisfy ∆11-CA −
+> 0([7, Theorem 2.2], [53, Lemma IX.4.3]). It is a model of φf in by the famous Ax–Grothendieck Theorem (cf. [59, 46]).
+> 28 It is a model of ∆11-CA −
+> 0since Aas a first-order structure in the empty theory is uncountably categorical and hence saturated (cf. [59, Theorem 5.2.11]) and hence recursively saturated, and the Barwise-Schlipf method shows that the second-order models associated to recursively saturated structures satisfy ∆11-CA −
+> 0([7, Theorem 2.2], [53, Lemma IX.4.3]). It is a model of ¬φP A 2since the sets in S1[A] are finite or cofinite. But e.g. the evens in a model of Peano arithmetic are infinite and coinfinite. NATURAL LANGUAGE QUANTIFIERS ARE PREDICATIVELY DEFINABLE 13
+
+Definition 7.1. (Definability relative to T ). Suppose that T is a theory and Q(R) is a generalized quantifier. Then Q is Σ 11-definable relative to T if there is a Σ 11-formula Φ( R) with exactly the free variables displayed such that T proves 
+
+∀ R (Q(R) ↔ Φ( R)) (7.1) Further, Π 11-definable relative to T is defined exactly the same, but with the Σ 11-formula replaced by a Π 11-formula. And first-order definable relative to T is defined exactly the same but with Σ 11-formula replaced by a first-order formula. Finally Q
+
+is ∆ 11-definable relative to T if it is both Σ 11- and Π 11-definable relative to T . If T is clear from context, then we omit “relative to T ” for brevity. We need a similar notion of bounded quantifiers and bounded definability: 
+
+Definition 7.2. (Bounded definability notions). (1) If X is a unary second-order term, then a formula φ has all quantifiers bounded to X if every first-order quantifier in φ has the form ∃ x Xx ∧ · · · or the form ∀ x (Xx → · · · ), and if every second-order quantifier in φ has the form 
+
+∃ R R ⊆ Xn ∧ · · · or the form ∀ R (R ⊆ Xn → · · · , where R is n-ary. (2) A formula is bound if there is an unary second-order term X such that all quantifiers in the formula are bound to X and the free variables of X do not occur bound in the formula. (3) If φ is a formula and X is a unary term whose free variables do not occur bound in φ, then we define φX to be the result of first binding the first-order quantifiers in φ to X and subsequently binding the second-order quantifiers in 
+
+φ to X.Obviously, φX as in (3) is bound in the sense of (2); and any formula bound in the sense of (2) is of the form φX .Here are three examples: 
+
+Example 7.3. If R is a binary second-order variable and X is unary second-order variable, then ( ∃ R ∀ x Rxx )X is ∃ R R ⊆ X2 ∧ ∀ x (Xx → Rxx ). This last formula is bound, with all quantifiers bound to X.
+
+Example 7.4. If R is a binary second-order variable and R′ is a binary second-order variable and X is a unary second-order variable, then U R is a unary second-order term and ( ∃ X ∀ x (Xx → R′xx )) U R is ∃ X ⊆ U R ∀ x (( U R)x → (Xx → R′xx )). This last formula is bound, with all quantifiers bound to the field U R of R.
+
+Example 7.5. The formulas |X| ≤ | Y | and |X| < |Y | from Definition 2.2 are bound to X ∪ Y . Likewise, the formula for X being Dedekind infinite and the formula for X being Dedekind finite are bound to X.However, we note the following, which is the familiar problem of predicate logic on empty domains: 29 , 30 29 It might be worth exploring ways to modify the logic to handle empty domains, along the lines of [24], [19]. However, given the other tools used in this paper, that would require a deeper understanding of the metatheory of such logics than I currently have.  
+
+> 30 If one is just interested in model theory, one can just accept empty domains and the con-sequences spelled out in the remark and let the chips fall where they may– this is how Hodges proceeds [28, p. 2, p. 46, Exercise 7]. However, without corresponding changes to the deductive 14 SEAN WALSH
+
+Remark 7.6. (Binding interacts poorly with the empty set). Suppose that A is a model of ACA − 
+
+> 0
+
+and x is from A and R is from Sn[A] and X
+
+is term with free variables among x, R , and suppose that X is empty, that is, X = ∅.If φ(x, R ) begins with a first-order existential quantifier, then A | = ¬φX (x, R ). If φ(x, R ) begins with a first-order universal quantifier, then A | = φX (x, R ). Despite this poor behavior in this limiting case, binding notions are important for their absoluteness properties. We encountered such properties already in Propo-sition 2.1. It is a recurring theme in mathematical logic: for instance, bounded formulas are absolute between transitive models of set theory, and recursive formu-las are absolute between models of first-order Peano arithmetic. 31 The following is the version of absoluteness which is useful in the setting of second-order logic: 
+
+Theorem 7.7. (Grades of absoluteness and bounded definability). Suppose that A, B are two Henkin models of ACA − 
+
+> 0
+
+with A a substructure of B.Suppose that φ(x, R ) is a formula with free variables among x, R , and suppose X is a unary term. Suppose that x, R are from A and the free variables of X are from A
+
+and are not bound in φ(x, R ). If φ(x, R ) is Σ 11, then 
+
+A | = φX (x, R ) = ⇒ B | = φX (x, R ) (7.2) If φ(x, R ) is Π 11 then the arrow is reversed. If φ(x, R ) is equivalent to a single Σ 11-formula on both A, B and a single Π 11-formula on both A, B, then the biconditional holds. In particular, if φ(x, R ) is first-order, then the biconditional holds. We prove this in §14, and it builds off of Proposition 2.1. Note that Example 6.1 shows that one cannot remove the binding to X and maintain the conditional in (7.2) for first-order formulas φ(x, R ). In the case of internal substructures (cf. Definition 4.3) one can improve Theo-rem 7.7 as follows: 
+
+Theorem 7.8. (More extensive absoluteness on internal substructures). If A is an internal substructure of B, then one has A | = φ(x, R ) iff B | = φA(x, R ), for all formulas φ and x from A and R from S n [A]. We prove this in §14. It has the following immediate corollary: 
+
+Corollary 7.9. (More extensive absoluteness on standard models). If A, B standard and A is a substructure of B, then one has A | = φ(x, R ) iff 
+
+B | = φA(x, R ), for all formulas φ and x from A and R from S n [A]. Having defined bounded quantifiers, we can now define bounded definability: 32 
+
+Definition 7.10. (Bounded definability of generalized quantifiers).          
+
+> system (along the lines of the previous footnote), this will cause problems when one starts doing metatheory related to the Soundness and Completeness Theorems, which I am very much using throughout the paper.
+> 31 [33, Lemma 12.9], [25, Lemma IV.1.20].
+> 32 It is possible to define a less restrictive version of this where we bind to UR∪UR′rather than to UR. However, the definition given anticipates the application to Henkin conservation in Theorem 8.3. NATURAL LANGUAGE QUANTIFIERS ARE PREDICATIVELY DEFINABLE 15
+
+Suppose that T is a theory and Q(R, R ′) is a generalized quantifier. Then Q is 
+
+bounded Σ11-definable relative to T if there is a Σ 11-formula Φ( R, R ′) with all free variables displayed such that T proves 
+
+∀ R ∀ R′ (Q(R, R ′) ↔ ΦU R(R, R ′)) (7.3) Further, bounded Π11-definable relative to T is defined exactly the same, but with the Σ11-formula replaced by a Π 11-formula. And bounded first-order definable relative to 
+
+T is defined exactly the same but with Σ 11-formula replaced by a first-order formula. Moreover, Q is bounded ∆11-definable relative to T if it is both bounded Σ 11-definable relative to T and bounded-Π 11-definable relative to T . Finally, Q is bounded definable relative to T if T proves (7.3) for some formula Φ( R, R ′). If T is clear from context, then we omit “relative to T ” for brevity. One then has the following immediate Corollary: 
+
+Corollary 7.11. (Grades of bounded definability suffices for grades of domain invariance). Suppose that T is a theory and Q(R, R ′) is a generalized quantifier. (1) If Q(R, R ′) is bounded Σ 11-definable relative to T , then Q(R, R ′) is upward Henkin invariant relative to T .(2) If Q(R, R ′) is bounded Π 11-definable relative to T , then Q(R, R ′) is downard Henkin invariant relative to T .(3) If Q(R, R ′) is bounded ∆ 11-definable relative to T , then Q(R, R ′) is Henkin domain invariant relative to T .
+
+Proof. This follows from Definition 7.10, Theorem 7.7, and Definition 4.5. □
+
+If one restricts to standard models, one gets something more, namely that all bounded definable generalized quantifiers, regardless of the complexity of the defi-nition, are domain invariant across standard models: 
+
+Corollary 7.12. (Bounded definability and domain invariance on standard mod-els). Suppose that T is a theory which is true on all standard models. Suppose that Q(R, R ′) is a generalized quantifier which is bounded definable relative to T .Suppose that A, B are two standard models with A a substructure of B. Suppose that R, R ′ are in Sn[A]. Then one has A | = Q(R, R ′) iff B | = Q(R, R ′). 
+
+Proof. This follows from Definition 7.10 and Corollary 7.9 and the fact that on B
+
+we have that  ΦU R(R, R ′)A is equivalent to Φ U R(R, R ′) since R is in Sn[A]. □
+
+The previous corollary indicates that domain invariance across standard models is compatible with arbitrarily complex bounded definable formulas. As we will see in next section, things turn out quite differently with Henkin models. We close by noting that branching quantifiers like Example 3.10 need not be ∆11-definable relative to ∆11-CA − 
+
+> 0
+
+:33 
+
+Proposition 7.13. (Branching quantifiers are not necessarily bounded ∆ 11-definable).  
+
+> 33 Equation (7.4) is from [50, 363, 494]. 16 SEAN WALSH
+
+Suppose that Q1, . . . , Q k are k-many type (1 , 1) generalized quantifiers. Consider the associated branching quantifier of type (1 , . . . , k ): 
+
+Br Q(A, R ) iff ∃ B1 ⊆ A1, . . . , B k ⊆ Akk^
+
+> i=1
+
+Qi(Ai, B i) ∧ B1 × · · · × Bk ⊆ R (7.4) If Q1, . . . , Q k are bounded Σ 11-definable relative to theory T , then so is Br Q. But there are examples of k ≥ 1 and Q1, . . . , Q k which are bounded Σ 11-definable relative to ∆11-CA − 
+
+> 0
+
+such that Br Q is not bounded ∆ 11-definable relative to ∆11-CA − 
+
+> 0
+
+.
+
+Proof. Consider k = 1 and Q(X, Y ) which says that X ∩ Y is Dedekind infinite (cf. Definition 2.2). Then Q(X, Y ) is a bounded Σ 11-formula. Let A, B be from Example 6.2. That is, A is the non-standard Henkin model where A is the complex numbers C with constant symbols for the field structure and with Sn[A] being the first-order definable subsets of the n-th Cartesian product Cn
+
+of the complex field. Further, B is the standard model such that B is the complex numbers C with constant symbols for the field structure. Let A, R be equal to C. Then B | = Br Q(A, R ) since in the metatheory one can identify the natural numbers as a subset of the complex field. However, A | =
+
+¬Br Q(A, R ) by the Ax-Grothendieck Theorem (cf. footnote 27). □
+
+8. Statement of main results 
+
+The first main result says that Henkin domain independent generalized quanti-fiers are low level definable: 
+
+Theorem 8.1. (Grades of Henkin domain independence entail grades of predicative definability). Suppose that T is a theory extending Σ11-AC − 
+
+> 0
+
+and that Q is a generalized quan-tifier. Then: (1) If Q is Henkin upward independent relative to T , then Q is Σ 11-definable relative to T .(2) If Q is Henkin downward independent relative to T , then Q is Π 11-definable relative to T .(3) If Q is Henkin domain independent relative to T , then Q is ∆ 11-definable relative to T .We prove Theorem 8.1 in §16, and the proof follows Marker’s proof of [44] of Feferman’s Preservation Theorem [14]. See the outset of §16 for more discussion of Marker’s proof. Note that the converse of Theorem 8.1 is false, as one can see from Example 6.1. In his later work on the Tarski-Sher logicality thesis, Feferman himself mentions his earlier Preservation Theorem. First, in Feferman [15, §5], he mentions it in passing in motivating a discussion of Manders’ result that absoluteness conditions will force first-order definability in certain circumstances. Second, in Feferman [16, 24], he appeals to his Preservation Theorem in order to prove that if a generalized quantifier can be implicitly defined as the unique solution to a sentence, then the generalized quantifier is first-order definable. This seems interesting and worthy of more discussion than I am able to give it here. But nothing in domain independence requires logicality, such as the type (1) quantifier in Example 3.7 involving a named individual (but see footnote 15). NATURAL LANGUAGE QUANTIFIERS ARE PREDICATIVELY DEFINABLE 17 
+
+We can improve Theorem 8.1 by obtaining bounded predicative definability in certain situations. In order to describe these situations, we need one last definition. 
+
+Definition 8.2. (Strong existential import). Suppose that T is a theory extending ACA − 
+
+> 0
+
+and suppose that Q(R, R ′) is a generalized quantifier. Then Q has strong existential import relative to T if T
+
+proves 
+
+∀ R ∀ R′  Q(R, R ′) → U R̸ = ∅ (8.1) and if for every individual constant c in the signature, T proves: 
+
+∀ R ∀ R′  Q(R, R ′) → (U R)c (8.2) To secure (8.1) one can of course define Q′(R, R ′) to be Q(R, R ′) ∧ U R̸ = ∅.This is how the Aristotelian universal (Example 3.4) is defined from the ordinary universal (Example 3.2). Likewise, note that (8.2) is satisfied by the paradigmatic example of a generalized quantifier defined with a constant symbol, namely the ex-ample of Montagovian individuals (Example 3.7). The general reason why we need to restrict to generalized quantifiers with strong existential import is that the empty set interacts poorly with binding (cf. Remark 7.6) and because substructures need to contain the denotations of the individual constant symbols (cf. Definition 4.1). Restricting to generalized quantifiers with strong existential import does not seem like a deep restriction given the way in which Q(∅, R ′) is controlled entirely by Q(∅, ∅) for Henkin conservative quantifiers (cf. Remark 5.5). In most cases, one anticipates that either (i) Q(∅, ∅) will be derivable from the background theory T or (ii) ¬Q(∅, ∅) will be derivable from the background theory T . In case (i), we simply define Q′(R, R ′) by Q(R, R ′) ∧ U R̸ = ∅ and work with it instead. In case (ii), we get an entailment to (8.1) when Q is Henkin conservative with respect to the background theory T (cf. Remark 5.5). Note that in Examples 3.3-3.9 we are in case (ii) for the minimal background theory ACA − 
+
+> 0
+
+.Here is then the theorem on bounded definability: 
+
+Theorem 8.3. (Sufficient conditions for bounded ∆ 11-definability). Suppose that T is a theory extending Σ11-AC − 
+
+> 0
+
+in a signature with only finitely many individual constants which is closed downwards under internal substructures. Suppose that Q is a generalized quantifier which is Henkin domain independent relative to T and Henkin conservative relative to T and has strong existential import relative to T . Then Q is bounded ∆ 11-definable relative to T .The proof of Theorem 8.3 is given at the end of §16. Note that a partial converse to this Theorem is in Corollary 7.11. However, there are many bounded formulas which are not Henkin conservative relative to natural theories, and so a full converse which goes from bounded definability to Henkin conservativity is not possible. It is no accident that domain independence and conservativity result in pred-icative definitions. For, historically a motivating idea of predicative constraints was that these definitions were stable across expansions, 34 and Theorem 8.1(3) and Theorem 8.3 give vivid displays of how certain kinds of stability entail varieties of ∆11-definability, which is the most traditional formal precisification of predicative    
+
+> 34 For references to, and discussion of, Poincar´ e, Weyl, and Kreisel, see [11, §2.3] and [64, §4]. 18 SEAN WALSH
+
+constraints. By Theorem 7.7, one can of course see that certain kinds of predica-tive definability entail a kind of stability or absoluteness. The surprise of course in Theorems 8.1, 8.3 is that this absoluteness requires definability of any kind. I have not seen anything like Theorem 8.3 in the literature. However, in [60], van Benthem posed the problem of “find[ing] a preservation result characterizing conservativity of first-order sentences” ([60, 462], cf. [61, 38]). He then says: “The obvious conjecture is that Q(X, Y ) is conservative in X iff Q is logically equivalent to some sentence with all quantifiers X-restricted. Kit Fine observed that this follows, indeed, from the work of Feferman” where Feferman’s [14] is cited (notation changed in quotation to match my own notation). But this discussion seems to assume at the outset that Q is first-order definable, whereas Theorem 8.3 is compatible with Q
+
+merely being ∆ 11-definable, as will be the case with the cardinality quantifiers (cf. Theorem 12.1). I do not know anywhere that van Benthem or Fine say how they take Feferman [14] to help establish the stated results for first-order definable Q.That said, the proof of Theorem 8.3, given at the close of §16, is comparatively direct once the definitions are in place. 9. Applications to explanatory projects in formal semantics 
+
+The semantics of generalized quantifiers are again given by a collection of tuples of subsets of Cartesian products of the underlying domain. 35 A chief challenge is to explain why so few of these are realized in natural language. For instance, Sternefield writes in a recent survey: “the number of possible quantifiers left as a result of such axioms as (17) [conservativity] is still huge. [. . . ] there is nothing in the theory that would allow for isolating exactly the ‘primitive’ or even the ‘lexical’ quantifiers of a natural language” ([56, 11]). Similarly, von Fintel-Matthewson say that “It is clear that natural languages do not nearly make full use of the logically possible space of determiner meanings. The conservativity universal may be fraying at the edges, but the investigation of the limits on possible determiner meanings is still a promising avenue of research” ([62, 163-164]). The main reason why Theorems 8.1, 8.3 are significant is that they explain why so few options for generalized quantifiers are realized in natural language. Namely, if one extends the domain independence conditions and the conservativity conditions to Henkin models, then these theorems directly entail the comparative low-level definability of the generalized quantifiers. Or, if one thought that domain independence and conservativity were just as much in need of explanation as the limited options for generalized quantifier meanings, then these theorems say that any explanation of domain independence and conservativity that also works for Henkin models itself suffices to explain the limited options for generalized quantifier meanings; and hence these explanatory tasks are not independent of one another. Before turning to whether the motivations for the semantic constraints extend to Henkin models, it is worth being a little more explicit about what it means to say that so few of the theoretically possible options for generalized quantifiers are realized in natural language. This should not be understood as a claim about what generalized quantifiers appear in the lexicon of natural languages. For, the lexicon will always be limited and will face pressure to be sparse, and what a sparse lexicon can generate can be vast: for instance, generalized quantifiers are closed    
+
+> 35 This is a key tenant of the tradition of generalized quantifiers (cf. footnote 1), but also present in introductory semantics textbooks, cf. [27, 140 ff], [21, §7.2, pp. 223 ff]. NATURAL LANGUAGE QUANTIFIERS ARE PREDICATIVELY DEFINABLE 19
+
+under Boolean operations. 36 I take it rather that the following is intended: there are some determiners which we recognize as generalized quantifiers, and of this subclass of determiners, their truth-conditions seem to be a comparatively small slice of those which are theoretically possible, given that generalized quantifiers have as their meanings simply arbitrary collections of tuples of subsets of Cartesian products of the underlying domain. It is however important to be precise about the meaning of “comparatively small.” On the one hand, it might be understood in terms of numerical constraints .For instance, if a standard model has first-order domain with n elements, then there are 2 2n×2n
+
+many theoretically possible denotations for type (1 , 1) quantifiers, but only 2 3n
+
+many theoretically possible denotations for type (1 , 1) quantifiers which are conservative. 37 Alternatively, it might be understood in terms of definability constraints on the truth conditions for these quantifiers. That is, in inspecting the list of examples of generalized quantifiers in §3, one notes that they all seem to be easy or simple to define, and definitions featuring e.g. 27 second-order quantifiers appear to be absent. Obviously Theorems 8.1, 8.3 fare better in contributing to the explanatory task at hand when one works with definability constraints rather than numerical constraints. But one’s applications of Theorems 8.1, 8.3 will vary depending on what one thinks of Example 3.10, our paradigmatic example of a branching quantifier (cf. (7.4)). Examples like these are often bounded definable, and by boundedness, they are domain invariant across standard models by Corollary 7.12, and they are often Henkin conservative and have strong existential import relative to minimal and nat-ural theories. But Theorems 8.1,8.3 indicate that they are Henkin domain invariant relative to a theory only if they are bounded ∆ 11-definable relative to the theory. Some of them are demonstrably not so definable (cf. Proposition 7.13), and for oth-ers one may suspect that are not so definable. For someone who took Example 3.10 as a core rather than periphery case of a generalized quantifier, this would be evi-dence that not all generalized quantifiers are downwards Henkin invariant. This is compatible with still holding that generalized quantifiers of natural languages are Henkin upwards invariant as well as Henkin conservative. From the perspective of someone who held this, Theorems 8.1(1) could still well serve to explain why so few theoretically possible generalized quantifiers appear in natural language, but with the definability constraint set at Σ 11-definable rather than bounded ∆ 11-definable. This discussion also gestures towards a possible method, which is simultaneously empirical and mathematical, of refuting the contention that the generalized quanti-fiers of natural language are Henkin domain invariant as well as Henkin conservative. Namely, one could try to produce an example of something which was recognizably a generalized quantifier of natural language and yet which was demonstrably not bounded ∆ 11-definable relative to some natural theory. Likewise, apropos the pre-vious paragraph, one could attempt to produce an example, like Example 3.10, at the periphery of the generalized quantifiers of natural language, but which was yet demonstrably not Σ 11-definable relative to some natural theory. Such examples    
+
+> 36 [50, 91-92], [57, §4.1.1]. This has a prominent place in [40, 265 ff].
+> 37 [50, 327]. For considerations like this, see [40, 290], [61, 9], [37, §4, p. 54], [56, 10]. 20 SEAN WALSH
+
+would of course be of further interest since they do not occur in the lists of the generalized quantifiers of natural language in the standard surveys. 38 , 39 
+
+10. Motivations for semantic constraints extend to Henkin models 
+
+Given the contributions to the explanatory projects discussed in the previous section, a real question then is whether the motivations for insisting on domain independence and conservativity extend from standard models to Henkin mod-els. This seems very clear in the case of conservativity. For, conservativity is just a biconditional, namely in the case of type (1 , 1) quantifiers, the biconditional 
+
+Q(X, Y ) ↔ Q(X, X ∩ Y ). 40 Since this is expressible in the object language of second-order logic and hence does not distinguish between Henkin models and stan-dard models, it seems that whatever motivates it or explains it will not distinguish between these two classes of models. For instance, conservativity is often explained by natural language needing a mechanism by which to temporarily introduce a domain of discourse. Keenan calls conservativity the “domain setting” property of a generalized quantifier. 41 If this domain setting role is accomplished by the aforementioned biconditional, then it can be done in both Henkin and standard models. However, conservativity is sometimes explained by appealing to structural features of syntactic processing. 42 In this case, to the extent that the syntactic pro-cessing is constrained to act primarily on the logical forms correlated with Q(X, Y )and Q(X, X ∩ Y ), it seems this will not distinguish between Henkin and standard models. As for domain independence, Peters and Westerst˚ ahl describe it as follows: Roughly, it is the property that the behavior of the quantifier doesn’t change when you extend the universe ([50] p. 100). The lack of change here of course has to be understood to mean that subsets which are in the denotation of the quantifier prior to the extension (or contraction) of the universe continue to be in the denotation of the quantifier after the extension (or contraction). Hence, the question is whether any of the reasons we have for insist-ing on this lack of change in standard models carries over to Henkin models. All finite models which satisfy first-order comprehension are standard models, and so looking only at finite models does not distinguish between the Henkin and standard semantics. But if one wants a semantics with a Soundness and Completeness The-orem and with the recursive enumerability of the validity relation, then the Henkin semantics are the clear choice. 43 Further, experience suggests that many arguments          
+
+> 38 Cf. footnote 1
+> 39 For a possible source of such examples, see the Keenan-Stavi Theorem discussed at the close of §19.
+> 40 In the general case, it is the biconditional (5.1) from Definition 5.1.
+> 41 [36, 1066]. Likewise, von Fintel-Matthewson write: “What this [conservativity] means is that the first argument of a determiner ‘sets the scene’ ” ([62, 161]).
+> 42 This is the kind of explanation offered by Romoli [51], [52]. Romoli is building off of prior work by Chierchia, Fox, Ludlow, and Sportiche. See [57, §4.2.2.2] for a survey of some of this work.
+> 43 By Trakhtenbrot’s Theorem (e.g. [12, Theorem X.5.4]) validity on finite models is not recursively enumerable and encodes the complement of the halting set. Hence to maintain recursive enumerability of the validity relation, one has to countenance at least some infinite models. By using Dedekind finiteness, as we do in §12, one can still work with the Henkin semantics and a certain kind of finiteness postulate. NATURAL LANGUAGE QUANTIFIERS ARE PREDICATIVELY DEFINABLE 21
+
+involving standard models can be recast with minimal modification as derivations in second-order logic which are hence applicable to Henkin models. For, one simply collects together the hypotheses about models to which one is appealing, and if they simply speak about elements of the underlying domain and relations on the under-lying domain, then they can be regimented into sentences in the object-language of second-order logic. 44 
+
+Peters and Westerst˚ ahl also describe domain independence as follows: What, then, does constancy of a quantifier Q mean? Intuitively, it means that Q ‘means the same’, or is given by the same rule ,on every universe. But the identity conditions for meanings, or for rules, are notoriously difficult to lay down. Indeed, it is not clear that the concept of constancy can be explained fully in an extensional framework like ours. But some things can be said. [ ¶]A special case is when the rule does not mention the universe M
+
+at all. This seems to be what Ext amounts to ([50] p. 106). If ‘given by the same rule’ simply means ‘given by a single rule definable in second-order logic,’ as in Definition 3.1, then this is very undemanding requirement, and will not get one to domain independence, in either the standard or Henkin seman-tics. But the latter part of the quotation seems to get closer to the core idea: namely a quantifier is domain independent if it does not query the underlying domain in the wrong way. This can be borne out by reflecting back on the type (1 , 1) generalized quantifier 
+
+Q(X, Y ) from Example 6.1, which is the existential quantifier if there are fewer than three objects in the underlying domain but is the universal quantifier if there are at least three objects in the underlying domain. This disjunctive example acts differently on X, Y depending on how things stand in other first-order parts of the universe; and as we saw in Example 6.1, it is not domain independent. This motivation then extends clearly to Henkin models, and just as one wants to restrict attention to type (1 , 1) quantifier Q(X, Y ) which leave the focus on X, Y and do not query other first-order parts of the universe, so one would want them to not query other second-order parts of the universe. This was illustrated by Examples 6.2, 6.3, where common idea was that the quantifier was the existential quantifier if the second-order part of the universe was expressively impoverished and it was the universal quantifier if the second-order part of the universe was expressively rich. Hence the suggestion is that one should accept both domain independence and Henkin independence of generalized quantifiers because one wants to restrict at-tention to type (1 , 1) generalized quantifiers Q(X, Y ) whose satisfaction conditions pertain to X, Y and not to other regions of the first- or second-order domain. (For notational ease, we continue to focus the discussion on type (1 , 1) generalized quan-tifiers; but this applies mutatis mutandis for generalized quantifiers of other types). An advantage of this proposal is that brings the motivation for domain indepen-dence closer to the motivation for conservativity. 45 Recall that the latter was a         
+
+> 44 For instance, [9, Part II] explores how many authors have recast the famous categoricity theorems of second-order arithmetic and set theory as derivations in second-order logic.
+> 45 There is precedent for bringing them closer in Keenan [37], Szabolcsi [57, §4.2.2.3], Glanzberg [22, 803]. For instance, Keenan writes that “It [the role of the noun argument] serves to limit the domain of objects we use the predicate to say something about. This simple idea of domain restriction is captured in the literature with two independent constraints: conservativity and
+> [domain]-extension ” ([37, §4, p. 54]). Later in the same section, he says more about domain 22 SEAN WALSH
+
+“domain setting” feature, where the idea is that Q(X, Y ) results in making X the temporary domain of discourse to which Y is restricted. Our discussion of the motivation of domain independence suggests the further thought: in addition to considering only Y ’s intersection with X, one must not query either first-order or second-order facts about the model which are outside of X.However, the proposal does come with disadvantages and challenges. First, the proposal introduces more explicitly notions of “aboutness” or “topicality” into this understanding of the motivations for domain independence and conservativity. 46 , 47 
+
+It is well-known that this kind of intentionality is hard to explicate and model, at least when one restricts oneself to the tools of formal semantics and logic. Second, the proposal conceives of a core task of domain independence as getting rid of the disjunctive examples in §6. But the history of Nelson’s grue should make us cautious in claiming anything more than provisional success in weeding out disjunctive laws. Third, a presupposition of the above discussion is that linguistic agents are moving between different Henkin models in the same way that they are moving between contexts in a more quotidian sense, and that the semantic constraints on quantifiers allows agents to hone in and focus on a topic that is fixed amid this wider flux. It does seem that some variation in the second-order domain is quotidian: in some discussions a limited conception of properties is at issue and in other discussions a more fine-grained conception of properties is at issue. That said, one would want a better understanding of the circumstances in which the second-order domain becomes subject to substantial variation, and whether the variation could be understood like Examples 6.2-6.3 in which one goes back and forth between a mathematically impoverished and a mathematically enriched setting. 11. Lowering to first-order definability 
+
+The theorems discussed thus far, namely Theorems 8.1, 8.3, get one to bounded ∆11-definability. But the standard list of examples, such as we sampled in §3, consists in large part of generalized quantifiers which are first-order definable. In this section we show that by switching to a slightly richer background theory we can improve the definability to first-order definability. We expand from pure second-order logic to a well-order: 48 
+
+Definition 11.1. (Well-order notions and axiomatizing finitude).               
+
+> limitation, to wit: “But natural languages are general purpose. Speakers use them to talk about anything they want, and common nouns in English provide the means to delimit ‘on line’ what speakers talk about and quantify over” ([37, §4, p. 56]).
+> 46 Szabolcsi is explicit about this, writing: “The NP-set serves as the determiner’s topic in the intuitive sense” ([57, §4.2.2.3]).
+> 47 One might object that nothing like this needed, and one can just get by with binding to and intersecting with Xin a type (1 ,1) quantifier Q(X, Y ). While this freezes the first-order objects as one moves between Henkin models, it will not freeze the second-order entities. That said, there are more radical ways to freeze the second-order entities: namely, one could just restrict throughout to standard models. However, that would come with the cost of making the validity relation massively intractable. However, there may be more nuanced proposals in the offing for how, in theory and practice, we freeze the second-order domain.
+> 48 This does two things for us. First, it gives us definable Skolem functions (cf. Definition 17.4 and Example 17.5), which we need for the proof of Theorems 11.2, 11.3, given in §17; and it is a natural case of definable Skolem functions which results in a theory which is downward closed under internal substructures. Second, it allows us to prove results about cardinality in the Dedekind finite setting, which we discuss in §12, and prove in §18. NATURAL LANGUAGE QUANTIFIERS ARE PREDICATIVELY DEFINABLE 23
+
+Let T − be one of ACA − 
+
+> 0
+
+, ∆11-CA − 
+
+> 0
+
+, Σ11-AC − 
+
+> 0
+
+, Σ11-CA − 
+
+> 0
+
+, or SOL .Then we define T wo to be the expansion of T − by the axioms saying that a fresh binary relation symbol ⪯ is a well-order of the first-order domain: – Reflexivity : ∀ x x ⪯ x
+
+– Anti-symmetry : ∀ x ∀ y (( x ⪯ y & y ⪯ x) → x = y)– Transitivity : ∀ x ∀ y ∀ z (( x ⪯ y & y ⪯ z) → x ⪯ z)– Linearity : ∀ x ∀ y (x ⪯ y ∨ y ⪯ x)– Well-ordering : ∀ X (( ∃ x Xx ) → (∃ x0 Xx 0 & ∀ y (Xy → x0 ⪯ y))) Finally T fin is the expansion of T wo by the axiom which says that universe V is Dedekind finite (cf. Definition 2.2). Note that if T − be one of ACA − 
+
+> 0
+
+, ∆11-CA − 
+
+> 0
+
+, Σ11-AC − 
+
+> 0
+
+, Σ11-CA − 
+
+> 0
+
+, or SOL , then both 
+
+T wo and T fin are closed downwards under internal substructures (cf. Definition 4.4), since initial segments of well-orders are still well-orders, and since Dedekind infini-tude is bounded Σ 11-definable. Then we have the following results: 
+
+Theorem 11.2. (From ∆ 11-definability to first-order definability). Suppose that Q is a generalized quantifier which is ∆ 11-definable relative to 
+
+Σ11-AC wo 0 . Then Q is first-order definable relative to Σ11-AC wo 0 .
+
+Theorem 11.3. (Sufficient condition for bounded first-order definable). Suppose that Q is a generalized quantifier which is Henkin domain invariant relative to Σ11-AC wo 0 and Henkin conservative relative to Σ11-AC wo 0 and has strong existential import relative to relative to Σ11-AC wo 0 . Then Q is bounded first-order definable relative to Σ11-AC wo 0 .We prove these two theorems in §17. However, note that Theorems 11.2-11.3 pertain to a specific theory, namely Σ11-AC wo 0 , whereas Theorems 8.1, 8.3 are about general background theories T of second-order logic. 12. Quantifiers defined in terms of cardinality 
+
+Finally, we make good on an obligation to show that Examples 3.6, 3.8 of Most 
+
+and More -than fit into the framework described in this paper. We have the following, where Σ11-CA fin 0 was defined at the end of Definition 11.1: 
+
+Theorem 12.1. (A theory for the paradigmatic cardinality-defined quantifiers). (1) Most and More -than are bounded ∆ 11-definable relative to Σ11-CA fin 0 .(2) Most and More -than are Henkin domain independent and Henkin conservative relative to Σ11-CA fin 0 .We prove this in §18. Obviously (1) follows from (2) and Theorems 8.1, 8.3. But to our knowledge, there is no easy way to verify the Henkin domain independence in (2) without going through the specific definitions produced in the proof of (1) and then appealing to Theorem 7.7. It is natural to ask whether the restriction to Dedekind finite universes in The-orem 12.1 is necessary. Let us consider the case of More -than (cf. Example 3.8). Note that one has |X| > |Y | iff More -than (X, Y, V). Hence if More -than is bounded ∆11-definable relative to a theory T , then |X| > |Y | is ∆ 11-definable relative to T ,by quantifiers which are bound to X ∪ Y (in the sense of Definition 7.2(2)). 24 SEAN WALSH 
+
+But, one can show using the method of forcing that this is false for ACA − 
+
+> 0
+
+.49 
+
+For, using this method, one can produce two Henkin models A, B of ACA − 
+
+> 0
+
+such that A is a substructure of B and one can produce two X, Y in S1[A] such that 
+
+A | = |X| < |Y | but B | = ¬(|X| < |Y |). Namely, A is the countable transitive ground model together with its first-order definable subsets, and B is a generic extension together with its first-order definable subsets; one further chooses X = ω and Y = κ
+
+for some uncountable cardinal κ in A which is collapsed in B. If |X| < |Y | was ∆11-definable relative to ACA − 
+
+> 0
+
+with quantifiers bound to X ∪ Y , then we would contradict Theorem 7.7. The restriction to the finite in Theorem 12.1 does not seem problematic, as far as empirical coverage goes. For, our judgments about Most and More -than are pri-marily informed by our experience with finite collections of e.g. people and other middle-sized objects. But the restriction to the finite does suggest an interest-ing test case for someone who wanted to deny that generalized quantifiers satisfy Henkin domain independence. For, by the above, More -than is not Henkin domain independent relative to ACA − 
+
+> 0
+
+. But it is domain independent on standard models by Corollary 7.12. If one thought that More -than was a generalized quantifier re-gardless of the size of the ambient universe, then this would be a reason to reject that all generalized quantifiers satisfy Henkin domain independence. Pursued in this direction, the discussion would start blending with discussions in philosophy of mathematics about whether and to what extent models produced by the method of forcing are or are not good candidates for intended models of set theory. 50 But those who outright reject the Henkin domain independence of generalized quanti-fiers would be in need of another explanation of why natural language generalized quantifiers realize so few of the theoretically possible options for collections of sub-sets of the underlying domain. 13. Applications to upper bounds on complexity 
+
+Finally, we mention an immediate corollary of Theorem 8.1(3) (there are similar corollaries for (1)-(2)). (Recall the axioms for well-orders in Definition 11.1). 
+
+Corollary 13.1. (Upper bounds on complexity). (1) Suppose that T is a theory extending Σ11-AC − 
+
+> 0
+
+containing an axiom saying that a binary constant symbol is a well-order of the domain. Suppose T is true on all standard models with first-order domain which is countably infinite and with the constant symbol interpreted as a well-order. Suppose that Q is a generalized quantifier which is Henkin domain independent with respect to T .For each countably infinite set A, consider the associated standard model A of 
+
+T along with a well-order. For each n ≥ 1, the set P (An) is naturally a Polish space by identifying it with the countable product {0, 1}An
+
+, and similarly for     
+
+> 49 In the setting of set theory, one can study models of ACA −
+> 0which come equipped with a membership relation on individuals which satisfies the appropriate second-order axioms of set theory. This axiom system is usually known as von Neumann-G¨ odel-Bernays set theory or NBG
+> for short (cf. [47, Chapter 4]).
+> 50 Categoricity arguments have been used, not uncontroversially, to answer “no they are not”; see [9, Chapter 11] for references to, and discussion of, Kreisel, McGee, and Martin among others. For nuanced versions of the answer “yes they are,” see Hamkins [26], although some care would have to exercised to situate his discussion of the models produced by forcing into the discussion of second-order logic. NATURAL LANGUAGE QUANTIFIERS ARE PREDICATIVELY DEFINABLE 25
+
+finite products of these. Then the quantifier Q is Borel on these models, under this identification. (2) Suppose that T is a theory extending Σ11-AC − 
+
+> 0
+
+containing an axiom saying that a binary constant symbol is a well-order of the domain. Suppose that T is true on all standard models with finite first-order domain {0, . . . , m } for m ≥ 1 and with the constant symbol interpreted as the usual ordering relation on the natural numbers. Suppose that Q is a generalized quantifier which is Henkin domain independent with respect to T . For m ≥ 1, consider the finite standard models 
+
+Am of T with domain {0, . . . , m } and with the constant symbol interpreted as the usual ordering relation for the natural numbers. Then the problem of determining membership in Q on these models is NP ∩ co -NP .
+
+Proof. For (1), by Theorem 8.1(3), this follows from Souslin’s Theorem, which says that testing whether R is in a ∆ 11-definable set over a Polish space is Borel. 51 
+
+For (2), by Theorem 8.1(3), this follows from Fagin’s Theorem, which says that testing whether R satisfies a ∆ 11-definable problem over Am is NP ∩ co -NP .52 . □
+
+This Corollary leverages how predicatively definable sets occur naturally through-out mathematics and computation and are tied to core notions like the Borel sets and the traditional complexity classes. Let us discuss each of these in turn. Borel sets are the events most commonly used in probability, measure-theoretic mathematics, and their many applications. The subject-matter of descriptive set theory is definability in Polish spaces, where the Borel sets form the lower end of a hierarchy of definability. 53 Corollary 13.1(1) says that the quantifiers at issue satisfy the usual condition for the theorems of probability theory and measure-theoretic mathematics to apply to them, and that they are not a source of set-theoretic pathology. However, the applicability of this is limited. As we saw in §12, the theory ACA − 
+
+> 0
+
+, which is true on all standard models with first-order domain which is countably infinite, is such that the quantifier More -than is not Henkin domain independent relative to ACA − 
+
+> 0
+
+.Computational complexity theory studies feasible models of computation, which admit computations that are a strict subclass of those allowed under the more tradi-tional Turing models of computation. 54 Corollary 13.1(2) identifies an upper bound on the computational complexity of the quantifier. If the motivations for domain independence extend to Henkin domain independence, then Corollary 13.1(2) would predict that natural language generalized quantifiers are not excessively infeasible to compute. Finally, in contrast to the conclusion of the previous paragraph, in §12 we identified the theory Σ11-CA fin 0 which satisfies the hypotheses of Corollary 13.1(2) and relative to which Most and More -than are Henkin domain invariant and Henkin conservative. Hence Most and More -than are NP ∩ co -NP on the finite models de-scribed in Corollary 13.1(2). Corollary 13.1(2) is rather complementary to Szymanik’s work, which puts the upper bound at NP rather than NP ∩ co -NP .55 This is not lowered due to branch-ing quantifiers and Ramsey quantifiers (cf. Example 3.10). 56 For someone who   
+
+> 51 [34, 88].
+> 52 [32, 115].
+> 53 Cf. [34].
+> 54 Cf. [32].
+> 55 [58, 14].
+> 56 [58, §7.3, §7.5]. 26 SEAN WALSH
+
+thought that branching quantifiers and Ramsey quantifiers were core rather than periphery generalized quantifiers, one would rather focus on the analogue of Corol-lary 13.1(2) which is centered around Fagin’s Theorem and Theorem 8.1(1) rather than Theorem 8.1(3). We now turn to the more technical part of the paper, in which we prove the various theorems in turn. 14. Proofs of Theorem 7.7, Theorem 7.8 
+
+In this theorem, recall that the binding concepts and notation was defined in Definition 7.2. 
+
+Theorem 7.7. (Grades of absoluteness and bounded definability). Suppose that A, B are two Henkin models of ACA − 
+
+> 0
+
+with A a substructure of B.Suppose that φ(x, R ) is a formula with free variables among x, R , and suppose X is a unary term. Suppose that x, R are from A and the free variables of X are from A
+
+and are not bound in φ(x, R ). If φ(x, R ) is Σ 11, then 
+
+A | = φX (x, R ) = ⇒ B | = φX (x, R ) (7.2) If φ(x, R ) is Π 11 then the arrow is reversed. If φ(x, R ) is equivalent to a single Σ 11-formula on both A, B and a single Π 11-formula on both A, B, then the biconditional holds. In particular, if φ(x, R ) is first-order, then the biconditional holds. 
+
+Proof. By Proposition 2.1 it suffices to consider the case where X is a unary second-order variable and where φ(x, R ) is in the signature with just membership. We begin by showing the biconditional for first-order φ(x, R ), by induction on complexity of φ(x, R ). As a base case, suppose that that φ is the atomic Ry , where y is some subtuple of x. Since this atomic φ does not have any quantifiers, one has that φX is the same as φ. Since A, B are Henkin models, one has that both A, B interpret Ry as the membership of y in R, and so we are done. The same is true if some of R and the entries in y are constants, since this was built into the definition of substructure (cf. Definition 4.1). The inductive steps for the propositional connectives are clear. We do the inductive step for the first-order existential quantifier. Suppose it holds for φ(x, y, R ); we show it holds for ∃ y φ (x, y, R ). – If A | = ( ∃ y φ (x, y, R )) X , then there is y in X such that A | = φ(x, y, R )X .Then y is in X ⊆ A ⊆ B and hence B | = Xy and by induction hypothesis 
+
+B | = φX (x, y, R ) and so B | = ∃ y Xy ∧ φX (x, y, R ) and so B | = ( ∃ y φ (x, y, R )) X .– If B | = ( ∃ y φ (x, y, R )) X , then B | = ∃ y Xy ∧ φX (x, y, R ). Then there is y in 
+
+X, which is a subset of A, such that B | = φX (x, y, R ). By induction hypothesis, 
+
+A | = φX (x, y, R ). Then A | = ( ∃ y φ (x, y, R )) X .To show the conditional (7.2) for a Σ 11-formula, suppose for simplicity that it is the case of ∃ S φ (x, y, R, S ), where S is unary and φ(x, y, R, S ) is first-order. Suppose that A | = ( ∃ S φ (x, y, R, S )) X . Then A | = ∃ S S ⊆ X φ X (x, y, R, S ). Then by Proposition 2.1, there is S in S1[A] ⊆ S1[B] such that S ⊆ X and A | =
+
+φX (x, y, R, S ). By the biconditional for φ(x, y, R, S ), one has B | = φX (x, y, R, S ). Then by Proposition 2.1 again, one has B | = ∃ S S ⊆ X φ X (x, y, R, S ) and hence 
+
+B | = ( ∃ S φ (x, y, R, S )) X .NATURAL LANGUAGE QUANTIFIERS ARE PREDICATIVELY DEFINABLE 27 
+
+The reverse conditional (7.2) for a Π 11-formula follows from the Σ 11 case by con-traposition and DeMorgan. 
+
+□
+
+Theorem 7.8. (More extensive absoluteness on internal substructures). If A is an internal substructure of B, then one has A | = φ(x, R ) iff B | = φA(x, R ), for all formulas φ and x from A and R from S n [A]. 
+
+Proof. Since A | = φ(x, R ) iff A | = φA(x, R ) the conclusion for first-order φ(x, R )follows from the previous Theorem. Suppose it holds for φ(x, R, S ); we show it holds for ∃ S φ (x, R, S ), where for the sake of simplicity S is unary. – Suppose that A | = ∃ S φ (x, y, R, S ). Then there is S in S1[A] ⊆ S1[B] such that 
+
+A | = φ(x, y, R, S ). Then A | = S ⊆ A and by two applications of Proposition 2.1 we have B | = S ⊆ A. Further, by induction hypothesis B | = φA(x, y, R, S ). Hence 
+
+B | = ( ∃ S φ (x, R, S )) A.– Suppose that B | = ( ∃ S φ (x, R, S )) A. Then B | = ∃ S ⊆ A ∧ φA(x, R, S ). By Proposition 2.1, there is S in S1[B] such that S ⊆ A and B | = φA(x, R, S ). Since 
+
+A is an internal substructure of B, one has that S1[A] = S1[B] ∩ P (A), and hence S is in S1[A]. And by induction hypothesis we have A | = φ(x, R, S ). Then 
+
+A | = ∃ S φ (x, y, R, S ). 
+
+□
+
+15. Henkin models and faithfulness 
+
+Henkin models as defined in §1 are required to interpret membership absolutely. It is natural to view them as models of many-sorted first-order logic, and hence to view A as the interpretation of the sort associated to objects and Sn[A] as the interpretation of the sort associated to n-ary second-order relations. In order to be able to apply the full metatheory of many-sorted first-order logic, 57 one needs (i) to have the freedom to temporarily relax the assumption that membership is interpreted absolutely, since e.g. the models coming from compactness will not in general have this property; and one needs simultaneously (ii) to know how to reinstate it by passing to a related model, since we want eventually to restate things in terms of Henkin models. Hence we define: 
+
+Definition 15.1. (Pre-Henkin model). A pre-Henkin model in a signature is a many-sorted structure of the form: 
+
+A = ( A, S 1[A], S 2[A], . . . ; EA 
+
+> 1
+
+, E A 
+
+> 2
+
+, . . . ) (15.1) where A is a non-empty set, and where (1) For all n ≥ 1, the interpretation EA 
+
+> n
+
+of the membership symbol En has sort 
+
+Sn[A] × An and in the object-language we suppress En and write Ra instead of En(R, a 1, . . . , a n). (2) For all n ≥ 1 the structure A satisfies extensionality: 
+
+∀ R ∀ S
+
+
+
+R = S ↔ ∀ x (Rx ↔ Sx )
+
+
+
+(15.2) where R, S are n-ary variables and the first-order tuple x has arity n.  
+
+> 57 [43, Chapter VI ff], [13, §4.3], [45, 28 ff], [59, 5]. 28 SEAN WALSH
+
+(3) The model A satisfies the comprehension schema (2.1) for first-order formulas in the signature. (4) For the interpretation of the signature, we have: (a) For all individual constant symbols c in the signature, it is interpreted as an element cA of A.(b) For all n ≥ 1 and all n-ary relation constant symbols C in the signature, it is interpreted as an element CA of Sn[A]. (c) For all n ≥ 1 and all n-ary relation symbols C in the signature, it is interpreted as a subset CA of An.In (1), the idea is that En interprets the membership relation between the domain 
+
+Sn[A] reserved for the n-ary second-order objects and n-tuples of elements from the first-order domain A. Since we only focus on models which satisfy first-order comprehension, and since the minimal set-theoretic apparatus described in §2 is all first-order definable, we may regard ourselves as working in the signature consisting just of membership symbols from (1) and the symbols from (4). In §2 we only had symbols corresponding to (4a), (4c). It is useful to include (4b) since in the setting of many-sorted first-order logic, they will act differently under morphisms. For instance, if f : A → B is an embedding of pre-Henkin structures, then for a binary relation constant symbol C1 in the sense of (4b), the standard definition of an embedding requires that (i) f (CA 
+
+> 1
+
+) = CB 
+
+> 1
+
+, while for a binary relation symbol C2 in the sense of (4c), the standard definition of an embedding requires that (ii) A | = C2xy iff B | = C2f (x)f (y) for all x, y in A. In the case where A, B are Henkin models and f : A → B is the inclusion map of a smaller Henkin model A
+
+into a larger Henkin model B, this is the difference between (i) CA 
+
+> 1
+
+= CB 
+
+> 1
+
+and (ii) CA 
+
+> 2
+
+∩ A2 = CB 
+
+> 2
+
+. Case (ii) is what one wants when one considers e.g. a larger linear order B and its restriction to a smaller linear order A. But in model theory it is of course commonplace in proofs to name elements of the domains with fresh constant symbols, and for this one wants to be in case (i). Since we are doing the proofs in these sections, we need to include (4b). Note that in a signature with n-ary relation symbols C as in (4c), there are three kinds of atomics: (I) equalities, (II) atomics coming from the membership symbols from (1), and (III) atomics coming from the n-ary constant relation sym-bols from (4). By extensionality (2), all equalities on second-order entities are definable in terms of membership. By (3), every n-ary constant relation symbol de-termines an element of Sn[A], and so anything from (III) is equivalent to something from (II). Hence, in a fixed pre-Henkin model, as well as a fixed Henkin model, we can assume without loss of generality that the atomics are: (I ′) equalities between individuals, (II ′) atomics coming from the membership symbol. Note that being a pre-Henkin model is preserved under isomorphism. Having defined this more general notion, we can then specify the notion defined in §1 as a special case: 
+
+Definition 15.2. (Henkin models as certain kinds of pre-Henkin models). A pre-Henkin model A is a Henkin model if both of the following hold: (1) For each n ≥ 1 one has Sn[A] ⊆ P (An), where the latter denotes the powerset of the n-th Cartesian power of A.(2) EA 
+
+> n
+
+is interpreted as set-theoretic membership in the metatheory, that is, EA 
+
+> n
+
+=
+
+{(R, a ) ∈ Sn[A] × An : a ∈ R}.NATURAL LANGUAGE QUANTIFIERS ARE PREDICATIVELY DEFINABLE 29 
+
+One has the following elementary observation: 
+
+Proposition 15.3. (Relation between pre-Henkin models and Henkin models). Every pre-Henkin model is isomorphic to a Henkin model. 
+
+Proof. Suppose A a pre-Henkin model. Define model B by B = A and Sn[B] = 
+
+{{ a ∈ An : A | = Ra } : R ∈ Sn[A]} and interpret membership as set-theoretic membership in the metatheory. Further, interpret cB = cA for individual constant symbols c, and interpret CB = {a ∈ An : A | = Ca } for n-ary constant relation symbols C for n ≥ 1 and for n-ary relation symbols C for n ≥ 1. Define bijection 
+
+f : A → B by f (a) = a for a in A and by f (R) = {a ∈ An : A | = Ra } for R in 
+
+Sn[A]. Then f : A → B preserves the membership relation: A | = Ra iff a in f (R), which happens iff B | = ( f (R))( f (a)), by definition of B’s absolute interpretation of membership and by f : A → B being the identity on An. Further, f (cA) = cB for individual constants c since f is the identity on A, and A | = Cx iff B | = C(f (x)) for 
+
+n-ary relation symbols C by definition of CB. Likewise for n-ary constant relation symbols C one has by definition f (CA) = {a ∈ An : A | = Ca } = CB. And B
+
+satisfies Definition 15.1(2)-(3) since it is isomorphic to A. Finally, B satisfies, by construction, Definition 15.2(1)-(2). □
+
+In the above proof, we use f (x) as an abbreviation for the tuple ( f (x1), . . . , f (xn)). Similarly, often in what follows we write f (x) = y, which is an abbreviation for 
+
+f (x1) = y1, . . . , f (xn) = yn.However, not every substructure of a Henkin model is Henkin model: 58 
+
+Example 15.4. (Among pre-Henkin models, being a Henkin model is not preserved under substructure). Consider a standard model B in a countable signature where B is uncountable. By Downward L¨ owenheim-Skolem, take an elementary substructure 
+
+A = ( A, S 1[A], S 2[A], . . . ; EA 
+
+> 1
+
+, E A 
+
+> 2
+
+, . . . ) (15.3) where A is countably infinite and each Sn[A] is countably infinite. Then A is a pre-Henkin model. Let X be the unique element of S1[A] such that A | = ∀x Xx . Then since it is an elementary substructure one has that B | = ∀ x Xx . Then since B is a Henkin model, X is in S1[B] and by extensionality X = B. Since A is countable and B is uncountable, we have that X is in S1[A] \ P (A), and thus S1[A] ⊈ P (A). Thus A is not a Henkin model. We can also describe this example in terms of embeddings: 
+
+Example 15.5. (Among pre-Henkin models, being a Henkin model is not preserved under taking images of embeddings). Let A, B be as in the previous example. By Proposition 15.3 there is a Henkin model A0 and isomorphism f : A0 → A . Since id A : A → B is an elementary embedding, the composition f = id A ◦ f : A0 → B is an elementary embedding, and its image is A. Hence the image of an elementary embedding between Henkin models is not necessarily a Henkin model. This example motivates the following definition, which is the natural analogue of Marker [44, Definition 1.2] in the setting of second-order logic:     
+
+> 58 For a similar point, see Boney [8, 168]. His solution is to continue to work with Henkin models, but to just dispense with substructures per se and to just work with the corresponding class of embeddings which preserve atomics in both directions. 30 SEAN WALSH
+
+Definition 15.6. (Faithful embeddings). Suppose that A, B are two pre-Henkin models. Then f : A → B is a faithful embedding if it is an embedding of A into B and for all n ≥ 1 and all R in Sn[A]and all R′ in Sn[B] with f (R) = R′ and all b in Bn with B | = R′b, there is a in An
+
+with f (a) = b.These are related by the following: 
+
+Proposition 15.7. (Henkin models and images of faithful embeddings). Suppose that B is a Henkin model. Suppose that D is a substructure of B. Then the following are equivalent: (1) D is a Henkin model. (2) There is a Henkin model A and a faithful embedding f : A → B with image D.
+
+Proof. Suppose (1); we show (2). Then the identity map id : D → B is a faithful embedding. For, suppose that n ≥ 1 and R in Sn[D] and b in Bn with B | = Rb .Then b in R since B is a Henkin model, and R ⊆ Dn since D is a Henkin model. Then b in Dn, which is what we wanted to show. Suppose (2); we show (1). Suppose A is a Henkin model and f : A → B is a faithful embedding with image D. Then D = {f (a) : a ∈ A} and Sn[D] = {f (R) : 
+
+R ∈ Sn[A]} and ED 
+
+> n
+
+= {(f (R), f (a)) : ( R, a ) ∈ Sn[A] × An & A | = Ra } and 
+
+cD = f (cA) for individual constant symbols c, and CD = f (CA) for n-ary relation constant symbols C, and CD = {f (x) : A | = Cx } for n-ary relation symbols C.(a) We first show that Sn[D] ⊆ P (Dn). Suppose that R′ in Sn[D]; we must show that R′ ⊆ Dn. Since R′ in Sn[D], we have R′ = f (R) for some R in Sn[A]. Since f : A → B preserves sorts, one has that R′ in Sn[B], and since B is a Henkin model we have that R′ ⊆ Bn. Suppose that b in R′. Since B is a Henkin model we have B | = R′b. Since f : A → B is faithful, there is a in An
+
+with f (a) = b. Then b in Dn by definition of D.(b) We second show that ED 
+
+> n
+
+is equal to {(R′, b ) ∈ Sn[D] × Dn : b ∈ R′}:– Suppose ( f (R), f (a)) in ED 
+
+> n
+
+. Then since A | = Ra and f : A → B is a homomorphism we have B | = ( f (R))( f (a)). Since B is a Henkin model we have f (a) in f (R). – Suppose that ( R′, b ) in Sn[D] × Dn with b in R′. Then R′ = f (R) for some 
+
+R in Sn[A] and b = f (a) for some a in An. Since B is a Henkin model 
+
+B | = R′b. Since f : A → B is an embedding we have A | = Ra . This then puts ( f (R), f (a)) in ED 
+
+> n
+
+, and so puts ( R′, b ) in ED 
+
+> n
+
+.(c) Finally, D satisfies the axioms in Definition 15.1(2)-(3) since f : A → D is an isomorphism and A satisfies these axioms. 
+
+□
+
+16. Proof of Theorems 8.1, 8.3 
+
+Theorem 8.1. (Grades of Henkin domain independence entail grades of predicative definability). Suppose that T is a theory extending Σ11-AC − 
+
+> 0
+
+and that Q is a generalized quan-tifier. Then: (1) If Q is Henkin upward independent relative to T , then Q is Σ 11-definable relative to T .NATURAL LANGUAGE QUANTIFIERS ARE PREDICATIVELY DEFINABLE 31 
+
+(2) If Q is Henkin downward independent relative to T , then Q is Π 11-definable relative to T .(3) If Q is Henkin domain independent relative to T , then Q is ∆ 11-definable relative to T .As mentioned in the abstract and the introduction, Theorem 8.1 basically fol-lows from Feferman’s Preservation Theorem [14], which Marker [44] proved model-theoretically. Since readers interested in generalized quantifiers may not be inter-ested in the model-theoretic details of Marker’s presentation, we specialize Marker’s proof to the setting of second-order logic. Further, since the proof is short, this requires about the same amount of space needed to verify that Theorem 8.1 follows from from Marker’s result. 59 
+
+Proof. For (1), suppose that T is a theory extending Σ11-AC 0, and suppose that Q is Henkin upward independent relative to T . We show that Q is Σ 11-definable relative to T . Without loss of generality, Q is instantiated in a model of T (otherwise choose an inconsistent Σ 11-definition). Let R1, . . . , R ℓ be new relation constant symbols, in the sense of Definition 15.1(4b), corresponding to the type of Q. We abbreviate R1, . . . , R ℓ as R. It suffices to show: there is a Σ 11-formula Φ such that the theory T proves: Φ( R) ↔ Q(R). Note that since Q is instantiated in a model of T , we have that there is a model 
+
+A of T + Q(R). For any model A in the expanded signature, let Σ 11(A) be the set of all Σ 11-sentences in the expanded signature which are true in A. Consider the following: 
+
+Case 16.1. There is a pair of models A0 and B0 such that A0 |= T + Q(R) and 
+
+B0 |= T + ¬Q(R) + Σ 11(A0). Suppose that Case 16.1 holds; we show that this eventuates in a violation of Henkin upward independence. Since B0 |= Σ 11(A0), one has that B0 is infinite iff 
+
+A0 is infinite; and likewise B0 is finite and of size n iff A0 is finite and of size n.Hence, suppose that both A0, B0 are finite and of size n. Finite models of the same size which satisfy the same first-order sentences in a signature are isomorphic and hence satisfy the same second-order sentences, which is impossible since A0 |= Q(R)and B0 |= ¬Q(R). Henceforth suppose that both A0, B0 are infinite, and without loss of generality countably infinite. Let ( A0, B0) be the disjoint sum of the two many-sorted structures. Let ( A, B) be a countable recursively saturated elementary extension of ( A0, B0). 60 By taking an isomorphic copy `a la Proposition 15.3, we may assume that both A, B are Henkin models. Enumerate both the first and second-order part of A simultaneously as α1, α 2, . . . , and similarly enumerate B as 
+
+β1, β 2, . . . . We build a faithful embedding f = S 
+
+> n
+
+fn : A → B in stages f0, f 1, f 2, . . . 
+
+such that fn satisfies: (i) The domain of fn is a finite subset including α1, . . . , α n.                         
+
+> 59 In outline, here is how one would verify that Theorem 8.1 follows from Marker’s result. First, one defines u◁ nRiff Ris n-ary and uis an element of the field URof R. Then one defines the class of formulas Σ nfrom ◁njust like Marker defines his class Σ from ◁([44, Definition 1.1]). Then, one defines the class of formulas Σ to be the union of the Σ n. Finally, one has to go through Marker’s proof and verify that his results about a single ◁work when one considers a countable sequence
+> ◁n.This last step amounts to reproving Marker’s theorem for this generalization. Lastly, one would show that the Σ formulas align extensionally with the Σ 11formulas in models of Σ11-AC −
+> 0.
+> 60 E.g. [45, 169], [53, 379]. 32 SEAN WALSH
+
+(ii) For any Σ 11-formula φ(υ1, . . . , υ j ) with free variables among υ1, . . . , υ j , if 
+
+A | = φ(γ1, . . . , γ j ) where γ1, . . . , γ j enumerates the domain of fn, then B | =
+
+φ(fn(γ1), . . . , f n(γj )). (iii) If βi is the least first-order object with i ≤ n which is in some tuple in some second-order object β in the range of fn−1, then βi is in the range of fn.Note that while each of the variables υ1, . . . , υ j in (ii) is either first-order or second-order (and if second-order is unary, binary, etc.), we are enumerating them all simultaneously but not marking their status in the notation: one could easily mark them as first-order or second-order (and if second order one could mark whether they are unary, binary, etc.), but this would terribly clutter the notation. By way of motivation for these conditions, note that: – Condition (ii) ensures that f : A → B is an embedding. In particular it ensures the injectivity of f and and that f preserves the individual constant symbols and n-ary relation constant symbols. For, consider the formula φc(υk) ≡ c = υk
+
+for an individual constant symbol c and individual variable υk, and consider the formula φi(υj ) ≡ Ri = υj for one of the Ri from our sequence of R1, . . . , R ℓ of relation constants symbols and υj an n-ary variable. Since A | = φc(cA) we have by condition (ii) that B | = φc(f (cA)), which is to say that f (cA) = cB. Since 
+
+A | = φi(RA 
+
+> i
+
+) we have by condition (ii) that B | = φi(f (RA 
+
+> i
+
+)), which is to say that 
+
+f (RA 
+
+> i
+
+) = RB 
+
+> i
+
+.– Condition (iii) ensures that f : A → B is a faithful embedding. For the base case, one takes f0 = ∅, and condition (ii) is satisfied because B | =Σ11(A). For the inductive step, we consider the following recursive type Γ( υ), where 
+
+γ1, . . . , γ j enumerates the domain of fn. We insert an initial formula in Γ( υ) which says that υ comes from B, and in general we put a formula in Γ( υ) if it has the form 
+
+φA(γ1, . . . , γ j , α n+1 ) → φB(fn(γ1), . . . , f n(γj ), υ ) (16.1) where φ(υ1, . . . , υ j , υ ) is a Σ 11-formula, and where as in (ii) the variables υ1, . . . , υ j , υ 
+
+may be first-order or second-order. This recursive type Γ( υ) is indeed finitely satisfied. For, suppose that we have m formulas: 
+
+φ1(υ1, . . . , υ j , υ ), . . . , φ m(υ1, . . . , υ j , υ ) (16.2) By reordering, we may suppose that A | = φi(γ1, . . . , γ j , α n+1 ) iff i ≤ m0, for some 
+
+m0 ≤ m. Then A | = ∃ υ Vm0 
+
+> i=1
+
+φi(γ1, . . . , γ j , υ ). Since this is itself a Σ 11-formula, by (ii) one has that B | = ∃ υ Vm0 
+
+> i=1
+
+φi(fn(γ1), . . . , f n(γj ), υ ). Thus Γ( υ) is indeed finitely satisfied and so satisfied in B by some β, and then we set fn+1 (αn+1 ) = β.Thus we have satisfied (i)-(ii). To ensure (iii), suppose that βi is the least first-order object with i ≤ n + 1 which is in some tuple in some second-order object β
+
+in the range of fn+1 , say β = f (γp). Without loss of generality the tuple is, say, a 2-tuple, so that ( βu, β i) ∈ β. Consider the following recursive type Γ ∗(v), where v
+
+is a first-order variable. We put an initial formula in Γ ∗(v) which says that v comes from A, and in general we put a formula in Γ ∗(v) if it has the form 
+
+φB(fn(γ1), . . . , f n(γj ), f n+1 (αn+1 ), β i) → φA(γ1, . . . , γ j , α n+1 , v ) (16.3) where φ(υ1, . . . , υ j , υ j+1 , v ) is a Π 11-formula. This recursive type is indeed finitely satisfied. For, suppose that we have m-such formulas 
+
+φ1(υ1, . . . , υ j , υ j+1 , v ), . . . , φ m(υ1, . . . , υ j , υ j+1 , v ) (16.4) NATURAL LANGUAGE QUANTIFIERS ARE PREDICATIVELY DEFINABLE 33 
+
+By reordering, we again may suppose that B | = φi(fn(γ1), . . . , f n(γj ), f n+1 (αn+1 ), β i)iff i ≤ m0, for some m0 ≤ m. Then one has: 
+
+B | = ∃ v ∃ u (f (γp))( u, v ) ∧
+
+> m0
+
+^
+
+> i=1
+
+φi(fn(γ1), . . . , f n(γj ), f n+1 (αn+1 ), v ) (16.5) Since B is a model of Σ11-AC − 
+
+> 0
+
+, this is equivalent to a Π 11-formula over B, and similarly over A, and thus by (ii) holding for fn+1 as defined so far, we have that 
+
+A | = ∃ v ∃ u γ p(u, v ) ∧
+
+> m0
+
+^
+
+> i=1
+
+φi(γ1, . . . , γ j , α n+1 , v ) (16.6) Thus Γ ∗(v) is indeed finitely satisfied and so satisfied in A by some γ, and then we set fn+1 (γ) = βi. This completes the construction of the faithful embedding 
+
+f : A → B . Let D be the image of A under the faithful embedding f : A → B .By Proposition 15.7, we have that D is a Henkin model which is a substructure of B. But the assumption that we are in Case 16.1 implies that A | = Q(R), and since f : A → D is an isomorphism, we have D | = Q(R). By Henkin upwards independence, we have B | = Q(R), which contradicts that we are in Case 16.1, which says that B | = ¬Q(R). Hence, rather we are in the following case 
+
+Case 16.2. There is no pair of models A0 and B0 such that A0 |= T + Q(R) and 
+
+B0 |= T + ¬Q(R) + Σ 11(A0). Then for any model A | = T + Q(R), one has that T + ¬Q(R) + Σ 11(A) is incon-sistent and so by compactness there is a Σ 11-sentence Φ A in Σ 11(A) such that 
+
+T ⊢ ΦA → Q(R) (16.7) In this, we appeal to the fact that Σ 11-formulas are closed under finite conjunctions. Then consider the theory ∆ = {¬ ΦA : A | = T + Q(R)} (16.8) Then T + Q(R) + ∆ is inconsistent. For, suppose that it had a model A. Then it would model ¬ΦA (since this sentence is in ∆) and it would model Φ A (since this sentence is, by construction, in Σ 11(A), and hence true on A). Since T + Q(R) + ∆ is inconsistent, there are a finite number of models A1, . . . , Am |= T + Q(R) such that T + Q(R) proves Wmi=1 ΦAi . But then together with (16.7), we have that 
+
+T ⊢ Q(R) ↔
+
+> m
+
+_
+
+> i=1
+
+ΦAi (16.9) This finishes the proof of (1) The proof of (2) follows from (1) by replacing Q by ¬Q; and (3) follows directly from (1)-(2). 
+
+□
+
+Now we turn to the proof of Theorem 8.3. We first prove a preliminary theorem: 
+
+Theorem 16.3. (Sufficient conditions for grades of bounded definability). Suppose that T is a theory extending ACA − 
+
+> 0
+
+in a signature with only finitely many individual constants which is closed downwards under internal substructures. 34 SEAN WALSH 
+
+Suppose that Q is a generalized quantifier which is Σ 11-definable (resp. Π11-definable, resp. first-order definable) relative to T and Henkin conservative relative to T and has strong existential import relative to T . Then Q is bounded Σ 11-definable (resp. bounded Π 11-definable, resp. bounded first-order definable) relative to T .
+
+Proof. Consider a Henkin model B of T , and consider the Σ 11-definition Ψ( R, R ′) ≡∃ S Ψ0(R, R ′, S ) of Q(R, R ′), where Ψ 0(R, R ′, S ) contains no second-order quanti-fiers. Then the following Σ 11-formula Φ( R, R ′) also defines Q(R, R ′) relative to T ,where we have added the dummy existentials, where c1, . . . , c n are the individual constants in the signature: 
+
+∃ S
+
+ (∃ x x = x) ∧
+
+> n
+
+^
+
+> i=1
+
+(∃ x x = ci) ∧ Ψ0(R, R ′, S )
+
+
+
+(16.10) Let Φ U R(R, R ′) be the result of bounding all quantifiers in Φ( R, R ′) to U R, as in Definition 7.2(3), so that Φ U R(R, R ′) is equivalent to: 
+
+∃ S ⊆ U R
+
+ (∃ x (U R)x) ∧
+
+> n
+
+^
+
+> i=1
+
+(U R)ci
+
+ ∧ ΨU R 
+
+> 0
+
+(R, R ′, S )
+
+
+
+(16.11) Let R, R ′ be fixed in Sn[B]. We claim that B | = Q(R, R ′) ↔ ΦU R(R, R ′ ∩ U R). First suppose that U R is empty or does not include the interpretation of one of the individual constants c1, . . . , c n. By strong existential import (cf. Definition 8.2), one has that B | = ¬Q(R, R ′). By (16.11) we have B | = ¬ΦU R(R, R ′). Hence we have the biconditional since both sides are false. Second suppose that U R is non-empty and contains all of the interpretations of the individual constants c1, . . . , c n. Then by choosing A = U R we have a Henkin internal substructure A of B (cf. Definition 4.3). Since T is closed downwards under internal substructures, we have that A | = T . Further, one has B | = Q(R, R ′) iff B | =
+
+Q(R, R ′∩U R) by Henkin conservativity. By Henkin domain invariance relative to T
+
+together with Proposition 2.1, this happens iff A | = Q(R, R ′ ∩ U R). Using the Σ 11-definition in A this happens iff A | = Φ( R, R ′ ∩ U R). By Theorem 7.8, this happens iff B | = Φ U R(R, R ′ ∩ U R). Hence indeed B | = Q(R, R ′) ↔ ΦU R(R, R ′ ∩ U R). Thus Q(R, R ′) is bounded Σ 11-definable. The same argument works for the Π 11-case and the first-order case. 
+
+□
+
+Here is then the theorem on bounded definability: 
+
+Theorem 8.3. (Sufficient conditions for bounded ∆ 11-definability). Suppose that T is a theory extending Σ11-AC − 
+
+> 0
+
+in a signature with only finitely many individual constants which is closed downwards under internal substructures. Suppose that Q is a generalized quantifier which is Henkin domain independent relative to T and Henkin conservative relative to T and has strong existential import relative to T . Then Q is bounded ∆ 11-definable relative to T .
+
+Proof. This follows from Theorem 8.1 and Theorem 16.3. □NATURAL LANGUAGE QUANTIFIERS ARE PREDICATIVELY DEFINABLE 35 
+
+17. Proof of Theorems 11.2-11.3 
+
+First we define a substitution notion: 
+
+Definition 17.1. (Substituting a first-order formula for a relation variable). Suppose that the type of R is n = ( n1, . . . , n k). Suppose that Φ( R) is a formula of second-order logic which has no second-order quantifiers and only second-order free variables, including the displayed R.Suppose that we have specified an additional first-order signature, which has re-lation symbols corresponding to all the free second-order variables of Φ( R) excluding 
+
+those of the displayed R (our substitution notion will remove these displayed R). Then a tuple of first-order formulas ξ in this signature is of type n if it has the form (ξ1(v1, x ), . . . , ξ k(vk, x )) (17.1) where the displayed vi are of length ni, and all the variables in v1, . . . , v n, x are pairwise distinct, and do not occur free or bound in Φ( R). If ξ is of type n, then we let Φ( ξ(·, x )) be the first-order formula in the signature which is the result of replacing each instance of Riu in Φ( R) with ξi(u, x ). Hence Φ( ξ(·, x )) has only the free variables x coming from ξ. Note that when we are writing Φ( ξ(·, x )), we are suppressing the v variables in (17.1). If one wanted a more explicit notation, one could write Φ( ξ(v, x )), but this has the disadvantage of creating the impression that v is free in this formula, which it is not. The following elementary example is illustrative: 
+
+Example 17.2. (Example of substitution). Let R be R1, R 2, where R1 is unary and R2 is binary, and let Φ( R) be the following: 
+
+∀ x ∀ y  (R1x ∧ R1y ∧ x̸ = y) → R2xy  (17.2) Then the type of R is (1 , 2). Suppose that we specify the first-order signature with unary relation symbol F and binary relation symbol S. Consider the following tuple of first-order formulas ξ of type (1 , 2): 
+
+ F v 1,1 ∧ Sx 1v1,1, Sv 2,2v2,1 → Sv 2,1x2
+
+ (17.3) Then one has that Φ( ξ(·, x )) is 
+
+∀ x ∀ y  (F x ∧ Sx 1x ∧ F y ∧ Sx 1y ∧ x̸ = y) → (Syx → Sxx 2) (17.4) which has only free variables x1, x 2.We begin the march to the proof of Theorems 11.2-11.3 by showing the following. 
+
+Theorem 17.3. (From ∆ 11-definable to first-order definable in ACA wo 0 ). Suppose that Q(R) is a generalized quantifier which is ∆ 11-definable relative to 
+
+ACA wo 0 . Then Q(R) is first-order definable relative to ACA wo 0 .The same result holds for ACA − 
+
+> 0
+
+. We prove it for ACA wo 0 because we need this for a later results in this section. 
+
+Proof. Suppose that Q(R) is definable in ACA wo 0 by a Σ 11-formula ∃ S Φ( R, S ) where Φ( R, S ) has no second-order quantifiers and has only the displayed variables free, which are all second-order. Suppose further that Q(R) is definable in ACA wo 0 by a Π11-formula ∀ S′ Ψ( R, S ′) where Ψ( R, S ′) has no second-order quantifiers and has 36 SEAN WALSH 
+
+only the displayed variables free, which are all second-order. Suppose that R is of type n, and S is of type n′, and S′ is of type n′′ .Let T0 be the first-order theory which schematically says that ⪯ is a well-order, and whose signature includes relation symbols corresponding to R.If a tuple of first-order formulas ξ in this signature is of type n′, then we form Φ( R, ξ (·, x )) from Φ( R, S ) as in Definition 17.1. Likewise, if a tuple of first-order formulas χ in this signature is of type n′′ , then we form Ψ( R, χ (·, y )) from Φ( R, S ′)as in Definition 17.1. Let T be T0 plus the set of all first-order sentences ∀ y Ψ( R, χ (·, y )), as χ ranges over tuples of first-order formulas in the signature of type n′′ . Then we claim that there is a finite number of tuples of first-order formulas ξ1, . . . , ξ n in the signature of type n′ such that 
+
+T ⊢
+
+> n
+
+_
+
+> i=1
+
+∃ x Φ( R, ξ i(·, x )) (17.5) Suppose not. Then by compactness there is a first-order model M such that 
+
+M | = T0 ∧ ∀ y Ψ( R, χ (·, y )) ∧ ∀ x ¬Φ( R, ξ (·, x )) (17.6) for all tuples of first-order formulas χ in the signature of type n′′ , and all tuples of first-order formulas ξ in the signature of type n′. Let A be the Henkin model of 
+
+ACA wo 0 such that A = M and Sn[A] = Def( M n), where this is the set of subsets of 
+
+M n which are definable by a first-order formula in M with parameters. Then R,as interpreted in M, determines an element of S n [A], which we likewise refer to simply as R. There are two cases: – First suppose that A | = Q(R). Then A | = ∃ S Φ( R, S ). But the witnesses S
+
+are elements of S n′ [A] = Def( M n′
+
+). But then S = {v : M | = ξ(v, a )} for a tuple of first-order formulas ξ(v, x ) in the signature of type n′ and parameters a
+
+from M . But then A | = Φ( R, S ) implies M | = Φ( R, ξ (·, a )), contradicting that 
+
+M | = ∀ x ¬Φ( R, ξ (·, x )). – Second suppose that A | = ¬Q(R). Then A | = ∃ S′ ¬Ψ( R, S ′). But the witnesses 
+
+S′ are elements of S n′′ [A] = Def( M n′′ 
+
+). But then S′ = {v : M | = χ(v, b )}
+
+for some tuple of first-order formulas χ(v, y ) in the signature of type n′′ and parameters b from M . But then A | = ¬Ψ( R, S ′) implies M | = ¬Ψ( R, χ (·, b )), contradicting that M | = ∀ y Ψ( R, χ (·, y )). In either case, we get a contradiction. Hence, rather (17.5) is true, for some finite number of tuples of first-order formulas ξ1, . . . , ξ n in the signature of type n′.Then, by the definition of T and by compactness, there is a finite number of tuples of first-order formulas χ1, . . . , χ m in the signature of type n′′ such that 
+
+T0 ⊢
+
+> m
+
+^
+
+> j=1
+
+∀ y Ψ( R, χ j (·, y )) →
+
+> n
+
+_
+
+> i=1
+
+∃ x Φ( R, ξ i(·, x )) (17.7) Let ξ∗ be the result of replacing the relation symbols R by second-order variables R
+
+in ξ. Likewise, let χ∗ be the result of replacing the relation symbols R by second-order variables R in χ. Under this replacement, (17.7) holds when we further replace provability in first-order logic relative to T0 by provability in second-order NATURAL LANGUAGE QUANTIFIERS ARE PREDICATIVELY DEFINABLE 37 
+
+logic relative to ACA wo 0 . Finally, we claim: 
+
+ACA wo 0 ⊢ ∀ R  Q(R) ↔
+
+> m
+
+^
+
+> j=1
+
+∀ y Ψ( R, χ ∗ 
+
+> j
+
+(·, y ))  (17.8) The forward direction is trivial, using the Π 11-definition of Q(R) and first-order comprehension. For the reverse direction, we simply use (17.7) and the Σ 11-definition of Q(R) and first-order comprehension. 
+
+□
+
+For the proof of the next theorem, we just need to recall one elementary definition from first-order model theory (cf. [28, 91]): 
+
+Definition 17.4. (Definable Skolem functions). A model M has definable Skolem functions if for every formula φ(x, y ) with x
+
+having length n there is a definable function f : M n → M such that 
+
+M | =  ∀ x ∃ y φ (x, y ) →  ∀ x φ (x, f (x)) 
+
+The simple example which we use is: 
+
+Example 17.5. (Simple example of definable Skolem functions). Any model of the first-order theory in a single binary relation ⪯ which says schematically that ⪯ is a well-order has definable Skolem functions. For, given 
+
+φ(x, y ) one defines f (x) = y iff φ(x, y ) ∧ ∀ z ≺ y ¬φ(x, z ). 
+
+Remark 17.6. (Extending to obtain definable Skolem functions with Cartesian products as co-domain). If M is a first-order structure, then a definable function f : M n → M m is understood simply to be an m-tuple of definable functions f1 : M n → M , . . . , 
+
+fm : M n → M defined by f (x1, . . . , x n) = ( f1(x1, . . . , x n), . . . , f m(x1, . . . , x n)). If a structure M has definable Skolem functions, then for every formula φ(x, y ) with x
+
+having length n and y having length m there is a definable function f : M n → M m
+
+such that 
+
+M | =  ∀ x ∃ y φ (x, y ) →  ∀ x φ (x, f (x)) 
+
+This is simply by induction on m ≥ 1. The base case holds by definition. Suppose 
+
+M | = ∀ x ∃ y ∃ z φ (x, y, z ). Then by induction hypothesis there is definable 
+
+f : M n → M m such that M | = ∀ x ∃ z φ (x, f (x), z ). Then by the case m = 1 there is a definable function g : M n → M such that M | = ∀ x φ (x, f (x), g (x)). The following conservation result was originally developed by Barwise-Schlipf [7] in the setting of arithmetic (see [53, Lemma IX.4.3]). It was deployed in the context of abstraction principles by Ferreira-Wehmeier [18] and later in Walsh [63]. The proof is similar to the proof of [63, Theorem 63(iv)]. This proof does not obviously go through if one replaces Σ11-AC wo 0 by Σ11-AC − 
+
+> 0
+
+and ACA wo 0 by ACA − 
+
+> 0
+
+, since this would remove the definable Skolem functions. 
+
+Theorem 17.7. (Conservation of Σ11-AC wo 0 over ACA wo 0 ). 
+
+Σ11-AC wo 0 is Π 12-conservative over ACA wo 0 .
+
+Proof. Suppose that we have Π 12-sentence ∀ R ∃ R′ Φ( R, R ′) where Φ( R, R ′) con-tains no second-order quantifiers, and where R is of type n, and R′ is of type n′.Suppose that Σ11-AC wo 0 proves the sentence but ACA wo 0 does not. Then there is a Henkin model A of ACA wo 0 such that A | = ∀ R′ ¬Φ( R, R ′), for some R in A. Since 38 SEAN WALSH 
+
+each finite model of ACA wo 0 is standard and hence a model of Σ11-AC wo 0 , we must have that A is infinite. Without loss of generality, A is countably infinite. Let M be the associated first-order model with domain A and with n-ary con-stant symbols interpreting each of the elements of Sn[A]. This includes the binary relation ⪯ which witnesses that A satisfies the axioms of a well-order. By first-order comprehension in A, one has Sn[A] = Def( M n). Hence for a tuple of first-order formulas ξ in this signature of type n′, one has M | = ∀ x ¬Φ( R, ξ (·, x )). Further, 
+
+M satisfies the schematic first-order theory expressing that ⪯ is a well-order in its signature. Because of this, M has definable skolem functions. Since M is infinite, choose a recursively saturated elementary extension N of 
+
+M. Let B be the Henkin model of ACA wo 0 with B = N and Sn[B] = Def( N n). Then B | = ∀ R′ ¬Φ( R, R ′), where R is the element of S n [B] corresponding to the interpretation of the eponymous constants R as interpreted by N . It suffices to show that B is a model of Σ11-AC wo 0 . For, then it would be a model of Σ11-AC wo 0 plus the negation of the Π 12 sentence ∀ R ∃ R′ Φ( R, R ′). To show that B is a model of Σ11-AC wo 0 , suppose B | = ∀ x ∃ R Ψ( x, R ), where Ψ( x, R ) has no second-order quantifiers, and where R has type n. Then N |=
+
+∀ x W 
+
+> ξ
+
+∃ y Ψ( x, ξ (·, y )), where ξ ranges over all tuples of first-order formulas in the signature of type n. Then N does not realize the recursive class of formulas Γ( x), which consists of all formulas ¬∃ y Ψ( x, ξ (·, y )) as ξ ranges over first-order formulas in the signature of type n. Since N is recursively saturated, Γ( x) is not a type, i.e. not finitely realized in N . Hence, choose a finite sequence of formulas 
+
+ξ1, . . . , ξ ℓ of type n such that N | = ∀ x Wℓi=1 ∃ y Ψ( x, ξ i(·, y )). By padding with extra dummy variables if need be, we can assume that the y in each of these is of the same length. Then 
+
+N | = ∀ x ∃ y
+
+ ℓ_
+
+> i=1
+
+Ψ( x, ξ i(·, y )) ∧
+
+> i−1
+
+^
+
+> j=1
+
+¬∃ z Ψ( x, ξ j (·, z )) 
+
+
+
+(17.9) Since N has definable Skolem functions, there is function f : N |x| → N |y| which is 
+
+N -definable such that: 
+
+N | = ∀ x
+
+ ℓ_
+
+> i=1
+
+Ψ( x, ξ i(·, f (x))) ∧
+
+> i−1
+
+^
+
+> j=1
+
+¬∃ z Ψ( x, ξ j (·, z )) 
+
+
+
+(17.10) Then we define a partition of N |x|, into definable subsets P1, . . . , P ℓ as follows: 
+
+Pi = {x : N | = Ψ( x, ξ i(·, f (x))) ∧
+
+> i−1
+
+^
+
+> j=1
+
+¬∃ z Ψ( x, ξ j (·, z )) } (17.11) Then for all 1 ≤ j ≤ | n| we define: 
+
+R′ 
+
+> j
+
+= {x v j : N | = ^
+
+> 1≤i≤ℓ
+
+ Pix → ξi,j (vj , f (x)) } (17.12) This implies that for all 1 ≤ i ≤ ℓ and 1 ≤ j ≤ | n| we have: 
+
+x ∈ Pi =⇒ R′ 
+
+> j
+
+[x] = {vj : N | = ξi,j (vj , f j (x)) } (17.13) Then one has B | = ∃ R′
+
+> 1
+
+, . . . , R ′ 
+
+> k
+
+∀ x Ψ( x, R ′
+
+> 1
+
+[x], . . . , R ′
+
+> k
+
+[x]), or in abbreviated form 
+
+B | = ∃ R′ ∀ x Ψ( x, R ′[x]). □
+
+This in place, we now prove Theorems 11.2-11.3 from §11: NATURAL LANGUAGE QUANTIFIERS ARE PREDICATIVELY DEFINABLE 39 
+
+Theorem 11.2. (From ∆ 11-definability to first-order definability). Suppose that Q is a generalized quantifier which is ∆ 11-definable relative to 
+
+Σ11-AC wo 0 . Then Q is first-order definable relative to Σ11-AC wo 0 .
+
+Proof. Suppose that Q is a generalized quantifier which is ∆ 11-definable relative to Σ11-AC wo 0 . Suppose that the Σ 11-formula is ∃ S Φ( R, S ) and the Π 11-formula is 
+
+∀ S′ Ψ( R, S ′), where Φ , Ψ have no second-order quantifiers. Then Σ11-AC wo 0 proves each of the following: 
+
+∀ R    ∃ S Φ( R, S ) →  ∀ S′ Ψ( R, S ′) 
+
+∀ R    ∀ S′ Ψ( R, S ′) →  ∃ S Φ( R, S ) (17.14) We may assume that S and S′ are distinct, and that S does not occur free or bound in Ψ( R, S ′), and similarly S′ does not occur free or bound in Φ( R, S ). Then by elementary manipulation of the quantifiers this is equivalent to the following, the first of which is Π 11 and the second of which is Π 12:
+
+∀ R ∀ S ∀ S′  ¬Φ( R, S ) ∨ Ψ( R, S ′)
+
+∀ R ∃ S ∃ S′ ¬Ψ( R, S ′) ∨ Φ( R, S ) (17.15) Since Σ11-AC wo 0 is Π 12-conservative over ACA wo 0 by Theorem 17.7, one has that ACA wo 0
+
+proves (17.15), and hence also (17.14). Let Q′(R) be the Σ 11-formula ∃ S Φ( R, S ). Then Q′(R) is ∆ 11-definable relative to ACA wo 0 . Then by Theorem 17.3, we have that Q′(R) is first-order definable relative to ACA wo 0 . Then since Σ11-AC wo 0 proves that Q(R) and Q′(R) are equivalent, we have that Q(R) is first-order definable relative to Σ11-AC wo 0 .
+
+□
+
+Theorem 11.3. (Sufficient condition for bounded first-order definable). Suppose that Q is a generalized quantifier which is Henkin domain invariant relative to Σ11-AC wo 0 and Henkin conservative relative to Σ11-AC wo 0 and has strong existential import relative to relative to Σ11-AC wo 0 . Then Q is bounded first-order definable relative to Σ11-AC wo 0 .
+
+Proof. This follows from Theorem 8.1 and Theorem 11.2 and Theorem 16.3. □
+
+18. Proof of Theorem 12.1 
+
+Our goal in this section is to prove Theorem 12.1. First we introduce some notation specific to Σ11-CA fin 0 , which recall was defined at the end of Definition 11.1. We define X ↾ a = {x ∈ X : x ≺ a}, and define [0 , a ) = {x : x ≺ a}, both of which exist by first-order comprehension. Define X ∼= Y if there is order isomor-phism from ( X, ⪯) to ( Y, ⪯), which is a Σ 11-notion. By an easy inductive argument, order isomorphisms when they exist are unique. An axiom of Σ11-CA fin 0 is that the universe V is Dedekind finite (cf. Definition 2.2 for the definition of Dedekind finite). It follows from this that every X is Dedekind finite, since any injection f : X → X which is not a surjection can be extended to an injection g : V → V which is not a surjection by setting g = f on X and g equal to the identity on V \ X.Then we have: 40 SEAN WALSH 
+
+Proposition 18.1. (Order isomorphisms in Σ11-CA fin 0 ). 
+
+Σ11-CA fin 0 proves that for all X either there is c such that X ∼= [0 , c ), or X = V,but not both. 
+
+Proof. We work in Σ11-CA fin 0 . In this proof, we use 0 as an abbreviation for the least element, and we use b + 1 as an abbreviation for the immediate successor of b when it exists. Using the well-ordering, note that b + 1 exists whenever there is c ≻ b.We make four preliminary observations. First, since the universe is Dedekind finite, every non-empty set X has a maximal element. For, otherwise, for all a in X there is b in X with b ≻ a. Hence, for all 
+
+a in X there is ⪯-least b in X with b ≻ a. Let R be the binary relation which collects together pairs ( a, b ) in X2 such that b ≻ a and b is least with this property, and note that R exists by first-order comprehension. Then R is the graph of an injective non-surjective function f : X → X:– It is non-surjective since 0 is not in its range. – It is injective since a ≺ b with both a, b in X implies f (a) ⪯ b ≺ f (b). Second, since the universe V is Dedekind finite, every a is either 0 or a = b + 1 for some b. This is trivial in the case that V = {0}. Hence we suppose that we are not in this case. Let X = {a : a = 0 ∨ ∃ b a = b + 1 }, which exists by first-order comprehension. By induction we show that Xa holds for all a. Suppose not. Then there is some ⪯-least a for which it does not hold. Then a cannot be zero and a is not the immediate successor of anything. Then [0 , a ) is non-empty and so by the previous paragraph has a greatest element, call it b. Since b ≺ a, one has both that 
+
+b + 1 exists and b + 1 ⪯ a. But by maximality of b, we have that b + 1 cannot be in [0 , a ), and so a ⪯ b + 1. Then a = b + 1, a contradiction. Third, to show that all elements are in a set Y , it suffices to show both of the following: – Base case : Y (0) – Induction step : if Y (b) and b + 1 exists then Y (b + 1). For, suppose that these two things hold and yet some a satisfies ¬Y (a). Then choose ⪯-least a such that ¬Y (a). By the previous paragraph a = 0 or a = b + 1 for some b. But if the former, then we contradict the base case, and if the latter then we contradict the induction step. Fourth, for every X and every a there is a c ⪯ a such that X ↾ a ∼= [0 , c ). For, fix X and do an induction on a with respect to the Σ 11-definable property of there being a c ⪯ a with X ↾ a ∼= [0 , c ): – If a is 0, we take c = a.– If a = b + 1 and X ↾ b ∼= [0 , d ) for some d ⪯ b, then if b in X we have X ↾ a ∼=[0 , d + 1) (note that d + 1 exists since d ⪯ b and b + 1 exists); and if b not in X
+
+we have X ↾ a ∼= [0 , d ). We now prove that for every X, either there is c such that X ∼= [0 , c ) or X = V.Let a be the maximal element of V. Then X ↾ a ∼= [0 , c ) for some c ⪯ a, by our previous work. There are then a couple of cases to consider. – If a not in X, then X ∼= [0 , c ). – If a in X, then consider two cases: c ≺ a or c = a.
+
+– If c ≺ a, then c + 1 exists and X ∼= [0 , c + 1). 
+
+– If c = a, then we can extend an order isomorphism f : X ↾ a → [0 , c ) to an order isomorphism g : X → V by sending g(a) = c. Then by considering NATURAL LANGUAGE QUANTIFIERS ARE PREDICATIVELY DEFINABLE 41 
+
+its inverse g−1 : V → X, we have that g−1 : V → V is injective and hence surjective, and thus X = V.Finally, one cannot have both X = V and X ∼= [0 , c ) for some c. For, any order isomorphism f : V → [0 , c ) would be an injective non-surjective function 
+
+f : V → V. □
+
+This implies: 
+
+Proposition 18.2. (A cardinality dichotomy in Σ11-CA fin 0 ). 
+
+Σ11-CA fin 0 proves that for all X, Y one has that there is an injection from X to Y ,or an injection which is not a surjection from Y to X, but not both. 
+
+Proof. One cannot have both, since if f : X → Y is an injection and g : Y → X is an injection which is not a surjection, then g ◦ f : X → X is an injection which is not a surjection. If Y is V, then we can satisfy the first disjunct with the identity map. If Y is not V and X is V, then we can satisfy the second disjunct with the identity map. Suppose now that both X, Y are not V. By Proposition 18.1, we have that 
+
+X ∼= [0 , c ) and Y ∼= [0 , d ) for some c, d , with witnessing order isomorphisms f, g .If c ⪯ d, then g−1 ◦ f is an injection from X to Y . If d ≺ c, then f −1 ◦ g is an injection which is not a surjection from Y to X; in particular, a point in X which is not in the range of f −1 ◦ g is the point x of X with f (x) = d. □
+
+Proposition 18.3. (Equivalent characterizations of strict less-than of cardinality in Σ11-CA fin 0 ). 
+
+Σ11-CA fin 0 proves that for all X, Y the following are equivalent: (1) There is an injection f : X → Y but there is no injection g : Y → X.(2) There is an injection f : X → Y which is not a surjection. (3) There is no surjection h : X → Y .
+
+Proof. First suppose (1); we show (2). Suppose that there is an injection f : X → Y
+
+but there is no injection g : Y → X. Then we claim that f : X → Y is not a surjection. If it was, then its inverse f −1 : Y → X would be an injection. Second suppose (2); we show (3). Suppose that f : X → Y is an injection but not a surjection. Suppose for reductio that there was a surjection h : X → Y . Then consider the binary relation R consisting of pairs ( y, x ) in Y ×X such that h(x) = y
+
+and there is no x0 ≺ x with h(x0) = y. The binary relation R exists by first-order comprehension. Then R defines the graph of an injective function g : Y → X. But then with f, g we have both disjuncts of Proposition 18.2. Third suppose (3); we show (1). If we had an injection g : Y → X, then we could choose a point y0 of Y , and consider the binary relation R consisting of pairs ( x, y )in X × Y such that if x is in the range of g, then g(y) = x, while if x is not in the range of g, then y = y0. The binary relation R exists by first-order comprehension. Then R defines the graph of a surjective function h : X → Y . Hence, there is no injection g : Y → X. Then by Proposition 18.2, there is an injection f : X → Y
+
+which is not a surjection. Hence, there is an injection f : X → Y , but there is no injection g : Y → X. □
+
+Finally, we can prove: 
+
+Theorem 12.1. (A theory for the paradigmatic cardinality-defined quantifiers). (1) Most and More -than are bounded ∆ 11-definable relative to Σ11-CA fin 0 .42 SEAN WALSH 
+
+(2) Most and More -than are Henkin domain independent and Henkin conservative relative to Σ11-CA fin 0 .
+
+Proof. For (1), it suffices to note that the relation |X| < |Y | is bounded ∆ 11-definable in Σ11-CA fin 0 . Recall from §1 that we define |X| < |Y | in second-order logic as: there is an injection f : X → Y but there is no injection g : Y → X. This condition is just what Proposition 18.3(1) says. And Proposition 18.3(2) provides the bounded Σ11-definition, and Proposition 18.3(3) provides the bounded Π 11-definition. For (2), to show Henkin domain independence, we simply appeal to (1) and Corollary 7.11(3). Finally, to see that Most and More -then are Henkin conservative, note that this is true for the same reason that they are conservative on standard models. In the case of Most one simply notes that F ∩ G is the same as F ∩ (F ∩ G), and that F \G is the same as F \(F ∩G) (cf. Example 3.6). In the case of More -than 
+
+one simply notes that F ∩ H is the same as F ∩ (( F ∪ G) ∩ H), and that G ∩ H is the same as G ∩ (( F ∪ G) ∩ H) (cf. Example 5.3). □
+
+19. Further Questions 
+
+In closing, four further issues bear investigating. First, following the tradition of generalized quantifiers, this paper works in second-order logic and with its models. But in many applications one will be working with ω-th order logic or with a type theory. It is not clear whether any of the results of this paper extend to those natural settings. For, the tools from first-order model theory which are used all depend on being able to reduce the “top layer” second-order objects to various kinds of definable first-order formulas, in certain elementary extensions. These methods will break down if there is no top layer and if higher layers can influence lower layers. Second, all of the proofs in this paper are highly model-theoretic, and go through the rich method of recursively saturated models initiated by Barwise-Schlipf. 61 
+
+However, as mentioned, Theorem 8.1 basically follows from Feferman’s Preservation Theorem, which Feferman originally proved by proof-theoretic means. It would be valuable to go through the arguments of this paper using proof-theoretic methods. Perhaps these methods could provide more of a procedure for i.e. going from a generalized quantifier satisfying Henkin domain independence to its ∆ 11-definition. The arguments of this paper, by contrast, provide no such information since they proceed by non-constructive compactness arguments. Third, it seems worthwhile to explore the idea of Henkin domain independence in the setting of a modal logic. One can view the approach adumbrated in this paper as the rudiments of a Kripke semantics for such a logic, whereby the worlds are the Henkin models and the accessibility relation is the substructure relation. As a first attempt, one might try to formalize principles such as the following, which seems to capture some part of Henkin upwards independence in the case of type (1 , 1) generalized quantifiers: 
+
+∀ X ∀ Y  Q(X, Y ) ↔ □ Q(X, Y ) (19.1) A natural question would be what modal logic, if any, was sound and complete for the aforementioned semantics, and whether these resulted in (19.1) or strengthen-ings thereof having implications for definability.  
+
+> 61 [7]. NATURAL LANGUAGE QUANTIFIERS ARE PREDICATIVELY DEFINABLE 43
+
+Fourth, it is worth examining closer the relation between Theorems 8.1, 8.3 and the Conservativity Theorem of Keenan-Stavi. 62 This result of Keenan-Stavi gives a “from below” characterization of conservative quantifiers on standard domains, namely as those containing certain basic generalized quantifiers and closed under the Boolean operations and a relativisation notion. 63 However, while an immensely elegant characterization, it is sometimes thought to depend too much on the under-lying first-order domain, and to be “mere enumeration.” 64 But in other settings, ∆11-definitions have equivalent characterizations which do not depend heavily on the underlying domain and which give voice to some kind of construction from below. These can be hard-fought results, such as Souslin’s Theorem, or the char-acterizations of ∆ 11-definable sets of natural numbers in terms of Kleene’s O.65 In other cases, such as in NP ∩ co -NP , there are to my knowledge no known “from below” characterizations. One natural question then is whether one can refine the Keenan-Stavi theorem to show that the bounded ∆ 11-definable generalized quan-tifiers are built up from below from simpler ones in a constructive manner which does not depend too heavily on the underlying domain. 
+
+Acknowledgments and funding 
+
+Acknowledgments. Thanks to Dylan Bumford, Salvatore Florio, James Gu, Ed Keenan, Ned Sanger, and the referees and editors for feedback and comments. 
+
+Funding. There is no external funding to report. 
+
+References 
+
+1. Aristotle, Complete works of Aristotle , vol. 1, Princeton University Press, 2014. 13 2. C.J. Ash and J. Knight, Computable structures and the hyperarithmetical hierarchy , Elsevier, 2000. 65 3. Jon Barwise, Admissible sets and structures , Perspectives in Mathematical Logic, vol. 7, Cambridge University Press, 1975. 65 4. , On branching quantifiers in English , Journal of Philosophical Logic 8 (1979), no. 1, 47–80. 18 5. Jon Barwise and Robin Cooper, Generalized quantifiers and natural language , Linguistics and Philosophy 4 (1981), no. 2, 159–219. 1, 23 6. Jon Barwise and Solomon Feferman, Model-theoretic logics , Perspectives in Mathematical Logic, Springer, 1985. 1, 12 7. Jon Barwise and John Schlipf, On recursively saturated models of arithmetic , Model Theory and Algebra, Lecture Notes in Mathematics, vol. 498, Springer, 1975, pp. 42–55. 27, 28, 17, 61 8. Will Boney, Model theoretic characterizations of large cardinals , Israel Journal of Mathematics 
+
+236 (2020), no. 1, 133–181. 58 9. Tim Button and Sean Walsh, Philosophy and model theory , Oxford University Press, 2018. 44, 50 10. Henri¨ ette de Swart, Adverbs of quantification: A generalized quantifier approach , Garland, 1993. 17, 26 11. Walter Dean and Sean Walsh, The prehistory of the subsystems of second-order arithmetic ,Review of Symbolic Logic 10 (2017), no. 2, 357–396. 34 
+
+> 62
+
+[40, 276, 317 ff], [21, p. 248, Fact 5], [22, 305-6], [65, 321]. 
+
+> 63
+
+At least, it is usually presented as a result about standard models. But it is not hard to see that with minimal modification it can be recast as a theorem of higher-order logic. 
+
+> 64
+
+[61, 10-11]; cf. [22, 305-6], [65, 321]. 
+
+> 65
+
+[2, Chapters 4-5]. This was generalized by Barwise and others to the setting of admissible sets (e.g. [3, §IV.3]). 44 SEAN WALSH 
+
+12. Heinz-Dieter Ebbinghaus, J¨ org Flum, and Wolfgang Thomas, Mathematical logic , third ed., Graduate Texts in Mathematics, Springer, 2021. 43 13. Herbert B Enderton, Chapter 4: Second-order logic , A Mathematical Introduction to Logic, Harcourt, second ed., 2001, pp. 282–306. 8, 57 14. Solomon Feferman, Persistent and invariant formulas for outer extensions , Compositio Math-ematica 20 (1968), 29–52. (abstract), 2, 8, 8, 16 15. , Set-theoretical invariance criteria for logicality , Notre Dame Journal of Formal Logic 
+
+51 (2010), no. 1, 3–20. 8 16. , Which quantifiers are logical? A combined semantical and inferential criterion ,Quantifiers, Quantifiers, and Quantifiers: Themes in Logic, Metaphysics, and Language (Alessandro Torza, ed.), Springer, 2015, pp. 19–30. 8 17. Solomon Feferman and Georg Kreisel, Persistent and invariant formulas relative to theories of higher order , Bulletin of the American Mathematical Society 72 (1966), 480–485. 2 18. Fernando Ferreira and Kai F Wehmeier, On the consistency of the ∆11-CA fragment of Frege’s Grundgesetze , Journal of Philosophical Logic 31 (2002), no. 4, 301–311. 17 19. Melvin Fitting, A tableau proof method admitting the empty domain , Notre Dame Journal of Formal Logic 12 (1971), no. 2, 219–224. 29 20. Salvatore Florio and Øystein Linnebo, The many and the one: A philosophical study of plural logic , Oxford University Press, 2021. 11 21. L.T.F. Gamut, Intensional logic and logical grammar , Logic, Language, and Meaning, vol. 2, University of Chicago Press, 1991. 7, 21, 26, 35, 62 22. Michael Glanzberg, Quantifiers , Oxford Handbook of the Philosophy of Language (Ernest Lepore and Barry C Smith, eds.), Oxford University Press, 2006, pp. 794–821. 15, 20, 25, 45, 62, 64 23. Martin Hackl, On the grammar and processing of proportional quantifiers: most versus more than half , Natural Language Semantics 17 (2009), no. 1, 63–98. 14 24. Theodore Hailperin, Quantification theory and empty individual-domains , The Journal of Symbolic Logic 18 (1953), no. 3, 197–200. 29 25. Petr Hajek and Pavel Pudlak, Metamathematics of first-order arithmetic , Springer, 1998. 31 26. Joel David Hamkins, The set-theoretic multiverse , Review of Symbolic Logic 5 (2012), no. 3, 416–449. 50 27. Irene Heim and Angelika Kratzer, Semantics in generative grammar , Wiley, 1998. 35 28. Wilfrid Hodges, Model theory , Encyclopedia of Mathematics and its Applications, vol. 42, Cambridge University Press, 1993. 30, 17 29. Jack Hoeksema, Plurality and conjunction , Studies in model theoretic semantics (A. ter Meulen, ed.), vol. 1, De Gruyter, 1983, pp. 63–83. 19 30. Thomas W Hungerford, Algebra , Springer, 1974. 27 31. Tim Hunter and Jeffrey Lidz, Conservativity and learnability of determiners , Journal of Se-mantics 30 (2013), no. 3, 315–334. 4 32. Neil Immerman, Descriptive complexity , Graduate Texts in Computer Science, Springer, 1996. 52, 54 33. Thomas Jech, Set theory , third ed., Springer, 2007. 31 34. Alexander S Kechris, Classical descriptive set theory , Springer, 1995. 51, 53 35. Edward Keenan, A boolean approach to semantics , Formal Methods in the Study of Lan-guage (J.A.G. Groenendijk, T.M.V. Janssen, and M.B.J Stokhof, eds.), vol. 2, Mathematisch Centrum, 1981, pp. 343–378. 23 36. , Quantifiers , Semantics: An International Handbook of Natural Language Meaning (Klaus von Heusinger, Claudia Maienborn, and Paul Portner, eds.), vol. 2, de Gruyter, 2011, pp. 1058–1087. 17, 20, 21, 23, 41 37. Edward L Keenan, The semantics of determiners , The Handbook of Contemporary Semantic Theory (Shalom Lappin, ed.), Blackwell, first ed., 1996, pp. 41–63. 26, 37, 45 38. Edward L. Keenan and Lawrence S. Moss, Generalized quantifiers and the expressive power of natural language , Generalized Quantifiers in Natural Language (Alice ter Meulen and Johan van Benthem, eds.), De Gruyter, 1985, pp. 73–124. 23 39. Edward L Keenan and Denis Paperno (eds.), Handbook of quantifiers in natural language ,2012 ed., Studies in Linguistics and Philosophy, Springer, 2012, two volumes. 20 40. Edward L. Keenan and Jonathan Stavi, A semantic characterization of natural language determiners , Linguistics and Philosophy 9 (1986), 253–326. 1, 23, 36, 37, 62 NATURAL LANGUAGE QUANTIFIERS ARE PREDICATIVELY DEFINABLE 45 
+
+41. Edward L. Keenan and Dag Westerst˚ ahl, Generalized quantifiers in linguistics and logic ,Handbook of logic and language (1997), 837–893. 1, 21, 23, 25 42. Feng-Hsi Liu, Branching quantification and scope independence , Quantifiers, Logic, and Lan-guage (van der Does and Jaap Jan van Eijck, eds.), CSLI Lecture Notes, CSLI, 1996, pp. 255– 268. 19 43. Mar´ ıa Manzano, Extensions of first order logic , Cambridge Tracts in Theoretical Computer Science, vol. 19, Cambridge University Press, 1996. 8, 57 44. David Marker, A model theoretic proof of Feferman’s Preservation Theorem , Notre Dame Journal of Formal Logic 25 (1984), no. 3, 213–216. (abstract), 3, 8, 15, 16, 59 45. , Model theory : An introduction , Springer, 2006. 57, 60 46. Robert May, Interpreting logical form , Linguistics and Philosophy 12 (1989), no. 4, 387–435. 19 47. Elliott Mendelson, Introduction to mathematical logic , fourth ed., Chapman & Hall, 1997. 49 48. Andrzej Mostowski, On a generalization of quantifiers , Studies in logic and the foundations of mathematics 93 (1957), 311–335. 1 49. Barbara Partee, The starring role of quantifiers in the history of formal semantics , The Logica Yearbook 2012 (2012), 113–136. 20 50. Stanley Peters and Dag Westerst˚ ahl, Quantifiers in language and logic , Oxford University Press, 2008. 1, 13, 14, 15, 16, 17, 18, 21, 23, 25, 33, 36, 37, 10 51. Jacopo Romoli, Toward a structural account of conservativity , Proceedings of Sinn und Be-deutung 14 14 (2010), 373 – 387. 42 52. , A structural account of conservativity , Semantics - Syntax Interface 2 (2015), no. 1, 28–57. 42 53. Stephen G. Simpson, Subsystems of second order arithmetic , Cambridge University Press, 2009. 2, 27, 28, 60, 17 54. Mark Steedman, Taking scope: The natural semantics of quantifiers , MIT Press, 2011. 19 55. Shane Steinert-Threlkeld and Jakub Szymanik, Ease of learning explains semantic universals ,Cognition 195 (2020), 104076. 4 56. Wolfgang Sternefeld, Quantifiers, scope, and pseudo-scope , The Wiley Blackwell Companion to Semantics, Wiley, 2020, pp. 1–44. 20, 9, 37 57. Anna Szabolcsi, Quantification , Cambridge University Press, 2010. 1, 14, 20, 21, 23, 36, 42, 45, 46 58. Jakub Szymanik, Quantifiers and cognition: Logical and computational perspectives , Studies in Linguistics and Philosophy, vol. 96, Springer, 2016. 4, 18, 19, 55, 56 59. Katrin Tent and Martin Ziegler, A course in model theory , Cambridge University Press, 2012. 27, 28, 57 60. Johan van Benthem, Questions about quantifiers , Journal of Symbolic Logic 49 (1984), no. 2, 443–466. 8 61. , Essays in logical semantics , Studies in Linguistics and Philosophy, Kluwer, 1986. 21, 8, 37, 64 62. Kai von Fintel and Lisa Matthewson, Universals in semantics , Linguistic Review 25 (2008), no. 1-2, 139–201. 9, 41 63. Sean Walsh, Comparing Hume’s Principle, Basic Law V and Peano Arithmetic , Annals of Pure and Applied Logic 163 (2012), 1679–1709. 17 64. , Predicativity, the Russell-Myhill paradox, and Church’s intensional logic , Journal of Philosophical Logic 45 (2016), no. 3, 277–326. 6, 7, 34 65. Dag Westerst˚ ahl, Quantifiers in formal and natural languages , Handbook of Philosophical Logic, Springer, second ed., 2007, pp. 223–338. 1, 21, 23, 62, 64 66. R Zuber and E Keenan, A note on conservativity , Journal of Semantics 36 (2019), 573–582. 24 
+
+Department of Philosophy, University of California, Los Angeles, 390 Portola Plaza, Dodd Hall 321, Los Angeles, CA 90095-1451 
+
+Email address : walsh@ucla.edu 
+
+URL : http://philosophy.ucla.edu/person/sean-walsh/
