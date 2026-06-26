@@ -1,0 +1,287 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-26T20:58:12.111784+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 3,
+    "deep_cap": 6,
+    "deep_selected": 3,
+    "quick_candidates": 4,
+    "quick_skim_target": 11,
+    "quick_selected": 4
+  },
+  "deep_dive": [
+    {
+      "id": "2606.25533v1",
+      "source": "arxiv",
+      "title": "Security and Privacy in Retrieval-Augmented Generation: Architectures, Threats, Defenses, and Future Directions for Building Trustworthy Systems",
+      "abstract": "Retrieval-Augmented Generation (RAG) has emerged as a dominant paradigm for enhancing large language models with external knowledge. By coupling retrieval mechanisms with generative models, RAG systems improve factual grounding and adaptability across domains. However, integrating retrieval pipelines introduces new security and privacy risks that extend beyond conventional language modeling threats. Sensitive information may be exposed through retrieval indices, query logs, context construction, or federated updates, while adversarial manipulation of knowledge bases can undermine trust in generated outputs. This survey provides a comprehensive examination of privacy and security challenges across RAG systems deployed in centralized, on-device (Micro-RAG), federated, and hybrid paradigms. We present a unified taxonomy of threat surfaces spanning the retrieval, context construction, and generation stages and systematically analyze attack classes, including membership inference, index inference, poisoning, gradient leakage, and collusion. We further review architectural, algorithmic, and cryptographic defenses, highlighting privacy-utility trade-offs and deployment considerations. Finally, we outline open research challenges toward building trustworthy, secure, and resilient RAG systems for real-world applications.",
+      "authors": [
+        "Balamurugan Palanisamy",
+        "G S S Chalapathi",
+        "Vikas Hassija",
+        "Rajkumar Buyya"
+      ],
+      "primary_category": "cs.CR",
+      "categories": [
+        "cs.CR",
+        "cs.CL"
+      ],
+      "published": "2026-06-24T08:08:10+00:00",
+      "link": "https://arxiv.org/pdf/2606.25533v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "comprehensive survey on security and privacy in RAG",
+      "llm_evidence_cn": "关于检索增强生成系统安全与隐私的全面综述",
+      "llm_evidence": "关于检索增强生成系统安全与隐私的全面综述",
+      "canonical_evidence": "关于检索增强生成系统安全与隐私的全面综述",
+      "llm_tldr_en": "A comprehensive survey examining security and privacy threats, defenses, and future directions in Retrieval-Augmented Generation systems.",
+      "llm_tldr_cn": "检索增强生成（RAG）已成为增强大语言模型外部知识的主流范式，但也引入了新的安全和隐私风险。该综述系统梳理了RAG系统中索引、查询日志、上下文构建等环节的威胁，并讨论了对抗性攻击及防御策略。文章还展望了构建可信RAG系统的未来方向，为相关研究提供参考。",
+      "llm_tldr": "检索增强生成（RAG）已成为增强大语言模型外部知识的主流范式，但也引入了新的安全和隐私风险。该综述系统梳理了RAG系统中索引、查询日志、上下文构建等环节的威胁，并讨论了对抗性攻击及防御策略。文章还展望了构建可信RAG系统的未来方向，为相关研究提供参考。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "servey",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.26807v1",
+      "source": "arxiv",
+      "title": "KARLA: Knowledge-base Augmented Retrieval for Language Models",
+      "abstract": "We propose a new method that allows an LLM to automatically pull in factual knowledge from a knowledge base during token generation. This means that (1)~factual knowledge in the LLM output can be updated without retraining the LLM, (2)~facts in the LLM output can be traced to the knowledge base for transparency and explainability, and (3)~smaller models can achieve the same factual accuracy as larger models. Our core idea is to train the model to produce special tokens that trigger a query to the knowledge base. Our experiments show that our method improves factual grounding in both short and long-form generation, and allows factual revisions to take effect through KB edits rather than parameter updates.",
+      "authors": [
+        "Francois Crespin",
+        "Fabian M. Suchanek",
+        "Nils Holzenberger"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-06-25T09:44:40+00:00",
+      "link": "https://arxiv.org/pdf/2606.26807v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "KARLA reduces hallucinations by augmenting LLM with knowledge base",
+      "llm_evidence_cn": "KARLA通过知识库增强减少幻觉",
+      "llm_evidence": "KARLA通过知识库增强减少幻觉",
+      "canonical_evidence": "KARLA通过知识库增强减少幻觉",
+      "llm_tldr_en": "KARLA trains LLM to trigger knowledge base queries, improving factual grounding and enabling updates without retraining.",
+      "llm_tldr_cn": "针对大语言模型在生成中缺乏事实依据、容易产生幻觉的问题，本文提出KARLA方法，通过训练模型在生成过程中产生特殊标记以触发知识库查询。该方法无需重新训练模型即可更新事实知识，并且可以追溯事实来源。实验表明，KARLA在短文本和长文本生成中均显著提升了事实准确性，使得小模型也能达到与大模型相当的事实能力。",
+      "llm_tldr": "针对大语言模型在生成中缺乏事实依据、容易产生幻觉的问题，本文提出KARLA方法，通过训练模型在生成过程中产生特殊标记以触发知识库查询。该方法无需重新训练模型即可更新事实知识，并且可以追溯事实来源。实验表明，KARLA在短文本和长文本生成中均显著提升了事实准确性，使得小模型也能达到与大模型相当的事实能力。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-06-21-728965-v1",
+      "source": "biorxiv",
+      "title": "NanoCellAnnotator: Formalizing Expert Cell Type Annotation with Large Language Models",
+      "abstract": "Motivation: Cell-type annotation in spatial transcriptomics is challenging due to sparse gene panels, spatial heterogeneity, and limited availability of tissue-matched reference atlases. Recent approaches have explored large language models (LLMs) for integrating biological knowledge during annotation, but unconstrained inference can produce biologically unsupported predictions and hallucinated cell types. In addition, many LLM-based pipelines rely on large cloud-hosted models that limit reproducibility and deployment in privacy-sensitive environments. Results: We introduce NanoCellAnnotator, a biologically constrained and confidence-aware framework for automated cell-type annotation in spatial transcriptomics. The framework de-couples spatial structure discovery, deterministic biological evidence construction, and language model-based semantic inference. Spatial clusters are identified using hybrid spatially regularized non-negative matrix factorization (hSNMF), after which cluster-level marker genes are abstracted into ontology-derived functional programs using Gene Ontology enrichment and GO-slim projection. A lightweight locally executable language model performs constrained label selection within a curated admissible label space derived from PanglaoDB and CellMarker. Annotation confidence is estimated independently using marker support strength and lineage separation, enabling ambiguous or heterogeneous clusters to be explicitly flagged. We evaluate NanoCellAnnotator on Xenium spatial transcriptomics data from intrahepatic cholangiocarci-noma and an independent breast cancer spatial transcriptomics dataset. The framework recovers canonical cell populations with high confidence while identifying heterogeneous or transitional spatial domains as ambiguous. Agreement with manual annotations was evaluated using accuracy and adjusted Rand index. Availability: Code available at https://github.com/ishtyaqmahmud/NanoCellAnnotator.",
+      "authors": [
+        "Mahmud, M. I.",
+        "Kochat, V.",
+        "Anzum, H.",
+        "Satpati, S.",
+        "Dwarampudi, J. M. R.",
+        "Rai, K.",
+        "Banerjee, T."
+      ],
+      "primary_category": "bioinformatics",
+      "categories": [
+        "bioinformatics"
+      ],
+      "published": "2026-06-25T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.06.21.728965v1.full.pdf",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "suppresses hallucinated cell types in LLM-based annotation",
+      "llm_evidence_cn": "在大语言模型注释中抑制幻觉细胞类型",
+      "llm_evidence": "在大语言模型注释中抑制幻觉细胞类型",
+      "canonical_evidence": "在大语言模型注释中抑制幻觉细胞类型",
+      "llm_tldr_en": "Introduces NanoCellAnnotator, a biologically constrained and confidence-aware LLM framework for cell-type annotation in spatial transcriptomics that explicitly addresses and suppresses hallucinated cell types while enabling deployment in privacy-sensitive environments.",
+      "llm_tldr_cn": "针对大语言模型在细胞类型注释中可能产生幻觉细胞类型的问题，本文提出NanoCellAnnotator，一个生物约束且置信度感知的框架。该框架通过解耦稀疏基因面板的局部表达模式与全局细胞类型知识，并引入生物学约束及置信度估计，有效抑制幻觉，同时支持在隐私敏感环境中的本地部署。实验表明该方法在不依赖云模型的情况下提供准确且可解释的注释。",
+      "llm_tldr": "针对大语言模型在细胞类型注释中可能产生幻觉细胞类型的问题，本文提出NanoCellAnnotator，一个生物约束且置信度感知的框架。该框架通过解耦稀疏基因面板的局部表达模式与全局细胞类型知识，并引入生物学约束及置信度估计，有效抑制幻觉，同时支持在隐私敏感环境中的本地部署。实验表明该方法在不依赖云模型的情况下提供准确且可解释的注释。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.21448v1",
+      "source": "arxiv",
+      "title": "Fast-TurboQuant: A Multiplier-Free Online Vector Quantization Approach",
+      "abstract": "As large language models scale, memory bandwidth for key-value caches and retrieval-augmented generation systems becomes a critical bottleneck. While 1-bit quantization addresses this constraint, recent TurboQuant relies on dense random rotation matrices to condition the vector distribution before quantization. This projection demands millions of floating-point multiplications per embedding, making it difficult to deploy on constrained edge silicon. We introduce Fast-TurboQuant, a multiplier-free projection architecture that replaces the dense matrix with a structured fast Johnson-Lindenstrauss transform. By applying a Rademacher phase inversion followed by a fast Walsh-Hadamard transform (FWHT), the method leverages sub-Gaussian concentration to satisfy the prerequisites of scalar Lloyd-Max quantization without Gaussian projections. This substitution reduces the arithmetic complexity to only additions, eliminating hardware multipliers. Evaluation on DBpedia OpenAI-3 Large embeddings demonstrates a 19.7 times algorithmic speedup under sequential execution. Furthermore, the dimension expansion due to the FWHT zero-padding reduces the mean squared error and improves Recall@10.",
+      "authors": [
+        "Pedro M. R. Pereira",
+        "Felipe A. P. de Figueiredo",
+        "Rausley A. A. de Souza"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.IT",
+        "eess.SP"
+      ],
+      "published": "2026-06-19T14:07:50+00:00",
+      "link": "https://arxiv.org/pdf/2606.21448v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "multiplier-free quantization via fast Johnson-Lindenstrauss transform",
+      "llm_evidence_cn": "通过快速Johnson-Lindenstrauss变换实现无乘法器量化",
+      "llm_evidence": "通过快速Johnson-Lindenstrauss变换实现无乘法器量化",
+      "canonical_evidence": "通过快速Johnson-Lindenstrauss变换实现无乘法器量化",
+      "llm_tldr_en": "Proposes Fast-TurboQuant replacing dense rotation with fast Walsh-Hadamard transform for multiplier-free vector quantization, improving efficiency for LLM KV cache.",
+      "llm_tldr_cn": "针对大语言模型KV缓存和检索增强生成系统的内存带宽瓶颈，现有TurboQuant需大量浮点乘法。提出Fast-TurboQuant，用快速Walsh-Hadamard变换替代密集旋转矩阵，实现无乘法器投影，利用亚高斯集中性保证性能，更适合边缘部署。",
+      "llm_tldr": "针对大语言模型KV缓存和检索增强生成系统的内存带宽瓶颈，现有TurboQuant需大量浮点乘法。提出Fast-TurboQuant，用快速Walsh-Hadamard变换替代密集旋转矩阵，实现无乘法器投影，利用亚高斯集中性保证性能，更适合边缘部署。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.21889v1",
+      "source": "arxiv",
+      "title": "Ranking-and-Selection with Multiple Correct Answers and Non-Answerable Estimates",
+      "abstract": "We study fixed-precision ranking-and-selection in structured settings where the answer may be non-unique and where noisy estimates may temporarily admit no valid answer at all. This phenomenon arises naturally in problems such as multi-fidelity ranking-and-selection and identifying a Condorcet winner from pairwise comparisons. To address this, we propose a unified framework based on answer-wise acceptance sets, restricted generalized likelihood ratio stopping, and an answer-pitfall decomposition that yields a max-max-min characteristic value and a common sampling principle. We introduce ENDS, a general procedure that combines estimation, nomination, pitfall detection, and cost-aware information-directed selection. We instantiate ENDS for various problems by deriving explicit formulas. Extensive numerical experiments show that this unified recipe performs well across a broad range of pure-exploration problems and offers a practical framework and proof-of-concept algorithmic recipe.",
+      "authors": [
+        "Qiaoqiao Wang",
+        "Wei You"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "stat.ML"
+      ],
+      "published": "2026-06-20T05:29:31+00:00",
+      "link": "https://arxiv.org/pdf/2606.21889v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "ranking-and-selection framework with multiple correct answers relates to preference learning in RLHF",
+      "llm_evidence_cn": "多正确答案的排序选择框架与RLHF中的偏好学习相关",
+      "llm_evidence": "多正确答案的排序选择框架与RLHF中的偏好学习相关",
+      "canonical_evidence": "多正确答案的排序选择框架与RLHF中的偏好学习相关",
+      "llm_tldr_en": "This paper studies ranking-and-selection when answers can be non-unique and non-answerable. It proposes ENDS, a framework combining estimation, nomination, pitfall detection, and cost-aware selection, with potential applications to RLHF-like preference aggregation.",
+      "llm_tldr_cn": "在固定精度排序与选择问题中，传统方法常假设唯一正确答案，但实际场景中答案可能不唯一甚至无有效答案（如多保真度排序或Condorcet赢家识别）。本文提出ENDS框架，基于答案级接受集、受限广义似然比停止和陷阱分解，给出统一采样原则。该框架可迁移至RLHF中从人类偏好中学习奖励模型的任务，为处理非确定性偏好提供方法论支持。",
+      "llm_tldr": "在固定精度排序与选择问题中，传统方法常假设唯一正确答案，但实际场景中答案可能不唯一甚至无有效答案（如多保真度排序或Condorcet赢家识别）。本文提出ENDS框架，基于答案级接受集、受限广义似然比停止和陷阱分解，给出统一采样原则。该框架可迁移至RLHF中从人类偏好中学习奖励模型的任务，为处理非确定性偏好提供方法论支持。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.22153v1",
+      "source": "arxiv",
+      "title": "$π$-RAG: Oblivious Retrieval via Semantic Quantization and Transcendental Addressing for Large Language Models",
+      "abstract": "This paper introduces $π$-RAG, a novel architecture for oblivious retrieval that decouples Large Language Models (LLMs) from sensitive data storage without sacrificing semantic understanding. Traditional Retrieval-Augmented Generation (RAG) architectures expose raw vector embeddings to potential inversion attacks and nondeterministic retrieval failures. To address this, we utilize the digits of $π$ as a source of transcendental entropy, creating an immutable indirection layer between the LLM and private records. The value $π$ provides immutability, is uneditable and math governs it. The architecture also introduces a Semantic Quantization Layer. This layer projects user inputs onto a pre-computed manifold of Canonical Intent Centroids. RAG performs vector cosine similarity but here it maps the centroids to deterministic offsets via cryptographic salt. The resulting $π$-key is a pointer to standardized payload from the actual datastore. By replacing direct access to the datastore via LLM with this transcendental layer, $π$-RAG mathematically guarantees that the inference remains oblivious to the data. This architecture unifies deterministic randomness, auditability, and differential privacy, demonstrating high efficacy for high-compliance sectors such as finance and healthcare.",
+      "authors": [
+        "Aniket Wattamwar",
+        "Mrunal Kakirwar"
+      ],
+      "primary_category": "cs.CR",
+      "categories": [
+        "cs.CR",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-06-20T17:22:36+00:00",
+      "link": "https://arxiv.org/pdf/2606.22153v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "RAG framework can reduce hallucination; semantic quantization for LLMs",
+      "llm_evidence_cn": "检索增强生成可缓解幻觉；语义量化层用于大语言模型",
+      "llm_evidence": "检索增强生成可缓解幻觉；语义量化层用于大语言模型",
+      "canonical_evidence": "检索增强生成可缓解幻觉；语义量化层用于大语言模型",
+      "llm_tldr_en": "pi-RAG proposes an oblivious retrieval architecture using pi digits as entropy source to protect privacy while maintaining semantic understanding, indirectly supporting hallucination reduction through external knowledge retrieval.",
+      "llm_tldr_cn": "该论文针对传统检索增强生成（RAG）中向量嵌入易受攻击和检索不确定性问题，提出pi-RAG架构，利用圆周率数字作为不可变熵源创建遗忘检索层，并引入语义量化层将输入投影到规范流形。该方法虽主要面向隐私保护，但其检索机制可通过提供外部知识辅助大语言模型减少幻觉，对后训练阶段提升模型可靠性具有启发性。",
+      "llm_tldr": "该论文针对传统检索增强生成（RAG）中向量嵌入易受攻击和检索不确定性问题，提出pi-RAG架构，利用圆周率数字作为不可变熵源创建遗忘检索层，并引入语义量化层将输入投影到规范流形。该方法虽主要面向隐私保护，但其检索机制可通过提供外部知识辅助大语言模型减少幻觉，对后训练阶段提升模型可靠性具有启发性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.24194v1",
+      "source": "arxiv",
+      "title": "Dialogue to Discovery: Attribute-Aware Preference Elicitation for Conversational Product Search Assistants",
+      "abstract": "Conversational product search assistants offer a more expressive, natural, and interactive alternative to traditional keyword-based product search. With limited screen space, showing only a few items increases the need for precise preference elicitation, which can prolong conversations, leading to user frustration and session abandonment. Conversely, rushing to recommend items without a clear understanding of preferences risks poor matches and a degraded user experience. We present Dialogue to Discovery (D2D), an attribute-oriented preference elicitation framework that dynamically exploits the structure of product attributes to efficiently steer conversations toward the user's desired item. D2D adaptively prioritizes the most informative queries and strategically times product recommendations, reducing premature or off-target suggestions that harm engagement. To evaluate D2D, we curate three datasets from the Amazon Reviews corpus. In simulated conversations modelled using a multi-factor utilitarian patience framework, D2D achieves a 22.2-29.9% improvement in target-finding accuracy, 6.6-16.1% reduction in abandonment, and 27.5% shorter average conversations over the state-of-the-art baselines. A complementary user study further confirms significant gains in both user satisfaction and perceived efficiency.",
+      "authors": [
+        "Sarthak Harne",
+        "Natwar Modani",
+        "Debabrata Mahapatra",
+        "Shubham Agarwal"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR",
+        "cs.CL",
+        "cs.HC"
+      ],
+      "published": "2026-06-23T06:30:31+00:00",
+      "link": "https://arxiv.org/pdf/2606.24194v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "preference elicitation framework for conversational search, analogous to learning user preferences in RLHF",
+      "llm_evidence_cn": "对话搜索中的偏好引导框架，类似于RLHF中学习用户偏好",
+      "llm_evidence": "对话搜索中的偏好引导框架，类似于RLHF中学习用户偏好",
+      "canonical_evidence": "对话搜索中的偏好引导框架，类似于RLHF中学习用户偏好",
+      "llm_tldr_en": "D2D dynamically exploits product attribute structure to efficiently elicit user preferences in conversational product search, reducing conversation length and improving recommendation accuracy.",
+      "llm_tldr_cn": "针对对话式产品搜索中偏好引导效率低的问题，提出D2D框架，通过动态利用产品属性结构高效引导用户偏好，优先询问区分性强的属性。实验表明该方法缩短了对话轮次并提升了推荐准确率，为交互式偏好学习提供了新视角，与RLHF中的奖励建模目标一致。",
+      "llm_tldr": "针对对话式产品搜索中偏好引导效率低的问题，提出D2D框架，通过动态利用产品属性结构高效引导用户偏好，优先询问区分性强的属性。实验表明该方法缩短了对话轮次并提升了推荐准确率，为交互式偏好学习提供了新视角，与RLHF中的奖励建模目标一致。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

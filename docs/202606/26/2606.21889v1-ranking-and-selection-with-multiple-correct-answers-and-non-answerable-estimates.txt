@@ -1,0 +1,906 @@
+Title: Ranking-and-Selection with Multiple Correct Answers and Non-Answerable Estimates
+
+URL Source: https://arxiv.org/pdf/2606.21889v1
+
+Published Time: Tue, 23 Jun 2026 01:30:05 GMT
+
+Number of Pages: 17
+
+Markdown Content:
+# Ranking-and-Selection with Multiple Correct Answers and Non-Answerable Estimates 
+
+Qiaoqiao Wang 1 and Wei You 11Dept. of Industrial Engineering and Decision Analytics, The Hong Kong University of Science and Technology, Hong Kong, China June 23, 2026 
+
+Abstract 
+
+We study fixed-precision ranking-and-selection in structured settings where the answer may be non-unique and where noisy estimates may temporarily admit no valid answer at all. This phenomenon arises naturally in problems such as multi-fidelity ranking-and-selection and identifying a Condorcet winner from pairwise comparisons. To address this, we propose a unified framework based on answer-wise acceptance sets, restricted generalized likelihood ratio stopping, and an answer–pitfall decomposition that yields a max-max-min characteristic value and a common sampling principle. We introduce ENDS, a general procedure that combines estimation, nomination, pitfall detection, and cost-aware information-directed selection. We instantiate ENDS for various problems by deriving explicit formulas. Extensive numerical experiments show that this unified recipe performs well across a broad range of pure-exploration problems and offers a practical framework and proof-of-concept algorithmic recipe. 
+
+# 1 Introduction 
+
+Many ranking-and-selection (R&S) problems arise in settings where information is noisy, structured, and expensive. In multi-fidelity experimentation, one can query cheap but biased proxies or expensive high-fidelity measurements; in dueling bandits, feedback arrives only through pairwise comparisons rather than direct rewards. These models are increasingly natural in engineering design, simulation optimization, preference learning for LLMs, and human-in-the-loop evaluation, where absolute scores are often unavailable or prohibitively costly and decisions must be made with a prescribed level of confidence. What makes these settings especially challenging is that the usual single-winner template is no longer sufficient. First, the answer map may be set-valued: in good-alternative or subset-selection problems, several answers can be simultaneously correct. Second, even when the true instance is answerable, a noisy estimate may temporarily fall outside the answerable set. In multi-fidelity ranking-and-selection, empirical means may violate the bias constraints; in dueling bandits, estimated 1
+
+> arXiv:2606.21889v1 [cs.LG] 20 Jun 2026
+
+preferences may induce ties or cycles so that no Condorcet winner exists. In such situations, the empirical-best answer can be undefined exactly when the algorithm still needs a principled way to sample, stop, and decide. The fixed-confidence pure-exploration literature has developed sharp lower bounds and asymp-totically efficient procedures for best-arm identification, and has gradually expanded to structured settings such as multiple correct answers, multi-fidelity observations, and pairwise preference feed-back (Garivier and Kaufmann 2016, Degenne and Koolen 2019, Poiani et al. 2024, Chen et al. 2020). In parallel, the ranking-and-selection literature has long emphasized the close connection between fixed-precision procedures and sequential hypothesis testing, and has developed important variants around good selection, subset selection, multi-fidelity simulation, and pairwise-comparison settings (Wang et al. 2024, Hong et al. 2021, Eckman and Henderson 2018, Xu et al. 2016, Ren et al. 2020). Related questions also arise in economics (Ramdas et al. 2020, Kasy and Sautmann 2021), where sequential experimentation, information acquisition, and stopping are studied under objectives that differ from bandit sample complexity but face many of the same conceptual tensions between exploration, confidence, and irreversible choice. Despite this progress, the existing treatments remain largely problem-specific. Standard for-mulations typically assume either a unique correct answer or an always-answerable estimate, and therefore do not directly address the joint presence of multiple correct answers and non-answerable estimates. This gap matters algorithmically: it affects how one defines the stopping statistic, how one nominates a provisional answer, and how one allocates sampling effort when no empirical winner is currently well defined. This paper takes a step toward that unification. Building on the pitfall-adapted nomination perspective of Qin and You (2026), we lift the framework from unique-answer settings to answer-wise acceptance sets and answer-wise pitfalls, so that the learner reasons over all candidate answers rather than only around a single true answer. We view the paper as a proof of concept that a single structural recipe can transfer across broad models and problems. The main contributions and organization of the paper are as follows. 
+
+• In Section 2, we propose a unified framework for cost-aware fixed-precision R&S with a 
+
+set-valued answer map and an answerable region .
+
+• In Section 3, we extend Qin and You (2026) with an answer-wise layer: rejection regions are decomposed by candidate answers and answer-wise pitfalls, yielding a restricted-GLR stopping rule and a max-max-min characteristic value that motivates the performance limit and the corresponding sampling principle. The proposed ENDS procedure combines estimation, answer-wise nomination, pitfall detection, and cost-aware information-directed selection in a portable way across problems. 
+
+• In Section 3, we derive explicit instantiations for representative problems, including good-alternative selection, multi-fidelity ranking-and-selection, and Condorcet-winner dueling ban-dits. 2• Through broad numerical experiments in Section 4, we show that the unified recipe is practically effective across qualitatively different exploration problems, supporting the case for a common algorithmic language beyond any one model class. 
+
+# 2 Problem formulation 
+
+Let Θ be the ambient space of valid parameters. We allow Θ to be structured; see Example 3. Let 
+
+U be a finite set of measurement types. At each round n, the learner chooses Un ∈ U and observes 
+
+Yn ∼ Pθ,U n . Each measurement type u ∈ U incurs measurement cost Cu(θ) > 0. For every u ∈ U ,let Nn,u ≜ ∑nℓ=1 1{Uℓ = u} and pn,u ≜ Nn,u /n . We write pn = ( pn,u )u∈U for the measurement allocation, and ¯Cθ(p) ≜ ∑
+
+> u∈U
+
+puCu(θ)for the average cost per sample under allocation p. The cost spent after n rounds is 
+
+Bn = ∑
+
+> u∈U
+
+Nn,u Cu(θ) = n ¯Cθ(pn).
+
+The goal is to identify a correct answer from the set of possible answers A, by allocating samples to the set of measurement types U and observing noisy measurements. We allow the answer map to be set-valued. For every parameter θ ∈ Θ, we let A⋆(θ) ⊆ A denote the set of correct answers at θ.In multiple-correct-answer problems, one can have |A ⋆(θ)| > 1. We say that an instance θ is answerable if A⋆(θ)̸ = ∅. Define the answerable set as Θ⋆ ≜ {θ ∈ Θ : A⋆(θ)̸ = ∅}.
+
+We require that the ground truth θ ∈ interior (Θ ∗), which excludes boundary instances at which arbitrarily small perturbations may change the set of correct answers, making exact identification statistically ill-posed. To accommodate genuinely non-answerable instances, we may augment the answer set to include a null answer a = ∅, representing the conclusion that no substantive answer exists. During learning the empirical estimate may leave the answerable set Θ ⋆ even if the true parameter does not, in which case an empirical answer need not exist. We refer to such estimates as a non-answerable estimate . For each answer a ∈ A , define its acceptance set by Θ⋆a ≜ {ϑ ∈ Θ⋆ : a ∈ A ⋆(ϑ)}.
+
+Let Alt a ≜ Θ⋆ \ Θ⋆a denote all answerable instances for which answer a is not correct. In this paper, we focus on the fixed-precision setting. The goal is to design a stopping rule τδ
+
+and a decision rule ˆ aτδ such that 
+
+Pθ(ˆ aτδ ∈ A ⋆(θ)) ≥ 1 − δ for every θ ∈ Θ⋆,
+
+while designing a sampling rule that minimizes the expected total cost Eθ[Bτδ ]. 32.1 Examples 
+
+Example 1 (Selection of a good alternative) . Fix a tolerance ε > 0. We consider selection of a good alternative from a set of K alternatives (Eckman and Henderson 2018). This is also referred to as ε-best-arm identification (Jourdan et al. 2023) or (ε, δ )-PAC learning. Each measurement type is an alternative, and U = [ K]. Sampling alternative i produces a noisy observation with mean 
+
+θi, and incurs cost Ci(θ), where θ = ( θi)i∈[K]. The ambient parameter is Θ, the set of all possible mean vectors. For example, if the measurements are Gaussian, then the ambient parameter space is 
+
+Θ = RK . The set of possible answers is A = [ K], and the set of correct answers is 
+
+A⋆(θ) ≜ {i ∈ [K] : θi ≥ max  
+
+> j∈[K]
+
+θj − ε}.
+
+Thus every instance is answerable, so Θ⋆ = Θ . This problem therefore exhibits multiple correct answers but no non-answerable estimates. The acceptance set for answer i is 
+
+Θ⋆i ≜ {ϑ ∈ Θ : ϑi ≥ ϑj − ε, ∀j̸ = i} .
+
+Example 2 (Multi-fidelity ranking-and-selection) . In multi-fidelity ranking-and-selection/BAI, each alternative i ∈ [K] can be sampled at several fidelity levels m ∈ [M ] with fidelity-dependent costs Cm,with higher fidelities being more expensive and less biased (Poiani et al. 2024). The measurement set is then U = [ K] × [M ], with measurement u = ( a, m ) representing that the learner samples alternative a at fidelity level m. The ambient parameter is θ = ( θa,m )a∈[K],m ∈[M ] ∈ Θ, where Θ
+
+denotes the set of all possible mean tables. The multi-fidelity model class ΘMF consists of all mean tables that satisfy the multi-fidelity constraints |θi,m − θi,M | ≤ ξm, i.e., 
+
+ΘMF ≜ {θ ∈ Θ : |θa,m − θa,M | ≤ ξm, ∀a ∈ [K], m ∈ [M ]},
+
+where ξm is the known bias level for fidelity m. Assume throughout that ξM = 0 . The set of possible answers is A = [ K]. The goal is to identify the correct answer defined as 
+
+A⋆(θ) = 
+
+
+
+argmax a∈[K] θa,M if θ ∈ ΘMF ,
+
+∅ if θ /∈ ΘMF .
+
+We assume that there is no tie at the highest fidelity. 1 The answerable set is 
+
+Θ⋆ 
+
+> MF
+
+≜ {θ ∈ Θ : A⋆(θ)̸ = ∅} = Θ MF ⊊ Θ,
+
+i.e., the set of mean tables that satisfy the multi-fidelity constraints. The acceptance set for answer i
+
+is Θ⋆i ≜ {ϑ ∈ Θ⋆ 
+
+> MF
+
+: ϑi,M > ϑ j,M , ∀j̸ = i}.    
+
+> 1We exclude ties at the highest fidelity because such instances lie on the boundary of identifiability. If two alternatives are tied at fidelity M, then an arbitrarily small perturbation can make either one uniquely optimal. In these boundary cases, the GLR is zero, so exact identification is statistically impossible. A standard remedy is to relax the objective and seek an ε-good alternative instead; see Example 1.
+
+4Example 3 (Dueling bandits with a Condorcet winner) . In dueling bandits, the observations are not direct measurements of individual alternatives, but rather binary preferences between pairs of alternatives. The measurement set is the set of unordered pairs U = {{ i, j } : 1 ≤ i < j ≤ K}, where measurement u = {i, j } means that the learner requests a duel between alternatives i and j. With the convention i < j , the observation is Bernoulli with mean θi,j . The ambient parameter space is 
+
+ΘDB ≜ {θ = ( θi,j )1≤i,j ≤K ∈ [0 , 1] K×K : θi,j = 1 − θj,i , ∀i, j }.
+
+The set of possible answers is A = [ K]. The goal is to identify the Condorcet winner 
+
+A⋆(θ) ≜ {i ∈ [K] : θi,j > 1/2, ∀j̸ = i}.
+
+A Condorcet winner need not exist if the preference matrix contains cycles, but it is unique if is exists. 2 The answerable set is 
+
+Θ⋆ 
+
+> CW
+
+≜ {θ ∈ ΘDB : |A ⋆(θ)| = 1 } ⊊ ΘDB .
+
+The acceptance set for answer i is 
+
+Θ⋆i ≜ {ϑ ∈ Θ⋆ 
+
+> CW
+
+: ϑi,j > 1/2, ∀j̸ = i}.
+
+See also Chen et al. (2020), Haddenhorst et al. (2021). 
+
+In Examples 2 and 3, the answerable set Θ ⋆ = ⋃ 
+
+> a∈A
+
+Θ⋆a is a proper subset of the ambient model Θ. Consequently, during learning the empirical or posterior estimate may leave Θ ⋆, in which case an empirical answer need not exist. We refer to such estimates as non-answerable estimates .
+
+2.2 Stopping rule via GLR statistics 
+
+We follow the sequential hypothesis-testing perspective in Hong et al. (2021), Wang et al. (2024). In the presence of non-answerable estimates, the natural testing statistic is the restricted generalized likelihood ratio (GLR) that compares the best fit inside an acceptance set with the best answerable parameter outside. Let ̂ θn denote an unconstrained maximum likelihood estimator (MLE) in the ambient parameter space Θ. For the one-parameter exponential-family models, the negative log-likelihood ratio relative to ̂ θn can be written as a sum of coordinatewise Kullback–Leibler (KL) divergences, i.e., Γ( Nn;̂ θn, ϑ), where Γ( w; θ, ϑ) ≜ ∑
+
+> u∈U
+
+wuKL( Pθ,u ∥Pϑ,u ), for w ∈ RU
+
+> +
+
+,
+
+where KL (·∥· ) is the KL divergence between probability distributions. The GLR statistic for answer 
+
+a is 
+
+Zn(a) ≜ Z(a; Nn,̂ θn), where Z(a; p, θ) ≜ inf 
+
+> ϑ∈Alt a
+
+Γ( p; θ, ϑ) − inf 
+
+> ϑ∈Θ⋆a
+
+Γ( p; θ, ϑ). (1)    
+
+> 2We can accommodate genuinely non-answerable instances by augmenting the answer set with a null answer a=∅.
+
+5The statistic Zn(a) is large when the data are much better explained by Θ ⋆a than by any alternative answer. Let Ln(ϑ) ≜ Γ( Nn;̂ θn, ϑ), then Zn(a) = inf ϑ∈Alt a Ln(ϑ) − inf ϑ∈Θ⋆a Ln(ϑ). Whenever ̂ θn ∈ Θ⋆a, we have inf ϑ∈Θ⋆a Ln(ϑ) = 0 and hence Zn(a) = inf ϑ∈Alt a Ln(ϑ). Thus, for a correct answer a and a consistent estimator that eventually enters Θ ⋆a, the GLR reduces to the usual Chernoff-type quantity used in fixed-confidence pure exploration (Garivier and Kaufmann 2016). In this sense, the GLR is a robustified version of the usual Chernoff information to handle non-answerable estimates. Recall that Zn(a) quantifies the evidence for a to be correct. The overall evidence of the data for some answer to be correct is then max a∈A Zn(a). Accordingly, a GLR stopping rule is 
+
+τδ ≜ inf {n ≥ 1 : max  
+
+> a∈A
+
+Zn(a) ≥ βn,δ }, (2) where βn,δ is a threshold typically in the order of O( log (1 /δ )); see Ding et al. (2025) for discussions. The corresponding decision rule is to nominate the answer best-supported by the data: ˆaτδ ∈ argmax 
+
+> a∈A
+
+Zτδ (a). (3) This decision rule differs from the usual empirical-best-answer rule. We choose it for essentially free finite-sample robustness, since the noisy estimates may be non-answerable and the empirical-best answer may then be undefined. Such transient non-answerability vanishes asymptotically under accurate estimation. 
+
+Remark 1 (On the threshold βn,δ and δ-correctness) . One needs a threshold sequence βn,δ such that Pθ (∃a / ∈ A ⋆(θ), ∃n ≥ 1 : Zn(a) ≥ βn,δ ) ≤ δ for every θ ∈ Θ⋆. This is the usual generalized-likelihood-ratio logic behind fixed-confidence pure exploration. The exact threshold calibration is generally open and problem-dependent; see Garivier and Kaufmann (2016), Ramdas et al. (2020), and Ding et al. (2025) for related discussions from the machine learning, economics and simulation communities. For the purposes of this paper, we keep the exact threshold abstract and focus instead on efficient sampling rules. In the numerical experiments, we use the heuristic threshold 
+
+βn,δ = log ((log n + 1) /δ ).
+
+2.3 Answer-wise pitfalls and the max-max-min characteristic value 
+
+To state the lower bound in a way that covers both non-answerable estimates and multiple-correct-answer problems, we propose an answer-wise generalization of pitfalls in Qin and You (2026). For each potential answer a ∈ A , we assume that the rejection region Alt a can be decomposed into finitely many simpler alternative sets. More precisely, for every candidate answer a ∈ A , let Alt a = ⋃
+
+> x∈X a
+
+Alt a,x ,
+
+where Xa is a finite pitfall index set for answer a and each Alt a,x ⊆ Alt a is a convex set of (answerable) alternative instances associated with pitfall x for answer a; see Sections 3.1–3.3) for examples. A pitfall x ∈ X a describes one concrete way in which answer a can fail. In ranking-and-selection, a 6pitfall is a challenger alternative that beats the current nominee. In dueling bandits, a pitfall is an opponent that prevents the nominee from being a Condorcet winner. In Qin and You (2026), pitfalls are indexed through the unique correct answer at the true instance. Here we instead index pitfalls by each candidate answer a. This answer-wise indexing is what lets the framework handle both multiple correct answers and temporary non-answerable estimates. For lower-bound statements, we consider only answerable instances θ ∈ Θ⋆. For any allocation 
+
+p ∈ ∆U , true instance θ ∈ Θ⋆, and alternative instance ϑ ∈ Θ, define the cost-normalized discrimination rate Γc(p; θ, ϑ) ≜ 
+
+> ∑
+> u∈U
+
+puKL( Pθ,u ∥Pϑ,u )¯Cθ(p) .
+
+This is the statistical distance between θ and ϑ under allocation p, normalized by the average cost per sample. For each answer–pitfall pair ( a, x ), define the cost-normalized information rate for ruling out pitfall x when certifying answer a as 
+
+Da,x (p; θ) ≜ inf 
+
+> ϑ∈Alt a,x
+
+Γc(p; θ, ϑ).
+
+Let ϑa,x (p, θ) ∈ argmin ϑ∈Alt a,x Γc(p; θ, ϑ) denote the most-confusing alternative instance. The learner must rule out all pitfalls, so the bottleneck information rate is min x∈X a Da,x (p; θ). Among all potential answers in A, the learner may nominate the one that is easiest to certify, namely the one with the largest bottleneck information rate. The learner then chooses the allocation p to maximize that rate. This leads to the characteristic value Γ⋆(θ) ≜ max 
+
+> p∈∆U
+
+max  
+
+> a∈A
+
+min 
+
+> x∈X a
+
+Da,x (p; θ).
+
+For problems with a unique answer, the second maximization is vacuous, as it is always attained by that answer. Accordingly, the characteristic value reduces to the one studied in Qin and You (2026). Nevertheless, the second maximization remains important when temporary estimates fall outside the answerable set. In multiple-correct-answer problems (Degenne and Koolen 2019), it is essential even for answerable instances, because the answer set is set-valued. Under any allocation rule that guarantees consistent estimation of the parameters, one expects 
+
+Zn(a) to grow approximately at rate Bn · min x∈X a Da,x (p; θ). Optimizing over p and a suggests the heuristic scaling max a∈A Zn(a) ≈ Bn · Γ⋆(θ). In view of the stopping rule (2) , this leads to the heuristic lower bound: 
+
+Eθ[Bτδ ] ≳ log(1 /δ )Γ⋆(θ) .
+
+This is the direct analogue of the classical characteristic time in fixed-confidence pure exploration (Garivier and Kaufmann 2016), except that the normalization is by spent budget rather than by the number of samples. We refer to Qin and Russo (2024) for a rigorous discussion. 73 The ENDS algorithm 
+
+We now generalize Qin and You (2026) to accommodate multiple correct answers and non-answerable estimates. At round n, let θn ∈ Θ be an estimator of θ. This estimator may be the sample mean, a posterior draw, or a projection onto the answerable set. During sampling, we nominate 
+
+an ∈ arg max  
+
+> a∈A
+
+Z(a; pn, θn)as the most plausible answer. (Here, we use a variant of GLR, namely Z(a; pn, θn), which uses the user-specified estimator θn instead of the ambient MLE ̂ θn. In our numerical experiments, we use posterior sampling as the default estimation routine for the sampling rule. Drawing θn from the current posterior naturally encourages exploration and mitigates the influence of rare, high-leverage early observations on nomination and pitfall detection.) Once the nominee an has been selected, the pitfall detector chooses 
+
+xn ∈ argmin 
+
+> x∈X an
+
+Dan,x (pn; θn).
+
+The principal pitfall xn is the most likely way for answer an to fail under the current estimate and allocation. The cost-aware information-directed selection (IDS) distribution is then 
+
+Han,x n 
+
+> u
+
+(pn; θn) ≜ pn,u KL( Pθn,u ∥Pϑan,xn ,u )/C u(θn)
+
+∑ 
+
+> v∈U
+
+pn,v KL( Pθn,v ∥Pϑan,xn ,v )/C v(θn) , (4) where ϑan,x n = ϑan,x n (pn, θn) is the most confusing alternative instance for that pitfall, namely 
+
+ϑan,x n (pn, θn) ∈ argmin 
+
+> ϑ∈Alt an,xn
+
+Γc(pn; θn, ϑ).
+
+The IDS (4) defines a valid distribution over measurement types; see Qin and You (2026) for the case with unit-cost. The next measurement is drawn from this distribution. The stopping rule is given by (2) and final decision is the nominee in (3) ; both based on the ambient-MLE-based GLR (1) . This yields a conceptually simple four-step scheme: Estimate–Nominate–Detect–Select. We refer to this algorithm as ENDS and summarize its fixed-precision variant in Algorithm 1. The sampling rule is anytime, so the algorithm can be turned into a fixed-budget algorithm by replacing the stopping rule with a fixed budget. To instantiate this algorithm for a specific problem, one needs only to specify the explicit form of the alternative sets Alt a,x , the cost-normalized information rates Da,x (p; θ), and the IDS distribution 
+
+Ha,x (p; θ). We now provide these explicit forms for Examples 1–3. 
+
+3.1 Example: Selection of a good alternative 
+
+Consider the selection of a good alternative in Example 1. A natural pitfall for answer a is a challenger alternative x̸ = a whose mean exceeds that of a by more than ε. Accordingly, for 
+
+x ∈ [K] \ { a} define Alt εa,x ≜ {ϑ ∈ Θ : ϑx > ϑ a + ε}. Then Alt a = ⋃ 
+
+> x̸=a
+
+Alt εa,x and Xa = [ K] \ { a}.The characteristic value is Γ⋆ε (θ) = max 
+
+> p∈∆K
+
+max  
+
+> a∈[K]
+
+min  
+
+> x̸=a
+
+Dεa,x (p; θ), where Dεa,x (p; θ) ≜ inf 
+
+> ϑ∈Alt εa,x
+
+Γc(p; θ, ϑ).
+
+8Algorithm 1 ENDS 
+
+Require: Confidence level δ, threshold sequence {βn,δ }n≥1, estimation routine est (default: poste-rior sampling)  
+
+> 1:
+
+Initialize: sample each measurement type u ∈ U once  
+
+> 2:
+
+while max a∈A Zn(a) < β n,δ do  
+
+> 3:
+
+θn ← est (Hn) ▷ Estimate  
+
+> 4:
+
+an ∈ arg max a∈A Z(a; pn, θn) ▷ Nominate  
+
+> 5:
+
+xn ∈ arg min x∈X an Dan,x (pn; θn) ▷ Detect  
+
+> 6:
+
+draw Un+1 ∼ Han,x n (pn; θn), where Han,x n = ( Han,x n 
+
+> u
+
+)u∈U is defined in (4) ▷ Select  
+
+> 7:
+
+measure Un+1 , observe Yn+1 and update Hn+1  
+
+> 8:
+
+end while  
+
+> 9:
+
+return ˆan ∈ arg max a∈A Zn(a)Assume that all alternatives belong to the same one-parameter exponential family with mean domain M and KL divergence d. For μ ∈ M, define the upper-feasible interval Jε(μ) ≜ (−∞ , μ +ε]∩M.
+
+For z ∈ M, let Π Jε(μ)(z) denote the projection of z onto Jε(μ). For any weight vector w = ( wi)i∈[K] ∈
+
+RK 
+
+> +
+
+and any mean vector z = ( zi)i∈[K] ∈ MK , define 
+
+Gεa,x (w, z) ≜ inf 
+
+> μ,ν ∈M
+> ν≥μ+ε
+
+{
+
+wad(za, μ ) + wxd(zx, ν )
+
+}
+
+and 
+
+Aεa(w, z) ≜ inf 
+
+> μ∈M
+
+wad(za, μ ) + ∑ 
+
+> j̸=a
+
+wj d
+
+(
+
+zj , ΠJε(μ)(zj )
+
+) .
+
+The quantity Gεa,x (w, z) is the weighted KL distance from z to the pitfall set Alt εa,x , while Aεa(w, z)is the weighted KL distance from z to the acceptance set Θ ⋆a. Then, Dεa,x (p; θ) = Gεa,x (p, θ)/ ¯Cθ(p).
+
+Let ( μ⋆a,x , ν ⋆a,x ) ∈ arg min μ,ν ∈M:ν≥μ+ε
+
+{pad(θa, μ ) + pxd(θx, ν )}, and define ϑa,x i (p, θ) = μ⋆a,x if i = a,
+
+ν⋆a,x if i = x, and θi otherwise. 
+
+Proposition 1. The vector ϑa,x (p, θ) attains the value Gεa,x (p, θ). Plugging ϑa,x into (4) , we obtain the explicit IDS distribution Ha,x (p; θ). Specifically, Ha,x i (p; θ) = 0 for every i / ∈ { a, x }. Let 
+
+Nn = ( Nn,i )i∈[K] and let ̂ θn be the ambient MLE. The explicit form of Zn(a) is obtained by 
+
+inf 
+
+> ϑ∈Θ⋆a
+
+Ln(ϑ) = Aεa(Nn,̂ θn), inf 
+
+> ϑ∈Alt a
+
+Ln(ϑ) = min  
+
+> x̸=a
+
+Gεa,x (Nn,̂ θn).
+
+Remark 2. In the Gaussian unit-variance, unit-cost case, d(u, v ) = ( u − v)2/2 and M = R. If 
+
+θx < θ a + ε, then Gεa,x (p, θ) = (θa−θx+ε)2 
+
+> 2(1 /p a+1 /p x)
+
+. The optimizer is μ⋆a,x = paθa+px(θx−ε) 
+
+> pa+px
+
+and ν⋆a,x = μ⋆a,x + ε,and the IDS rule reduces to Ha,x a (p; θ) = px 
+
+> pa+px
+
+and Ha,x x (p; θ) = pa 
+
+> pa+px
+
+. The outer maximization is attained by a = I⋆, and 
+
+Γ⋆ε (θ) = max 
+
+> p∈∆K
+
+min 
+
+> x̸=I⋆
+
+(θI⋆ − θx + ε)2
+
+2 (1 /p I⋆ + 1 /p x) .
+
+93.2 Example: Multi-fidelity ranking-and-selection 
+
+Consider the multi-fidelity ranking-and-selection problem described in Example 2. A natural pitfall for answer a is a challenger alternative x̸ = a whose top-fidelity mean strictly exceeds that of alternative a. Accordingly, for x ∈ [K] \ { a}, define Alt MF  
+
+> a,x
+
+≜ {ϑ ∈ ΘMF : ϑx,M > ϑ a,M }. The characteristic value is Γ⋆
+
+> MF
+
+(θ) = max 
+
+> p∈∆U
+
+max  
+
+> a∈A
+
+min  
+
+> x̸=a
+
+DMF  
+
+> a,x
+
+(p; θ), where DMF  
+
+> a,x
+
+(p; θ) ≜ inf 
+
+> ϑ∈Alt MF
+> a,x
+
+Γc(p; θ, ϑ). (5) At answerable instances with a unique best alternative, the maximum over a is vacuous because it is attained by that alternative. For non-answerable instances, the maximization is useful for nomination. Assume that each fidelity level belongs to a one-parameter exponential family with mean domain M and KL divergence d. For μ ∈ M, define the valid interval at fidelity m by Im(μ) ≜
+
+[μ − ξm, μ + ξm] ∩ M for all m ∈ [M ]. For z ∈ M, let Π Im(μ)(z) denote the projection of z onto Im(μ). For any weight w = ( wi,m )i∈[K],m ∈[M ] and any mean table z = ( zi,m )i∈[K],m ∈[M ] ∈ MK×M , define Ψi(μ; w, z) ≜ ∑Mm=1 wi,m d
+
+(
+
+zi,m , ΠIm(μ)(zi,m )
+
+)
+
+for i ∈ [K]. This is the weighted KL distance from z
+
+to the set of mean tables that satisfy the multi-fidelity constraints for alternative i with top-fidelity mean μ.For a ∈ [K] and x̸ = a, define the weighted KL distance from z to the pitfall set Alt MF 
+
+> a,x
+
+Ga,x (w, z) ≜ inf 
+
+> ϑ∈Alt MF
+> a,x
+
+∑ 
+
+> i∈[K]
+> m∈[M]
+
+wi,m d(zi,m , ϑ i,m )= ∑
+
+> i / ∈{ a,x }
+
+inf  
+
+> μ∈M
+
+Ψi(μ; w, z) + inf 
+
+> μa,μ x∈M
+> μx≥μa
+
+{
+
+Ψa(μa; w, z) + Ψ x(μx; w, z)
+
+}
+
+.
+
+For each j̸ = a, fix any minimizer ℓj ∈ arg min ν∈M Ψj (ν; w, z), and define 
+
+Aa(w, z) ≜ inf 
+
+> μ∈M
+
+[
+
+Ψa(μ; w, z) + ∑ 
+
+> j̸=a
+
+Ψj (μ ∧ ℓj ; w, z)
+
+]
+
+.
+
+Since each Ψ j (·; w, z) is convex, inf ν≤μ Ψj (ν; w, z) = Ψ j (μ ∧ ℓj ; w, z) for all j̸ = a, so Aa(w, z) is exactly the weighted KL distance from z to the acceptance set Θ ⋆a, written as a one-dimensional convex optimization. Finally, DMF  
+
+> a,x
+
+(p; θ) = Ga,x (p, θ)/ ¯C(p) with ¯C(p) ≜ ∑Ki=1 
+
+∑Mm=1 pi,m Cm.Let μ⋆i ∈ arg min μ∈M Ψi(μ; p, θ) for each i / ∈ { a, x }, let (μ⋆a, μ ⋆x) ∈ arg min 
+
+> μa,μ x∈M:μx≥μa
+
+{Ψa(μa; p, θ) + Ψ x(μx; p, θ)},
+
+fix ℓ⋆j ∈ arg min ν∈M Ψj (ν; p, θ) for each j̸ = a, and let 
+
+λ⋆a ∈ arg min 
+
+> μ∈M
+
+[Ψa(μ; p, θ) + ∑ 
+
+> j̸=a
+
+Ψj (μ ∧ ℓ⋆j ; p, θ)].
+
+10 Proposition 2. The table ϑa,x (p, θ) defined by ϑa,x i,m (p, θ) ≜ ΠIm(μ⋆i )(θi,m ) for i ∈ [K], m ∈ [M ]
+
+attains the value Ga,x (p, θ). Plugging ϑa,x into (4) , we obtain the explicit IDS distribution Ha,x (p; θ).The table ϑa,⋆ (p, θ) defined below belongs to Θ⋆a and attains the value Aa(p, θ):
+
+ϑa,⋆ i,m (p, θ) ≜
+
+
+
+ΠIm(λ⋆a)(θa,m ), i = a, 
+
+ΠIm(λ⋆a∧ℓ⋆i )(θi,m ), i̸ = a, i ∈ [K], m ∈ [M ].
+
+Let Nn = ( Nn,i,m )i,m and let ̂ θn be the ambient MLE. The explicit form of Zn(a) is obtained by 
+
+inf 
+
+> ϑ∈Θ⋆a
+
+Ln(ϑ) = Aa(Nn,̂ θn), inf 
+
+> ϑ∈Alt a
+
+Ln(ϑ) = min  
+
+> x̸=a
+
+Ga,x (Nn,̂ θn).
+
+Remark 3 (Gaussian special case) . In the Gaussian unit-variance case, M = R and d(u, v ) = (u − v)2/2, so 
+
+Ψi(μ; w, z) = 12
+
+> M
+
+∑
+
+> m=1
+
+wi,m 
+
+(|zi,m − μ| − ξm
+
+)2+, i ∈ [K].
+
+Therefore, for any choice of minimizers ℓj ∈ arg min ν∈R Ψj (ν; w, z),
+
+Aa(w, z) = inf 
+
+> μ∈R
+
+ 12
+
+> M
+
+∑
+
+> m=1
+
+wa,m 
+
+(|za,m − μ| − ξm
+
+)2+ + ∑ 
+
+> j̸=a
+
+12
+
+> M
+
+∑
+
+> m=1
+
+wj,m 
+
+(|zj,m − (μ ∧ ℓj )| − ξm
+
+)2+
+
+ .
+
+Remark 4. If ̂ θn ∈ Θ⋆a, then Aa(Nn,̂ θn) = 0 and, for every x̸ = a,
+
+Ga,x (Nn,̂ θn) = inf 
+
+> μ∈M
+
+{Ψa(μ; Nn,̂ θn) + Ψ x(μ; Nn,̂ θn)}.
+
+Hence Zn(a) = min x̸=a inf μ∈M
+
+{Ψa(μ; Nn,̂ θn) + Ψ x(μ; Nn,̂ θn)}.
+
+3.3 Example: Dueling bandits with a Condorcet winner 
+
+Consider the dueling bandit problem described in Example 3. A natural pitfall for answer a is a challenger alternative x̸ = a that itself becomes a Condorcet winner. Accordingly, for x ∈ [K] \ { a},define Alt CW  
+
+> a,x
+
+≜ {ϑ ∈ ΘDB : ϑx,j > 1/2, ∀j̸ = x}. Since x beating every opponent already implies uniqueness of the Condorcet winner, we have Alt CW  
+
+> a,x
+
+= Θ ⋆x. Hence Alt a = ⋃ 
+
+> x̸=a
+
+Alt CW  
+
+> a,x
+
+with 
+
+Xa = [ K] \ { a}. The characteristic value is Γ⋆
+
+> CW
+
+(θ) = max 
+
+> p∈∆U
+
+max  
+
+> a∈[K]
+
+min  
+
+> x̸=a
+
+DCW  
+
+> a,x
+
+(p; θ), where DCW  
+
+> a,x
+
+(p; θ) ≜ inf 
+
+> ϑ∈Alt CW
+> a,x
+
+Γc(p; θ, ϑ).
+
+Let d denote the Bernoulli KL divergence. For any weight vector w = ( w{i,j }){i,j }∈U ∈ RU
+
+> +
+
+,extend it symmetrically by setting wi,j ≜ w{i,j } = wj,i for i̸ = j. Define ICW ≜ [1 /2, 1] and projection Π CW (q) ≜ ΠICW (q) = q ∨ 12 for q ∈ [0 , 1]. For any preference matrix z ∈ ΘDB and each alternative i ∈ [K], define Ψi(w, z) ≜ ∑ 
+
+> j̸=i
+
+wi,j d (zi,j , ΠCW (zi,j )) = ∑ 
+
+> j:zi,j ≤1/2
+
+wi,j d(zi,j , 1/2) .
+
+11 Consequently, GCW  
+
+> a,x
+
+(w, z) = Ψ x(w, z), A CW  
+
+> a
+
+(w, z) = Ψ a(w, z), and 
+
+DCW  
+
+> a,x
+
+(p; θ) = Ψx(p, θ)¯Cθ(p) =
+
+∑  
+
+> j̸=x
+
+p{x,j }d(θx,j , θ x,j ∨ 1/2) ¯Cθ(p) =
+
+∑  
+
+> j:θx,j ≤1/2
+
+p{x,j }d(θx,j , 1/2) ¯Cθ(p) .
+
+The most confusing alternative for pitfall x is therefore obtained by leaving every duel not involving x unchanged and pushing each losing duel of x exactly to the boundary 1 /2. For 
+
+x̸ = a, define the boundary representative ϑa,x (p, θ) ∈ ΘDB by ϑa,x x,j (p, θ) ≜ θx,j ∨ 12 , ϑa,x j,x (p, θ) ≜
+
+1 − ϑa,x x,j (p, θ), j ̸ = x, and ϑa,x i,j (p, θ) ≜ θi,j for all i, j ̸ = x. Similarly, define ϑa,⋆ (p, θ) by replacing x
+
+with a in the display above. 
+
+Proposition 3. The matrix ϑa,x (p, θ) attains the same objective value as the infimum defining 
+
+GCW  
+
+> a,x
+
+(p, θ), and ϑa,⋆ (p, θ) attains the same objective value as the infimum defining ACW  
+
+> a
+
+(p, θ).Plugging ϑa,x into (4) , we obtain the explicit IDS distribution Ha,x (p; θ). Let Nn = ( Nn, {i,j }){i,j }∈U 
+
+and let ̂ θn be the ambient MLE. The explicit form of Zn(a) is obtained by 
+
+inf 
+
+> ϑ∈Θ⋆a
+
+Ln(ϑ) = ACW  
+
+> a
+
+(Nn,̂ θn) = Ψ a(Nn,̂ θn)
+
+and 
+
+inf 
+
+> ϑ∈Alt a
+
+Ln(ϑ) = min  
+
+> x̸=a
+
+GCW  
+
+> a,x
+
+(Nn,̂ θn) = min  
+
+> x̸=a
+
+Ψx(Nn,̂ θn).
+
+Remark 5. If ̂ θn ∈ Θ⋆a, then Ψa(Nn,̂ θn) = 0 and 
+
+Zn(a) = min 
+
+> x̸=a
+
+∑
+
+> j:
+
+̂θn,x,j ≤1/2
+
+Nn, {x,j }d(̂θn,x,j , 1/2) .
+
+If θ ∈ Θ⋆ 
+
+> CW
+
+has Condorcet winner a⋆, then the outer maximization in Γ⋆
+
+> CW
+
+(θ) is attained by a⋆. In the unit-cost setting, 
+
+Γ⋆
+
+> CW
+
+(θ) = max 
+
+> p∈∆U
+
+min 
+
+> x̸=a⋆
+
+∑ 
+
+> j:θx,j ≤1/2
+
+p{x,j }d(θx,j , 1/2) .
+
+# 4 Numerical experiments 
+
+In this section, we evaluate the proposed algorithm ENDS against state-of-the-art methods for selection of a good alternative, multi-fidelity R&S, and dueling bandits. Our numerical results show that ENDS (with posterior sampling as the default estimation routine), as a unified algorithm, is highly robust and competitive. We refer readers to Qin and You (2026) for more experiments on conventional R&S, whose algorithm is a special case of ENDS with unique answers. 
+
+4.1 Selection of a good alternative 
+
+For Example 1, we evaluate ENDS on 100 randomly generated Gaussian instances following Zhong and Hong (2018). In each instance, the means of the K arms are drawn i.i.d. from N (0 , 16 ϵ2) with 
+
+ϵ = 0 .1, and the observation variances are all equal to 1 but treated as unknown. As baselines, we implement the unknown-variance version of Algorithm 2 of Kim and Eckman (2024) (coupled with 12 our GLR stopping), KN procedure (Kim and Nelson 2001), Paulson’s procedure (Paulson 1964), Procedure 2 of Zhong and Hong (2018), and uniform allocation. For ENDS, we plug the empirical sample variances into the formulas in Section 3.1. A fully rigorous treatment of unknown variance would require extending the GLR to two-parameter exponential-family models; see Section 4.1 of Qin and You (2026). ENDS and the uniform-allocation baseline use the stopping rule in (2) with the heuristic threshold βn,δ = log ((log n + 1) /δ ).                                                                                           
+
+> Table 1: Comparison of expected stopping budget under confidence level δ= 0 .05 and unknown observation variance σ2
+> i= 1. PCS omitted, since all algorithms achieve a perfect PCS of 1.
+> K# good systems ENDS KE-Alg2 KN Paulson ZH-Proc2 Uniform
+> E[Bτδ]±SE E[Bτδ]±SE E[Bτδ]±SE E[Bτδ]±SE E[Bτδ]±SE E[Bτδ]±SE 10 1.43 1035 ±122 1723 ±305 2545 ±159 3236 ±199 6243 ±563 3737 ±414 100 1.86 4563 ±279 9148 ±1702 21453 ±482 27707 ±701 42028 ±1772 60964 ±4536 1000 2.28 19917 ±892 48412 ±8630 186094 ±1944 265476 ±4276 272350 ±4978 702645 ±54655
+
+The results are reported in Table 1. All methods achieve essentially perfect PGS on this benchmark, while ENDS consistently requires the smallest stopping budget across all values of K.The advantage becomes more pronounced as the number of alternatives increases, suggesting that ENDS scales favorably in this unknown-variance setting. We note, however, that ENDS is not designed for large-scale problems, where the computational burden can become substantial. 
+
+4.2 Multi-fidelity R&S 
+
+We consider four synthetic instances. In each instance, the configuration is specified by the fidelity-wise mean vectors θ·,m , the bias vector ξ, and the sampling cost vector C. The top fidelity determines the true best arm. Instance 1 has ( K, M ) = (5 , 2), θ·,1 = (0 .4, 0.4, 0.4, 0.4, 0.5), and θ·,2 =(0 .5, 0.5, 0.5, 0.5, 0.6), with ξ = (0 .1, 0) and C = (0 .5, 5). In this instance, the optimal allocation balances sampling across the two fidelities. Instance 2 has ( K, M ) = (4 , 2), θ·,1 = (0 .9, 0.4, 0.4, 0.3), and θ·,2 = (0 .5, 0.6, 0.7, 0.85), with ξ = (0 .55 , 0) and C = (0 .1, 5). Here the low fidelity acts as a misleading trap, and the optimal allocation samples exclusively from the high fidelity. Instance 3 has ( K, M ) = (4 , 2), θ·,1 = (0 .15 , 0.25 , 0.55 , 0.85), and θ·,2 = (0 .1, 0.2, 0.6, 0.8), with ξ = (0 .1, 0) and 
+
+C = (0 .5, 5). In this case, the optimal allocation samples exclusively from the low fidelity. We also include Instance 4, randomly generated with ( K, M ) = (5 , 4), following the setup in Table 2 of Poiani et al. (2024). For all instances, we fix target confidence level δ = 0 .05 and Gaussian observation with known variance σ2 = 1. We compare ENDS with MF-GRAD (Poiani et al. 2024), TS-KKT-IDS (Qin and You 2026) applied only at the highest fidelity, GRAD (M´ enard 2019) applied only at the highest fidelity, and two uniform allocation schemes: uniform sampling and uniform cost allocation. To ensure a fair comparison, all algorithms use the same stopping rule in (2) with a heuristic stopping threshold 
+
+βn,δ = log ((log n + 1) /δ ).13 Table 2: Comparison of expected stopping cost ( ± Monte Carlo standard error) under confidence level                                                                                    
+
+> δ= 0 .05 and observation variance σ2= 1. PCS omitted, since all algorithms achieve a PCS of >0.998.
+> Inst. ENDS MF-GRAD TS-KKT-IDS GRAD Uniform Sample Uniform Cost
+> 132237 ±531 65611 ±1088 53841 ±712 77602 ±1086 56952 ±814 67366 ±1012 211504 ±199 38790 ±671 10794 ±203 17215 ±352 18883 ±347 38980 ±656 33550 ±84 4231 ±103 5085 ±101 8938 ±196 6844 ±153 4539 ±103 43613 ±65 3953 ±78 21815 ±330 28922 ±455 11765 ±184 3734 ±69
+
+We make several observations from these experiments. First, ENDS achieves the lowest expected stopping cost in almost all instances while maintaining PCS equal to 1. The only exception is Instance 2, where it is slightly outperformed by TS-KKT-IDS. In Instance 2, the optimal allocation places all mass on the highest fidelity, so restricting attention to that fidelity is advantageous; indeed, ENDS restricted to the highest fidelity coincides exactly with TS-KKT-IDS. Second, although MF-GRAD is based on the same optimal allocation problem in (5) , it treats sampling allocation as a continuous optimization problem followed by a tracking step. By contrast, ENDS acts directly as a bandit sampling rule, which appears markedly more efficient in our experiments. Third, Instance 2 shows that ENDS is robust to misleading low-fidelity information. When the low fidelity distorts the arm ranking, MF-GRAD incurs much larger cost because it converges slowly to the optimal allocation that excludes the low fidelity. ENDS instead performs nearly as well as TS-KKT-IDS, which effectively benefits from oracle knowledge that the low fidelity should be ignored. Fourth, in Instance 4, most of the discriminative information lies in the lower fidelities. This explains the poor performance of TS-KKT-IDS and GRAD, which use only the highest fidelity, and the competitive performance of uniform cost allocation, which assigns very little mass to the highest fidelity. Finally, all algorithms achieve nearly perfect PCS, suggesting that the heuristic stopping rules are conservative. Sharper threshold calibration is left for future work, see also Ding et al. (2025). 
+
+4.3 Dueling bandits 
+
+We compare ENDS with state-of-the-art dueling bandit algorithms on random instances drawn from the family considered by Haddenhorst et al. (2021). As baselines, we implement SAVAGE (Urvoy et al. 2013), DKWT (Haddenhorst et al. 2021), SEEBS (Ren et al. 2020), Explore-then-Verify (EtV, Karnin 2016), and a uniform-allocation baseline. For each algorithm, we averaged over 1000 independently sampled instances, sampled uniformly from the set of K-armed preference matrices such that: (i) there is a unique Condorcet winner; (ii) every off-diagonal entry is at least h/ 2 away from 1 /2. The parameter h controls the hardness of the instance, with smaller values corresponding to more difficult problems. ENDS and Uniform-allocation use the GLR stopping (2) , while all other algorithms use their own stopping rules. Table 3 reports the expected stopping cost E[Bτδ ] ( ± Monte Carlo standard error). Across all settings, ENDS is the most cost-efficient method. The baselines with their native stopping rules 14 Table 3: Comparison of the expected stopping budget E[Bτδ ] ( ± Monte Carlo standard error) under different configurations of ( m, h ) and δ = 0 .05. PCS omitted, since all algorithms achieve a perfect PCS of 1. (m, h ) ENDS SAVAGE Uniform DKWT SEEBS EtV                                                                                                                                                             
+
+> (5 ,0.20) 173 ±4953 ±15 501 ±20 6506 ±103 7535 ±134 8751 ±176 (5 ,0.15) 206 ±51246 ±24 670 ±30 8293 ±142 11779 ±239 11183 ±280 (5 ,0.10) 303 ±10 1825 ±47 1058 ±57 14198 ±396 19404 ±472 20464 ±1803 †2
+> (5 ,0.05) 479 ±27 3580 ±146 2081 ±158 31291 ±1255 37198 ±1133 50368 ±4220 †14
+> (10 ,0.20) 295 ±42805 ±22 809 ±32 14509 ±155 17520 ±194 26281 ±317 (10 ,0.15) 336 ±53276 ±33 1065 ±57 18475 ±200 27447 ±347 33373 ±730 (10 ,0.10) 409 ±74321 ±63 1471 ±90 32826 ±596 45535 ±689 58731 ±3330 †7
+> (10 ,0.05) 494 ±11 6888 ±177 2701 ±446 74341 ±1910 81790 ±1567 154396 ±8501 †76
+> †xindicates that the algorithm was forcibly terminated at 10 6steps on xout of the 1000 instances.
+
+incur substantially larger costs. This comparison also suggests that the GLR-based stopping rule, which is decoupled from the sampling rule, can be considerably more efficient than elimination-type stopping rules designed jointly with their sampling rules. Thus, the observed advantage should not be attributed solely to the ENDS sampling rule; it is partly intertwined with the use of a stronger stopping rule. The same caveat applies to the comparisons with KN, Paulson, and ZH-Proc2 (but not KE-Alg2) in Section 4.1. In contrast, all algorithms in Section 4.2 use the same stopping rule. 
+
+# 5 Conclusion 
+
+We studied cost-aware fixed-precision ranking-and-selection problems in which the correct answer may be non-unique and intermediate estimates may be non-answerable. To handle this setting, we proposed a unified framework based on answer-wise acceptance sets, restricted generalized likelihood ratio stopping, and an answer–pitfall decomposition, which leads to a common max-max-min characteristic value and the ENDS procedure. We derived explicit instantiations for good-alternative selection, multi-fidelity ranking-and-selection, and Condorcet-winner dueling bandits, and numerical experiments suggest that this unified recipe is robust and competitive across these qualitatively different problems. Several directions remain open. A natural next step is to establish stronger theoretical guarantees for ENDS, such as asymptotic, instance-dependent upper bounds that match the characteristic value. A second is to develop a sharper understanding of the stopping rule, including less conservative threshold calibration and nonasymptotic δ-correctness guarantees. It would also be interesting to extend the framework to broader structured settings with richer feedback models, such as contextual problems. 15 Acknowledgments 
+
+Wei You’s research is generously supported by the Hong Kong Research Grants Council [Grant GRF 16212823] and [Theme-based Research Project T32-615/24-R]. 
+
+# References 
+
+Wei Chen, Yihan Du, Longbo Huang, and Haoyu Zhao. Combinatorial pure exploration for dueling bandit. In International Conference on Machine Learning , pages 1531–1541. PMLR, 2020. R´ emy Degenne and Wouter M Koolen. Pure exploration with multiple correct answers. Advances in Neural Information Processing Systems , 32:14591–14600, 2019. Mingrui Ding, Siyang Gao, and Qiuhong Zhao. Stopping rules for sampling in precision medicine. In 2025 Winter Simulation Conference (WSC) , pages 929–940. IEEE, 2025. doi: 10.1109/WSC68292.2025. 11338934. David J Eckman and Shane G Henderson. Guarantees on the probability of good selection. In 2018 Winter Simulation Conference (WSC) , pages 351–365. IEEE, 2018. doi: 10.1109/WSC.2018.8632345. Aur´ elien Garivier and Emilie Kaufmann. Optimal best arm identification with fixed confidence. In 29th Annual Conference on Learning Theory , volume 49 of Proceedings of Machine Learning Research , pages 998–1027. PMLR, 2016. Bj¨ orn Haddenhorst, Viktor Bengs, and Eyke H¨ ullermeier. Identification of the generalized condorcet winner in multi-dueling bandits. Advances in Neural Information Processing Systems , 34:25904–25916, 2021. L. Jeff Hong, Weiwei Fan, and Jun Luo. Review on ranking and selection: A new perspective. Frontiers of Engineering Management , 8(3):321–343, 2021. doi: 10.1007/s42524-021-0152-6. Marc Jourdan, R´ emy Degenne, and Emilie Kaufmann. An ε-best-arm identification algorithm for fixed-confidence and beyond. Advances in Neural Information Processing Systems , 36:16578–16649, 2023. doi: 10.52202/075280-0727. Zohar S Karnin. Verification based solution for structured MAB problems. In D. Lee, M. Sugiyama, U. Luxburg, I. Guyon, and R. Garnett, editors, Advances in Neural Information Processing Systems ,volume 29. Curran Associates, Inc., 2016. URL https://proceedings.neurips.cc/paper_files/ paper/2016/file/65b9eea6e1cc6bb9f0cd2a47751a186f-Paper.pdf .Maximilian Kasy and Anja Sautmann. Adaptive treatment assignment in experiments for policy choice. 
+
+Econometrica , 89(1):113–132, 2021. doi: 10.3982/ECTA17527. Seong-Hee Kim and Barry L Nelson. A fully sequential procedure for indifference-zone selection in simulation. 
+
+ACM Transactions on Modeling and Computer Simulation (TOMACS) , 11(3):251–273, 2001. doi: 10.1145/502109.502111. Taeho Kim and David J Eckman. Rate-optimal budget allocation for the probability of good selection. In 
+
+2024 Winter Simulation Conference (WSC) , pages 3324–3335. IEEE, 2024. Pierre M´ enard. Gradient ascent for active exploration in bandit problems. arXiv preprint arXiv:1905.08165 ,2019. Edward Paulson. A sequential procedure for selecting the population with the largest mean from k normal populations. The Annals of Mathematical Statistics , pages 174–180, 1964. 
+
+16 Riccardo Poiani, R´ emy Degenne, Emilie Kaufmann, Alberto Maria Metelli, and Marcello Restelli. Optimal multi-fidelity best-arm identification. Advances in Neural Information Processing Systems , 37:121882– 121927, 2024. doi: 10.52202/079017-3874. Chao Qin and Daniel Russo. Optimizing adaptive experiments: A unified approach to regret minimization and best-arm identification. arXiv preprint arXiv:2402.10592 , 2024. Chao Qin and Wei You. Dual-directed algorithm design for efficient pure exploration. Operations Research ,74(2):573–1152, 2026. doi: 10.1287/opre.2023.0590. Aaditya Ramdas, Johannes Ruf, Martin Larsson, and Wouter Koolen. Admissible anytime-valid sequential inference must rely on nonnegative martingales. arXiv preprint arXiv:2009.03167 , 2020. Wenbo Ren, Jia Liu, and Ness Shroff. The sample complexity of best-k items selection from pairwise comparisons. In International Conference on Machine Learning , pages 8051–8072. PMLR, 2020. Tanguy Urvoy, Fabrice Clerot, Raphael F´ eraud, and Sami Naamane. Generic exploration and k-armed voting bandits. In International conference on machine learning , pages 91–99. PMLR, 2013. doi: 10.5555/3042817.3042904. Wenyu Wang, Hong Wan, and Xi Chen. Bonferroni-free and indifference-zone-flexible sequential elimination procedures for ranking and selection. Operations Research , 72(5):2119–2134, 2024. Jie Xu, Si Zhang, Edward Huang, Chun-Hung Chen, Loo Hay Lee, and Nurcin Celik. Mo 2tos: Multi-fidelity optimization with ordinal transformation and optimal sampling. Asia-Pacific Journal of Operational Research , 33(3):1650017, 2016. doi: 10.1142/S0217595916500172. Ying Zhong and L Jeff Hong. Fully sequential ranking and selection procedures with pac guarantee. In 2018 Winter Simulation Conference (WSC) , pages 1898–1908. IEEE, 2018. doi: 10.1109/WSC.2018.8632439. 
+
+17
