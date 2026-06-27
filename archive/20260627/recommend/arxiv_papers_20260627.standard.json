@@ -1,0 +1,170 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-27T21:21:04.218052+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 3,
+    "deep_cap": 6,
+    "deep_selected": 3,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [
+    {
+      "id": "2606.21631v1",
+      "source": "arxiv",
+      "title": "CuratorKIT : Data Curation and Synthetic Data Generation for LLM Post-Training",
+      "abstract": "Data curation is a critical part of post-training pipelines for large language models, yet existing tools often treat ingestion, deduplication, synthetic generation, and quality filtering as separate stages. This fragmentation makes it difficult to audit pipeline decisions or understand why individual samples are rejected. CuratorKIT is an open-source Python library that covers this full lifecycle in a single configurable pipeline. The framework is composed of six source format readers and automatic schema detection, a pre-generation data hygiene layer for credentials, PII, and toxic content, eight LLM-powered generation tasks, three complementary quality gates with provenance-exact hallucination verification, structured adaptive recovery, and five training-ready export formats compatible with TRL, Unsloth, and AlignTune. Every pipeline decision is recorded in an append-only per-sample provenance chain, and rejected samples carry structured failure reasons rather than being silently discarded. CuratorKIT supports 100+ LLM providers through LiteLLM, exposes both a Python API and a YAML-driven CLI, and is designed for practitioners who need reproducible, auditable data pipelines at scale .",
+      "authors": [
+        "Soham Bhattacharjee",
+        "Karun Sharma",
+        "Vinay Kumar Sankarapu",
+        "Pratinav Seth"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-06-19T17:36:34+00:00",
+      "link": "https://arxiv.org/pdf/2606.21631v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "unified data curation pipeline for LLM post-training with hallucination verification",
+      "llm_evidence_cn": "统一的LLM后训练数据整理流程，包含幻觉验证",
+      "llm_evidence": "统一的LLM后训练数据整理流程，包含幻觉验证",
+      "canonical_evidence": "统一的LLM后训练数据整理流程，包含幻觉验证",
+      "llm_tldr_en": "Presents CuratorKIT, an open-source Python library for end-to-end data curation and synthetic data generation for LLM post-training, including hallucination verification.",
+      "llm_tldr_cn": "针对LLM后训练中数据整理流程分散、无法审计的问题，提出CuratorKIT开源库，集成了数据摄取、去重、合成生成和质量过滤，并包含基于来源的精确幻觉验证。提供八个LLM驱动的生成任务和三个互补的质量门控。",
+      "llm_tldr": "针对LLM后训练中数据整理流程分散、无法审计的问题，提出CuratorKIT开源库，集成了数据摄取、去重、合成生成和质量过滤，并包含基于来源的精确幻觉验证。提供八个LLM驱动的生成任务和三个互补的质量门控。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-06-23-734138-v1",
+      "source": "biorxiv",
+      "title": "Agentic AI for Structural Elucidation and Discovery of Drug Metabolites from Mass Spectrometry Data",
+      "abstract": "The majority of chemical signals detected in public metabolomics repositories remain structurally undefined. Large language models (LLMs) are probabilistic systems whose capacity to generate outputs beyond their training data, which can cause hallucinations, makes them also potentially suited to hypothesize structures for molecules that have never been described. We aimed to build a system that could harness this LLM generative capacity combined with domain specific tools/framework to constrain hallucination and produce validated discoveries. We developed a GNPS2 agentic AI system that interprets LC-MS/MS data by integrating spectral alignment, molecular formula inference, rule-based structural enumeration, machine learning-based spectrum prediction, and translates natural language hypotheses from domain experts into dynamically generated analytical workflows. We demonstrate the annotation of unknown drug metabolites from public data guided by chemical hypotheses. The agent predicted, and we experimentally confirmed, a phosphorylated hydroxyzine, an acetaminophen-p-coumaric acid ester, and identified two new oxidative ibuprofen-carnitine conjugates from public repositories. These results demonstrate that LLM-driven agentic reasoning, when combined with domain expertise, can indeed generate experimentally testable structural hypotheses for previously uncharacterized metabolites leveraging pan repository data.",
+      "authors": [
+        "Wang, X.",
+        "Patan, A.",
+        "Zhao, H. N.",
+        "Charron-Lamoureux, V.",
+        "Shin, Y.",
+        "Petras, D.",
+        "Hong, Y.",
+        "Bowen, B. P.",
+        "Northen, T. R.",
+        "Dorrestein, P. C.",
+        "Wang, M."
+      ],
+      "primary_category": "bioinformatics",
+      "categories": [
+        "bioinformatics"
+      ],
+      "published": "2026-06-26T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.06.23.734138v1.full.pdf",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "LLM hallucination constrained for drug metabolite discovery",
+      "llm_evidence_cn": "通过领域工具约束LLM幻觉进行药物代谢物发现",
+      "llm_evidence": "通过领域工具约束LLM幻觉进行药物代谢物发现",
+      "canonical_evidence": "通过领域工具约束LLM幻觉进行药物代谢物发现",
+      "llm_tldr_en": "Agentic AI system constrains LLM hallucination using domain-specific tools to discover validated drug metabolites from mass spec data.",
+      "llm_tldr_cn": "LLM生成能力可用于未描述分子结构推测，但存在幻觉问题。本文提出GNPS2 agentic AI系统，通过谱对齐、分子式推断、规则枚举和机器学习等工具约束幻觉，在LC-MS/MS数据上实现了经验证的结构发现。该系统展示了在科学发现中有效利用LLM的潜力。",
+      "llm_tldr": "LLM生成能力可用于未描述分子结构推测，但存在幻觉问题。本文提出GNPS2 agentic AI系统，通过谱对齐、分子式推断、规则枚举和机器学习等工具约束幻觉，在LC-MS/MS数据上实现了经验证的结构发现。该系统展示了在科学发现中有效利用LLM的潜力。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.22249v1",
+      "source": "arxiv",
+      "title": "On the Expressive Power of Weight Quantization in Large Language Models",
+      "abstract": "In recent years, weight quantization that encodes the learnable parameters of large language models in an $n$-bit format has garnered significant attention due to its potential for model compression and inference acceleration. Many practical techniques have been developed; however, the theoretical understanding of many aspects, especially the approximation and degradation of expressive power as the number of quantization bits decreases, remains unclear. In this paper, we provide a theoretical investigation into the expressive capability of large language models relative to the number of quantization bits. We argue that 1.58-bit is the limiting precision for weight quantization by establishing the universal approximation and expressive collapse properties of weight-quantized models with respect to the number of quantization bits. Additionally, we confirm that weight quantization leads to expressive degradation, in which the expressive capacity of weight-quantized models degrades polynomially as the number of quantization bits decreases. These theoretical findings provide a solid foundation for advancing weight quantization in the context of scaling laws and shed insights for future research in model compression and inference acceleration.",
+      "authors": [
+        "Shao-Qun Zhang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-20T22:22:26+00:00",
+      "link": "https://arxiv.org/pdf/2606.22249v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "theoretical investigation of expressive power of LLM weight quantization",
+      "llm_evidence_cn": "对大语言模型权重量化表达能力的理论分析",
+      "llm_evidence": "对大语言模型权重量化表达能力的理论分析",
+      "canonical_evidence": "对大语言模型权重量化表达能力的理论分析",
+      "llm_tldr_en": "This paper theoretically analyzes the expressive power of LLMs under weight quantization, establishing that 1.58-bit is the limiting precision for universal approximation, and characterizing expressive collapse.",
+      "llm_tldr_cn": "针对大语言模型权重量化中理论基础薄弱的问题，本文系统研究了量化比特数对模型表达能力的影响。通过建立通用近似和表达能力坍塌理论，论证了1.58比特是保证通用近似能力的极限精度。该工作为低精度量化提供了理论指导，解释了实际中量化性能下降的边界。",
+      "llm_tldr": "针对大语言模型权重量化中理论基础薄弱的问题，本文系统研究了量化比特数对模型表达能力的影响。通过建立通用近似和表达能力坍塌理论，论证了1.58比特是保证通用近似能力的极限精度。该工作为低精度量化提供了理论指导，解释了实际中量化性能下降的边界。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "math formulation",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.21535v1",
+      "source": "arxiv",
+      "title": "From Embedding Geometry to Spectral Search: Energy Dispersion Networks For Vector Retrieval",
+      "abstract": "Vector spaces, such as embedding spaces that encode dense semantic information, need not be analyzed solely through pointwise geometry. They can also be interpreted as energy networks through the spectral graph induced by the topology of their column vectors, i.e., their feature-space structure. Building on this perspective, we introduce Graph Wiring, a general framework for exploiting feature-space spectral structure, together with Spectral Indexing, its task-specific instantiation for vector search. By coupling geometric similarity with spectral information, the proposed method improves head-tail coherence and semantic alignment relative to purely geometric retrieval methods. It further supports adaptive search behavior through tau-modulation, providing the flexibility increasingly required by modern Retrieval-Augmented Generation (RAG) pipelines. We present the complete algorithmic pipeline, establish its theoretical foundation through epiplexity, and evaluate the approach across benchmark and industrial settings using the open-source arrowspace library.",
+      "authors": [
+        "Lorenzo Moriondo",
+        "Ilias Azizi"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR"
+      ],
+      "published": "2026-06-19T15:33:35+00:00",
+      "link": "https://arxiv.org/pdf/2606.21535v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "improves vector retrieval by coupling geometric similarity with spectral information, enhancing retrieval quality for RAG",
+      "llm_evidence_cn": "通过耦合几何相似性与频谱信息改进向量检索，提升RAG检索质量",
+      "llm_evidence": "通过耦合几何相似性与频谱信息改进向量检索，提升RAG检索质量",
+      "canonical_evidence": "通过耦合几何相似性与频谱信息改进向量检索，提升RAG检索质量",
+      "llm_tldr_en": "Proposes Graph Wiring and Spectral Indexing to enhance vector retrieval by leveraging feature-space spectral structure, improving head-tail coherence and semantic alignment over geometric-only methods.",
+      "llm_tldr_cn": "为提升向量检索的语义对齐能力，本文提出Graph Wiring框架和Spectral Indexing方法，利用特征空间的频谱图结构，将几何相似性与频谱信息耦合，改善了头尾一致性和语义对齐，相比于纯几何检索方法具有更高的适应性，可支持RAG系统更准确地检索相关信息，从而减少幻觉。",
+      "llm_tldr": "为提升向量检索的语义对齐能力，本文提出Graph Wiring框架和Spectral Indexing方法，利用特征空间的频谱图结构，将几何相似性与频谱信息耦合，改善了头尾一致性和语义对齐，相比于纯几何检索方法具有更高的适应性，可支持RAG系统更准确地检索相关信息，从而减少幻觉。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

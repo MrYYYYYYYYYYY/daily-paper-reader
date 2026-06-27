@@ -6,43 +6,32 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-26
-- 运行时间：2026-06-26 21:02:03 UTC
+- 最新运行日期：2026-06-27
+- 运行时间：2026-06-27 21:24:23 UTC
 - 运行状态：成功
-- 本次总论文数：7
+- 本次总论文数：4
 - 精读区：3
-- 速读区：4
+- 速读区：1
 
 ### 今日简报（AI）
-今日共推荐7篇论文，精读3篇，重点关注检索增强生成（RAG）的安全隐私问题与知识库增强检索方法。
-最值得精读的是两篇9分论文：一篇系统梳理RAG的架构威胁与防御体系，另一篇提出利用知识库增强语言模型检索的KARLA方法。
-建议普通读者优先精读这两篇高分数论文，快速掌握RAG领域的安全与知识增强两大核心前沿。
-- 详情：[/202606/26/README](/202606/26/README)
+今日精选2篇高分论文，聚焦LLM后训练的数据策展与合成数据生成，以及AI驱动的药物代谢物结构解析。最值得关注的是CuratorKIT的数据策展方法（9.0分）和Agentic AI在质谱数据分析中的应用（9.0分），两者分别从数据质量和自动化分析角度提升效率。建议下一步可尝试利用CuratorKIT优化自有训练数据，或探索Agentic AI在药物代谢研究中的实际部署。
+- 详情：[/202606/27/README](/202606/27/README)
 
 ### 精读区论文标签
-1. [Security and Privacy in Retrieval-Augmented Generation: Architectures, Threats, Defenses, and Future Directions for Building Trustworthy Systems](/202606/26/2606.25533v1-security-and-privacy-in-retrieval-augmented-generation-architectures-threats-defenses-and-future-directions-for-building-trustworthy-systems)  
+1. [CuratorKIT : Data Curation and Synthetic Data Generation for LLM Post-Training](/202606/27/2606.21631v1-curatorkit--data-curation-and-synthetic-data-generation-for-llm-post-training)  
    标签：评分：9.0/10、query:lpt
-   evidence：关于检索增强生成系统安全与隐私的全面综述
-2. [KARLA: Knowledge-base Augmented Retrieval for Language Models](/202606/26/2606.26807v1-karla-knowledge-base-augmented-retrieval-for-language-models)  
+   evidence：统一的LLM后训练数据整理流程，包含幻觉验证
+2. [Agentic AI for Structural Elucidation and Discovery of Drug Metabolites from Mass Spectrometry Data](/202606/27/biorxiv-10-64898-2026-06-23-734138-v1-agentic-ai-for-structural-elucidation-and-discovery-of-drug-metabolites-from-mass-spectrometry-data)  
    标签：评分：9.0/10、query:lpt
-   evidence：KARLA通过知识库增强减少幻觉
-3. [NanoCellAnnotator: Formalizing Expert Cell Type Annotation with Large Language Models](/202606/26/biorxiv-10-64898-2026-06-21-728965-v1-nanocellannotator-formalizing-expert-cell-type-annotation-with-large-language-models)  
-   标签：评分：9.0/10、query:lpt
-   evidence：在大语言模型注释中抑制幻觉细胞类型
+   evidence：通过领域工具约束LLM幻觉进行药物代谢物发现
+3. [On the Expressive Power of Weight Quantization in Large Language Models](/202606/27/2606.22249v1-on-the-expressive-power-of-weight-quantization-in-large-language-models)  
+   标签：评分：8.0/10、query:lpt
+   evidence：对大语言模型权重量化表达能力的理论分析
 
 ### 速读区论文标签
-1. [Fast-TurboQuant: A Multiplier-Free Online Vector Quantization Approach](/202606/26/2606.21448v1-fast-turboquant-a-multiplier-free-online-vector-quantization-approach)  
-   标签：评分：7.0/10、query:lpt
-   evidence：通过快速Johnson-Lindenstrauss变换实现无乘法器量化
-2. [Ranking-and-Selection with Multiple Correct Answers and Non-Answerable Estimates](/202606/26/2606.21889v1-ranking-and-selection-with-multiple-correct-answers-and-non-answerable-estimates)  
+1. [From Embedding Geometry to Spectral Search: Energy Dispersion Networks For Vector Retrieval](/202606/27/2606.21535v1-from-embedding-geometry-to-spectral-search-energy-dispersion-networks-for-vector-retrieval)  
    标签：评分：6.0/10、query:lpt
-   evidence：多正确答案的排序选择框架与RLHF中的偏好学习相关
-3. [$π$-RAG: Oblivious Retrieval via Semantic Quantization and Transcendental Addressing for Large Language Models](/202606/26/2606.22153v1--rag-oblivious-retrieval-via-semantic-quantization-and-transcendental-addressing-for-large-language-models)  
-   标签：评分：6.0/10、query:lpt
-   evidence：检索增强生成可缓解幻觉；语义量化层用于大语言模型
-4. [Dialogue to Discovery: Attribute-Aware Preference Elicitation for Conversational Product Search Assistants](/202606/26/2606.24194v1-dialogue-to-discovery-attribute-aware-preference-elicitation-for-conversational-product-search-assistants)  
-   标签：评分：6.0/10、query:lpt
-   evidence：对话搜索中的偏好引导框架，类似于RLHF中学习用户偏好
+   evidence：通过耦合几何相似性与频谱信息改进向量检索，提升RAG检索质量
 
 
 <div class="dpr-home-promo-card">

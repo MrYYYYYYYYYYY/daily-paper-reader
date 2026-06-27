@@ -1,0 +1,656 @@
+Title: CuratorKIT : Data Curation and Synthetic Data Generation for LLM Post-Training
+
+URL Source: https://arxiv.org/pdf/2606.21631v1
+
+Published Time: Tue, 23 Jun 2026 01:24:56 GMT
+
+Number of Pages: 23
+
+Markdown Content:
+## Soham Bhattacharjee, Karun Sharma, Vinay Kumar Sankarapu, Pratinav Seth Lexsi Labs 
+
+## pratinav.seth@lexsi.ai 
+
+## Abstract 
+
+Data curation is a critical part of post-training pipelines for large language models, yet existing tools often treat ingestion, deduplication, synthetic generation, and quality filtering as separate stages. This fragmentation makes it difficult to audit pipeline decisions or understand why individual samples are rejected. CuratorKIT is an open-source Python library that covers this full lifecycle in a single configurable pipeline. The framework is composed of six source format readers and automatic schema detection, a pre-generation data hygiene layer for credentials, PII, and toxic content, eight LLM-powered generation tasks, three complementary quality gates with provenance-exact hallucination verification, structured adaptive recovery, and five training-ready export formats compatible with TRL, Unsloth, and AlignTune. Every pipeline decision is recorded in an append-only per-sample provenance chain, and rejected samples carry structured failure reasons rather than being silently discarded. CuratorKIT supports 100+ LLM providers through LiteLLM, exposes both a Python API and a YAML-driven CLI, and is designed for practitioners who need reproducible, auditable data pipelines at scale . 
+
+Keywords: Synthetic Data, Data Curation, LLM Post-Training, LLM-as-Judge, Hallucination Detection, Data Quality, Open-Source Framework 
+
+# 1 Introduction 
+
+Building high-quality post-training datasets for large language models requires ingestion from heterogenous sources, removing duplicates, generating or transforming samples, applying quality filters and exporting the resultant dataset in a format suitable for training. In practice, most projects assemble this chain from independent scripts with incompatible schemas, no shared audit trail, and no mechanism for understanding why a sample was rejected or whether it could have been recovered. This makes the resulting pipeline difficult to reproduce, difficult to inspect, and poorly suited for iterative improvement. Existing frameworks address parts of this problem. distilabel [ 1] and AgentInstruct [ 2] cover LLM-powered generation and preference scoring. DataTrove [ 3] handles large-scale ingestion and cleaning. NeMo Data Designer [ 4] targets structured synthetic generation from templates. While these tools are helpful, they do not offer a unified lifecycle that connects source ingestion, generation, validation, recovery, and export under a single audit model. The absence of provenance is particularly consequential for hallucination gating. If the source evidence associated with a sample is not preserved, a later verifier must retrieve an approximately relevant chunk post-hoc during quality filtering. That retrieval step can introduce errors precisely where the pipeline requires the strongest grounding. Similarly, when rejected samples are treated as discarded noise rather than recoverable artifacts, pipelines lose the opportunity to diagnose systematic failures and apply targeted repair. We introduce CuratorKIT, a unified and configurable library for building auditable post-training data curation pipelines. CuratorKIT covers the full curation lifecycle in a single framework, spanning synthetic data generation, quality filtering, 
+
+> arXiv:2606.21631v1 [cs.CL] 19 Jun 2026
+
+CuratorKIT : Data Curation and Synthetic Data Generation for LLM Post-Training Ingestion & Normalization 
+
+> Reader Base
+> auto-format detection
+> Schema Gate
+> task-type validation
+> whitespace
+> De-duplicator
+> Exact / MinHash
+> Text Cleaner
+> unicode· encoding. HTML.
+> Data Hygiene Layer
+> Secrets Gate
+> PII Pseudonymizer
+> Toxicity Gate
+> API keys. credentials.
+> high-entropy tokens
+> consistent fake entity replacement
+> classifier → LLM judge (two-phase)
+> LLM Backend
+> LiteLLM. Ollama
+> QA Pairs
+> per chunk
+> Preference Pairs
+> chosen / rejected
+> GRPO Rollouts
+> K responses
+> Multi-Turn
+> conversational
+> Evol Instruct
+> complexity rewrites
+> Chain-of-Thought
+> stepwise generation
+> Synthetic Data Generation
+> Quality Filtering & Data Recovery
+> Hallucination Gate
+> grounding score vs source
+> Reward Gate
+> multi-dim quality score
+> Reward Refiner
+> weakest dimension rewrite
+> Deduplication & Sampling
+> Diversity Gate
+> semantic similarity threshold
+> Embedding Deduplicator
+> persistent cross-run deduplication
+> Stratified Sampler
+> target distribution rebalancing
+> Max Samples Truncator
+> global cap enforcement
+> Alpaca
+> ShareGPT
+> DPO
+> GRPO
+> PPO
+> Dataset Export
+> Corpus SchemaGate
+> filtering based on task
+> PDF
+> JSONL
+> JSON
+> Input Data Sources
+> CSV
+> HF Hub
+> Diagnostic Probe
+> failure to targeted retry
+
+Figure 1 CuratorKIT pipeline. Data flows from six source formats through ingestion, optional generation, quality gating, and adaptive recovery. Accepted samples are exported in five training formats. 
+
+schema validation, and training-ready export. Every processing decision is recorded in an append-only per-sample provenance chain, and rejected samples retain structured failure reasons instead of being silently removed. It supports 100+ LLM providers through LiteLLM [ 5], provides both a Python API and a YAML-driven CLI, and is designed for practitioners who need reproducible, auditable data pipelines at scale. The empirical validation of its core gating and recovery components is reported in the companion study [ 6 ]. This document describes the full library: its architecture, every component, and how to use it. 
+
+# 2 Architecture 
+
+CuratorKIT follows a pipeline architecture where data flows through a sequence of steps, as shown in Figure 1. Each step is one of four types (reader, gate, normalizer, or exporter), dispatched by type in a runner that is approximately 100 lines of code. Adding a new step means implementing one of four abstract base classes. 
+
+## 2.1 The DataSample 
+
+Every record in the pipeline is a DataSample : a Pydantic model with thirteen fields covering all eight supported task types. Rather than maintaining separate schemas per task family, CuratorKIT uses a single unified record with fields activated or ignored based on the task_type tag. 
+
+Table 1 DataSample fields. The task_type tag governs which fields are required and how they are validated. 
+
+Field Purpose 
+
+id Stable UUID4 identifier 
+
+source_uri Source document or file URI 
+
+instruction Prompt or instruction 
+
+input Context passage (Alpaca-style); also stores source chunk for grounded generation 
+
+output Target response (SFT); full text (pretraining) 
+
+chosen / rejected DPO preference pair completions 
+
+label Scalar quality score (unpaired preference) 
+
+responses / reward_scores GRPO rollouts and scores 
+
+task_type One of eight task family tags 
+
+metadata Arbitrary step-specific data 
+
+provenance_chain Append-only list of step records 
+
+## 2.2 Provenance and Rejection 
+
+Each sample carries an append-only provenance_chain , which stores the sequence of ProvenanceRecord objects added by pipeline steps. Each record contains the step name, a version string, a UTC timestamp, a configuration hash, and a free-form notes dictionary. Once a record is appended, it is never modified. This design makes pipeline decisions auditable at the level of individual samples. For example, a sample that fails the hallucination gate retains both the grounding score and the judge’s specific complaints in its provenance chain. A RejectedSample extends DataSample with two additional fields: rejection_reason , a structured string such as "hallucination_contract_failed:0.42" , and rejecting_step , the class that rejected the sample. Any step 2CuratorKIT : Data Curation and Synthetic Data Generation for LLM Post-Training 
+
+that drops a sample must return a RejectedSample with a structured reason; silent drops are treated as bugs. After each run, all rejected samples are written to rejected.jsonl .
+
+## 2.3 Configuration and API 
+
+All pipeline behaviour is driven by a single CuratorConfig dataclass, a flat configuration object with over 100 fields spanning data sources, LLM backends, generation tasks, quality gates, and hygiene settings. There are no nested sub-objects, no hidden state, and no step-wiring code to write. The entry point mirrors the TRL [ 7] trainer pattern, with 
+
+CuratorConfig serving the role that TrainingArguments plays in HuggingFace Transformers [8]:    
+
+> from curatorkit import Curator, CuratorConfig config = CuratorConfig( dataset="data/corpus.jsonl", generation_task="qa", llm_model="openai/gpt-4o-mini", hallucination_threshold=0.7, reward_threshold=0.7, export_formats=["alpaca", "sharegpt"], )curator = Curator(config) result = curator.run()
+> # result.passed âĂŤ accepted DataSample objects # result.rejected âĂŤ RejectedSample objects with structured reasons # result.stage_counts âĂŤ per-step input/output/rejected tallies # result.diagnostics âĂŤ PipelineDiagnostics (when probe is active)
+
+The apply_patch(dict) method returns a shallow copy of the config with only the specified fields changed, leaving the original unchanged. This powers the adaptive recovery system, which tests repair strategies without mutating the base configuration. 
+
+## 2.4 Mandatory Outputs 
+
+Every pipeline run produces four outputs: • manifest.json : configuration hash, per-stage counts, rejection breakdown, dedup statistics, token usage, wall-clock time. • dataset_card.md : human-readable Markdown summary with stage-by-stage pass rates and reproduction instructions. • rejected.jsonl : one JSON object per rejected sample with the full provenance chain and structured rejection reason. • checksums.txt : SHA-256 hashes of all output files. These mandatory outputs since they track the reproducibility and summary of the generation. They are written after every run regardless of which steps were configured. 
+
+# 3 Ingestion & Normalisation 
+
+The ingestion and normalization layer handles the non-generative stages of the curation pipeline. It reads raw data from heterogeneous source formats, resolves schema ambiguities, enforces structural constraints, removes redundant samples, cleans text, and rebalances distributions before downstream use. No LLM call is made at any point in this layer. The design follows a single invariant: every record that enters the pipeline must exit either as a well-formed 
+
+DataSample or as a RejectedSample with a structured reason. 3CuratorKIT : Data Curation and Synthetic Data Generation for LLM Post-Training 
+
+## 3.1 Source Format Readers 
+
+CuratorKIT provides six source format readers, each implemented as a subclass of BaseConnector . A reader subclass is responsible for implementing a single method, _iter_rows() , which yields (line_no, raw_dict) tuples. The base connector then handles the shared downstream logic, including user preprocessing, field mapping, format detection, 
+
+DataSample construction, and rejection on parse failure. This separation keeps source-specific parsing separate from the rest of the pipeline, so adding a new source format does not require changes to downstream components. CuratorKIT includes six readers for common file, dataset, and document formats. It supports line-delimited JSON, JSON arrays with an optional data_key , CSV and TSV files, Apache Parquet files, Hugging Face Hub datasets, and PDFs. The CSV reader includes header detection and JSON cell parsing, the Hugging Face reader supports streaming, subsets, and splits, and the PDF reader uses MinerU for layout-preserving extraction with multiple chunking strategies and optional table extraction. 
+
+Field mapping. Source column names rarely match the canonical DataSample field names. The field_mapping 
+
+parameter handles this translation, with no preprocessing code needed for column renaming:    
+
+> CuratorConfig( dataset="data/raw.jsonl", field_mapping={ "instruction": "question", # source column -> DataSample field
+> "output": "answer", "input": "context", }, )
+
+User preprocessing. For transformations beyond column renaming, a preprocessing_fn callable runs on every raw row before field mapping and format detection. Returning None drops the row; returning a fully-constructed 
+
+DataSample bypasses all subsequent detection logic, giving the caller complete control when the automatic path is insufficient:  
+
+> def clean_row(row: dict) -> dict | None: if len(row.get("answer", "")) < 20: return None # drop short answers
+> row["answer"] = " ".join(row["answer"].split()) return row CuratorConfig( dataset="data/raw.jsonl", preprocessing_fn=clean_row, field_mapping={"instruction": "question", "output": "answer"}, )
+
+Multi-source pipelines. The dataset parameter accepts a list of sources, where each entry can be a string path, a HuggingFace dataset identifier, or a dict with per-source overrides for split, subset, and sample cap. A top-level split 
+
+applies as the default for any source that does not specify its own: 
+
+> CuratorConfig( dataset=[ "tatsu-lab/alpaca", "data/extra.jsonl", {"name": "openai/summarize_from_feedback", "split": "validation", "max_samples": 500}, ], split="train", )
+
+PDF chunking. The PDF reader exposes the full MinerU extraction surface through CuratorConfig : chunking strategy, token cap, overlap, and table extraction are all configurable. The pdf_output_mode parameter allows 4CuratorKIT : Data Curation and Synthetic Data Generation for LLM Post-Training 
+
+in-reader generation ( "qa" , "preference" , "grpo" , "multiturn" ), enabling a pipeline that starts from a raw PDF corpus and produces training-ready samples without any intermediate file:  
+
+> CuratorConfig( dataset="docs/contracts.pdf", pdf_chunk_strategy="heading", pdf_chunk_max_tokens=512, pdf_chunk_overlap_tokens=50, pdf_extract_tables=True, pdf_output_mode="qa", # or "chunk" to defer generation
+> )
+
+## 3.2 Format Auto-Detection 
+
+Real-world datasets rarely follow a single column schema. The same field may appear under different names across datasets, and some column names are ambiguous across task types. To reduce manual configuration, CuratorKIT uses a three-stage detection procedure to infer the format of each source. The first stage builds candidate mappings from the observed columns. CuratorKIT maps more than 60 common column-name variants to semantic slots. For example, instruction , prompt , query , question , user_input , and human 
+
+can all map to the instruction field. When a name is ambiguous, such as input , CuratorKIT applies a deterministic priority order so that detection remains reproducible. The second stage validates each candidate against the actual values in the data. For example, a conversations column is accepted only if it has the expected conversational structure, such as list[dict] . If the column instead contains a flat string, that candidate is rejected and the next-best mapping is evaluated. The third stage normalizes role names for chat-style datasets. Aliases such as human , user , and input are mapped to 
+
+"user" , while assistant , gpt , and model are mapped to "assistant" . This supports both ChatML and ShareGPT-style conventions without requiring users to rewrite their input data. After inspecting the first N rows, where N is configurable and defaults to 10, the detector selects a format and reports a confidence tier among HIGH , MEDIUM , LOW , or UNKNOWN . This makes automatic detection transparent because users can see when the inferred schema is reliable and when it may need manual review. 
+
+## 3.3 Schema Validation 
+
+The SchemaGate is the first gate in the pipeline and the only one that is always active. It validates field presence, token count bounds, and encoding for every sample, with field requirements determined by the sample’s task_type tag: SFT samples ( instruction_following , conversational ) require instruction and output ; preference samples require chosen and rejected ; GRPO samples require instruction and a non-empty responses list; language modeling samples require only output . Token counting is correspondingly task-aware, counting instruction + chosen for preference pairs and instruction + longest_response for GRPO rollouts. Both whitespace-based counting (default) and tiktoken tokenisation are supported.   
+
+> CuratorConfig( min_tokens=10, max_tokens=4096, use_tiktoken=False, # True for tiktoken cl100k_base
+> schema_gate=True, # False to skip all schema checks
+> )
+
+## 3.4 Text Cleaning 
+
+TextCleaner provides five independently selectable transforms: HTML tag stripping, Unicode normalisation (NFC), mojibake encoding repair, whitespace collapse, and control character removal. Each transform appends a record to the sample’s provenance chain, so the exact sequence of cleaning operations applied to any sample is recoverable from the audit log itself. 5CuratorKIT : Data Curation and Synthetic Data Generation for LLM Post-Training 
+
+> CuratorConfig( clean=True, clean_transforms=["html", "unicode", "whitespace"], )
+
+## 3.5 Deduplication 
+
+Three complementary deduplication strategies address redundancy at different scales and across different notions of similarity. All three are task-type-aware: the hash key or embedding input is constructed from the semantically meaningful fields for the given task family, rather than a fixed set of columns. 
+
+ExactDeduplicator uses SHA-256 hashing of normalised text to remove identical samples before they reach the generation or export stages. The hash key is constructed from the fields that carry the sample’s full semantic content, which varies by task type. SFT, evol-instruct, and chain-of-thought samples are hashed over the instruction and output together, preference pairs additionally include the chosen and rejected completions, and GRPO rollouts are hashed over the instruction alongside all responses in the rollout. 
+
+MinHashDeduplicator removes near-duplicates using character n-gram MinHash, with n = 3 by default. It uses LSH banding to avoid comparing every sample against every other sample, making near-duplicate detection more efficient on larger datasets. The banding parameters are chosen automatically from the configured similarity threshold, which defaults to 0.85. 
+
+EmbeddingDeduplicator supports semantic and cross-run deduplication by maintaining a persistent embedding index on disk. When FAISS [ 9] is available, it is used for approximate nearest-neighbor search; otherwise, CuratorKIT falls back to a NumPy-based brute-force search. Because the index is saved across runs, samples accepted in earlier runs are not reintroduced when the pipeline is run again on newly added data. 
+
+> CuratorConfig( dedup="minhash", minhash_threshold=0.85, embedding_dedup=True, embedding_index_dir="output/embedding_index", embedding_dedup_threshold=0.92, )
+
+## 3.6 Sampling, Truncation, and Export 
+
+StratifiedSampler corrects skewed category distributions by downsampling over-represented categories to their configured target fractions. Under-represented categories are never silently accepted: they produce an explicit manifest warning that names the affected categories and the magnitude of the shortfall, making distribution imbalances visible in the audit record rather than absorbed quietly. 
+
+MaxSamplesTruncator enforces a global output cap after all resampling has completed. Positioning truncation after StratifiedSampler ensures that the target distribution is established before the size limit is applied, rather than cutting into a distribution that has not yet been rebalanced. When a per-source cap is needed before samples from different readers are pooled, the per-reader max_samples override is the correct mechanism. 
+
+> CuratorConfig( resample=True, resample_field="source_dataset", target_distribution={"legal": 0.4, "medical": 0.3, "general": 0.3}, max_samples=10000, )
+
+CuratorKIT exports to five training-ready formats: AlpacaExporter (→ sft_alpaca.jsonl ), ShareGPTExporter 
+
+(→ sft_sharegpt.jsonl , with full multi-turn support), DPOExporter (→ dpo.jsonl , auto-detecting conver-6CuratorKIT : Data Curation and Synthetic Data Generation for LLM Post-Training 
+
+sational turns), GRPOExporter (→ grpo.jsonl ), PPOExporter (→ ppo.jsonl ), and a CorpusExporter (→
+
+corpus.jsonl ) that preserves full chunk metadata for downstream corpus analysis. Multiple formats can be specified in a single run. Output splitting via output_split shuffles accepted samples and writes each format’s output into per-split subdirectories: 
+
+> CuratorConfig( export_formats=["alpaca", "sharegpt", "dpo"], output_split={"train": 0.8, "val": 0.1, "test": 0.1}, output_dir="output/", )
+
+# 4 Data Hygiene Layer 
+
+The data hygiene layer comprises three components that clean source data before any LLM generation call is made: 
+
+SecretsGate , PIIPseudonymizer , and ToxicityGate . Their placement before generation is a deliberate constraint: credentials are rejected before a generation request is issued, PII is pseudonymised before a model generates con-tinuations, and toxic material is discarded before paying for inference. All three are task-type-aware, selecting the fields appropriate for each sample’s task_type rather than scanning a fixed column set, with the option to override field selection explicitly. Execution order is fixed, SecretsGate → PIIPseudonymizer → ToxicityGate , ordered by increasing computational cost so that the cheapest gate clears the most obvious contamination before the more expensive components run. 
+
+## 4.1 SecretsGate 
+
+SecretsGate rejects samples containing credentials, API keys, or high-entropy tokens using the detect-secrets 
+
+battery: deterministic regex plugins covering AWS keys, GitHub tokens, PEM private keys, JWTs, and common SaaS tokens, combined with Shannon entropy analysis for Base64 and hexadecimal strings. The design rejects rather than redacts, as retaining the surrounding context of a redacted credential still teaches a fine-tuned model the structural pattern of credential exposure. KeywordDetector is disabled by default to avoid false positives on legitimate prose mentions of words like key or secret , and can be enabled via code_corpus_mode=True for code corpora. Rejected samples carry a structured rejection reason listing all triggered detector types, with per-type finding counts written to the provenance record.  
+
+> CuratorConfig( dataset="data/raw.jsonl", secrets_gate=True, secrets_code_corpus_mode=False, # True for code corpora
+> )
+
+## 4.2 PIIPseudonymizer 
+
+PIIPseudonymizer replaces personally identifiable information with consistent fake values, following the clinical NLP de-identification approach used in i2b2 and MIMIC-III. The design pseudonymises rather than masks: replacing 
+
+John Smith with [PERSON] corrupts document structure and degrades QA generation quality, whereas a realistic fake name preserves semantic coherence for all downstream generation and verification tasks. Detection uses Microsoft Presidio with spaCy NER, and replacement values are generated by Faker. Consistency is maintained through a per-sample entity map, so the same entity string receives the same fake value across all fields within a sample, with the map reset between samples to prevent cross-sample linkage. A faker_seed parameter makes replacements reproducible across runs. The default entity type set covers PERSON , EMAIL_ADDRESS , PHONE_NUMBER , US_SSN , CREDIT_CARD ,
+
+IP_ADDRESS , US_BANK_NUMBER , and IBAN_CODE , deliberately excluding DATE_TIME to avoid over-redacting contract metadata where dates carry semantic weight. The ENTITY_TYPES_CLINICAL preset extends the default set with 
+
+DATE_TIME , LOCATION , and MEDICAL_LICENSE for clinical or legal corpora where these fields also constitute PII. 7CuratorKIT : Data Curation and Synthetic Data Generation for LLM Post-Training     
+
+> from curatorkit.hygiene.pii import ENTITY_TYPES_CLINICAL CuratorConfig( dataset="data/clinical_notes.jsonl", pii_pseudonymize=True, pii_entity_types=ENTITY_TYPES_CLINICAL, # adds DATE_TIME, LOCATION, etc.
+> pii_score_threshold=0.7, # Presidio confidence threshold
+> pii_spacy_model="en_core_web_lg", # or "en_core_web_sm" for dev/CI
+> pii_faker_seed=42, # reproducible replacements
+> )
+
+## 4.3 ToxicityGate 
+
+ToxicityGate rejects samples with toxic content using a two-phase approach that separates clear cases from ambiguous ones. In the first phase, the Detoxify classifier [ 10 ] scores each sample across six toxicity dimensions. Samples whose maximum dimension score falls below the pass threshold are accepted immediately without any LLM call. Samples whose maximum score exceeds the reject threshold are rejected immediately. Samples in the intermediate range are escalated to an optional LLM judge for a second opinion, incurring an LLM call only for genuinely ambiguous cases. This design avoids paying for LLM inference on the large majority of samples that are unambiguously clean or unambiguously toxic. Three Detoxify model variants are supported: "unbiased" (default, recommended for academic and professional corpora where sensitive topics appear in legitimate context), "original" (for informal web text), and "multilingual" for non-English datasets. For corpora where the subject matter includes clinical, legal, or social science content, raising the pass threshold to 0.2 avoids excessive escalation on text that discusses sensitive topics without being toxic.   
+
+> CuratorConfig( dataset="data/raw.jsonl", toxicity_gate=True, toxicity_classifier_pass_threshold=0.1, toxicity_classifier_reject_threshold=0.5, toxicity_detoxify_model="unbiased", toxicity_llm_judge=True, # escalate borderline samples
+> toxicity_llm_reject_threshold=0.5, llm_model="openai/gpt-4o-mini", # required when llm_judge=True
+> )
+
+All three hygiene components can be composed in a single CuratorConfig invocation alongside a generation task. When all three are active, they execute in the fixed cost-ordered sequence before any generation call is made: 
+
+> CuratorConfig( dataset="data/raw.jsonl", secrets_gate=True, pii_pseudonymize=True, toxicity_gate=True, generation_task="qa", llm_model="openai/gpt-4o-mini", export_formats=["alpaca"], output_dir="output/", )
+
+# 5 Synthetic Data Generation 
+
+The synthetic data generation layer takes normalised source samples and produces training-ready outputs by is-suing structured LLM calls, parsing the responses, and stamping each output with a full provenance record. All eight generation tasks extend BaseGenerationTask , which provides synchronous and asynchronous run loops with asyncio.Semaphore concurrency control, parse-failure retry, and rejected-sample accumulation via 8CuratorKIT : Data Curation and Synthetic Data Generation for LLM Post-Training 
+
+flush_rejected() . Parse failures are never dropped silently: a sample whose LLM response cannot be parsed is emitted as a RejectedSample with rejection_reason=generation_parse_failed , and the raw LLM response is preserved in the provenance record for diagnosis. All tasks are corpus-aware: when the input sample carries source text, it is embedded in the generation prompt and stored in sample.input so downstream hallucination verification can check the answer against the exact evidence that produced it. 
+
+## 5.1 LLM Backends 
+
+CuratorKIT abstracts LLM access behind a BaseLLM interface with two concrete backends. LiteLLMBackend 
+
+routes through LiteLLM [ 5] to 100+ providers including OpenAI, Anthropic, Google Gemini, AWS Bedrock, Azure, vLLM [ 11 ], and SGLang. It supports extra_body for provider-specific parameters, such as chat_template_kwargs 
+
+for thinking-mode control on Qwen3 [ 12 ] and other reasoning models, and automatically strips <think> blocks from reasoning model outputs. OllamaBackend provides a direct HTTP client for local Ollama models, requiring no API key or external service. Both backends expose synchronous generate() and asynchronous agenerate() 
+
+methods with built-in exponential backoff retry, token tracking, and latency instrumentation. LLMResponse carries the generated text, model identifier, token counts, and a to_provenance_dict() method that serialises these fields directly into the ProvenanceRecord.notes dictionary. Separate generator and judge models are supported through the judge_llm_model parameter, allowing a stronger model to evaluate outputs without the same-model leniency bias that arises when a generator scores its own responses [13, 14].   
+
+> CuratorConfig( llm_model="openai/gpt-4o-mini", # generator
+> llm_temperature=0.7, llm_concurrency=16, judge_llm_model="openai/gpt-4o", # judge -- stronger, separate model
+> judge_llm_temperature=0.1, judge_concurrency=8, )
+
+## 5.2 Generation Tasks 
+
+Eight generation tasks are available, summarised in Table 2. Each task owns only the prompt template and the output parser; the LLM backend is injected at construction time, making tasks composable with either backend without modification.                     
+
+> Table 2 Generation tasks available in CuratorKIT.
+> Task Output type Description
+> QAGenerationTask instruction_following Grounded QA pairs per source chunk with diffi-culty control
+> PreferenceGenerationTask preference Chosen/rejected pairs for DPO; single-call or two-pass mode
+> GRPORolloutTask grpo Ktemperature-varied responses per prompt with optional scoring
+> MultiTurnTask conversational Multi-turn dialogues via turn-by-turn or single-call generation
+> EvolInstructTask instruction_following Instruction rewrites across five complexity strate-gies
+> ChainOfThoughtTask instruction_following Step-by-step reasoning in generate or wrap mode
+> AdversarialQAGenerationTask instruction_following QA pairs with controlled hallucination injection for gate evaluation
+> BadSampleInjector instruction_following Post-hoc adversarial injection utility for gate benchmarking
+
+QAGenerationTask is the primary text-to-SFT task. It generates N question-answer pairs per source chunk with configurable difficulty ( easy , medium , hard ) and separate table-specific prompts for chunks extracted from PDF tables. A run_multi_passage() mode generates cross-passage questions that require information from two adjacent chunks, producing harder samples less susceptible to single-chunk memorisation. 9CuratorKIT : Data Curation and Synthetic Data Generation for LLM Post-Training 
+
+> CuratorConfig( dataset="docs/handbook.pdf", llm_model="openai/gpt-4o-mini", generation_task="qa", num_questions=3, difficulty="medium", )
+
+PreferenceGenerationTask produces chosen/rejected pairs for DPO training [ 15 ]. In single_call mode, one LLM call produces both responses. In two_pass mode, the chosen response is generated first and the rejected response is generated separately at higher temperature, achieving stronger quality contrast between the two completions. 
+
+GRPORolloutTask generates K diverse responses per prompt for group relative policy optimisation [ 16 ]. Tem-peratures across the K rollouts are either specified explicitly or derived from a configurable spread around the base temperature, ensuring sufficient diversity in the response set. Rollouts can be scored by a separate LLM judge in the same pipeline step. 
+
+> CuratorConfig( dataset="data/prompts.jsonl", llm_model="openai/gpt-4o-mini", generation_task="grpo", num_responses=6, grpo_temperatures=[0.0, 0.3, 0.6, 0.9, 1.2, 1.5], score_responses=True, )
+
+MultiTurnTask generates conversational data. In turn_by_turn mode (default), each turn is an independent LLM call conditioned on all prior turns, mirroring how real RLHF conversation data is collected and avoiding the distribution collapse of single-call generation. This uses 2 × num_turns LLM calls per sample. 
+
+EvolInstructTask rewrites instructions using five complexity strategies: add_constraints , deepen , concretize ,
+
+increase_reasoning , and broaden , following the Evol-Instruct paradigm [ 17 ]. When source text is present, evolutions remain grounded to the corpus. Answers can be generated via an optional second LLM pass. 
+
+ChainOfThoughtTask operates in two modes: generate produces a full reasoning chain from scratch, and wrap 
+
+takes an existing instruction-output pair and generates the reasoning chain leading to that answer [18]. 
+
+AdversarialQAGenerationTask extends QAGenerationTask to inject controlled hallucinations at a configurable rate during the first generation pass. Five injection types are supported: contradicts_source , parametric_drift ,
+
+high_temperature_drift , domain_mismatch , and instruction_quality . Since the hallucination gate evaluates these samples without access to the injection metadata, this provides ground-truth labels for gate precision and recall measurement without requiring human annotation. 
+
+BadSampleInjector is a complementary post-hoc utility that takes already-generated samples and replaces a fraction of answers with adversarially hallucinated variants. It is intended for gate evaluation experiments rather than standard pipeline use. 
+
+## 5.3 Custom Prompt Templates 
+
+Every generation task and quality gate accepts a prompt template override. Templates are validated at construction time against a list of required placeholder variables, so a missing {context} or {num_questions} raises a ValueError 
+
+with the full variable list before any LLM call is made. 10 CuratorKIT : Data Curation and Synthetic Data Generation for LLM Post-Training 
+
+> CuratorConfig( generation_task="qa", qa_prompt_template=( "You are a legal analyst. Generate {num_questions} precise " "{difficulty} questions from the clause below. Each question " "must be answerable from the text alone.\n\n" "Clause:\n{context}\n\n" "Return JSON: [{\"question\": \"...\", \"answer\": \"...\"}]" ), )
+
+# 6 Quality Filtering & Adaptive Recovery 
+
+Generated samples pass through a sequence of three quality gates before export. Each gate operates on a distinct signal axis: source grounding, instruction-following quality, and semantic diversity. Samples that fail a gate are not discarded immediately. Every rejection triggers a structured diagnostic process that classifies the failure into one of nine categories and, where the failure is recoverable, applies a targeted repair rather than blind resampling. This section describes the three gates, the failure taxonomy, and the recovery system. 
+
+## 6.1 Hallucination Gate 
+
+HallucinationGate uses an LLM judge to verify that each generated answer is grounded in its source text. The judge evaluates four dimensions: factual accuracy, source grounding, non-contradiction, and absence of parametric drift. It pro-duces a grounding_score in [0 , 1] along with lists of supported and unsupported claims. Samples below the configured threshold (default 0.7) are rejected with a structured reason of the form hallucination_contract_failed:0.42 .The verification is provenance-exact: the judge receives the source chunk from sample.input , which is the same text stored by the generation task at the time of generation. This eliminates the retrieval error class that affects post-hoc grounding checks, where the retrieved chunk may be similar to but not identical to the original generation context [ 19 , 20 ]. For DPO preference pairs, only the chosen response is evaluated. For GRPO rollouts, the highest-scoring response is checked. Using the same model for both generation and judgement introduces same-model leniency bias [13]; a separate, typically stronger judge model is recommended.  
+
+> CuratorConfig( hallucination_threshold=0.7, judge_llm_model="openai/gpt-4o", # recommended: separate from generator
+> judge_llm_temperature=0.1, )
+
+## 6.2 Reward Gate 
+
+RewardGate scores samples along configurable quality dimensions following the UltraFeedback rubric [ 21 ]. Seven di-mensions are available: helpfulness , honesty , instruction_following , truthfulness , depth , creativity ,and coherence . The judge produces an overall score as the mean of all dimension scores, alongside a per-dimension breakdown and free-text strengths and weaknesses. The per-dimension breakdown is consumed directly by the 
+
+RewardRefiner during recovery. For DPO preference pairs, the gate applies dual scoring: the chosen response must clear the threshold and the rejected response must fall below it. A pair where the rejected response also clears the threshold is dropped for insufficient quality contrast, as such pairs provide a weak training signal for preference learning. Contrast failures of this kind are not forwarded to the recovery system, since rewriting the answer cannot resolve a failure in the generation contrast itself. 11 CuratorKIT : Data Curation and Synthetic Data Generation for LLM Post-Training 
+
+> CuratorConfig( reward_threshold=0.7, reward_dimensions=["helpfulness", "honesty", "instruction_following", "depth"], judge_llm_model="openai/gpt-4o", )
+
+## 6.3 Diversity Gate 
+
+DiversityGate filters near-duplicate samples via embedding cosine similarity using sentence-transformers [ 22 ]. Accepted samples form a growing reference set within the current pipeline run; each new candidate is compared against all accepted samples and rejected if its maximum similarity exceeds the threshold (default 0.92). FAISS [ 9 ] is used for approximate nearest neighbour search when available, with a NumPy brute-force fallback otherwise. The text field to embed is selected automatically from task_type , using chosen for preference pairs, instruction for GRPO rollouts, and instruction + output for SFT samples.  
+
+> CuratorConfig( diversity_threshold=0.92, embedding_model="sentence-transformers/all-MiniLM-L6-v2", embedding_device=None, # "cuda" | "cpu" | None (auto-detect)
+> )
+
+## 6.4 Failure Mode Taxonomy 
+
+Every gate rejection enters a structured diagnostic process rather than being discarded. The diagnostic system classifies each rejection into one of nine failure modes, six of which are recoverable through targeted repair. The taxonomy is organised by the gate that produced the rejection, since each gate surfaces a distinct class of failure and each class admits a different repair strategy.                       
+
+> Table 3 Failure mode taxonomy. Recoverable modes are addressed by the inline probe and reward refiner.
+> Origin Mode Description Recoverable
+> HallucinationGate
+> THRESHOLD_MARGINAL Score just below threshold; outcome un-stable at current temperature Yes
+> GENERATOR_TEMPERATURE High temperature caused source drift Yes
+> GENERATOR_PARAMETRIC Model ignored source and relied on prior knowledge Yes
+> SOURCE_AMBIGUOUS Source-response relationship is funda-mentally unclear No RewardGate
+> INSTRUCTION_QUALITY Generated question is poor or ambigu-ous Yes
+> RESPONSE_QUALITY Generated answer is weak or incoherent Yes
+> DOMAIN_MISMATCH Generation prompt ill-suited to domain style Yes DiversityGate NEAR_DUPLICATE Sample too similar to an already-accepted sample No Fallback UNKNOWN Probe sequence exhausted without a con-clusive diagnosis No
+
+## 6.5 Diagnostic Probe 
+
+DiagnosticProbe runs inline on every HallucinationGate rejection, consuming at most five LLM calls per sample across two routing paths. The routing decision is conditioned on the grounding score written to the sample’s provenance record by the failing gate evaluation. For samples whose grounding score is at or above the score_split threshold (default 0.5), a near-boundary failure is assumed and the probe runs a temperature sweep first, regenerating the sample 12 CuratorKIT : Data Curation and Synthetic Data Generation for LLM Post-Training 
+
+at each configured temperature (default T ∈ { 0.3, 0.5}). If all regenerations pass the gate, the mode is classified as 
+
+THRESHOLD_MARGINAL ; if only the lower temperature passes, it is classified as GENERATOR_TEMPERATURE . If the sweep is inconclusive, the probe proceeds to the prompt variant sequence. For samples scoring below score_split ,a deeper source grounding failure is assumed and the strict grounding probe is attempted first. A pass on this path classifies the mode as GENERATOR_PARAMETRIC , confirming that the model was relying on prior knowledge rather than the provided source passage. If the strict grounding probe fails, the temperature sweep is run, followed by the remaining prompt variants. The prompt variant sequence covers three cases in order: a strict grounding prompt targeting GENERATOR_PARAMETRIC , a domain-adapted prompt targeting DOMAIN_MISMATCH , and an instruction regeneration step targeting INSTRUCTION_QUALITY , where the probe rewrites the question from the source rather than the answer. The first regeneration that clears the gate is accepted and reintegrated into the pipeline inline, flowing into RewardGate alongside the original passing samples. If all five probe calls are exhausted without recovery, the sample is classified as SOURCE_AMBIGUOUS or UNKNOWN and written to the rejection log.  
+
+> CuratorConfig( enable_diagnostic_probe=True, probe_temperatures=[0.3, 0.5], probe_score_split=0.5, probe_generator_model=None, # None = use llm_model
+> )
+
+Probe templates can be overridden for domain-specific recovery strategies. Each template receives {source} and 
+
+{question} as placeholders: 
+
+> CuratorConfig( enable_diagnostic_probe=True, probe_extra_templates={ "strict_grounding": ( "Answer using ONLY the passage. Quote specific sentences.\n\n" "Passage:\n{source}\n\nQuestion:\n{question}" ), "domain_specific": ( "You are a legal analyst. Answer from the passage only.\n\n" "Passage:\n{source}\n\nQuestion:\n{question}" ), }, )
+
+## 6.6 Reward Refiner 
+
+RewardRefiner operates on samples that fail RewardGate after the inline probe has been exhausted. It reads the lowest-scoring dimension and the judge’s associated weakness note from the gate’s provenance record, then issues a single targeted rewrite prompting the generator to improve that specific axis while remaining grounded in the source passage. The refined sample is re-evaluated by the same RewardGate instance. If it passes, it joins the accepted pool. For DPO pairs, the refined answer becomes the new chosen field while the original adversarial rejected 
+
+response is preserved unchanged, maintaining the pair structure for downstream preference training. Samples rejected for insufficient DPO quality contrast ( rejected_above_threshold ) are skipped entirely by the refiner, as the failure lies in the generation contrast rather than the answer quality and cannot be resolved by rewriting. 
+
+> CuratorConfig( enable_reward_refiner=True, reward_refine_prompt_template=None, reward_instruction_refine_template=None, )
+
+13 CuratorKIT : Data Curation and Synthetic Data Generation for LLM Post-Training 
+
+## 6.7 Pipeline Diagnostics 
+
+PipelineDiagnostics is a run-level accumulator that collects every diagnosed rejection during a pipeline run. It is accessible as result.diagnostics after Curator.run() completes and writes a diagnostic_summary.json to the output directory alongside the standard manifest files. 
+
+result = curator.run() if result.diagnostics: d = result.diagnostics print(f"Diagnosed : {d.to_dict()[’total_diagnosed’]}") print(f"Recovered : {d.probe_recovery_count()}") print(f"Probe calls: {d.total_probe_calls()}") print(f"Mode counts: {d.mode_counts()}") 
+
+# 7 Usage 
+
+## 7.1 Installation 
+
+git clone https://github.com/Lexsi-Labs/CuratorKIT.git cd CuratorKIT pip install -e . # core: cleaning + dedup only 
+
+pip install -e ".[generation]" # + LLM backends (LiteLLM) 
+
+pip install -e ".[connectors]" # + Parquet + HuggingFace readers 
+
+pip install -e ".[embedding]" # + diversity gate + cross-run dedup 
+
+pip install -e ".[embedding-faiss]" # + FAISS-accelerated diversity gate 
+
+pip install -e ".[hygiene]" # + SecretsGate + PIIPseudonymizer + ToxicityGate 
+
+pip install -e ".[pdf]" # + PDF extraction (GPU auto-detected) 
+
+pip install -e ".[all]" # connectors + generation + embedding + hygiene 
+
+## 7.2 Usage Patterns 
+
+Pattern 1: Clean and deduplicate an existing dataset. No LLM required. Reads any supported format, deduplicates, cleans, and exports: 
+
+from curatorkit import Curator, CuratorConfig result = Curator(CuratorConfig( dataset="Anthropic/hh-rlhf", dedup="minhash", clean=True, export_formats=["alpaca", "sharegpt"], output_dir="output/clean", )).run() result.print_summary() 
+
+# --------------------------------------------# passed : 8 120 # rejected : 340 # time : 12.3s # output : output/clean # --------------------------------------------
+
+14 CuratorKIT : Data Curation and Synthetic Data Generation for LLM Post-Training 
+
+Pattern 2: Screen source data for hygiene before generation. Runs the three hygiene gates on the input corpus before any LLM API call is made. API keys and PII in source data never reach an external endpoint: 
+
+result = Curator(CuratorConfig( dataset="data/corpus.jsonl", secrets_gate=True, secrets_hex_limit=4.5, # raise from 3.0 for prose corpora 
+
+secrets_base64_limit=5.5, # raise from 4.5 for prose corpora 
+
+pii_pseudonymize=True, toxicity_gate=True, export_formats=["alpaca"], output_dir="output/hygiene", )).run() 
+
+Each gate is independent: SecretsGate rejects samples containing credentials or high-entropy tokens; 
+
+PIIPseudonymizer replaces detected entities in-place using Presidio NER and Faker; ToxicityGate rejects samples whose Detoxify score exceeds the rejection threshold. Rejected samples are written to rejected.jsonl with structured rejection reasons for post-run audit. 
+
+Pattern 3: Generate synthetic data and filter it. Reads a PDF, generates QA pairs, and checks that each answer is grounded in its source chunk: 
+
+result = Curator(CuratorConfig( dataset="docs/handbook.pdf", llm_model="openai/gpt-4o-mini", generation_task="qa", num_questions=3, hallucination_threshold=0.7, export_formats=["alpaca"], output_dir="output/qa", )).run() 
+
+Pattern 4: Generate, filter, and recover failures. Adds a reward gate, inline diagnostic probe (fires on both 
+
+HallucinationGate and RewardGate rejections), and a post-pipeline reward refiner: 
+
+result = Curator(CuratorConfig( dataset="docs/handbook.pdf", llm_model="openai/gpt-4o-mini", judge_llm_model="openai/gpt-4o", # separate judge avoids self-leniency 
+
+generation_task="qa", hallucination_threshold=0.7, reward_threshold=0.7, enable_diagnostic_probe=True, enable_reward_refiner=True, export_formats=["alpaca", "sharegpt", "dpo"], output_dir="output/qa_full", )).run() if result.diagnostics: d = result.diagnostics print(f"Diagnosed : {d.to_dict()[’total_diagnosed’]}") print(f"Recovered : {d.probe_recovery_count()}") print(f"Probe calls: {d.total_probe_calls()}") 
+
+15 CuratorKIT : Data Curation and Synthetic Data Generation for LLM Post-Training 
+
+## 7.3 Custom Generation Tasks and Gates 
+
+New generation tasks subclass BaseGenerationTask and implement two methods. New gates subclass BaseGate 
+
+and implement run() :
+
+from curatorkit.generators.base import BaseGenerationTask from curatorkit.llm.base import BaseLLM, LLMResponse from curatorkit.schema import DataSample import uuid class SummarisationTask(BaseGenerationTask): def _build_messages(self, sample: DataSample) -> list[dict]: source = self._get_source_context(sample) return [{"role": "user", "content": f"Summarise:\n\n{source}"}] def _parse_response(self, sample: DataSample, response: LLMResponse): text = response.text.strip() if not text: return [] return [DataSample( id=str(uuid.uuid4()), source_uri=sample.source_uri, instruction="Summarise the passage.", input=self._get_source_context(sample), output=text, task_type="instruction_following", provenance_chain=list(sample.provenance_chain), )] 
+
+Use custom tasks directly with Pipeline (bypassing CuratorConfig ): 
+
+from curatorkit.pipeline import Pipeline from curatorkit.llm.litellm import LiteLLMBackend llm = LiteLLMBackend(model="openai/gpt-4o-mini") task = SummarisationTask(llm=llm, concurrency=10) pipeline = Pipeline([reader, schema_gate, task, alpaca_exporter], output_dir=Path("output/")) result = pipeline.run() 
+
+## 7.4 PDF Setup 
+
+MinerU model weights are downloaded automatically on first use, but the installation can be verified explicitly: 
+
+curatorkit setup-pdf --check # verify MinerU installation 
+
+## 7.5 CLI and YAML Configuration 
+
+The CLI entry point is curatorkit . Pipelines can be defined entirely in YAML, validated by Pydantic before any step runs: 16 CuratorKIT : Data Curation and Synthetic Data Generation for LLM Post-Training 
+
+# pipeline.yaml 
+
+name: "qa-pipeline" version: "0.2.0" readers: - type: pdf path: "corpus/contracts.pdf" chunk_strategy: heading extract_tables: true gates: - type: schema min_tokens: 20 max_tokens: 4096 - type: secrets secrets_code_corpus_mode: false secrets_hex_limit: 4.5 secrets_base64_limit: 5.5 - type: hallucination hallucination_threshold: 0.7 - type: reward reward_threshold: 0.6 reward_dimensions: [helpfulness, honesty, instruction_following] - type: toxicity toxicity_classifier_pass_threshold: 0.1 toxicity_classifier_reject_threshold: 0.5 normalizers: - type: exact_dedup - type: minhash_dedup minhash_threshold: 0.85 - type: text_cleaner - type: pii_pseudonymizer pii_score_threshold: 0.7 generators: - type: qa num_questions: 3 difficulty: medium exporters: - type: alpaca - type: sharegpt - type: dpo llm: model: openai/gpt-4o-mini temperature: 0.7 concurrency: 16 diagnostic: enable_probe: true probe_temperatures: [0.3, 0.5] output_split: train: 0.8 val: 0.1 test: 0.1 
+
+17 CuratorKIT : Data Curation and Synthetic Data Generation for LLM Post-Training 
+
+# Validate config and print execution plan -- no LLM calls 
+
+curatorkit run pipeline.yaml --dry-run 
+
+# Full run 
+
+curatorkit run pipeline.yaml --output-dir ./output/ --verbose 
+
+# Async execution for generation-heavy pipelines 
+
+curatorkit run pipeline.yaml --async --verbose 
+
+# Reset cross-run dedup index before running 
+
+curatorkit run pipeline.yaml --reset-index 
+
+YAML for local vLLM endpoints: 
+
+llm: model: openai/Qwen/Qwen3-8B api_base: http://localhost:8000/v1 api_key: token-abc123 temperature: 0.7 concurrency: 32 extra_body: chat_template_kwargs: enable_thinking: false 
+
+## 7.6 Custom Prompt Templates 
+
+Every generation task and gate accepts a *_prompt_template override. Templates are validated at construction time: if a required placeholder is absent, a ValueError listing all required variables is raised before any LLM call is made: 
+
+CuratorConfig( generation_task="qa", qa_prompt_template=( "You are a legal analyst. Generate {num_questions} precise " "{difficulty} questions from the clause below. Each question " "must be answerable from the text alone.\n\n" "Clause:\n{context}\n\n" "Return JSON: [{\"question\": \"...\", \"answer\": \"...\"}]" ), )
+
+The reward judge prompt can be replaced entirely to define a custom evaluation rubric. The prompt receives 
+
+{instruction} and {response} as placeholders and must return a JSON object containing at minimum an 
+
+overall_score field in [0 , 1] :
+
+CuratorConfig( reward_threshold=0.7, reward_prompt_template=( "Rate this legal answer 0.0-1.0:\n" "- Cites clause/article (0.4 weight)\n" "- States obligation precisely (0.3 weight)\n" "- Identifies exceptions (0.3 weight)\n\n" "Instruction: {instruction}\nResponse: {response}\n\n" "Return JSON: {\"overall_score\": 0.XX, \"reasoning\": \"...\"}" ), )
+
+18 CuratorKIT : Data Curation and Synthetic Data Generation for LLM Post-Training 
+
+# 8 Feature Comparison 
+
+Table 4 compares CuratorKIT against related data curation frameworks. 
+
+Table 4 Feature comparison across data curation frameworks. ✓= full support, ~= partial, ×= not available. 
+
+Distilabel DataTrove NeMo DD AgentInstruct CuratorKIT Ingestion 
+
+Multi-format readers ( ≥5) ✓ ✓ ~ × ✓
+
+Generation 
+
+Generation tasks ( ≥5) ✓ ~ ✓4 ✓ ✓5
+
+Quality enforcement 
+
+Schema validation × × ✓ × ✓
+
+Hallucination / faithfulness gate ~1 × ~2 × ✓
+
+Reward / quality scoring gate ✓ × ~ × ✓
+
+Diversity / semantic dedup gate ✓ × × × ✓
+
+Deduplication (exact + fuzzy + cross-run) ✓ ✓ × × ✓
+
+Provenance & observability 
+
+Per-sample provenance chain ~3 × × × ✓
+
+Structured rejection reasons × ~ × × ✓
+
+Recovery 
+
+Adaptive recovery (diagnose + repair) × × × × ✓
+
+Usability 
+
+YAML + CLI + Python API ✓ ~ ✓ × ✓         
+
+> 1UltraFeedback truthfulness; no source-grounded verification. 2LLM judge accuracy rubric; no per-sample source grounding. 3Pipeline-level YAML lineage; no per-row trace. 4NVIDIA NIM endpoints only. 5Via LiteLLM plus native Ollama backend.
+
+Key structural differences from other frameworks: • Rejection as a structured event. Every rejected sample carries a machine-readable reason string, the rejecting step identity, and the configuration snapshot. Without a structured failure reason, the only actionable response to a gate failure is discard. With one, the recovery system can route the sample to a targeted repair rather than treating all failures as equivalent. • Rejection as the start of recovery. Other frameworks treat quality gates as terminal. CuratorKIT’s diagnostic loop classifies each failure and applies a targeted repair: different interventions for temperature-driven drift, parametric leakage, instruction quality issues, and source ambiguity. Blind resampling applies the same intervention regardless of cause; targeted repair applies the right one. • Provenance without retrieval. Hallucination verification requires the verifier to see the same evidence the generator saw. Retrieval-based approaches approximate this by re-fetching a similar chunk, introducing error when the returned chunk is close but not identical to the original. Storing the source chunk in the sample’s own fields eliminates this error class at no infrastructure cost. • Separate generator and judge models. The architecture explicitly supports different models for generation and evaluation, avoiding same-model leniency bias documented in self-rewarding setups [13]. 
+
+# 9 Empirical Studies 
+
+We validated CuratorKIT across three generator scales from the Qwen3 family [ 12 ] (1.7B, 4B, 8B) and two judge scales (14B, 35B). The source corpus comprises 1,500 chunks drawn from CUAD [ 23 ] (commercial contracts), Pub-MedQA [ 24 ] (biomedical abstracts), and Wikipedia, with three QA pairs generated per chunk and 20% of samples seeded with controlled hallucination injections across four failure types: contradicts_source , parametric_drift , do-
+
+19 CuratorKIT : Data Curation and Synthetic Data Generation for LLM Post-Training main_mismatch , and instruction_quality . The downstream fine-tuning evaluation uses Qwen3-4B as the base model with LoRA (rank 16, α = 32 ), evaluated on a frozen test set of 1,400 samples. 
+
+## 9.1 Gate Complementarity 
+
+The hallucination and reward gates operate on orthogonal signal axes and reject largely disjoint failure populations. Table 5 reports the Jaccard similarity between the sets of samples rejected by each gate independently. Overlap stays in the range [0 .28 , 0.32] across all three generator scales, confirming that neither gate subsumes the other. Running reward-only filtering misses the faithfulness failures caught exclusively by the hallucination gate; running hallucination-only filtering misses the quality failures caught exclusively by the reward gate.                      
+
+> Table 5 Rejection-set Jaccard overlap between HallucinationGate and RewardGate across generator scales (14B judge).
+> Generator Hall-only (%) Reward-only (%) Both (%) Jaccard
+> 1.7B 7.3 32.3 18.4 0.317 4B 6.5 38.6 21.6 0.324 8B 8.5 36.6 17.8 0.284
+
+## 9.2 Downstream Fine-Tuning Quality 
+
+Table 6 compares unfiltered generation against both-gates-filtered generation on ROUGE-L [ 25 ], BERTScore-F1 [ 26 ], and faithfulness across all three generator scales. Every delta is strictly positive across all three metrics at every generator scale: no metric regresses under filtering. The gain is largest where the generator is weakest, reaching +3 .1% 
+
+ROUGE-L at 1.7B, and compresses as generator quality increases. Generator scale is the dominant driver of downstream quality, with a cross-generator ROUGE-L improvement of +6 .6% from 1.7B to 8B dwarfing any within-generator spread across curation conditions.                                 
+
+> Table 6 Downstream fine-tuning quality: unfiltered vs. both gates applied. Qwen3-4B base model, LoRA, 1,400-sample test set.
+> Generator Condition ROUGE-L BERTScore-F1 Faithfulness
+> 1.7B Unfiltered 0.5227 0.9059 0.8537 Both gates 0.5388 0.9112 0.8606
+> ∆+0.0161 (+3.1%) +0.0053 (+0.6%) +0.0069 (+0.8%) 4B Unfiltered 0.5577 0.9185 0.8542 Both gates 0.5606 0.9197 0.8570
+> ∆+0.0029 (+0.5%) +0.0012 (+0.1%) +0.0028 (+0.3%) 8B Unfiltered 0.5734 0.9187 0.8527 Both gates 0.5764 0.9191 0.8540
+> ∆+0.0030 (+0.5%) +0.0004 (+0.04%) +0.0013 (+0.2%)
+
+## 9.3 Adaptive Recovery 
+
+The adaptive recovery pipeline (DiagnosticProbe and RewardRefiner) is evaluated against hard filtering and against naive regeneration retry. Compared to hard filtering at identical quality thresholds, adaptive recovery yields +23 .6% 
+
+more accepted samples at 1.7B, +48 .4% at 4B, and +53 .1% at 8B, with the yield advantage growing with generator scale. Against naive retry under the same judge and thresholds, the adaptive pipeline achieves a higher recovery rate (32.5% vs. 24.9% of all rejections recovered) and substantially higher injection recall across all four failure types (67.0% vs. 53.5% overall, with a 23 percentage point gap on instruction_quality failures). Structured diagnosis routes repairs to the failure type rather than issuing a blind regeneration from the same prompt, which is the source of its advantage on systematically diagnosable failures. 
+
+## 9.4 Data Hygiene Validation 
+
+The hygiene layer was validated across two notebooks. Notebook 07 used CuratorKIT’s qa_prompt_template 
+
+parameter to instruct a Qwen3-8B generator to produce four structured contamination batches, covering answers embedding API keys and tokens, first-person instructions containing names, emails, and SSNs, hostile forum-style 20 CuratorKIT : Data Curation and Synthetic Data Generation for LLM Post-Training                    
+
+> Table 7 Adaptive recovery vs. naive retry: injection recall by failure type (Qwen3-1.7B generator, 14B judge).
+> Injection type Adaptive recall Naive retry recall Gap
+> contradicts_source 59.8% 49.4% +10.4pp
+> parametric_drift 71.7% 58.1% +13.6pp
+> domain_mismatch 65.3% 61.3% +4.0pp
+> instruction_quality 74.4% 51.3% +23.1pp
+> Overall 67.0% 53.5% +13.5pp
+
+answers, and a clean control batch. The four batches were combined into a single 184-sample contaminated dataset and passed to Notebook 08. Notebook 08 ran the full hygiene pipeline on this input. SecretsGate rejected all 184 samples before any reached the downstream components. Since SecretsGate runs as the first and cheapest gate in the fixed execution order, the entire contaminated batch was intercepted before any PII normalisation or toxicity scoring was invoked, and no credentials reached an external LLM endpoint. This confirms that the cost-ordered gate sequence works as intended, with the most structurally obvious contamination eliminated at zero model cost before the more expensive components are ever invoked. 
+
+# 10 Limitations 
+
+CuratorKIT has several practical limitations. The DiagnosticProbe can issue up to five sequential LLM calls per rejected sample; although diagnose_batch() parallelizes probes across samples, per-sample latency remains significant and should be considered when estimating pipeline throughput. Recovery is currently limited to corpus-grounded generation tasks, since the probe requires a populated sample.input field for regeneration, and instruction-only or open-ended samples bypass this stage. In addition, RewardRefiner performs only one targeted rewrite per sample and does not continue iterating if the rewritten sample fails re-evaluation. Some components require language-specific configuration such as PIIPseudonymizer defaults to English Presidio models, so non-English corpora require explicit spaCy model configuration and may have lower detection accuracy. CuratorKIT currently operates on text only and does not support multimodal pipelines. Finally, the nine-mode failure taxonomy used by DiagnosticProbe was developed and validated on corpus-grounded QA tasks with the Qwen3 generator family, so transfer to other task types or generator families requires separate empirical validation. 
+
+# 11 Conclusion 
+
+CuratorKIT is a unified and configurable framework for LLM post-training data curation that brings together source ingestion, schema detection, data hygiene, synthetic generation, quality filtering, adaptive recovery, and training-ready export within a single auditable pipeline. Every sample carries an append-only provenance chain, and every rejected sample retains a structured record of why it failed rather than being silently discarded. The companion study [ 6] validates the core gating and recovery components, finding that exact source provenance is necessary for reliable hallucination detection, that hallucination and reward gates capture largely disjoint failure populations making both necessary, and that adaptive recovery provides its clearest benefit when smaller generators are non-negotiable. CuratorKIT is compatible with AlignTune [27], TRL [7], and Unsloth [28]. CuratorKIT will be open-sourced and made available at https://github.com/Lexsi-Labs/CuratorKIT .
+
+# References 
+
+[1] Ã ˛ Alvaro BartolomÃl’ Del Canto, Gabriel MartÃ n BlÃ ˛ azquez, AgustÃ n Piqueres LajarÃ n, and Daniel Vila Suero. Distilabel: An ai feedback (aif) framework for building datasets with and for llms. https://github. com/argilla-io/distilabel , 2024. [2] Arindam Mitra, Luciano Del Corro, Guoqing Zheng, Shweti Mahajan, Dany Rouhana, Andres Codas, Yadong Lu, Wei ge Chen, Olga Vrousgos, Corby Rosset, Fillipe Silva, Hamed Khanpour, Yash Lara, and Ahmed Awadallah. Agentinstruct: Toward generative teaching with agentic flows, 2024. [3] Guilherme Penedo, Hynek KydlÃ Ä ek, Alessandro Cappelli, Mario Sasko, and Thomas Wolf. Datatrove: large scale data processing, 2024. 21 CuratorKIT : Data Curation and Synthetic Data Generation for LLM Post-Training 
+
+[4] NVIDIA The NeMo Data Designer Team. Nemo data designer: A framework for generating synthetic data from scratch or based on your own seed data. https://github.com/NVIDIA-NeMo/DataDesigner , 2025. GitHub Repository. [5] BerriAI. LiteLLM: Call all llm apis using the openai format, 2024. [6] Soham Bhattacharjee, Karun Sharma, Vinay Kumar Sankarapu, and Pratinav Seth. Provenance-grounded gating and adaptive recovery in synthetic post-training data curation, 2026. [7] Leandro von Werra, Younes Belkada, Lewis Tunstall, Edward Beeching, Tristan Thrush, Nathan Lambert, Shengyi Huang, Kashif Rasul, and Quentin GallouÃl’dec. TRL: Transformers Reinforcement Learning, 2020. [8] Thomas Wolf, Lysandre Debut, Victor Sanh, Julien Chaumond, Clement Delangue, Anthony Moi, Pierric Cistac, Tim Rault, RÃl’mi Louf, Morgan Funtowicz, Joe Davison, Sam Shleifer, Patrick von Platen, Clara Ma, Yacine Jernite, Julien Plu, Canwen Xu, Teven Le Scao, Sylvain Gugger, Mariama Drame, Quentin Lhoest, and Alexander M. Rush. Transformers: State-of-the-art natural language processing. In Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing: System Demonstrations , pages 38–45, Online, October 2020. Association for Computational Linguistics. [9] Matthijs Douze, Alexandr Guzhva, Chengqi Deng, Jeff Johnson, Gergely Szilvasy, Pierre-Emmanuel MazarÃl’, Maria Lomeli, Lucas Hosseini, and HervÃl’ JÃl’gou. The faiss library, 2025. [10] Laura Hanu and Unitary team. Detoxify. Github. https://github.com/unitaryai/detoxify, 2020. [11] Woosuk Kwon, Zhuohan Li, Siyuan Zhuang, Ying Sheng, Lianmin Zheng, Cody Hao Yu, Joseph E. Gonzalez, Hao Zhang, and Ion Stoica. Efficient memory management for large language model serving with pagedattention. In Proceedings of the ACM SIGOPS 29th Symposium on Operating Systems Principles , 2023. [12] An Yang, Anfeng Li, Baosong Yang, Beichen Zhang, Binyuan Hui, Bo Zheng, Bowen Yu, Chang Gao, Chengen Huang, Chenxu Lv, Chujie Zheng, Dayiheng Liu, Fan Zhou, Fei Huang, Feng Hu, Hao Ge, Haoran Wei, Huan Lin, Jialong Tang, Jian Yang, Jianhong Tu, Jianwei Zhang, Jianxin Yang, Jiaxi Yang, Jing Zhou, Jingren Zhou, Junyang Lin, Kai Dang, Keqin Bao, Kexin Yang, Le Yu, Lianghao Deng, Mei Li, Mingfeng Xue, Mingze Li, Pei Zhang, Peng Wang, Qin Zhu, Rui Men, Ruize Gao, Shixuan Liu, Shuang Luo, Tianhao Li, Tianyi Tang, Wenbiao Yin, Xingzhang Ren, Xinyu Wang, Xinyu Zhang, Xuancheng Ren, Yang Fan, Yang Su, Yichang Zhang, Yinger Zhang, Yu Wan, Yuqiong Liu, Zekun Wang, Zeyu Cui, Zhenru Zhang, Zhipeng Zhou, and Zihan Qiu. Qwen3 technical report, 2025. [13] Weizhe Yuan, Richard Yuanzhe Pang, Kyunghyun Cho, Xian Li, Sainbayar Sukhbaatar, Jing Xu, and Jason Weston. Self-rewarding language models. In Proceedings of the 41st International Conference on Machine Learning , ICML’24. JMLR.org, 2024. [14] Harrison Lee, Samrat Phatale, Hassan Mansoor, Thomas Mesnard, Johan Ferret, Kellie Lu, Colton Bishop, Ethan Hall, Victor Carbune, Abhinav Rastogi, and Sushant Prakash. Rlaif vs. rlhf: scaling reinforcement learning from human feedback with ai feedback. In Proceedings of the 41st International Conference on Machine Learning ,ICML’24. JMLR.org, 2024. [15] Rafael Rafailov, Archit Sharma, Eric Mitchell, Christopher D Manning, Stefano Ermon, and Chelsea Finn. Direct preference optimization: Your language model is secretly a reward model. In Thirty-seventh Conference on Neural Information Processing Systems , 2023. [16] Zhihong Shao, Peiyi Wang, Qihao Zhu, Runxin Xu, Junxiao Song, Mingchuan Zhang, Y.K. Li, Y. Wu, and Daya Guo. Deepseekmath: Pushing the limits of mathematical reasoning in open language models, 2024. [17] Can Xu, Qingfeng Sun, Kai Zheng, Xiubo Geng, Pu Zhao, Jiazhan Feng, Chongyang Tao, Qingwei Lin, and Daxin Jiang. WizardLM: Empowering large pre-trained language models to follow complex instructions. In The Twelfth International Conference on Learning Representations , 2024. [18] Xuezhi Wang, Jason Wei, Dale Schuurmans, Quoc V Le, Ed H. Chi, Sharan Narang, Aakanksha Chowdhery, and Denny Zhou. Self-consistency improves chain of thought reasoning in language models. In The Eleventh International Conference on Learning Representations , 2023. [19] Joshua Maynez, Shashi Narayan, Bernd Bohnet, and Ryan McDonald. On faithfulness and factuality in abstractive summarization. In Dan Jurafsky, Joyce Chai, Natalie Schluter, and Joel Tetreault, editors, Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics , pages 1906–1919, Online, July 2020. Association for Computational Linguistics. [20] Hannah Rashkin, David Reitter, Gaurav Singh Tomar, and Dipanjan Das. Increasing faithfulness in knowledge-grounded dialogue with controllable features. In Chengqing Zong, Fei Xia, Wenjie Li, and Roberto Navigli, editors, Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (Volume 1: Long Papers) , pages 704–718, Online, August 2021. Association for Computational Linguistics. 22 CuratorKIT : Data Curation and Synthetic Data Generation for LLM Post-Training 
+
+[21] Ganqu Cui, Lifan Yuan, Ning Ding, Guanming Yao, Bingxiang He, Wei Zhu, Yuan Ni, Guotong Xie, Ruobing Xie, Yankai Lin, Zhiyuan Liu, and Maosong Sun. Ultrafeedback: Boosting language models with scaled ai feedback, 2024. [22] Nils Reimers and Iryna Gurevych. Making monolingual sentence embeddings multilingual using knowledge distillation. In Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing .Association for Computational Linguistics, 11 2020. [23] Dan Hendrycks, Collin Burns, Anya Chen, and Spencer Ball. Cuad: An expert-annotated nlp dataset for legal contract review. NeurIPS , 2021. [24] Qiao Jin, Bhuwan Dhingra, Zhengping Liu, William Cohen, and Xinghua Lu. PubMedQA: A dataset for biomedi-cal research question answering. In Kentaro Inui, Jing Jiang, Vincent Ng, and Xiaojun Wan, editors, Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP) , pages 2567–2577, Hong Kong, China, November 2019. Association for Computational Linguistics. [25] Chin-Yew Lin. ROUGE: A package for automatic evaluation of summaries. In Text Summarization Branches Out ,pages 74–81, Barcelona, Spain, July 2004. Association for Computational Linguistics. [26] Tianyi Zhang*, Varsha Kishore*, Felix Wu*, Kilian Q. Weinberger, and Yoav Artzi. Bertscore: Evaluating text generation with bert. In International Conference on Learning Representations , 2020. [27] R E Zera Marveen Lyngkhoi, Chirag Chawla, Pratinav Seth, Utsav Avaiya, Soham Bhattacharjee, Mykola Khandoga, Rui Yuan, and Vinay Kumar Sankarapu. Aligntune: Modular toolkit for post-training alignment of large language models, 2026. [28] Michael Han Daniel Han and Unsloth team. Unsloth, 2023. 23

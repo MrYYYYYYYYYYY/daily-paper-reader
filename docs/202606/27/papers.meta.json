@@ -1,0 +1,69 @@
+{
+  "label": "2026-06-27",
+  "date": "2026-06-27",
+  "generated_at": "2026-06-27T21:24:31",
+  "count": 4,
+  "papers": [
+    {
+      "paper_id": "202606/27/2606.21631v1-curatorkit--data-curation-and-synthetic-data-generation-for-llm-post-training",
+      "section": "deep",
+      "title_en": "CuratorKIT : Data Curation and Synthetic Data Generation for LLM Post-Training",
+      "authors": "Soham Bhattacharjee, Karun Sharma, Vinay Kumar Sankarapu, Pratinav Seth",
+      "date": "2026-06-19",
+      "pdf": "https://arxiv.org/pdf/2606.21631v1",
+      "score": "9.0",
+      "evidence": "统一的LLM后训练数据整理流程，包含幻觉验证",
+      "tldr": "现有LLM后训练数据整理工具将摄入、去重、合成生成和质量过滤分离，导致审计困难。CuratorKIT作为开源Python库，提供从源读取、预处理、八种LLM生成任务到三种质量门控（含幻觉验证）及自适应恢复的完整管道，并记录每个样本的溯源链。它支持100+LLM提供商和五种训练格式输出，为需要可重现、可审计大规模数据管道的从业者设计。",
+      "tags": "query:lpt",
+      "abstract_en": "Data curation is a critical part of post-training pipelines for large language models, yet existing tools often treat ingestion, deduplication, synthetic generation, and quality filtering as separate stages. This fragmentation makes it difficult to audit pipeline decisions or understand why individual samples are rejected. CuratorKIT is an open-source Python library that covers this full lifecycle in a single configurable pipeline. The framework is composed of six source format readers and automatic schema detection, a pre-generation data hygiene layer for credentials, PII, and toxic content, eight LLM-powered generation tasks, three complementary quality gates with provenance-exact hallucination verification, structured adaptive recovery, and five training-ready export formats compatible with TRL, Unsloth, and AlignTune. Every pipeline decision is recorded in an append-only per-sample provenance chain, and rejected samples carry structured failure reasons rather than being silently discarded. CuratorKIT supports 100+ LLM providers through LiteLLM, exposes both a Python API and a YAML-driven CLI, and is designed for practitioners who need reproducible, auditable data pipelines at scale .",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/27/biorxiv-10-64898-2026-06-23-734138-v1-agentic-ai-for-structural-elucidation-and-discovery-of-drug-metabolites-from-mass-spectrometry-data",
+      "section": "deep",
+      "title_en": "Agentic AI for Structural Elucidation and Discovery of Drug Metabolites from Mass Spectrometry Data",
+      "authors": "Wang, X., Patan, A., Zhao, H. N., Charron-Lamoureux, V., Shin, Y., Petras, D., Hong, Y., Bowen, B. P., Northen, T. R., Dorrestein, P. C., Wang, M.",
+      "date": "2026-06-26",
+      "pdf": "https://www.biorxiv.org/content/10.64898/2026.06.23.734138v1.full.pdf",
+      "score": "9.0",
+      "evidence": "通过领域工具约束LLM幻觉进行药物代谢物发现",
+      "tldr": "公共代谢组学数据中大量化学信号未被鉴定。本文利用大语言模型的生成能力，结合谱图比对、分子式推断、规则结构枚举和机器学习谱图预测，构建了GNPS2智能体系统，自动生成可验证的结构假说。系统成功从公共数据中发现了磷酸化羟嗪、对乙酰氨基酚-对香豆酸酯等新代谢物，并经实验确认。该方法展示了LLM驱动推理与领域专业知识结合在未知代谢物发现中的巨大潜力。",
+      "tags": "query:lpt",
+      "abstract_en": "The majority of chemical signals detected in public metabolomics repositories remain structurally undefined. Large language models (LLMs) are probabilistic systems whose capacity to generate outputs beyond their training data, which can cause hallucinations, makes them also potentially suited to hypothesize structures for molecules that have never been described. We aimed to build a system that could harness this LLM generative capacity combined with domain specific tools/framework to constrain hallucination and produce validated discoveries. We developed a GNPS2 agentic AI system that interprets LC-MS/MS data by integrating spectral alignment, molecular formula inference, rule-based structural enumeration, machine learning-based spectrum prediction, and translates natural language hypotheses from domain experts into dynamically generated analytical workflows. We demonstrate the annotation of unknown drug metabolites from public data guided by chemical hypotheses. The agent predicted, and we experimentally confirmed, a phosphorylated hydroxyzine, an acetaminophen-p-coumaric acid ester, and identified two new oxidative ibuprofen-carnitine conjugates from public repositories. These results demonstrate that LLM-driven agentic reasoning, when combined with domain expertise, can indeed generate experimentally testable structural hypotheses for previously uncharacterized metabolites leveraging pan repository data.",
+      "source": "biorxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/27/2606.22249v1-on-the-expressive-power-of-weight-quantization-in-large-language-models",
+      "section": "deep",
+      "title_en": "On the Expressive Power of Weight Quantization in Large Language Models",
+      "authors": "Shao-Qun Zhang",
+      "date": "2026-06-20",
+      "pdf": "https://arxiv.org/pdf/2606.22249v1",
+      "score": "8.0",
+      "evidence": "对大语言模型权重量化表达能力的理论分析",
+      "tldr": "权重量化通过将大语言模型参数编码为低位格式实现压缩与加速，但其理论基础薄弱。本文理论证明了1.58位是权重量化的极限精度，并建立了通用逼近和表达崩溃性质，表明当位数低于1.58时模型失去通用逼近能力。同时，量化位数减少会导致表达能力多项式级退化。这些发现为缩放定律下的量化提供了理论支撑，并指导模型压缩与推理加速研究。",
+      "tags": "query:lpt",
+      "abstract_en": "In recent years, weight quantization that encodes the learnable parameters of large language models in an $n$-bit format has garnered significant attention due to its potential for model compression and inference acceleration. Many practical techniques have been developed; however, the theoretical understanding of many aspects, especially the approximation and degradation of expressive power as the number of quantization bits decreases, remains unclear. In this paper, we provide a theoretical investigation into the expressive capability of large language models relative to the number of quantization bits. We argue that 1.58-bit is the limiting precision for weight quantization by establishing the universal approximation and expressive collapse properties of weight-quantized models with respect to the number of quantization bits. Additionally, we confirm that weight quantization leads to expressive degradation, in which the expressive capacity of weight-quantized models degrades polynomially as the number of quantization bits decreases. These theoretical findings provide a solid foundation for advancing weight quantization in the context of scaling laws and shed insights for future research in model compression and inference acceleration.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/27/2606.21535v1-from-embedding-geometry-to-spectral-search-energy-dispersion-networks-for-vector-retrieval",
+      "section": "quick",
+      "title_en": "From Embedding Geometry to Spectral Search: Energy Dispersion Networks For Vector Retrieval",
+      "authors": "Lorenzo Moriondo, Ilias Azizi",
+      "date": "2026-06-19",
+      "pdf": "https://arxiv.org/pdf/2606.21535v1",
+      "score": "6.0",
+      "evidence": "通过耦合几何相似性与频谱信息改进向量检索，提升RAG检索质量",
+      "tldr": "传统向量检索仅依赖点态几何相似性，忽略了特征空间谱结构与拓扑信息。本文提出Graph Wiring框架和Spectral Indexing方法，将嵌入空间视为能量网络，通过结合几何与谱信息进行检索。实验表明该方法改善了头尾一致性和语义对齐，并通过tau调制支持自适应搜索行为。该工作为RAG管道提供了灵活高效的检索方案，理论基于epiplexity建立，并开源实现。",
+      "tags": "query:lpt",
+      "abstract_en": "Vector spaces, such as embedding spaces that encode dense semantic information, need not be analyzed solely through pointwise geometry. They can also be interpreted as energy networks through the spectral graph induced by the topology of their column vectors, i.e., their feature-space structure. Building on this perspective, we introduce Graph Wiring, a general framework for exploiting feature-space spectral structure, together with Spectral Indexing, its task-specific instantiation for vector search. By coupling geometric similarity with spectral information, the proposed method improves head-tail coherence and semantic alignment relative to purely geometric retrieval methods. It further supports adaptive search behavior through tau-modulation, providing the flexibility increasingly required by modern Retrieval-Augmented Generation (RAG) pipelines. We present the complete algorithmic pipeline, establish its theoretical foundation through epiplexity, and evaluate the approach across benchmark and industrial settings using the open-source arrowspace library.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
