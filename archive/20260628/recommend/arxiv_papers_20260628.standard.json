@@ -1,0 +1,255 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-28T21:14:34.003032+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 4,
+    "deep_cap": 6,
+    "deep_selected": 4,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [
+    {
+      "id": "2606.25906v1",
+      "source": "arxiv",
+      "title": "OracleAnalyser: Analysing Implicit Semantics of Oracle Bone Scripts through MLLMs with Post-training",
+      "abstract": "With the advancement of artificial intelligence, research on oracle bone scripts has entered a new era. However, existing methods and benchmarks remain largely confined to recognition tasks, overlooking the equally crucial aspect of oracle bone analysis. To address this gap, we propose OracleAnalyser, a reasoning framework for oracle bone analysis based on post-training techniques. Specifically, we fine-tune Qwen2.5-VL-3B-Instruct through multiple post-training stages and introduce a new preference optimization algorithm, Stable Focal Preference Optimization (SFPO), tailored to the characteristics of oracle bone datasets. In addition, we release both an oracle bone reasoning dataset and an oracle bone preference dataset, and further construct a new benchmark to evaluate models' analytical capabilities for oracle bone scripts. Extensive experiments validate the superior analytical performance of OracleAnalyser, which achieves remarkable results with only 3B parameters, surpassing models with substantially larger scales.",
+      "authors": [
+        "Zijia Song",
+        "Yelin Wang",
+        "Zhengyi Ma",
+        "Zitong Yu",
+        "Tianheng Wang",
+        "Jiahuan Zhang",
+        "Taorui Wang",
+        "Kaicheng Yu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.MM"
+      ],
+      "published": "2026-06-24T14:54:41+00:00",
+      "link": "https://arxiv.org/pdf/2606.25906v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Post-training MLLM with novel preference optimization for oracle bone analysis",
+      "llm_evidence_cn": "通过后训练和偏好优化分析甲骨文",
+      "llm_evidence": "通过后训练和偏好优化分析甲骨文",
+      "canonical_evidence": "通过后训练和偏好优化分析甲骨文",
+      "llm_tldr_en": "Proposes OracleAnalyser, a post-training framework for oracle bone script analysis using multi-stage fine-tuning and a new preference optimization algorithm (SFPO).",
+      "llm_tldr_cn": "现有甲骨文研究局限于识别任务，缺乏深入分析。本文提出OracleAnalyser框架，通过多阶段后训练Qwen2.5-VL-3B-Instruct，并针对甲骨文数据特点设计了稳定焦点偏好优化算法（SFPO）。同时发布了推理偏好数据集。实验表明该方法在甲骨文分析任务上表现优异，展示了后训练技术在新兴领域的应用潜力。",
+      "llm_tldr": "现有甲骨文研究局限于识别任务，缺乏深入分析。本文提出OracleAnalyser框架，通过多阶段后训练Qwen2.5-VL-3B-Instruct，并针对甲骨文数据特点设计了稳定焦点偏好优化算法（SFPO）。同时发布了推理偏好数据集。实验表明该方法在甲骨文分析任务上表现优异，展示了后训练技术在新兴领域的应用潜力。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.26627v1",
+      "source": "arxiv",
+      "title": "Agents That Know Too Much: A Data-Centric Survey of Privacy in LLM Agents",
+      "abstract": "Large language model agents increasingly query databases, search document collections, call external APIs, remember past interactions, and act on a user's behalf. As they move from answering questions to operating over sensitive data, privacy becomes harder to enforce. An agent touches many data sources, runs multi-step workflows, keeps state across sessions, and acts with delegated permissions. Sensitive information can therefore leak not only through its final answer but through the queries it issues, the intermediate results it handles, the memory it writes, and the messages it exchanges with other agents. We survey the privacy of LLM agents from a data-centric view, organizing the field around the data an agent touches rather than by attack type, and we use data agent as shorthand for an LLM agent that works with data. Research on these risks is active but scattered across retrieval-augmented generation, text-to-SQL interfaces, agent memory, prompt injection, access control, and contextual privacy. This survey brings that work together: we taxonomize the data sources an agent touches, the privacy risks each source creates, and the governance mechanisms that address them; we map the benchmarks used to measure these risks and identify what is missing; and we set out the open problems. Two findings recur: among governance mechanisms only information-flow control covers both compositional and cross-session inference leakage, the two least-protected risks; and no benchmark drives an agent across its data surfaces under one privacy policy, the instrument the field most lacks. Our goal is a reference that situates the scattered literature and gives future work a common framing.",
+      "authors": [
+        "Nada Lahjouji",
+        "Ashwin Gerard Colaco"
+      ],
+      "primary_category": "cs.CR",
+      "categories": [
+        "cs.CR",
+        "cs.AI"
+      ],
+      "published": "2026-06-25T05:44:18+00:00",
+      "link": "https://arxiv.org/pdf/2606.26627v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Data-centric survey of privacy in LLM agents",
+      "llm_evidence_cn": "LLM代理隐私的数据中心化综述",
+      "llm_evidence": "LLM代理隐私的数据中心化综述",
+      "canonical_evidence": "LLM代理隐私的数据中心化综述",
+      "llm_tldr_en": "Comprehensive survey of privacy risks in LLM agents from a data-centric perspective, covering multiple data touchpoints.",
+      "llm_tldr_cn": "随着LLM代理处理越来越敏感的数据，隐私保护变得困难。本文从数据中心化视角系统梳理了LLM代理面临的多维隐私风险，包括查询、中间结果、记忆和跨代理消息等。该综述为后续研究提供了全面的隐私威胁分类和防护方向。",
+      "llm_tldr": "随着LLM代理处理越来越敏感的数据，隐私保护变得困难。本文从数据中心化视角系统梳理了LLM代理面临的多维隐私风险，包括查询、中间结果、记忆和跨代理消息等。该综述为后续研究提供了全面的隐私威胁分类和防护方向。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "servey",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.21974v1",
+      "source": "arxiv",
+      "title": "Fine-Tuning Large Language Models for Quantum Reasoning",
+      "abstract": "Large language models (LLMs) exhibit abilities beyond natural language modelling and text generation. Recent advances in their reasoning capabilities have spurred interest in applying LLMs to complex scientific tasks requiring deep domain expertise and sophisticated reasoning. Quantum computing, as a highly specialised field with significant knowledge barriers and hardware constraints, could greatly benefit from such advancements. However, a key open question that first must be answered is: How can we develop fine-tuning pipelines that instil genuine quantum reasoning in LLMs, rather than task-specific pattern matching? We study this question through quantum circuit simulation as a training objective, where the model must predict the measurement probability distribution resulting from a sequence of quantum gate operations. We propose and compare two fine-tuning pipelines: (1) Supervised Fine-Tuning (SFT) on explicit gate-by-gate state-vector simulation traces, and (2) a two-stage SFT+Group Relative Policy Optimisation (GRPO) approach that sequentially applies SFT followed by GRPO with verifiable rewards. Our findings show that SFT achieves near-perfect in-distribution and gate-count extrapolation accuracy, significantly outperforming both the base model and the GPT-OSS-120B baseline. SFT+GRPO trades some in-distribution precision for better generalisation to larger qubit systems that SFT alone cannot handle. Both pipelines significantly outperform the baselines, demonstrating that targeted fine-tuning on explicit reasoning traces is an effective strategy for advancing quantum reasoning in LLMs.",
+      "authors": [
+        "Katherine Ip",
+        "Casey R. Myers",
+        "Udaya Parampalli",
+        "James Quach",
+        "Peiyong Wang"
+      ],
+      "primary_category": "quant-ph",
+      "categories": [
+        "quant-ph",
+        "cs.AI"
+      ],
+      "published": "2026-06-20T10:06:29+00:00",
+      "link": "https://arxiv.org/pdf/2606.21974v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Fine-tuning LLMs for reasoning, central to post-training theme",
+      "llm_evidence_cn": "微调LLM用于推理，是后训练核心主题",
+      "llm_evidence": "微调LLM用于推理，是后训练核心主题",
+      "canonical_evidence": "微调LLM用于推理，是后训练核心主题",
+      "llm_tldr_en": "This paper explores how to develop fine-tuning pipelines that instill genuine quantum reasoning in LLMs, using quantum circuit simulation as training objective.",
+      "llm_tldr_cn": "该论文研究如何开发微调流水线，使大语言模型获得真正的量子推理能力，而非任务特定的模式匹配。通过量子电路模拟作为训练目标，模型需预测测量概率分布，从而学习量子逻辑。该工作为后训练阶段的推理能力注入提供了方法论基础，对复合后训练主题具有直接贡献。",
+      "llm_tldr": "该论文研究如何开发微调流水线，使大语言模型获得真正的量子推理能力，而非任务特定的模式匹配。通过量子电路模拟作为训练目标，模型需预测测量概率分布，从而学习量子逻辑。该工作为后训练阶段的推理能力注入提供了方法论基础，对复合后训练主题具有直接贡献。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.22317v1",
+      "source": "arxiv",
+      "title": "Curriculum Reinforcement Learning Can Incentivize Reasoning Capacity in LLMs Beyond the Base Model",
+      "abstract": "Reinforcement learning with verifiable rewards (RLVR) is widely viewed as a promising path toward continuously improving large language models. Recent works, however, suggest that mainstream RLVR often reallocates sampling probabilities among trajectories already present in the base model: it can improve sampling efficiency, reflected by higher pass@1 scores, but yields limited gains, and can even decrease pass@k scores when k is large, and therefore may fail to expand the base model's reasoning capacity boundary. In this paper, we present a boundary-aware Curriculum RL approach to move beyond the base model's reasoning capacity boundary. Our approach first uses pass@k sampling to locate the current reasoning capacity boundary, then applies targeted teacher guidance to examples near or beyond that boundary, and finally uses RL to consolidate the newly introduced reasoning patterns. Across Qwen, Llama, and DeepSeek base models, boundary-aware Curriculum RL improves both pass@1 scores and pass@256 scores, with pass@1 reflecting one-attempt performance and pass@256 serving as an empirical proxy for the reasoning capacity boundary. In our experiments, average pass@256 improves by 9.8 percentage points over the base models and by 10.3 percentage points over Vanilla RLVR. These results suggest that boundary-aware Curriculum RL can provide a scalable route for LLMs to continuously improve beyond the base model's empirical reasoning capacity boundary.",
+      "authors": [
+        "Pengxiang Cai",
+        "Tianchen Fang",
+        "Xiaohan Li",
+        "Qingyuan Zeng",
+        "Guocong Li",
+        "Jintai Chen"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-21T03:15:25+00:00",
+      "link": "https://arxiv.org/pdf/2606.22317v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Curriculum RL for LLM reasoning beyond base model",
+      "llm_evidence_cn": "课程强化学习提升大语言模型推理能力",
+      "llm_evidence": "课程强化学习提升大语言模型推理能力",
+      "canonical_evidence": "课程强化学习提升大语言模型推理能力",
+      "llm_tldr_en": "Proposes boundary-aware Curriculum RL to expand LLM reasoning capacity beyond the base model, addressing limitations of standard RLVR.",
+      "llm_tldr_cn": "现有强化学习仅重采样已有轨迹，无法扩展大语言模型推理边界。本文提出边界感知的课程强化学习，通过pass@k采样定位当前边界，然后逐步提升难度以突破原有能力上限。实验表明该方法能有效提高模型推理能力，超越基础模型的原始容量。该方法为基于奖励的LLM后训练提供了新思路。",
+      "llm_tldr": "现有强化学习仅重采样已有轨迹，无法扩展大语言模型推理边界。本文提出边界感知的课程强化学习，通过pass@k采样定位当前边界，然后逐步提升难度以突破原有能力上限。实验表明该方法能有效提高模型推理能力，超越基础模型的原始容量。该方法为基于奖励的LLM后训练提供了新思路。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.21906v1",
+      "source": "arxiv",
+      "title": "Deeper is Not Always Better: Mitigating the Alignment Tax via Confident Layer Decoding",
+      "abstract": "Autoregressive generation in large language models (LLMs) conventionally decodes from the final layer, assuming that deeper representations yield more reliable next-token predictions. We revisit this assumption by revealing a recurring Guess-Refine-Perturb dynamic: early layers form coarse guesses, intermediate layers refine reasoning-relevant semantics, and final layers can perturb these refined predictions toward generic or alignment-preferred tokens. We introduce Confident Decoding, a training-free decoding strategy that dynamically selects the most reliable near-final layer through entropy-guided conservative backward search. We further provide a theoretical formulation of layer selection as an optimal stopping problem, showing that under bounded projection noise and dominant late-stage alignment perturbation, our search rule filters perturbation while bounding the loss relative to the oracle refinement layer. Experiments across dense and Mixture-of-Experts LLMs demonstrate consistent gains on challenging reasoning benchmarks, including GPQA-Diamond, Omni-MATH, and HLE, with zero memory overhead and less than 2% latency increase. These results suggest dynamically bypassing final-layer perturbations can unlock stronger reasoning behavior from aligned LLMs.",
+      "authors": [
+        "Xuanming Zhang",
+        "Sining Zhoubian",
+        "Yuxuan Chen",
+        "Tianyi Tang",
+        "An Yang",
+        "Sean Du",
+        "Chujie Zheng",
+        "Fei Huang",
+        "Dayiheng Liu",
+        "Gao Huang",
+        "Jingren Zhou"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-06-20T07:03:26+00:00",
+      "link": "https://arxiv.org/pdf/2606.21906v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "confident decoding mitigates alignment tax, related to hallucination suppression",
+      "llm_evidence_cn": "自信解码减轻对齐惩罚，与幻觉抑制相关",
+      "llm_evidence": "自信解码减轻对齐惩罚，与幻觉抑制相关",
+      "canonical_evidence": "自信解码减轻对齐惩罚，与幻觉抑制相关",
+      "llm_tldr_en": "Confident Decoding dynamically selects the most reliable near-final layer via entropy-guided search, mitigating alignment tax and potentially reducing hallucinations. Provides theoretical formulation as an optimal stopping problem.",
+      "llm_tldr_cn": "大语言模型解码时默认使用最后一层，但最后层可能引入对齐偏差。本文揭示了解码过程中的“猜测-精炼-扰动”动态，并提出Confident Decoding策略，通过熵引导的逆向搜索选择最可靠的近最终层，避免最后一层的扰动。该策略无需训练即可提升生成质量，同时降低对齐惩罚，间接有利于抑制幻觉。",
+      "llm_tldr": "大语言模型解码时默认使用最后一层，但最后层可能引入对齐偏差。本文揭示了解码过程中的“猜测-精炼-扰动”动态，并提出Confident Decoding策略，通过熵引导的逆向搜索选择最可靠的近最终层，避免最后一层的扰动。该策略无需训练即可提升生成质量，同时降低对齐惩罚，间接有利于抑制幻觉。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.22018v1",
+      "source": "arxiv",
+      "title": "Optimal Macroitem Sequences in the Precedence Constrained Knapsack Problem",
+      "abstract": "The Precedence Constrained Knapsack Problem (PCKP) asks for a maximum-profit subset of items, subject to a knapsack capacity constraint and precedence constraints encoded by a directed acyclic graph. We study the structure of optimal solutions of the Linear Programming (LP) relaxation of the natural Integer Linear Programming formulation of the PCKP. We introduce the notion of macroitem and of feasible sequence of macroitems, which partitions the item set while respecting the precedence structure. We establish that an optimal LP solution is fully characterized by the optimal sequence of macroitems: items are packed in nonincreasing order of the profit-to-weight ratio of their macroitem, with at most one macroitem fractionally included. We further show that the breakpoints of the parametric Lagrangian function of the capacity constraint coincide with the profit-to-weight ratios of the macroitems in the optimal sequence, and provide a complete combinatorial characterization of optimal dual solutions in terms of a feasible flow within each macroitem. Finally, for the special case in which the precedence graph is a forest, we devise an O(n^2) algorithm to compute the optimal sequence, which improves to O(n log n) for in-trees or out-trees, where n denotes the number of items.",
+      "authors": [
+        "Valerio Dose",
+        "Fabio Furini",
+        "Marco Locatelli"
+      ],
+      "primary_category": "math.OC",
+      "categories": [
+        "math.OC",
+        "cs.DS"
+      ],
+      "published": "2026-06-20T12:45:22+00:00",
+      "link": "https://arxiv.org/pdf/2606.22018v1",
+      "tags": [
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "mathematical formulation of optimal sequences in PCKP",
+      "llm_evidence_cn": "PCKP中最优序列的数学形式化",
+      "llm_evidence": "PCKP中最优序列的数学形式化",
+      "canonical_evidence": "PCKP中最优序列的数学形式化",
+      "llm_tldr_en": "This paper provides a mathematical analysis of the Precedence Constrained Knapsack Problem, characterizing optimal solutions via macroitem sequences and linear programming relaxation.",
+      "llm_tldr_cn": "本文研究了带优先约束的背包问题（PCKP）中线性规划松弛解的结构。通过引入宏项目和可行序列的概念，给出了最优LP解的完整刻画：项目按宏项目利润-重量比降序排列，至多有一个宏项目被部分包含。这一数学形式化对于组合优化和算法设计有理论价值。",
+      "llm_tldr": "本文研究了带优先约束的背包问题（PCKP）中线性规划松弛解的结构。通过引入宏项目和可行序列的概念，给出了最优LP解的完整刻画：项目按宏项目利润-重量比降序排列，至多有一个宏项目被部分包含。这一数学形式化对于组合优化和算法设计有理论价值。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "math formulation",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

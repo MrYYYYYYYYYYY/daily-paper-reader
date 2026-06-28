@@ -6,32 +6,42 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-27
-- 运行时间：2026-06-27 21:24:23 UTC
+- 最新运行日期：2026-06-28
+- 运行时间：2026-06-28 21:20:02 UTC
 - 运行状态：成功
-- 本次总论文数：4
-- 精读区：3
-- 速读区：1
+- 本次总论文数：6
+- 精读区：4
+- 速读区：2
 
 ### 今日简报（AI）
-今日精选2篇高分论文，聚焦LLM后训练的数据策展与合成数据生成，以及AI驱动的药物代谢物结构解析。最值得关注的是CuratorKIT的数据策展方法（9.0分）和Agentic AI在质谱数据分析中的应用（9.0分），两者分别从数据质量和自动化分析角度提升效率。建议下一步可尝试利用CuratorKIT优化自有训练数据，或探索Agentic AI在药物代谢研究中的实际部署。
-- 详情：[/202606/27/README](/202606/27/README)
+今日6篇论文中，重点精读了甲骨文隐式语义分析和量子推理微调两篇高分研究。
+
+最值得关注的是《OracleAnalyser》通过后训练MLLM实现甲骨文语义解析，以及《Fine-Tuning》探索LLM在量子推理任务中的应用。
+
+建议普通读者优先阅读这两篇，了解多模态大模型在古文字领域的突破，以及大模型与量子计算交叉的新方向。
+- 详情：[/202606/28/README](/202606/28/README)
 
 ### 精读区论文标签
-1. [CuratorKIT : Data Curation and Synthetic Data Generation for LLM Post-Training](/202606/27/2606.21631v1-curatorkit--data-curation-and-synthetic-data-generation-for-llm-post-training)  
+1. [OracleAnalyser: Analysing Implicit Semantics of Oracle Bone Scripts through MLLMs with Post-training](/202606/28/2606.25906v1-oracleanalyser-analysing-implicit-semantics-of-oracle-bone-scripts-through-mllms-with-post-training)  
    标签：评分：9.0/10、query:lpt
-   evidence：统一的LLM后训练数据整理流程，包含幻觉验证
-2. [Agentic AI for Structural Elucidation and Discovery of Drug Metabolites from Mass Spectrometry Data](/202606/27/biorxiv-10-64898-2026-06-23-734138-v1-agentic-ai-for-structural-elucidation-and-discovery-of-drug-metabolites-from-mass-spectrometry-data)  
-   标签：评分：9.0/10、query:lpt
-   evidence：通过领域工具约束LLM幻觉进行药物代谢物发现
-3. [On the Expressive Power of Weight Quantization in Large Language Models](/202606/27/2606.22249v1-on-the-expressive-power-of-weight-quantization-in-large-language-models)  
+   evidence：通过后训练和偏好优化分析甲骨文
+2. [Fine-Tuning Large Language Models for Quantum Reasoning](/202606/28/2606.21974v1-fine-tuning-large-language-models-for-quantum-reasoning)  
    标签：评分：8.0/10、query:lpt
-   evidence：对大语言模型权重量化表达能力的理论分析
+   evidence：微调LLM用于推理，是后训练核心主题
+3. [Curriculum Reinforcement Learning Can Incentivize Reasoning Capacity in LLMs Beyond the Base Model](/202606/28/2606.22317v1-curriculum-reinforcement-learning-can-incentivize-reasoning-capacity-in-llms-beyond-the-base-model)  
+   标签：评分：8.0/10、query:lpt
+   evidence：课程强化学习提升大语言模型推理能力
+4. [Agents That Know Too Much: A Data-Centric Survey of Privacy in LLM Agents](/202606/28/2606.26627v1-agents-that-know-too-much-a-data-centric-survey-of-privacy-in-llm-agents)  
+   标签：评分：8.0/10、query:lpt
+   evidence：LLM代理隐私的数据中心化综述
 
 ### 速读区论文标签
-1. [From Embedding Geometry to Spectral Search: Energy Dispersion Networks For Vector Retrieval](/202606/27/2606.21535v1-from-embedding-geometry-to-spectral-search-energy-dispersion-networks-for-vector-retrieval)  
-   标签：评分：6.0/10、query:lpt
-   evidence：通过耦合几何相似性与频谱信息改进向量检索，提升RAG检索质量
+1. [Deeper is Not Always Better: Mitigating the Alignment Tax via Confident Layer Decoding](/202606/28/2606.21906v1-deeper-is-not-always-better-mitigating-the-alignment-tax-via-confident-layer-decoding)  
+   标签：评分：7.0/10、query:lpt
+   evidence：自信解码减轻对齐惩罚，与幻觉抑制相关
+2. [Optimal Macroitem Sequences in the Precedence Constrained Knapsack Problem](/202606/28/2606.22018v1-optimal-macroitem-sequences-in-the-precedence-constrained-knapsack-problem)  
+   标签：评分：7.0/10、query:lpt
+   evidence：PCKP中最优序列的数学形式化
 
 
 <div class="dpr-home-promo-card">

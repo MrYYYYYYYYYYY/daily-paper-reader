@@ -1,0 +1,2503 @@
+Title: Optimal Macroitem Sequences in the Precedence Constrained Knapsack Problem
+
+URL Source: https://arxiv.org/pdf/2606.22018v1
+
+Published Time: Tue, 23 Jun 2026 01:57:05 GMT
+
+Number of Pages: 43
+
+Markdown Content:
+# Optimal Macroitem Sequences in the Precedence Constrained Knapsack Problem 
+
+Valerio Dose 
+
+Dipartimento di Ingegneria Informatica, Automatica e Gestionale, Sapienza Universit` a di Roma 
+
+valerio.dose@uniroma1.it 
+
+Fabio Furini 
+
+Dipartimento di Ingegneria Informatica, Automatica e Gestionale, Sapienza Universit` a di Roma 
+
+fabio.furini@uniroma1.it 
+
+Marco Locatelli 
+
+Dipartimento di Ingegneria e Architettura, Universit` a di Parma 
+
+marco.locatelli@unipr.it 
+
+Abstract 
+
+The Precedence Constrained Knapsack Problem (PCKP) asks for a maximum-profit subset of items, subject to a knapsack capacity constraint and precedence constraints encoded by a directed acyclic graph. We study the structure of optimal solutions of the Linear Programming (LP) relaxation of the natural Integer Linear Programming formulation of the PCKP. We introduce the notion of macroitem and of feasible sequence of macroitems , which partitions the item set while respecting the precedence structure. We establish that an optimal LP solution is fully characterized by the optimal sequence of macroitems : items are packed in nonincreasing order of the profit-to-weight ratio of their macroitem, with at most one macroitem fractionally included. We further show that the breakpoints of the parametric Lagrangian function of the capacity constraint coincide with the profit-to-weight ratios of the macroitems in the optimal sequence, and provide a complete combinatorial characterization of optimal dual solutions in terms of a feasible flow within each macroitem. Finally, for the special case in which the precedence graph is a forest, we devise an 𝑂 (𝑛 2) algorithm to compute the optimal sequence, which improves to 𝑂 (𝑛 log 𝑛 ) for in-trees or out-trees, where 𝑛 denotes the number of items. 
+
+Keywords: Precedence Constrained Knapsack Problem, Linear Programming relaxation, La-grangian relaxation, Forests 
+
+# 1 Introduction 
+
+Let G := (I , A) be a directed acyclic graph where I := {1, 2, . . . , 𝑛 } is a set of 𝑛 items, which are the vertices of G, and A is its set of 𝑚 arcs. An arc (𝑖, 𝑗 ) ∈ A models the fact that item 𝑗 precedes 1
+
+> arXiv:2606.22018v1 [math.OC] 20 Jun 2026
+
+Figure 1: A directed acyclic graph associated to a PCKP instance with 𝑛 = 8 items and 𝑚 = 9 arcs. The index 𝑖 of an item is indicated next to the associated item. For each item 𝑖 ∈ { 1, 2, . . . , 8}, the profit 𝑝 𝑖 is shown on the left side of the associated item, while the weight 𝑤 𝑖 is shown on the right side; the two values are separated by a vertical line. An optimal PCKP solution with knapsack capacity 𝑐 = 4 is the subset of items {1, 3, 6}, whose items are colored in red. The optimal solution value is 5 given by the sum of the item profits 𝑝 1, 𝑝 3 and 𝑝 6.                  
+
+> 1234
+> 567
+> 8
+> 11−11−11−12
+> 625121
+> 31
+
+item 𝑖 , i.e., item 𝑖 can be selected only if item 𝑗 is selected as well. Each item 𝑖 ∈ I is associated to a (possibly negative) integer profit 𝑝 𝑖 ∈ Z and a positive integer weight 𝑤 𝑖 ∈ Z>0. Finally, let 𝑐 ∈ Z>0
+
+be the positive integer capacity of a knapsack. Given these input data, the Precedence Constrained Knapsack Problem (PCKP) asks for selecting a subset of items with maximum total profit such that their total weight does not exceed the knapsack capacity and they satisfy the precedence constraints induced by the arcs of the graph G. Fig. 1 shows a PCKP instance and an optimal solution of the problem. The PCKP is NP-complete ([11, 17]) and it is a relevant generalization of the classical Knapsack Problem (KP). The reader is referred to [18, 20] for comprehensive books on models and algorithms of the classical KP and its variants. The PCKP arises naturally in many applications like investment planning ([15]), production planning ([16, 26]) and network design ([25]). Moreover, in the context of open pit mining problems, the PCKP plays an important role, since it corresponds to the 
+
+Constrained Pit Limit Problem (CPIT) ([7, 9]) with a single resource and a single time period. The relaxed PCKP without the capacity constraint is known in the literature as the Maximum Closure Problem (MCP), see e.g., [22]. This problem asks for selecting a maximum-profit subset of items such that they satisfy the precedence constraints. The MCP is also referred to by different names in the mining literature such as Ultimate Pit Limit Problem (UPIT) [7] or the Open-Pit Mining Problem [14]. The MCP can be solved in polynomial time and efficient specialized algorithms have been developed. The related literature is extensive, we refer the interested reader to, e.g., 2[2, 3, 8, 12, 14, 19]. We assume that G does not contain directed cycles, since all items in such a cycle can be merged into a single one. We also assume that the knapsack capacity is strictly smaller than the total weight of all items. Otherwise, the capacity constraint is redundant, and the PCKP reduces to the MCP. In this paper, we develop a novel way of interpreting the structure of parametric optimal solutions of the Linear Programming (LP) relaxation of the natural Integer Linear Programming 
+
+(ILP) formulation for the PCKP when varying the capacity. The mathematical structure of such solutions is known, see, e.g., [7, 19], and it is based on the knowledge of a parametric solution of the MCP. Our results reveal a new interpretation that links the structure of optimal LP solutions for the PCKP and the KP. Indeed, in optimal LP solutions of the KP, items are selected to be put in the knapsack following their nonincreasing efficiencies given by the profit over weight ratio. One of the contributions of this work is to show that an analogous result holds for the PCKP: subsets of items, which we call macroitems , are selected simultaneously in nonincreasing order of efficiency, defined as the ratio of their total profit to their total weight. The subsets of items can be obtained by maximizing this ratio while maintaining the relative precedences satisfied. We also characterize the structure of optimal dual solutions, thus providing a novel combinatorial interpretation for both primal and dual LP solutions. The optimal sequence of macroitems can be computed through parametric pseudoflow methods in 𝑂 (𝑚𝑛 log 𝑛 ) time [13], which for the special case of forests becomes 𝑂 (𝑛 2 log 𝑛 ). We improve this bound by devising an 𝑂 (𝑛 2) algorithm for forests, and two 
+
+𝑂 (𝑛 log 𝑛 ) algorithms for the cases of in-forests or out-forests, i.e., forests where all items have in-degree or out-degree not larger than one, respectively. We also provide computational evidence that these improvements translate into practical performance gains over the parametric pseudoflow approach. The remainder of the paper is organized as follows. In Section 2 we present the natural ILP formulation for the PCKP and its LP relaxation. We then collect preliminary results on a parametric version of MCP. Finally, we introduce a related precedence-constrained ratio optimization problem. In Section 3 we introduce feasible and optimal sequences of macroitems and relate them to the breakpoints of the parametric closure value function. In Section 4 we show how the optimal sequence of macroitems determines primal and dual optimal solutions of the LP relaxation. In Section 5 we present the algorithms for directed forests and their complexity analysis. In Section 6 we describe the generation of the benchmark instances and report the computational comparison with the parametric pseudoflow approach. In Section 7 we summarize the main results and outline possible directions for future research. 32 The natural ILP formulation of the PCKP and its relaxations 
+
+For each item 𝑖 ∈ I , let us introduce a binary variable 𝑥 𝑖 ∈ { 0, 1} taking value 1 if and only if item 
+
+𝑖 is selected in the knapsack. Using these 𝑛 binary variables, the natural ILP formulation for the PCKP reads as follows: max 
+
+> 𝒙 ∈{ 0,1}I
+
+(∑︁ 
+
+> 𝑖 ∈I
+
+𝑝 𝑖 𝑥 𝑖 :∑︁ 
+
+> 𝑖 ∈I
+
+𝑤 𝑖 𝑥 𝑖 ≤ 𝑐, 𝑥 𝑖 − 𝑥 𝑗 ≤ 0, (𝑖, 𝑗 ) ∈ A 
+
+)
+
+. (1) The objective function in (1) maximizes the total profit of the selected items. The capacity constraint 
+
+in (1) imposes that the total weight of the selected items is no larger than the knapsack capacity. The precedence constraints in (1) impose respecting the precedence relationships between pairs of items, that is, if there is an arc (𝑖, 𝑗 ) ∈ A , item 𝑖 can be selected only if item 𝑗 is selected. The formulation (1) is called ℱ in the remainder of this manuscript. Moreover, we denote by 𝜁 (ℱ) the optimal solution value of ℱ, i.e., the optimal value of the PCKP. The ℱ formulation has been studied mainly from a polyhedral perspective. In particular, [4] investigates the polyhedron associated with the PCKP and introduces clique-based facet-defining inequalities that strengthen the natural formulation. The work of [10] focuses instead on separation, developing procedures for finding maximally violated valid inequalities and showing how these cuts can be used to improve exact solution methods for the PCKP. 
+
+## 2.1 Linear programming relaxation and its dual problem 
+
+By replacing the binary variables in (1) with the following continuous variables: 
+
+𝑥 𝑖 ∈ [ 0, 1], 𝑖 ∈ I ,
+
+we obtain the LP relaxation of ℱ which we denote by ℱLP . Moreover, we denote by 𝜁 (ℱLP )
+
+its optimal value that provides a valid upper bound on 𝜁 (ℱ). In this paper, we are interested in determining the parametric optimal solutions to ℱLP , for every possible capacity value 𝑐 > 0. Using a non-negative dual variable 𝜆 for the capacity constraint, a non-negative dual variable 
+
+𝛼 𝑖 𝑗 for each precedence constraint corresponding to an arc (𝑖, 𝑗 ) ∈ A , and, for each item 𝑖 ∈ I , a non-negative dual variable 𝜇 𝑖 for each less than or equal to one constraint, the dual problem of ℱLP 
+
+reads as follows: 4min  
+
+> 𝜆 ≥0,𝜶 ≥0,𝝁 ≥0
+
+𝑐 𝜆 +∑︁ 
+
+> 𝑖 ∈I
+
+𝜇 𝑖 (2a) 
+
+𝑤 𝑖 𝜆 + 𝜇 𝑖 +∑︁   
+
+> 𝑗 ∈I +(𝑖 )
+
+𝛼 𝑖 𝑗 −∑︁  
+
+> 𝑘 ∈I −(𝑖 )
+
+𝛼 𝑘𝑖 ≥ 𝑝 𝑖 , 𝑖 ∈ I . (2b) For each item 𝑖 ∈ I , the set I+ (𝑖 ) := { 𝑗 ∈ I : (𝑖, 𝑗 ) ∈ A} is the set of its out-neighbors , and the set I− (𝑖 ) := {𝑘 ∈ I : (𝑘, 𝑖 ) ∈ A} is the set of its in-neighbors . The value of a variable 𝛼 𝑖 𝑗 can be interpreted as a flow passing through the associated arc (𝑖, 𝑗 ) ∈ A and, accordingly, Í𝑗 ∈I + (𝑖 ) 𝛼 𝑖 𝑗 
+
+and Í𝑘 ∈I − (𝑖 ) 𝛼 𝑘𝑖 become the outgoing and incoming total flows of an item 𝑖 ∈ I , respectively. Within this interpretation, constraints (2b) impose for each item 𝑖 ∈ I that the difference between the outgoing and incoming total flows must be greater than or equal to the profit 𝑝 𝑖 of the item minus 𝜆 times the weight 𝑤 𝑖 of the item and the value of the variable 𝜇 𝑖 .We denote the LP formulation (2) by ℱD(LP) in the remainder of this manuscript. More-over, we denote by 𝜁 (ℱD(LP) ) its optimal value, and, by the LP strong duality theorem, we have 
+
+𝜁 (ℱLP ) = 𝜁 (ℱD(LP) ).
+
+## 2.2 Parametric maximum closure problem 
+
+An explicit solution of ℱLP is known since [19], and it is also derived in [7, Proposition 3.1], where it is applied in relation with problems in mine production planning. This solution is based on the determination of the function 𝑢 : [0, +∞) → R given by 
+
+𝑢 (𝜆 ) := max 
+
+> 𝒙 ∈{ 0,1}I
+
+(∑︁ 
+
+> 𝑖 ∈I
+
+( 𝑝 𝑖 − 𝜆 𝑤 𝑖 ) 𝑥 𝑖 : 𝑥 𝑖 − 𝑥 𝑗 ≤ 0, (𝑖, 𝑗 ) ∈ A 
+
+)
+
+, (3) which is related to the Lagrangian relaxation of the capacity constraint in ℱ. For a fixed 𝜆 problem (3) is known in the literature as the (maximum) closure problem on the graph G, which can be reduced to a max-flow/min-cut problem on an extended graph (see, for example, [12, Section 2.2]). We denote with P the set of feasible solutions of (3). Every feasible solution 𝒙 of (3) defines an affine function with equation 
+
+𝑓 𝒙 (𝜆 ) := 𝑃 (𝒙 ) − 𝜆 𝑊 (𝒙 ),
+
+where, for any 𝒙 ∈ { 0, 1}𝑛 , we have 
+
+𝑃 (𝒙 ) :=∑︁ 
+
+> 𝑖 ∈I
+
+𝑝 𝑖 𝑥 𝑖 , 𝑊 (𝒙 ) :=∑︁ 
+
+> 𝑖 ∈I
+
+𝑤 𝑖 𝑥 𝑖 .
+
+5With abuse of notation, for any 𝑀 ⊂ I we also write 
+
+𝑃 (𝑀 ) :=∑︁ 
+
+> 𝑖 ∈𝑀
+
+𝑝 𝑖 , 𝑊 (𝑀 ) :=∑︁ 
+
+> 𝑖 ∈𝑀
+
+𝑤 𝑖 .
+
+Note that 𝑓 𝒙 is strictly decreasing if 𝒙 ≠ 0 because weights are always positive. Since the set P
+
+has finite cardinality, for every 𝜆 ≥ 0 the value 𝑢 (𝜆 ) is defined as the largest of the finite number of values 𝑓 𝒙 (𝜆 ), i.e., 
+
+𝑢 (𝜆 ) = max  
+
+> 𝒙 ∈P
+
+𝑓 𝒙 (𝜆 ).
+
+Then, we have that the function 𝑢 is a nonincreasing piecewise-affine convex function with a finite number of breakpoints. We indicate the breakpoints with the symbols 
+
+𝜆 0 = +∞ > 𝜆 1 > 𝜆 2 > · · · > 𝜆 𝑘 > 𝜆 𝑘 +1 = 0.
+
+Breakpoints 𝜆 𝑟 , with 𝑟 ∈ { 1, 2, . . . , 𝑘 }, are 𝜆 values such that the set 
+
+𝑋 ★(𝜆 ) = {𝒙 ∈ P : 𝑢 (𝜆 ) = 𝑓 𝒙 (𝜆 )} ,
+
+of optimal solutions of problem (3) is not a singleton. To compute the function 𝑢 and its breakpoints, one can systematically search for its distinct affine components by solving problem (3) for specific values of 𝜆 . At these fixed values, the formulation simplifies into a standard non-parametric graph closure problem. This strategy is applied, for instance, in the implementation of the algorithms developed by [7] for the Open-Pit Mine Production Scheduling Problem. Alternative approaches leverage algorithms designed for the general parametric max-flow/min-cut problem, with the one presented in [13] representing the state of the art. The next observation records the closure property of the feasible set of the parametric closure problem (3), which is the basic order-theoretic ingredient used to compare its optimal solutions. 
+
+Proposition 1. Given the set P of feasible solutions of (3), we have that (P , ∧, ∨) is a lattice, where 
+
+∧ and ∨ are the logical and and logical or between binary vectors, respectively. Proof. Proof. To prove that P is a lattice we need to show that 𝒙 , 𝒚 ∈ P implies that 𝒙 ∨ 𝒚 ∈ P 
+
+and that 𝒙 ∧ 𝒚 ∈ P . If we assume by contradiction that 𝒙 ∨ 𝒚 ∉ P, then ∃ ( 𝑖, 𝑗 ) ∈ A such that 
+
+(𝒙 ∨ 𝒚 )𝑖 = 1 and (𝒙 ∨ 𝒚 ) 𝑗 = 0. But if (𝒙 ∨ 𝒚 )𝑖 = 1, then either 𝑥 𝑖 = 1 or 𝑦 𝑖 = 1, while (𝒙 ∨ 𝒚 ) 𝑗 = 0implies that 𝑥 𝑗 = 𝑦 𝑗 = 0. But due to the fact that 𝒙 , 𝒚 ∈ P , we must have that 𝑥 𝑗 = 1 or 𝑦 𝑗 = 1. Similarly, if we assume by contradiction that 𝒙 ∧ 𝒚 ∉ P, then ∃ ( 𝑖, 𝑗 ) ∈ A such that (𝒙 ∧ 𝒚 )𝑖 = 16and (𝒙 ∧ 𝒚 ) 𝑗 = 0. But (𝒙 ∧ 𝒚 )𝑖 = 1 implies that 𝑥 𝑖 = 𝑦 𝑖 = 1, while (𝒙 ∧ 𝒚 ) 𝑗 = 0 implies 𝑥 𝑗 = 0 or 
+
+𝑦 𝑗 = 0. But 𝒙 , 𝒚 ∈ P implies 𝑥 𝑗 = 𝑦 𝑗 = 1. □
+
+As already observed, each breakpoint 𝜆 𝑟 is such that the set 𝑋 ★(𝜆 𝑟 ) of optimal solutions of problem (3) for 𝜆 = 𝜆 𝑟 is not a singleton. Note that if 𝒛 ∈ 𝑋 ★(𝜆 𝑟 ), then the optimal value of (3) is 
+
+𝑓 𝒛 (𝜆 𝑟 ) = 𝑃 (𝒛 ) − 𝜆 𝑟 𝑊 (𝒛 ). The next result shows that the lattice structure discussed in Proposition 1 is inherited by the set of optimal solutions of the parametric closure problem at a breakpoint. 
+
+Proposition 2. Let 𝒛 1, 𝒛 2 ∈ 𝑋 ★(𝜆 𝑟 ). Then, 𝒛 1 ∧ 𝒛 2, 𝒛 1 ∨ 𝒛 2 ∈ 𝑋 ★(𝜆 𝑟 ).Proof. Proof. If 𝒛 1 ≤ 𝒛 2, then 𝒛 1 ∧ 𝒛 2 = 𝒛 1 and 𝒛 1 ∨ 𝒛 2 = 𝒛 2, so that the result is true. Similarly, if 
+
+𝒛 1 ≥ 𝒛 2. Therefore, let us assume that 𝒛 1 ≰ 𝒛 2 and 𝒛 1 ≱ 𝒛 2. First of all, in view of Proposition 1, we have that 𝒛 1 ∨ 𝒛 2, 𝒛 1 ∧ 𝒛 2 ∈ P . Now, let us set 
+
+𝑞 (𝜆 𝑟 ) =∑︁  
+
+> 𝑗 ∈M ( 𝒛 1)\M ( 𝒛 2)
+
+( 𝑝 𝑗 − 𝜆 𝑟 𝑤 𝑗 ).
+
+If 𝑞 (𝜆 𝑟 ) > 0, we have that 
+
+𝑃 (𝒛 1 ∨ 𝒛 2) − 𝜆 𝑟 𝑊 (𝒛 1 ∨ 𝒛 2) == 𝑃 (𝒛 2) − 𝜆 𝑟 𝑊 (𝒛 2) + 𝑞 (𝜆 𝑟 ) > 𝑃 (𝒛 2) − 𝜆 𝑟 𝑊 (𝒛 2),
+
+(4) which contradicts the optimality of 𝒛 2. If 𝑞 (𝜆 𝑟 ) < 0, we have that 
+
+𝑃 (𝒛 1 ∧ 𝒛 2) − 𝜆 𝑟 𝑊 (𝒛 1 ∧ 𝒛 2) == 𝑃 (𝒛 1) − 𝜆 𝑟 𝑊 (𝒛 1) − 𝑞 (𝜆 𝑟 ) > 𝑃 (𝒛 1) − 𝜆 𝑟 𝑊 (𝒛 1),
+
+(5) which contradicts the optimality of 𝒛 1.Therefore, only 𝑞 (𝜆 𝑟 ) = 0 is possible. But in this case (4) and (5) show that 𝒛 1 ∨ 𝒛 2 and 𝒛 1 ∧ 𝒛 2
+
+are also both optimal for (3) as we wanted to prove. □
+
+Now, for each breakpoint 𝜆 𝑟 we set 
+
+𝒙 𝑟 −1 = Ó  
+
+> 𝒛 ∈𝑋 ★(𝜆 𝑟 )
+
+𝒛 𝒙 𝑟 = Ô  
+
+> 𝒛 ∈𝑋 ★(𝜆 𝑟 )
+
+𝒛 ,
+
+i.e., 𝒙 𝑟 −1 is the minimal optimal solution in 𝑋 ★(𝜆 𝑟 ), while 𝒙 𝑟 is the maximal optimal solution in 
+
+𝑋 ★(𝜆 𝑟 ). Obviously 𝒙 𝑟 ≥ 𝒙 𝑟 −1. Noticing that 𝑞 (𝜆 ) is decreasing, then the maximal solution 𝒙 𝑟 will be the unique optimal solution of (3) for 𝜆 ∈ ( 𝜆 𝑟 +1, 𝜆 𝑟 ), while the minimal solution 𝒙 𝑟 −1 will be the 7unique optimal solution of (3) for 𝜆 ∈ ( 𝜆 𝑟 , 𝜆 𝑟 −1). Stated in another way, we have that 𝑢 (𝜆 ) = 𝑓 𝒙 𝑟 (𝜆 )
+
+for 𝜆 ∈ ( 𝜆 𝑟 +1, 𝜆 𝑟 ), while 𝑢 (𝜆 ) = 𝑓 𝒙 𝑟 −1 (𝜆 ) for 𝜆 ∈ ( 𝜆 𝑟 , 𝜆 𝑟 −1). Note that the breakpoint 𝜆 𝑟 is the intersection of the two lines 𝑓 𝒙 𝑟 −1 (𝜆 ) and 𝑓 𝒙 𝑟 (𝜆 ), so that 
+
+𝜆 𝑟 = 𝑃 (𝒙 𝑟 − 𝒙 𝑟 −1)
+
+𝑊 (𝒙 𝑟 − 𝒙 𝑟 −1) . (6) The following theorem gives the main interpretation of each breakpoint: it is the best profit-to-weight ratio that can be obtained by adding a new feasible block of items. 
+
+Theorem 1. For every 𝑟 ∈ { 1, 2, . . . , 𝑘 }, the vector 𝒙 𝑟 − 𝒙 𝑟 −1 is the optimal solution with largest support of the binary linear fractional problem 
+
+max  
+
+> 𝒙 ∈{ 0,1}I
+> 𝑃 (𝒙 )
+> 𝑊 (𝒙 )
+
+𝑥 𝑖 − 𝑥 𝑗 ≤ 0, (𝑖, 𝑗 ) ∈ A such that (𝒙 𝑟 −1)𝑖 = (𝒙 𝑟 −1) 𝑗 = 0,𝑥 𝑖 = 0, 𝑖 such that (𝒙 𝑟 −1)𝑖 = 1,
+
+Í𝑖 ∈I 𝑥 𝑖 ≥ 1,
+
+(7) 
+
+where the last constraint guarantees that the objective function is always defined in a feasible point. Equivalently, in view of (6), the breakpoint 𝜆 𝑟 is the optimal value of the above problem. Proof. Proof. Let us assume by contradiction that there exists 𝒙 𝑡 ∈ P with 𝒙 𝑡 − 𝒙 𝑟 −1 feasible for (7) and such that 
+
+𝑃 (𝒙 𝑡 − 𝒙 𝑟 −1)
+
+𝑊 (𝒙 𝑡 − 𝒙 𝑟 −1) > 𝑃 (𝒙 𝑟 − 𝒙 𝑟 −1)
+
+𝑊 (𝒙 𝑟 − 𝒙 𝑟 −1) . (8) We prove that (8) implies 
+
+𝑓 𝒙 𝑡 (𝜆 𝑟 ) = 𝑃 (𝒙 𝑡 ) − 𝜆 𝑟 𝑊 (𝒙 𝑡 ) > 𝑃 (𝒙 𝑟 ) − 𝜆 𝑟 𝑊 (𝒙 𝑟 ) = 𝑓 𝒙 𝑟 (𝜆 𝑟 ), (9) which contradicts the optimality of 𝒙 𝑟 for (3). To see this, we first recall that 
+
+𝜆 𝑟 = 𝑃 (𝒙 𝑟 − 𝒙 𝑟 −1)
+
+𝑊 (𝒙 𝑟 − 𝒙 𝑟 −1) , (10) so that 
+
+𝑃 (𝒙 𝑡 ) − 𝜆 𝑟 𝑊 (𝒙 𝑡 ) = 𝑃 (𝒙 𝑡 ) − 𝑃 (𝒙 𝑟 −𝒙 𝑟 −1)    
+
+> 𝑊 (𝒙 𝑟 −𝒙 𝑟 −1)
+
+𝑊 (𝒙 𝑡 )
+
+𝑃 (𝒙 𝑟 ) − 𝜆 𝑟 𝑊 (𝒙 𝑟 ) = 𝑃 (𝒙 𝑟 ) − 𝑃 (𝒙 𝑟 −𝒙 𝑟 −1)    
+
+> 𝑊 (𝒙 𝑟 −𝒙 𝑟 −1)
+
+𝑊 (𝒙 𝑟 ).
+
+8Then, after setting 𝒛 𝑟 = 𝒙 𝑟 − 𝒙 𝑟 −1, we have that: 
+
+𝑊 (𝒛 𝑟 ) [𝑃 (𝒙 𝑡 ) − 𝜆 𝑟 𝑊 (𝒙 𝑡 )] − [ 𝑃 (𝒙 𝑟 ) − 𝜆 𝑟 𝑊 (𝒙 𝑟 )] == 𝑃 (𝒙 𝑡 )𝑊 (𝒛 𝑟 ) − 𝑊 (𝒙 𝑡 )𝑃 (𝒛 𝑟 ) − 𝑃 (𝒙 𝑟 )𝑊 (𝒛 𝑟 ) + 𝑊 (𝒙 𝑟 )𝑃 (𝒛 𝑟 ) == 𝑃 (𝒙 𝑡 )𝑊 (𝒛 𝑟 ) − 𝑊 (𝒙 𝑡 )𝑃 (𝒛 𝑟 ) + 𝑃 (𝒙 𝑟 )𝑊 (𝒙 𝑟 −1) − 𝑃 (𝒙 𝑟 −1)𝑊 (𝒙 𝑟 ) .
+
+(11) We can rewrite (8) as follows: 
+
+𝑃 (𝒙 𝑡 )𝑊 (𝒛 𝑟 ) − 𝑃 (𝒙 𝑟 −1)𝑊 (𝒛 𝑟 ) > 𝑃 (𝒙 𝑟 )𝑊 (𝒙 𝑡 − 𝒙 𝑟 −1) − 𝑃 (𝒙 𝑟 −1)𝑊 (𝒙 𝑡 − 𝒙 𝑟 −1),
+
+and then also as: 
+
+𝑃 (𝒙 𝑡 )𝑊 (𝒛 𝑟 ) − 𝑊 (𝒙 𝑡 )𝑃 (𝒛 𝑟 ) + 𝑃 (𝒙 𝑟 )𝑊 (𝒙 𝑟 −1) − 𝑃 (𝒙 𝑟 −1)𝑊 (𝒙 𝑟 ) > 0,
+
+which, in view of the last equation in (11) and of 𝑊 (𝒛 𝑟 ) > 0, implies (9). □
+
+Remark 1. Notice that if the subset of items associated to the last vector 𝒙 𝑘 is not the whole set 
+
+I, then Problem (7) has feasible solutions also choosing 𝑟 = 𝑘 + 1, since the constraints depend only on 𝒙 𝑟 −1. The optimal value in that case would be negative, and it would not be associated to an affine piece of the function 𝑢 . This allows us to extend the sequence 𝒙 𝑟 until the last element of the sequence is always associated with the full set of items I. Accordingly, the sequence 𝝀 of breakpoints can be extended to include some negative values computed according to Eq. (6). For the purpose of our exposition, we consider these extended sequences and we define, for every index 
+
+𝑟 in these sequences, the subsets M𝑟 as 
+
+M𝑟 := {𝑖 ∈ I : (𝒙 𝑟 )𝑖 = 1}.
+
+The last observation in this section is a simple ratio property for disjoint sets, used later to compare unions of candidate macroitems. 
+
+Proposition 3. Let 𝑀 1, 𝑀 2 ⊂ I be nonempty. If 𝑀 1 and 𝑀 2 are disjoint, i.e., 𝑀 1 ∩ 𝑀 2 = ∅, then it cannot hold that 
+
+𝑃 (𝑀 1 ∪ 𝑀 2)
+
+𝑊 (𝑀 1 ∪ 𝑀 2) > 𝑃 (𝑀 1)
+
+𝑊 (𝑀 1) , 𝑃 (𝑀 2)
+
+𝑊 (𝑀 2) or 𝑃 (𝑀 1 ∪ 𝑀 2)
+
+𝑊 (𝑀 1 ∪ 𝑀 2) < 𝑃 (𝑀 1)
+
+𝑊 (𝑀 1) , 𝑃 (𝑀 2)
+
+𝑊 (𝑀 2) , (12) 9equivalently, 𝑃 (𝑀 1∪𝑀 2)  
+
+> 𝑊 (𝑀 1∪𝑀 2)
+
+≤ max 
+
+n 𝑃 (𝑀 1)  
+
+> 𝑊 (𝑀 1)
+
+, 𝑃 (𝑀 2) 
+
+> 𝑊 (𝑀 2)
+
+o
+
+and 𝑃 (𝑀 1∪𝑀 2)  
+
+> 𝑊 (𝑀 1∪𝑀 2)
+
+≥ min 
+
+n 𝑃 (𝑀 1)  
+
+> 𝑊 (𝑀 1)
+
+, 𝑃 (𝑀 2) 
+
+> 𝑊 (𝑀 2)
+
+o
+
+. Moreover, 
+
+𝑃 (𝑀 1 ∪ 𝑀 2)
+
+𝑊 (𝑀 1 ∪ 𝑀 2) ≥ ( or ≤) 𝑃 (𝑀 1)
+
+𝑊 (𝑀 1) , 𝑃 (𝑀 2)
+
+𝑊 (𝑀 2) ⇒ 𝑃 (𝑀 1 ∪ 𝑀 2)
+
+𝑊 (𝑀 1 ∪ 𝑀 2) = 𝑃 (𝑀 1)
+
+𝑊 (𝑀 1) = 𝑃 (𝑀 2)
+
+𝑊 (𝑀 2) . (13) 
+
+Proof. Proof. Let us assume by contradiction that the first inequality in (12) holds (the proof for the second inequality is analogous). Then, since 𝑀 1 ∩ 𝑀 2 = ∅:
+
+𝑃 (𝑀 1 ∪ 𝑀 2)
+
+𝑊 (𝑀 1 ∪ 𝑀 2) = 𝑃 (𝑀 1) + 𝑃 (𝑀 2)
+
+𝑊 (𝑀 1) + 𝑊 (𝑀 2) > 𝑃 (𝑀 1)
+
+𝑊 (𝑀 1) , 𝑃 (𝑀 2)
+
+𝑊 (𝑀 2) .
+
+But 𝑃 (𝑀 1)+ 𝑃 (𝑀 2)   
+
+> 𝑊 (𝑀 1)+ 𝑊 (𝑀 2)
+
+> 𝑃 (𝑀 1)  
+
+> 𝑊 (𝑀 1)
+
+⇒ 𝑃 (𝑀 2)  
+
+> 𝑊 (𝑀 2)
+
+> 𝑃 (𝑀 1)    
+
+> 𝑊 (𝑀 1)
+> 𝑃 (𝑀 1)+ 𝑃 (𝑀 2)
+> 𝑊 (𝑀 1)+ 𝑊 (𝑀 2)
+
+> 𝑃 (𝑀 2)  
+
+> 𝑊 (𝑀 2)
+
+⇒ 𝑃 (𝑀 2)  
+
+> 𝑊 (𝑀 2)
+
+< 𝑃 (𝑀 1)  
+
+> 𝑊 (𝑀 1)
+
+,
+
+which is not possible. In a completely similar way we can also prove (13). □
+
+## 2.3 A related ratio optimization problem 
+
+Let us also introduce the following precedence-constrained ratio optimization problem, which corresponds to the MCP with a fractional objective function. The problem reads as follows: max 
+
+> 𝒙 ∈{ 0,1}I
+
+( Í𝑖 ∈I 𝑝 𝑖 𝑥 𝑖 
+
+Í𝑖 ∈I 𝑤 𝑖 𝑥 𝑖 
+
+: 𝑥 𝑖 − 𝑥 𝑗 ≤ 0, (𝑖, 𝑗 ) ∈ A ,∑︁ 
+
+> 𝑖 ∈I
+
+𝑤 𝑖 𝑥 𝑖 > 0
+
+)
+
+. (14) In this model, the coefficient 𝑝 𝑖 can be seen as the return, benefit, or revenue generated by item 𝑖 ,while 𝑤 𝑖 may represent the amount of capital, budget, or resource consumption required to select it. Thus, the objective maximizes the return per unit of invested resource over all feasible solutions satisfying the precedence constraints. The strict positivity condition on the denominator simply excludes the empty solution. Ratio objectives of this type are classical in fractional programming [6, 23] and arise naturally when the goal is to maximize an efficiency measure. In finance, for instance, related ratios are used to compare returns with the amount of capital or risk required to obtain them, as in return-on-investment and risk-adjusted performance criteria [24]. Problem (14) is a combinatorial problem in its own right, and the results of this paper can be used to solve it efficiently. 10 3 Macroitems 
+
+In order to show the combinatorial structure of an optimal solution of ℱLP , we introduce a few definitions. 
+
+Definition 1. A macroitem is a subset M ⊂ I of items. In what follows we denote with 𝒙 M the binary vector corresponding to the indicator of set M,i.e., 
+
+
+
+𝒙 M
+
+ 
+
+> 𝑖
+
+= 1 if and only if 𝑖 ∈ M . We introduce the following definition. 
+
+Definition 2. A feasible sequence S of macroitems is an ordered partition of the item set I into 
+
+𝑘 (S) macroitems 
+
+S =  I1, I2, . . . , I𝑘 (S) 
+
+
+
+such that, for each 𝑟 ∈ { 1, 2, . . . , 𝑘 (S)} and each 𝑗 ∈ I 𝑟 , all out-neighbors of 𝑗 belong to preceding macroitems or to the macroitem itself, i.e., 
+
+I+ ( 𝑗 ) ⊂ 
+
+> 𝑟
+
+Ø
+
+> 𝑠 =1
+
+I𝑠 , (15) where I+ ( 𝑗 ) is the set of out-neighbors of item 𝑗 in graph G. Stated in another way, a sequence is feasible if for each 𝑟 ∈ { 1, 2, . . . , 𝑘 (S)} it holds that the binary vector 𝒙 ∪𝑟 𝑠 =1I𝑠 ∈ P , i.e., it is feasible for (3). For each macroitem I𝑟 in a feasible sequence, the profit 𝑃 𝑟 and the weight 𝑊 𝑟 are defined as 
+
+𝑃 𝑟 := 𝑃 (I 𝑟 ) =∑︁ 
+
+> 𝑖 ∈I 𝑟
+
+𝑝 𝑖 , 𝑊 𝑟 := 𝑊 (I 𝑟 ) =∑︁ 
+
+> 𝑖 ∈I 𝑟
+
+𝑤 𝑖 .
+
+We introduce the notion of split macroitem of a feasible sequence. 
+
+Definition 3. Given a feasible sequence of macroitems S =  I1, I2, . . . , I𝑘 (S) 
+
+ and the capacity 𝑐 
+
+of a knapsack, the split macroitem of S is the macroitem Iℎ(S) such that 
+
+> ℎ(S)− 1
+
+∑︁ 
+
+> 𝑟 =1
+
+𝑊 𝑟 ≤ 𝑐, 
+
+> ℎ(S)
+
+∑︁ 
+
+> 𝑟 =1
+
+𝑊 𝑟 > 𝑐. 
+
+By the standing assumption on the capacity, the split macroitem exists for every feasible sequence. Given a feasible sequence of macroitems, we can construct a feasible solution of ℱLP as 11 Figure 2: The sequence S = (I 1, I2, I3, I4) is a feasible sequence of macroitems. With capacity 
+
+𝑐 = 4 the split macroitem of S is I2 and the associated solution of maximum capacity assigns 
+
+𝑥 𝑖 = 1 if 𝑖 ∈ I 1, 𝑥 𝑖 = 13 if 𝑖 ∈ I 2, 𝑥 𝑖 = 0 if 𝑖 ∈ I 3 ∪ I 4, for a total profit of −23 . The sequence 
+
+S′ = (I 1, I3, I2, I4) is also feasible, and would give us an associated solution of total profit 83 .
+
+1 1 −1 1 −1 1 −1 2
+
+6 2 5 1 2 1
+
+3 1
+
+I1
+
+I3
+
+I2
+
+I4
+
+follows: 
+
+𝑥 𝑖 =
+
+
+
+1, 𝑖 ∈ I 𝑟 , 𝑟 ∈ { 1, 2, . . . , ℎ (S) − 1},𝑐 − Íℎ(S)− 1 
+
+> 𝑠 =1
+
+𝑊 𝑠 
+
+𝑊 ℎ(S) 
+
+, 𝑖 ∈ I ℎ(S) ,
+
+0, 𝑖 ∈ I 𝑟 , 𝑟 ∈ { ℎ(S) + 1, ℎ (S) + 2, . . . , 𝑘 (S)} .
+
+In other words, we take entire macroitems of the ordered sequence up to the split macroitem, we put only a fraction of the split macroitem (the fraction needed to fill the capacity), and we do not take all the other macroitems. A feasible sequence of macroitems and its associated solution of maximum capacity for the example in Fig. 1, is represented in Fig. 2. Note that the feasible solution found is very bad (it has negative profit) and it could easily be improved by just reordering the sequence of macroitems, while keeping it feasible. For this reason it is useful to introduce the following definitions. 
+
+Definition 4. A nonincreasing sequence of macroitems S := (I 1, I2, . . . , I𝑘 (S) ) is a feasible sequence such that 
+
+𝑟 < 𝑠 ⇒ 𝑃 𝑟 
+
+𝑊 𝑟 
+
+≥ 𝑃 𝑠 
+
+𝑊 𝑠 
+
+,
+
+where for any macroitem I𝑟 , we call 𝑃 𝑟  
+
+> 𝑊 𝑟
+
+the ratio of the macroitem. If 
+
+𝑟 < 𝑠 ⇒ 𝑃 𝑟 
+
+𝑊 𝑟 
+
+> 𝑃 𝑠 
+
+𝑊 𝑠 
+
+,
+
+12 then we call the sequence a decreasing sequence of macroitems. Observing that 𝑃 𝑟 
+
+𝑊 𝑟 
+
+= 𝑃 𝑟 +1
+
+𝑊 𝑟 +1
+
+⇒ 𝑃 𝑟 
+
+𝑊 𝑟 
+
+= 𝑃 𝑟 +1 + 𝑃 𝑟 
+
+𝑊 𝑟 +1 + 𝑊 𝑟 
+
+,
+
+any nonincreasing sequence S can always be replaced by a decreasing sequence by replacing each pair of macroitems with the same ratio with the union of the two macroitems. Now we can define the sequences of macroitems which allow us to compute optimal solutions of ℱLP .
+
+Definition 5. An optimal sequence of macroitems S is a feasible sequence (I 1, I2, . . . , I𝑘 (S) ),which is also maximal in the lexicographic order induced by the order ≻ on macroitems defined by stating that M ≻ M ′ if 
+
+• the ratio of M is strictly larger than the ratio of M′ or 
+
+• M and M′ have the same ratio and M has a strictly larger weight than M′.
+
+Remark 2. Note that an optimal sequence of macroitems exists and it is unique. It is also decreasing by definition. The following result gives us the interpretation of the breakpoints of the function 𝑢 , as the profit/weight ratios associated to the macroitems in the optimal sequence with positive ratio. Recall that M1, . . . , M𝑘 are the subsets with indicator vectors 𝒙 1, . . . , 𝒙 𝑘 , obtained by the iterative solution of Problem (7). Following Remark 1, the sequence is extended to include also macroitems with negative profit. The first vectors of this sequence, more precisely, those with positive profit, are also those giving the affine pieces of the function 𝑢 as explained in Theorem 1 and Remark 1. 
+
+Theorem 2. The sequence S := (I 1, I2, . . . , I𝑘 ) where 
+
+I1 = M1, I𝑟 = M𝑟 \ M 𝑟 −1 for 𝑟 ∈ { 2, 3, . . . , 𝑘 },
+
+is the optimal sequence of macroitems. Proof. Proof. We need to show that the sequence S is feasible and optimal. 
+
+• The sequence is feasible, since for each 𝑟 ∈ { 1, 2, . . . , 𝑘 }, we have that 𝒙 ∪𝑟 𝑠 =1I𝑠 = 𝒙 𝑟 , and 
+
+𝒙 𝑟 ∈ P .
+
+• The sequence is optimal because the ratio of a macroitem I𝑟 is equal to the breakpoint 𝜆 𝑟 as computed in (6) and Remark 1, and for all 𝑟 ∈ { 2, 3, . . . , 𝑘 } it holds that 𝜆 𝑟 < 𝜆 𝑟 −1. Moreover, 13 Figure 3: The optimal sequence of macroitems (I 1, I2, I3). In this example, the optimal solution of ℱLP , with capacity 𝑐 = 4, assigns 𝑥 𝑖 = 1 if 𝑖 ∈ I 1, 𝑥 𝑖 = 12 if 𝑖 ∈ I 2, and 𝑥 𝑖 = 0 if 𝑖 ∈ I 3.
+
+1 1 −1 1 −1 1 −1 2
+
+6 2 5 1 2 1
+
+3 1
+
+I2 I1 I3
+
+for every 𝑟 ∈ { 1, 2, . . . , 𝑘 }, I𝑟 is equal to the set with indicator vector 𝒙 𝑟 − 𝒙 𝑟 −1, i.e., the binary vector corresponding to the optimal solution of (7) with largest support, as stated in Theorem 1 and Remark 1. 
+
+□
+
+For the example of Fig. 1, the optimal sequence of macroitems has three elements I1, I2 and I3
+
+and they are represented in Fig. 3. In particular, 𝑃 (I 1) = 4, 𝑊 (I 1) = 2, 𝑃 (M 1) = 4, and 𝜆 1 = 42 ;
+
+𝑃 (I 2) = 6, 𝑊 (I 2) = 4, 𝑃 (M 2) = 10, and 𝜆 2 = 64 ; and 𝑃 (I 3) = 4, 𝑊 (I 3) = 4, 𝑃 (M 3) = 14, and 
+
+𝜆 3 = 44 .In Fig. 4, we can find the plot of the function 𝑢 for this example, this time indicating the breakpoints, which are the ratios of the macroitems in the optimal sequence. 
+
+Remark 3. In the case of the classical knapsack problem we have that G is the graph with empty set of arcs. Therefore, applying Theorem 2 to such an instance we obtain 
+
+I1 = arg max 
+
+> 𝑖 ∈I
+
+𝑝 𝑖 
+
+𝑤 𝑖 
+
+, I𝑟 = arg max   
+
+> 𝑖 ∈I\∪ 𝑟 −1
+> 𝑗 =1I𝑗
+
+𝑝 𝑖 
+
+𝑤 𝑖 
+
+, 𝑟 ∈ { 2, 3, . . . , 𝑡 },
+
+where 𝑡 is the number of distinct values of the ratios 𝑝 𝑖  
+
+> 𝑤 𝑖
+
+, 𝑖 ∈ I . In particular, if all the ratios have distinct values, we have that 
+
+I𝑗 = {𝑖 𝑗 }, 𝑗 ∈ { 1, 2, . . . , 𝑛 },
+
+14 Figure 4: Representation of the breakpoints of the function 𝑢 for the example in Fig. 1, which are the profit/weight ratios of the macroitems in the optimal sequence represented in Fig. 3. 0 44 64
+
+> 42
+
+0410 14 
+
+𝑢 (𝜆 )
+
+where 𝑖 1, 𝑖 2 . . . , 𝑖 𝑛 are such that: 
+
+𝑝 𝑖 1
+
+𝑤 𝑖 1
+
+> 𝑝 𝑖 2
+
+𝑤 𝑖 2
+
+> · · · > 𝑝 𝑖 𝑛 −1
+
+𝑤 𝑖 𝑛 −1
+
+> 𝑝 𝑖 𝑛 
+
+𝑤 𝑖 𝑛 
+
+,
+
+which is the usual ordering leading to the definition of the optimal solution of the linear relaxation of the classical knapsack problem. 
+
+Remark 4. The optimal sequence of macroitems also provides an optimal solution of the ratio optimization problem (14) introduced in Section 2.3. Indeed, its optimal value is the ratio of the first macroitem I1 of the optimal sequence, and the incidence vector of I1 is an optimal solution of (14): this is exactly the first iteration of the construction in Theorem 1. The corresponding minimization version of (14) is obtained analogously, using the dual variant of the construction presented in Section 5.3. 
+
+# 4 Optimal Solutions of ℱLP 
+
+In this section, we will show that an optimal solution for ℱLP can be constructed as in the continuous relaxation of the classical knapsack problem, using an optimal sequence of macroitems, instead of just a nonincreasing sequence of simple items. An analogue to the classical knapsack also holds for the dual problem, and for the optimal multiplier in the Lagrangian relaxation of the capacity constraint. 15 For the rest of the discussion we consider optimal sequences of macroitems S = (I 1, I2, . . . , I𝑘 (S) )
+
+and we assume that the split macroitem Iℎ(S) has a positive profit. Indeed, otherwise, all macroitems in the sequence with a positive profit, would fit in the capacity 𝑐 . In that case the optimal solution is easily given by taking all items contained in all macroitems with positive profit. Moreover, we define the residual capacity ˜𝑐 (S) as ˜𝑐 (S) = 𝑐 −
+
+> ℎ(S)− 1
+
+∑︁ 
+
+> 𝑟 =1
+
+𝑊 𝑟 . (16) The following theorem establishes the optimal solution of ℱLP and of the corresponding dual problem ℱD(LP) .
+
+Theorem 3. Given an optimal sequence of macroitems S := (I 1, I2, . . . , I𝑘 (S) ), let us assume that the split macroitem Iℎ(S) has a positive profit. Then, an optimal solution of ℱLP is: 
+
+𝑥 𝑖 =
+
+
+
+1, 𝑖 ∈ I 𝑟 , 𝑟 ∈ { 1, 2, . . . , ℎ (S) − 1},
+
+˜𝑐 (S) 
+
+𝑊 ℎ(S) 
+
+, 𝑖 ∈ I ℎ(S) ,
+
+0, 𝑖 ∈ I 𝑟 , 𝑟 ∈ { ℎ(S) + 1, ℎ (S) + 2, . . . , 𝑘 (S)} .
+
+(17) 
+
+An optimal solution of the dual ℱD(LP) of ℱLP is a nonnegative solution given by: 
+
+𝜆 = 𝑃 ℎ(S) 
+
+𝑊 ℎ(S) 
+
+,𝜇 𝑖 = 𝑤 𝑖 
+
+ 𝑃 𝑟 
+
+𝑊 𝑟 
+
+− 𝑃 ℎ(S) 
+
+𝑊 ℎ(S) 
+
+
+
+, 𝑖 ∈ I 𝑟 , 𝑟 ∈ { 1, 2, . . . , ℎ (S) − 1},𝜇 𝑖 = 0, 𝑖 ∈ I 𝑟 , 𝑟 ∈ { ℎ(S) , ℎ (S) + 1, . . . , 𝑘 (S)} ,𝛼 𝑖 𝑗 = 0, 𝑖 ∈ I 𝑟 , 𝑗 ∈ I 𝑠 , 𝑟 ≠ 𝑠, 
+
+(18) 
+
+together with, for each 𝑟 ∈ { 1, 2, . . . , 𝑘 (S)} , any nonnegative solution of the following linear system ∑︁   
+
+> 𝑗 ∈I +(𝑖 )
+
+𝛼 𝑖 𝑗 −∑︁  
+
+> 𝑘 ∈I −(𝑖 )
+
+𝛼 𝑘𝑖 = 𝑝 𝑖 − 𝑤 𝑖 
+
+𝑃 𝑟 
+
+𝑊 𝑟 
+
+, 𝑖 ∈ I 𝑟 . (19) 
+
+Remark 5. Notice that in (18) the values of the 𝜇 𝑖 dual variables for every 𝑖 ∈ I 𝑟 with 𝑟 ∈{1, 2, . . . , ℎ (S) − 1} are analogous to the corresponding optimal values of the dual solutions in the classical knapsack problem. Indeed, in the classical knapsack problem, if we assume that all the items 𝑖 have different 𝑝 𝑖  
+
+> 𝑤 𝑖
+
+ratio, the optimal sequence of macroitems is just the sequence of 16 singletons containing one item, ordered by decreasing ratio (see Remark 3), and we have a split item ℎ, depending on the capacity of the knapsack. For the classical problem, the values of the dual variables associated to the relaxed primal constraints 𝑥 𝑖 ≤ 1, for the items 𝑖 with 𝑝 𝑖  
+
+> 𝑤 𝑖
+
+> 𝑝 ℎ 
+
+> 𝑤 ℎ
+
+are 
+
+𝜇 𝑖 = 𝑝 𝑖 − 𝑤 𝑖 𝑝 ℎ 
+
+> 𝑤 ℎ
+
+. In the general PCKP setting, where we have precedences, the profit and weight of the item 𝑖 become the profit and weight of the macroitem I𝑟 containing 𝑖 , the ratio of the split item becomes the ratio of the split macroitem Iℎ(S) . Then, the value 𝑃 𝑟 − 𝑊 𝑟 𝑃 ℎ( S)  
+
+> 𝑊 ℎ( S)
+
+, which is associated to macroitem I𝑟 has to be split among the items 𝑖 ∈ I 𝑟 , and this is done by weighing the quantity proportionally to the weight of the item within the macroitem. Hence we have 
+
+𝜇 𝑖 =
+
+
+
+𝑃 𝑟 − 𝑊 𝑟 
+
+𝑃 ℎ(S) 
+
+𝑊 ℎ(S) 
+
+ 𝑤 𝑖 
+
+𝑊 𝑟 
+
+= 𝑤 𝑖 
+
+ 𝑃 𝑟 
+
+𝑊 𝑟 
+
+− 𝑃 ℎ(S) 
+
+𝑊 ℎ(S) 
+
+
+
+which is positive since I𝑟 precedes Iℎ(S) in the optimal sequence of macroitems. 
+
+Proof. Proof. Vector 𝒙 as defined in (17) is a feasible solution of ℱLP with primal objective function value given in (22). The dual objective function value at a dual solution fulfilling (18) is equal to: 
+
+𝑐 𝑃 ℎ(S) 
+
+𝑊 ℎ(S) 
+
++
+
+> ℎ(S)− 1
+
+∑︁ 
+
+> 𝑟 =1
+
+
+
+𝑃 𝑟 − 𝑊 𝑟 
+
+𝑃 ℎ(S) 
+
+𝑊 ℎ(S) 
+
+
+
+=
+
+> ℎ(S)− 1
+
+∑︁ 
+
+> 𝑟 =1
+
+𝑃 𝑟 + 𝑃 ℎ(S) 
+
+𝑊 ℎ(S) 
+
+𝑐 −
+
+> ℎ(S)− 1
+
+∑︁ 
+
+> 𝑟 =1
+
+𝑊 𝑟 
+
+!
+
+=
+
+> ℎ(S)− 1
+
+∑︁ 
+
+> 𝑟 =1
+
+𝑃 𝑟 + 𝑃 ℎ(S) 
+
+˜𝑐 (S) 
+
+𝑊 ℎ(S) 
+
+,
+
+which is equal to the primal objective function value at vector 𝒙 defined in (17) . Therefore, if we are able to prove that a nonnegative solution of (18) exists and it is feasible for the dual problem ℱD(LP) , we can conclude that the primal solution (17) is optimal for the primal problem, and the dual solution obtained through a nonnegative solution of (18) is optimal for the dual problem. Thus, we need to check that a nonnegative solution of (18) fulfills the constraints of (2). For every 𝑖 ∈ I 𝑟 with 𝑟 ∈ { 1, 2, . . . , ℎ (S) − 1}, we note that 
+
+𝑤 𝑖 𝜆 + 𝜇 𝑖 +∑︁   
+
+> 𝑗 ∈I +(𝑖 )
+
+𝛼 𝑖 𝑗 −∑︁  
+
+> 𝑘 ∈I −(𝑖 )
+
+𝛼 𝑘𝑖 = 𝑤 𝑖 
+
+𝑃 ℎ(S) 
+
+𝑊 ℎ(S) 
+
++ 𝑤 𝑖 
+
+ 𝑃 𝑟 
+
+𝑊 𝑟 
+
+− 𝑃 ℎ(S) 
+
+𝑊 ℎ(S) 
+
+
+
++ 𝑝 𝑖 − 𝑃 𝑟 
+
+𝑊 𝑟 
+
+𝑤 𝑖 = 𝑝 𝑖 .
+
+For every 𝑖 ∈ I 𝑟 with 𝑟 ∈ { ℎ(S) , ℎ (S) + 1, . . . , 𝑘 (S)} , we note that 
+
+𝑤 𝑖 𝜆 + 𝜇 𝑖 +∑︁   
+
+> 𝑗 ∈I +(𝑖 )
+
+𝛼 𝑖 𝑗 −∑︁  
+
+> 𝑘 ∈I −(𝑖 )
+
+𝛼 𝑘𝑖 = 𝑤 𝑖 
+
+𝑃 ℎ(S) 
+
+𝑊 ℎ(S) 
+
++ 0 + 𝑝 𝑖 − 𝑤 𝑖 
+
+𝑃 𝑟 
+
+𝑊 𝑟 
+
+≥ 𝑝 𝑖 ,
+
+where the last inequality holds since 𝑃 ℎ( S)  
+
+> 𝑊 ℎ( S)
+
+≥ 𝑃 𝑟  
+
+> 𝑊 𝑟
+
+, because 𝑟 ≥ ℎ(S) and the optimal sequence of macroitems (I 1, I2, . . . , I𝑘 (S) ) is decreasing. 17 Then, it remains to prove that for every 𝑟 ∈ { 1, 2, . . . , 𝑘 (S)} , there exists a nonnegative vec-tor 𝛼 such that 𝛼 𝑖 𝑗 = 0 if 𝑖 and 𝑗 belong to different macroitems in the optimal sequence, and ∑︁   
+
+> 𝑗 ∈I +(𝑖 )∩I 𝑟
+
+𝛼 𝑖 𝑗 −∑︁  
+
+> 𝑘 ∈I −(𝑖 )∩I 𝑟
+
+𝛼 𝑘𝑖 = 𝑝 𝑖 − 𝑤 𝑖 
+
+𝑃 𝑟 
+
+𝑊 𝑟 
+
+, 𝑖 ∈ I 𝑟 . (20) To see this, we introduce the subgraph G(I 𝑟 ) = (I 𝑟 , A (I 𝑟 )) induced by I𝑟 , where 
+
+A (I 𝑟 ) = {( 𝑖, 𝑗 ) ∈ A : 𝑖, 𝑗 ∈ I 𝑟 },
+
+and for each 𝑖 ∈ I 𝑟 we set 
+
+𝑏 𝑖 = 𝑝 𝑖 − 𝑤 𝑖 
+
+𝑃 𝑟 
+
+𝑊 𝑟 
+
+.
+
+Then, a nonnegative vector 𝛼 fulfilling (20) is a feasible flow for the min-cost flow problem over graph G(I 𝑟 ) where all arcs have infinite capacities, and the items 𝑖 ∈ I 𝑟 are subdivided into supply items with supply 𝑏 𝑖 > 0, demand items with demand −𝑏 𝑖 > 0, and transit items with 𝑏 𝑖 = 0. Existence of such a feasible flow is proved as follows. We have that: 
+
+• the total demand equals the total supply, i.e., ∑︁ 
+
+> 𝑖 ∈I 𝑟
+
+𝑏 𝑖 =∑︁ 
+
+> 𝑖 ∈I 𝑟
+
+
+
+𝑝 𝑖 − 𝑤 𝑖 
+
+𝑃 𝑟 
+
+𝑊 𝑟 
+
+
+
+= 𝑃 𝑟 − 𝑊 𝑟 
+
+𝑃 𝑟 
+
+𝑊 𝑟 
+
+= 0.
+
+• For every proper subset M of I𝑟 such that ∑︁ 
+
+> 𝑖 ∈M
+
+𝑏 𝑖 > 0, (21) we have A+ 
+
+> 𝑟
+
+(M) := {( 𝑖, 𝑗 ) ∈ A : 𝑖, 𝑗 ∈ I 𝑟 , 𝑖 ∈ M , 𝑗 ∉ M} ≠ ∅. Indeed, the left-hand side of (21) is equal to ∑︁ 
+
+> 𝑖 ∈M
+
+
+
+𝑝 𝑖 − 𝑤 𝑖 
+
+𝑃 𝑟 
+
+𝑊 𝑟 
+
+
+
+= 𝑃 (M) − 𝑊 (M) 𝑃 𝑟 
+
+𝑊 𝑟 
+
+,
+
+where 𝑃 (M) := Í𝑖 ∈M 𝑝 𝑖 and 𝑊 (M) := Í𝑖 ∈M 𝑤 𝑖 . Hence, inequality (21) is equivalent to   
+
+> 𝑃 (M)
+> 𝑊 (M)
+
+> 𝑃 𝑟  
+
+> 𝑊 𝑟
+
+. Now, if we assume by contradiction that there is no arc exiting from M within 
+
+I𝑟 (i.e., A+ 
+
+> 𝑟
+
+(M) = ∅), then M alone can be put in place of I𝑟 in any feasible sequence of macroitems containing I𝑟 , while maintaining the feasibility of the sequence and advancing its position in the lexicographic order defined in Definition 5, thus contradicting the fact that 
+
+S = (I 1, I2, . . . , I𝑘 (S) ) is an optimal sequence of macroitems. 18 Figure 5: Representation of the flow giving the optimal solution of ℱD(LP) , with capacity 𝑐 = 4, for the example of Fig. 1. The outflow-inflow balance of an item, prescribed by (18), is written inside the relative item, while the flow components are written along the corresponding arc. 
+
+−12 −52 −3 −33 3 12 
+
+> 12
+> 52
+
+3 0 300 0 2These two facts allow us to apply classic theorems on the existence of feasible flows on networks, to show that a flow within G(I 𝑟 ) satisfying (20) exists (see, for example, [1, Theorem 6.12]). 
+
+□
+
+It follows from Theorem 3 that the optimal value of ℱLP and ℱD(LP) is 
+
+> ℎ(S)− 1
+
+∑︁ 
+
+> 𝑟 =1
+
+𝑃 𝑟 + 𝑃 ℎ(S) 
+
+˜𝑐 (S) 
+
+𝑊 ℎ(S) 
+
+. (22) As an illustration of the previous result, we refer to Fig. 3 for the optimal solution of the ℱLP 
+
+arising from the graph in Fig. 1, while in Fig. 5 we represent the flow inside the macroitems, which gives the optimal solution of the dual problem ℱD(LP) , for the same example. The final result concerns the value of the optimal multiplier for the Lagrangian relaxation of the capacity constraint, i.e., the optimal solution of the dual Lagrangian problem. This is the solution of min  
+
+> 𝜆 ≥0
+
+𝑐 𝜆 + max 
+
+> 𝑥 ∈P
+
+∑︁ 𝑖 ∈I 
+
+( 𝑝 𝑖 − 𝜆 𝑤 𝑖 )𝑥 𝑖 
+
+!
+
+= min  
+
+> 𝜆 ≥0
+
+𝑐 𝜆 + 𝑢 (𝜆 ). (23) We denote the optimization problem (23) by ℱLAG in the remainder of this manuscript. More-over, we denote by 𝜁 (ℱLAG ) its optimal value. We are able to prove the following result, analogous to the one for the classical knapsack problem: 19 Theorem 4. Let S = (I 1, I2, . . . , I𝑘 ) be the optimal sequence of macroitems, and assume that the split macroitem Iℎ for this sequence has positive profit. Then, the optimal solution of ℱLAG is 
+
+𝜆 ℎ := 𝑃 ℎ 
+
+> 𝑊 ℎ
+
+and its optimal value is equal to the optimal value of ℱLP , i.e., 𝜁 (ℱLAG ) = 𝜁 (ℱLP ).Proof. Proof. Given the optimal sequence of macroitems (I 1, I2, . . . , I𝑘 ), the function 𝑢 (𝜆 ) :=
+
+max Í𝑖 ∈I ( 𝑝 𝑖 − 𝜆 𝑤 𝑖 )𝑥 𝑖 can be written, for each 𝑟 ∈ { 0, 1, . . . , 𝑘 } and each 𝜆 ∈ [ 𝜆 𝑟 +1, 𝜆 𝑟 ), in the form 
+
+𝑢 (𝜆 ) = 𝑃 (M 𝑟 ) − 𝜆 𝑊 (M 𝑟 ),
+
+where M0 := ∅, 𝜆 0 := +∞ and 𝜆 𝑘 +1 := 0. The subgradient of the objective function 𝑔 (𝜆 ) =
+
+𝑐 𝜆 + 𝑢 (𝜆 ) of (23) evaluated at breakpoint 𝜆 𝑟 is the interval: 
+
+𝜕 𝑔 (𝜆 𝑟 )
+
+𝜕 𝜆 = [𝑐 − 𝑊 (M 𝑟 ), 𝑐 − 𝑊 (M 𝑟 −1)] .
+
+Then, by definition of the split macroitem, it holds that 0 ∈ [ 𝑐 − 𝑊 (M ℎ), 𝑐 − 𝑊 (M ℎ−1)] = 𝜕 𝑔 (𝜆 ℎ)
+
+𝜕 𝜆 ,
+
+i.e., 𝜆 ℎ fulfills the optimality condition of the convex nonsmooth optimization problem (23). The optimal value of the dual Lagrangian problem is: 
+
+𝜁 (ℱLAG ) = 𝑔 (𝜆 ℎ) = 𝑐 𝜆 ℎ + 𝑢 (𝜆 ℎ) = 𝑐 𝑃 ℎ
+
+𝑊 ℎ
+
++ 𝑃 (M ℎ) − 𝑃 ℎ
+
+𝑊 ℎ
+
+𝑊 (M ℎ) =
+
+> ℎ−1
+
+∑︁ 
+
+> 𝑟 =1
+
+𝑃 𝑟 + 𝑃 ℎ
+
+𝑐 − Íℎ−1 
+
+> 𝑟 =1
+
+𝑊 𝑟 
+
+𝑊 ℎ
+
+,
+
+which is equal to the optimal value of ℱLP , i.e., 𝜁 (ℱLAG ) = 𝜁 (ℱLP ). □
+
+The plot of the objective function of ℱLAG for the example of Fig. 1 with capacity 𝑐 = 4 is represented in Fig. 6. Note that since in this case ℎ = 2, the minimum of the function 𝑐 𝜆 + 𝑢 (𝜆 ) is attained at 𝜆 2 = 64 , which is the ratio of the split macroitem I2.
+
+# 5 Algorithms for computing the optimal sequence of macroitems on directed forests 
+
+In this section, we present new algorithms for computing the optimal sequence of macroitems when the precedence graph G is a directed forest , i.e., a disjoint union of directed trees. We show that, despite the additional combinatorial structure imposed by the precedence constraints, the optimal sequence can be computed with an 𝑂 (𝑛 2) algorithm, where 𝑛 is the number of items. We 20 Figure 6: Plot of the function 𝑐 𝜆 + 𝑢 (𝜆 ) for the example of Fig. 1 with capacity 𝑐 = 4. The minimum is achieved at the breakpoint giving the profit/weight ratio of the split macroitem in the optimal sequence. 0 44 64
+
+> 42
+
+0410 14 
+
+𝑐 𝜆 + 𝑢 (𝜆 )
+
+further show that when the arcs are all directed in the same direction (i.e., the forest is composed of out-trees or in-trees ), a close variant of this algorithm reduces the complexity to 𝑂 (𝑛 log 𝑛 ),matching the time needed to compute the parametric LP relaxation of the classical KP for all capacity values, which requires sorting items by efficiency and thus runs in 𝑂 (𝑛 log 𝑛 ) [18, 20]. As already discussed in the Introduction, the optimal sequence of macroitems can also be obtained on arbitrary precedence graphs via parametric flow algorithms in 𝑂 (𝑚𝑛 log 𝑛 ) time, where 𝑚 is the number of arcs [13]; on forests, where 𝑚 = 𝑂 (𝑛 ), this general-purpose bound becomes 𝑂 (𝑛 2 log 𝑛 ),and the algorithms introduced in this section improve on it by exploiting the tree structure directly. A computational comparison between these two approaches is provided in Section 6. 
+
+## 5.1 Notation 
+
+In order to describe the algorithms of this section, we introduce the following notation. 
+
+Definition 6. Let G = (I , A) be a directed forest and let 𝑗 ∈ I be an item. The preceding set of item 𝑗 is the set of items which can be reached from 𝑗 with a directed path, which is the set 
+
+𝐹 𝑗 = {𝑘 ∈ I : there exists a directed path from 𝑗 to 𝑘 }.
+
+Let 𝑎 = (𝑖, 𝑗 ) ∈ A be an edge. The minimal preceding set of arc 𝑎 = (𝑖, 𝑗 ) is the set of items 21 which are in the preceding set of 𝑖 but not in the preceding set of 𝑗 , namely the set 
+
+𝐹 𝑎 := 𝐹 𝑖 \ 𝐹 𝑗 .
+
+Definition 7. Let G = (I , A) be a directed forest and let 𝑗 ∈ I be an item. The succeeding set of item 𝑗 is the set of items which can reach 𝑗 with a directed path, which is the set 
+
+𝐵 𝑗 = {𝑘 ∈ I : there exists a directed path from 𝑘 to 𝑗 }.
+
+Let 𝑎 = (𝑖, 𝑗 ) ∈ A be an edge. The minimal succeeding set of arc 𝑎 = (𝑖, 𝑗 ) is the set of items which are in the succeeding set of 𝑗 but not in the succeeding set of 𝑖 , namely the set 
+
+𝐵 𝑎 := 𝐵 𝑗 \ 𝐵 𝑖 .
+
+Definition 8. We indicate with If the set of the final items of G, and with Ii the set of its initial items , which are defined respectively by 
+
+If := { 𝑗 ∈ I : I+ ( 𝑗 ) = ∅} , Ii := { 𝑗 ∈ I : I− ( 𝑗 ) = ∅} .
+
+Definition 9. Let G = (I , A) be a directed forest and let M′ ⊂ M ⊂ I be a chain of subsets of items. The set of arcs connecting items in M is the set 
+
+A (M) := {( 𝑖, 𝑗 ) ∈ A : 𝑖, 𝑗 ∈ M} .
+
+The set of items in M which are connected with M′ by an arc exiting M′ is the set 
+
+M+ (M ′) := { 𝑗 ∈ M \ M ′ : ∃𝑖 ∈ M ′, (𝑖, 𝑗 ) ∈ A} ,
+
+and the set of items in M which are connected with M′ by an arc entering M′ is the set 
+
+M− (M ′) := {𝑖 ∈ M \ M ′ : ∃ 𝑗 ∈ M ′, (𝑖, 𝑗 ) ∈ A} .
+
+An illustration of preceding/succeeding sets associated to items and arcs, and of final/initial items, can be found in Fig. 7, while an illustration of the sets M+ (M ′) and M− (M ′) is in Fig. 8. Notice that a sequence S =  I1, I2, . . . , I𝑘 (S) 
+
+ of macroitems is feasible if and only if for every item 𝑗 ∈ I , all items in 𝐹 𝑗 are contained in macroitems of the sequence S that precede the macroitem containing 𝑗 , or are contained in the same macroitem. Furthermore, given an arc 
+
+𝑎 = (𝑖, 𝑗 ), item 𝑖 can be in the same macroitem as item 𝑗 only if all items in 𝐹 𝑎 are contained in 22 Figure 7: Representation of a directed tree. The arc 𝑎 = (𝑖, 𝑗 ) is highlighted in bold. Two dashed lines enclose the sets 𝐹 𝑖 and 𝐵 𝑗 . The items in 𝐹 𝑎 , and their connecting arcs, are highlighted in orange, while the same is done in green for 𝐵 𝑎 . Final items (i.e., items 𝑣 with I+ (𝑣 ) = ∅) are filled with a north-east line pattern, while initial items (i.e., items 𝑣 with I− (𝑣 ) = ∅) are filled with a dot pattern.  
+
+> 𝑗
+> 𝑖
+> 𝑎
+> 𝐹 𝑖
+> 𝐵 𝑗
+> 𝐹 𝑎
+> 𝐵 𝑎
+
+23 Figure 8: Directed graph with dashed set M and highlighted subset M′ in purple. Nodes in 
+
+M+ (M ′) are highlighted in teal with a north-west line pattern, and the arcs from M′ to M+ (M ′)
+
+are highlighted in teal. Nodes in M− (M ′) are highlighted in brown with a crosshatch pattern, and the arcs from M− (M ′) to M′ are highlighted in brown. 
+
+> M
+> M′
+
+a macroitem of the sequence S that precedes the macroitem containing 𝑗 , or are contained in the same macroitem. 
+
+Remark 6. Notice that I+ (𝐹 𝑗 ) = {𝑘 ∈ I \ 𝐹 𝑗 : ∃𝑖 ∈ 𝐹 𝑗 , (𝑖, 𝑘 ) ∈ A} = ∅ for every 𝑗 ∈ I by Definition 6. Furthermore I+ (𝐹 (𝑖, 𝑗 ) \ { 𝑖 }) = ∅ for every (𝑖, 𝑗 ) ∈ A since 𝐹 (𝑖, 𝑗 ) \ { 𝑖 } is the disjoint union of the sets 𝐹 𝑘 with 𝑘 ∈ I + (𝑖 ) \ { 𝑗 }
+
+## 5.2 Main algorithm to compute the optimal sequence of macroitems on a forest 
+
+To show that our main algorithm outputs the optimal sequence of macroitems we prove three propositions. 
+
+Proposition 4. Suppose G = (I , A) is a directed forest and let M ⊂ I be a subset of items. If 
+
+I+ (M) = ∅, then 
+
+M = ©«Ä 
+
+> 𝑎 ∈˜A
+
+𝐹 𝑎 ª®¬
+
+⊔ ˜If
+
+24 for some subset ˜A ⊂ A and ˜If ⊂ I f, i.e., M is the disjoint union of the minimal preceding sets associated to some arcs and some subset of final items. Proof. Proof. We can show this constructively. We start with ˜A = ∅ and ˜If = ∅. Then, we add one final item in If ∩ M to ˜If for every connected component of the graph (M , A (M)) . Such final items exist since I+ (M) = ∅ and G is a forest. Thus we obtain a first set M′ ⊂ M defined by 
+
+M′ = ˜If
+
+and we have I+ (M ′) = ∅.Now if M− (M ′) ≠ ∅ (i.e., M ≠ M′), we consider any item 𝑗 ∈ M ′ which is connected to some item in M− (M ′). Then we take any maximal backwards path 𝜋 𝑗 ⊂ A (M) \ A (M ′) from 𝑗 
+
+to some item 𝑣 ( 𝑗 ) with M− ({ 𝑣 ( 𝑗 )}) = ∅, and we add the arcs in 𝜋 𝑗 to ˜A, updating M′ accordingly. Since the new elements added to ˜A are chosen in a backwards path in A (M) \ A (M ′), we have 
+
+𝐹 𝑎 ∩ 𝐹 𝑎 ′ = ∅, for every 𝑎, 𝑎 ′ ∈ ˜A with 𝑎 ≠ 𝑎 ′. Thus we obtain 
+
+M′ = ©«Ä 
+
+> 𝑎 ∈˜A
+
+𝐹 𝑎 ª®¬
+
+⊔ ˜If
+
+and we have enlarged the set M′ to also include Ð 𝐹 𝑣 ( 𝑗 ) , where the union is extended to all items 
+
+𝑗 ∈ M ′ which are connected to some item in M− (M ′). Hence we have again I+ (M ′) = ∅.Then, we repeat the last step until M′ = M. □
+
+An illustration of the outcome of the constructive procedure described in the proof of Proposi-tion 4 can be found in Fig. 9. 
+
+Proposition 5. Suppose G = (I , A) is a directed forest and let 𝑎 ∗ ∈ arg max 𝑎 ∈A 𝑃 (𝐹 𝑎 )  
+
+> 𝑊 (𝐹 𝑎 )
+
+with 
+
+𝑎 ∗ = (𝑢, 𝑣 ). If 𝑃 (𝐹 𝑎 ∗ )   
+
+> 𝑊 (𝐹 𝑎 ∗)
+
+≥ 𝑝 𝑓   
+
+> 𝑤 𝑓
+
+for every 𝑓 ∈ I f, then the two items 𝑢 and 𝑣 belong to the same macroitem in the optimal sequence. Proof. Proof. Let S =  I1, I2, . . . , I𝑘 (S) 
+
+ be the optimal sequence of macroitems and let 𝑡 (𝑣 ) ∈ {1, 2, . . . , 𝑘 (S)} be the index of the macroitem containing 𝑣 , i.e., 𝑣 ∈ I 𝑡 (𝑣 ) . Consider the set of items 
+
+M := 
+
+> 𝑡 (𝑣 )
+
+Ø
+
+> 𝑟 =1
+
+I𝑟 .
+
+Notice that I+ (M) = ∅ since S is a feasible sequence of macroitems. By Proposition 4 we have 
+
+M = ©«Ä 
+
+> 𝑎 ∈˜A
+
+𝐹 𝑎 ª®¬
+
+⊔ ˜If (24) 25 Figure 9: Constructive decomposition of a set M with I+ (M) = ∅ according to the proof of Proposition 4. We start from one final item per connected component in M, i.e., M′ = ˜If =
+
+{1, 4, 8}, and then iteratively add sets 𝐹 𝑎 associated with arcs 𝑎 from M− (M ′) to M′ (shown as dashed colored arcs), until M′ = M. The resulting disjoint union is M = {1, 4, 8} ⊔ 𝐹 (6,1) ⊔
+
+𝐹 (7,4) ⊔ 𝐹 (12 ,8) ⊔ 𝐹 (9,6) ⊔ 𝐹 (10 ,6) .1 2 3 45 6 7 89 10 11 12 13 14 15 16   
+
+> M
+> {1}{4}
+> {8}
+> 𝐹 (6,1)𝐹 (7,4)
+> 𝐹 (12 ,8)
+> 𝐹 (9,6)
+> 𝐹 (10 ,6)
+
+26 for some ˜A ⊂ A and ˜If ⊂ I f.Suppose by contradiction that 𝑢 ∉ I𝑡 (𝑣 ) and thus 𝑢 ∉ M since (𝑢, 𝑣 ) ∈ A and S is a feasible sequence of macroitems. Hence by Remark 6 we have I+ (𝐹 𝑎 ∗ ∩ M) = ∅. Thus by Proposition 4 we have 
+
+𝐹 𝑎 ∗ ∩ M =
+
+Ä
+
+> 𝑎 ∈A ∗
+
+𝐹 𝑎 
+
+!
+
+⊔ I ∗ 
+
+> f
+
+(25) for some A∗ ⊂ A and I∗ 
+
+> f
+
+⊂ I f.We have 𝑃 (𝐹 𝑎 ∗ \ M) 
+
+𝑊 (𝐹 𝑎 ∗ \ M) ≥ 𝑃 (𝐹 𝑎 ∗ )
+
+𝑊 (𝐹 𝑎 ∗ ) ≥ 𝑃 (M) 
+
+𝑊 (M) ≥ 𝑃 (I 𝑡 (𝑣 ) )
+
+𝑊 (I 𝑡 (𝑣 ) )
+
+where in the last inequality we used the fact that S =  I1, I2, . . . , I𝑘 (S) 
+
+ is a decreasing sequence of macroitems. The second inequality follows from the fact that 𝑃 (𝐹 𝑎 ∗ )   
+
+> 𝑊 (𝐹 𝑎 ∗)
+
+≥ 𝑃 (𝐹 𝑎 )  
+
+> 𝑊 (𝐹 𝑎 )
+
+for every 𝑎 ∈ A 
+
+and 𝑃 (𝐹 𝑎 ∗ )   
+
+> 𝑊 (𝐹 𝑎 ∗)
+
+≥ 𝑝 𝑓   
+
+> 𝑤 𝑓
+
+for every 𝑓 ∈ I f, Eq. (24) and Proposition 3. The first inequality follows again from the same properties of 𝐹 𝑎 ∗ , Eq. (25) and Proposition 3. This chain of inequalities contradicts the hypothesis that S is the optimal sequence of macroitems, because the sequence obtained from 
+
+ I1, . . . , I𝑡 (𝑣 )− 1, I𝑡 (𝑣 ) ∪ ( 𝐹 𝑎 ∗ \ M) , I𝑡 (𝑣 )+ 1 \ ( 𝐹 𝑎 ∗ \ M) , . . . , I𝑘 (S) \ ( 𝐹 𝑎 ∗ \ M) 
+
+after possibly removing some empty sets at the end, is feasible and higher than S in the lexicographic order associated to ≻. Indeed, 𝑃 (𝐹 𝑎 ∗ \M)    
+
+> 𝑊 (𝐹 𝑎 ∗\M)
+
+> 𝑃 (I 𝑡 (𝑣 ) )    
+
+> 𝑊 (I 𝑡 (𝑣 ))
+
+and since 𝐹 𝑎 ∗ \ M and I𝑡 (𝑣 ) are disjoint, the ratio of their union is not lower than the ratio of I𝑡 (𝑣 ) , by Proposition 3. □
+
+Proposition 5 allows us, by collapsing the arc 𝑎 ∗, to reduce the problem of finding the optimal sequence of macroitems to a smaller graph. An illustration of such an operation on an instance can be found in Fig. 10, where a full run of the main algorithm is presented. 
+
+Proposition 6. Suppose G = (I , A) is a directed forest and let 𝑔 ∈ B f := arg max 𝑓 ∈I f   
+
+> 𝑝 𝑓
+> 𝑤 𝑓
+
+. If  
+
+> 𝑝 𝑔
+> 𝑤 𝑔
+
+> 𝑃 (𝐹 𝑎 )  
+
+> 𝑊 (𝐹 𝑎 )
+
+for every 𝑎 ∈ A , then Bf is the first macroitem in the optimal sequence of macroitems. Proof. Proof. Since the optimal sequence of macroitems must be feasible, any candidate subset 
+
+M ⊂ I to be the first macroitem in the optimal sequence must satisfy I+ (M) = ∅. By Proposition 4 we have 
+
+M = ©«Ä 
+
+> 𝑎 ∈˜A
+
+𝐹 𝑎 ª®¬
+
+⊔ ˜If
+
+for some subsets ˜A ⊂ A , ˜If ⊂ I f. Since 𝑔 ∈ B f = arg max 𝑓 ∈I f   
+
+> 𝑝 𝑓
+> 𝑤 𝑓
+
+and 𝑝 𝑔  
+
+> 𝑤 𝑔
+
+> 𝑃 (𝐹 𝑎 )  
+
+> 𝑊 (𝐹 𝑎 )
+
+for every 𝑎 ∈ A ,by Proposition 3 the ratio associated to the set Bf is larger than or equal to the ratio associated to 
+
+M, with the equality possible only if ˜A = ∅. This implies that Bf is the subset of I of largest ratio with the largest support, i.e., the larger subset in the order ≻. □
+
+27 Algorithm 1 Algorithm to compute the optimal sequence of macroitems on a forest  
+
+> 1:
+
+input I, A, If, 𝒑 , 𝒘  
+
+> 2:
+
+⊲ Initialization:  
+
+> 3:
+
+I′ = I, A′ = A, I′ 
+
+> f
+
+= If 
+
+> 4:
+
+for 𝑗 ∈ I ′ do  
+
+> 5:
+
+Set 𝑝 ′ 
+
+> 𝑗
+
+= 𝑝 𝑗 , 𝑤 ′ 
+
+> 𝑗
+
+= 𝑤 𝑗 profit and weight for item 𝑗 ∈ I ′; M 𝑗 = { 𝑗 } 
+
+> 6:
+
+end for  
+
+> 7:
+
+𝑘 = 0 
+
+> 8:
+
+while I′ ≠ ∅ do  
+
+> 9:
+
+⊲ Determine 𝑎 ∗ = (𝑢, 𝑣 ) from Proposition 5 and its ratio 𝑃 (𝐹 𝑎 ∗ )   
+
+> 𝑊 (𝐹 𝑎 ∗)
+
+: 
+
+> 10:
+
+(𝑢, 𝑣 ) ← FindBestWing (I ′, A′) 
+
+> 11:
+
+⊲ Determine the set Bf from Proposition 6 and the ratio 𝑝 ′ 
+
+> 𝑔
+> 𝑤 ′
+> 𝑔
+
+: 
+
+> 12:
+
+(𝑔, Bf) ← FindBestFinalNodes (I ′ 
+
+> f
+
+) 
+
+> 13:
+
+⊲ If largest ratio is achieved by some final items (items in Bf), we get a new macroitem:  
+
+> 14:
+
+if 𝑝 ′ 
+
+> 𝑔
+> 𝑤 ′
+> 𝑔
+
+> 𝑃 (𝐹 (𝑢,𝑣 ) )   
+
+> 𝑊 (𝐹 (𝑢,𝑣 ))
+
+then  
+
+> 15:
+
+RemoveFinalNodes (B f) 
+
+> 16:
+
+else  
+
+> 17:
+
+⊲ If largest ratio is achieved by (or also by) 𝐹 𝑎 ∗ we “contract” the arc 𝑎 ∗: 
+
+> 18:
+
+ContractArc (𝑢, 𝑣 ) 
+
+> 19:
+
+end if  
+
+> 20:
+
+end while  
+
+> 21:
+
+return S =  I1, I2, . . . , I𝑘 
+
+
+
+In Algorithm 1, after the initialization (lines 3-7), which creates a copy (I ′, A′) of the graph and associates to each copied item 𝑗 a set of items M 𝑗 ⊂ I in the original graph, then in the main cycle (lines 8-20) at each iteration we either find a new macroitem in the optimal sequence as prescribed by Proposition 6, and we remove it from the graph (I ′, A′), or we “contract” an arc joining two adjacent items according to Proposition 5. In particular, in procedure FindBestWing (Algorithm 2) we determine the arc 𝑎 ∗ = (𝑢, 𝑣 ) ∈ A ′
+
+whose associated set 𝐹 𝑎 ∗ is the one with the largest ratio. Then, in procedure FindBestFinalNodes 
+
+(Algorithm 3) we determine the set Bf of the final items of I′ with the largest ratio. Now, if the largest determined ratio is achieved only by the final items in Bf, then the subset of items 
+
+Ð 𝑓 ∈B f M 𝑓 ⊂ I is the next macroitem in the optimal sequence by Proposition 6. Hence, procedure 
+
+RemoveFinalNodes (Algorithm 4) adds to the optimal sequence the new macroitem, and removes the items in Bf together with the corresponding arcs from the graph (I ′, A′). Conversely, if the largest determined ratio is achieved by (or also by) a set 𝐹 𝑎 ∗ ⊂ I ′ associated to some arc 
+
+𝑎 ∗ ∈ A ′, procedure ContractArc (Algorithm 5) removes arc 𝑎 ∗ = (𝑢, 𝑣 ) from A′ according to Proposition 5, joining the two items 𝑢 and 𝑣 and the corresponding sets M𝑢 , M𝑣 of associated items in I. An illustration of a full run of Algorithm 1 on a small instance can be found in Fig. 10. 
+
+Theorem 5. Algorithm 1 computes the optimal sequence of macroitems on a directed forest in 
+
+28 Algorithm 2 Sub-procedure FindBestWing : determine arc 𝑎 ∗ = (𝑢, 𝑣 ) with largest ratio 𝑃 (𝐹 𝑎 ∗ )   
+
+> 𝑊 (𝐹 𝑎 ∗)
+> 1:
+
+procedure FindBestWing (I′, A′) 
+
+> 2:
+
+Compute 𝑃 (𝐹 𝑗 ), 𝑊 (𝐹 𝑗 ) for every 𝑗 ∈ I ′ 
+
+> 3:
+
+𝑢 = 0, 𝑣 = 0, 𝑃 (𝐹 (0,0) ) = −∞ , 𝑊 (𝐹 (0,0) ) = 1 
+
+> 4:
+
+for 𝑎 = (𝑖, 𝑗 ) ∈ A ′ do  
+
+> 5:
+
+𝑃 (𝐹 𝑎 ) = 𝑃 (𝐹 𝑖 ) − 𝑃 (𝐹 𝑗 ), 𝑊 (𝐹 𝑎 ) = 𝑊 (𝐹 𝑖 ) − 𝑊 (𝐹 𝑗 ) 
+
+> 6:
+
+if 𝑃 (𝐹 𝑎 )   
+
+> 𝑊 (𝐹 𝑎 )
+
+> 𝑃 (𝐹 (𝑢,𝑣 ) )   
+
+> 𝑊 (𝐹 (𝑢,𝑣 ))
+
+then 𝑢 = 𝑖 , 𝑣 = 𝑗  
+
+> 7:
+
+end if  
+
+> 8:
+
+end for  
+
+> 9:
+
+return (𝑢, 𝑣 ) 
+
+> 10:
+
+end procedure 
+
+Algorithm 3 Sub-procedure FindBestFinalNodes : determine set Bf of final items with largest ratio 𝑝 ′ 
+
+> 𝑔
+> 𝑤 ′
+> 𝑔
+> 1:
+
+procedure FindBestFinalNodes (I′ 
+
+> f
+
+) 
+
+> 2:
+
+𝑔 = 0, 𝑝 ′ 
+
+> 0
+
+= −∞ , 𝑤 ′ 
+
+> 0
+
+= 1, Bf = ∅ 
+
+> 3:
+
+for 𝑓 ∈ I ′ 
+
+> f
+
+do  
+
+> 4:
+
+if 𝑝 ′
+
+> 𝑓
+> 𝑤 ′
+> 𝑓
+
+> 𝑝 ′ 
+
+> 𝑔
+> 𝑤 ′
+> 𝑔
+
+then 𝑔 = 𝑓 , Bf = { 𝑓 } 
+
+> 5:
+
+else if 𝑝 ′
+
+> 𝑓
+> 𝑤 ′
+> 𝑓
+
+= 𝑝 ′ 
+
+> 𝑔
+> 𝑤 ′
+> 𝑔
+
+then Bf = Bf ∪ { 𝑓 } 
+
+> 6:
+
+end if  
+
+> 7:
+
+end for  
+
+> 8:
+
+return (𝑔, Bf) 
+
+> 9:
+
+end procedure 
+
+𝑂 (𝑛 2) time. Proof. Proof. At each iteration, either Proposition 6 identifies the next macroitem and removes it, or Proposition 5 identifies an arc whose endpoints must belong to the same macroitem and contracts it. These operations preserve the optimal sequence of the original instance, after replacing each contracted item by the associated set M 𝑗 . Since each iteration decreases the cardinality of I′ by at least one, there are at most 𝑛 iterations. In a forest, completing the four procedures in Algorithms 2 to 5 can be done in 𝑂 (𝑛 ) time. This is rather obvious for the last three procedures, each involving one or two for cycles with at most 𝑛 iterations, and with a constant number of operations per iteration. Concerning the procedure in Algorithm 2, it also takes 𝑂 (𝑛 ) by a recursive computation of the values 𝑃 (𝐹 𝑗 ) and 𝑊 (𝐹 𝑗 ) starting from the final items of the graph, up to the initial ones. Hence, the (at most) 𝑛 iterations, with a computational cost per iteration equal to 𝑂 (𝑛 ), require a number of operations which is 𝑂 (𝑛 2).
+
+□
+
+Remark 7. We remark that the proposed approach does not suffer from numerical precision prob-29 Algorithm 4 Sub-procedure RemoveFinalNodes : create next macroitem from Bf and update the graph  
+
+> 1:
+
+procedure RemoveFinalNodes (Bf) 
+
+> 2:
+
+𝑘 = 𝑘 + 1, I𝑘 = Ð 𝑓 ∈ B f M 𝑓 , Cf = ∅ 
+
+> 3:
+
+for 𝑖 ∈ I ′− (B f) do Cf = Cf ∪ { 𝑖 } 
+
+> 4:
+
+for (𝑖, 𝑓 ) ∈ A ′ with 𝑓 ∈ B f do  
+
+> 5:
+
+A′ = A′ \ {( 𝑖, 𝑓 )}  
+
+> 6:
+
+end for  
+
+> 7:
+
+end for  
+
+> 8:
+
+for 𝑖 ∈ C f do  
+
+> 9:
+
+if I′+ (𝑖 ) = ∅ then I′ 
+
+> f
+
+= I′ 
+
+> f
+
+∪ { 𝑖 } 
+
+> 10:
+
+end if  
+
+> 11:
+
+end for  
+
+> 12:
+
+I′ 
+
+> f
+
+= I′ 
+
+> f
+
+\ B f, I′ = I′ \ B f 
+
+> 13:
+
+end procedure 
+
+Algorithm 5 Sub-procedure ContractArc : contract arc 𝑎 ∗ = (𝑢, 𝑣 ) and merge the associated item sets  
+
+> 1:
+
+procedure ContractArc (𝑢, 𝑣 ) 
+
+> 2:
+
+for 𝑖 ∈ I ′− (𝑢 ) do A′ = A′ \ {( 𝑖, 𝑢 )} , A′ = A′ ∪ {( 𝑖, 𝑣 )}  
+
+> 3:
+
+end for  
+
+> 4:
+
+for 𝑗 ∈ I ′+ (𝑢 ) \ { 𝑣 } do A′ = A′ \ {( 𝑢, 𝑗 )} , A′ = A′ ∪ {( 𝑣, 𝑗 )}  
+
+> 5:
+
+if 𝑣 ∈ I ′ 
+
+> f
+
+then  
+
+> 6:
+
+I′ 
+
+> f
+
+= I′ 
+
+> f
+
+\ { 𝑣 } 
+
+> 7:
+
+end if  
+
+> 8:
+
+end for  
+
+> 9:
+
+M𝑣 = M𝑢 ∪ M 𝑣 , 𝑝 ′ 
+
+> 𝑣
+
+= 𝑝 ′ 
+
+> 𝑢
+
++ 𝑝 ′ 
+
+> 𝑣
+
+, 𝑤 ′ 
+
+> 𝑣
+
+= 𝑤 ′ 
+
+> 𝑢
+
++ 𝑤 ′ 
+
+> 𝑣
+> 10:
+
+A′ = A′ \ {( 𝑢, 𝑣 )} , I′ = I′ \ { 𝑢 } 
+
+> 11:
+
+end procedure 
+
+lems. Indeed, comparisons between ratios of integers can be obviously done by comparing integer numbers, while all other operations only involve integer values. This is a notable difference with respect, e.g., to the approach based on pseudoflow computations. Indeed, such approach might be unable to recognize two distinct macroitems when the difference between their ratios is below a given numerical precision, as discussed in Section 6. 
+
+## 5.3 Dual Variant 
+
+Algorithm 1 finds the macroitems in the optimal sequence in decreasing order with respect to their ratio. It is possible to devise an analogous variant of Algorithm 1, which finds the macroitems in the optimal sequence in increasing order. In this variant, instead of computing the ratio of final items and preceding sets, we need to compute the ratio of initial items and succeeding sets , namely the sets Ii, 𝐵 𝑗 and 𝐵 𝑎 already introduced in Section 5.1. A graphical illustration of initial items, 30 Figure 10: Run of Algorithm 1. Ratios on arcs/final items are shown in purple. At each step, the selected maximum-ratio part is highlighted (orange for arc-based selections, teal for final-item-only selections). 
+
+2 1 −2 1
+
+−2 1 −1 1 2 1
+
+4 3 5 1
+
+1 2
+
+3 4 5
+
+6 7
+
+−32
+
+12
+
+1 12
+
+72 12 −2
+
+−2 2
+
+2 1 −2 1
+
+−2 1 4 2
+
+2 1
+
+4 3
+
+1 2
+
+3 4
+
+5
+
+6
+
+1 2
+
+54 12
+
+12 −2
+
+−22
+
+2 1
+
+−2 1 2 3
+
+2 1
+
+4 3
+
+1
+
+3 2
+
+5
+
+6
+
+1 1
+
+54
+
+12
+
+2
+
+−22
+
+−2 1 2 3
+
+4 3
+
+3 2
+
+6
+
+1 12
+
+−2 23
+
+2 3
+
+2 4
+
+2
+
+3
+
+12
+
+23
+
+2 4 3
+
+12
+
+𝑎 ∗ = (7, 4) with ratio 72 ; Bf = {1, 5} with ratio 2 𝑎 ∗ = (4, 2) with ratio 2; Bf = {1, 5} with ratio 2; 
+
+M4 = {4, 7}
+
+𝑎 ∗ = (6, 3) with ratio 1; Bf = {1, 5} with ratio 2; 
+
+M2 = {2, 4, 7}; I1 = ∪ 𝑗 ∈B f M 𝑗 = {1, 5} top-left: 𝑎 ∗ = (6, 3) with ratio 1; Bf = {2} with ratio 23 ;
+
+M2 = {2, 4, 7}
+
+top-right: 𝑎 ∗ = (3, 2) with ratio 12 ; Bf = {2} with ratio 23 ;
+
+M2 = {2, 4, 7}, M3 = {3, 6}; I2 = ∪ 𝑗 ∈B f M 𝑗 = {2, 4, 7}
+
+bottom: no arcs; Bf = {3} with ratio 12 ; I3 = M3 = {3, 6}
+
+31 and succeeding sets associated to items and arcs, can be found in Fig. 7. We have the following three propositions, whose proofs are analogous to those of Propositions 4 to 6, and we omit them in this paper. 
+
+Proposition 7. Suppose G = (I , A) is a directed forest and let M ⊂ I be a subset of items. If 
+
+I− (M) = ∅, then 
+
+M = ©«Ä 
+
+> 𝑎 ∈˜A
+
+𝐵 𝑎 ª®¬
+
+⊔ ˜Ii
+
+for some subset ˜A ⊂ A and ˜Ii ⊂ I i, i.e., M is the disjoint union of the minimal succeeding sets associated to some arcs and some subset of initial items. 
+
+Proposition 8. Suppose G = (I , A) is a directed forest and let 𝑎 ∗ ∈ arg min 𝑎 ∈A 𝑃 (𝐵 𝑎 )  
+
+> 𝑊 (𝐵 𝑎 )
+
+with 
+
+𝑎 ∗ = (𝑢, 𝑣 ). If 𝑃 (𝐵 𝑎 ∗ )   
+
+> 𝑊 (𝐵 𝑎 ∗)
+
+≤ 𝑝 𝑖  
+
+> 𝑤 𝑖
+
+for every 𝑖 ∈ I i, then the two items 𝑢 and 𝑣 belong to the same macroitem in the optimal sequence. 
+
+Proposition 9. Suppose G = (I , A) is a directed forest and let 𝑔 ∈ D i := arg min 𝑖 ∈I i 
+
+> 𝑝 𝑖
+> 𝑤 𝑖
+
+. If  
+
+> 𝑝 𝑔
+> 𝑤 𝑔
+
+< 𝑃 (𝐵 𝑎 )  
+
+> 𝑊 (𝐵 𝑎 )
+
+for every 𝑎 ∈ A , then Di is the last macroitem in the optimal sequence of macroitems. 
+
+Thanks to these results, Algorithm 1 can be converted to find the macroitems in the optimal sequence in increasing order with respect to their ratio. We refer to this algorithm as the dual variant of Algorithm 1, and an illustration of a full run of this dual variant can be found in Fig. 11. We also have the same complexity of 𝑂 (𝑛 ) per iteration and 𝑂 (𝑛 2) total complexity, for which we give only the statement, since the proof is analogous to the one of Theorem 5. 
+
+Theorem 6. The dual variant of Algorithm 1 computes the optimal sequence of macroitems on a directed forest in 𝑂 (𝑛 2) time. Remark 8. One can also combine the two approaches in a single iteration to halve the number of total iterations, but at the cost of increasing (doubling) the number of operations per iteration. 
+
+## 5.4 Improved variants with all out-trees or all in-trees 
+
+If we know that the forest graph G is composed of all trees whose arcs all point in the same direction, we can employ a heap data structure in Algorithm 1 and obtain a better total complexity of 𝑂 (𝑛 log 𝑛 ). To describe this variant we first give the definition of out-tree and in-tree. 
+
+Definition 10. Let G = (I , A) be a directed connected tree. We say that G is an in-tree if for every item 𝑗 ∈ I we have |I + ( 𝑗 )| ≤ 1. As a consequence, there is only one item 𝑗 0 with I+ ( 𝑗 0) = 0, which we call the root of the in-tree. 32 Figure 11: Run of the dual variant of Algorithm 1 on the same instance as Fig. 10. Ratios on arcs/initial items are shown in purple. At each step, the selected minimum-ratio part is highlighted (green for arc-based sets 𝐵 𝑎 , brown for initial-item selections). 
+
+2 1 −2 1
+
+−2 1 −1 1 2 1
+
+4 3 5 1
+
+1 2
+
+3 4 5
+
+6 7
+
+2 −2
+
+−2 2 34 2
+
+43 5
+
+2 1
+
+−2 1 −3 2 2 1
+
+4 3 5 1
+
+1
+
+3 4 5
+
+6 7
+
+2
+
+−2 23 15 2
+
+43 5
+
+2 1
+
+−3 2 2 1
+
+2 4 5 1
+
+1
+
+4 5
+
+6 7
+
+2
+
+23 −16 2
+
+12 5
+
+2 1 2 1
+
+2 4
+
+2 3
+
+1 5
+
+6
+
+7
+
+2 2
+
+23
+
+12
+
+2 1 2 1
+
+2 3
+
+1 5
+
+7
+
+2 2
+
+23
+
+2 1 2 1
+
+1 5
+
+2 2
+
+𝑎 ∗ = (4, 2) with ratio −2; Di = {6} with ratio 
+
+> 43
+
+𝑎 ∗ = (6, 3) with ratio −2; Di = {6} with ratio 43 ;
+
+M4 = {2, 4}
+
+𝑎 ∗ = (7, 4) with ratio − 16 ; Di = {6} with ratio 12 ;
+
+M4 = {2, 4}, M6 = {3, 6}
+
+𝑎 ∗ = (6, 7) with ratio 23 ; Di = {6} with ratio 12 ;
+
+M7 = {2, 4, 7}; I3 = M6 = {3, 6}
+
+𝑎 ∗ = (7, 1) with ratio 2; Di = {7} with ratio 23 ;
+
+I2 = M7 = {2, 4, 7}
+
+no arcs; Di = {1, 5} with ratio 2; 
+
+I1 = {1, 5}
+
+33 Definition 11. Let G = (I , A) be a directed connected tree. We say that G is an out-tree if for every item 𝑗 ∈ I we have |I − ( 𝑗 )| ≤ 1. As a consequence, there is only one item 𝑗 0 with 
+
+I− ( 𝑗 0) = 0, which we call the root of the out-tree. Algorithm 6 is devised for in-trees. In the initialization (lines 3-7) we create a copy of the set of items and we insert the elements in a heap with respect to their ratio. Then in the main cycle (lines 8-23), at each iteration we extract the item 𝑔 at the top of the heap. If item 𝑔 is a final item, we add it to the current (or to a new) macroitem (lines 11-17), we delete it from the graph and we update the heap accordingly. If item 𝑔 is not a final item, we contract the only arc exiting 𝑔 and we update the heap accordingly. 
+
+Theorem 7. If G is a directed forest of in-trees, Algorithm 6 computes the optimal sequence of macroitems in 𝑂 (𝑛 log 𝑛 ) time. Proof. Proof. We assume that the heap is a Fibonacci one (see, e.g., [5, Section 1.1]). Building the heap requires 𝑂 (𝑛 ) operations. Next, at each iteration of the main cycle, we first remove the element with largest value from the heap, which requires 𝑂 (log 𝑛 ). Next, when we are contracting an arc, we need to update the value of a single element in the heap. This, again, requires 𝑂 (log 𝑛 )
+
+operations. Since the number of iterations is 𝑂 (𝑛 ), we can conclude that the overall complexity of Algorithm 6 is 𝑂 (𝑛 log 𝑛 ).
+
+□
+
+Remark 9. Notice that Algorithm 6 is doing essentially the same operations of Algorithm 1, except the recomputation, at each iteration in the main cycle, of the values 𝑃 (𝐹 𝑗 ), 𝑊 (𝐹 𝑗 ) for every 𝑗 ∈ I ′
+
+(line Algorithm 2 in Algorithm 2). Indeed, when the graph is only composed of in-trees, for every arc 𝑎 = (𝑖, 𝑗 ) ∈ A the set of items 𝐹 𝑎 is just the singleton {𝑖 }. Furthermore, if at the end of an iteration of the main cycle we remove some final items, we do not have to update any of the values 𝑃 (𝐹 𝑎 ), 𝑊 (𝐹 𝑎 ) with 𝑎 ∈ A , since final items do not belong to sets 𝐹 𝑎 with 𝑎 ∈ A , when there are only in-trees. If instead, at the end of an iteration of the main cycle we contract an arc 
+
+𝑎 = (𝑖, 𝑗 ) ∈ A , we only need to update the value of 𝐹 𝑎 ′ , where 𝑎 ′ is the only arc exiting 𝑗 , since in the graph there are only in-trees. Thus, exploiting the in-tree structure, we can employ a heap to extract the item with the largest ratio at each iteration, without unnecessary recomputation. 
+
+Remark 10 . Remark 9 also explains why a heap data structure cannot improve the worst case complexity of Algorithm 1, when we have general trees. Indeed, if at the end of an iteration of the main cycle we are removing some final item 𝑓 ∈ I ′ 
+
+> f
+
+, then it is necessary to update the values of 𝑃 (𝐹 𝑎 ), 𝑊 (𝐹 𝑎 ) for every 𝑎 = (𝑖, 𝑗 ) ∈ A ′ with 𝑖 ∈ 𝐵 𝑓 and 𝑗 ∉ 𝐵 𝑓 , which could be a number of updates of the order of 𝑂 (𝑛 ) in the worst case. Similarly, if at the end of an iteration of the main cycle we are contracting an arc 𝑎 ∗ ∈ A ′, then it is necessary to update the values of 𝑃 (𝐹 𝑎 ), 𝑊 (𝐹 𝑎 )
+
+34 Algorithm 6 Improved variant of Algorithm 1 to compute the optimal sequence of macroitems on a forest of in-trees  
+
+> 1:
+
+input I, A, If, 𝒑 , 𝒘  
+
+> 2:
+
+⊲ Initialization:  
+
+> 3:
+
+I′ = I, A′ = A, I′ 
+
+> f
+
+= If 
+
+> 4:
+
+for 𝑗 ∈ I ′ do  
+
+> 5:
+
+Set 𝑝 ′ 
+
+> 𝑗
+
+= 𝑝 𝑗 , 𝑤 ′ 
+
+> 𝑗
+
+= 𝑤 𝑗 profit and weight for item 𝑗 ∈ I ′; M 𝑗 = { 𝑗 } 
+
+> 6:
+
+end for  
+
+> 7:
+
+𝑘 = 0; Build max-heap with values 𝑝 ′
+
+> 𝑗
+> 𝑤 ′
+> 𝑗
+
+for every 𝑗 ∈ I ′; 𝑟 = +∞  
+
+> 8:
+
+while I′ ≠ ∅ do  
+
+> 9:
+
+Let 𝑔 ∈ I ′ be the item at the top of the heap (i.e., one of the items with largest ratio)  
+
+> 10:
+
+⊲ If top of the heap 𝑔 is a final item, we add it to the next macroitem  
+
+> 11:
+
+if 𝑔 ∈ I ′ 
+
+> f
+
+then  
+
+> 12:
+
+if 𝑝 ′ 
+
+> 𝑔
+> 𝑤 ′
+> 𝑔
+
+< 𝑟 then 𝑘 = 𝑘 + 1, I𝑘 = M𝑔 , 𝑟 = 𝑝 ′ 
+
+> 𝑔
+> 𝑤 ′
+> 𝑔
+> 13:
+
+else I𝑘 = I𝑘 ∪ M 𝑔  
+
+> 14:
+
+end if  
+
+> 15:
+
+for 𝑖 ∈ I ′− (𝑔 ) do I′ 
+
+> f
+
+= I′ 
+
+> f
+
+∪ { 𝑖 }, A′ = A′ \ {( 𝑖, 𝑔 )}  
+
+> 16:
+
+end for  
+
+> 17:
+
+I′ 
+
+> f
+
+= I′ 
+
+> f
+
+\ { 𝑔 }, I′ = I′ \ { 𝑔 }; remove 𝑔 from heap and update heap  
+
+> 18:
+
+⊲ If top of the heap 𝑔 is not a final item, we “contract” the only arc (𝑔, 𝑣 ) exiting 𝑔  
+
+> 19:
+
+else  
+
+> 20:
+
+M𝑣 = M𝑔 ∪ M 𝑣 , 𝑝 ′ 
+
+> 𝑣
+
+= 𝑝 ′ 
+
+> 𝑔
+
++ 𝑝 ′ 
+
+> 𝑣
+
+, 𝑤 ′ 
+
+> 𝑣
+
+= 𝑤 ′ 
+
+> 𝑔
+
++ 𝑤 ′ 
+
+> 𝑣
+> 21:
+
+A′ = A′ \ {( 𝑔, 𝑣 )} , I′ = I′ \ { 𝑔 }; update 𝑝 ′ 
+
+> 𝑣
+> 𝑤 ′
+> 𝑣
+
+in heap  
+
+> 22:
+
+end if  
+
+> 23:
+
+end while  
+
+> 24:
+
+return S =  I1, I2, . . . , I𝑘 
+
+
+
+for every 𝑎 = (𝑖, 𝑗 ) with 𝑖 ∈ 𝐵 𝑎 ∗ and 𝑗 ∉ 𝐵 𝑎 ∗ , which could be a number of updates of the order of 𝑂 (𝑛 ) in the worst case. Thus, maintaining a heap data structure with the relevant ratios, in the case of general trees, would cost 𝑂 (𝑛 log 𝑛 ) operations per iteration of the main cycle, in the worst case, which would worsen the total complexity to 𝑂 (𝑛 2 log 𝑛 ) to complete all iterations, instead of 
+
+𝑂 (𝑛 2) if we just recompute all relevant ratios at each iteration. Nevertheless, using a heap in the main algorithm still provides a notable speedup in practice, as observed in Section 6. 
+
+Remark 11 . The dual variant of Algorithm 1 presented in Section 5.3, can also be improved using a heap-based data structure, in the case of a forest of out-trees. In this case we obtain an algorithm which computes the optimal sequence of macroitems in reverse order, i.e., starting from the macroitem with lowest ratio. The total complexity is 𝑂 (𝑛 log 𝑛 ) also in this case. We state this result without proof, since it is analogous to the one of Theorem 7. 
+
+Theorem 8. If G is a directed forest of out-trees, the dual variant of Algorithm 6 computes the optimal sequence of macroitems in 𝑂 (𝑛 log 𝑛 ) time. 
+
+35 6 Computational Results 
+
+This section evaluates the practical performance of the algorithms developed in Section 5. All algorithms were implemented in C++ and run single-threaded, and all experiments were conducted on a Linux machine equipped with an Intel i7-12700 processor (2.1 GHz) and 32 GB of RAM. We first describe the generation of the benchmark instances used throughout the section. We then justify the heap-based implementation of the main forest algorithm by comparing it with a non-heap implementation of the same algorithm. We then study how the heap-based algorithm scales on the instances with a large number of items, and we assess the impact of the specialized variants for in-trees and out-trees. Finally, we compare the heap-based forest algorithm with a bounded-precision implementation of the parametric pseudoflow approach. 
+
+## 6.1 Instance Generation 
+
+This section describes the generation of the benchmark instances used throughout the computational experiments. The instances are grouped by number of items, forest density, orientation pattern, and profit-weight correlation class. Each benchmark instance is obtained by combining two independent components: the item coefficients, namely weights and profits, and the precedence graph. The item coefficients are generated following the standard test classes used for the classical knapsack problem [21]. For each item 𝑖 , the weight 𝑤 𝑖 is sampled uniformly from {1, 2, . . . , 𝑅 }, with 𝑅 = 1000. Profits are generated according to three classes: uncorrelated ( uncorr ), where 𝑝 𝑖 is sampled independently and uniformly from {1, 2, . . . , 𝑅 }; weakly correlated ( weakly-corr ), where 𝑝 𝑖 is sampled uniformly from the integer interval between max {1, 𝑤 𝑖 − 𝑅 /10 } and 𝑤 𝑖 + 𝑅 /10; and strongly correlated (strongly-corr ), where 𝑝 𝑖 = 𝑤 𝑖 + 𝑅 /10. We also generate signed variants of these three classes by independently changing the sign of each profit with probability 0 .25. We denote them by 
+
+uncorr-neg , weakly-corr-neg , and strongly-corr-neg , respectively. The second component is the precedence graph. We consider three families of directed forests. In an in-forest , every item has out-degree at most one. It is generated by scanning items 
+
+𝑖 ∈ { 1, 2, . . . , 𝑛 − 1} and, independently with probability 𝜌 , adding one arc (𝑖, 𝑗 ) with 𝑗 chosen uniformly from {𝑖 + 1, 𝑖 + 2, . . . , 𝑛 }. In an out-forest , every item has in-degree at most one. It is generated by scanning items 𝑖 ∈ { 2, 3, . . . , 𝑛 } and, independently with probability 𝜌 , adding one arc 
+
+( 𝑗, 𝑖 ) with 𝑗 chosen uniformly from {1, 2, . . . , 𝑖 − 1}. Finally, in a gen-forest , we first generate an undirected forest by connecting each item 𝑖 ∈ { 2, 3, . . . , 𝑛 } to a uniformly chosen predecessor 𝑗 < 𝑖 
+
+with probability 𝜌 , and then orient each selected edge independently in one of the two possible directions with probability 0 .5. The density parameter is 𝜌 ∈ { 0.3, 0.6, 0.9, 1.0}, referred to as 
+
+sparse , medium , dense , and conn , respectively. The first three density classes generate forests, 36 possibly with several connected components. The class conn corresponds to 𝜌 = 1.0 and therefore generates a connected forest, which is in fact a single spanning tree. For every combination of topology, profit-weight class, density, and size, we generate 10 independent instances. We use two main test beds in the computational experiments. The medium-sized test bed contains 7 200 instances: all three topologies, all six profit-weight classes, all four density values, and ten seeds for each size in 𝑛 ∈ { 100 , 200 , 300 , . . . , 1 000 }. The large-sized test bed contains 7 200 instances with the same combinations of topologies, profit-weight classes, densities, and seeds, for each size in 𝑛 ∈ { 10 000 , 20 000 , . . . , 100 000 }.
+
+## 6.2 Justification of the Heap-Based Variant 
+
+We implemented the main algorithm of the paper in a heap-based version, following the practical variant anticipated in Remark 10. We refer to this implementation as the Heap-based Forest Macroitem Algorithm (HFMA ). To isolate the effect of the heap data structure, we compare HFMA 
+
+with a non-heap implementation of the same forest macroitem algorithm, denoted by FMA . This implementation follows Algorithm 1 and uses the same incremental updates of closure sums as 
+
+HFMA , but it selects the maximum-ratio final item or arc by direct linear scans, instead of maintaining the candidate ratios in a heap. We tested both algorithms on the gen-forest instances of the medium-sized test bed, plus the sizes 𝑛 = 10 000 and 𝑛 = 20 000 of the large-sized test bed. Figure 12 reports the average CPU time of HFMA and FMA on these benchmark instances. Each point is the mean over all profit-weight classes, arc densities, and seeds available for that value of 𝑛 .10 2 10 3 10 4 2 10 4
+
+10 −1
+
+10 0
+
+10 1
+
+10 2
+
+10 3
+
+𝑛 
+
+> CPU time (ms)
+
+HFMA 
+
+FMA 
+
+Figure 12: HFMA vs FMA CPU time on the medium-sized gen-forest benchmark instances, plus the sizes 𝑛 = 10 000 and 𝑛 = 20 000 of the large-sized test bed. The two implementations have comparable running times on the smallest instances, where the overhead of maintaining a heap offsets the benefit of faster selection. As 𝑛 grows, however, the 37 repeated linear scans of FMA become dominant. At 𝑛 = 1000, FMA is about 2 .0 times slower than HFMA ; at 𝑛 = 10000, the gap increases to about 17 .6 times, and at 𝑛 = 20000 it further widens to about 33 .1 times. This confirms that the heap-based implementation, despite not being asymptotically preferable in the worst-case analysis, is suitable to obtain stable performance on larger forest instances. 
+
+## 6.3 Scaling of HFMA 
+
+We now evaluate the scalability of HFMA on the gen-forest instances of the large-sized test bed. Figure 13 reports, for each value of 𝑛 , the number of tested instances and the corresponding mean CPU time. Each row averages over all profit-weight classes, arc densities, and seeds, for a total of 240 instances. Figure 13: HFMA CPU time on the large-sized benchmark instances.                        
+
+> CPU time
+> 𝑛 #inst HFMA (ms) 10 000 240 20.1 20 000 240 46.1 30 000 240 77.2 40 000 240 108.5 50 000 240 147.8 60 000 240 189.1 70 000 240 236.1 80 000 240 278.8 90 000 240 321.1 100 000 240 365.4
+
+10000 40000 70000 100000 
+
+0
+
+100 
+
+200 
+
+300 
+
+400 
+
+𝑛 
+
+> CPU time (ms)
+
+HFMA 
+
+The observed growth is smooth over the whole large-sized range. The CPU times appear to follow a 𝑂 (𝑛 log 𝑛 ) growth. This empirical behavior is well below the worst-case complexity 
+
+𝑂 (𝑛 2 log 𝑛 ) of the heap-based implementation on general forests. But this is not in conflict with the theoretical analysis, since the complexity result refers to a worst-case analysis, whereas the reported times are averages over the generated benchmark instances. 
+
+## 6.4 Specialized Variants for In-Trees and Out-Trees 
+
+We finally evaluate the specialized heap-based variants for forests composed only of in-trees or only of out-trees. We denote by HIMA the Heap-based In-tree Macroitem Algorithm and by HOMA 
+
+the Heap-based Out-tree Macroitem Algorithm . The former is the algorithm of Section 5.4; the latter is the dual heap-based variant described in Remark 11. Both are tested on the corresponding 
+
+large-sized instances. 38 Figure 14 reports the number of tested instances and the mean CPU times of the specialized algorithms. Figure 14: Specialized heap-based variants on the large-sized benchmark instances.                                  
+
+> CPU-time (ms)
+> 𝑛 #inst HIMA HOMA
+> 10 000 240 5.6 5.4 20 000 240 11.9 11.9 30 000 240 19.6 19.6 40 000 240 29.3 29.2 50 000 240 39.6 39.3 60 000 240 50.2 49.7 70 000 240 61.9 61.5 80 000 240 73.5 72.6 90 000 240 85.4 84.1 100 000 240 97.2 96.1
+
+10000 40000 70000 100000 
+
+0
+
+50 
+
+100 
+
+𝑛 
+
+> CPU time (ms)
+
+HOMA 
+
+HIMA 
+
+In this case, the CPU times of both HIMA and HOMA display a 𝑂 (𝑛 log 𝑛 ) growth, which is aligned with the worst-case complexity of these algorithms. To quantify the benefit of specialization, we compute, for each value of 𝑛 , the ratio between the mean CPU time of HFMA and the mean CPU time of the specialized algorithm, both measured on the same set of instances (in-forest instances for HIMA , out-forest instances for HOMA ). With this measure, HIMA is between 7 .5 and 9 .8 times faster than HFMA on in-forest instances, while HOMA is between 4 .3 and 5 .0 times faster than HFMA 
+
+on out-forest instances. 
+
+## 6.5 Comparison with Pseudoflow 
+
+As a benchmark against a general parametric-flow approach, we use the Bounded-Precision Para-metric Pseudoflow algorithm ( BPPF ), namely the public implementation of Hochbaum’s parametric pseudoflow method available at https://github.com/hochbaumGroup/Bounded-precision-simple-param git .We compare HFMA and BPPF on the gen-forest instances of the medium-sized test bed. This gives 2 400 instances, obtained from all 6 profit-weight classes, all 4 arc densities, and 10 seeds for each value of 𝑛 . For each instance, HFMA computes the optimal sequence of macroitems and the corresponding breakpoint ratios. The same instance is also solved by BPPF , and the two outputs are compared in terms of the number and composition of macroitems. Figure 15 reports the CPU time comparison. The table on the left gives, for each value of 𝑛 ,the number of tested instances, the average CPU time of HFMA and BPPF , and their ratio. The plot on the right represents the same average CPU times as a function of 𝑛 .39 Figure 15: HFMA vs BPPF on the medium-sized gen-forest benchmark instances. The table reports the number of instances, the plotted mean CPU times, and their ratio; the graph shows the corresponding CPU-time profiles as a function of 𝑛 .                                            
+
+> CPU-time (ms)
+> 𝑛 #inst HFMA BPPF ratio 100 240 0.1 0.2 1.7 200 240 0.2 0.6 2.4 300 240 0.4 1.1 2.9 400 240 0.5 1.7 3.4 500 240 0.8 2.8 3.6 600 240 1.0 3.7 3.7 700 240 1.2 4.7 4.1 800 240 1.4 6.2 4.6 900 240 1.6 8.1 4.9 1000 240 1.8 9.1 5.0
+
+100 400 700 1,000 
+
+0
+
+5
+
+10 
+
+𝑛 
+
+> CPU time (ms)
+
+HFMA 
+
+BPPF 
+
+The gap between HFMA and BPPF widens as 𝑛 grows: the ratio BPPF /HFMA increases from about 1.7× at 𝑛 = 100 to about 5 .1× at 𝑛 = 1000, roughly tripling over the range. This is consistent with 
+
+BPPF solving a general parametric minimum-cut problem on the whole network, whereas HFMA 
+
+exploits the special forest structure of the precedence graph directly, so its running time grows more slowly with 𝑛 .As a consistency check for the performance comparison, we also verified the macroitem parti-tions returned by the two algorithms. Since BPPF is a bounded-precision implementation, we ran it with a specified tolerance of 10 −6 on the input coefficients and on the resulting breakpoint ratios. The number and composition of the macroitems coincide on 2 392 out of the 2 400 tested instances. In the remaining 8 instances, BPPF merges two consecutive macroitems whose breakpoint ratios differ by less than this tolerance. These cases occur only for instances with 700 ≤ 𝑛 ≤ 1 000. This is consistent with the numerical-precision issue discussed in Remark 7. The precision parameter of 
+
+BPPF cannot be increased without qualification: the implementation scales decimal capacities to integers, and using more decimal digits increases the magnitude of the internal integer coefficients, thereby creating overflow. We also tested BPPF on instances with more than 1000 items, but on these instances the same numerical-precision issues prevent a reliable comparison with HFMA .
+
+# 7 Conclusion 
+
+In this paper we have studied the combinatorial structure of optimal solutions of the LP relaxation of the natural ILP formulation of the Precedence Constrained Knapsack Problem (PCKP). Our central contribution is the introduction of the concept of optimal sequence of macroitems , an ordered partition of the item set into precedence-closed groups ranked by nonincreasing profit-to-40 weight ratio, and the proof that this sequence fully characterizes optimal LP solutions. Specifically, the optimal LP solution assigns value 1 to all items in macroitems preceding the split macroitem, a common fractional value to all items in the split macroitem, and 0 to all remaining items. This result generalizes the classical greedy structure of LP-optimal solutions, where the role of individual items is taken over by macroitems. We have further characterized the structure of optimal dual solutions, showing that they cor-respond to feasible flows within each macroitem of the optimal sequence. As an additional consequence, we have identified the optimal Lagrangian multiplier for the capacity constraint as the profit-to-weight ratio of the split macroitem, recovering the analogue of the classical result for the standard Knapsack Problem. On the algorithmic side, we have presented an 𝑂 (𝑛 2) algorithm for computing the optimal se-quence of macroitems when the precedence graph is a directed forest, based on iterative contraction of the arc with the highest profit-to-weight ratio among all minimal preceding sets. When the forest is composed of in-trees (or out-trees), we have shown that a heap-based variant of the algorithm achieves 𝑂 (𝑛 log 𝑛 ) complexity, by exploiting the fact that each arc’s minimal preceding set is a singleton in this case. As a by-product, since its optimal solution coincides with the first (resp. last) macroitem of the optimal sequence, the same algorithms also compute the optimal solution of the precedence-constrained ratio optimization problem (14) introduced in Section 2.3, within the same complexity bounds. An interesting open future research direction is to study whether efficient algorithms for com-puting the optimal sequence of macroitems can be devised beyond the forest case, and whether the LP structure identified here can be embedded into branch-and-bound frameworks to yield improved exact algorithms for the PCKP. 
+
+# Code and Data Availability 
+
+The source code and computational material used in the experiments are available online, with the aim of stimulating further research on these topics and facilitating reproducible comparisons. The code repository is https://github.com/fabiofurini/macroitems-cpp ; it contains the C++ implementation of the forest macroitem algorithms and the scripts used to reproduce the benchmark runs. The data repository is the data directory of the same GitHub repository: 
+
+https://github.com/fabiofurini/macroitems-cpp/tree/main/data ; it contains the raw CSV files underlying the computational figures and tables. In particular, the data files report one row per tested instance and include the instance class, topology, density, seed, number of macroitems, and running time. The pseudoflow comparison uses the public Bounded-Precision Parametric Pseudoflow implementation available at https://github.com/hochbaumGroup/ 
+
+41 Bounded-precision-simple-parametric.git .
+
+# References 
+
+[1] Ravindra K Ahuja, Thomas L Magnanti, and James B Orlin. Network flows: Theory, algorithms, and applications . Prentice-Hall, Inc., 1993. [2] Michel L Balinski. On a selection problem. Management Science , 17(3):230–231, 1970. [3] F Barahona and D. Jensen. Plant location with minimum inventory. Mathematical Programming , 83 (1):101–111, 1998. [4] Natashia Boland, Andreas Bley, Christopher Fricke, Gary Froyland, and Renata Sotirov. Clique-based facets for the precedence constrained knapsack problem. Mathematical Programming , 133:481–511, 2012. [5] Gerth Stølting Brodal, George Lagogiannis, and Robert E. Tarjan. Strict fibonacci heaps. ACM Transactions on Algorithms , 21(2), January 2025. [6] Abraham Charnes and William W. Cooper. Programming with linear fractional functionals. Naval Research Logistics Quarterly , 9(3–4):181–186, 1962. [7] Renaud Chicoisne, Daniel Espinoza, Marcos Goycoolea, Eduardo Moreno, and Enrique Rubio. A new algorithm for the open-pit mine production scheduling problem. Operations Research , 60(3):517–528, 2012. [8] Denis Cornaz, Fabio Furini, Mathieu Lacroix, Enrico Malaguti, A Ridha Mahjoub, and S´ ebastien Martin. The vertex k-cut problem. Discrete Optimization , 31:8–28, 2019. [9] Daniel Espinoza, Marcos Goycoolea, Eduardo Moreno, and Alexandra Newman. Minelib: A library of open pit mining problems. Annals of Operations Research , 206:93–114, 2013. [10] Daniel Espinoza, Marcos Goycoolea, and Eduardo Moreno. The precedence constrained knapsack problem: Separating maximally violated inequalities. Discrete Applied Mathematics , 194:65–80, 2015. [11] Michael R Garey and David S Johnson. Computers and intractability , volume 174. freeman San Francisco, 1979. [12] Dorit S Hochbaum. A new–old algorithm for minimum-cut and maximum-flow in closure graphs. 
+
+Networks , 37(4):171–193, 2001. [13] Dorit S Hochbaum. The pseudoflow algorithm: A new algorithm for the maximum-flow problem. 
+
+Operations research , 56(4):992–1009, 2008. [14] Dorit S Hochbaum and Anna Chen. Performance analysis and best implementations of old and new algorithms for the open-pit mining problem. Operations Research , 48(6):894–914, 2000. [15] Oscar H Ibarra and Chul E Kim. Approximation algorithms for certain scheduling problems. Mathe-matics of Operations Research , 3(3):197–204, 1978. 
+
+42 [16] David S Johnson and KA Niemi. On knapsacks, partitions, and a new dynamic programming technique for trees. Mathematics of Operations Research , 8(1):1–14, 1983. [17] Thys Brentwood Johnson. Optimum open pit mine production scheduling . University of California, Berkeley, 1968. [18] H. Kellerer, U. Pferschy, and D. Pisinger. Knapsack Problems . Springer, Berlin Heidelberg, 2004. [19] Helmut Lerchs and Ingo Grossmann. Optimum design of open-pit mines. CIM bulletin , 58:47–54, 1965. [20] S. Martello and P. Toth. Knapsack Problems: Algorithms and Computer Implementations . John Wiley & Sons, Chichester, New York, 1990. [21] S. Martello, D. Pisinger, and P. Toth. Dynamic programming and strong bounds for the 0-1 knapsack problem. Management Science , 45(3):414–424, 1999. [22] Jean-Claude Picard. Maximal closure of a graph and applications to combinatorial problems. Man-agement Science , 22(11):1268–1272, 1976. [23] Siegfried Schaible. Fractional programming. I. duality. Management Science , 22(8):858–867, 1976. [24] William F. Sharpe. Mutual fund performance. The Journal of Business , 39(1):119–138, 1966. [25] Dong X Shaw, Geon Cho, and Hsuliang Chang. A depth-first dynamic programming procedure for the extended tree knapsack problem in local access network design. Telecommunication Systems , 7:29–43, 1997. [26] Kathryn E Stecke and Ilyong Kim. A study of fms part type selection approaches for short-term production planning. International Journal of Flexible Manufacturing Systems , 1:7–29, 1988. 
+
+43
