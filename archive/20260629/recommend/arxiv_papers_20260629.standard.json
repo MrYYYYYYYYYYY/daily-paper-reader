@@ -1,0 +1,470 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-29T21:49:44.675410+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 5,
+    "deep_cap": 6,
+    "deep_selected": 5,
+    "quick_candidates": 5,
+    "quick_skim_target": 11,
+    "quick_selected": 5
+  },
+  "deep_dive": [
+    {
+      "id": "2606.25906v1",
+      "source": "arxiv",
+      "title": "OracleAnalyser: Analysing Implicit Semantics of Oracle Bone Scripts through MLLMs with Post-training",
+      "abstract": "With the advancement of artificial intelligence, research on oracle bone scripts has entered a new era. However, existing methods and benchmarks remain largely confined to recognition tasks, overlooking the equally crucial aspect of oracle bone analysis. To address this gap, we propose OracleAnalyser, a reasoning framework for oracle bone analysis based on post-training techniques. Specifically, we fine-tune Qwen2.5-VL-3B-Instruct through multiple post-training stages and introduce a new preference optimization algorithm, Stable Focal Preference Optimization (SFPO), tailored to the characteristics of oracle bone datasets. In addition, we release both an oracle bone reasoning dataset and an oracle bone preference dataset, and further construct a new benchmark to evaluate models' analytical capabilities for oracle bone scripts. Extensive experiments validate the superior analytical performance of OracleAnalyser, which achieves remarkable results with only 3B parameters, surpassing models with substantially larger scales.",
+      "authors": [
+        "Zijia Song",
+        "Yelin Wang",
+        "Zhengyi Ma",
+        "Zitong Yu",
+        "Tianheng Wang",
+        "Jiahuan Zhang",
+        "Taorui Wang",
+        "Kaicheng Yu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.MM"
+      ],
+      "published": "2026-06-24T14:54:41+00:00",
+      "link": "https://arxiv.org/pdf/2606.25906v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Stable Focal Preference Optimization (SFPO) for preference learning in post-training",
+      "llm_evidence_cn": "提出稳定焦点偏好优化（SFPO）用于后训练中的偏好学习",
+      "llm_evidence": "提出稳定焦点偏好优化（SFPO）用于后训练中的偏好学习",
+      "canonical_evidence": "提出稳定焦点偏好优化（SFPO）用于后训练中的偏好学习",
+      "llm_tldr_en": "OracleAnalyser fine-tunes an MLLM for oracle bone analysis with a new preference optimization algorithm SFPO, directly relevant to reward modeling for RLHF.",
+      "llm_tldr_cn": "现有甲骨文分析局限于识别任务，缺乏深层次分析能力。本文提出OracleAnalyser，基于后训练技术微调多模态大语言模型，并针对甲骨文数据集特性设计了新的偏好优化算法SFPO。实验表明，该方法在甲骨文分析任务上表现优异，并发布了相应的推理和偏好数据集。该工作为后训练中的奖励建模和偏好学习提供了新思路，直接关联到人类反馈强化学习中的偏好建模。",
+      "llm_tldr": "现有甲骨文分析局限于识别任务，缺乏深层次分析能力。本文提出OracleAnalyser，基于后训练技术微调多模态大语言模型，并针对甲骨文数据集特性设计了新的偏好优化算法SFPO。实验表明，该方法在甲骨文分析任务上表现优异，并发布了相应的推理和偏好数据集。该工作为后训练中的奖励建模和偏好学习提供了新思路，直接关联到人类反馈强化学习中的偏好建模。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.27578v1",
+      "source": "arxiv",
+      "title": "PEBS: Per-rater Empirical-Bayes Shrinkage for RLHF Reward-Model Calibration",
+      "abstract": "Reward models for Reinforcement Learning from Human Feedback (RLHF) pool preferences across thousands of annotators and fit one global affine calibrator, collapsing raters with systematically different rating-scale offsets and slopes into a single average-rater fit that does not match any individual annotator. PEBS is a per-rater empirical-Bayes shrinkage estimator: it fits per-rater affine calibrators on a held-out slice of each annotator's ratings and applies Morris-James-Stein empirical-Bayes shrinkage toward the population mean, in closed form and without retraining the reward model. On PRISM, PEBS reduces within-user held-out RMSE by 8.58% over the pooled population-slope baseline. The procedure replicates on PluriHarms harm ratings (Qwen-2.5 base, in-family) with a +9.66% RMSE reduction over the same population-slope baseline. PEBS is a closed-form post-hoc estimator for annotator-specific affine calibration in RLHF reward modeling; it leaves the reward base model unchanged and estimates only the rater-level map used at inference time for new ratings.",
+      "authors": [
+        "Arnav Raj"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-25T22:09:50+00:00",
+      "link": "https://arxiv.org/pdf/2606.27578v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Per-rater empirical-Bayes shrinkage for RLHF reward model calibration",
+      "llm_evidence_cn": "用于RLHF奖励模型校准的每评分员经验贝叶斯收缩",
+      "llm_evidence": "用于RLHF奖励模型校准的每评分员经验贝叶斯收缩",
+      "canonical_evidence": "用于RLHF奖励模型校准的每评分员经验贝叶斯收缩",
+      "llm_tldr_en": "PEBS applies per-rater empirical-Bayes shrinkage to calibrate RLHF reward models, reducing within-user RMSE by 8.58% over pooled baselines.",
+      "llm_tldr_cn": "针对RLHF奖励模型校准中忽视评分员差异的问题，提出PEBS方法：为每个评分员拟合独立的仿射校准器，并采用经验贝叶斯向总体均值收缩，无需重新训练模型。在PRISM数据集上，PEBS将用户内留出RMSE相比汇总基线降低了8.58%，并在PluriHarms数据集上验证了有效性。该工作提供了一种轻量级、可复现的奖励模型校准改进方案。",
+      "llm_tldr": "针对RLHF奖励模型校准中忽视评分员差异的问题，提出PEBS方法：为每个评分员拟合独立的仿射校准器，并采用经验贝叶斯向总体均值收缩，无需重新训练模型。在PRISM数据集上，PEBS将用户内留出RMSE相比汇总基线降低了8.58%，并在PluriHarms数据集上验证了有效性。该工作提供了一种轻量级、可复现的奖励模型校准改进方案。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.27608v1",
+      "source": "arxiv",
+      "title": "Qwen-Image-2.0-RL Technical Report",
+      "abstract": "We present Qwen-Image-2.0-RL, a post-training pipeline that applies reinforcement learning from human feedback (RLHF) and on-policy distillation (OPD) to improve both the visual quality and instruction-following capability of the Qwen-Image-2.0 diffusion model. To provide reliable reward signals, we construct task-specific composite reward models by fine-tuning vision-language models with a pointwise scoring paradigm and chain-of-thought reasoning. For text-to-image generation, the reward models cover alignment, aesthetics, and portrait fidelity dimensions. For image editing tasks, the reward system addresses instruction-following accuracy and face identity preservation. Building on this reward system, we develop a scalable GRPO-based RL training framework, incorporating a hybrid classifier-free guidance (CFG) strategy to preserve pre-trained knowledge, prompt curation via intra-group reward range filtering, and per-category reward weight calibration. To merge the task-specialized RL policies for T2I and editing, we propose on-policy distillation as the final training stage, which consolidates multiple teachers into a single student model through trajectory-level velocity matching. Extensive evaluation shows that Qwen-Image-2.0-RL achieves 57.84 overall score on Qwen-Image-Bench (+2.61 over the base model), Elo ratings of 1193 in text-to-image arena (+78) and 1349 in image edit arena (+93), demonstrating consistent gains in aesthetic quality, prompt adherence, and editing accuracy.",
+      "authors": [
+        "Yixian Xu",
+        "Kaiyuan Gao",
+        "Yuxiang Chen",
+        "Yilei Chen",
+        "Zecheng Tang",
+        "Zihao Liu",
+        "Zikai Zhou",
+        "Deqing Li",
+        "Hao Meng",
+        "Kuan Cao",
+        "Jiahao Li",
+        "Jie Zhang",
+        "Liang Peng",
+        "Lihan Jiang",
+        "Ningyuan Tang",
+        "Shengming Yin",
+        "Tianhe Wu",
+        "Xiaoyue Chen",
+        "Yan Shu",
+        "Yanran Zhang",
+        "Yi Wang",
+        "Yu Wu",
+        "Yujia Wu",
+        "Zekai Zhang",
+        "Zhendong Wang",
+        "Xiao Xu",
+        "Kun Yan",
+        "Chenfei Wu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.LG"
+      ],
+      "published": "2026-06-25T23:49:50+00:00",
+      "link": "https://arxiv.org/pdf/2606.27608v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "reward modeling for RLHF",
+      "llm_evidence_cn": "强化学习人类反馈中的奖励建模",
+      "llm_evidence": "强化学习人类反馈中的奖励建模",
+      "canonical_evidence": "强化学习人类反馈中的奖励建模",
+      "llm_tldr_en": "This technical report presents a post-training pipeline for Qwen-Image-2.0 using RLHF and on-policy distillation, with task-specific composite reward models for alignment, aesthetics, and portrait fidelity.",
+      "llm_tldr_cn": "本文提出了Qwen-Image-2.0-RL的后训练流程，利用强化学习人类反馈（RLHF）和在线策略蒸馏（OPD）提升扩散模型的视觉质量与指令遵循能力。为提供可靠奖励信号，构建了基于点式评分和思维链推理的复合奖励模型，覆盖文本到图像生成的对齐、美学和人像保真度等维度，并通过GRPO框架实现可扩展的强化学习训练。",
+      "llm_tldr": "本文提出了Qwen-Image-2.0-RL的后训练流程，利用强化学习人类反馈（RLHF）和在线策略蒸馏（OPD）提升扩散模型的视觉质量与指令遵循能力。为提供可靠奖励信号，构建了基于点式评分和思维链推理的复合奖励模型，覆盖文本到图像生成的对齐、美学和人像保真度等维度，并通过GRPO框架实现可扩展的强化学习训练。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.27739v1",
+      "source": "arxiv",
+      "title": "The Weakest Link Tells It All: Outcome-Supervised Process Reward Modeling via Learnable Credit Assignment",
+      "abstract": "Process reward models (PRMs) enhance the reasoning capabilities of large language models (LLMs) by providing fine-grained feedback, yet training PRMs typically requires expensive stepwise annotations. Outcome-supervised PRMs offer a scalable alternative by learning from final-answer correctness alone, but this introduces a fundamental *credit assignment* challenge, i.e., attributing outcomes to responsible reasoning steps. Existing approaches rely on either uniform or causal assignment, both of which fail to anchor credit in step correctness and thus hinder process error identification.   In this work, we propose Outcome-Supervised Process Reward Modeling via **L**earnable **C**redit **A**ssignment (**LCA**), an outcome-supervised PRM framework that jointly learns credit assignment and reward modeling under the principle of *Weakest Link Assignment: a reasoning chain is as strong as its weakest link*. To address mutual dependence between credit assignment and reward modeling, we formalize outcome-supervised PRM as a Multiple Instance Learning (MIL) problem and introduce Softmax-Weighted-Sum (SWS) pooling, an MIL pooling technique tailored for strong dependence and redundancy among reasoning states. We prove Bayes consistency of our algorithm under mild assumptions. Extensive experiments demonstrate that **LCA** consistently outperforms state-of-the-art outcome-supervised PRMs across multiple tasks and backbones. Code is available at https://anonymous.4open.science/r/LCA.",
+      "authors": [
+        "Tianyu Jia",
+        "Yue Fang",
+        "Hongxin Ding",
+        "Rihong Qiu",
+        "Zhibang Yang",
+        "Zhijing Wu",
+        "Xu Chu",
+        "Junfeng Zhao",
+        "Yasha Wang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-26T05:38:08+00:00",
+      "link": "https://arxiv.org/pdf/2606.27739v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "outcome-supervised process reward modeling with learnable credit assignment",
+      "llm_evidence_cn": "基于可学习信用分配的结果监督过程奖励建模",
+      "llm_evidence": "基于可学习信用分配的结果监督过程奖励建模",
+      "canonical_evidence": "基于可学习信用分配的结果监督过程奖励建模",
+      "llm_tldr_en": "Proposes LCA for outcome-supervised PRM, using learnable credit assignment to identify step errors without step-level annotations.",
+      "llm_tldr_cn": "过程奖励模型（PRM）需要昂贵步级标注。本文提出LCA方法，仅使用最终答案正确性，通过可学习信用分配自动为每个推理步分配贡献分数。实验表明LCA在数学推理等任务上显著优于均匀或因果信用分配，有效提升PRM的可扩展性和准确性。",
+      "llm_tldr": "过程奖励模型（PRM）需要昂贵步级标注。本文提出LCA方法，仅使用最终答案正确性，通过可学习信用分配自动为每个推理步分配贡献分数。实验表明LCA在数学推理等任务上显著优于均匀或因果信用分配，有效提升PRM的可扩展性和准确性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.22402v1",
+      "source": "arxiv",
+      "title": "Reinforcement learning to improve large language model-based automated code compliance systems",
+      "abstract": "Large language model (LLM)-based approaches for automated code compliance (ACC) of building regulations are prone to generating incorrect and hallucinated computer-processable rules. This paper introduces P4IR, a two-stage framework that uses supervised fine-tuning (SFT) to instill domain knowledge in an LLM, followed by Group Relative Policy Optimization (GRPO) to improve the accuracy of the generated intermediate representations in the form of high-level code skeletons. The framework achieved reductions of up to 23.8% and 38.6% in tree edit distance and token-level Levenshtein distance respectively, relative to the SFT baselines. Comparative analysis demonstrates that this approach in a zero-shot setting outperforms leading LLMs in both code structure and semantics, specifically Claude Opus and Sonnet 4.5, GPT-5.2, Qwen-3-Max, and GLM-4.7, evaluated via few-shot prompting. Additionally, the GRPO stage produced a small yet statistically significant reduction in false positives. By combining SFT with GRPO to optimize directly for domain-specific objectives, this approach offers a path toward more accurate and reliable LLM-based ACC systems.",
+      "authors": [
+        "Jack Wei Lun Shi",
+        "Minghao Dang",
+        "Wawan Solihin",
+        "Leong Hien Poh",
+        "Justin K. W. Yeoh"
+      ],
+      "primary_category": "cs.SE",
+      "categories": [
+        "cs.SE",
+        "cs.AI",
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-06-21T09:17:02+00:00",
+      "link": "https://arxiv.org/pdf/2606.22402v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Uses GRPO to reduce hallucination in automated code compliance",
+      "llm_evidence_cn": "使用GRPO减少自动代码合规中的幻觉",
+      "llm_evidence": "使用GRPO减少自动代码合规中的幻觉",
+      "canonical_evidence": "使用GRPO减少自动代码合规中的幻觉",
+      "llm_tldr_en": "Introduces P4IR framework that uses SFT and GRPO to reduce hallucinated rules in LLM-based code compliance, achieving significant error reductions.",
+      "llm_tldr_cn": "本文针对大语言模型在自动代码合规中容易产生错误和幻觉规则的问题，提出了P4IR框架。该框架首先通过监督微调注入领域知识，然后采用分组相对策略优化（GRPO）提高生成中间表示（高级代码骨架）的准确性。实验表明，相比微调基线，该方法在树编辑距离和token级Levenshtein距离上分别减少高达23.8%和38.6%，并在零样本设置下优于主流大语言模型。",
+      "llm_tldr": "本文针对大语言模型在自动代码合规中容易产生错误和幻觉规则的问题，提出了P4IR框架。该框架首先通过监督微调注入领域知识，然后采用分组相对策略优化（GRPO）提高生成中间表示（高级代码骨架）的准确性。实验表明，相比微调基线，该方法在树编辑距离和token级Levenshtein距离上分别减少高达23.8%和38.6%，并在零样本设置下优于主流大语言模型。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.23259v1",
+      "source": "arxiv",
+      "title": "Explicit Formula for Inverse and Determinant in Geometric Algebras over Odd-dimensional Vector Spaces",
+      "abstract": "In this paper, we present explicit formulas for the inverse and determinant in geometric (Clifford) algebras over vector spaces of dimension $n=7$. The derivation of these formulas is made possible by generalizing the concept of conjugation to basis conjugation operations. We further develop a general method for constructing such formulas over odd-dimensional spaces from the known even-dimensional case. To validate computational utility of the results, we provide a numerical implementation of the formulas. The code implementation is available at the repository github.com/kamranuz/clifford_7d. These formulas extend previous results for lower dimensions and offer new insights for applications in mathematical physics and computational geometry.",
+      "authors": [
+        "K. S. Abdulkhaev",
+        "D. S. Shirokov"
+      ],
+      "primary_category": "math.RA",
+      "categories": [
+        "math.RA",
+        "cs.SC"
+      ],
+      "published": "2026-06-22T12:43:25+00:00",
+      "link": "https://arxiv.org/pdf/2606.23259v1",
+      "tags": [
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "provides explicit mathematical formulas and algorithm for computing inverse and determinant in 7D geometric algebras",
+      "llm_evidence_cn": "给出了7维几何代数中逆和行列式的显式数学公式及算法",
+      "llm_evidence": "给出了7维几何代数中逆和行列式的显式数学公式及算法",
+      "canonical_evidence": "给出了7维几何代数中逆和行列式的显式数学公式及算法",
+      "llm_tldr_en": "Presents explicit formulas for inverse and determinant in geometric algebras over 7D vector spaces using generalized conjugation. Provides numerical implementation and extends previous lower-dimension results to odd dimensions.",
+      "llm_tldr_cn": "几何代数在高维空间中的计算缺乏显式公式。本文通过推广基共轭概念，推导了7维几何代数中逆和行列式的显式公式，并给出从偶数维到奇数维的通用构造方法。提供数值实现验证了计算实用性。该结果可用于数学物理和计算机图形学应用。",
+      "llm_tldr": "几何代数在高维空间中的计算缺乏显式公式。本文通过推广基共轭概念，推导了7维几何代数中逆和行列式的显式公式，并给出从偶数维到奇数维的通用构造方法。提供数值实现验证了计算实用性。该结果可用于数学物理和计算机图形学应用。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "math formulation",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.27632v1",
+      "source": "arxiv",
+      "title": "Yuvion LLM: An Adversarially-Aware Large Language Model for Content And AI Safety",
+      "abstract": "As large language models are increasingly deployed in real-world systems, safety failures can still lead to harmful outputs and dangerous misuse. We argue that the essence of safety is adversarial: many failures arise not from natural inputs alone, but from strategic attempts to evade model policies and safeguards. However, existing general-purpose model development largely overlook this adversarial nature, and often remain insufficient for realistic safety scenarios involving planning, tool use, and multi-step reasoning, causing measured safety performance to overestimate real deployment robustness. To address this gap, we present Yuvion LLM, a large language model built for adversarially robust content safety and broader AI safety. Yuvion LLM treats adversarial robustness and agentic capability as first-class objectives. Its pipeline combines adversarially aware data construction, knowledge-enhanced continued pretraining, and policy-grounded multi-task safety post-training, including risk-aware supervised fine-tuning and reinforcement learning-based policy optimization, together with safety-aware agentic reinforcement learning for tool use and multi-step reasoning in complex safety scenarios. We further introduce the Yuvion LLM RiskEval (YLRE), a collection of 93 benchmarks across four evaluation categories, covering diverse open and internal evaluations with a focus on safety, adversarial robustness, and real-world capability requirements. Across these evaluations, Yuvion LLM demonstrates clear advantages on safety-focused benchmarks and particularly strong robustness under adversarial conditions, while maintaining solid overall capability. Notably, Yuvion-8B outperforms most state-of-the-art baselines, including substantially larger models such as GPT-5.4 and Qwen3-MAX, on several safety tasks.",
+      "authors": [
+        "Ting Ma",
+        "Xiufeng Huang",
+        "Benlei Cui",
+        "Xiaowen Xu",
+        "Shikai Qiu",
+        "Ruijie Jian",
+        "Hongxing Li",
+        "Guanghui Wang",
+        "Longtao Huang",
+        "Haiwen Hong",
+        "Haolei Xu",
+        "Wenjing Jiang",
+        "Ziwen Xu",
+        "Zhaoyu Fan",
+        "Shaoxuan He",
+        "Chuxi Xiao",
+        "Yujian Li",
+        "Xinyue Chen",
+        "Chunyang Chai",
+        "Wenxuan Liu",
+        "Ziheng Wang",
+        "Dongjie Zhang",
+        "Yangfan Zhou",
+        "Libin Dong",
+        "Yupeng Cao",
+        "Xiaoqian Xia",
+        "Jing Wang",
+        "Zhe Jiang",
+        "Zhenan Ye",
+        "Guang Yang",
+        "Bin Liu",
+        "Wei Peng",
+        "Ziqiang Zhu",
+        "Meihui Lian",
+        "Kaiwen Lv Kacuila",
+        "Haidong Ding",
+        "Bingyu Zhu",
+        "Yan Wang",
+        "Hai Zhao",
+        "Xuan Jin",
+        "Wei Zhao",
+        "Pengfei Sun",
+        "Wei Wang",
+        "Huiming Zhang",
+        "Bin Li",
+        "Hui Xue"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-06-26T01:12:02+00:00",
+      "link": "https://arxiv.org/pdf/2606.27632v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "adversarially-aware LLM for content and AI safety",
+      "llm_evidence_cn": "对抗性感知LLM用于内容和AI安全",
+      "llm_evidence": "对抗性感知LLM用于内容和AI安全",
+      "canonical_evidence": "对抗性感知LLM用于内容和AI安全",
+      "llm_tldr_en": "Presents Yuvion LLM, an adversarially-aware large language model designed for robust content safety and AI safety, addressing failures from strategic attacks.",
+      "llm_tldr_cn": "现有大语言模型在安全方面存在不足，难以应对对抗性攻击导致的策略绕过。本文提出Yuvion LLM，通过对抗性感知训练增强模型对复杂攻击的鲁棒性。在多种安全基准上，Yuvion LLM展示了更强的防护能力，为AI安全部署提供了更可靠的解决方案。",
+      "llm_tldr": "现有大语言模型在安全方面存在不足，难以应对对抗性攻击导致的策略绕过。本文提出Yuvion LLM，通过对抗性感知训练增强模型对复杂攻击的鲁棒性。在多种安全基准上，Yuvion LLM展示了更强的防护能力，为AI安全部署提供了更可靠的解决方案。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.27814v1",
+      "source": "arxiv",
+      "title": "ATOD: Annealed Turn-aware On-policy Distillation for Multi-turn Autonomous Agents",
+      "abstract": "Training small language-model agents for long-horizon interactive tasks requires both fast imitation and reward-driven improvement. On-policy distillation (OPD) provides dense teacher guidance and typically improves rapidly in the early stage, but its gains saturate once the student approaches the teacher, limiting the final performance ceiling. Reinforcement learning (RL) directly optimizes environment rewards and encourages exploratory improvement toward a higher reward-defined ceiling, but sparse and delayed feedback makes early-stage learning much less efficient than OPD. In this paper, we propose ATOD (Annealed Turn-aware On-policy Distillation), a hybrid online distillation algorithm that explicitly exploits this complementarity. (1) ATOD uses an annealed OPD-RL schedule: OPD dominates early training to approach teacher-level behavior, while RL is gradually strengthened to drive reward-based exploration. (2) ATOD introduces Turn-level Disagreement-Uncertainty Reweighting (T-DUR), which softly amplifies high-utility turns and improves dense supervision in long trajectories. Experiments on ALFWorld, WebShop, and Search-QA show that ATOD consistently outperforms competing post-training baselines: across the three student sizes, ATOD improves average success rate by 3.03 points over OPD and 23.62 points over GRPO, while surpassing the corresponding teacher models by 2.16 points.",
+      "authors": [
+        "Qitai Tan",
+        "Zefang Zong",
+        "Yang Li",
+        "Peng Chen"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-06-26T07:56:32+00:00",
+      "link": "https://arxiv.org/pdf/2606.27814v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "hybrid distillation and RL algorithm for LM agents",
+      "llm_evidence_cn": "结合模仿与强化学习的语言模型训练算法",
+      "llm_evidence": "结合模仿与强化学习的语言模型训练算法",
+      "canonical_evidence": "结合模仿与强化学习的语言模型训练算法",
+      "llm_tldr_en": "Proposes ATOD, a hybrid online distillation algorithm that combines on-policy distillation and reinforcement learning to train small language-model agents for multi-turn tasks, achieving better performance than either alone.",
+      "llm_tldr_cn": "针对小语言模型智能体在多轮交互任务中训练效率与性能上限的矛盾，提出ATOD算法，融合在线策略蒸馏与强化学习：蒸馏提供早期快速学习，强化学习突破性能上限。实验表明，ATOD在多个多轮任务上优于纯蒸馏或纯强化学习方案，为语言模型后训练提供了高效混合训练新范式。",
+      "llm_tldr": "针对小语言模型智能体在多轮交互任务中训练效率与性能上限的矛盾，提出ATOD算法，融合在线策略蒸馏与强化学习：蒸馏提供早期快速学习，强化学习突破性能上限。实验表明，ATOD在多个多轮任务上优于纯蒸馏或纯强化学习方案，为语言模型后训练提供了高效混合训练新范式。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.28126v1",
+      "source": "arxiv",
+      "title": "AI-Driven Synthesis for High-Tech System Design: Automating Innovation",
+      "abstract": "This article addresses the combinatorial complexity inherent in modern high-tech system design by presenting automation-in-design (AiD) as a transformative paradigm. We propose computational design synthesis (CDS), a framework utilising deep learning and generative AI to automate the creation of novel systems. Two case studies (e-drive system design and spatial dimensioning problem) serve as proof-points for this approach. The AI-driven methods used in the case studies represent a fundamental shift in engineering, advancing from simulation-based optimisation towards autonomous design with minimal human supervision.",
+      "authors": [
+        "Luuk Oerlemans",
+        "Steven Westerhof",
+        "Theo Hofman"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.AR",
+        "cs.CE",
+        "cs.ET",
+        "cs.RO"
+      ],
+      "published": "2026-06-26T14:26:48+00:00",
+      "link": "https://arxiv.org/pdf/2606.28126v1",
+      "tags": [
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "focuses on automating innovation in system design using AI",
+      "llm_evidence_cn": "聚焦于利用AI自动化系统设计中的创新过程",
+      "llm_evidence": "聚焦于利用AI自动化系统设计中的创新过程",
+      "canonical_evidence": "聚焦于利用AI自动化系统设计中的创新过程",
+      "llm_tldr_en": "Proposes computational design synthesis (CDS) framework using deep learning and generative AI to automate creation of novel systems. Case studies in e-drive and spatial dimensioning demonstrate shift from simulation-based optimization to autonomous design.",
+      "llm_tldr_cn": "高科技系统设计面临组合复杂性挑战。本文提出计算设计综合框架，利用深度学习和生成式AI自动化创新设计过程。通过电动车驱动系统设计和空间尺寸问题两个案例验证，展示了从基于仿真的优化到自主设计的范式转变。该方法显著减少了人工监督需求。",
+      "llm_tldr": "高科技系统设计面临组合复杂性挑战。本文提出计算设计综合框架，利用深度学习和生成式AI自动化创新设计过程。通过电动车驱动系统设计和空间尺寸问题两个案例验证，展示了从基于仿真的优化到自主设计的范式转变。该方法显著减少了人工监督需求。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "innovation",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-06-25-734665-v1",
+      "source": "biorxiv",
+      "title": "Client-server interfaces enable efficient agent-driven variant calling",
+      "abstract": "Background: Large language model (LLM) agents increasingly automate bioinformatics analyses, but most existing bioinformatics tools were built for standalone use by human experts. An agent driving such a tool must reason about its installation, configuration, and execution from documentation for human, spending many turns, tokens, and tool calls per result. How a method is exposed to an agent can therefore matter as much as the method itself. By designing agentic interfaces for these tools, agent can reduce such overhead and improve the reliability of agent-driven analyses. Findings: To test this design, we re-architected Clair3, a widely used deep-learning-based long-read variant caller, into a client-server system, Clair3-Connect. The client performs all genomics related processing and holds the identifiable data. The server runs only neural-network inference, and the client sends only feature tensors to the server, while sample identifiers and genomic context remain on the client. The client exposes schema-defined agent-facing tools that an agent invokes through single structured calls. On an APOE diplotyping task, all 60 agent runs were correct. The agentic tools used 12K tokens in 3 turns, 6.8 to 14 times fewer tokens than the shell-driven baselines (81K-163K tokens), at about a quarter the wall-clock time and far more stably (4% versus 35% token usage variation). Dropping the pileup and phasing stages to keep the client light left SNP F1 within 0.1-0.3 points of standard Clair3 by 50x coverage, while mutual TLS and AES-256-GCM encryption added 7.2% to end-to-end runtime. Conclusions: Recasting an established algorithm as developer-built, agentic tools behind a secure client-server boundary makes it more efficient, reliable, and easier to deploy for an LLM agent than a third-party wrapper, which cannot recover the defaults and conventions only its developers know. Agentic interfaces should be a first-class deliverable of bioinformatics tool development.",
+      "authors": [
+        "Yu, X.",
+        "Zheng, Z.",
+        "CHEN, L.",
+        "QIn, Z.",
+        "Guo, X.",
+        "He, M.",
+        "Luo, R."
+      ],
+      "primary_category": "bioinformatics",
+      "categories": [
+        "bioinformatics"
+      ],
+      "published": "2026-06-28T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.06.25.734665v1.full.pdf",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "agentic interface improvement for variant calling",
+      "llm_evidence_cn": "变体检测的代理接口改进",
+      "llm_evidence": "变体检测的代理接口改进",
+      "canonical_evidence": "变体检测的代理接口改进",
+      "llm_tldr_en": "This paper re-architects the Clair3 variant caller into a client-server system, improving the efficiency and reliability of LLM agent-driven bioinformatics analyses.",
+      "llm_tldr_cn": "本文针对LLM代理执行生物信息学工具时效率低的问题，将深度学习变体检测工具Clair3重构为客户端-服务器架构（Clair3-Connect），通过设计代理友好的接口显著减少代理与工具交互的轮次和令牌开销，提升了自动分析的可靠性和效率。",
+      "llm_tldr": "本文针对LLM代理执行生物信息学工具时效率低的问题，将深度学习变体检测工具Clair3重构为客户端-服务器架构（Clair3-Connect），通过设计代理友好的接口显著减少代理与工具交互的轮次和令牌开销，提升了自动分析的可靠性和效率。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

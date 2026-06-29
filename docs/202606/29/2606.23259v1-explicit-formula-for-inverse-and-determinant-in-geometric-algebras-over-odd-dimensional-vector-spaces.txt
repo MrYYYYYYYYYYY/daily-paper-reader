@@ -1,0 +1,885 @@
+Title: Explicit Formula for Inverse and Determinant in Geometric Algebras over Odd-dimensional Vector Spaces
+
+URL Source: https://arxiv.org/pdf/2606.23259v1
+
+Published Time: Tue, 23 Jun 2026 03:05:18 GMT
+
+Number of Pages: 21
+
+Markdown Content:
+# Explicit Formula for Inverse and Determinant in Geometric Algebras over Odd-dimensional Vector Spaces 
+
+## Kamron Abdulkhaev and Dmitry Shirokov 
+
+Last Revised: June 23, 2026 
+
+Abstract. In this paper, we present explicit formulas for the inverse and determinant in geometric (Clifford) algebras over vector spaces of dimension n = 7. The derivation of these formulas is made possible by generalizing the concept of conjugation to basis conjugation operations. We further develop a general method for constructing such formulas over odd-dimensional spaces from the known even-dimensional case. To validate computational utility of the results, we provide a numerical implementation of the formulas. The code implementation is available at the repository github.com/kamranuz/clifford_7d . These formulas extend previous results for lower dimensions and offer new insights for applications in mathematical physics and computational geometry. 
+
+Mathematics Subject Classification (2010). Primary 15A66; Secondary 15A15, 68W30, 15-04. 
+
+Keywords. Basis-free formula, Clifford algebra, Geometric algebra, De-terminant, Inverse, Grade projection, Operation of conjugation. 
+
+## 1. Introduction 
+
+Geometric (Clifford) algebras provide a powerful algebraic framework that unifies various mathematical structures and finds extensive applications in mathematics, physics, and engineering [5, 7, 9, 10]. Central to their utility is the ability to represent geometric transformations and encode multilinear algebraic operations in a coordinate-free manner. Among the fundamental algebraic invariants, the determinant plays a crucial role in characterizing in-vertibility. While explicit determinant formulas are well-understood for geo-metric algebras of low dimensions, notably for n ≤ 6 [2,6,17] (see also Section 3), the case of n = 7 presents unique challenges due to the increased algebraic 
+
+> arXiv:2606.23259v1 [math.RA] 22 Jun 2026
+
+2 K. Abdulkhaev and D. Shirokov complexity and the richer structure of the algebra [8]. Existing approaches often rely on additional algebra isomorphism constructions, which obscure the intrinsic geometric nature of the determinant and complicate direct com-putations within the algebra itself. In this paper, we overcome these challenges by deriving an explicit for-mula that is independent of the representation for the inverse and determi-nant in geometric algebras Cℓ p,q with p + q = 7. Our approach generalizes the classical notion of conjugation to a broader family of basis conjugation op-erations, enabling the expression of the determinant formula purely in terms of algebraic operations intrinsic to Cℓ p,q with p + q = 7. This construction not only clarifies the algebraic structure underlying the determinant but also provides a practical computational tool for testing invertibility and calculat-ing inverses of multivectors in geometric algebras. Beyond the specific result for n = 7, we present a general method for constructing such determinant and inverse formulas for Clifford algebras over odd-dimensional vector spaces from known formulas for the lower even-dimensional case. We also provide a numerical implementation of the derived formulas with performance evaluation. The implementation enables direct computa-tion of the determinant and inverse of any multivector in a Clifford algebras over seven-dimensional vector spaces. Our performance benchmarks show that while the new formulas have a modest increase in computational cost, they offer substantially improved robustness and precision compared to pre-vious methods. The implementation is available at the repository github. com/kamranuz/clifford_7d .Our work extends and refines earlier determinant formulas obtained via algebra isomorphisms [8], offering new insights and computational advan-tages. In contrast to known methods based on Faddeev-LeVerrier algorithm [12, 17], our approach is not recursive and yields in explicit formulas. Such explicit formulas have interesting from a theoretical point of view. Given the importance of geometric algebras over seven-dimensional vector spaces in mathematical physics, the explicit formulas presented here have potential applications in both theoretical investigations and numerical implementa-tions [7]. This paper is an extended version of the short note in Conference Pro-ceedings [1], where we presented the explicit isomorphism-free formula using basis conjugations, and its optimized version. In this extended version, we additionally provide a comprehensive numerical implementation and perfor-mance evaluation, and introduce a general recursive method to derive de-terminant formulas for Clifford algebras over odd-dimensional vector spaces directly from known even-dimensional cases. The paper is organized as follows. In Section 2, we review the main definitions relevant to geometric algebra. In Section 3, we review known de-terminant formulas in geometric algebra for dimensions up to n = 6. In Section 4, we focus on the Hitzer and Sangwine determinant formula for 
+
+n = 7 derived via algebra isomorphisms. In Section 5, we develop the explicit Inverse and Determinant in Cℓ p,q over Odd-dimensional Spaces 3determinant formula independent of any algebra isomorphism by introducing basis conjugations. In Section 6, we present an optimized version of the for-mula. In Section 7, we provide a numerical implementation of the formulas and evaluate their performance. In Section 8, we present a method to derive such formulas in the for Clifford algebras over odd-dimensional vector spaces, using known formulas for lower even-dimensional vector spaces case. Finally, In Section 9, we offer conclusions and perspectives for further research. 
+
+## 2. Main definitions 
+
+Let us consider the (Clifford) geometric algebra Cℓ p,q , p + q = n [5, 9, 10] with the generators e1, e2, . . . , en and the identity element e. The generators satisfy the conditions 
+
+eaeb + ebea = 2 ηab e, a, b = 1 , . . . , n, 
+
+where η = ( ηab ) = diag(1 , . . . , 1, −1, . . . , −1) is the diagonal matrix with its first p entries equal to 1 and the last q entries equal to −1 on the diagonal. The standard basis of Cℓ p,q is given by the set 
+
+Bp,q := {ea1a2··· ak | a1 < a 2 < · · · < a k, k = 0 , 1, . . . , n }, (2.1) where each ea1a2··· ak = ea1 ea2 · · · eak denotes a product of generators with strictly increasing indices. This set Bp,q forms a basis of Cℓ p,q . We call the subspace of Cℓ p,q of elements, which are linear combinations of the basis elements with multi-indices of length k, the subspace of grade k and denote it by Cℓ kp,q . Elements of grade 0 are identified with scalars Cℓ 0 
+
+> p,q
+
+≡ R, e ≡ 1. The projection of any element U ∈ Cℓ p,q onto the subspace Cℓ kp,q is denoted by ⟨U ⟩k in this paper. We have 
+
+⟨U + V ⟩k = ⟨U ⟩k + ⟨V ⟩k, ⟨λU ⟩k = λ⟨U ⟩k, λ ∈ R, U, V ∈ Cℓ p,q . (2.2) An arbitrary element (multivector) U ∈ Cℓ p,q can be written in the form 
+
+U =
+
+> n
+
+X
+
+> k=0
+
+⟨U ⟩k, ⟨U ⟩k ∈ Cℓ kp,q . (2.3) The scalar ⟨U ⟩0 is called the scalar part of U . We have the property 
+
+⟨U V ⟩0 = ⟨V U ⟩0, ∀U, V ∈ Cℓ p,q . (2.4) 
+
+Definition 2.1 ([17]). Any operation of the form 
+
+U 7 →
+
+> n
+
+X
+
+> k=0
+
+λk⟨U ⟩k, λk = ±1 (2.5) is called an operation of conjugation in Cℓ p,q .Note that the operation of conjugation is an involution, meaning that applying it twice yields the identity transformation. The operations of con-jugation commute with each other. We have three classical operations of 4 K. Abdulkhaev and D. Shirokov conjugation: the grade involution, the reversion, and the Clifford conjugation 
+
+> 1
+
+:
+
+bU =
+
+> n
+
+X
+
+> k=0
+
+(−1) k⟨U ⟩k, eU =
+
+> n
+
+X
+
+> k=0
+
+(−1) k(k−1) 2 ⟨U ⟩k, beU =
+
+> n
+
+X
+
+> k=0
+
+(−1) k(k+1) 2 ⟨U ⟩k. (2.6) These operations have the following properties 
+
+dU V = bU bV , gU V = eV eU , dgU V = beV beU , ∀ U, V ∈ Cℓ p,q . (2.7) 
+
+Definition 2.2 ([17]). Let U ∈ Cℓ p,q be an arbitrary multivector and p +
+
+q = n. Let us denote N := 2 [ n+1 2 ], where square brackets mean taking the integer part. We define a sequence of elements U(k) and scalars C(k) with 
+
+k = 1 , 2, . . . , N recursively as follows 
+
+U(1) := U, U(k+1) := U (U(k) − C(k)), C(k) := Nk ⟨U(k)⟩0 ∈ Cℓ 0 
+
+> p,q
+
+.
+
+Then the determinant of an element U ∈ Cℓ p,q is defined as Det( U ) := −C(N ) ∈ Cℓ 0 
+
+> p,q
+
+.
+
+Unlike the straightforward definition of the determinant in geometric al-gebra given by Det( U ) := det( β(U )) via matrix isomorphism β from C⊗Cℓ p,q 
+
+to certain matrix algebra of dimension N (see for the details [17]), the defi-nition above is intrinsic to geometric algebra Cℓ p,q . The proposed definition uses only addition operation, geometric multiplication, and projection oper-ation. Nevertheless, it is equivalent to the straightforward definition of the determinant via the matrix determinant. 
+
+Definition 2.3. The algebra of hyperbolic numbers (also called split-complex numbers ) is defined as S := {z = x + jy | x, y ∈ R, j2 = 1 }, where j
+
+is the hyperbolic unit satisfying j2 = 1, in contrast to the imaginary unit 
+
+i of complex numbers, where i2 = −1. The set S forms a two-dimensional commutative algebra over the real numbers. 
+
+## 3. Known Determinant Formulas in Geometric Algebra for 
+
+## n ≤ 6
+
+In this section, we provide a brief overview of known to date determinant formulas for multivectors in geometric algebras Cℓ p,q with n = p + q ≤ 6. De-terminant formulas are critical for characterizing invertibility and computing inverses in geometric algebras. We begin by introducing the necessary definitions and constructions. Following that, we summarize key results up to n = 6 from [2, 17] in Theo-rem 3.1.        
+
+> 1The Clifford conjugation is a composition of the grade involution band the reversion e.Note that some authors [10] denote the Clifford conjugation by . We do not use separate notation for the Clifford conjugation in this paper and write the combination of the two symbols band e.
+
+Inverse and Determinant in Cℓ p,q over Odd-dimensional Spaces 5For our convenience, we use the following notation for the operation of conjugation, introduced in [8]. Given a multivector U ∈ Cℓ p,q , we could represent operation of conjugation that changes signs of a subset of grades 
+
+M ⊆ { 1, . . . , n } in the following form 
+
+mM (U ) = U − 2 X
+
+> k∈M
+
+⟨U ⟩k,
+
+where ⟨U ⟩k denotes the projection of the element U onto grade k.
+
+Example 1. For an element U ∈ Cℓ 7,0 and the set of indices M = {0, 7}, we have 
+
+m0,7(U ) = U − 2⟨U ⟩0 − 2⟨U ⟩7,
+
+where ⟨U ⟩0 is the scalar part, and ⟨U ⟩7 is the component of the highest grade. Several results have been established concerning the computation of the determinant and inverse in geometric algebras. Explicit formulas for the inverse of Clifford algebra elements have been derived for dimensions n ≤ 5, as reported in [3,6,16], each employing distinct techniques. Later, an explicit formula for the n = 6 case was provided in [2]. A summary of these findings can be found in [17], and we present them here in Theorem 3.1. 
+
+Theorem 3.1 ([17]). For the cases n ≤ 6, there exist the following determinant formulas Det : Cℓ p,q → Cℓ 0
+
+> p,q
+
+Det( U ) = U F (U ) ∈ Cℓ 0 
+
+> p,q
+
+,
+
+where 
+
+F (U ) := 
+
+bU , if n = 1 ,
+
+beU , if n = 2 ,
+
+eU bU beU , if n = 3 ,
+
+eU m 4( bU beU ), if n = 4 ,
+
+eU m 4,5( bU beU )m4,5(U eU m 4,5( bU beU )) , if n = 5 , 
+
+> 13
+
+eU bU beU m 4,5,6( bU beU U eU )+ 23 eU m 4,5,6
+
+
+
+m4,5,6( bU beU )m4,5,6
+
+
+
+m4,5,6( bU beU )m4,5,6(U eU )
+
+ 
+
+, if n = 6 .
+
+If Det( U )̸ = 0 , then there exists U −1 with the following explicit form 
+
+U −1 = F (U )Det( U ) .
+
+## 4. Hitzer & Sangwine Result for n = 7 
+
+Recently, Hitzer and Sangwine proposed the following determinant formula for n = 7 using a technique based on algebra isomorphisms [8]. 6 K. Abdulkhaev and D. Shirokov 
+
+Theorem 4.1 ([8]). Let U ∈ Cℓ p,q with p + q = 7 . Then the determinant of the element U can be calculated by the formula 
+
+Det( U ) = ϕ−1(By ) \ϕ−1(By ) ∈ Cℓ 0 
+
+> p,q
+
+, W := B eB, B := ϕ(U ),y := eB
+
+ 13 W m 1,4,5(W W ) + 23 m4(m4(W )m1,4,5(m4(W )m4(W ))) 
+
+
+
+,
+
+where ϕ is an isomorphism 
+
+ϕ : Cℓ p,q 
+
+> ∼
+
+−→
+
+(
+
+C ⊗ Cℓ p′,q ′ , if q′ is even, 
+
+S ⊗ Cℓ p′,q ′ , else, p′ + q′ = 6 . (4.1) The explicit formula for the determinant presented above not only char-acterizes invertibility, but also provides a direct method for computing the inverse element in the algebra. In particular, if Det( U )̸ = 0, the inverse can be written as 
+
+U −1 = ϕ−1(y) \ϕ−1(By )Det( U ) ,
+
+where all terms are defined as in the theorem above. 
+
+## 5. Explicit Formula of Determinant for n = 7 
+
+In this section we consider the determinant formula for elements of geomet-ric algebra in the case n = 7, independent of the isomorphism (4.1). First, however, we need to explicitly construct such an isomorphism ϕ.
+
+Definition 5.1. Let {e1, . . . , e 7} be the generators of Cℓ p,q with p + q = 7 and 
+
+{E1, . . . , E 6} be the generators of Cℓ p′,q ′ with p′ + q′ = 6. Let us define the isomorphism 
+
+ϕ : Cℓ p,q 
+
+> ∼
+
+−→
+
+(
+
+C ⊗ Cℓ p′,q ′ , if q′ is even ,
+
+S ⊗ Cℓ p′,q ′ , else ,ϕ(e1 m+1 ) := 1 ⊗ Em, m = 1 , . . . , 6,ϕ(e1234567 ) := r ⊗ E, r =
+
+(
+
+i ∈ C, if q′ is even ,j ∈ S, else ,
+
+where E is the identity element of the algebra Cℓ p′,q ′ .
+
+Lemma 5.2. Let U ∈ Cℓ p,q , p + q = 7 and let ϕ be the isomorphism from Definition 5.1. Then the following identities hold 
+
+ϕ(m0,7(U )) = m0(ϕ(U )) , ϕ(m2,5(U )) = m1,2(ϕ(U )) ,ϕ(m3,4(U )) = m3,4(ϕ(U )) , ϕ(m1,6(U )) = m5,6(ϕ(U )) .
+
+Proof. The Lemma follows from analyzing how the isomorphism ϕ from Def-inition 5.1 acts on basis elements of Cℓ p,q of various grades. The identities are verified for all basis elements of Cℓ p,q listed in Table 1, which provides a complete description of the mapping ϕ on basis elements. □Inverse and Determinant in Cℓ p,q over Odd-dimensional Spaces 7
+
+U ∈ Cℓ p,q ±ϕ(U ) grade of U grade of ϕ(U )
+
+e 1 ⊗ e 0 0
+
+e1 i+1 1 ⊗ Ei 2 1
+
+ei+1 j+1 1 ⊗ Eij 2 2
+
+e1 i+1 j+1 k+1 1 ⊗ Eijk 4 3
+
+ei+1 j+1 k+1 l+1 1 ⊗ Eijkl 4 4
+
+e1 i+1 j+1 k+1 l+1 m+1 1 ⊗ Eijklm 6 5
+
+e234567 1 ⊗ E123456 6 6
+
+e1234567 r ⊗ e 7 0
+
+e1 r ⊗ E123456 1 6
+
+e234567 ei+1 j+1 k+1 l+1 m+1 r ⊗ Eijklm 1 5
+
+e1234567 ei+1 j+1 k+1 l+1 r ⊗ Eijkl 3 4
+
+e234567 ei+1 j+1 k+1 r ⊗ Eijk 3 3
+
+e1234567 ei+1 j+1 r ⊗ Eij 5 2
+
+e234567 ei+1 r ⊗ Ei 5 1
+
+Table 1. Mapping of grades under the isomorphism ϕ (Def-inition 5.1). Here i, j, k, l, m ∈ {1, . . . , 6}.Note that the identities provided above do not extend to m4(ϕ(U )) and m1,4,5(ϕ(U )), which appear in the determinant formula in Theorem 4.1. In particular, there is no subset M ⊆ { 0, . . . , 6} for which the identities 
+
+ϕ(mM (U )) = mM ′ (ϕ(U )) hold in the cases M ′ = {4} and M ′ = {1, 4, 5}.This limitation motivates the introduction of the following generalization of conjugation operation. 
+
+Definition 5.3. For a subset of basis elements B ⊆ Bp,q (see (2.1)), we define the associated basis conjugation map bB : Cℓ p,q → Cℓ p,q 
+
+bB (U ) = U − 2 X
+
+> i∈B
+
+[U ]i,
+
+where [ U ]i is the projection onto the basis element i.
+
+Example 2. For the element U = e + 3 e1 + e7 + e17 + e1234567 ∈ Cℓ 7,0 with generators {e1, . . . , e 7} and a subset of basis elements B = {e1, e 1234567 }, we have 
+
+be1,e 1234567 (U ) = U − 2[ U ]e1 − 2[ U ]e1234567 = e + 3 e1 + e7 + e17 + e1234567 
+
+−6e1 − 2e1234567 = e − 3e1 + e7 + e17 − e1234567 .
+
+Note that the basis conjugation operations are a generalization of the conjugation operations and have the following properties. 
+
+Lemma 5.4. For U, W ∈ Cℓ p,q , α, β ∈ R, B, C ⊆ Bp,q and M ⊆ { 1, . . . , n },we have 
+
+bB (αU + βW ) = αb B (U ) + βb B (W ), bB (bB (U )) = U, (5.1) 
+
+bB (bC (U )) = bC (bB (U )) = bB△C (U ), mM (bB (U )) = bB (mM (U )) , (5.2) 8 K. Abdulkhaev and D. Shirokov 
+
+where △ denotes the symmetric difference of sets, bB , b C are arbitrary basis conjugation operations, mM is an arbitrary conjugation operation. 
+
+This broader family of operations allows the conjugation operation to be transferred through an isomorphism ϕ introduced in Definition 5.1. 
+
+Lemma 5.5. For U ∈ Cℓ p,q , p + q = 7 , we have 
+
+ms(ϕ(U )) = ϕ(bs(U )) , s = 1 , 2, . . . , 6,
+
+where 
+
+0 = {e, e 1234567 },
+
+1 = {e12 , e 13 , e 14 , e 15 , e 16 , e 17 , e 34567 , e 24567 , e 23567 , e 23467 , e 23457 , e 23456 },
+
+2 = {e23 , e 24 , e 25 , e 26 , e 27 , e 34 , e 35 , e 36 , e 37 , e 45 , e 46 , e 47 , e 56 , e 57 , e 67 ,e14567 , e 13567 , e 13467 , e 13457 , e 13456 , e 12567 , e 12467 , e 12457 , e 12456 ,e12367 , e 12357 , e 12356 , e 12347 , e 12346 , e 12345 },
+
+3 = {e1234 , e 1235 , e 1236 , e 1237 , e 1245 , e 1246 , e 1247 , e 1256 , e 1257 , e 1267 ,e1345 , e 1346 , e 1347 , e 1356 , e 1357 , e 1367 , e 1456 , e 1457 , e 1467 , e 1567 , (5.3) 
+
+e567 , e 467 , e 457 , e 456 , e 367 , e 357 , e 356 , e 347 , e 346 , e 345 , e 267 , e 257 ,e256 , e 247 , e 246 , e 245 , e 237 , e 236 , e 235 , e 234 },
+
+4 = {e2345 , e 2346 , e 2356 , e 2456 , e 3456 , e 2347 , e 2357 , e 2457 , e 3457 , e 2367 ,e2467 , e 3467 , e 2567 , e 3567 , e 4567 , e 167 , e 157 , e 147 , e 137 , e 127 , e 156 ,e146 , e 136 , e 126 , e 145 , e 135 , e 125 , e 134 , e 124 , e 123 },
+
+5 = {e2, e 3, e 4, e 5, e 6, e 7, e 134567 , e 124567 , e 123567 , e 123467 , e 123457 , e 123456 },
+
+6 = {e1, e 234567 }.
+
+Proof. Table 1 lists a all basis elements of Cℓ p,q , p + q = 7, parametrised by i, j, k, l, m ∈ { 1, . . . , 6} with their images under ϕ (up to an overall sign) and the grades of those images. Grouping the rows of Table 1 according to the grade of ϕ(U ) shows that the sets 1 , . . . , 6 are precisely the families of elements whose images have grades 1 , . . . , 6. Thus, for every basis element 
+
+eA ∈ Bp,q , we have 
+
+ms(ϕ(eA)) = 
+
+(
+
+−ϕ(eA), if eA ∈ s, ϕ(eA), else .
+
+Let us have an arbitrary element U ∈ Cℓ p,q . Let us expand the element in terms of the basis U = P 
+
+> A∈Bp,q
+
+uAeA. By linearity of ϕ and ms, we get 
+
+ms(ϕ(U )) = X
+
+> A∈Bp,q
+
+uA ms(ϕ(eA)) = X 
+
+> eA/∈s
+
+uA ϕ(eA) − X
+
+> eA∈s
+
+uA ϕ(eA)= X
+
+> A∈Bp,q
+
+uAϕ(bs(eA)) = X
+
+> A∈Bp,q
+
+ϕ(bs(uAeA)) = ϕ(bs(U )) .
+
+□Inverse and Determinant in Cℓ p,q over Odd-dimensional Spaces 9
+
+Lemma 5.6. For U, V ∈ Cℓ p,q , where p + q = 7 , we have 
+
+b2,3,6(U V ) = b2,3,6(V )b2,3,6(U ), (5.4) 
+
+b1,3,5(U V ) = b1,3,5(U )b1,3,5(V ), (5.5) 
+
+b1,2,5,6(U V ) = b1,2,5,6(V )b1,2,5,6(U ). (5.6) 
+
+where 1, 2, 3, 5, 6 are defined in (5.3). Proof. Using Lemma 5.5, Definition 5.1 and properties (2.7), we get 
+
+ϕ(b2,3,6(U V )) = m2,3,6(ϕ(U V )) = ^ϕ(U V ) = ^ϕ(U )ϕ(V ) = ]ϕ(V ) ]ϕ(U )= m2,3,6(ϕ(V )) m2,3,6(ϕ(U )) = ϕ(b2,3,6(V )) ϕ(b2,3,6(U )) = ϕ(b2,3,6(V )b2,3,6(U )) = ϕ(b2,3,6(V U )) , (5.7) 
+
+ϕ(b1,3,5(U V )) = m1,3,5(ϕ(U V )) = \ϕ(U V ) = \ϕ(U )ϕ(V ) = [ϕ(U ) [ϕ(V )= m1,3,5(ϕ(U )) m1,3,5(ϕ(V )) = ϕ(b1,3,5(U )) ϕ(b1,3,5(V )) = ϕ(b1,3,5(U )b1,3,5(V )) = ϕ(b1,3,5(U V )) . (5.8) Applying ϕ−1 to both sides of (5.7) and (5.8) yields (5.4) and (5.5), respec-tively. The final identity (5.6) follows from (5.4) and (5.5). □
+
+This result allows us to obtain the following reformulation of Theo-rem 4.1, which does not depend on the isomorphism ϕ, meaning all compu-tations are made directly within the algebra itself. 
+
+Theorem 5.7. Let U ∈ Cℓ p,q , where p + q = 7 . Then the determinant of the element U can be calculated by the formula 
+
+Det( U ) = U y cU y ∈ Cℓ 0 
+
+> p,q
+
+, (5.9) 
+
+y := 13 b2,3,6(U )W b 1,4,5(W W )+ 23 b2,3,6(U )b4(b4(W )b1,4,5(b4(W )b4(W ))) , (5.10) 
+
+W := U b 2,3,6(U ),
+
+where sets 1, 2, 3, 4, 5, 6 are defined in Lemma 5.5. Proof. Let U ∈ Cℓ p,q with p + q = 7, and let ϕ be the isomorphism given in (4.1). For any X ∈ Cℓ p′,q ′ with p′ +q′ = 6, denote by X the result of applying the inverse isomorphism ϕ−1 to X, meaning X := ϕ−1(X). By Theorem 4.1, the determinant of U can be written as Det( U ) = By cBy, V = B eB, B = ϕ(U ), (5.11) 
+
+y = eB
+
+ 13 V m 1,4,5(V V ) + 23 m4(m4(V )m1,4,5(m4(V )m4(V ))) 
+
+
+
+(5.12) We now simplify each part of the formula using Lemma 5.5. 
+
+eB = m2,3,6(ϕ(U )) = ϕ  b2,3,6(U ) = b2,3,6(U ) (5.13) 
+
+V = B eB = ϕ (U ) ϕ  b2,3,6(U ) = U b 2,3,6(U ) = W (5.14) 10 K. Abdulkhaev and D. Shirokov 
+
+m1,4,5(V V ) = m1,4,5
+
+ ϕ(V V ) = ϕ  b1,4,5(V V )
+
+= b1,4,5(V V ) = b1,4,5(W W ) (5.15) 
+
+m4(m4(V )m1,4,5(m4(V )m4(V ))) = m4
+
+
+
+ϕ
+
+
+
+m4(V )m1,4,5(m4(V )m4(V )
+
+ 
+
+= ϕ
+
+
+
+b4
+
+
+
+m4(V ) m1,4,5(m4(V )m4(V )) 
+
+ 
+
+= b4
+
+
+
+m4(V ) m1,4,5(m4(V )m4(V )) 
+
+
+
+(5.16) = b4
+
+
+
+m4
+
+ ϕ  V  m1,4,5
+
+
+
+ϕ
+
+
+
+m4(V )m4(V )
+
+ 
+
+= b4
+
+
+
+b4
+
+ V  b1,4,5
+
+
+
+m4(V ) m4(V )
+
+ 
+
+= b4
+
+ b4 (W ) b1,4,5
+
+ b4 (W ) b4 (W ) 
+
+Finally, inserting (5.13), (5.14), (5.15) and (5.16) into (5.11) and( 5.12) yields the result. □
+
+Corollary 5.8. If Det( U )̸ = 0 , then the inverse of U ∈ Cℓ p,q , p + q = 7 is given by 
+
+U −1 = y cU y 
+
+Det( U ) ,
+
+where Det and y are defined in (5.9) and (5.10), respectively. Example 3. We illustrate the application of Corollary 5.8 by computing the inverse 2 of the multivector U = e + e35 + e1234567 . First, let us compute the auxiliary element 
+
+W = U b 2,3,6(U ) = ( e + e35 + e1234567 )( e − e35 + e1234567 ) = e + 2 e1234567 .
+
+Next, let us calculate intermediate quantities 
+
+W W = ( e + 2 e1234567 )( e + 2 e1234567 ) = −3e + 4 e1234567 ,W b 1,4,5(W W ) = ( e + 2 e1234567 )( −3e + 4 e1234567 ) = −11 e − 2e1234567 .
+
+Note that 
+
+W = b4(W ), W b 1,4,5(W W ) = b4(b4(W )b1,4,5(b4(W )b4(W )) ,y = b2,3,6(U )
+
+ 13 W b 1,4,5(W W ) + 23 b4
+
+ b4(W )b1,4,5
+
+ b4(W )b4(W ) 
+
+= ( e − e35 + e1234567 )( −11 e − 2e1234567 )= −9e + 11 e35 + 2 e12467 − 13 e1234567 .
+
+> 2
+
+One of the reviewers noted that for this specific U , the minimal polynomial has degree 3, so the determinant and inverse could be found in only 3 multiplicative steps (see [12]). We follow the general corollary instead, to illustrate the systematic procedure. Inverse and Determinant in Cℓ p,q over Odd-dimensional Spaces 11 Now, let us compute 
+
+U y = ( e + e35 + e1234567 )( −9e + 11 e35 + 2 e12467 − 13 e1234567 )= −7e − 24 e1234567 ,y cU y = ( −9e + 11 e35 + 2 e12467 − 13 e1234567 )( −7e + 24 e1234567 )= 375 e − 125 e35 + 250 e12467 − 125 e1234567 .
+
+Thus, the determinant of U is Det( U ) = U y cU y = ( −7e − 24 e1234567 )( −7e + 24 e1234567 ) = 625 e. 
+
+Finally, the inverse of U is 
+
+U −1 = y cU y 
+
+Det( U ) = 35 e − 15 e35 + 25 e12467 − 15 e1234567 .
+
+As noted above, the previous example could be computed using a spe-cialized shortcut for both the determinant and the inverse. To better motivate the full generality of Corollary 5.8, we now consider a multivector for which such simplification does not apply. 
+
+Example 4. Let U = e + e7 + e13 + e14 + e15 + e26 + e34 ∈ Cℓ 7,0. Applying Corollary 5.8, we first compute the auxiliary element 
+
+W = U b 2,3,6(U ) = e + 2 e7 + 4 e13 + 2 e15 + 2 e137 + 2 e147 + 2 e157 − 2e2346 .
+
+Next, let us calculate intermediate quantities 
+
+W 2 = −23 e − 20 e7 + 16 e13 + 8 e14 + 12 e15 + 20 e137 + 4 e147 + 12 e157 
+
+−4e2346 − 8e23467 + 8 e123456 + 8 e1234567 ,b4(W )2 = −23 e + 28 e7 − 8e14 − 4e15 + 12 e137 − 4e147 + 4 e157 
+
++4 e2346 + 8 e23467 − 8e123456 + 8 e1234567 ,T1 := W b 1,4,5(W 2) = 169 + 134 e7 − 108 e13 + 24 e14 − 58 e15 
+
+−18 e137 − 66 e147 − 26 e157 + 66 e2346 − 16 e2356 − 16 e2456 
+
+−24 e23467 + 16 e23567 + 16 e24567 − 40 e123456 − 56 e1234567 ,T2 := b4(W )b1,4,5
+
+ (b4(W )2 = −119 − 10 e7 − 60 e13 + 72 e14 − 10 e15 
+
+−78 e137 + 66 e147 − 22 e157 − 66 e2346 + 16 e2356 + 16 e2456 
+
+−72 e23467 + 16 e23567 + 16 e24567 + 8 e123456 + 40 e1234567 .12 K. Abdulkhaev and D. Shirokov Now, let us compute 
+
+y0 := 13 (T1 + 2 b4(T2)) = −23 + 38 e7 − 76 e13 + 56 e14 − 26 e15 + 46 e137 
+
+−66 e147 + 6 e157 + 66 e2346 − 16 e2356 − 16 e2456 − 56 e23467 
+
++16 e23567 + 16 e24567 − 8e123456 + 8 e1234567 ,y = b2,3,6(U )y0 = 61 + 29 e7 − 109 e13 − 109 e14 − 43 e15 + 89 e26 − 43 e34 
+
+−66 e35 + 66 e45 + 74 e137 + 74 e147 + 18 e157 − 94 e267 + 18 e347 
+
++56 e357 − 56 e457 − 26 e1236 − 26 e1246 − 2e1256 + 34 e1345 + 2 e2346 
+
++24 e2356 − 24 e2456 + 6 e12367 + 6 e12467 − 18 e12567 − 14 e13457 
+
++18 e23467 − 24 e23567 + 24 e24567 − 66 e123456 + 56 e1234567 ,U y = 305 − 80 e1234567 .
+
+Thus, the determinant of U is 
+
+Det (U ) = U y cU y = 99425 .
+
+Finally, the inverse of U is 
+
+U −1 = 1Det( U ) y cU y = 199425 (14125( e + e7) − 35165( e13 + e14 )
+
+−14555( e15 + e34 ) + 28265 e26 − 20610( e35 − e45 )+24490( e137 + e147 ) + 5330( e157 + e347 ) − 31390 e267 
+
++19160( e357 − e457 ) − 3450( e1236 + e12367 + e1246 + e12467 )
+
+−2050( e1256 + e12567 − e2346 − e23467 )+2850( e1345 + e13457 ) + 1400( e2356 − e2456 + e23567 − e24567 )
+
+− 17810 e123456 + 21960 e1234567 ) .
+
+## 6. Optimized Explicit Formula of Determinant for n = 7 
+
+The explicit determinant formula for n=7, derived in the previous section, is computationally intensive due to repeated application of basis conjugation operations. In this section, we present an optimized version of the formula. The optimization is particularly useful for practical computations, where clas-sical operations of conjugation might be easier to implement. 
+
+Lemma 6.1. For U, V ∈ Cℓ p,q with p + q ∈ { 6, 7}, we have 
+
+m1,2,3,4,5,6(U V )U = U m 1,2,3,4,5,6(V U ). (6.1) 
+
+Proof. First, let us consider the case n = 6. From (2.4), we have 12 (U V + m1,2,3,4,5,6(U V )) = ⟨U V ⟩0 = ⟨V U ⟩0 = 12 (V U + m1,2,3,4,5,6(V U )) .
+
+The expressions on the left side and on the right side are scalars. Multiplying the left side by 2 U on the right and the right side by 2 U on the left, we get (6.1) for p + q = 6. Inverse and Determinant in Cℓ p,q over Odd-dimensional Spaces 13 Now, let us consider the case n = 7. Using Lemma 5.5, Definition 5.1 and just proven property (6.1) for the case n = 6, we get 
+
+ϕ(U m 1,2,3,4,5,6(V U )) = ϕ(U )m1,2,3,4,5,6(ϕ(V )ϕ(U ))) = ϕ(b1,2,3,4,5,6(U V )U ) = ϕ(m1,2,3,4,5,6(U V )U ). (6.2) Finally, applying ϕ−1 to both sides of (6.2) results in the (6.1) for p + q =7. □
+
+Note that similar results to Lemma 6.1 can be found in [17]. 
+
+Lemma 6.2. Let U ∈ Cℓ p,q , p + q = 7 , W := U b 2,3,6(U ) and H := m3,4(W ).Then the following identities hold 
+
+b4(W ) = m3,4(W ), (6.3) 
+
+b1,4,5(W W ) = m1,2,3,4,5,6(W W ), (6.4) 
+
+b1,4,5(HH ) = m1,2,3,4,5,6(HH ), (6.5) 
+
+b4(Hm 1,2,3,4,5,6(HH )) = m3,4(Hm 1,2,3,4,5,6(HH )) , (6.6) 
+
+where sets 1, 2, 3, 4, 5, 6 are defined in (5.3). Proof. By Lemma 5.6, we have the following identities 
+
+b2,3,6(W ) = W, b2,3,6(W W ) = W W, b2,3,6(HH ) = HH. 
+
+If we combine them with the commutative properties of the basis conjugation operations (5.2), Lemma 5.2 and Lemma 5.5, we obtain identities (6.3), (6.4) and (6.5) in the following way 
+
+b4(W ) = b4(b3(W )) = b3,4(W ) = m3,4(W ),b1,4,5(W W ) = b1,4,5(b2,3,6(W W )) = b1,2,3,4,5,6(W W ) = m1,2,3,4,5,6(W W ),b1,4,5(HH ) = b1,4,5(b2,3,6(( HH )) = b1,2,3,4,5,6(HH ) = m1,2,3,4,5,6(HH ).
+
+Now, using Lemma 5.5, Lemma 6.1 and Definition 5.1, we get 
+
+ϕ(Hm 1,2,3,4,5,6(HH )) = ϕ(Hb 1,2,3,4,5,6(HH )) = ϕ(H)m1,2,3,4,5,6(ϕ(H)ϕ(H))) = m1,2,3,4,5,6(ϕ(H)ϕ(H)) ϕ(H) (6.7) = ϕ(b1,2,3,4,5,6(HH )H)= ϕ(m1,2,3,4,5,6(HH )H).
+
+Applying ϕ−1 to both sides of (6.7) results in the following identity 
+
+Hm 1,2,3,4,5,6(HH ) = m1,2,3,4,5,6(HH )H. (6.8) Next, using commutative properties of the basis conjugation operations (5.2), Lemma 5.6, Lemma 6.1 and (6.8), we obtain 
+
+b2,3,6
+
+ b4(Hm 1,2,3,4,5,6(HH ))  = b4
+
+ b2,3,6(Hm 1,2,3,4,5,6(HH )) 
+
+= b4
+
+ b2,3,6(m1,2,3,4,5,6(HH )) b2,3,6(H)
+
+= b4
+
+ m1,2,3,4,5,6(b2,3,6(HH )) b2,3,6(H)
+
+= b4(m1,2,3,4,5,6(HH )H) = b4(Hm 1,2,3,4,5,6(HH )) . (6.9) 14 K. Abdulkhaev and D. Shirokov In (6.9), we see that the expression b4(Hm 1,2,3,4,5,6(HH )) does not change under b2,3,6, which in particular means that it does not change under b3. This leads to identity (6.6) in the following manner 
+
+b4 (Hm 1,2,3,4,5,6(HH )) = b3
+
+ b4(Hm 1,2,3,4,5,6(HH ))  = m3,4(Hm 1,2,3,4,5,6(HH )) .
+
+□
+
+Theorem 6.3. Let U ∈ Cℓ p,q , where p + q = 7 . Then the determinant of the element U can be calculated by the formula 
+
+Det( U ) = U y cU y ∈ Cℓ 0 
+
+> p,q
+
+, (6.10) 
+
+where 
+
+y := b2,3,6(U )
+
+ 13 W m 1,2,3,4,5,6(W W ) (6.11) + 23 m3,4(m3,4(W )m1,2,3,4,5,6(m3,4(W )m3,4(W ))) 
+
+
+
+,W := U b 2,3,6(U ).
+
+Here sets 2, 3, 6 are defined in (5.3). Proof. The result follows from Theorem 5.7 and Lemma 6.2. □
+
+Corollary 6.4. If Det( U )̸ = 0 , then the inverse of U ∈ Cℓ p,q , p + q = 7 is given by 
+
+U −1 = y cU y 
+
+Det( U ) ,
+
+where Det and y are defined in (6.10) and (6.11), respectively. 
+
+Note that the optimized version of the formulas yields better results when the conjugation operation itself is better optimized. This improvement arises because conjugation operations are often highly optimized in many programming libraries, as we demonstrate in Section 7. Furthermore, the use of classical conjugation might be theoretically preferable, as it minimizes dependence on specific basis elements. 
+
+## 7. Numerical Implementation and Performance of the Formulas for n = 7 
+
+In this section, we provide a numerical implementation of the formulas and evaluate their performance. Specifically, we implement the formulas for the determinant and inverse in the geometric algebras Cℓ p,q with p + q = 7, as derived in earlier sections using formal algebraic methods. For completeness, we also implement a recursive method based on the Faddeev–LeVerrier algo-rithm. The code implementation is available at the repository github.com/ kamranuz/clifford_7d .Hitzer’s and Sangwine’s isomorphism-dependent formulas from Theo-rem 4.1 are implemented in the functions cl7 determinant hitzersangwine Inverse and Determinant in Cℓ p,q over Odd-dimensional Spaces 15 and cl7 inverse hitzersangwine . Recursive method based on Faddeev-LeVerrier algorithm [17] is implemented in the functions cl7 inverse fvs 
+
+and cl7 determinant fvs . Since in our setup a random multivector is mul-tivector of span dimension 7 with probability one, recursive method with a variable number of steps [12] is equivalent to cl7 determinant fvs and 
+
+cl7 inverse fvs . Our explicit formulas from Theorem 5.7 are implemented in the functions cl7 determinant and cl7 inverse , while optimized ver-sions from Theorem 6.3 are provided in functions cl7 determinant opt and 
+
+cl7 inverse opt .The main difference between optimized and non-optimized versions lies in the choice of conjugation operations. Consequently, performance depends heavily on how the Clifford conjugation is implemented. To illustrate this, we compare two distinct approaches: the projection method , which subtracts spe-cific components from the original multivector, and the signed array method ,which applies conjugation through element-wise multiplication of basis el-ements with a predefined array of signs. The functions cl7 determinant ,
+
+cl7 determinant opt , cl7 inverse , and cl7 inverse opt are implemented using first approach, while cl7 ar inverse opt , cl7 ar determinant opt ,
+
+cl7 ar determinant and cl7 ar inverse use the second. All the experiments were conducted on Google Compute Engine virtual instances via Google Colab with 12.7 GB of RAM and a dual-core Intel(R) Xeon(R) CPU @ 2.20GHz) , with hyper-threading disabled. The implementa-tion environment consisted of Python 3.12.13, the clifford Python library 1.5.1 [4] for geometric algebra construction and multivector operations. Addi-tionally, standard and scientific Python libraries such as numpy 2.0.2, timeit ,
+
+gc , and tracemalloc were employed for computation and performance pro-filing. We first validated the correctness of the implementation using unit tests. These tests confirmed that our determinant and inverse functions yield re-sults consistent with algebraic expectations. However, we discovered that due to limits of floating-point precision, cl7 determinant hitzersangwine and 
+
+cl7 inverse hitzersangwine do not produce correct results. Particularly, 
+
+cl7 determinant hitzersangwine returns a non-zero scalar accompanied by a non-scalar part close to zero, while cl7 inverse hitzersangwine re-turns an element that does not satisfy the defining inverse property. While the first function we rectified by clipping coefficients close to zero, the second we could not correct. We then evaluated performance. A test set of 100 000 multivectors, each having 128 normally distributed coefficients, with a fixed NumPy random seed to ensure reproducibility. Each function was applied to every multivec-tor in this set, and the resulting performance metrics are summarized in Table 7 and Figure 1. For each candidate function, the evaluation proceeded as follows: garbage collection was disabled to avoid unpredictable timing in-terruptions; each multivector in the fixed test set was processed sequentially; and the execution time per call was measured using time.perf counter .16 K. Abdulkhaev and D. Shirokov After all runs completed, peak memory usage and memory allocation traces were recorded, and garbage collection was turned on. Function cl7 inverse hitzersangwine was excluded from the subse-quent performance evaluation as it failed the unit tests. The performance re-sults illustrate a clear trade-off between computational efficiency and numer-ical robustness. According to Hitzer’s and Sangwine’s formula, the core cal-culations occur in a subalgebra of reduced dimension. Computations within this smaller algebra are faster due to the lower number of coefficients re-quired (64 versus 128 in the full algebra), explaining the superior speed of cl7 determinant hitzersangwine . However, this theoretical speed ad-vantage is negated in practice by numerical instability, which manifests as non-scalar artifacts in the determinant and a complete failure in the inverse computation. We explain this instability by compounded floating-point errors, which arise primarily from Python’s standard implementation of complex numbers required for evaluating the isomorphism ϕ. In contrast, the formulas we have derived do not require an explicit implementation of the isomorphism ϕ,nor do they rely complex or hyperbolic numbers. This not only simplifies implementation but also enhances numerical stability by avoiding error-prone intermediate mappings. The performance results demonstrate that implementations based on the signed array method are among the fastest, with mean execution times ranging from 1.76 ms to 2.27 ms and low standard deviations. The near-identical performance of the optimised and non-optimised variants in this group confirms that the signed-array approach is already highly efficient, leaving essentially no room for further optimisation. In contrast, the pro-jection method benefits substantially from the optimised conjugation strat-egy: the optimised versions ( cl7 determinant opt and cl7 inverse opt )achieve a roughly twofold speedup over their non-optimised counterparts (cl7 determinant and cl7 inverse ), reducing mean times from approxi-mately 14 ms to 6.5 ms. The recursive method based on the Faddeev–LeVerrier algorithm ( cl7 determinant fvs and cl7 inverse fvs ) are faster than im-plementations with the projection method but slower than implementation with the signed-array method and isomorphism-based variants. 
+
+## 8. Explicit Formula for the case n = 2 k + 1 from n = 2 k
+
+In this section, we present a method to derive explicit formulas for the deter-minant and inverse in the for Clifford algebras over 2 k + 1-dimensional vector spaces, using known formulas for 2 k-dimensional vector spaces case 3. First,                
+
+> 3One of the reviewers noted that there is no analogous step from odd dimension to the next even dimension for the following reason. The tensor products C⊗Cℓ p,q and S⊗Cℓ p,q
+> are equivalent to Cℓ 0,1⊗Cℓ p,q and Cℓ 1,0⊗Cℓ p,q respectively. However, when two or more one-dimensional Clifford algebras appear, such a tensor product no longer yields a new Clifford algebra. Instead, it describes an extension [11].
+
+Inverse and Determinant in Cℓ p,q over Odd-dimensional Spaces 17 
+
+Function Mean Time Std Dev (ms) (ms) 
+
+cl7 determinant hitzersangwine 1.534 0.478 
+
+cl7 ar determinant opt 1.760 0.458 
+
+cl7 ar determinant 1.765 0.461 
+
+cl7 ar inverse 2.264 0.575 
+
+cl7 ar inverse opt 2.273 0.585 
+
+cl7 determinant fvs 4.447 1.069 
+
+cl7 inverse fvs 5.554 1.338 
+
+cl7 determinant opt 6.276 1.455 
+
+cl7 inverse opt 6.736 1.553 
+
+cl7 determinant 13.735 3.107 
+
+cl7 inverse 14.118 3.185 
+
+Table 2. Performance Metrics (Averaged Over 100 000 Runs) 
+
+> cl7 determinant hitzersangwine
+> cl7 determinant fvs
+> cl7 inverse fvs
+> cl7 determinant
+> cl7 determinant opt
+> cl7 inverse
+> cl7 inverse opt
+> cl7 ar determinant
+> cl7 ar determinant opt
+> cl7 ar inverse
+> cl7 ar inverse opt
+
+0246810 12 14 16 18 1.53 4.45 5.55 13 .74 6.28 14 .12 6.74 1.77 1.76 2.26 2 .27 1.53 4.45 5.55 13 .74 14 .12 6.28 6.74 1.76 2.27 1.77 2.26 Mean Time (ms) 
+
+Figure 1. Performance Metrics (Averaged Over 100 000 Runs) 18 K. Abdulkhaev and D. Shirokov let us restate determinant and inverse formulas for n = 2 k + 1 obtained by Hitzer and Sangwine using a technique based on algebra isomorphisms [8]. 
+
+Definition 8.1 ([8]). Let {e1, . . . , e n} be the generators of Cℓ p,q with p + q =
+
+n = 2 k + 1 and {E1, . . . , E n−1} be the generators of Cℓ p′,q ′ with p′ + q′ =
+
+n − 1 = 2 k. Let us define the isomorphism Φ : Cℓ p,q 
+
+> ∼
+
+−→
+
+(
+
+C ⊗ Cℓ q,p −1, if k + q is odd ,
+
+S ⊗ Cℓ q,p −1, else ,
+
+Φ( e1 m+1 ) := 1 ⊗ Em, m = 1 , . . . , n − 1,
+
+Φ( e12 ...n ) := r ⊗ E, r =
+
+(
+
+i ∈ C, if k + q is odd ,j ∈ S, else ,
+
+where E is the identity element of the algebra Cℓ p′,q ′ .
+
+Theorem 8.2 ([8]). Let us have U ∈ Cℓ p′,q ′ , p ′ + q′ = 2 k and 
+
+Det 2k(U ) = U f (U ) ∈ Cℓ 0 
+
+> p′,q ′
+
+,
+
+where f (U ) is a sum of products of conjugations. Then, for V ∈ Cℓ p,q , p +
+
+q = 2k + 1 , we have 
+
+Det 2k+1 (V ) = Φ −1(Det 2k(B)) dΦ−1(Det 2k(B)) , B := Φ( V ). (8.1) 
+
+Corollary 8.3 ([8]). If Det( V )̸ = 0 , then the inverse of V ∈ Cℓ p,q , p +q = 2 k+1 
+
+is given by 
+
+V −1 = Φ−1(f (B))) dΦ−1(Det 2k(B)) Det 2k+1 (V ) ,
+
+where Det and B are defined in (8.1). 
+
+Now, we present a method for obtaining explicit and isomorphism-invariant formulas for the determinant and inverse in the following theorem. 
+
+Theorem 8.4. Let us have U ∈ Cℓ p′,q ′ , p ′ + q′ = 2 k and 
+
+Det 2k(U ) = U f (U ) ∈ Cℓ 0 
+
+> p′,q ′
+
+,
+
+where f (U ) is a sum of products of conjugations. Then, for V ∈ Cℓ p,q , p +q =2k + 1 , we have 
+
+Det 2k+1 (V ) = V F (V ) \V F (V ),F (V ) := Φ −1 ◦ f ◦ Φ( V ), Φ : Cℓ p,q 
+
+> ∼
+
+−→
+
+(
+
+C ⊗ Cℓ p′,q ′ , if q′ is even ,
+
+S ⊗ Cℓ p′,q ′ , else .
+
+Proof. Since by definition F (V ) = Φ −1 ◦ f ◦ Φ( V ), we can write 
+
+f ◦ Φ( V ) = Φ ◦ F (V ).Inverse and Determinant in Cℓ p,q over Odd-dimensional Spaces 19 Substituting this into (8.1), we obtain Det 2k+1 (V ) = Φ−1(Φ( V )Φ ◦ F (V )) dΦ−1(Φ( V )Φ ◦ F (V )) = Φ−1 ◦ Φ( V F (V )) \Φ−1 ◦ Φ( V F (V )) = V F (V ) \V F (V )since Φ −1 ◦ Φ acts as the identity on Cℓ p,q . This completes the proof. □
+
+Corollary 8.5. If Det 2k+1 (V )̸ = 0 , then the inverse of V ∈ Cℓ p,q , p +q = 2 k+1 
+
+is given by 
+
+V −1 = F (V ) \V F (V )Det 2k+1 (V ) ,
+
+where Det 2k+1 is defined in Theorem 8.2. 
+
+Lemma 8.6. ∀S = 1 , 2, . . . , n − 1, ∃S ⊆ Bp,q such that 
+
+mS (Φ( V )) = Φ( bS (V )) , V ∈ Cℓ p,q , p + q = n = 2 k + 1 .
+
+Note that F (V ) can indeed be computed without directly applying the isomorphism Φ. Using Lemma 8.6, any conjugations of Φ( V ) can be replaced by the corresponding basis conjugations of V . Therefore, the formula F (V ) = Φ−1 ◦ f ◦ Φ( V ) is equivalent to applying f directly to V , but replacing each conjugation by the respective basis conjugation. 
+
+## 9. Conclusions 
+
+In this paper, we have successfully derived an explicit formula for the deter-minant in geometric algebras Cℓ p,q with p + q = 7. By introducing a novel family of basis conjugation operations, we have derived formulas that are intrinsic to the algebra, eliminating the need for external algebraic isomor-phisms that have complicated previous approaches. This advancement yields a clearer geometric interpretation and enhances the stability and reliability of practical computations. Our explicit formulas extend and refine earlier results [8]. Our main contributions are as follows. First, we presented an explicit, isomorphism-free determinant and inverse formulas for Cℓ p,q with p + q = 7 (Theorems 5.7 and 6.3). Second, we developed and benchmarked a numerical implementa-tion, demonstrating that our isomorphism-free formulas offer superior numer-ical robustness compared to earlier isomorphism-dependent methods, though with a modest increase in computational cost. Benchmarks also show that our isomorphism-free formulas have lower computational cost that known re-cursive method based on the Faddeev–LeVerrier algorithm [12, 17]. The im-plementation is publicly available at the repository github.com/kamranuz/ clifford_7d . Third, we established a general method (Theorem 8.2) for constructing isomorphism-free determinant and inverse formulas for Clifford algebras over any odd-dimensional vector space from known formulas for the preceding even dimension. 20 K. Abdulkhaev and D. Shirokov The framework of basis conjugations developed here not only solves a specific problem in dimension seven but also provides a new algebraic perspec-tive that could be applied to other invariant theoretic problems in geometric algebra. Future research directions include discovering analogous explicit de-terminant formulas in higher odd dimensions, optimizing the computational efficiency of the formulas further and exploring applications of these stable numerical methods in areas such as physics and engineering (see, for example, various applications of Cℓ p,q with p + q = 7 in [13–15]). 
+
+## Acknowledgment 
+
+The results of this paper were reported at the ENGAGE Workshop (Hong Kong, July 2025) within the International Conference Computer Graphics International 2025 (CGI 2025). The authors are grateful to the organizers and the participants of this conference for fruitful discussions. The authors are grateful to the anonymous Reviewers for their careful reading of the paper and helpful comments on how to improve the presenta-tion. The publication was prepared within the framework of the Academic Fund Program at HSE University (grant №26-00-017 Clifford algebras and matrix methods: theory and applications). 
+
+Data availability. Data sharing not applicable to this article as no datasets were generated or analyzed during the current study. 
+
+Declarations conflict of interest. The authors declare that they have no conflict of interest. 
+
+## References                      
+
+> [1] Abdulkhaev, K., & Shirokov, D. Explicit Formula for Inverse and Determinant in Geometric Algebras over Seven-Dimensional Vector Spaces. In E. Hitzer, G. Papagiannakis, & H. Hadfield (Eds.), Empowering Novel Geometric Algebra for Graphics and Engineering, ENGAGE 2025, Lecture Notes in Computer Science, 16510 , Springer, Cham, pp. 189–200 (2026). [2] Acus, A., Dargys, A.: The Inverse of a Multivector: Beyond the Threshold
+> p+q= 5. Adv. Appl. Clifford Algebras 28 , 65 (2018) [3] Dadbeh, P.: Inverse and determinant in 0 to 5 dimensional Clifford algebra. arXiv:1104.0067 (2011) [4] Hadfield H, Wieser E., Arsenovic A., Kern R., and The Pygae Team: pygae/clifford: v1.3.1 (2020), https://github.com/pygae/clifford
+> 10.5281/zenodo.1453978 [5] Hestenes, D.: Space-Time Algebra. Gordon and Breach, New York (1966) [6] Hitzer, E., Sangwine, S.: Multivector and multivector matrix inverses in real Clifford algebras. Applied Mathematics and Computation 311 , 375–389 (2017) [7] Hitzer, E., Lavor, C., Hildenbrand, D.: Current survey of Clifford geometric algebra applications. Mathematical Methods in the Applied Sciences 47 (3), 1331-1361 (2024)
+
+Inverse and Determinant in Cℓ p,q over Odd-dimensional Spaces 21 
+
+[8] Hitzer, E., Sangwine, S. J.: Construction of Multivector Inverse for Clifford Algebras Over 2 m + 1-Dimensional Vector Spaces from Multivector Inverse for Clifford Algebras Over 2m-Dimensional Vector Spaces. Advances in Applied Clifford Algebras 29 (2), 29 (2019) [9] Lasenby, A., Lasenby, J.: Applications of geometric algebra in physics and links with engineering. In: Geometric Algebra with Applications in Science and Engineering. Birkhauser, Boston (2001) [10] Lounesto, P.: Clifford Algebras and Spinors. Cambridge Univ. Press, Cam-bridge (1997) [11] Marchuk, N. G.. ”Classification of Extended Clifford Algebras”.Russian Math-ematics 62, no.11 (2018): 23-27 [12] Prodanov, Dimiter. ”Computation of Minimal Polynomials and Multivector Inverses in Non-Degenerate Clifford Algebras”.Mathematics 13, no.7 (2025) [13] Trayling, G., Baylis, W.E.: The Cl 7 Approach to the Standard Model. In: Ablamowicz, R. (eds) Clifford Algebras. Progress in Mathematical Physics, vol 34. Birkh¨ auser Boston (2004) [14] Shaw, R.: A new view of d=7 Clifford algebra. Journal of Physics A: Mathe-matical and General 21 (1), 7 (1988) [15] Su´ arez, R.: Special geometric structures in dimensions 6, 7, and 8 and their induced minimal left ideals. Beitr Algebra Geom (2025) [16] Shirokov, D.: Concepts of trace, determinant and inverse of Clifford algebra ele-ments. Progress in analysis. Proceedings of the 8th congress of ISAAC, Volume 1, Peoples’ Friendship University of Russia, 187–194 (2012); arXiv:1108.5447 (2011) [17] Shirokov, D.: On computing the determinant, other characteristic polynomial coefficients, and inverse in Clifford algebras of arbitrary dimension. Computa-tional and Applied Mathematics 40 , 173 (2021) Kamron Abdulkhaev HSE University 101000 Moscow Russia e-mail: ksabdulkhaev@edu.hse.ru 
+
+Dmitry Shirokov HSE University 101000 Moscow Russia and Institute for Information Transmission Problems of the Russian Academy of Sci-ences 127051 Moscow Russia e-mail: dshirokov@hse.ru

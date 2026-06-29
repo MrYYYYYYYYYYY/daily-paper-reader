@@ -1,0 +1,237 @@
+Title: AI-Driven Synthesis for High-Tech System Design: Automating Innovation
+
+URL Source: https://arxiv.org/pdf/2606.28126v1
+
+Published Time: Mon, 29 Jun 2026 01:03:38 GMT
+
+Number of Pages: 9
+
+Markdown Content:
+> 1
+
+# AI-Driven Synthesis for High-Tech System Design: Automating Innovation 
+
+Luuk Oerlemans, Steven Westerhof, and Theo Hofman 
+
+Abstract —This article addresses the combinatorial complex-ity inherent in modern high-tech system design by presenting automation-in-design (AiD) as a transformative paradigm. We propose computational design synthesis (CDS), a framework utilising deep learning and generative AI to automate the creation of novel systems. Two case studies (e-drive system design and spatial dimensioning problem) serve as proof-points for this approach. The AI-driven methods used in the case studies represent a fundamental shift in engineering, advancing from simulation-based optimisation towards autonomous design with minimal human supervision. 
+
+I. T HE MODERN ENGINEERING CHALLENGE : A 
+
+COMBINATORIAL EXPLOSION 
+
+The design of next-generation high-tech systems is fun-damentally constrained by a ‘combinatorial explosion’ of potential configurations. The sheer number of components, materials, and interconnections creates a design space of such magnitude that manual or exhaustive exploration is infeasible. This article posits that artificial intelligence (AI), through a concept termed automation-in-design (AiD), offers a powerful and systematic approach to navigate this complexity, enabling engineers to generate and optimise novel solutions with un-precedented efficiency. Engineers creating complex dynamical systems must ad-dress a set of fundamental, interdependent design problems. As illustrated in Figure 1, these challenges are deeply coupled and demand a holistic, integrated solution rather than a sequential one. The three primary problem domains are [1]:  
+
+> •
+
+The discrete topology design problem: This concerns the selection of components or subsystems from a technology library and the definition of their interconnections to establish a functional system architecture. A topology can be represented as a graph where the vertices (nodes) are the components and the edges the physical connections, for example.  
+
+> •
+
+The dimensioning design problem: Following the se-lection of a topology and its associated technologies, this phase involves specifying the precise continuous parameters of each component, such as size, mass, and material properties.  
+
+> •
+
+The control design problem: For active dynamical sys-tems, this involves designing the system’s control strat-egy, which is interdependent with both the chosen topol-ogy and the physical dimensions of its components. 
+
+Luuk Oerlemans (M.Sc. student), Steven Westerhof (M.Sc. student) and Theo Hofman (Professor) are all affiliated with the Engineering Systems Design lab within the Control Systems Technology section, Dept. Mechanical Engineering at Eindhoven University of Technology in Eindhoven (NL). Corresponding author: t.hofman@tue.nl, www.tue.nl/cst Selecting and connecting system components Topology Design Specifying component parameters Dimensioning Design Strategies for active system management Control Design 
+
+Fig. 1. Coupled design problem areas for complex dynamical systems [1]. 
+
+Addressing these coupled challenges sequentially inevitably leads to suboptimal outcomes. Therefore, a smarter, integrated approach is required to unlock innovative architectures and achieve significant performance improvements. II. A NEW PARADIGM : A UTOMATION -IN -DESIGN THROUGH COMPUTATIONAL SYNTHESIS 
+
+The strategic shift from traditional, sequential design methodologies to an integrated, automated paradigm is critical for advancing high-tech systems engineering. By embracing co-design – the simultaneous optimisation of physical and control systems – and leveraging computational design synthe-sis (CDS), engineers can discover novel system architectures that yield substantial performance gains and cost reductions [2]. This paradigm utilises AI to automate design-space ex-ploration, systematically generating a multitude of feasible, high-performance solutions for the engineer. 
+
+Functional and structural foundations 
+
+Using an e-drive system as an illustrative example (see also below, Case study 1, for more details), two principal challenges emerge in system-topology synthesis: first, how to systematically generate a valid topology from a library of available components, and second, how to manage the vast resulting design space. The process commences by mapping functions (F) to the components (C) that realise them and defining the connectivity between components [3]. As shown in Figure 2, this mapping facilitates a multi-level analysis. Design rules are derived top-down by mapping functions to components, which constrains valid connectivity.  
+
+> arXiv:2606.28126v1 [cs.AI] 26 Jun 2026 2
+> Fig. 2. Function and structural system analyses. Example: topology-design problem of an e-drive system [2].
+
+Subsequently, new system topologies are generated bottom-up by mapping components back to functions, enabling a structured search for novel and effective interconnections. This structural information can be represented as a graph model, where components are nodes and their connections are edges, with design constraints dictating permissible connections [2]. 
+
+The CDS framework and the role of AI 
+
+The concept of computational design synthesis connects the functional/structural engineering problem with the per-formance engineering design space through modelling and evaluation (Figure 3) [2]. Every synthesised and functional topology, seen as an element of the set of feasible topologies (Tnew), must be evaluated for performance (J), which itself involves a search for optimal design variables (x*). The foundation of this framework relies on robust knowledge-extraction methods (Figure 4), which codify the relationships between functions, components, and design rules. This knowledge can be acquired through expert input, physics-based engineering analysis, or automatic data mining, and it serves as the essential prerequisite for generating valid new topologies. Knowledge extraction can be classified by (in)direct and automatic learning, respectively [4]. Using the new synthesised topologies, we have an under-standing of how many components, which components and their degree of connectivity are used for each new design, expressed as a set of discrete variables z. Each set of fea-sible topologies is a function of z. Automated modelling is needed to map efficiently the (feasible) topology graph models, Tnew (z), to the involved decision variables, x, using 
+
+x = h(Tnew (z)) [5]. For each new topology the performance needs to be maximised while searching for the optimal design decision variables, x∗, via analyses and optimisation. This is done in the performance engineering design space ultimately for the whole feasible topology set. 
+
+AI-driven optimisation: Discrete dynamic system-topology de-sign 
+
+An agent can be trained using reinforcement learning (RL) [6] to predict newly synthesised designs based on this data, expressed as Tnew = g(z). Moreover, large language models (LLMs) can automate the extraction of system information – such as component modules, functions, and physical con-straints – by learning from (digital) documents of existing systems [7], thereby supporting automatic learning. The concept of direct learning, where the designer interacts with computer-generated designs, is discussed in [8]. This approach enables co-creation of new feasible designs through iterative updates to design rules – in contrast to indirect learning, where design rules are first systematically extracted through discussions between a knowledge expert (system architect) and a knowledge engineer in the classical way. Following the explanation in [9], we emphasise the distinc-tive deep-learning predictive concepts relevant to complex dis-crete dynamic system-topology design analysis and generation [2], as opposed to continuum-based (material layout) topology design [10]. AI models are integral to this framework, supporting two primary design schemes (Figure 5) [9]: 
+
+Iterative AI optimisation: This scheme focuses on finding the optimal variables x∗ for a generated feasible topology Tnew 
+
+through physics-based analysis and optimisation. The optimal topology is then identified through an iterative, nested process. Case study 1 (see below) provides a powerful demonstration of this scheme, using a reinforcement learning nonlinear programming (RL-NLP) framework to intelligently iterate through topologies and optimise their continuous parameters. 
+
+Generative AI optimisation: This advanced scheme lever-ages data from iterative optimisations to train a predictive model, such as a deep Q-network [11][12]. This trained model can then rapidly predict optimal topologies T∗ 
+
+> new
+
+directly from design constraints, providing system engineers with high-quality solutions almost instantaneously. The knowledge gained from the iterative approach in Case study 1 would be the foundation for training such a generative model. This entails, for design scheme 1, finding the optimal vari-ables in the performance space, x∗ = arg min x∈F J(x, T new ),with the constraints set F = {x ∈ Rn | y(x, T new ) ≤ ytarget }
+
+for each generated feasible topology, Tnew , using automated modelling; and, accordingly, finding the optimal topology T ∗
+
+> new
+
+as a function of z, in an iterative (nested) fashion during the automated evaluation step; or, in case of design scheme 2, using this data to train a deep Q-network to predict the optimal set of topologies as a function of z and provided set of design constraints, ytarget , in a very fast manner for the designer. In both schemes, predictive or generative AI agents can be an integrative part of the process of creating new optimised designs. As depicted in Figure 6, these AI-powered methods are driving an evolution in engineering, moving from classical simulation-based design towards fully autonomous, AI-driven design [13]. The following case studies provide practical demonstrations of these powerful methods in action. Case study 1 demonstrates enhancements achieved through an it-erative AI optimisation framework using a generative AI model in the functional engineering space, while Case study 2 introduces novel solutions for interdependent challenges in component placement, routing, and physics optimisation – key aspects of dimensioning design. Leveraging a predictive AI model in the performance space, complex spatial packaging becomes a solvable optimisation, eliminating tedious CAD iterations. The solution results from both case studies will pave the road to a holistic integrative 3       
+
+> Fig. 3. Computational design synthesis framework connecting the functional and structural engineering problem with the performance engineering design space [2] (example applications: mechatronic, robotic or powertrain systems). Indirect Direct Automatic
+> Expert Knowledge engineer Acquisition tool Data
+> Fig. 4. Three types of knowledge acquisition [4].
+
+approach for both functional, structural and performance engi-neering that includes spatial optimisation of components and subsystems. III. C ASE STUDY 1
+
+Iterative AI optimisation for e-drive systems 
+
+A critical challenge in mechatronics and robotics is the efficient optimisation of systems defined by both discrete architectural choices and continuous sizing variables. For example, the design of a drive-train unit, depicted in Figure 7, includes careful selection of different components (e.g., gears, axles, machine) as well as the scaling and parameter sizing of these components to meet both functional (e.g., electric driving, braking) and performance requirements (e.g., top speed, acceleration, gradeability). 4     
+
+> Fig. 5. Generative, predictive AI models can be supportive for AI-based engineering design schemes: iterative and generative AI optimisation. Optimal
+> Design
+> Generative
+> Design
+> Autonomous
+> Design
+> Simulation -based
+> design optimization
+> Generative AI Agentic AI
+> CDS AI + CDS AI + CDS
+> Fig. 6. Transformation towards AI-powered system design [13].
+
+This case study presents a powerful proof-point for the principles of AiD, demonstrating an AI-driven framework that systematically navigates these complex mixed-integer design spaces to find physically feasible, high-performance solutions for complex systems, like these electric drive-train units. 
+
+The hybrid RL-NLP approach 
+
+Traditional optimisation methods are ill-suited for integrated discrete-continuous problems, due to inefficient exploration of the design space with long and computationally heavy simula-tions. Reinforcement learning (RL) is a promising alternative for the traditional optimisation methods, due to its ability to explore broad action spaces efficiently. However, pure RL agents often fail to enforce the strict physical constraints required for engineering precision. An-other limitation for using RL in an engineering context is that engineering design tasks typically require the evaluation of a complete configuration, meaning there are no meaningful intermediate rewards to guide a multi-step learning process. To address these limitations, we developed an iterative AI optimisation framework, shown in Figure 8, that integrates the exploratory power of RL (for solving the functional engineering part) with the rigour of a physics-based nonlin-ear programming (NLP) solver (for solving the performance engineering part). The roles of each component are clearly delineated: 
+
+Outer loop (RL Agent): Handles high-level, discrete deci-sions by selecting a system topology (e.g., parallel or co-axial   
+
+> Fig. 7. Exploded view of Audi Q6 e-tron quattro front drive, an integrated e-drive system of multiple components. The e-machine is parallel axially con-nected to the differential. Electric power consumption (combined): 19.6–17.0 kWh/100 km; CO2-emissions (combined): 0 g/km; CO2-class: A. (Source: Audi MediaCenter)
+> Fig. 8. AI-powered framework. The outer RL loop receives an input state, selects an action through its policy network, and passes it to the inner environment represented by the NLP solver. Within the inner loop, the selected action and state are mapped to a topology-dependent NLP problem that is solved by the NLP solver. The resulting scalarised objective defines a reward, which is returned to the outer loop and used together with the corresponding state–action pair to update the agent’s policy network.
+
+design construction, etc.) from a predefined action space or design vector, z (see Figure 9). 
+
+Inner loop (NLP Solver): For each topology proposed by the RL agent, the NLP solver performs a constrained continuous optimisation, ensuring the design is physically feasible (e.g, gear ratios, face widths) and optimised with respect to its continuous parameters x.This architecture is reformulated as a single-step, ‘solver-in-the-loop’ set-up, which is equivalent to a ‘contextual bandit’ problem: A contextual bandit is a machine-learning framework that makes decisions by considering the ‘context’ of each situation to personalised actions. Think of it like a recom-mendation system that considers the designer’s preferences before suggesting something. This formulation is necessary because it allows the agent to learn from a single, final reward corresponding to the quality of a fully evaluated design, bypassing the need for intermediate rewards (instead of getting feedback at every step). 5 
+
+> Fig. 9. Design space of the gearbox optimisation problem. The gearbox configuration is defined hierarchically through discrete design choices: layout (coaxial or parallel), stage count (single-, two-, or multi-stage), and gearset types (spur, helical, or planetary gear set), which must be selected for each stage implied by the chosen stage count. Each unique combination constitutes a distinct gearbox topology that can be explored within the optimisation framework.
+
+Results and impact 
+
+Validation of the framework on an automotive gearbox-topology optimisation problem demonstrated its profound ad-vantages over conventional methods. The RL agent selected discrete topology designs among various layouts with various components (e.g., single-stage co-axial or dual-stage parallel design, etc.), while the NLP solver optimised geometric pa-rameters under strict sizing and efficiency constraints. Fig-ure 10 illustrates the diversity of gearbox layouts synthesised by the framework, where the component technology changes as a function of the outer volume and performance require-ments of the design. Each topology is generated from a combination of discrete choices (layout, realisation, stage count) expressed by z,and continuous parameters (gear diameters, ratios, and face widths) given by x. The inner physics solver automatically dimensions every gear pair so that torque limits, stresses, and packaging constraints ( ytarget ) are satisfied, yielding physically valid drive configurations – while simultaneously the power-train efficiency from the drive shafts towards the input of the electric machine is maximised and the overall e-drive mass (gearbox and e-machine) is minimised ( J(x)) given different designs for the overall gearbox ratio ( ytarget ) between 2.3 and 8.14 (–). Benchmarking the AI-generated design results with a brute force (BF) optimisation, showed a reduction of the evaluation time with three times an order of magnitude; the agent was able to make predictions within only 2% error of the optimum BF value, while all computed results satisfied the physical feasibility (stresses, packaging) across all configurations. These results confirm that this hybrid AI-driven frame-work enables scalable, constraint-aware design exploration at a fraction of the traditional computational cost. While the framework masterfully navigates the discrete topology space – determining which gearbox layouts and configurations best meet performance targets (using the trained generative agent) – a separate but equally critical challenge lies in how these selected components are physically arranged. The spatial dimensioning of parts directly influences efficiency and performance, making it a vital continuation of the design process, as discussed next. IV. C ASE STUDY 2
+
+Solving the dimensioning problem with geometric abstraction and predictive AI in the performance space 
+
+The strategic aim to design smaller, lighter, and more effi-cient systems necessitates the tight integration of mechanical, electrical, and multi-physics considerations – such as thermal, flow behaviour, and electromagnetic effects [14]. In current engineering practice, however, spatial integration is still largely driven by manual CAD iteration and design intuition – mean-ing that thousands of potential configurations remain unex-plored, and numerical trade-offs among volume, routing, and physics are rarely systematically evaluated. Predictive AI can automate this exploration by rapidly evaluating and proposing viable configurations, reducing reliance on time-consuming manual modelling. Building on the topology optimisation in Case study 1, this next case study demonstrates a framework for holistically solving the interdependent problems of component placement, routing, and physics optimisation – addressing the dimension-ing challenge at the heart of multi-domain system design. This could ultimately be combined with the approach introduced in Case study 1 into a larger computational design synthesis program. The maximal disjoint ball decomposition (MDBD) geometric abstraction framework converts the previously too-complex-to-solve spatial packaging challenge into a manage-able optimisation problem (see example of e-drive system in Figure 11). To support this, we introduce a workflow that moves from CAD to an MDBD representation, then through an optimisa-tion or learning framework, and finally back to CAD. Because full CAD geometry is too complex for fast collision checking or gradient-based reasoning, MDBD offers a lightweight, differentiable abstraction suitable for optimisation. A trained agent can efficiently explore this non-convex design space, proposing high-quality placements much faster than manual exploration. Finally, the optimised positions are applied to the original CAD components, preserving geometric fidelity and eliminating the need for repeated manual CAD iterations. This combination allows engineers to avoid repeated manual CAD iteration while retaining full geometric fidelity. In this case study, we guide the reader through three steps. First, we introduce the geometric set-up and show how the MDBD abstraction enables a conventional continuous optimisation approach for placement and routing. Next, we validate the framework using a benchmark scenario with a known analytical solution. Finally, we outline how agent-based optimisation can be integrated into the same structure, and propose how predictive AI can further accelerate and generalise the spatial dimensioning workflow. 
+
+Methodology: from NP-hard to tractable 
+
+The core computational challenges are twofold: compo-nent placement and routing problems are NP-hard, exhibit-ing complexity that grows exponentially with system size 6Gearbox Con fi g Evaluation 
+
+Engineer Inputs - Performance Indicators, 
+
+> Acceleration 8 s (0 - 100 km/h) Top Speed 150 km/h
+> Gradeability 9%
+> Dimensions 40 x 70 x 65 cm
+> Midsize Car
+> Nissan Leaf
+> Gear speed ratio
+> = [2.3, 8.14]
+
+Design Space - Physics-Based Modeling  
+
+> Possible Gearboxes Outputed by Agent - choices expressed by
+> L
+> W
+> H
+> L
+> W
+> HH
+> L
+> W
+> Single-stage, parallel, helical Two-stage, parallel, helical Single-stage, co-axial, PGS
+
+Functional & Structural Design Space Generative AI 
+
+> Analysis Inputs Automated modeling
+
+Performance Space - Automated Simulation, Optimization 
+
+> NLP Solver: minimize losses and gearbox mass,
+> Gearboxes in the objective space -ef fi ciency over drive cycle Performance evaluation over WLTP drivecycle - optimizing
+
+Fig. 10. The engineer defines high-level performance targets, ytarget – such as top speed, acceleration, gradeability, and packaging dimensions, yet also the physical component limitations and the optimisation criteria J (efficiency, gearbox mass) – which form the input to the AI-driven framework. Based on these requirements and chosen component types, z, the trained-RL agent generates several feasible gearbox topologies, Tnew , for example single- and two-stage parallel gearbox layouts and a single-stage coaxial planetary configuration as shown. Each topology is optimised through a physics-based solver for parameters such as gear ratio ( γ), powertrain efficiency, and gearbox mass. The resulting designs are then evaluated in the objective space, where the trade-off between efficiency and mass can be visualised, enabling engineers to select the most suitable configuration for the given performance targets. 
+
+[15], and traditional CAD representations are discrete and non-differentiable, rendering them incompatible with efficient gradient-based optimisation algorithms [16]. Our proposed solution transforms this intractable problem into a solvable continuous optimisation problem through geo-metric abstraction: 
+
+Maximal disjoint ball decomposition (MDBD): This method creates a simplified, continuous, and differentiable geometric representation by filling each object with the largest possible set of non-overlapping spheres. This abstraction cap-tures complex geometry with tuneable fidelity and enables efficient, gradient-based collision detection [17]. An example of translating a gearbox-motor combination into an MDBD representation is shown in Figure 11. 
+
+Framework structure: The geometric set-up comprises a workspace containing objects (composed of spheres), connec-tion ports, and routing segments defined by moveable control points. Each object can translate and rotate freely. An example of this is depicted in Figure 12, where the previous motor-gearbox set-up is shown. 7          
+
+> Fig. 11. Amotor-gearbox combination (example CAD model, left) is transformed from a complex 3D shape (example real hardware, bottom right) to a maximal disjoint ball decomposition (MDBD, top right), which can be used for placement optimisation of the motor (green), differential (blue), and gears (yellow).
+> Fig. 12. A simplified ‘skateboard model’ of an electric car with a fitted motor-gearbox combination, as introduced in Figure 11.
+
+Optimisation formulation: The problem is formulated as a constrained, nonlinear, non-convex continuous optimisation. The objective function is a weighted combination of three sub-objectives: Volume minimization, Routing length minimiza-tion, and Physics optimization. Spatial placement feasibility is enforced through a set of constraints: (i) No overlap between objects. (ii) No overlap between routing segments and objects. (iii) No overlap between different routing segments. 
+
+Solving process: To effectively search the non-convex solution space, a hybrid solving approach is employed. As illustrated in Figure 13, this process combines stochastic random initialisation with an interior-point algorithm to find local minima, with the process repeated to explore different regions of the design space. Here, z represents the MDBD objects and relations; ytarget is the desired physics objective; x
+
+is the design variable; x∗ is the optimal design variable; x0 is the initial design variable provided by stochastic initialisation; and y is the result of the optimisation process. We can evaluate the result against J, the design criterion value. 
+
+Validation 
+
+The framework’s accuracy was first validated against a benchmark use-case involving the placement and routing of cuboid shapes (see Figure 14), for which an analytical op-timum is known. The visual result, shown in Figure 15, EXIT   
+
+> Optimization finds
+> local minima Random Initialization start point
+> Yes
+> No
+> Nested Framework
+> Fig. 13. The nested optimisation program uses a Random Initialization to find an initial position; the interior point optimisation finds a local minimum. This repeats until the maximum number of iterations is reached [21].
+> Fig. 14. Cuboid schematic: the dimensions 1x1x2 are shown in the single cuboid on the left; the connection port of the cuboid is shown in green. Note that there are two ports; the bottom one is not visible. On the right-hand side of the figure, an analytical optimal solution is shown [21].
+
+demonstrated that a good solution was found for the ana-lytical configuration. When analysing the difference between the analytical optimum and the found results, a volume and routing length difference of approximately 0.6% to 2% is seen, confirming the method’s validity. 
+
+Agent-based modelling 
+
+Future developments can extend this framework by inte-grating agent-based modelling principles with learning-based optimisation to replace the nested optimisation program. In this approach, the geometric system is represented by an agent that controls the decision vector x, which includes translations, rotations, and routing control points. The MDBD environment provides differentiable feedback on collisions, routing lengths, and physical feasibility, following a reinforcement learning (RL) paradigm rather than traditional optimisation:  
+
+> •
+
+State, s: current configuration derived from x. 
+
+> •
+
+Action, a: adjustments to x, modifying positions, orien-tations, or routing with Dx.8
+
+Fig. 15. The left panel visualises the original 1x1x2 cuboid object assembled from 40 spheres. The right panel shows the MDBD sphere decompositions for six objects, each highlighted with a separate colour. The solution aligns with the analytical configuration, confirming the result demonstrated in Figure 14 [21]. MDBD 
+
+> Modelling Environment
+> Agent
+> Action:
+> Reward:
+> Constraints:
+> State:
+
+Fig. 16. Single-agent reinforcement-learning loop. The agent updates the de-cision vector x; the MDBD environment evaluates the resulting configuration and returns a reward based on the optimisation objectives.  
+
+> •
+
+Reward, r(s, a ): scalar feedback combining volume, rout-ing length, and physics performance, with penalties for constraint violations. Through repeated interactions, the agent learns a policy for mapping configurations to optimal updates in x to maximise expected reward. Unlike deterministic gradient-based solvers, this learning-based approach explores broader non-convex design spaces and adapts to changing objectives. As shown in Figure 16, the agent interacts with the MDBD environment: each action updates x, the framework evaluates constraints and objectives, and the reward updates the policy using RL algorithms such as Q-learning [18], policy gradient [19], or actor-critic methods [20]. Once trained, the agent integrates seamlessly into the workflow (see Figure 17), en-abling scalable, data-driven dimensioning of complex, multi-physics systems. In doing so, it closes the CAD-to-MDBD-to-optimisation-to-CAD loop outlined in the introduction and demonstrates how predictive AI can systematically explore thousands of spatial configurations, reducing dependence on manual CAD iteration and moving towards the holistic, multi-domain design synthesis envisioned in this case study. 11122 
+
+> 3D STL File MDBD Representation of Object
+> MDBD Conversion
+> Computer Aided Design
+> Predictive AI
+> Exported 3D Objects MDBD Objects
+> Performance Space
+> Output: Results in Computer Aided Design
+> Design Space
+
+Fig. 17. The full framework to start with a CAD design and end with a CAD design. Using predictive AI for the placement, routing, and physics problem [22]. 
+
+V. C ONCLUSION : THE FUTURE OF ENGINEERING IS COLLABORATIVE 
+
+AI-powered automation-in-design is not a replacement for engineers but a profound augmentation of their capabilities, providing the tools necessary to manage the combinato-rial complexity of modern systems. The bi-level RL-NLP framework automates the daunting task of exploring discrete architectural choices, freeing the engineer from combinato-rial enumeration. Similarly, the MDBD geometric abstraction framework transforms the once-intractable spatial packaging problem into a solvable optimisation, liberating the engineer from laborious manual CAD-based iteration. By handling the immense task of generating and evaluating thousands of physically consistent designs, these AI tools empower human engineers to focus on creativity, innovation, and problem-framing. We are entering a new era of engineer-ing where human intuition guides the powerful exploratory capacity of AI to achieve breakthroughs previously beyond our reach. REFERENCES [1] Silvas, E., Hofman, T., Murgovski, N., Etman, L., & Steinbuch, M. (2017). Review of Optimization Strategies for System-Level Design in Hybrid Electric Vehicles. IEEE Transactions on Vehicular Technology ,66(1), 57–70. [2] Wijkniet, J., & Hofman, T. (2018). Modified Computational Design Syn-thesis Using Simulation-Based Evaluation and Constraint Consistency for Vehicle Powertrain Systems. IEEE Trans. on Vehicular Technology ,67(9), 8065–8076. [3] Silvas, E., Hofman, T., Serebrenik, A., & Steinbuch, M. (2015). Functional and Cost-Based Automatic Generator for Hybrid Vehicles Topologies. IEEE/ASME Transactions on Mechatronics , 20(4), 1561– 1572. [4] Luft, T., Roth, D., Binz, H., & Wartzack, S. (2017). A new “knowledge-based engineering” guideline. In ICED17 (Ed.), 21st Int. Conf. on Engineering Design, ICED17 . Vancouver, Canada. [5] Harselaar, W. v., Hofman, T., & Brouwer, M. (2018, Aug.). Automated Dynamic Modeling of Arbitrary Hybrid and Electric Drivetrain Topolo-gies. IEEE Transactions on Vehicular Technology (8), 6921–6934. [6] Wang, D., Gao, N., Liu, D., Li, J., & Lewis, F. L. (2024, Jan.). Recent Progress in Reinforcement Learning and Adaptive Dynamic Programming for Advanced Control Applications. IEEE/CAA Journal of Automatica Sinica , 11(1), 18–36. [7] Koh, E. C. (2024). Auto-DSM: Using a Large Language Model to generate a Design Structure Matrix. Natural Language Processing Journal , 9. 9
+
+[8] Kort, A.-J., Wijkniet, J., Serebrenik, A., & Hofman, T. (2020). Auto-mated Multi-Level Dynamic System Topology Design Synthesis. Vehi-cles , 2(4), 603–624. [9] Kang, N. (2025, May 21). Generative AI-driven design optimization: eight key application scenarios. JMST Adv. , 7, 105–111. [10] Eschenauer, H. A. (2001, July). Topology optimization of continuum structures: A review . ASME. Appl. Mech. Rev. , 54(4), 331–390. [11] Clifton, J., & Laber, E. (2020). Q-Learning: Theory and Applications. 
+
+Annual Review of Statistics and Its Application , 7, 279–301. [12] Boppiniti, S. T. (2021, Jun. 1). Evolution of Reinforcement Learning: From Q-Learning to Deep. Available at SSRN: https://ssrn.com/abstract= 5061696. [13] Oh, S. J. (2019, September 16). Deep Generative Design: Integration of Topology Optimization and Generative Models. ASME. J. Mech. Des. ,141(11). [14] Peddada, S. R., Zeidner, L. E., Ilies, H. T., James, K. A., & Allison, J. T. (2022, Aug.). Toward Holistic Design of Spatial Packaging of Interconnected Systems With Physical Interactions (SPI2). Journal of Mechanical Design , 144(12). [15] Yano, N., Morinaga, T., & Saito, T. (2008). Packing optimization for cargo containers. SICE Annual Conference (pp. 3479–3482). Chofu, Japan: IEEE. [16] Jiangce Chen. (2023). Non-uniform Disjoint Ball Decomposition: For-mulations and Applications in Engineering Design. Connecticut, USA: University of Connecticut. [17] Chen, J., & Ilies, H. T. (2020, Sep.). Maximal Disjoint Ball Decompo-sitions for shape modeling and analysis. Computer-Aided Design , 126, 102850. [18] Watkins, C., & Dayan, P. (1992). Q-learning. Mach Learn , 8, 279–292. [19] H. Tan. (2021). Reinforcement Learning with Deep Deterministic Policy Gradient. Int. Conf. on Artificial Intelligence, Big Data and Algorithms (CAIBDA) , (pp. 82–85). Xi’an, China: IEEE. [20] Grondman, I., Busoniu, L., Lopes, G. A., & Babuska, R. (2012, Nov.). A Survey of Actor-Critic Reinforcement Learning: Standard and Natural Policy Gradients. IEEE Trans. Syst., Man, Cybern. C , 42(6), 1291–1307. [21] S. Westerhof & T. Hofman. (2026). A Hybrid Optimization Framework for Spatial Packaging of Interconnected Systems. In: eprint . arXiv: 2605.17424 [cs.CE]. https://arxiv.org/abs/2605.17424. [22] S. Westerhof & T. Hofman. (2026). Spatial Optimization of Inter-connected Systems in Non-Convex Design Spaces. In: eprint . arXiv: 2605.17387 [cs.CE]. https://arxiv.org/abs/2605.17387.
