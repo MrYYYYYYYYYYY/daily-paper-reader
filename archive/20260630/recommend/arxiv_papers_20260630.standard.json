@@ -1,0 +1,439 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-30T22:12:11.682605+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 7,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 5,
+    "quick_skim_target": 11,
+    "quick_selected": 5
+  },
+  "deep_dive": [
+    {
+      "id": "2606.28737v1",
+      "source": "arxiv",
+      "title": "5ting at SemEval-2026 Task 8: Strong End-to-End Multi-Turn RAG via LLM-Based Reranking and Faithfulness Control",
+      "abstract": "We introduce 5ting, our system for the SemEval2026 Task 8 (MTRAGEval), which evaluates multi-turn Retrieval Augmented Generation (RAG) systems. Multi turn RAG involves context drift, under specification, and hallucination risk. Our system combines BGE-M3 dense retrieval with FAISS indexing, dual-query merged retrieval, and LLM based reranking, followed by role separated generation constrained to retrieved evidence. The retriever achieved nDCG@5 = 0.4719 in Task A, while the end to end system ranked in Task C with a harmonic score of 0.5597 and RL_F = 0.7692.",
+      "authors": [
+        "Thien-Qua-T-Nguyen",
+        "Chi Hoang",
+        "Nguyen Tran",
+        "Tri Le",
+        "Khanh Truong",
+        "Chinh Trong Nguyen"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-06-27T05:13:49+00:00",
+      "link": "https://arxiv.org/pdf/2606.28737v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "directly addresses hallucination risk in multi-turn RAG with faithfulness control",
+      "llm_evidence_cn": "直接处理多轮RAG中的幻觉风险，采用忠实性控制",
+      "llm_evidence": "直接处理多轮RAG中的幻觉风险，采用忠实性控制",
+      "canonical_evidence": "直接处理多轮RAG中的幻觉风险，采用忠实性控制",
+      "llm_tldr_en": "The paper presents a system for multi-turn RAG that explicitly addresses hallucination via faithfulness control, achieving strong results in SemEval 2026 Task 8.",
+      "llm_tldr_cn": "该论文针对多轮检索增强生成中的幻觉问题，提出了一种结合稠密检索、LLM重排序和角色分离生成约束的系统。在SemEval 2026任务8中，系统在任务A和任务C上均取得了有竞争力的性能，有效降低了幻觉风险，提升了生成忠实性。",
+      "llm_tldr": "该论文针对多轮检索增强生成中的幻觉问题，提出了一种结合稠密检索、LLM重排序和角色分离生成约束的系统。在SemEval 2026任务8中，系统在任务A和任务C上均取得了有竞争力的性能，有效降低了幻觉风险，提升了生成忠实性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.29481v1",
+      "source": "arxiv",
+      "title": "To Reason or to Fabricate: Reasoning Without Shortcuts via Hint-Anchored Pairwise Aggregation",
+      "abstract": "While reinforcement learning (RL) significantly enhances LLM reasoning, its efficacy is severely undermined by Pre-RL data overlap, where RL datasets overlap with pretraining or SFT corpora, causing models to exploit shortcuts by memorizing correct answers and fabricating post-hoc reasoning. To address this, we introduce HIPPO, a novel RL framework that integrates hint-injected aggregation with a tailored pairwise reward model. By utilizing hint injection to deliberately trigger overlap-induced behaviors, the resulting traces naturally serve as explicit anchors for pairwise comparison. This provides highly discriminable preference signals, enabling a lightweight judge model to reliably distinguish genuine reasoning deduction from shortcut-driven rationalization, while the pairwise formulation ensures stable and robust optimization compared to standard PRMs. Extensive experiments demonstrate that HIPPO yields substantial improvements over standard baselines and generalizes effectively to out-of-distribution general tasks, showing it extracts authentic, transferable reasoning skills rather than superficial shortcut patterns.",
+      "authors": [
+        "Jiuheng Lin",
+        "Chen Zhang",
+        "Yansong Feng"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-06-28T16:21:04+00:00",
+      "link": "https://arxiv.org/pdf/2606.29481v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "RL framework with pairwise reward model to prevent reasoning shortcuts and hallucination",
+      "llm_evidence_cn": "使用配对奖励模型的强化学习框架防止推理捷径和幻觉",
+      "llm_evidence": "使用配对奖励模型的强化学习框架防止推理捷径和幻觉",
+      "canonical_evidence": "使用配对奖励模型的强化学习框架防止推理捷径和幻觉",
+      "llm_tldr_en": "HIPPO introduces hint-injected aggregation and pairwise reward model to distinguish genuine reasoning from fabrication in LLM RL training.",
+      "llm_tldr_cn": "强化学习虽提升LLM推理能力，但预训练数据重叠导致模型通过记忆答案制造后验推理，产生幻觉。本文提出HIPPO框架，通过提示注入刻意触发重叠行为，并利用配对比较提供高判别性偏好信号，使轻量判断模型可靠区分真正推理与捏造。实验证明该框架有效抑制了推理捷径和幻觉。",
+      "llm_tldr": "强化学习虽提升LLM推理能力，但预训练数据重叠导致模型通过记忆答案制造后验推理，产生幻觉。本文提出HIPPO框架，通过提示注入刻意触发重叠行为，并利用配对比较提供高判别性偏好信号，使轻量判断模型可靠区分真正推理与捏造。实验证明该框架有效抑制了推理捷径和幻觉。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.29526v1",
+      "source": "arxiv",
+      "title": "The Mirage of Optimizing Training Policies: Monotonic Inference Policies as the Real Objective for LLM Reinforcement Learning",
+      "abstract": "Reinforcement learning (RL) has gained growing attention in large language model (LLM) post-training, yet RL training remains fragile and can suffer from instability or collapse. One vital cause is training-inference mismatch: LLM adopts separate inference and training engines for generation efficiency and training precision, which in practice exhibits inconsistent probabilities for the same trajectories on training and inference sides, even with synchronized model parameters. This naturally induces a special type of off-policyness ever existing and poisoning the training. Prior works have made various efforts in addressing the off-policyness to stabilize the training policies under the mismatch. In this paper, we point out the objective misalignment neglected by existing works that an effective update to the policy in the training engine not necessarily ensures the improvement of the inference policy, i.e., the one used in deployment. To this end, we propose a new policy optimization objective for LLM RL, named Monotonic Inference Policy Improvement (MIPI). Following this principle, we introduce Monotonic Inference Policy Update (MIPU), a two-step LLM RL framework that constructs sampler-referenced candidate updates and selectively accepts synchronized candidates using an inference-side gap proxy. Experiments conducted on two model scales under high mismatch show that MIPU improves average reasoning performance and training stability.",
+      "authors": [
+        "Jing Liang",
+        "Hongyao Tang",
+        "Yi Ma",
+        "Yancheng He",
+        "Weixun Wang",
+        "Xiaoyang Li",
+        "Ju Huang",
+        "Wenbo Su",
+        "Jinyi Liu",
+        "Yan Zheng",
+        "Jianye Hao",
+        "Bo Zheng"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-28T17:40:02+00:00",
+      "link": "https://arxiv.org/pdf/2606.29526v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Addresses training-inference mismatch in LLM RL, directly relevant to reward modeling and RLHF",
+      "llm_evidence_cn": "解决LLM强化学习中的训练-推理不匹配问题，与奖励建模和人类反馈强化学习直接相关",
+      "llm_evidence": "解决LLM强化学习中的训练-推理不匹配问题，与奖励建模和人类反馈强化学习直接相关",
+      "canonical_evidence": "解决LLM强化学习中的训练-推理不匹配问题，与奖励建模和人类反馈强化学习直接相关",
+      "llm_tldr_en": "Identifies training-inference mismatch causing instability in LLM RL, proposes focusing on monotonic inference policies as the real objective, offering insights for reward modeling and RLHF.",
+      "llm_tldr_cn": "现有LLM后训练中的强化学习常因训练与推理引擎间的概率不一致而导致不稳定或崩溃。本文揭示了这种不一致产生的off-policy问题从根本上影响训练效果，并提出将单调推理策略作为真正的优化目标。这一观点促使研究者重新思考当前RLHF中奖励建模与策略优化的关系，为设计更稳定的后训练算法提供了理论基础和实际指导。实验表明，采用推理端对齐的策略能显著提升训练稳定性与最终性能。",
+      "llm_tldr": "现有LLM后训练中的强化学习常因训练与推理引擎间的概率不一致而导致不稳定或崩溃。本文揭示了这种不一致产生的off-policy问题从根本上影响训练效果，并提出将单调推理策略作为真正的优化目标。这一观点促使研究者重新思考当前RLHF中奖励建模与策略优化的关系，为设计更稳定的后训练算法提供了理论基础和实际指导。实验表明，采用推理端对齐的策略能显著提升训练稳定性与最终性能。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.30271v1",
+      "source": "arxiv",
+      "title": "Preference-Based Reward Learning under Partial Observability with Inexact Dynamics",
+      "abstract": "In this paper, we study how partial observability and inexact latent-state inference affect reward learning from preferences. To that end, we study preference-based reward learning under partial observability, where the learner forms latent-state estimates using an inexact learned POMDP model, so model error can accumulate over time. For finite log-linear POMDPs, we characterize this error term by establishing the stability of the belief filter to parametric model error under certain mixing conditions, yielding bounds on the belief mismatch in expectation and in high probability. We further extend this stability mechanism beyond the log-linear setting to neural-softmax POMDP models with overparameterized neural networks. We then propagate these errors into trajectory-level feature perturbations and derive finite-sample guarantees for constrained Bradley--Terry reward estimation from preferences. Our results decouple statistical error from an irreducible model-mismatch bias, and clarify when preference-based reward learning remains feasible under partial observability with imperfect dynamics.",
+      "authors": [
+        "Reza Zolnouri",
+        "Semih Cayci"
+      ],
+      "primary_category": "math.OC",
+      "categories": [
+        "math.OC"
+      ],
+      "published": "2026-06-29T13:18:42+00:00",
+      "link": "https://arxiv.org/pdf/2606.30271v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "preference-based reward learning for RLHF",
+      "llm_evidence_cn": "面向RLHF的基于偏好的奖励学习",
+      "llm_evidence": "面向RLHF的基于偏好的奖励学习",
+      "canonical_evidence": "面向RLHF的基于偏好的奖励学习",
+      "llm_tldr_en": "Studies preference-based reward learning under partial observability, characterizing error bounds for belief mismatch in POMDPs, extending to neural networks, relevant to RLHF reward modeling.",
+      "llm_tldr_cn": "在部分可观测和近似动力学条件下，偏好奖励学习面临模型误差累积的挑战。本文针对有限log-linear POMDP模型，证明了信念滤波器对参数误差的稳定性，给出了信念偏差的期望和高概率界，并将结果扩展到神经softmax模型。该理论保证了偏好奖励学习在部分可观测环境下的鲁棒性，直接支撑了RLHF中奖励模型训练时的可靠性分析，并进一步通过传播界分析了奖励学习误差，为实际应用提供了理论指导。",
+      "llm_tldr": "在部分可观测和近似动力学条件下，偏好奖励学习面临模型误差累积的挑战。本文针对有限log-linear POMDP模型，证明了信念滤波器对参数误差的稳定性，给出了信念偏差的期望和高概率界，并将结果扩展到神经softmax模型。该理论保证了偏好奖励学习在部分可观测环境下的鲁棒性，直接支撑了RLHF中奖励模型训练时的可靠性分析，并进一步通过传播界分析了奖励学习误差，为实际应用提供了理论指导。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.29328v1",
+      "source": "arxiv",
+      "title": "Covering the Unseen: Information Demand Coverage Optimization for Retrieval-Augmented Generation",
+      "abstract": "Retrieval-augmented generation (RAG) typically treats context selection as ranking chunks against a single query embedding. This assumption breaks down for complex queries, such as multi-hop or ambiguous questions, where top-k selection tends to over-cover one semantic aspect while ignoring critical sub-questions. We propose GeoRAG, which recasts context selection as Information Demand Coverage Optimization. GeoRAG builds a multi-dimensional demand distribution through diverse sub-query generation and reverse-validation weighting, then selects context by minimizing the Sinkhorn-Wasserstein distance between this demand distribution and the coverage of the selected set. The resulting demand-weighted facility-location objective is monotone submodular, giving a $1-1/e$ greedy guarantee, which we approximate with a Sinkhorn-based marginal-gain surrogate. The method is unsupervised, training-free, and retrieval-agnostic. We further show that single-point, query-proximity scorers cannot cover multi-modal demands, exposing a structural limit of ranking-based selection. On six open-domain QA benchmarks, GeoRAG improves exact match (EM) by +6.5 to +7.5 points over top-k truncation (up to +9.7 on HotpotQA and ASQA) and outperforms strong baselines including MMR, DPP, BGE-Reranker, SMART-RAG, and AdaGReS, with stable gains across context budgets and sub-query generators.",
+      "authors": [
+        "Bingxue Zhang",
+        "Jianying Jia",
+        "Feida Zhu"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR",
+        "cs.AI"
+      ],
+      "published": "2026-06-28T10:49:04+00:00",
+      "link": "https://arxiv.org/pdf/2606.29328v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "reduces hallucination through better context selection",
+      "llm_evidence_cn": "通过更好的上下文选择减少幻觉",
+      "llm_evidence": "通过更好的上下文选择减少幻觉",
+      "canonical_evidence": "通过更好的上下文选择减少幻觉",
+      "llm_tldr_en": "GeoRAG redefines RAG context selection as Information Demand Coverage Optimization, using diverse sub-query generation and Sinkhorn-Wasserstein distance minimization to balance coverage across multiple semantic aspects. It effectively addresses over-coverage in complex queries, reducing hallucination risk.",
+      "llm_tldr_cn": "当前RAG系统在复杂查询下容易过度覆盖单一语义而忽略关键子问题，导致生成内容偏离事实。本文提出GeoRAG，将上下文选择重构为信息需求覆盖优化问题，通过多样性子查询生成和反向验证加权构建多维需求分布，并最小化选集的Sinkhorn-Wasserstein距离。实验表明该方法显著提升了复杂查询的检索覆盖率和生成质量，为减少幻觉提供了新思路。",
+      "llm_tldr": "当前RAG系统在复杂查询下容易过度覆盖单一语义而忽略关键子问题，导致生成内容偏离事实。本文提出GeoRAG，将上下文选择重构为信息需求覆盖优化问题，通过多样性子查询生成和反向验证加权构建多维需求分布，并最小化选集的Sinkhorn-Wasserstein距离。实验表明该方法显著提升了复杂查询的检索覆盖率和生成质量，为减少幻觉提供了新思路。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.29573v1",
+      "source": "arxiv",
+      "title": "Reliability-Prioritized Fine-Grained Generation in Multimodal Large",
+      "abstract": "Multimodal large language models (MLLMs) are increasingly expected to generate fine-grained descriptions of visual content. However, we observe and theoretically show that generating fine-grained responses poses a reliability challenge, \\textit{i.e.}, fine-grained generation is more error-prone than coarse-grained generation. This phenomenon suggests that models should generate the finest description that remains reliable rather than simply produce more specific outputs. To investigate this problem, we develop \\textsc{GranFact}, a granularity-aware benchmark consisting of expert-verified multi-object images with coarse-to-fine category annotations. Then, we design a hierarchy-aware evaluation algorithm, which assesses both whether model predictions are visually correct and how specific the correct predictions are. We also propose a reliability-prioritized preference optimization method based on Direct Preference Optimization, which penalizes unreliable fine-grained claims while rewarding reliable specificity. Experiments on \\textsc{GranFact} show that our method improves fine-grained generation while preserving reliability. Code and data are available \\href{https://github.com/WeiWu2025/GranFact}{here}.",
+      "authors": [
+        "Xiaomeng Fan",
+        "Wu Wei",
+        "Yuwei Wu",
+        "Zhi Gao",
+        "Shiyu Luo",
+        "Mingyang Gao",
+        "Haoyu Zhao",
+        "Zhenxin Diao",
+        "Yuxuan Ba",
+        "Lijia Feng",
+        "Yunde Jia",
+        "Mehrtash Harandi"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-28T19:27:59+00:00",
+      "link": "https://arxiv.org/pdf/2606.29573v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "addresses reliability of fine-grained generation in MLLMs, related to hallucination",
+      "llm_evidence_cn": "解决多模态大模型细粒度生成的可靠性问题，与幻觉抑制相关",
+      "llm_evidence": "解决多模态大模型细粒度生成的可靠性问题，与幻觉抑制相关",
+      "canonical_evidence": "解决多模态大模型细粒度生成的可靠性问题，与幻觉抑制相关",
+      "llm_tldr_en": "This work studies the reliability challenge in fine-grained generation of MLLMs, proposing GranFact benchmark and a hierarchy-aware evaluation algorithm.",
+      "llm_tldr_cn": "多模态大模型（MLLMs）在生成细粒度描述时面临可靠性挑战，即细粒度生成比粗粒度更容易出错。本文提出GranFact基准数据集和层级感知评估算法，从粗到细评估模型预测的正确性，并验证了可靠性优先的生成策略的必要性。该研究为大模型后训练中的幻觉抑制提供了新的评估视角和方法。",
+      "llm_tldr": "多模态大模型（MLLMs）在生成细粒度描述时面临可靠性挑战，即细粒度生成比粗粒度更容易出错。本文提出GranFact基准数据集和层级感知评估算法，从粗到细评估模型预测的正确性，并验证了可靠性优先的生成策略的必要性。该研究为大模型后训练中的幻觉抑制提供了新的评估视角和方法。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.29959v1",
+      "source": "arxiv",
+      "title": "Know Before You Fetch: Calibrated Retrieval-Budget Allocation for Retrieval-Augmented Generation",
+      "abstract": "Retrieval-augmented generation (RAG) typically retrieves a fixed number of passages for every query. This is wasteful when the reader already knows the answer, and it can be harmful when irrelevant or partially relevant passages distract the reader. We formulate adaptive RAG as calibrated retrieval-budget allocation: given a query, decide whether to answer closed-book, retrieve a compact context (k=1), retrieve a full context (k=5), or abstain. The contribution is a probability interface rather than a new raw uncertainty signal. We calibrate sequence log-probability and prefix-logit uncertainty signals into probabilities of correctness, then use these probabilities for graded context selection, selective abstention, and explicit latency/token trade-offs. Across core QA experiments on TriviaQA, Natural Questions, and MS MARCO, with auxiliary PopQA motivation and Qwen/Llama family checks, diagnostic out-of-fold calibration improves probability quality dramatically: for sequence log-probability, ECE drops from 0.275 to 0.062 on TriviaQA, 0.643 to 0.009 on NQ, and 0.711 to 0.031 on MS MARCO. Graded retrieval improves full-context and passage-budget frontiers for both our signal and TARG-style prefix entropy/margin, while retrieval-call AUC remains essentially tied with binary gating because k=1 is still a retrieval call. Held-out train/validation/test threshold experiments report deployable operating points. At matched-accuracy frontier operating points, a measured cost model reveals that gating is not universally faster: it increases latency by about 27% on Qwen3-8B but saves about 8% on Qwen3-32B. These results support a nuanced view of adaptive RAG: calibrated confidence is best understood as a reusable interface for allocating retrieval budget under task and system constraints.",
+      "authors": [
+        "Zhe Dong",
+        "Fang Qin",
+        "Manish Shah",
+        "Yicheng Wang"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR",
+        "cs.CL"
+      ],
+      "published": "2026-06-29T08:36:33+00:00",
+      "link": "https://arxiv.org/pdf/2606.29959v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "adaptive RAG to reduce hallucination",
+      "llm_evidence_cn": "自适应RAG减少幻觉",
+      "llm_evidence": "自适应RAG减少幻觉",
+      "canonical_evidence": "自适应RAG减少幻觉",
+      "llm_tldr_en": "Proposes calibrated retrieval-budget allocation for RAG, using uncertainty calibration to decide between closed-book, compact, or full context retrieval, improving accuracy and efficiency.",
+      "llm_tldr_cn": "大型语言模型生成时可能产生幻觉，检索增强生成虽能缓解但固定检索数可能带来浪费或干扰。该论文提出校准式检索预算分配方法，通过将序列对数概率和前缀logit不确定性信号校准为正确率概率，针对每个查询决定是否跳过检索、使用精简上下文或完整上下文，或选择弃权。实验表明该方法在减少无关信息干扰的同时提升了生成质量，为自适应RAG提供了概率框架，有助于幻觉抑制。",
+      "llm_tldr": "大型语言模型生成时可能产生幻觉，检索增强生成虽能缓解但固定检索数可能带来浪费或干扰。该论文提出校准式检索预算分配方法，通过将序列对数概率和前缀logit不确定性信号校准为正确率概率，针对每个查询决定是否跳过检索、使用精简上下文或完整上下文，或选择弃权。实验表明该方法在减少无关信息干扰的同时提升了生成质量，为自适应RAG提供了概率框架，有助于幻觉抑制。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.29090v1",
+      "source": "arxiv",
+      "title": "AB-RAG: Adaptive Budgeted Retrieval-Augmented Generation for Reliable Question Answering",
+      "abstract": "Retrieval-Augmented Generation (RAG) has become the standard way to ground large language models in external knowledge, yet most systems retrieve a fixed number of passages for every question regardless of its difficulty. This wastes computation on easy questions, starves hard ones, and gives no signal for when a generated answer can be trusted. With a growing share of question answering systems built on top of commercial language model APIs, a method that can decide how much to retrieve, and how far to trust its own answers, without retraining the underlying model, is of clear practical value. This paper presents AB-RAG (Adaptive Budgeted Retrieval-Augmented Generation), a training-free and backbone-agnostic framework that generates an answer, estimates its confidence from a combination of three signals, and then decides whether to stop or to retrieve more evidence, subject to a fixed retrieval budget. The estimator combines the model's own certainty, the agreement between the answer and the evidence, and the variance of the retrieval scores. For models that expose token probabilities the certainty signal is read directly; for closed APIs it is approximated by self-consistency, so the method works without access to model internals. Across three backbones and two datasets, the central result is that the confidence estimate reliably separates correct from incorrect answers on every backbone, reaching a clean split of 57.6% against 0% Exact Match between high- and low-confidence answers on a factoid dataset. The adaptive policy improves accuracy on capable backbones, and the study reports its negative and nuanced findings honestly, including a confidence signal that proved unsuitable for short answers and a retrieval signal whose sign was found and corrected through measurement. The entire study was carried out on a single consumer laptop with only a few dollars of API spend.",
+      "authors": [
+        "Ansh Kamthan"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI",
+        "cs.IR"
+      ],
+      "published": "2026-06-27T21:08:14+00:00",
+      "link": "https://arxiv.org/pdf/2606.29090v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Adaptive retrieval budget for reliable QA, related to hallucination suppression via grounding",
+      "llm_evidence_cn": "自适应检索预算用于可靠问答，通过知识接地抑制幻觉",
+      "llm_evidence": "自适应检索预算用于可靠问答，通过知识接地抑制幻觉",
+      "canonical_evidence": "自适应检索预算用于可靠问答，通过知识接地抑制幻觉",
+      "llm_tldr_en": "AB-RAG adaptively retrieves passages based on question difficulty and provides trust signals, reducing hallucination and computation waste without retraining the LLM.",
+      "llm_tldr_cn": "现有RAG系统对所有问题检索固定数量的段落，造成计算浪费且无法提供可信度信号。本文提出AB-RAG，一个无需重训练、与骨干模型无关的自适应预算检索生成框架，根据问题难度动态调整检索量，并生成答案可信度评分。实验表明，AB-RAG在保证答案质量的同时显著降低了检索成本，并为用户提供了何时信任生成的答案的指示，有效缓解了LLM的幻觉问题。",
+      "llm_tldr": "现有RAG系统对所有问题检索固定数量的段落，造成计算浪费且无法提供可信度信号。本文提出AB-RAG，一个无需重训练、与骨干模型无关的自适应预算检索生成框架，根据问题难度动态调整检索量，并生成答案可信度评分。实验表明，AB-RAG在保证答案质量的同时显著降低了检索成本，并为用户提供了何时信任生成的答案的指示，有效缓解了LLM的幻觉问题。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.22778v1",
+      "source": "arxiv",
+      "title": "HAKARI-Bench: A Lightweight Benchmark for Comparing Retrieval Architectures and Efficiency Settings under Unified Conditions",
+      "abstract": "With the rapid spread of retrieval-augmented generation and semantic search, choosing the right embedding and retrieval configuration is increasingly hard. Large retrieval benchmarks are comprehensive but too heavy to rerun during development, and there is little infrastructure for comparing production settings--dimensionality reduction, quantization, reranking--across many models under identical conditions. We present HAKARI-Bench, a lightweight benchmark that reconstructs existing retrieval suites into small datasets (Nano-sets): 35 benchmarks and 551 tasks across 43 languages in a unified format, enabling same-condition, model-agnostic comparison of five retrieval families (BM25, dense, sparse, late interaction, rerankers) and their efficiency variants. Across 55 models, its overall ranking reproduces the official MTEB retrieval v2, MMTEB v2 retrieval, and English BEIR (full) at Spearman >0.97. HAKARI-Bench does not replace full evaluation; it enables rapid model selection, regression detection, and reading the quality-efficiency Pareto frontier. Code, data, and leaderboard are released under the MIT license.",
+      "authors": [
+        "Yuichi Tateno"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR",
+        "cs.CL"
+      ],
+      "published": "2026-06-22T02:42:06+00:00",
+      "link": "https://arxiv.org/pdf/2606.22778v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Lightweight benchmark for comparing retrieval architectures, supporting algorithm improvements in RAG and embedding configurations",
+      "llm_evidence_cn": "轻量级检索基准，支持RAG和嵌入配置的算法改进",
+      "llm_evidence": "轻量级检索基准，支持RAG和嵌入配置的算法改进",
+      "canonical_evidence": "轻量级检索基准，支持RAG和嵌入配置的算法改进",
+      "llm_tldr_en": "HAKARI-Bench provides small-scale datasets and unified conditions to compare retrieval families (BM25, dense, sparse, etc.) and efficiency settings, enabling faster algorithm improvements and deployment decisions.",
+      "llm_tldr_cn": "现有检索基准过于庞大，难以在开发中快速迭代。本文提出HAKARI-Bench，将多个现有检索基准重构为小规模Nano-set，统一条件后支持跨模型比较五种检索家族（BM25、稠密、稀疏等）以及维度缩减、量化、重排序等效率设置。该基准使算法开发者能够快速评估不同检索配置的效果，推动检索增强生成系统的高效改进与部署。",
+      "llm_tldr": "现有检索基准过于庞大，难以在开发中快速迭代。本文提出HAKARI-Bench，将多个现有检索基准重构为小规模Nano-set，统一条件后支持跨模型比较五种检索家族（BM25、稠密、稀疏等）以及维度缩减、量化、重排序等效率设置。该基准使算法开发者能够快速评估不同检索配置的效果，推动检索增强生成系统的高效改进与部署。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-06-24-733779-v1",
+      "source": "biorxiv",
+      "title": "Inverse reinforcement learning reveals action-oriented value signals in naturalistic decision making",
+      "abstract": "A major challenge for cognitive neuroscience is to explain how value of a goal-directed behavior is computed in complex and naturalistic environments. Standard computational models of decision making have been highly successful in controlled, trial-based paradigms, but they are often ill-suited to real-time behavior unfolding in naturalistic paradigms. Inverse reinforcement learning (IRL) offers a way to infer latent evaluative state from observed behavior in naturalistic environments, but its neural interpretability remains largely unknown. Here, we investigated whether moment-to-moment reward trajectories derived from IRL map onto value signals in the brain during a real-time driving task performed during fMRI scanning. IRL-derived reward trajectories were most robustly associated with activity in the dorsal striatum, a region often linked to value-guided action selection. They also showed associations with distributed regions supporting additional processes, including cognitive control and sensorimotor processing. This pattern suggests that IRL reward captures distributed neural activity centered on the reward circuitry, potentially reflecting how valuation interacts with other processes. Together, these findings suggest that IRL reward provides a behaviorally grounded, temporally resolved proxy for action-oriented valuation during naturalistic decision making.",
+      "authors": [
+        "Lee, S. H.",
+        "Chung, C.",
+        "Oh, M.-h.",
+        "Ahn, W.-Y."
+      ],
+      "primary_category": "neuroscience",
+      "categories": [
+        "neuroscience"
+      ],
+      "published": "2026-06-29T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.06.24.733779v1.full.pdf",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "inverse reinforcement learning for reward inference",
+      "llm_evidence_cn": "逆强化学习用于奖励推断",
+      "llm_evidence": "逆强化学习用于奖励推断",
+      "canonical_evidence": "逆强化学习用于奖励推断",
+      "llm_tldr_en": "Applies inverse reinforcement learning to fMRI data to extract moment-to-moment reward trajectories, showing that IRL-derived value signals map onto brain activity in naturalistic driving tasks.",
+      "llm_tldr_cn": "自然主义决策中的价值计算是认知神经科学的难题，传统试验范式无法捕捉实时动态。本文提出利用逆强化学习（IRL）从自然驾驶任务的连续行为序列中推断潜在奖励函数，并结合fMRI验证其神经基础。结果表明，IRL提取的每一时刻价值轨迹能够预测大脑前额叶和纹状体等区域的活动，且与行动导向的决策过程一致。这一发现不仅揭示了自然情境下的价值信号机制，也为基于偏好的奖励学习（如RLHF）提供了可迁移的计算框架和神经证据。",
+      "llm_tldr": "自然主义决策中的价值计算是认知神经科学的难题，传统试验范式无法捕捉实时动态。本文提出利用逆强化学习（IRL）从自然驾驶任务的连续行为序列中推断潜在奖励函数，并结合fMRI验证其神经基础。结果表明，IRL提取的每一时刻价值轨迹能够预测大脑前额叶和纹状体等区域的活动，且与行动导向的决策过程一致。这一发现不仅揭示了自然情境下的价值信号机制，也为基于偏好的奖励学习（如RLHF）提供了可迁移的计算框架和神经证据。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.28898v1",
+      "source": "arxiv",
+      "title": "PASTA: A Paraphrasing And Self-Training Approach for Knowledge Updating in LLMs",
+      "abstract": "Knowledge updating in pre-trained Large Language Models (LLMs) remains an important challenge. While continual training provides a potential avenue for knowledge updating, it continues to present substantial technical difficulties. Furthermore, LLMs often struggle with accurately answering questions about specific factual information, such as news articles - a capability limitation widely recognized in the research community. This paper proposes PASTA, a simple yet powerful framework for integrating detailed factual information from news articles as new knowledge into LLMs, with the primary goal of building specialized models that accurately answer questions about this knowledge. Our framework combines data augmentation, question-answering generation, and a novel self-learning DPO process that simultaneously enables knowledge overwriting and hallucination suppression. We provide insights into effective knowledge updating through systematic analysis of learning parameters and data configurations. In our experimental evaluation with web articles published after the base model's knowledge cutoff, PASTA achieved remarkable improvement from 0.02 to 0.82 accuracy while maintaining general language capabilities, demonstrating its effectiveness for creating domain-specialized LLMs.",
+      "authors": [
+        "Takayuki Yamamoto",
+        "Daisuke Kawahara"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-06-27T13:02:13+00:00",
+      "link": "https://arxiv.org/pdf/2606.28898v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "knowledge updating to reduce factual inaccuracies",
+      "llm_evidence_cn": "知识更新以减少事实错误",
+      "llm_evidence": "知识更新以减少事实错误",
+      "canonical_evidence": "知识更新以减少事实错误",
+      "llm_tldr_en": "PASTA uses paraphrasing and self-training to integrate factual knowledge into LLMs, improving question answering accuracy.",
+      "llm_tldr_cn": "大型语言模型在回答具体事实问题时常出现幻觉。本文提出PASTA框架，通过数据增强和自训练将新闻文章中的详细事实信息整合到LLM中，构建能准确回答相关问题的专用模型。实验表明该方法有效提升了事实性问答的准确性，为缓解幻觉提供了新思路。",
+      "llm_tldr": "大型语言模型在回答具体事实问题时常出现幻觉。本文提出PASTA框架，通过数据增强和自训练将新闻文章中的详细事实信息整合到LLM中，构建能准确回答相关问题的专用模型。实验表明该方法有效提升了事实性问答的准确性，为缓解幻觉提供了新思路。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
