@@ -1,0 +1,509 @@
+Title: OASIF: An Efficient Obfuscation-Aware Self-Improving Framework for LLM-Based Assembly Code Instruction Following and Comprehension
+
+URL Source: https://arxiv.org/pdf/2606.29155v1
+
+Published Time: Tue, 30 Jun 2026 00:56:07 GMT
+
+Number of Pages: 17
+
+Markdown Content:
+# OASIF: An Efficient Obfuscation-Aware Self-Improving Framework for LLM-Based Assembly Code Instruction Following and Comprehension 
+
+Xinyi Wang 1, ∗, Rongze Chen 1, Ke Wang 2, Qiyuan Chen 3, Yanming Liu 4, Xiang Li 1, Chunfu Jia 11 College of Cryptology and Cyber Science, Nankai University  
+
+> 2
+
+Renmin University of China  
+
+> 3
+
+Ant Group  
+
+> 4
+
+Zhejiang University 
+
+{2120230741@mail.nankai.edu.cn }
+
+Abstract 
+
+Large Language Models (LLMs) have recently shown promise in automated binary analysis, yet they remain brittle under commercial-grade obfuscation. We present OASIF, an Obfuscation-Aware Self-evolving Instruction-Following framework for obfuscated assembly comprehension. OASIF couples a token-efficient assembly encoder with a lightweight projector to expose long obfuscated code to a pretrained code LLM under a bounded context budget and follows a three-phase training: (i) feature-space alignment, (ii) supervised instruction fine-tuning, and (iii) on-line self-evolving reinforcement learning with hybrid rewards, enabling continual adaptation with minimal manual verification. On VMISA-Bench, a challenging out-of-distribution suite featuring three commercial VM-based obfuscators, OASIF consistently improves open-source backbones; Qwen2.5-Coder-Instruct-14B at-tains Success Rate gains of +15 .9, +5 .8, and +16 .9 percentage points (pp) on Code Virtualizer, Themida (v3.0.7), and VMProtect (v3.5), respectively, and improves the OASIF-Bench average by +9 .8. OASIF further delivers stable gains across seven standard BCSD benchmarks while preserving general and domain-relevant capabilities on HumanEval, VulBench, and HumanEval-Decompile. 
+
+1 Introduction 
+
+The analysis and comprehension of assembly code underpin a wide range of security-critical tasks, including reverse engineering [Karg ´en and Shahmehri, 2017, Megira et al., 2018], malware analy-sis [Megira et al., 2018], vulnerability detection [Mantovani et al., 2022, Taviss et al., 2024], and software hardening [Thirumoorthy et al., 2022]. Unlike high-level programming languages, assembly code exposes low-level hardware operations with minimal syntactic structure and weak semantic abstraction, resulting in long instruction sequences with low information density [Wang et al., 2022] that are difficult to interpret and reason about. Bridging such hardware-centric representations with natural language semantics is therefore essential for downstream tasks such as semantic recovery, behavioral explanation [Tan et al., 2024], and deobfuscation [Al-Kaswan et al., 2023], yet it remains a long-standing challenge. Recent years have witnessed growing interest in applying LLMs [Achiam et al., 2023, Touvron et al., 2023, Bai et al., 2023] to binary analysis [Mic, 2025]. Early efforts predominantly rely on masked language modeling or contrastive representation learning to extract semantic embeddings from assembly code, exemplified by Asm2Vec [Ding et al., 2019], CodeArt [Su et al., 2024], and CLAP [Wang et al., 2024]. These methods capture instruction-level semantics and support similarity-based retrieval, but they are not designed for instruction following or multi-step reasoning. More 
+
+> Preprint.
+> arXiv:2606.29155v1 [cs.SE] 28 Jun 2026
+
+recent approaches adapt decoder-based LLMs to assembly code through structural modeling or supervised fine-tuning [Jiang et al., 2023, Tan et al., 2024, Wang et al., 2025], achieving improved generation and explanation capabilities. However, most existing methods depend on static supervision, making them brittle under heavy obfuscation and difficult to scale to real-world scenarios. This limitation becomes particularly pronounced under industrial-grade code obfuscation. Among various techniques, virtual machine (VM)-based obfuscation is widely regarded as one of the strongest protections used in commercial software and real-world malware [Banescu et al., 2016, Blazytko et al., 2017]. By translating native instructions into proprietary virtual instruction sets executed by custom interpreters, VM-based obfuscators fundamentally reshape control flow, instruction semantics, and execution context [Salwan et al., 2018, Li et al., 2022]. The resulting binaries exhibit long execution traces, frequent decoy context switches, and complex one-to-many instruction mappings that are absent from standard training corpora [Coogan et al., 2011, Xu et al., 2018]. Two key challenges hinder LLMs’ effectiveness: obfuscated code often expands to hundreds of thousands of instructions, far exceeding the context window of most open-source LLMs, and acquiring fine-grained supervision is prohibitively expensive, especially for commercial black-box obfuscators. To address these challenges, we propose OASIF, an Obfuscation-Aware Self-evolving Instruction-Following framework for understanding obfuscated assembly code. As illustrated in Fig. 1, OASIF integrates a token efficient assembly encoder with a pretrained code LLM through a lightweight projection module. We introduce a three-phase training, the first two phases establish stable as-sembly–language alignment and instruction following behavior via Feature Space Alignment and Instruction Fine-tuning. In the Online Self-Evolving Reinforcement Learning (RL) phase, eval-uating its own outputs with hybrid structural and semantic rewards, OASIF enables continuous self-improvement on challenging obfuscated samples. Our main contributions are summarized as follows. • We propose OASIF, a framework that introduces a three-phase training featuring online self-evolving reinforcement learning to improve instruction following and comprehension under assembly obfuscation. • We develop an instruction-centric synthetic data generation engine that enables annotation-efficient adaptation to obfuscated assembly code while maintaining training scalability. Additionally, we present OASIF-Bench, a comprehensive obfuscated assembly comprehen-sion and instruction following benchmark. • On VMISA-Bench featuring three commercial VM obfuscators, OASIF consistently im-proves open-source backbones; specifically, Qwen2.5-Coder-Instruct-14B achieves Success Rate (SR) gains of +15 .9, +5 .8, and +16 .9 pp on Code Virtualizer, Themida(v3.0.7), and VMProtect(v3.5), respectively, and improves the OASIF-Bench average score by +9 .8.Furthermore, OASIF enhances general assembly comprehension across seven standard BCSD benchmarks while preserving domain-relevant capabilities on HumanEval, VulBench, and HumanEval-Decompile. Assembly Encoder                                                                                            
+
+> Assembly -Language
+> Connector
+> LLM
+> Stage1: Feature Space Alignment
+> ···
+> 46: mov ecx , [ebp+var_4],
+> 47: xor ecx ,ebp ,
+> 48: call @__security_check_cookie@4 ,
+> 49: add esp , 74h,
+> 50: cmp ebp ,esp ,
+> 51: call __ RTC_CheckEsp ,
+> 52: mov esp ,ebp ,
+> 53: pop ebp ,
+> 54: retn
+> ···
+> 26 :mov eax , [rbp -38h],
+> 27: mov ecx ,eax ,
+> ···
+> 1794: sub rsp , 20h,
+> 1795: call cs:__ imp_WSACleanup ,
+> 1796: add rsp , 20h,
+> 1797: mov dword ptr [rbp -38h], 0ED09D0ADh,
+> 1798: jmp INSTR1815 ,
+> 1799: mov rax , [rbp -30h],
+> 1800: mov dword ptr [rbp -38h], 2160225Dh,
+> 1801: jmp INSTR1815 ,
+> 1802: mov rax , [rbp -30h],
+> 1803: mov ecx , [ rax ],
+> 1804: shl ecx , 1,
+> 1805: mov rax , [rbp+8],
+> 1806: mov [rax ], ecx ,
+> 1807: mov rax , [rbp+8],
+> 1808: mov ecx , [ rax ],
+> 1809: sub rsp , 20h,
+> 1810: call printIntLine ,
+> 1811: add rsp , 20h,
+> 1812: mov dword ptr [rbp -38h], 3397DCD1h,
+> 1813: jmp INSTR1815 ,
+> 1814: mov dword ptr [rbp -38h], 97EEC6EAh,
+> 1815 :jmp INSTR26
+> (a) Data Engine
+> Assembly Code
+> Obfuscated Assembly Code
+> Text Tokenizer
+> (b) OASIF Framework
+> Source Code (C/C++)
+> Preprocessor
+> Control Flow Graph
+> Compiler
+> Obfuscator
+> Optimizer
+> Query !𝒚 𝟏
+> !𝒚 𝟐
+> ···
+> !𝒚 𝒊 #𝑺𝒆𝒎𝒂𝒏𝒕𝒊𝒄
+> 𝑺𝒕𝒓𝒖𝒄𝒕𝒖𝒓𝒂𝒍
+> !𝒚 𝑵
+> ···
+> 𝒚
+> Majority
+> Voting
+> 𝑹 (!𝒚 𝟏 ,𝒚 )
+> ···
+> 𝑹 (!𝒚 𝟏 ,𝒚 )
+> 𝑹 (!𝒚 𝟏 ,𝒚 )
+> Semantic Reward
+> Calculation
+> Structural Reward
+> Calculation
+> Semantic Rewards
+> Structural Rewards
+> Unlabeled
+> labeled
+> Policy
+> Optimization
+> Predictions
+> [assembly] <inst_end >[text] <inst_start ><EOS>
+> Text
+> Stage2: Instruction Fine -tuning Stage3: Online Self -Evolution RL
+> Listen_socket read data using a listen socket (server side), execute command with execl .
+> What is the actual argument list passed to __ execl in this assembly snippet? Does this
+> assembly appear to be obfuscated; if so, which obfuscation technique(s) were used?
+
+Figure 1: Overview of the OASIF framework. (a) Data Engine generates paired normal/obfuscated assembly by compiling source code and applying obfuscation. (b) OASIF Framework aligns assembly features with a pretrained code LLM and trains in three stages. 22 Related Work 
+
+2.1 LLMs for Binary Analysis and Obfuscation 
+
+Deep learning for binary analysis has progressed from static representation learning to LLM-enabled generative reasoning. Early work mainly adopts Masked Language Modeling (MLM) [Devlin et al., 2019] to capture instruction semantics. Asm2Vec [Ding et al., 2019] and CodeArt [Su et al., 2024] learn robust assembly embeddings, and CLAP [Wang et al., 2024] aligns assembly with natural language via contrastive learning. To enhance comprehension, Nova [Jiang et al., 2023] models assembly structures with hierarchical attention, and ASMA-Tune [Wang et al., 2025] further aligns assembly features with LLMs through structural semantic tuning. These methods strengthen code LLMs on low-information-density assembly inputs, yet robustness under commercial-grade obfuscation remains challenging. Obfuscation further increases difficulty due to substantial control-flow and instruction-level pertur-bations. DisasLLM [Rong et al., 2024] explores an LLM-driven strategy for analyzing executables. However, systematic evaluations [Tkachenko et al., 2025] show that although models can handle some common transformations, stronger techniques remain difficult, underscoring the need for more robust reasoning and adaptation. Meanwhile, the prevailing reliance on supervised fine-tuning is increasingly limited by the scarcity and cost of high-quality labeled data for obfuscated binaries. 
+
+2.2 RL and Self-Evolution in LLMs 
+
+Recent progress in self-improvement enables models to enhance inference performance with min-imal or no additional annotation [Wang et al., 2023, Luo et al., 2023, Yuan et al., 2024]. Self-consistency [Zuo et al., 2025], for instance, uses majority voting and consistency signals to stabilize reasoning trajectories. While such paradigms have been shown to be effective in domains like mathematical reasoning and code generation [Guo et al., 2025], their practical instantiation for binary security tasks remains underexplored, especially where supervision is expensive and data distributions shift sharply under obfuscation. Our work targets this gap by introducing OASIF, a framework that integrates a multi-modal assembly encoder with a self-evolving reinforcement learning strategy to enhance instruction understanding and reasoning under obfuscation. Moving beyond purely static supervision, OASIF leverages unlabeled or weakly supervised data to iteratively refine instruction-following and comprehension under obfuscation while also improving generalization on standard assembly understanding tasks. 
+
+3 Dataset Engine 
+
+3.1 Binary Dataset Construction Raw corpora. Following CLAP [Wang et al., 2024] and ASMA-Tune [Wang et al., 2025], we build a large-scale multi-source corpus from BinaryCorp-3M [Wang et al., 2022] and the Juliet Test Suite [Boland and Black, 2012], and further augment Juliet with obfuscated variants to better reflect real-world reverse-engineering settings. BinaryCorp-3M, collected from Arch Linux official repositories and AUR [Arc, 2025, AUR, 2025], contains 10,265 binaries and ∼3M functions across diverse software categories, supports gcc /clang and five optimization levels, and is among the largest corpora for binary code similarity detection (BCSD). Juliet provides 64,099 vulnerability-analysis test cases with accompanying vulnerability descriptions, and its semantic annotations have been validated for code understanding tasks [Taviss et al., 2024]. 
+
+Compilation, disassembly, and annotation. 
+
+For the BinaryCorp-3M training split, we parse instructions and CFGs with Capstone, reconstruct per-instruction jump metadata, sample across compilers and optimization levels, and retain functions with 10–3,000 instructions. For Juliet, we compile C/C++ sources with gcc under randomly selected optimization levels ( -O0 –-O3 ), disassemble the binaries with IDA Pro, extract function names and types from symbol-preserved binaries via IDA’s function identification, and derive function-level textual descriptions from vulnerability headers. 
+
+Obfuscated variants. We further compile Juliet with Obfuscator-LLVM (OLLVM) [Junod et al., 2015] using instruction substitution (SUB), bogus control flow (BCF), and control-flow flattening (FLA). We disassemble x86 64 binaries with IDA Pro and rebase instruction addresses while keeping relative jump offsets [Wang et al., 2024, 2025] to preserve structural semantics and critical identifiers (e.g., function calls and variable names). The resulting raw assembly corpus contains 513,106 3snippets: 212,117 from the BinaryCorp-3M training split, 79,920 from unobfuscated Juliet, and 221,069 from OLLVM-obfuscated Juliet, including 2,651 SUB, 58,578 FLA, 79,920 BCF, and 79,920 ALL (SUB+FLA+BCF) samples. Details and exact OLLVM flags are reported in Appendix A. 
+
+3.2 Instruction-Centric Synthetic Data Generation 
+
+Given an assembly corpus C = {ci}Ni=1 , we use an LLM Mϕ to generate instruction-centric supervi-sion via task-specific prompts. For a task type t ∈ T , the generator is defined as:      
+
+> G(c, t ) = Mϕ(πt(c)) 7→(Qt, A t)(1)
+
+where πt(·) denotes a few-shot prompt for task t. We consider five task types T =
+
+{simp , detail , conv , reason , reason +}, which correspond to simplified description, detailed de-scription, multi-turn conversation, reasoning, and challenge-level reasoning, following the perception-to-reasoning progression [Liu et al., 2024, Chen et al., 2024, Luo et al., 2023]. 
+
+Three-phase training datasets. We organize all synthetic data into three stage-specific datasets:                         
+
+> Dalign =[
+> c∈Calign
+> {G(c, simp )⊕c}(2)
+> Dsft =[
+> c∈Csft
+> {G(c, t )⊕c|t∈ { detail ,conv ,reason }} (3)
+> Drl ={(Q, A )}Mj=1 ,(Q, A ) = G(c, reason +), c ∈Crl (4)
+
+where ⊕ concatenates c with the generated QA pair, and reason + denotes challenge prompts requiring multi-step semantic inference. The instruction mixture in Dsft follows [Liu et al., 2024], whereas Drl requires complete reasoning steps and manual verification. Overall, D = {Dalign , D sft , D rl } provides multi-granularity supervision for three-phase training, emphasizing obfuscation robustness and reasoning-intensive alignment. After stage-specific filtering and deduplication, Dalign , Dsft , and Drl contain 430,027 simp , 11,750 detail /conv /reason , and 4,244 manually verified reason + instances, respectively. Details are provided in Appendix B. 
+
+4 Methodology 
+
+We present OASIF, an effective obfuscation-aware framework for improving LLMs in assembly instruction following and comprehension. As shown in Fig. 1, OASIF combines an assembly encoder, a lightweight projector, and a pretrained code LLM with a compact three-phase training pipeline. The training pipeline consists of three phases: feature-space alignment (Phase I), supervised instruction fine-tuning (Phase II), and Online Self-Evolving Reinforcement Learning with hybrid rewards (Phase III). Phases I–II establish stable assembly–language alignment and basic instruction-following ability, while Phase III further enhances the model through self-evolving RL, enabling continual refinement without relying on abundant ground-truth annotations for commercially obfuscated code. 
+
+4.1 Framework Structure Token-Efficient Assembly Representation. Obfuscation typically inflates code length and disrupts local regularities, resulting in extremely long sequences that exceed the context window of most open-source LLMs. Consequently, given an obfuscated snippet and assembly codes c, directly serializing it into a textual sequence for LLMs is impractical. To address this challenge, we employ a dedicated assembly encoder Fenc to compress obfuscated assembly into a compact representation with a fixed-dimensional space Rdenc , and further align this representation with the linguistic space of the LLM via an MLP-based projection W : Rdenc → Rdllm , as shown in Eq. (5) , ensuring compatibility with limited context windows while preserving the essential structural and semantic information of the original assembly code.           
+
+> Zc=W Fenc (c), F enc (c)∈Rdenc ,Zc∈Rdllm (5)
+
+Instruction Decoding with Special Tokens. After obtaining the compact assembly representation 
+
+Zc, we condition the LLM on both encoded assembly and language instructions to generate analyzes. To explicitly structure the input, we introduce special tokens instead of treating assembly and instructions as homogeneous text. In particular, <inst start> and <inst end> delimit each instruction instance, separating prompt components and stabilizing instruction-conditioned decoding. 44.2 Phases I & II: Supervised Knowledge Acquisition 
+
+In this subsection, we describe the training procedures for the projector and the instruction following capability of the LLM. The first two training phases are intentionally designed to be lightweight, providing a solid and efficient initialization for the subsequent self-evolution RL stage. 
+
+4.2.1 Phase I: Feature Space Alignment 
+
+In the first phase, we freeze the LLM and only optimize the projector to align assembly features with the semantic space of the LLM. The projector is trained using the simplified summary y generated by the frozen LLM from either the obfuscated or the original assembly representation Zc, as specified by the corresponding objective Eq. (6) . This ensures that the assembly token embedding acquires a direct and consistent semantic interpretation within the frozen LLM.       
+
+> Lalign =Ec∼D align
+> "
+> −
+> LX
+> i=1
+> log P(yi|Zc, y <i )
+> #
+> (6)
+
+Dalign is the input distribution used for alignment, and L denotes the length of the output summary y.
+
+4.2.2 Phase II: Instruction Fine-Tuning 
+
+Subsequently, the projector and the LLM are jointly optimized on instruction following data while keeping the assembly encoder frozen. As formulated in Eq. (6) , this phase maintains the same autoregressive language-modeling loss as Phase I. This training process enables the LLM to internalize the semantics of obfuscated assembly and attain a foundational understanding of obfuscated assembly code, thereby establishing a robust precursor for the subsequent self-evolution stage. 
+
+4.3 Phase III: Self-Evolving RL with hybrid rewards 4.3.1 Self-Evolving RL 
+
+Phases I–II establish robust general behaviors, commercial obfuscation remains challenging. Given the limited context length of open-source LLMs and the impracticality of collecting human annotations for long obfuscated-code analyses, we adopt a self-evolving RL scheme to enhance comprehension of obfuscated assembly. For each obfuscated assembly snippet c and its corresponding instruction q,the model samples multiple candidate analyses, scores each candidate from multiple perspectives. These scores are then used to optimize the model itself. 
+
+4.3.2 Hybrid Rewards 
+
+To provide reliable learning signals under heavily obfuscated assembly code, we redesign the reward function as a combination of structural reward and semantic reward. 
+
+Structural Awareness Reward. The structural reward encourages the model to accurately identify obfuscation techniques while strictly penalizing the misclassification of obfuscated code as benign (ORG). Specifically, the reward is set to 1 for a correct prediction of the specific obfuscation type, 0.2
+
+for the binary detection of whether obfuscation exists, and 0 otherwise. Given the predicted class ˆt,the ground-truth tgt , and the set of obfuscation types T , the reward Rstruc is formally defined as:                  
+
+> Rstruc =
+> 
+> 1if ˆt=tgt
+> 0.2if ˆt̸=tgt and (ˆ t, t gt ∈ T or ˆt, t gt /∈ T )0otherwise (7)
+
+Semantic Reward. Relying solely on the correctness of the final output yields a sparse learning signal. To provide denser supervision, we introduce a semantic reward Rsem over the generated reasoning process. The model evaluates its own reasoning steps against the original unobfuscated assembly and the reference metadata along five dimensions, i.e., helpfulness, relevance, accuracy, detail, and comprehensiveness, from which Rsem is computed. 
+
+Total Reward. The overall reward is a combination of structural and semantic components, weighted by a hyperparameter λ and conditioned on the model’s generated response y:     
+
+> Rtotal =λR struc (ˆ t, t gt ) + (1 −λ)Rsem (c, q, y )(8)
+
+4.3.3 Group Relative Policy Optimization 
+
+We optimize our model using GRPO [Shao et al., 2024]. For each sample, the model scores its own 
+
+K sampled trajectories to obtain rewards. We normalize rewards within each group and directly use the resulting standardized advantage in the GRPO objective: 5JGRPO (θ) = E(c,q )∼D rl                   
+
+> 1
+> K
+> PKk=1
+> h
+> clip
+> πθ(yk|c,q )
+> πθold (yk|c,q )·Rk−mean( R)std( R),1−ϵ, 1 + ϵ
+> 
+> −βDKL (πθ∥πref )
+> i
+> (9)
+
+Rk is the reward of the k-th trajectory and R = {R1, R 2, . . . , R K } denotes the set of trajectory rewards in the group. πθ and πθold are the new and old policies, and πref is the reference policy. 
+
+5 Experimental Setup 
+
+5.1 Evaluation Benchmarks and Metrics Commercial Black-box VM-based Obfuscator Comprehension. 
+
+We evaluate on VMISA [Li et al., 2022], which tests whether models can recover the semantics of proprietary virtual instructions that are entirely unseen during training, making it a challenging out-of-distribution setting. It includes binaries protected by Code Virtualizer [Cod, 2019], Themida (v3.0.7) [The, 2019], and VMProtect (v3.5) [VMP, 2019]. We report the number of recovered instructions k from the virtual instruction set (ISA) and the success rate SR = k 
+
+> |ISA |
+
+× 100% . Details are provided in Appendix C. 
+
+Obfuscation-Aware Assembly-Language Instruction Following. We introduce OASIF-Bench ,the benchmark dedicated to LLM-based obfuscated assembly comprehension and instruction fol-lowing. We randomly select 30 domain-diverse assembly snippets from the BinaryCorp-3M test split, ensuring no overlap with the training data, while covering cryptography, malware, and protocol implementations. Following Sec. 3.2, we expand them into 150 snippets using five types (ORG, BCF, FLA, SUB and ALL). The resulting dataset contains 450 expert-curated queries spanning conversation, description, and reasoning tasks. All queries and reference answers are independently analyzed and cross-validated by five binary-analysis experts. Following the evaluation protocol in LLaVA [Liu et al., 2024] and ASMA-Tune [Wang et al., 2025], GPT-5.4 serves as the evaluator and scores model outputs on a 1–10 scale across five dimensions (helpfulness, relevance, accuracy, detail, and comprehensiveness) relative to an expert-derived upper bound. Scores are normalized to a 0–100 scale for reporting, and each sample is scored over three independent trials to stabilize the estimate. 
+
+Binary Code Similarity Detection (BCSD). For binary code similarity detection, we use seven established benchmarks widely adopted in prior BCSD research [Su et al., 2024, Jiang et al., 2023, Wang et al., 2025]: Curl , Coreutils , Binutils , ImageMagick , SQLite , OpenSSL , and Putty .Consistent with prior work, we report Recall@1 under varying pool sizes to measure the percentage of queries for which the ground-truth candidate is ranked first, and Mean Reciprocal Rank (MRR) as the average reciprocal rank of the correct candidate. 
+
+Domain-Relevant Capability Preservation. To verify that OASIF preserves capabilities relevant to code generation and downstream binary-analysis tasks, we further evaluate on three non-overlapping benchmarks: HumanEval [Chen et al., 2021], VulBench [Gao et al., 2023], and HumanEval-Decompile [Tan et al., 2024]. We follow the official settings of each benchmark and report Pass@1 for HumanEval, Accuracy/F1/Precision/Recall for VulBench, and Compile Rate/Run Rate (Pass@1) for HumanEval-Decompile. Details of the dataset and optimization levels are provided in Appendix D. 
+
+5.2 Baselines 
+
+We compare our framework against a representative suite of state-of-the-art LLMs: (1) Proprietary LLMs: GPT-5, GPT-4-Turbo, Claude-Sonnet-4-5, Claude-Opus-4-6, and Gemini-2.5-Pro. (2) 
+
+Open-Source Code LLMs: Qwen2.5-Coder-Instruct (7B, 14B), Qwen3-Coder-Plus, DeepSeek-Coder-V2-Lite-Instruct-16B [Zhu et al., 2024], DeepSeek-Coder-Instruct-6.7B, GPT-oss-120B. 
+
+5.3 Model Instantiation and Training Settings 
+
+We instantiate OASIF using three representative backbones: Qwen2.5-Coder-Instruct-14B, Qwen2.5-Coder-Instruct-7B, and DeepSeek-Coder-Instruct-6.7B. The architecture comprises three components: an Assembly Code Encoder (CLAP-ASM [Wang et al., 2024], 110M parameters), a Connector (single-layer MLP, 30M parameters), and the LLM backbone. Dimension alignment adapts the projector output to each LLM’s hidden size (e.g., 3,584 for Qwen2.5-7B and 4,096 for DeepSeek-6.7B). Training is conducted in three stages. Phase I (Alignment) is trained for 1 epoch on 8 NVIDIA H20 GPUs (learning rate 1e-5, global batch size 1024). Phase II (SFT) is fine-tuned for 1 epoch on 8 NVIDIA H20 GPUs (learning rate 1e-5, global batch size 32). Phase III (RL) is optimized for 3 6Table 1: Results on VMISA-Bench and OASIF-Bench. Best result per column among proprietary models and open-source models (including OASIF) are bolded.                                                                                                                                                          
+
+> Model VMISA-Bench ( k(SR%)) OASIF-Bench Code Virtualizer Themida v3.0.7 VMProtect v3.5 ORG BCF FLA SUB ALL Avg
+> Proprietary Large Language Models
+> GPT-5 89 (64.5) 45 (32.6) 153 (64.6) 76.8 79.1 80.0 77.0 74.0 77.4
+> Claude-Sonnet-4-5 104 (75.4) 57 (41.3) 105 (44.3) 75.6 68.0 79.7 59.6 67.6 70.1 Claude-Opus-4-6 101 (73.2) 56 (40.6) 144 (60.8) 80.2 76.9 78.5 67.2 74.8 75.5 Gemini-2.5-Pro 98 (71.0) 41 (29.7) 183 (77.2) 69.0 66.4 64.2 72.0 59.8 66.3
+> Open-Source Code Large Language Models
+> Qwen2.5-Coder-Instruct-7B 40 (29.0) 5 (3.6) 46 (19.4) 37.8 35.8 41.8 37.7 41.8 39.0 Qwen2.5-Coder-Instruct-14B 60 (43.5) 12 (8.7) 78 (32.9) 56.2 54.8 55.0 51.7 55.8 54.7 Qwen3-Coder-Plus 81 (58.7) 23 (16.7) 74 (31.2) 56.1 60.6 69.3 51.6 63.8 60.3 DeepSeek-Coder-Instruct-6.7B 32 (23.2) 7 (5.1) 52 (21.9) 37.1 38.4 39.6 30.6 30.4 35.2 DeepSeek-Coder-V2-Lite-Instruct-16B 74 (53.6) 22 (15.9) 95 (40.1) 58.0 52.0 56.0 50.0 51.0 53.4 GPT-oss-120B 42 (30.4) 14 (10.1) 92 (38.8) 73.6 68.7 72.0 64.7 68.4 69.5
+> OASIF (Ours)
+> Qwen2.5-Coder-Instruct-7B-OASIF 46 (33.3) ↑4.3 8 (5.8) ↑2.2 56 (23.6) ↑4.2 49.6 ↑11.8 38.6 ↑2.8 44.4 ↑2.6 46.4 ↑8.7 49.8 ↑8.0 45.8 ↑6.8
+> Qwen2.5-Coder-Instruct-14B-OASIF 82 (59.4) ↑15.9 20 (14.5) ↑5.8 118 (49.8) ↑16.9 62.0 ↑5.8 61.7 ↑6.9 68.4 ↑13.4 64.8 ↑13.1 65.8 ↑10.0 64.5 ↑9.8
+> DeepSeek-Coder-Instruct-6.7B-OASIF 52 (37.7) ↑14.5 13 (9.4) ↑4.3 82 (34.6) ↑12.7 52.4 ↑15.3 35.0 ↓3.4 55.8 ↑16.2 40.9 ↑10.3 38.2 ↑7.8 44.5 ↑9.3
+
+epochs on 32 NVIDIA H20 GPUs, with 8 rollouts per instruction, a temperature of 0.7, top-p 0.9, 
+
+ϵ=0.2, β=0.04, and a maximum sequence length of Lmax =4096. λ is empirically set to 0.5 to balance the reward signals. 
+
+5.4 Implementation Details 
+
+Inference is performed with a temperature of 0 and top-k of 1 to ensure deterministic outputs. Prompts and data used for evaluation are strictly excluded from the retrieval corpus generation. BCSD follows the established few-shot CoT protocol from prior work [Wang et al., 2025] to enable direct comparison of both general-purpose and specialized code LLMs. Under the deterministic decoding setting, small numerical differences are highly reproducible and are unlikely to be attributable to sampling variance. 
+
+6 Experiments 
+
+6.1 VMISA-Bench Evaluation 
+
+Tab. 1 reports the performance of OASIF and baseline models on VMISA-Bench, which constitutes a challenging out-of-distribution setting since the virtual ISAs are entirely unseen during training. 
+
+OASIF consistently improves open-source LLMs across all three commercial VM obfuscators, with larger gains on smaller backbones, and remains effective under different VM instruction transformation regimes. Across Code Virtualizer, Themida, and VMProtect, OASIF-equipped models exhibit clear and stable gains over their corresponding backbones. For example, Qwen2.5-Coder-Instruct-14B improves from 43.5% to 59.4% SR on Code Virtualizer ( +15 .9), from 8.7% to 14.5% on Themida ( +5 .8), and from 32.9% to 49.8% on VMProtect ( +16 .9). Similar trends are observed for the 7B Qwen and DeepSeek-6.7B variants, indicating effectiveness across model scales and architectures, with diminishing returns as backbone capacity increases. The gains re-main pronounced even on VMProtect, which combines one-to-many (O2M) and one-to-one (O2O) instruction mappings and semantically obfuscates context-switch instructions, requiring reasoning over multiple handler compositions for a single native instruction. Under this more complex regime, Qwen2.5-Coder-Instruct-14B-OASIF approaches or surpasses the success rates of some closed-source models on VMProtect despite using substantially fewer parameters in an open-source setting. 
+
+These results indicate stronger obfuscation-aware comprehension rather than memorization of fixed mapping rules. By integrating token-efficient assembly representations with self-evolving reinforcement learning, OASIF improves generalization to unseen proprietary VM-based obfuscation and enhances compositional reasoning over virtual handlers in difficult OOD settings. 
+
+6.2 OASIF-Bench Evaluation 
+
+Tab. 1 reports the performance of OASIF and baseline models on OASIF-Bench. 70.0                         
+
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Binutils Coreutils Curl ImageMagick
+> 0100 200 300 400 500
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> OpenSSL
+> 0100 200 300 400 500
+> Putty
+> 0100 200 300 400 500
+> SQLite
+> 0100 200 300 400 500
+> Average
+> FEW-SHOT ZERO-SHOT
+> Recall@1
+> Function Pool Sizes
+> GPT-4-Turbo
+> Qwen2.5-Coder-7B
+> DeepSeek-Coder-6.7B
+> Qwen2.5-Coder-Instruct-7B
+> Qwen2.5-Coder-Instruct-14B
+> DeepSeek-Coder-Instruct-6.7B
+> DeepSeek-Coder-V2-Lite-Instruct-16B
+> Qwen2.5-Coder-Instruct-7B-OASIF
+> Qwen2.5-Coder-Instruct-14B-OASIF
+> DeepSeek-Coder-Instruct-6.7B-OASIF
+
+Figure 2: BCSD experimental results. We present normalized evaluation results. The x-axes denote different sizes of candidate function pools, and the y-axes denote the Recall@1 performance. Table 2: BCSD evaluation results across seven suites and the average score. 
+
+Model BCSD Evaluation (Pool size 500) Binutils Coreutils Curl ImageMagick SQLite OpenSSL Putty Average 
+
+Few-shot CoT 
+
+GPT-4-Turbo 0.190 0.175 0.191 0.162 0.169 0.232 0.174 0.185 Qwen2.5-Coder-7B 0.072 0.076 0.078 0.072 0.065 0.101 0.070 0.076 DeepSeek-Coder-7B 0.050 0.053 0.052 0.074 0.037 0.067 0.047 0.054 
+
+Zero-shot CoT 
+
+Qwen2.5-Coder-Instruct-7B 0.155 0.106 0.119 0.135 0.091 0.147 0.119 0.124 Qwen2.5-Coder-Instruct-14B 0.227 0.179 0.224 0.226 0.172 0.246 0.212 0.212 DeepSeek-Coder-Instruct-6.7B 0.075 0.070 0.083 0.084 0.066 0.095 0.075 0.078 DeepSeek-Coder-V2-Lite-Instruct-16B 0.108 0.086 0.109 0.119 0.086 0.141 0.107 0.108 
+
+OASIF (Ours) 
+
+Qwen2.5-Coder-Instruct-7B-OASIF 0.166 0.149 0.176 0.198 0.118 0.208 0.159 0.168 
+
+Qwen2.5-Coder-Instruct-14B-OASIF 0.225 0.174 0.236 0.247 0.175 0.265 0.208 0.218 DeepSeek-Coder-Instruct-6.7B-OASIF 0.082 0.077 0.080 0.099 0.086 0.110 0.097 0.090 
+
+OASIF consistently improves obfuscation-aware comprehension across all obfuscation types. 
+
+Qwen2.5-Coder-Instruct-14B-OASIF improves the average score from 54.7 to 64.5 ( +9 .8), surpassing the roughly 30 × larger Qwen3-Coder-Plus (60.3) and approaching several proprietary baselines. Qwen2.5-Coder-Instruct-7B-OASIF and DeepSeek-Coder-Instruct-6.7B-OASIF gain +6 .8 and +9 .3
+
+on average, respectively, with positive improvements in nearly all obfuscation settings. These gains confirm that the improvements extend beyond VMISA-Bench alone and generalize to broader obfuscation-aware instruction-following settings. Length-stratified analysis refers to Appendix E. 
+
+6.3 Binary Code Similarity Detection Evaluation 
+
+Fig. 2 reports Recall@1 under varying pool sizes, while Tab. 2 presents Mean Reciprocal Rank (MRR) results with a fixed pool size of 500 across seven suites. 
+
+OASIF consistently improves binary code similarity detection across model backbones and suites, with larger gains on weaker backbones and diminishing returns on stronger ones. 
+
+As shown in Fig. 2, OASIF-enhanced models maintain higher average Recall@1 than their baselines across pool sizes. The same trend appears in Tab. 2, Qwen2.5-Coder-Instruct-7B-OASIF improves average MRR by +0 .044 with gains on all seven benchmarks, DeepSeek-Coder-Instruct-6.7B-OASIF improves by +0 .012 , and Qwen2.5-Coder-Instruct-14B-OASIF still gains +0 .006 despite the stronger baseline. Notably, the 14B backbone already exceeds GPT-4-Turbo with few-shot CoT before OASIF training (0.212 vs. 0.185), indicating limited headroom on this retrieval protocol. Overall, the larger gains on the 7B and DeepSeek-6.7B backbones suggest that OASIF primarily improves assembly comprehension, with diminishing returns on already strong backbones. 8Table 3: Capability preservation across HumanEval, VulBench, and HumanEval-Decompile.                                                     
+
+> Model HumanEval VulBench HumanEval-Decompile Pass@1 (%) Acc (%) F1 (%) Prec (%) Recall (%) Compile Rate (%) Run Rate (%)
+> Open-Source Code Large Language Models
+> Qwen2.5-Coder-Instruct-7B 88.4 41.28 29.20 27.31 51.67 81.25 4.27 Qwen2.5-Coder-Instruct-14B 89.6 59.13 33.46 33.69 45.28 80.03 6.86 DeepSeek-Coder-Instruct-6.7B 66.1 32.57 26.42 24.02 52.84 48.48 3.36 DeepSeek-Coder-V2-Lite-Instruct-16B 81.1 48.02 27.08 24.01 49.33 53.66 3.81
+> OASIF (Ours)
+> Qwen2.5-Coder-Instruct-7B-OASIF 86.5 40.93 27.57 27.04 48.02 83.54 3.81
+> Qwen2.5-Coder-Instruct-14B-OASIF 84.8 58.60 32.20 33.30 44.57 82.10 6.20
+> DeepSeek-Coder-Instruct-6.7B-OASIF 50.6 31.73 26.03 23.44 52.78 50.15 2.44
+
+Table 4: Ablation study on different configu-rations and training components (Recall@1 on the average BCSD evaluation sets).                   
+
+> Training Components Configuration Recall@1 (%)
+> Full training 49.1
+> w/o Assembly encoder 41.7 (↓7.4)w/o Feature Space Alignment 27.3 (↓21 .8)w/o Instruction Fine-tuning 23.6 (↓25 .5)w/o Self-Evolving RL 39.7 (↓9.4)
+> Model Scale
+> 7B model size 35.9 (↓13 .2)14B model size 49.1
+
+Table 5: Two-stage agentic loop evaluation on VM-Protect v3.5.                  
+
+> Configuration kSR (%)
+> Direct inference
+> Claude-Opus-4-6 144 60.8 Qwen3-Coder-Plus 74 31.2 GPT-oss-120B 92 38.8 Qwen2.5-Coder-Instruct-14B-OASIF 118 49.8
+> Two-stage agentic loop (back-end: Claude-Opus-4-6)
+> Front-end: Qwen3-Coder-Plus 120 50.6 Front-end: GPT-oss-120B 147 62.0 Front-end: Qwen2.5-Coder-Instruct-14B-OASIF 148 62.4
+
+6.4 Capability Preservation 
+
+To assess whether OASIF training preserves general and domain-relevant capabilities, we evaluate on three benchmarks that lie outside the OASIF training distribution. Results are presented in Tab. 3. 
+
+OASIF preserves domain-relevant capabilities while keeping general capability trade-offs within an acceptable range. 
+
+HumanEval Pass@1 decreases moderately for Qwen2.5-Coder-Instruct-7B ( −1.9) and 14B ( −4.8), with a larger drop on DeepSeek-Coder-Instruct-6.7B. In contrast, VulBench remains stable, with all four metrics within roughly one point of the base models, and HumanEval-Decompile shows consistent Compile Rate gains of +2 .29 , +2 .07 , and +1 .67 across the three backbones, suggesting mild positive transfer to decompilation comprehension. Overall, OASIF improves obfuscation comprehension while largely preserving domain-relevant performance. 
+
+6.5 Ablation Study 
+
+Tab. 4 reports the ablation results of key components in the proposed framework. 
+
+The effectiveness of the framework relies on the coordinated design of representation, alignment, and optimization stages. Removing any major component consistently degrades performance from the full configuration (49.1%), indicating that the observed gains do not arise from a single module. Feature space alignment and instruction fine-tuning play a central role in bridging assembly representations and language-model reasoning. The performance decrease observed when removing the self-evolving RL further confirms that iterative behavior refinement provides additional gains. The 14B backbone outperforms the 7B, demonstrating that larger models are better able to leverage the aligned representations and training signals introduced by the framework. The ablation results validate the necessity of each component within the unified training pipeline. 
+
+6.6 Agentic Pipeline Evaluation 
+
+We study a two-stage agentic pipeline on VMProtect v3.5: a front-end model analyses the obfuscated binary, and a fixed back-end model performs final semantic reasoning based on the observations and original assembly. This setup isolates the effect of front-end comprehension (Tab. 5). 
+
+Improving front-end comprehension strengthens the full pipeline. Qwen3-Coder-Plus as a front-end still underperforms compared to standalone Claude-Opus-4-6, suggesting an observation bottleneck. GPT-oss-120B raises SR to 62.0%, and the OASIF-trained 14B front-end further reaches 962.4% at k=148 , showing that OASIF improves observation quality and enables a 14B model to effectively augment a frontier reasoning model. 
+
+7 Conclusion 
+
+We present OASIF, an Obfuscation-Aware Self-evolving Instruction-Following framework with three-stage training for obfuscated assembly instruction following and comprehension. Across commercial VM-based obfuscation, OASIF-Bench, seven BCSD benchmarks, OASIF consistently improves open-source LLMs while preserving capabilities on HumanEval, VulBench, and HumanEval-Decompile. 
+
+Limitations 
+
+While OASIF delivers consistent improvements in obfuscated assembly comprehension, several limitations remain and point to directions for future work. 
+
+Granularity and scope of analysis. OASIF operates at the function-level on x86 64 binaries, following the standard workflow in which disassemblers (e.g., IDA Pro, Ghidra) decompose binaries into individual functions. End-to-end analysis of complete large-scale binaries with inter-procedural reasoning, cross-function data-flow tracking, and whole-program symbolic recovery is beyond the current scope and constitutes an important direction for future work. Generalization to other instruction set architectures (e.g., ARM, RISC-V) has also not been empirically validated. 
+
+Statistical reporting under high compute cost. Each OASIF training run requires 8 H20 GPUs for Phases I–II and 32 H20 GPUs for Phase III RL, making multi-seed sweeps prohibitive within our budget. We therefore report single-run results under near-deterministic inference (temperature 
+
+= 0 , top-k = 1 ), which yield highly reproducible outputs. The consistency of the observed gains across three different backbones (Qwen2.5-Coder-Instruct-7B/14B, DeepSeek-Coder-Instruct-6.7B) and across multiple independent benchmarks (VMISA-Bench, OASIF-Bench, BCSD, HumanEval, VulBench, HumanEval-Decompile) mitigates but does not fully replace formal variance estimation. 
+
+Reliance on synthetic supervision and expert curation. The three-phase training data are gener-ated by an LLM Mϕ with few-shot prompts and are subsequently filtered. Dsft and especially Drl 
+
+require manual expert verification, which caps dataset size (4,244 RL samples in our setting) and introduces annotator-specific biases. Scaling to substantially larger RL corpora while maintaining quality remains an open problem, and the semantic reward Rsem obtained from LLM self-evaluation may still contain residual judge biases that our decoupled structural reward only partially offsets. 
+
+Coverage of obfuscation schemes. Training supervision comes from OLLVM-based variants (SUB, BCF, FLA), whereas evaluation targets three commercial black-box VM obfuscators (Code Virtualizer, Themida v3.0.7, VMProtect v3.5). Although this represents a strong OOD evaluation, the space of real-world obfuscation is broader (packers, hardware-assisted protections, anti-analysis techniques, novel or evolving commercial protectors), and robustness to obfuscators whose design departs substantially from the VM-based family we studied is not guaranteed. 
+
+Backbone-dependent preservation of general capability. The impact of OASIF training on unrelated general code generation depends on the backbone. Qwen2.5-Coder backbones exhibit only modest HumanEval drops, while DeepSeek-Coder-Instruct-6.7B shows a larger decline that is not observed on binary-oriented benchmarks (VulBench, HumanEval-Decompile). This suggests that the trade-off between obfuscation-specialized reasoning and broad code generation is model-dependent, and principled techniques for capability preservation (e.g., adapter-based training, replay buffers of general code) are left for future work. 
+
+Dual-use considerations. OASIF is designed to advance defensive reverse engineering, malware analysis, and vulnerability triage; however, the same capability can, in principle, assist actors seeking to analyze protected software or adapt obfuscated malware. We restrict releases to research bench-marks and model weights for reproducibility, avoid releasing ready-to-use deobfuscation pipelines, and emphasize that deployment should comply with applicable laws, licenses, and responsible-disclosure practices. A fuller discussion is provided in the Broader Impact Statement. 10 Broader Impact Statement 
+
+This paper advances machine learning methods for automated understanding of obfuscated assembly code, with potential benefits for software security, including improved reverse engineering, malware analysis, vulnerability triage, and defensive deobfuscation. At the same time, the techniques may be misused to accelerate analysis of protected software, weaken intellectual property protections, or aid malicious actors in understanding and adapting obfuscated malware. To mitigate these risks, we focus on evaluation in research benchmarks, avoid releasing actionable deobfuscation tooling or exploitation guidance, and emphasize that deployment should follow applicable laws, licenses, and responsible disclosure practices. We hope this work encourages further research on robust, auditable, and security-oriented LLMs, alongside community development of appropriate safeguards and usage policies. 
+
+References 
+
+Code virtualizer overview. https://www.oreans.com/codevirtualizer.php , 2019. Accessed: 2019-04-12. Themida overview. https://www.oreans.com/themida.php , 2019. Accessed: 2019-04-12. Vmprotect software protection. https://www.vmpsoft.com/ , 2019. Accessed: 2019-04-12. Aur (en) - home. https://aur.archlinux.org/ , 2025. Accessed: 2025-05-06. Arch linux - package search. https://archlinux.org/packages/ , 2025. Accessed: 2025-05-06. Microsoft security copilot — microsoft security. https://www.microsoft.com/en-us/ security/business/ai-machine-learning/microsoft-security-copilot , 2025. Ac-cessed: 2025-05-06. Josh Achiam, Steven Adler, Sandhini Agarwal, Lama Ahmad, Ilge Akkaya, Florencia Leoni Aleman, Diogo Almeida, Janko Altenschmidt, Sam Altman, Shyamal Anadkat, et al. Gpt-4 technical report. 
+
+arXiv preprint arXiv:2303.08774 , 2023. Ali Al-Kaswan, Toufique Ahmed, Maliheh Izadi, Anand Ashok Sawant, Premkumar Devanbu, and Arie van Deursen. Extending source code pre-trained language models to summarise decom-piled binaries. In 2023 IEEE International Conference on Software Analysis, Evolution and Reengineering (SANER) , pages 260–271. IEEE, 2023. Jinze Bai, Shuai Bai, Yunfei Chu, Zeyu Cui, Kai Dang, Xiaodong Deng, Yang Fan, Wenbin Ge, Yu Han, Fei Huang, et al. Qwen technical report. arXiv preprint arXiv:2309.16609 , 2023. Sebastian Banescu, Christian Collberg, Vijay Ganesh, Zack Newsham, and Alexander Pretschner. Code obfuscation against symbolic execution attacks. In Proceedings of the 32nd Annual Confer-ence on Computer Security Applications , pages 189–200, 2016. Tim Blazytko, Moritz Contag, Cornelius Aschermann, and Thorsten Holz. Syntia: Synthesizing the semantics of obfuscated code. In 26th USENIX Security Symposium (USENIX Security 17) , pages 643–659, 2017. Tim Boland and Paul E Black. Juliet 1. 1 c/c++ and java test suite. Computer , 45(10):88–90, 2012. Lin Chen, Jinsong Li, Xiaoyi Dong, Pan Zhang, Conghui He, Jiaqi Wang, Feng Zhao, and Dahua Lin. Sharegpt4v: Improving large multi-modal models with better captions. In European Conference on Computer Vision , pages 370–387. Springer, 2024. Mark Chen, Jerry Tworek, Heewoo Jun, Qiming Yuan, Henrique Ponde De Oliveira Pinto, Jared Kaplan, Harri Edwards, Yuri Burda, Nicholas Joseph, Greg Brockman, et al. Evaluating large language models trained on code. arXiv preprint arXiv:2107.03374 , 2021. Kevin Coogan, Gen Lu, and Saumya Debray. Deobfuscation of virtualization-obfuscated software: a semantics-based approach. In Proceedings of the 18th ACM conference on Computer and communications security , pages 275–284, 2011. 11 Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. Bert: Pre-training of deep bidirectional transformers for language understanding. In Proceedings of the 2019 conference of the North American chapter of the association for computational linguistics: human language technologies, volume 1 (long and short papers) , pages 4171–4186, 2019. Steven HH Ding, Benjamin CM Fung, and Philippe Charland. Asm2vec: Boosting static representa-tion robustness for binary clone search against code obfuscation and compiler optimization. In 
+
+2019 ieee symposium on security and privacy (sp) , pages 472–489. IEEE, 2019. Zeyu Gao, Hao Wang, Yuchen Zhou, Wenyu Zhu, and Chao Zhang. How far have we gone in vulnerability detection using large language models. arXiv preprint arXiv:2311.12420 , 2023. Daya Guo, Qihao Zhu, Dejian Yang, Zhenda Xie, Kai Dong, Wentao Zhang, Guanting Chen, Xiao Bi, Yu Wu, YK Li, et al. Deepseek-coder: When the large language model meets programming–the rise of code intelligence. arXiv preprint arXiv:2401.14196 , 2024. Daya Guo, Dejian Yang, Haowei Zhang, Junxiao Song, Ruoyu Zhang, Runxin Xu, Qihao Zhu, Shirong Ma, Peiyi Wang, Xiao Bi, et al. Deepseek-r1: Incentivizing reasoning capability in llms via reinforcement learning. arXiv preprint arXiv:2501.12948 , 2025. Binyuan Hui, Jian Yang, Zeyu Cui, Jiaxi Yang, Dayiheng Liu, Lei Zhang, Tianyu Liu, Jiajun Zhang, Bowen Yu, Keming Lu, et al. Qwen2. 5-coder technical report. arXiv preprint arXiv:2409.12186 ,2024. Nan Jiang, Chengxiao Wang, Kevin Liu, Xiangzhe Xu, Lin Tan, and Xiangyu Zhang. Nova: Generative language models for binaries. arXiv preprint arXiv:2311.13721 , 2023. Pascal Junod, Julien Rinaldini, Johan Wehrli, and Julie Michielin. Obfuscator-llvm–software protec-tion for the masses. In 2015 ieee/acm 1st international workshop on software protection , pages 3–9. IEEE, 2015. Ulf Karg ´en and Nahid Shahmehri. Towards robust instruction-level trace alignment of binary code. In 2017 32nd IEEE/ACM International Conference on Automated Software Engineering (ASE) ,pages 342–352. IEEE, 2017. Shijia Li, Chunfu Jia, Pengda Qiu, Qiyuan Chen, Jiang Ming, and Debin Gao. Chosen-instruction attack against commercial code virtualization obfuscators. In In Proceedings of the 29th Network and Distributed System Security Symposium , 2022. Haotian Liu, Chunyuan Li, Qingyang Wu, and Yong Jae Lee. Visual instruction tuning. Advances in neural information processing systems , 36, 2024. Ziyang Luo, Can Xu, Pu Zhao, Qingfeng Sun, Xiubo Geng, Wenxiang Hu, Chongyang Tao, Jing Ma, Qingwei Lin, and Daxin Jiang. Wizardcoder: Empowering code large language models with evol-instruct. arXiv preprint arXiv:2306.08568 , 2023. Alessandro Mantovani, Luca Compagna, Yan Shoshitaishvili, and Davide Balzarotti. The convergence of source code and binary vulnerability discovery–a case study. In Proceedings of the 2022 ACM on Asia Conference on Computer and Communications Security , pages 602–615, 2022. S Megira, AR Pangesti, and FW Wibowo. Malware analysis and detection using reverse engineering technique. In Journal of Physics: Conference Series , volume 1140, page 012042. IOP Publishing, 2018. Huanyao Rong, Yue Duan, Hang Zhang, XiaoFeng Wang, Hongbo Chen, Shengchen Duan, and Shen Wang. Disassembling obfuscated executables with llm. arXiv preprint arXiv:2407.08924 , 2024. Jonathan Salwan, S ´ebastien Bardin, and Marie-Laure Potet. Symbolic deobfuscation: From vir-tualized code back to the original. In International Conference on Detection of Intrusions and Malware, and Vulnerability Assessment , pages 372–392. Springer, 2018. Zhihong Shao, Peiyi Wang, Qihao Zhu, Runxin Xu, Junxiao Song, Xiao Bi, Haowei Zhang, Mingchuan Zhang, YK Li, Yang Wu, et al. Deepseekmath: Pushing the limits of mathemat-ical reasoning in open language models. arXiv preprint arXiv:2402.03300 , 2024. 12 Zian Su, Xiangzhe Xu, Ziyang Huang, Zhuo Zhang, Yapeng Ye, Jianjun Huang, and Xiangyu Zhang. Codeart: Better code models by attention regularization when symbols are lacking. Proceedings of the ACM on Software Engineering , 1(FSE):562–585, 2024. Hanzhuo Tan, Qi Luo, Jing Li, and Yuqun Zhang. Llm4decompile: Decompiling binary code with large language models. arXiv preprint arXiv:2403.05286 , 2024. Scarlett Taviss, Steven HH Ding, Mohammad Zulkernine, Philippe Charland, and Sudipta Acharya. Asm2seq: Explainable assembly code functional summary generation for reverse engineering and vulnerability analysis. Digital Threats: Research and Practice , 5(1):1–25, 2024. Karpagalingam Thirumoorthy et al. A feature selection model for software defect prediction using binary rao optimization algorithm. Applied Soft Computing , 131:109737, 2022. Anton Tkachenko, Dmitrij Suskevic, and Benjamin Adolphi. Deconstructing obfuscation: A four-dimensional framework for evaluating large language models assembly code deobfuscation capa-bilities. arXiv preprint arXiv:2505.19887 , 2025. Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timoth ´ee Lacroix, Baptiste Rozi `ere, Naman Goyal, Eric Hambro, Faisal Azhar, et al. Llama: Open and efficient foundation language models. arXiv preprint arXiv:2302.13971 , 2023. Hao Wang, Wenjie Qu, Gilad Katz, Wenyu Zhu, Zeyu Gao, Han Qiu, Jianwei Zhuge, and Chao Zhang. Jtrans: Jump-aware transformer for binary code similarity detection. In Proceedings of the 31st ACM SIGSOFT International Symposium on Software Testing and Analysis , pages 1–13, 2022. Hao Wang, Zeyu Gao, Chao Zhang, Zihan Sha, Mingyang Sun, Yuchen Zhou, Wenyu Zhu, Wenju Sun, Han Qiu, and Xi Xiao. Clap: Learning transferable binary code representations with natural language supervision. In Proceedings of the 33rd ACM SIGSOFT International Symposium on Software Testing and Analysis , pages 503–515, 2024. Xinyi Wang, Jiashui Wang, Jinbo Su, Ke Wang, Peng Chen, Yanming Liu, Long Liu, Xiang Li, Yangdong Wang, Qiyuan Chen, et al. Asma-tune: Unlocking llms’ assembly code comprehension via structural-semantic instruction tuning. arXiv preprint arXiv:2503.11617 , 2025. Yizhong Wang, Yeganeh Kordi, Swaroop Mishra, Alisa Liu, Noah A Smith, Daniel Khashabi, and Hannaneh Hajishirzi. Self-instruct: Aligning language models with self-generated instructions. In 
+
+Proceedings of the 61st annual meeting of the association for computational linguistics (volume 1: long papers) , pages 13484–13508, 2023. Dongpeng Xu, Jiang Ming, Yu Fu, and Dinghao Wu. Vmhunt: A verifiable approach to partially-virtualized binary code simplification. In Proceedings of the 2018 ACM SIGSAC Conference on Computer and Communications Security , pages 442–458, 2018. Weizhe Yuan, Richard Yuanzhe Pang, Kyunghyun Cho, Xian Li, Sainbayar Sukhbaatar, Jing Xu, and Jason E Weston. Self-rewarding language models. In Forty-first International Conference on Machine Learning , 2024. Qihao Zhu, Daya Guo, Zhihong Shao, Dejian Yang, Peiyi Wang, Runxin Xu, Y Wu, Yukun Li, Huazuo Gao, Shirong Ma, et al. Deepseek-coder-v2: Breaking the barrier of closed-source models in code intelligence. arXiv preprint arXiv:2406.11931 , 2024. Yuxin Zuo, Kaiyan Zhang, Li Sheng, Shang Qu, Ganqu Cui, Xuekai Zhu, Haozhan Li, Yuchen Zhang, Xinwei Long, Ermo Hua, et al. Ttrl: Test-time reinforcement learning. arXiv preprint arXiv:2504.16084 , 2025. 13 A Dataset Composition 
+
+We report the full composition of the raw assembly corpus, the OLLVM variant breakdown on Juliet (x86 64), and the three-stage training datasets in Tab. 6. All variant-wise counts and the exact OLLVM compilation flags are also included for reproducibility. Table 6: Dataset composition (raw corpus, OLLVM variants, and three-stage training). 
+
+Dataset Records Raw Assembly Corpus 
+
+BinaryCorp-3M (train) 212,117 Juliet (unobfuscated) 79,920 Juliet (OLLVM-obfuscated) a 221,069 
+
+OLLVM Variant Breakdown (Juliet, x86 64) 
+
+None (no obfuscation) 79,920 SUB (Instruction Substitution) b 2,651 FLA (Control-Flow Flattening) c 58,578 BCF (Bogus Control Flow) d 79,920 ALL (SUB+FLA+BCF) e 79,920 
+
+Training Data 
+
+Dalign (simp) 430,027 
+
+Dsft (detail/conv/reason) 11,750 
+
+Drl (reason +) 4,244           
+
+> aInclude sub/fla/bcf/all
+> bSUB -mllvm-sub
+> cFLA -mllvm-fla-mllvm-perFLA=100
+> dBCF -mllvm-bcf-mllvm-boguscf-prob=100-mllvm-boguscf-loop=1
+> eALL -mllvm-sub-mllvm-fla-mllvm-perFLA= 100-mllvm-bcf-mllvm-boguscf-prob=100-mllvm-boguscf-loop=1
+
+B Training Data Construction and Quality Control 
+
+We organize the training data into three stage-specific subsets: Dalign , Dsft , and Drl . Beyond the aggregate sizes reported in Sec. 3, we summarize the stage-wise source composition and filtering criteria here to clarify data quality control. For Dalign , we apply automated deduplication by function name and description to remove exact and near-duplicate samples. Starting from the 212,117 BinaryCorp-3M, 79,920 unobfuscated Juliet, and 221,069 OLLVM-obfuscated Juliet snippets reported in Tab. 6, this filtering yields the final 430,027 aligned instances used in Phase I. For Dsft , we retain only samples whose obfuscated assembly is at least 1.5 × longer than the corre-sponding original assembly, ensuring that the transformation meaningfully changes the code structure. We further apply Spark TopK filtering with K=80 to balance token-length distributions across obfus-cation types. After these automated filters, three domain experts independently review the retained samples to verify that the generated question–answer pairs are factually accurate and that the answers correctly describe the behavior of the obfuscated code; any sample flagged by at least one reviewer is removed. The final split contains about 12K instances, including 2,684 non-obfuscated samples and 9,066 obfuscated samples (SUB: 186, BCF: 3,252, FLA: 3,234, ALL: 2,394). For Drl , all retained question–answer pairs require multi-step reasoning and complete reasoning traces. We apply manual filtering, deduplication, and expert verification, and all candidate samples are independently reviewed by three binary-analysis experts. Each expert evaluates whether the question is meaningful and whether the reference answer is correct. We retain only samples that receive unanimous agreement from all three experts. The final split contains 4,244 instances, with 1,058 ORG, 30 SUB, 1,054 BCF, 1,048 FLA, and 1,054 ALL samples. 14 C Detailed VMISA Benchmark Description 
+
+VMISA [Li et al., 2022] contains programs protected by commercial black-box virtualization ob-fuscators, including Code Virtualizer [Cod, 2019], Themida (v3.0.7) [The, 2019], and VMProtect (v3.5) [VMP, 2019], and tests whether models can recover the semantics of proprietary virtual instruc-tions unseen during training, providing a strong out-of-distribution evaluation. Native-instruction to virtual-handler mappings are categorized into two families: One-to-One (O2O), where a single native instruction is emulated by one handler typically containing a kernel operation aligned with the original mnemonic, and One-to-Multiple (O2M), where one native instruction is realized by a composition of multiple handlers, potentially with multiple mapping rules for the same operation (e.g., implementing xor via logical NOR /NAND handlers rather than a dedicated xor handler). In practice, Code Virtualizer and Themida adopt O2O mappings over a virtual ISA of size |ISA |=138 ,whereas VMProtect combines O2M and O2O mappings over |ISA |=237 , yielding a more diverse mapping space. The benchmark also stresses analysis under context-switch obfuscation. While VMs typically save and restore native context using mov or push /pop , Code Virtualizer and Themida additionally use 
+
+xchg and insert decoy context switches that may occur at the same stack depth as true restorations, complicating context pairing. VMProtect instead semantically obfuscates the generated context-switch instructions, hindering rule-based simplification. For evaluation, we extract the virtual instruction set (ISA) of each obfuscator and report the number of recovered instructions k, where a virtual instruction is considered recovered if the model correctly identifies the corresponding Intel-ISA semantics of a virtual handler against expert-annotated ground-truth mappings. Recovery requires the correct native mnemonic and operand semantics; for O2M transformations in VMProtect, it further requires identifying the complete semantic equivalence of the handler composition. We report the success rate SR = k 
+
+> |ISA |
+
+× 100% to normalize across different ISA sizes. 
+
+D Detailed Capability-Preservation Benchmark Description 
+
+To verify that OASIF preserves capabilities relevant to code generation and downstream binary-analysis tasks, we evaluate on three additional benchmarks that do not overlap with the OASIF training data. HumanEval comprises 164 hand-written Python programming tasks with function signatures and docstrings, and is widely used to assess code LLMs [Guo et al., 2024, Hui et al., 2024]. 
+
+VulBench [Gao et al., 2023] targets vulnerability detection and covers three task types and seven sub-datasets (big-vul, ctf ida, ctf reversed, d2a, devign, magma bin, magma src), totaling 9,222 test cases. HumanEval-Decompile [Tan et al., 2024] is a binary-to-source decompilation benchmark comprising 164 C functions aligned with HumanEval and compiled at optimization levels O0–O3. We follow the official settings of each benchmark. Specifically, for HumanEval we adopt Pass@1 to measure the proportion of functionally correct code generations that pass all test cases. For VulBench, we report Accuracy, F1, Precision, and Recall aggregated across all task types. For HumanEval-Decompile, we report Compile Rate and Run Rate (Pass@1) averaged across optimization levels O0–O3. 
+
+E Length-Stratified Evaluation on OASIF-Bench 
+
+To better understand how OASIF behaves across input scales, we partition OASIF-Bench samples into three token-length buckets and evaluate Qwen2.5-Coder-Instruct-7B ( Base ) and its OASIF-trained counterpart ( OASIF ) on each bucket. Per-dimension scores are reported on a 0–10 scale; the Overall column is the per-bucket average across the five dimensions, and Weighted Avg is aggregated over all buckets. Results are reported in Tab. 7. Both the base and OASIF-trained models exhibit a clear inverse relationship between input length and output quality, and the gain introduced by OASIF is most pronounced in the short-to-medium bucket (291–4,719 tokens: +0.67 Overall) while remaining positive in the longest bucket (10,391–46,567 tokens: +0.58 Overall). Since the assembly encoder compresses arbitrary-length assembly into a single fixed-dimensional embedding mapped to one LLM token, longer inputs inevitably lose 15 fine-grained details, which explains the steeper degradation of Relevance. Long sequences (10K+) also fall in the tail of the encoder’s pretraining distribution, further reducing encoding quality. Table 7: Length-stratified evaluation on OASIF-Bench.                                                        
+
+> Model Token Range Helpfulness Relevance Accuracy Detail Comprehensiveness Overall
+> Qwen2.5-Coder-Instruct-7B (Base) 291 – 4,719 3.85 6.50 3.60 3.25 3.20 4.08 5,226 – 9,648 3.40 5.55 3.50 2.78 3.07 3.66 10,391 – 46,567 3.35 5.20 3.25 2.90 2.90 3.52
+> Weighted Avg 3.69 6.21 3.53 3.13 3.13 3.90
+> Qwen2.5-Coder-Instruct-7B-OASIF (Ours) 291 – 4,719 4.66 7.44 4.41 3.57 3.66 4.75 5,226 – 9,648 4.30 6.43 5.55 3.05 3.17 4.50 10,391 – 46,567 4.20 5.80 3.90 3.30 3.30 4.10
+> Weighted Avg 4.52 7.07 4.41 3.44 3.52 4.58
+
+F Reward Design and Evaluation Decoupling 
+
+The semantic reward Rsem is computed by a privileged reward model (PRM) that conditions on the original source code csrc and obfuscation parameters Ω, neither of which is available to the policy model πθ . This information asymmetry is intentional: the PRM evaluates semantic faithfulness with privileged posterior information rather than scoring outputs based only on the surface plausibility of the model response. As a result, the reward process is structurally decoupled from policy generation and does not reduce to self-evaluation. We further decouple training-time reward computation from benchmark-time scoring at three levels. First, during RL, the hybrid reward combines structural and semantic signals, with λ=0 .5 used as an empirical balancing coefficient between the two terms. Second, OASIF-Bench is evaluated by GPT-5.4 as an independent external judge against expert-derived reference answers across five dimensions: helpfulness, relevance, accuracy, detail, and comprehensiveness. Third, VMISA-Bench, BCSD, VulBench, and HumanEval-Decompile rely on external benchmarks and established evaluation protocols that are independent of the reward model. The consistency of the observed gains across these heterogeneous settings provides cross-validation beyond any single evaluator. 
+
+G Notes on BCSD Evaluation Protocol 
+
+BCSD is included as a capability-preservation benchmark rather than as the primary measure of obfuscation-aware instruction following. Following prior work, all models generate natural-language descriptions that are then compared through semantic retrieval using Contriever-MSMARCO. We report Recall@1 under varying pool sizes and Mean Reciprocal Rank (MRR) with a fixed pool size of 500. To enable direct comparison with published BCSD results from both general-purpose and specialized code LLMs, we follow the established few-shot chain-of-thought protocol used in prior work. Inference is performed under near-deterministic settings (temperature 0 and top-k 1), and prompts and evaluation data are strictly excluded from the retrieval-corpus construction process. Under this protocol, small numerical differences are highly reproducible and are unlikely to be explained by sampling variance alone. 
+
+H Practical Scope on Complex Software 
+
+VMISA-Bench already evaluates real commercial obfuscators applied to actual programs. For whole-binary analysis of complex software, OASIF is intended to operate within the standard reverse-engineering workflow. Tools such as IDA Pro or Ghidra first decompose the binary into individual functions, after which OASIF is applied at the function level. This function-level granularity is consistent with how human analysts and existing automated systems analyze real-world binaries. The broader applicability is also supported by the source distribution of OASIF-Bench, whose assembly snippets are drawn from the BinaryCorp-3M test split, spanning diverse real software 16 domains, and by the length-stratified results in Appendix E, which show consistent gains across inputs ranging from hundreds to more than 40K tokens. End-to-end inter-procedural reasoning over entire large-scale binaries remains outside the current scope and is left for future work. 17

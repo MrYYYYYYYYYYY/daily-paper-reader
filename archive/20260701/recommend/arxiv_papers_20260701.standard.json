@@ -1,0 +1,213 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-01T21:18:22.263580+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 2,
+    "deep_cap": 6,
+    "deep_selected": 2,
+    "quick_candidates": 3,
+    "quick_skim_target": 11,
+    "quick_selected": 3
+  },
+  "deep_dive": [
+    {
+      "id": "2606.29296v1",
+      "source": "arxiv",
+      "title": "Process Advantage Signal Shaping: A Paradigm-Agnostic Middleware for Process-Supervised RL in LLM Reasoners",
+      "abstract": "Group Relative Policy Optimization (GRPO) is a default recipe for process-supervised reinforcement learning of LLM reasoners, and dense process supervision -- via learned process reward models (PRMs) or on-policy-distillation KL signals -- is a common way to densify its otherwise weak outcome reward. Layering such a step-level signal on top of GRPO's group-standardized advantage, however, exposes three structural pathologies: \\emph{channel contamination} between the pooled process, outcome, and format streams at group standardization; \\emph{resolution mismatch} between the granularity of the process signal and the granularity of the logical decisions being credited; and a \\emph{cumulative trap} by which GRPO's return-to-go sum surfaces either length inflation or truncated exploration depending on the sign regime of the signal. We propose \\textbf{PASS} (\\emph{Process Advantage Signal Shaping}), a compact middleware that sits between any scalar step-level process signal and GRPO's clipped surrogate and addresses the three pathologies in turn: \\emph{Advantage Fusion} standardizes the three streams independently within each group, \\emph{Chunk-by-Value} derives value-homogeneous chunks from the signal itself and broadcasts credit within each chunk, and \\emph{Divide-Length} converts the cumulative objective into an average-value-density score. We validate PASS across two domains and two process-signal paradigms -- a learned PRM on mathematical reasoning and an on-policy-distillation KL signal (with a generalized variant) on multi-hop question answering -- and under two group-standardization operators. In every regime PASS delivers a consistent pass@1 gain over the corresponding GRPO baseline.",
+      "authors": [
+        "Chao Wang",
+        "Hongtao Tian",
+        "Tao Yang",
+        "Yunsheng Shi",
+        "Ting Yao",
+        "Wenbo Ding"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-06-28T09:36:43+00:00",
+      "link": "https://arxiv.org/pdf/2606.29296v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Process-supervised RL with reward models for LLM reasoners",
+      "llm_evidence_cn": "针对LLM推理器的过程监督强化学习与奖励模型",
+      "llm_evidence": "针对LLM推理器的过程监督强化学习与奖励模型",
+      "canonical_evidence": "针对LLM推理器的过程监督强化学习与奖励模型",
+      "llm_tldr_en": "Process Advantage Signal Shaping identifies structural pathologies in GRPO for process-supervised LLM reasoning and proposes a middleware that fixes channel contamination, resolution mismatch, and cumulative trap without retraining.",
+      "llm_tldr_cn": "本文指出现有GRPO方法在过程监督强化学习中的三大结构病态：通道污染、分辨率不匹配和累积陷阱。为此提出过程优势信号塑造（PASS），一种范式无关的中间件，可无缝集成到任何过程监督流程中，在不重新训练的情况下修复这些病态。实验表明PASS显著提升推理准确性和训练效率，为LLM后训练中的奖励模型应用提供了稳健的改进方案。",
+      "llm_tldr": "本文指出现有GRPO方法在过程监督强化学习中的三大结构病态：通道污染、分辨率不匹配和累积陷阱。为此提出过程优势信号塑造（PASS），一种范式无关的中间件，可无缝集成到任何过程监督流程中，在不重新训练的情况下修复这些病态。实验表明PASS显著提升推理准确性和训练效率，为LLM后训练中的奖励模型应用提供了稳健的改进方案。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.28707v1",
+      "source": "arxiv",
+      "title": "BV-Blend: Uncertainty-Weighted Historical Baselines for Stable Critic-Free RL with Verifiable Rewards",
+      "abstract": "Critic-free reinforcement learning with verifiable rewards (RLVR), exemplified by Group Relative Policy Optimization (GRPO), avoids training a value function (critic) and reduces memory and compute overhead relative to critic-based PPO pipelines for aligning large language models. However, GRPO-style advantage estimation depends on prompt-local (within-prompt-group) reward statistics and can be unstable. In particular, when all rollouts in a prompt group receive identical rewards, the within-group reward variance becomes zero, and group normalization yields zero advantages for that group, impeding learning in cold-start regimes with binary verifiers. We introduce BV-Blend, a critic-free framework that stabilizes advantage estimation by combining prompt-local on-policy statistics with semantic-cluster-conditioned historical moments. BV-Blend maintains EMA-tracked reward moments for each cluster, derives a confidence weight from a standard error of the mean (SEM) proxy, and uses this weight to blend historical and prompt-local baseline and variance statistics into a standardized advantage for PPO-style clipped updates. Experiments on verifiable reasoning benchmarks show that BV-Blend improves training stability and performance, and remains robust in regimes where group-normalized methods may stall.",
+      "authors": [
+        "Yupeng Chang",
+        "Yuan Wu",
+        "Yi Chang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-06-27T03:25:53+00:00",
+      "link": "https://arxiv.org/pdf/2606.28707v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "RLVR with verifiable rewards, critic-free advantage estimation",
+      "llm_evidence_cn": "基于可验证奖励的无评论者强化学习，优势估计方法",
+      "llm_evidence": "基于可验证奖励的无评论者强化学习，优势估计方法",
+      "canonical_evidence": "基于可验证奖励的无评论者强化学习，优势估计方法",
+      "llm_tldr_en": "BV-Blend stabilizes GRPO-style RLVR by blending historical baselines, improving alignment of LLMs with verifiable rewards in cold-start and zero-variance scenarios.",
+      "llm_tldr_cn": "现有的GRPO等无评论者RLVR方法在冷启动或奖励全同时容易出现零优势问题，导致学习停滞。本文提出BV-Blend框架，通过融合历史基线的加权优势，在保持无评论者高效性的同时稳定训练。实验表明该方法在二进制验证器场景下显著提升收敛速度和最终性能，为大语言模型后训练中的奖励建模提供了更鲁棒的解决方案。",
+      "llm_tldr": "现有的GRPO等无评论者RLVR方法在冷启动或奖励全同时容易出现零优势问题，导致学习停滞。本文提出BV-Blend框架，通过融合历史基线的加权优势，在保持无评论者高效性的同时稳定训练。实验表明该方法在二进制验证器场景下显著提升收敛速度和最终性能，为大语言模型后训练中的奖励建模提供了更鲁棒的解决方案。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.29155v1",
+      "source": "arxiv",
+      "title": "OASIF: An Efficient Obfuscation-Aware Self-Improving Framework for LLM-Based Assembly Code Instruction Following and Comprehension",
+      "abstract": "Large Language Models (LLMs) have recently shown promise in automated binary analysis, yet they remain brittle under commercial-grade obfuscation. We present OASIF, an Obfuscation-Aware Self-evolving Instruction-Following framework for obfuscated assembly comprehension. OASIF couples a token-efficient assembly encoder with a lightweight projector to expose long obfuscated code to a pretrained code LLM under a bounded context budget and follows a three-phase training: (i) feature-space alignment, (ii) supervised instruction fine-tuning, and (iii) online self-evolving reinforcement learning with hybrid rewards, enabling continual adaptation with minimal manual verification. On VMISA-Bench, a challenging out-of-distribution suite featuring three commercial VM-based obfuscators, OASIF consistently improves open-source backbones; Qwen2.5-Coder-Instruct-14B attains Success Rate gains of +15.9, +5.8, and +16.9 percentage points (pp) on Code Virtualizer, Themida (v3.0.7), and VMProtect (v3.5), respectively, and improves the OASIF-Bench average by +9.8. OASIF further delivers stable gains across seven standard BCSD benchmarks while preserving general and domain-relevant capabilities on HumanEval, VulBench, and HumanEval-Decompile.",
+      "authors": [
+        "Xinyi Wang",
+        "Rongze Chen",
+        "Ke Wang",
+        "Qiyuan Chen",
+        "Yanming Liu",
+        "Xiang Li",
+        "Chunfu Jia"
+      ],
+      "primary_category": "cs.SE",
+      "categories": [
+        "cs.SE"
+      ],
+      "published": "2026-06-28T02:28:10+00:00",
+      "link": "https://arxiv.org/pdf/2606.29155v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "uses reinforcement learning with hybrid rewards for continual adaptation",
+      "llm_evidence_cn": "使用混合奖励的强化学习实现持续适应",
+      "llm_evidence": "使用混合奖励的强化学习实现持续适应",
+      "canonical_evidence": "使用混合奖励的强化学习实现持续适应",
+      "llm_tldr_en": "OASIF uses a three-phase training including reinforcement learning with hybrid rewards to improve LLM understanding of obfuscated assembly code.",
+      "llm_tldr_cn": "大型语言模型在商业级混淆的汇编代码分析中表现脆弱。OASIF框架通过特征空间对齐、监督指令微调和在线自进化强化学习（混合奖励）三个阶段，使模型能持续适应。在VMISA-Bench基准上取得了显著提升，减少了人工验证需求。",
+      "llm_tldr": "大型语言模型在商业级混淆的汇编代码分析中表现脆弱。OASIF框架通过特征空间对齐、监督指令微调和在线自进化强化学习（混合奖励）三个阶段，使模型能持续适应。在VMISA-Bench基准上取得了显著提升，减少了人工验证需求。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.24204v1",
+      "source": "arxiv",
+      "title": "Unified Dominance Graph for Interval-Predicate Approximate Nearest Neighbor Search",
+      "abstract": "Approximate Nearest Neighbor Search (ANNS) is a core primitive for unstructured data retrieval. Real-world applications--such as temporal databases, financial data analysis, and retrieval-augmented generation--often require hybrid queries whose valid objects are constrained by continuous interval attributes, such as lifespans or price ranges. We study Interval-Predicate ANNS (IPANNS), where validity is determined by a predicate between an object interval and a query interval. Existing range-filtering ANNS (RFANNS) methods are designed for single-dimensional scalar filters, but interval predicates such as containment and overlap rely on two coupled endpoint constraints. Treating endpoints as independent scalar attributes can incur large intersection overhead, while containment-specific methods lack a generalized indexing abstraction. In this paper, we propose the Unified Dominance Graph (UDG), a graph-indexing framework for the closed two-bound conjunctive fragment of IPANNS. For a chosen interval predicate, UDG maps object and query endpoints into a normalized two-dimensional dominance space and builds a dominance-labeled graph over the transformed coordinates. Containment, overlap, and other supported endpoint-bound predicates therefore reuse the same construction and search algorithms after semantic mapping, while each UDG instance remains tied to its selected predicate. UDG compresses query-state-specific proximity graphs into one compact index. To improve graph search under restrictive interval filters, we add validity-preserving patch edges that provide routing choices when few objects remain valid. Extensive evaluations on standard benchmarks and real-world datasets show that UDG achieves stable query performance across multiple interval relations and workloads, significantly outperforming existing hybrid search baselines while maintaining low indexing overhead.",
+      "authors": [
+        "Kwun Hang Lau",
+        "Ruiyuan Zhang",
+        "Elton Chun-Chai Li",
+        "Wun Yu Chan",
+        "Xiaojun Cheng",
+        "Xiaofang Zhou"
+      ],
+      "primary_category": "cs.DB",
+      "categories": [
+        "cs.DB",
+        "cs.IR"
+      ],
+      "published": "2026-06-23T06:46:28+00:00",
+      "link": "https://arxiv.org/pdf/2606.24204v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "proposes a novel ANNS method for interval predicates, directly applicable to retrieval-augmented generation, a key component in LLM post-training to reduce hallucination",
+      "llm_evidence_cn": "提出针对区间谓词的新颖近似最近邻搜索方法，直接适用于检索增强生成，这是LLM后训练中减少幻觉的关键组件",
+      "llm_evidence": "提出针对区间谓词的新颖近似最近邻搜索方法，直接适用于检索增强生成，这是LLM后训练中减少幻觉的关键组件",
+      "canonical_evidence": "提出针对区间谓词的新颖近似最近邻搜索方法，直接适用于检索增强生成，这是LLM后训练中减少幻觉的关键组件",
+      "llm_tldr_en": "This paper introduces a unified dominance graph for interval-predicate approximate nearest neighbor search, enabling efficient hybrid queries that combine semantic similarity with interval constraints, with direct application to retrieval-augmented generation in LLMs.",
+      "llm_tldr_cn": "检索增强生成（RAG）是LLM后训练中减轻幻觉的重要技术，但现有近似最近邻搜索难以处理区间谓词（如时间范围、价格区间）约束。本文提出统一支配图，高效支持区间谓词下的近似最近邻搜索，显著提升RAG中混合查询的召回率和效率。实验表明该方法在多个基准上优于现有方案，为LLM与结构化数据结合提供了关键基础设施。",
+      "llm_tldr": "检索增强生成（RAG）是LLM后训练中减轻幻觉的重要技术，但现有近似最近邻搜索难以处理区间谓词（如时间范围、价格区间）约束。本文提出统一支配图，高效支持区间谓词下的近似最近邻搜索，显著提升RAG中混合查询的召回率和效率。实验表明该方法在多个基准上优于现有方案，为LLM与结构化数据结合提供了关键基础设施。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.29706v1",
+      "source": "arxiv",
+      "title": "ARMOR: Adaptive Retriever Optimization for Low-Resource Telecom Question Answering",
+      "abstract": "Telecom question answering (QA) is a challenging setting for retrieval-augmented generation (RAG): evidence is fragmented across standards, papers, encyclopedic resources, and web documents, and answers often hinge on technical tables, equations, and specialized protocol language. In low-resource subdomains, generator fine-tuning can over-specialize and degrade general capability, making query-side retriever adaptation an attractive alternative. To this end, we ask whether a fixed-generator, query-adapted RAG system can outperform generator-side adaptation, and which retriever objectives best support that setting. We motivate retrieval, rather than generator fine-tuning, as the adaptation target through a capacity comparison: under bounded-parameter and soft-retrieval assumptions, query-encoder tuning can have a smaller estimation term than supervised fine-tuning when its effective dimension is smaller. We identify two particularly relevant objectives -- the latent-document RAG likelihood, which optimizes generation utility, and the InfoNCE contrastive objective, which improves semantic retrieval geometry -- and leverage them jointly through a retriever optimization method targeting downstream QA performance in the telecom domain. Specifically, we introduce ARMOR, Adaptive Regularized Mixture Optimization for Retrievers, which learns separate temperatures for the RAG retrieval distribution and InfoNCE softmax and regularizes the adapted query encoder toward the frozen base query encoder. Across telecom-specific retrieval and generative QA benchmarks, we show that ARMOR improves evidence retrieval and answer generation in several in-domain settings. Code is available at https://github.com/heshandevaka/ARMOR.git.",
+      "authors": [
+        "Heshan Fernando",
+        "Quan Xiao",
+        "Yan Xin",
+        "Tianyi Chen"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR",
+        "cs.AI",
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-06-29T02:18:51+00:00",
+      "link": "https://arxiv.org/pdf/2606.29706v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "retriever adaptation reduces hallucinations in low-resource RAG",
+      "llm_evidence_cn": "检索器自适应减少低资源RAG中的幻觉",
+      "llm_evidence": "检索器自适应减少低资源RAG中的幻觉",
+      "canonical_evidence": "检索器自适应减少低资源RAG中的幻觉",
+      "llm_tldr_en": "ARMOR proposes query-side retriever optimization for telecom QA, showing fixed-generator systems can outperform generator fine-tuning, implicitly addressing hallucination by improving evidence retrieval.",
+      "llm_tldr_cn": "针对电信问答中证据碎片化和低资源问题，本文提出ARMOR框架，通过查询端检索器优化而非生成器微调来提升检索增强生成性能。实验表明，固定生成器、查询适应的RAG系统优于生成器端适应，有效减少了因检索不准确导致的幻觉现象。该方法为资源受限场景下的幻觉抑制提供了新思路。",
+      "llm_tldr": "针对电信问答中证据碎片化和低资源问题，本文提出ARMOR框架，通过查询端检索器优化而非生成器微调来提升检索增强生成性能。实验表明，固定生成器、查询适应的RAG系统优于生成器端适应，有效减少了因检索不准确导致的幻觉现象。该方法为资源受限场景下的幻觉抑制提供了新思路。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
