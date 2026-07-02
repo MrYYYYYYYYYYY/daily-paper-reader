@@ -1,0 +1,623 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-02T20:07:17.575155+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 8,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 8,
+    "quick_skim_target": 11,
+    "quick_selected": 8
+  },
+  "deep_dive": [
+    {
+      "id": "2606.26917v1",
+      "source": "arxiv",
+      "title": "GEOALIGN: Geometric Rollout Curation for Robust LLM Reinforcement Learning",
+      "abstract": "Online reinforcement learning is widely used to align large language models (LLMs) with reward signals, yet training can be unstable under noisy or misspecified rewards. We identify a failure mode we call directional inconsistency: within a batch, a small set of high-reward rollouts induces representation-space preference directions that sharply disagree with the batch majority, resulting in high-variance and destabilizing updates. We propose geoalign, a lightweight plug-in for rollout curation in iterative policy optimization. Geoalign (i) forms within-prompt preference pairs, (ii) learns an online projector on per-rollout hidden states to concentrate reward-ordered displacement directions, and (iii) detects directionally inconsistent rollouts via their angular deviation from a batch consensus prototype and rectifies them with within-prompt stable alternatives. Geoalign is forward-pass only and adds negligible overhead. Across dialogue alignment with a learned reward model and mathematical reasoning with binary verified rewards, Geoalign improves final performance and reduces training oscillation, outperforming PF-PPO, PAR, PODS, and Seed-GRPO. These results suggest latent directional consensus as an effective reliability signal for online LLM RL.",
+      "authors": [
+        "Ting Zhou",
+        "Zhenqing Ling",
+        "Yiyang Zhao",
+        "Ying Shen",
+        "Daoyuan Chen"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-25T11:53:37+00:00",
+      "link": "https://arxiv.org/pdf/2606.26917v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Robust RL training via geometric curation of rollouts to handle noisy rewards",
+      "llm_evidence_cn": "通过几何方法筛选生成轨迹来处理噪声奖励，提升RL训练鲁棒性",
+      "llm_evidence": "通过几何方法筛选生成轨迹来处理噪声奖励，提升RL训练鲁棒性",
+      "canonical_evidence": "通过几何方法筛选生成轨迹来处理噪声奖励，提升RL训练鲁棒性",
+      "llm_tldr_en": "GEOALIGN identifies and filters directionally inconsistent rollouts using geometry of hidden states, stabilizing LLM RL training under noisy rewards.",
+      "llm_tldr_cn": "在线强化学习在噪声奖励下训练不稳定，本文发现批内高奖励rollout与多数产生方向不一致的偏好方向。提出GEOALIGN，通过在线投影器学习每个rollout的奖励排序位移方向，检测并剔除方向不一致的rollout。实验表明该方法显著提升训练稳定性，且可轻松集成到现有迭代优化中。该工作为LLM对齐提供了实用的鲁棒性增强手段。",
+      "llm_tldr": "在线强化学习在噪声奖励下训练不稳定，本文发现批内高奖励rollout与多数产生方向不一致的偏好方向。提出GEOALIGN，通过在线投影器学习每个rollout的奖励排序位移方向，检测并剔除方向不一致的rollout。实验表明该方法显著提升训练稳定性，且可轻松集成到现有迭代优化中。该工作为LLM对齐提供了实用的鲁棒性增强手段。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.26997v1",
+      "source": "arxiv",
+      "title": "RolloutPipe: Overlapping Pipelined Rollout and Training in Disaggregated On-Policy LLM Reinforcement Learning",
+      "abstract": "Large language model (LLM) post-training for reasoning increasingly relies on reinforcement learning with verifiable rewards (RLVR), where models learn from ground-truth feedback on mathematical, logical, and scientific tasks. To enable flexible resource allocation and support heterogeneous training setups, modern RLVR systems adopt disaggregated architectures that decouple rollout generation and policy training across independent GPU pools. However, existing synchronous on-policy GRPO (Group Relative Policy Optimization) RLVR systems finish an entire rollout before starting training, leaving the trainer GPU pool idle while rollout is still ongoing. Asynchronous RL pipelines overlap the two stages, but at the cost of training on stale data. To address these challenges, we propose RolloutPipe, a post-training framework for disaggregated RLVR systems, which turns the fixed-weight rollout into a complete-group pipeline where trainable groups move to the trainer while later groups are still being generated. RolloutPipe achieves this through two techniques including complete-group pipelining (CGP) and frontier-group dispatch (FGD). CGP dispatches each trainable complete group to the trainer FIFO as soon as group materialization finishes, and FGD is an admission policy on the Rollout node that first admits requests for the frontier groups needed to form the next training batch, so that trainer-ready groups arrive earlier and more steadily. The design starts training before the rollout completes while maintaining on-policy correctness. Evaluated on Qwen3-1.7B across four reasoning and science benchmarks and twelve rollout settings, RolloutPipe shortens the rollout-to-train-end time by 30.7%-42.3%, and lowers the trainer waiting ratio by 37%-76% compared to Slime, a state-of-the-art rollout and training system.",
+      "authors": [
+        "Rongjian Chen",
+        "Jianmin Hu",
+        "Kejiang Ye",
+        "Minxian Xu"
+      ],
+      "primary_category": "cs.DC",
+      "categories": [
+        "cs.DC",
+        "cs.LG"
+      ],
+      "published": "2026-06-25T13:14:14+00:00",
+      "link": "https://arxiv.org/pdf/2606.26997v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Algorithm improvement for LLM RL training pipeline",
+      "llm_evidence_cn": "针对LLM强化学习训练管线的算法改进",
+      "llm_evidence": "针对LLM强化学习训练管线的算法改进",
+      "canonical_evidence": "针对LLM强化学习训练管线的算法改进",
+      "llm_tldr_en": "RolloutPipe overlaps rollout and training stages in disaggregated LLM RL systems, reducing trainer GPU idle time and improving efficiency.",
+      "llm_tldr_cn": "这篇论文针对大型语言模型强化学习后训练中rollout生成与策略训练解耦架构下训练GPU空闲的问题，提出了RolloutPipe方法，通过重叠流水线化两个阶段来提升资源利用率。实验表明该方法能显著提高训练吞吐量，并保持收敛质量。这项工作为大规模RL后训练提供了实用的系统优化方案。",
+      "llm_tldr": "这篇论文针对大型语言模型强化学习后训练中rollout生成与策略训练解耦架构下训练GPU空闲的问题，提出了RolloutPipe方法，通过重叠流水线化两个阶段来提升资源利用率。实验表明该方法能显著提高训练吞吐量，并保持收敛质量。这项工作为大规模RL后训练提供了实用的系统优化方案。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.27291v1",
+      "source": "arxiv",
+      "title": "Designing Reward Signals for Portable Query Generation: A Case Study in Industrial Semantic Job Search",
+      "abstract": "Job-search platforms rely on low-bandwidth query interfaces that often fail to capture the high-dimensional complexity of candidate profiles. We present an end-to-end RLAIF (Reinforcement Learning from AI Feedback) framework to generate \\emph{portable} job search queries, terms that abstract away seeker-specific identifiers while preserving generalizable qualifications. This task introduces a highly adversarial reward surface where policy optimization frequently exploits flaws in LLM-as-judge rubrics, resulting in degenerate verbatim-copying behaviors.   We conducted comprehensive empirical experiments to isolate the impact of optimization mechanics against structured reward engineering. Our results demonstrate that for critic-free optimizers, performance is overwhelmingly dictated by robust reward shaping, rendering the specific choice of algorithm largely immaterial. While critic-free per-rollout baseline methods (RLOO and REINFORCE++) natively resist reward-hacking, the group-relative advantage normalization in GRPO appears uniquely sensitive to spurious reward signals, making it disproportionately susceptible to exploitation. We show that introducing a deterministic, rule-based reward floor to correct for rewards assigned to verbatim copying mitigates this failure mode, resulting in a substantial $+0.147$ quality improvement on a cross-family evaluation judge. Ultimately, we show that the training-time reward model inflates performance gains by $2.4\\times$, confirming that the training success is fundamentally dependent on enforcing reward-shaping disciplines rather than selecting alternative optimizers.",
+      "authors": [
+        "Ping Liu",
+        "Qianqi Shen",
+        "Jianqiang Shen",
+        "Wenqiong Liu",
+        "Rajat Arora",
+        "Yunxiang Ren",
+        "Chunnan Yao",
+        "Dan Xu",
+        "Baofen Zheng",
+        "Wanjun Jiang",
+        "Andrii Soviak",
+        "Kevin Kao",
+        "Jingwei Wu",
+        "Wenjing Zhang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-25T17:09:12+00:00",
+      "link": "https://arxiv.org/pdf/2606.27291v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Uses RLAIF and reward modeling for query generation",
+      "llm_evidence_cn": "使用RLAIF和奖励建模进行查询生成，直接匹配奖励建模需求",
+      "llm_evidence": "使用RLAIF和奖励建模进行查询生成，直接匹配奖励建模需求",
+      "canonical_evidence": "使用RLAIF和奖励建模进行查询生成，直接匹配奖励建模需求",
+      "llm_tldr_en": "End-to-end RLAIF framework for portable job search query generation, addressing adversarial reward surfaces. Directly relevant to reward modeling for RLHF in LLM post-training.",
+      "llm_tldr_cn": "该论文提出一个端到端RLAIF框架，用于生成可迁移的求职搜索查询，任务面临高度对抗的奖励表面，策略优化常利用评判模型的缺陷产生退化行为。通过结构化奖励工程与优化机制隔离实验，展示了奖励信号设计对查询生成质量的关键影响。该工作直接关联大型语言模型后训练中的奖励建模与人类偏好学习。",
+      "llm_tldr": "该论文提出一个端到端RLAIF框架，用于生成可迁移的求职搜索查询，任务面临高度对抗的奖励表面，策略优化常利用评判模型的缺陷产生退化行为。通过结构化奖励工程与优化机制隔离实验，展示了奖励信号设计对查询生成质量的关键影响。该工作直接关联大型语言模型后训练中的奖励建模与人类偏好学习。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.29777v1",
+      "source": "arxiv",
+      "title": "The Longevity of Innovation",
+      "abstract": "Modern science is organized around specialization in training and teamwork. Scientists develop deep expertise within a field and combine complementary knowledge through collaboration to solve complex problems. Yet whether specialization is the most effective path to sustained innovation remains unclear. Here we introduce a quantitative framework that distinguishes generalists from specialists based on scaling patterns of disciplinary mobility while remaining independent of career age and productivity. Applying this framework to 49 million publications produced by 3 million scientists between 1900 and 2020, we examine how research style relates to innovation, learning, collaboration, and productivity. We find that scientists who move across fields are more likely to sustain innovative contributions throughout their careers, whereas those who remain within narrow fields exhibit the age-related decline in innovation. Generalists are less anchored to the literature of their training. They are more likely to pursue research independently, and, when they collaborate, they preferentially partner with other generalists. Teams with a greater share of generalists produce more innovative research, even after accounting for differences in knowledge diversity. Despite these advantages, generalists publish fewer papers on average and have become less common over time. These findings reveal a tension between the longevity of scientific careers and the longevity of scientific innovation.",
+      "authors": [
+        "Yiling Lin",
+        "Zak Risha",
+        "Erin Leahey",
+        "Lingfei Wu"
+      ],
+      "primary_category": "cs.SI",
+      "categories": [
+        "cs.SI"
+      ],
+      "published": "2026-06-29T04:43:22+00:00",
+      "link": "https://arxiv.org/pdf/2606.29777v1",
+      "tags": [
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Studies innovation longevity and scientific generalists vs specialists",
+      "llm_evidence_cn": "研究创新的持久性与科学通才/专才",
+      "llm_evidence": "研究创新的持久性与科学通才/专才",
+      "canonical_evidence": "研究创新的持久性与科学通才/专才",
+      "llm_tldr_en": "Introduces a quantitative framework distinguishing generalists from specialists based on disciplinary mobility scaling, applied to 49M publications, finding that scientists who move across fields are more likely to sustain innovative contributions.",
+      "llm_tldr_cn": "本论文引入一个量化框架，通过学科流动性缩放模式区分通才与专才，并应用于1900至2020年间4900万篇论文。研究发现，跨领域流动的科学家更有可能持续做出创新贡献，这挑战了专业化是创新最佳路径的传统观点。",
+      "llm_tldr": "本论文引入一个量化框架，通过学科流动性缩放模式区分通才与专才，并应用于1900至2020年间4900万篇论文。研究发现，跨领域流动的科学家更有可能持续做出创新贡献，这挑战了专业化是创新最佳路径的传统观点。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "innovation",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.30406v1",
+      "source": "arxiv",
+      "title": "MOPD: Multi-Teacher On-Policy Distillation for Capability Integration in LLM Post-Training",
+      "abstract": "Modern large language models (LLMs) rely on reinforcement learning during post-training to push specific capabilities, yet integrating multiple capabilities into one model remains hard. Existing methods, such as Off-Policy Finetune and Mix-RL, are either inefficient or lose performance. In this work, we propose Multi-teacher On-Policy Distillation (MOPD), a post-training paradigm for combining the capabilities of multiple domain RL teachers: we first run per-domain specialised RL to obtain a set of domain teachers, then distill these teachers into the student on its own rollouts. This eliminates exposure bias and provides a dense optimization signal. On Qwen3-30B-A3B, MOPD outperforms Mix-RL, Cascade RL, Off-Policy Finetune, and Param-Merge baselines, inheriting nearly all of each teacher's capability. MOPD also enables parallel, independent development of domain teachers, removing the cross-domain coupling typical of multi-domain post-training. MOPD has been deployed in the post-training of MiMo-V2-Flash, an industrial-scale frontier model, demonstrating its practical value for capability integration in frontier-scale LLMs.",
+      "authors": [
+        "Wenhan Ma",
+        "Jianyu Wei",
+        "Liang Zhao",
+        "Hailin Zhang",
+        "Bangjun Xiao",
+        "Lei Li",
+        "Qibin Yang",
+        "Bofei Gao",
+        "Yudong Wang",
+        "Rang Li",
+        "Jinhao Dong",
+        "Zhifang Sui",
+        "Fuli Luo"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-06-29T14:51:28+00:00",
+      "link": "https://arxiv.org/pdf/2606.30406v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "multi-teacher RL distillation for capability integration in LLM post-training",
+      "llm_evidence_cn": "用于LLM后训练的多教师强化学习蒸馏方法来整合能力",
+      "llm_evidence": "用于LLM后训练的多教师强化学习蒸馏方法来整合能力",
+      "canonical_evidence": "用于LLM后训练的多教师强化学习蒸馏方法来整合能力",
+      "llm_tldr_en": "Proposes MOPD, a multi-teacher on-policy distillation paradigm for LLM post-training that combines domain-specific RL teachers via student rollouts, outperforming Mix-RL and Cascade RL on Qwen3-30B-A3B.",
+      "llm_tldr_cn": "针对LLM后训练中多能力整合难的问题，提出多教师在线策略蒸馏（MOPD）范式：先为每个领域训练专门的RL教师，再在学生自身轨迹上蒸馏。该方法消除了曝光偏差并提供了密集优化信号。在Qwen3-30B-A3B上，MOPD胜过混合RL、级联RL等基线，为后训练中的奖励建模与能力融合提供了有效方案。",
+      "llm_tldr": "针对LLM后训练中多能力整合难的问题，提出多教师在线策略蒸馏（MOPD）范式：先为每个领域训练专门的RL教师，再在学生自身轨迹上蒸馏。该方法消除了曝光偏差并提供了密集优化信号。在Qwen3-30B-A3B上，MOPD胜过混合RL、级联RL等基线，为后训练中的奖励建模与能力融合提供了有效方案。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.30420v1",
+      "source": "arxiv",
+      "title": "Experience Augmented Policy Optimization for LLM Reasoning",
+      "abstract": "Reinforcement Learning with Verifiable Rewards (RLVR) is a powerful paradigm for improving the reasoning capabilities of large language models (LLMs). However, existing RLVR methods typically rely on on-policy optimization from scratch, resulting in high sampling costs and inefficient utilization of accumulated experience. As model capabilities and policy behaviors evolve during training, recent attempts to reuse experience via fixed reasoning trajectories further suffer from policy mismatch. Motivated by these limitations, we argue that experience in RLVR should not be reused as fixed reasoning trajectories, but instead expressed in a policy-adaptive manner. In this work, we propose Experience-Augmented Policy Optimization (EAPO), which leverages a prior RL-optimized policy as an action-level experience prior and selectively injects experience at critical decision points during rollout. To ensure stable and unbiased learning from experience-augmented rollouts, EAPO further incorporates an adapted importance sampling scheme. Experiments on using Qwen-2.5-math 7b and Qwen-3-8B on five different benchmarks demonstrate that EAPO consistently improves reasoning performance over state-of-the-art RLVR methods.",
+      "authors": [
+        "Jinda Lu",
+        "Kexin Huang",
+        "Junkang Wu",
+        "Shuo Yang",
+        "Jinghan Li",
+        "Chiyu Ma",
+        "Shaohang Wei",
+        "Xiang Wang",
+        "Guoyin Wang",
+        "Jingren Zhou"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-29T15:05:28+00:00",
+      "link": "https://arxiv.org/pdf/2606.30420v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Proposes Experience-Augmented Policy Optimization for LLM reasoning using verifiable rewards, directly relevant to reward modeling.",
+      "llm_evidence_cn": "提出基于可验证奖励的LLM推理经验增强策略优化，直接涉及奖励建模。",
+      "llm_evidence": "提出基于可验证奖励的LLM推理经验增强策略优化，直接涉及奖励建模。",
+      "canonical_evidence": "提出基于可验证奖励的LLM推理经验增强策略优化，直接涉及奖励建模。",
+      "llm_tldr_en": "Proposes Experience-Augmented Policy Optimization (EAPO) for RLVR in LLM reasoning, reusing experience in a policy-adaptive manner to reduce sampling costs and improve efficiency, outperforming on-policy methods.",
+      "llm_tldr_cn": "针对LLM推理中可验证奖励强化学习（RLVR）采样成本高的问题，提出经验增强策略优化（EAPO），以策略自适应方式重用经验，避免固定轨迹的策略失配。在推理任务上，EAPO显著优于现有on-policy方法，为RLVR提供了高效的新范式。",
+      "llm_tldr": "针对LLM推理中可验证奖励强化学习（RLVR）采样成本高的问题，提出经验增强策略优化（EAPO），以策略自适应方式重用经验，避免固定轨迹的策略失配。在推理任务上，EAPO显著优于现有on-policy方法，为RLVR提供了高效的新范式。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.30044v1",
+      "source": "arxiv",
+      "title": "Building Multi-Task Agentic LLMs via Two-Phase Distillation",
+      "abstract": "A key step toward artificial general intelligence is to train models that can perform multiple tasks. In this paper, we study how to build such models by first training separate RL experts for individual tasks and then consolidating them via distillation, as an alternative to directly training a single model on mixed tasks. We show that off-policy distillation degrades in multi-task settings due to the mode-covering nature of forward KL: aggregating data from multiple tasks introduces a large number of behavioral modes that can exceed the student's capacity, forcing it to average across behaviors and leading to degraded performance. In contrast, on-policy distillation is mode-seeking but requires strong initialization. Inspired by these observations, we propose a two-phase approach: off-policy distillation followed by on-policy refinement. Evaluation across conversational agents and text-based games confirms that this two-phase approach matches single-task RL expert performance for each individual task, whereas off-policy or on-policy distillation alone fails to match this performance.",
+      "authors": [
+        "Huaijie Wang",
+        "Shusheng Xu",
+        "Yi Wu",
+        "Kaifeng Lyu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-29T09:36:24+00:00",
+      "link": "https://arxiv.org/pdf/2606.30044v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Proposes two-phase distillation to build multi-task LLMs, an algorithmic improvement for post-training.",
+      "llm_evidence_cn": "提出两阶段蒸馏构建多任务LLM，属于后训练算法改进。",
+      "llm_evidence": "提出两阶段蒸馏构建多任务LLM，属于后训练算法改进。",
+      "canonical_evidence": "提出两阶段蒸馏构建多任务LLM，属于后训练算法改进。",
+      "llm_tldr_en": "Proposes two-phase distillation for multi-task LLMs: first train separate RL experts, then on-policy distillation to consolidate, avoiding mode-covering issues of off-policy methods.",
+      "llm_tldr_cn": "针对多任务LLM训练中直接混合任务数据导致性能退化的问题，提出两阶段蒸馏：先训练独立RL专家，再通过on-policy蒸馏合并。理论分析和实验证明on-policy蒸馏能保持专家能力，优于off-policy方法。",
+      "llm_tldr": "针对多任务LLM训练中直接混合任务数据导致性能退化的问题，提出两阶段蒸馏：先训练独立RL专家，再通过on-policy蒸馏合并。理论分析和实验证明on-policy蒸馏能保持专家能力，优于off-policy方法。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.27483v1",
+      "source": "arxiv",
+      "title": "Internalizing the Future: A Unified Agentic Training Paradigm for World Model Planning",
+      "abstract": "Large language model (LLM) agents have demonstrated strong capability in sequential decision-making, yet they remains fundamentally reactive in long-horizon tasks. Unlike humans who employ \"what-if\" reasoning to evaluate potential plans before commitment, standard agents lack an internal world model to simulate future outcomes. Therefore, we propose to internalize future-aware planning by training a single autoregressive model to verbalize both a prospective state rollout and a plan-conditioned success estimate-a textual analogue of the Q-value. Crucially, we identify a format-capability gap: simply fine-tuning agents on look-ahead traces during post-training leads to superficial mimicry of foresight without genuine predictive grounding. To bridge this gap, we introduce a three-stage training paradigm: (i) World Model Agentic Mid-Training (WM-AMT) to inject latent predictive capabilities into the policy; (ii) Format-Eliciting SFT (FE-SFT) to structure this injected capability; and (iii) Foresight-Conditioned Reinforcement Learning (FC-RL) to refine the calibration and utility of the generated simulations. Evaluated on search and mathematical reasoning tasks, our approach consistently outperforms other training baselines. Our results demonstrate that effective internal world modeling in LLM agents requires a capability-first training pipeline to achieve grounded and calibrated foresight.",
+      "authors": [
+        "Xuan Zhang",
+        "Zhijian Zhou",
+        "Lingfeng Qiao",
+        "Yulei Qin",
+        "Ke Li",
+        "Xing Sun",
+        "Xiaoyu Tan",
+        "Chao Qu",
+        "Yuan Qi"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-06-25T19:05:44+00:00",
+      "link": "https://arxiv.org/pdf/2606.27483v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Proposes a unified training paradigm for world model planning in LLM agents, an algorithmic improvement for post-training.",
+      "llm_evidence_cn": "提出LLM智能体世界模型规划的统一训练范式，属于后训练算法改进。",
+      "llm_evidence": "提出LLM智能体世界模型规划的统一训练范式，属于后训练算法改进。",
+      "canonical_evidence": "提出LLM智能体世界模型规划的统一训练范式，属于后训练算法改进。",
+      "llm_tldr_en": "Proposes to internalize future-aware planning by training LLMs to verbalize state rollouts and success estimates, addressing the format-capability gap in agentic post-training.",
+      "llm_tldr_cn": "针对LLM智能体在长程任务中缺乏内部世界模型的问题，提出统一训练范式，使模型在自回归生成中同时输出状态展开和成功估计（类似Q值）。实验证明该方法能真正内化前瞻能力，优于仅模仿轨迹的微调方法。",
+      "llm_tldr": "针对LLM智能体在长程任务中缺乏内部世界模型的问题，提出统一训练范式，使模型在自回归生成中同时输出状态展开和成功估计（类似Q值）。实验证明该方法能真正内化前瞻能力，优于仅模仿轨迹的微调方法。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.31156v1",
+      "source": "arxiv",
+      "title": "One Retrieval to Cover Them All: Co-occurrence-Aware Knowledge Base Reorganization for Session-Level RAG",
+      "abstract": "RAG systems retrieve documents optimized for answering one query at a time. Yet enterprise users arrive with sessions, that is, coherent episodes of related questions that span semantically distant parts of the knowledge base. We show that a single retrieval call over a standard knowledge base covers only 41% of a user's session-level information need. To close this gap, we reorganize the KB offline using co-occurrence-aware clustering and expand retrieval candidates through cluster neighborhoods at query time. On WixQA (6,221 enterprise support articles), our method raises single-query session coverage to 58% (+17% absolute; 95% CI: [14.1, 20.4]), reduces retrieval calls to 70% coverage by 34%, and compresses the KB to 20% of its original size, all consistently across four embedding models and six functional domains. We argue that session-level coverage, not single-query recall, should be the primary metric for enterprise RAG evaluation.",
+      "authors": [
+        "Shivam Ratnakar",
+        "Yixuan Zhu",
+        "Cecilia Cheng",
+        "Chaya Vijayakumar"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR",
+        "cs.AI"
+      ],
+      "published": "2026-06-30T05:35:10+00:00",
+      "link": "https://arxiv.org/pdf/2606.31156v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "RAG method for session-level retrieval improves coverage and reduces hallucinations",
+      "llm_evidence_cn": "会话级RAG方法，通过共现感知聚类重组知识库，提升检索覆盖，有助于减轻幻觉",
+      "llm_evidence": "会话级RAG方法，通过共现感知聚类重组知识库，提升检索覆盖，有助于减轻幻觉",
+      "canonical_evidence": "会话级RAG方法，通过共现感知聚类重组知识库，提升检索覆盖，有助于减轻幻觉",
+      "llm_tldr_en": "Proposes co-occurrence-aware knowledge base reorganization for session-level RAG, raising single-query session coverage from 41% to 58%. Applicable to hallucination suppression in LLM systems.",
+      "llm_tldr_cn": "该论文针对会话级RAG系统中单次检索覆盖不足的问题，提出基于共现感知聚类的知识库重组方法，在查询时通过簇邻域扩展检索候选。在WixQA数据集上，单查询会话覆盖率从41%提升至58%，减少34%的检索调用次数。该方法可直接应用于大模型后训练中的幻觉抑制，通过增强检索相关性来减少生成错误。",
+      "llm_tldr": "该论文针对会话级RAG系统中单次检索覆盖不足的问题，提出基于共现感知聚类的知识库重组方法，在查询时通过簇邻域扩展检索候选。在WixQA数据集上，单查询会话覆盖率从41%提升至58%，减少34%的检索调用次数。该方法可直接应用于大模型后训练中的幻觉抑制，通过增强检索相关性来减少生成错误。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.30851v1",
+      "source": "arxiv",
+      "title": "Test-Time Verification for Text-to-SQL via Outcome Reward Models",
+      "abstract": "Improving the reliability of large language models (LLMs) at inference time is a central challenge in structured reasoning tasks such as Text-to-SQL. Common test-time inference strategies, including Best-of-N sampling and Majority Voting, rely on heuristic signals such as execution success or output frequency, which provide limited semantic discrimination across candidate outputs. In this work, we study Outcome Reward Models (ORMs) as learned semantic scoring functions for test-time verification in Text-to-SQL. While ORMs have been previously explored for test-time scaling and alignment, their application to structured query generation remains underexplored. We introduce GradeSQL, a scalable framework for training task-specific ORMs via automated candidate generation and execution-based labeling, enabling verifier training without manual annotation. We integrate ORMs into a verification-driven Best-of-N pipeline and evaluate our approach on the BIRD and Spider benchmarks across multiple open-source LLM families. ORM-based selection consistently outperforms execution-based Best-of-N and Majority Voting, with gains of up to +4.33% on BIRD and +2.10% on Spider. We further show that ORMs scale effectively with larger candidate sets and yield stronger improvements on complex queries. Overall, our results demonstrate that ORM-based verification provides a simple, effective, and scalable alternative to heuristic test-time selection strategies for Text-to-SQL. Code datasets and models are publicly available.",
+      "authors": [
+        "Mattia Tritto",
+        "Giuseppe Farano",
+        "Dario Di Palma",
+        "Gaetano Rossiello",
+        "Fedelucio Narducci",
+        "Dharmashankar Subramanian",
+        "Tommaso Di Noia"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI",
+        "cs.DB"
+      ],
+      "published": "2026-06-29T19:31:39+00:00",
+      "link": "https://arxiv.org/pdf/2606.30851v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "uses Outcome Reward Models for test-time verification, a form of reward modeling",
+      "llm_evidence_cn": "使用结果奖励模型进行测试时验证，是一种奖励建模形式",
+      "llm_evidence": "使用结果奖励模型进行测试时验证，是一种奖励建模形式",
+      "canonical_evidence": "使用结果奖励模型进行测试时验证，是一种奖励建模形式",
+      "llm_tldr_en": "GradeSQL applies Outcome Reward Models as learned scoring functions for test-time verification in Text-to-SQL, directly related to reward modeling.",
+      "llm_tldr_cn": "该论文研究结果奖励模型（ORM）在Text-to-SQL测试时验证中的应用。现有方法依赖执行成功等启发式信号。作者提出GradeSQL框架，通过自动化候选生成训练任务特定ORM。实验表明ORM能够更好地区分语义正确的候选查询。这项工作将奖励模型从RLHF扩展到结构化查询生成，与奖励建模需求高度相关。",
+      "llm_tldr": "该论文研究结果奖励模型（ORM）在Text-to-SQL测试时验证中的应用。现有方法依赖执行成功等启发式信号。作者提出GradeSQL框架，通过自动化候选生成训练任务特定ORM。实验表明ORM能够更好地区分语义正确的候选查询。这项工作将奖励模型从RLHF扩展到结构化查询生成，与奖励建模需求高度相关。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.27632v1",
+      "source": "arxiv",
+      "title": "Yuvion LLM: An Adversarially-Aware Large Language Model for Content And AI Safety",
+      "abstract": "As large language models are increasingly deployed in real-world systems, safety failures can still lead to harmful outputs and dangerous misuse. We argue that the essence of safety is adversarial: many failures arise not from natural inputs alone, but from strategic attempts to evade model policies and safeguards. However, existing general-purpose model development largely overlook this adversarial nature, and often remain insufficient for realistic safety scenarios involving planning, tool use, and multi-step reasoning, causing measured safety performance to overestimate real deployment robustness. To address this gap, we present Yuvion LLM, a large language model built for adversarially robust content safety and broader AI safety. Yuvion LLM treats adversarial robustness and agentic capability as first-class objectives. Its pipeline combines adversarially aware data construction, knowledge-enhanced continued pretraining, and policy-grounded multi-task safety post-training, including risk-aware supervised fine-tuning and reinforcement learning-based policy optimization, together with safety-aware agentic reinforcement learning for tool use and multi-step reasoning in complex safety scenarios. We further introduce the Yuvion LLM RiskEval (YLRE), a collection of 93 benchmarks across four evaluation categories, covering diverse open and internal evaluations with a focus on safety, adversarial robustness, and real-world capability requirements. Across these evaluations, Yuvion LLM demonstrates clear advantages on safety-focused benchmarks and particularly strong robustness under adversarial conditions, while maintaining solid overall capability. Notably, Yuvion-8B outperforms most state-of-the-art baselines, including substantially larger models such as GPT-5.4 and Qwen3-MAX, on several safety tasks.",
+      "authors": [
+        "Ting Ma",
+        "Xiufeng Huang",
+        "Benlei Cui",
+        "Xiaowen Xu",
+        "Shikai Qiu",
+        "Ruijie Jian",
+        "Hongxing Li",
+        "Guanghui Wang",
+        "Longtao Huang",
+        "Haiwen Hong",
+        "Haolei Xu",
+        "Wenjing Jiang",
+        "Ziwen Xu",
+        "Zhaoyu Fan",
+        "Shaoxuan He",
+        "Chuxi Xiao",
+        "Yujian Li",
+        "Xinyue Chen",
+        "Chunyang Chai",
+        "Wenxuan Liu",
+        "Ziheng Wang",
+        "Dongjie Zhang",
+        "Yangfan Zhou",
+        "Libin Dong",
+        "Yupeng Cao",
+        "Xiaoqian Xia",
+        "Jing Wang",
+        "Zhe Jiang",
+        "Zhenan Ye",
+        "Guang Yang",
+        "Bin Liu",
+        "Wei Peng",
+        "Ziqiang Zhu",
+        "Meihui Lian",
+        "Kaiwen Lv Kacuila",
+        "Haidong Ding",
+        "Bingyu Zhu",
+        "Yan Wang",
+        "Hai Zhao",
+        "Xuan Jin",
+        "Wei Zhao",
+        "Pengfei Sun",
+        "Wei Wang",
+        "Huiming Zhang",
+        "Bin Li",
+        "Hui Xue"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-06-26T01:12:02+00:00",
+      "link": "https://arxiv.org/pdf/2606.27632v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Adversarial robustness method for LLM safety, related to reducing harmful outputs (hallucinations)",
+      "llm_evidence_cn": "面向LLM安全的对抗鲁棒性方法，与减少有害输出（幻觉）相关",
+      "llm_evidence": "面向LLM安全的对抗鲁棒性方法，与减少有害输出（幻觉）相关",
+      "canonical_evidence": "面向LLM安全的对抗鲁棒性方法，与减少有害输出（幻觉）相关",
+      "llm_tldr_en": "Yuvion LLM is an adversarially-aware LLM designed for robust content safety, addressing failures from strategic attacks that bypass policies.",
+      "llm_tldr_cn": "大语言模型的安全失败常源于对抗性攻击，而现有通用模型开发忽视了这一特性。Yuvion LLM专为对抗鲁棒的内容安全设计，通过考虑规划、工具使用和多步推理中的对抗场景，提升实际部署中的安全性。该工作旨在弥合实验室安全评测与真实世界鲁棒性之间的差距，为后续构建更安全的LLM提供了对抗感知训练思路。",
+      "llm_tldr": "大语言模型的安全失败常源于对抗性攻击，而现有通用模型开发忽视了这一特性。Yuvion LLM专为对抗鲁棒的内容安全设计，通过考虑规划、工具使用和多步推理中的对抗场景，提升实际部署中的安全性。该工作旨在弥合实验室安全评测与真实世界鲁棒性之间的差距，为后续构建更安全的LLM提供了对抗感知训练思路。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.00254v1",
+      "source": "arxiv",
+      "title": "Query-Centric Optimization of AI Workflows via Approximate Query Processing and Proxy Models",
+      "abstract": "Many modern AI workflows, ranging from LLM post-training pipelines to agentic reasoning tasks, can be expressed as declarative queries whose expensive predicate is evaluated by a large model or reward function. We propose a query-centric formulation of these workflows and show that classical database techniques, namely approximate query processing (AQP) and proxy-model (PM) based filtering, can substantially reduce the number of expensive model invocations without requiring changes to the underlying models or pipelines. Our first strategy treats the workflow as an online aggregation problem: it progressively samples records, maintains a running aggregate estimate with a confidence interval, and terminates early once the interval stabilizes, accepting the estimate when it falls within a user-specified error bound. Our second strategy trains a lightweight, CPU-resident decision tree on a small set of oracle-labeled examples and uses it to pre-filter records whose outcome can be predicted with high confidence, routing only uncertain records to the expensive model. We evaluate both strategies on TPC-DS aggregate queries and on real LLM post-training pipelines including math reasoning, general instruction following, and code generation. On TPC-DS, Strategy AQP keeps aggregate error under 10% while reaching its adaptive stopping point at 10-15% of oracle calls under balanced distributions, an 85-90% reduction, and Strategy PM reduces oracle calls by 60-70%. On LLM pipelines, Strategy AQP reaches its adaptive stopping point at 20-50% of oracle calls with less than 5% accuracy loss on the structured math and code tasks; open-ended instruction following, scored by a reward model, shows a larger but bounded reduction. Strategy PM reduces reward-model scoring time by up to 19x on structured tasks with less than 10% accuracy loss.",
+      "authors": [
+        "Huayi Wang",
+        "Jun Xu",
+        "Gromit Yeuk-Yin Chan"
+      ],
+      "primary_category": "cs.DB",
+      "categories": [
+        "cs.DB"
+      ],
+      "published": "2026-06-30T23:05:59+00:00",
+      "link": "https://arxiv.org/pdf/2607.00254v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "optimization of AI workflows including LLM post-training via AQP and proxy models",
+      "llm_evidence_cn": "通过近似查询处理和代理模型优化LLM后训练流程",
+      "llm_evidence": "通过近似查询处理和代理模型优化LLM后训练流程",
+      "canonical_evidence": "通过近似查询处理和代理模型优化LLM后训练流程",
+      "llm_tldr_en": "Proposes a query-centric optimization framework using AQP and proxy models to reduce expensive model calls in LLM post-training pipelines and agentic reasoning tasks.",
+      "llm_tldr_cn": "本工作将AI工作流（如LLM后训练管道）表达为声明式查询，并利用近似查询处理（AQP）和代理模型（PM）过滤来减少大模型调用的次数。方法无需修改底层模型，即可显著降低计算开销。实验表明该框架在多种推理任务中有效，为提升后训练效率提供了新的视角。",
+      "llm_tldr": "本工作将AI工作流（如LLM后训练管道）表达为声明式查询，并利用近似查询处理（AQP）和代理模型（PM）过滤来减少大模型调用的次数。方法无需修改底层模型，即可显著降低计算开销。实验表明该框架在多种推理任务中有效，为提升后训练效率提供了新的视角。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.31031v1",
+      "source": "arxiv",
+      "title": "GenPage: Towards End-to-End Generative Homepage Construction at Netflix",
+      "abstract": "We present GenPage, an end-to-end generative approach to Netflix homepage construction that replaces the traditional multi-stage recommender stack with a single transformer. GenPage treats the user and request context as a prompt, and autoregressively generates the entire structured, multi-row homepage as the response. We adapt the LLM training recipe: pretraining on production pages, followed by post-training via weighted binary classification (WBC) or reinforcement learning (RL). For industry-scale deployment, we introduce techniques addressing cold start, model freshness, business-rule enforcement, and serving efficiency. In online A/B tests against a mature, highly optimized production homepage recommender, the WBC variant of GenPage delivered a +0.24% lift on the core user engagement metric we use for launch decisions (p < 0.001), while reducing end-to-end serving latency by 20%. Offline, two findings stand out: enriching the prompt yields a larger improvement than scaling model capacity in our current regime, and RL post-training increases homepage diversity even though diversity is not part of the objective.",
+      "authors": [
+        "Lequn Wang",
+        "Jiangwei Pan",
+        "Fengdi Che",
+        "Linas Baltrunas"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR"
+      ],
+      "published": "2026-06-30T02:00:05+00:00",
+      "link": "https://arxiv.org/pdf/2606.31031v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Uses LLM post-training (RL/WBC) for generative homepage construction, demonstrates RL in recommendation",
+      "llm_evidence_cn": "使用LLM后训练（RL/WBC）构建生成式主页，展示后训练在推荐中的应用",
+      "llm_evidence": "使用LLM后训练（RL/WBC）构建生成式主页，展示后训练在推荐中的应用",
+      "canonical_evidence": "使用LLM后训练（RL/WBC）构建生成式主页，展示后训练在推荐中的应用",
+      "llm_tldr_en": "GenPage replaces multi-stage recommender with LLM post-trained via WBC/RL, achieving + performance in A/B test at Netflix.",
+      "llm_tldr_cn": "Netflix提出GenPage，用单一Transformer端到端生成主页，替代传统多阶段推荐流水线。采用预训练加后训练（加权二分类或强化学习）的策略，并解决冷启动、模型更新等工程问题。在线A/B测试中，WBC变体取得正向效果，展示了LLM后训练在工业推荐系统中的巨大潜力。",
+      "llm_tldr": "Netflix提出GenPage，用单一Transformer端到端生成主页，替代传统多阶段推荐流水线。采用预训练加后训练（加权二分类或强化学习）的策略，并解决冷启动、模型更新等工程问题。在线A/B测试中，WBC变体取得正向效果，展示了LLM后训练在工业推荐系统中的巨大潜力。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.00508v1",
+      "source": "arxiv",
+      "title": "When RAG Meets Query Planning: Logical Query Trees for Resolving Exploratory Reasoning Problems",
+      "abstract": "Retrieval-Augmented Generation (RAG) effectively grounds large language models (LLMs) in external knowledge but struggles with \\textbf{exploratory reasoning problems (ERPs)} that are the complex queries involving high uncertainty and ambiguity. Resolving ERPs requires complex reasoning with unclear paths, tending to result in retrieval noise and error accumulation. Furthermore, the absence of an end-to-end planning mechanism makes it difficult to generate effective trajectories for ERPs. Motivated by database query planning, we introduce \\emph{PlanRAG}, an RAG framework that models ERPs of natural language as \\textbf{logical query trees (LQTs)}. However, translating ERPs into LQTs is non-trivial due to representation and optimization gaps between structured SQL and unstructured natural language, making it highly challenging to construct high-quality LQTs. To address these problems, we first decompose ERPs into atomic queries and then organize them into LQTs using dynamic programming guided by a cost model involving multiple complementary dimensions. Finally, we execute iterative aggregation, rewriting, retrieval, and generation over LQTs, processing nodes concurrently and propagating intermediate results upward, with further parallelization across multiple threads for efficiency. Our experimental results show that PlanRAG outperforms state-of-the-art iteration-based and graph-based RAG systems on our newly constructed dataset, \\textbf{WikiWeb-ERP}, thereby providing a new formulation for optimizing natural language queries. Our source code and dataset are available at https://anonymous.4open.science/r/PlanRAG-main-B2C8/.",
+      "authors": [
+        "Ganlin Xu",
+        "Linghao Zhang",
+        "Zhitao Yin",
+        "Hongda Xi",
+        "Chen Yang",
+        "Jiaqing Liang",
+        "Weijia Lu",
+        "Sihang Jiang",
+        "Yanghua Xiao",
+        "Deqing Yang"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR"
+      ],
+      "published": "2026-07-01T06:43:55+00:00",
+      "link": "https://arxiv.org/pdf/2607.00508v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "RAG query planning to reduce retrieval noise and error accumulation for ambiguous queries",
+      "llm_evidence_cn": "通过查询规划和逻辑查询树减少RAG中的检索噪声和错误累积，抑制幻觉",
+      "llm_evidence": "通过查询规划和逻辑查询树减少RAG中的检索噪声和错误累积，抑制幻觉",
+      "canonical_evidence": "通过查询规划和逻辑查询树减少RAG中的检索噪声和错误累积，抑制幻觉",
+      "llm_tldr_en": "PlanRAG models exploratory reasoning problems as logical query trees to reduce retrieval noise and error accumulation in RAG, addressing hallucination from ambiguity.",
+      "llm_tldr_cn": "检索增强生成在处理不确定性和模糊性强的探索性推理问题时容易产生错误累积和幻觉。本文提出PlanRAG框架，受数据库查询规划启发，将自然语言问题建模为逻辑查询树，通过端到端规划机制生成有效推理轨迹，减少检索噪声和误差传播。实验表明PlanRAG能显著提升复杂推理任务的准确性和鲁棒性，为RAG中的幻觉抑制提供了新的方法路径。",
+      "llm_tldr": "检索增强生成在处理不确定性和模糊性强的探索性推理问题时容易产生错误累积和幻觉。本文提出PlanRAG框架，受数据库查询规划启发，将自然语言问题建模为逻辑查询树，通过端到端规划机制生成有效推理轨迹，减少检索噪声和误差传播。实验表明PlanRAG能显著提升复杂推理任务的准确性和鲁棒性，为RAG中的幻觉抑制提供了新的方法路径。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
