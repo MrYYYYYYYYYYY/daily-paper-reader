@@ -6,62 +6,34 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-02
-- 运行时间：2026-07-02 20:14:08 UTC
+- 最新运行日期：2026-07-03
+- 运行时间：2026-07-03 21:49:44 UTC
 - 运行状态：成功
-- 本次总论文数：14
-- 精读区：6
-- 速读区：8
+- 本次总论文数：4
+- 精读区：2
+- 速读区：2
 
 ### 今日简报（AI）
-今日14篇推荐中聚焦LLM强化学习优化，6篇精读围绕rollout数据筛选与流水线训练。最值得关注两篇9分工作：《GEOALIGN》的几何rollout精选提升鲁棒性，《RolloutPipe》实现解耦在线RL中rollout与训练重叠流水线。建议读者深入探究强化学习数据质量与训练效率的融合策略，例如在较小模型上实验rollout缓存机制以平衡开销。
-- 详情：[/202607/02/README](/202607/02/README)
+1) 今日精读论文聚焦强化学习与视觉语言模型反馈对齐（CoRe评分9.0）及RAG逻辑查询规划（8.0），速读覆盖知识图谱多跳检索与对话记忆系统。  
+2) 最值得关注的方向是结合视觉语言奖励的强化学习对齐方法，以及用逻辑查询树提升RAG在探索性推理中的表现。  
+3) 建议优先阅读精读论文，关注它们在实际部署中的可复现性；后续可留意二者在复杂任务中的协同应用。
+- 详情：[/202607/03/README](/202607/03/README)
 
 ### 精读区论文标签
-1. [GEOALIGN: Geometric Rollout Curation for Robust LLM Reinforcement Learning](/202607/02/2606.26917v1-geoalign-geometric-rollout-curation-for-robust-llm-reinforcement-learning)  
+1. [CoRe: Combined Rewards with Vision-Language Model Feedback for Preference-Aligned Reinforcement Learning](/202607/03/2607.01721v1-core-combined-rewards-with-vision-language-model-feedback-for-preference-aligned-reinforcement-learning)  
    标签：评分：9.0/10、query:lpt
-   evidence：通过几何方法筛选生成轨迹来处理噪声奖励，提升RL训练鲁棒性
-2. [RolloutPipe: Overlapping Pipelined Rollout and Training in Disaggregated On-Policy LLM Reinforcement Learning](/202607/02/2606.26997v1-rolloutpipe-overlapping-pipelined-rollout-and-training-in-disaggregated-on-policy-llm-reinforcement-learning)  
-   标签：评分：9.0/10、query:lpt
-   evidence：针对LLM强化学习训练管线的算法改进
-3. [Designing Reward Signals for Portable Query Generation: A Case Study in Industrial Semantic Job Search](/202607/02/2606.27291v1-designing-reward-signals-for-portable-query-generation-a-case-study-in-industrial-semantic-job-search)  
-   标签：评分：9.0/10、query:lpt
-   evidence：使用RLAIF和奖励建模进行查询生成，直接匹配奖励建模需求
-4. [The Longevity of Innovation](/202607/02/2606.29777v1-the-longevity-of-innovation)  
-   标签：评分：9.0/10、query:lpt
-   evidence：研究创新的持久性与科学通才/专才
-5. [MOPD: Multi-Teacher On-Policy Distillation for Capability Integration in LLM Post-Training](/202607/02/2606.30406v1-mopd-multi-teacher-on-policy-distillation-for-capability-integration-in-llm-post-training)  
-   标签：评分：9.0/10、query:lpt
-   evidence：用于LLM后训练的多教师强化学习蒸馏方法来整合能力
-6. [Experience Augmented Policy Optimization for LLM Reasoning](/202607/02/2606.30420v1-experience-augmented-policy-optimization-for-llm-reasoning)  
-   标签：评分：9.0/10、query:lpt
-   evidence：提出基于可验证奖励的LLM推理经验增强策略优化，直接涉及奖励建模。
+   evidence：提出CoRe框架，使用组合奖励进行偏好对齐强化学习
+2. [When RAG Meets Query Planning: Logical Query Trees for Resolving Exploratory Reasoning Problems](/202607/03/2607.00508v2-when-rag-meets-query-planning-logical-query-trees-for-resolving-exploratory-reasoning-problems)  
+   标签：评分：8.0/10、query:lpt
+   evidence：逻辑查询树用于RAG规划，探索性推理的算法改进
 
 ### 速读区论文标签
-1. [Building Multi-Task Agentic LLMs via Two-Phase Distillation](/202607/02/2606.30044v1-building-multi-task-agentic-llms-via-two-phase-distillation)  
-   标签：评分：8.0/10、query:lpt
-   evidence：提出两阶段蒸馏构建多任务LLM，属于后训练算法改进。
-2. [Test-Time Verification for Text-to-SQL via Outcome Reward Models](/202607/02/2606.30851v1-test-time-verification-for-text-to-sql-via-outcome-reward-models)  
-   标签：评分：8.0/10、query:lpt
-   evidence：使用结果奖励模型进行测试时验证，是一种奖励建模形式
-3. [Internalizing the Future: A Unified Agentic Training Paradigm for World Model Planning](/202607/02/2606.27483v1-internalizing-the-future-a-unified-agentic-training-paradigm-for-world-model-planning)  
+1. [Query-Aware Spreading Activation for Multi-Hop Retrieval over Knowledge Graphs](/202607/03/2606.30133v1-query-aware-spreading-activation-for-multi-hop-retrieval-over-knowledge-graphs)  
    标签：评分：7.0/10、query:lpt
-   evidence：提出LLM智能体世界模型规划的统一训练范式，属于后训练算法改进。
-4. [Yuvion LLM: An Adversarially-Aware Large Language Model for Content And AI Safety](/202607/02/2606.27632v1-yuvion-llm-an-adversarially-aware-large-language-model-for-content-and-ai-safety)  
-   标签：评分：7.0/10、query:lpt
-   evidence：面向LLM安全的对抗鲁棒性方法，与减少有害输出（幻觉）相关
-5. [GenPage: Towards End-to-End Generative Homepage Construction at Netflix](/202607/02/2606.31031v1-genpage-towards-end-to-end-generative-homepage-construction-at-netflix)  
-   标签：评分：7.0/10、query:lpt
-   evidence：使用LLM后训练（RL/WBC）构建生成式主页，展示后训练在推荐中的应用
-6. [When RAG Meets Query Planning: Logical Query Trees for Resolving Exploratory Reasoning Problems](/202607/02/2607.00508v1-when-rag-meets-query-planning-logical-query-trees-for-resolving-exploratory-reasoning-problems)  
-   标签：评分：7.0/10、query:lpt
-   evidence：通过查询规划和逻辑查询树减少RAG中的检索噪声和错误累积，抑制幻觉
-7. [One Retrieval to Cover Them All: Co-occurrence-Aware Knowledge Base Reorganization for Session-Level RAG](/202607/02/2606.31156v1-one-retrieval-to-cover-them-all-co-occurrence-aware-knowledge-base-reorganization-for-session-level-rag)  
+   evidence：通过查询感知的图遍历提升RAG检索相关性，减少幻觉风险
+2. [Mandol: An Agglomerative Agent Memory System for Long-Term Conversations](/202607/03/2606.29778v1-mandol-an-agglomerative-agent-memory-system-for-long-term-conversations)  
    标签：评分：6.0/10、query:lpt
-   evidence：会话级RAG方法，通过共现感知聚类重组知识库，提升检索覆盖，有助于减轻幻觉
-8. [Query-Centric Optimization of AI Workflows via Approximate Query Processing and Proxy Models](/202607/02/2607.00254v1-query-centric-optimization-of-ai-workflows-via-approximate-query-processing-and-proxy-models)  
-   标签：评分：6.0/10、query:lpt
-   evidence：通过近似查询处理和代理模型优化LLM后训练流程
+   evidence：提出聚合记忆系统以提升大模型准确性与效率
 
 
 <div class="dpr-home-promo-card">
