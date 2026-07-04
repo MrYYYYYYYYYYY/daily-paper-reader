@@ -1,0 +1,217 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-04T20:30:29.545743+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 4,
+    "quick_skim_target": 11,
+    "quick_selected": 4
+  },
+  "deep_dive": [
+    {
+      "id": "2606.29227v1",
+      "source": "arxiv",
+      "title": "The Human-Machine Knowledge Spiral",
+      "abstract": "Nonaka emphasized that innovation is the result of a continuous back-and-forth between tacit and explicit knowledge. Artificial intelligence introduces a fundamentally new object into this process -- tacit machine knowledge -- but Nonaka's ideas are more relevant than ever. The central role of the knowledge-creating company remains the same: to create the shared context in which different kinds of knowledge can feed off each other, become organizational knowledge, and set off further cycles of innovation.",
+      "authors": [
+        "Aaron Chatterji",
+        "Daniel Rock",
+        "Eduard Talamas"
+      ],
+      "primary_category": "econ.GN",
+      "categories": [
+        "econ.GN",
+        "cs.CY"
+      ],
+      "published": "2026-06-28T06:31:25+00:00",
+      "link": "https://arxiv.org/pdf/2606.29227v1",
+      "tags": [
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "directly discusses innovation as knowledge spiral",
+      "llm_evidence_cn": "直接讨论知识螺旋中的创新",
+      "llm_evidence": "直接讨论知识螺旋中的创新",
+      "canonical_evidence": "直接讨论知识螺旋中的创新",
+      "llm_tldr_en": "This paper discusses Nonaka and AI's tacit machine knowledge, emphasizing innovation through continuous knowledge conversion.",
+      "llm_tldr_cn": "该论文探讨了Nonaka的知识螺旋理论，指出人工智能引入了新的隐性机器知识。创新是隐性知识与显性知识持续交互的结果。组织需要创造共享环境以促进不同类型知识的融合，进而推动创新循环。论文强调了知识创造公司在AI时代的核心作用仍是搭建不同知识类型的交流场域。",
+      "llm_tldr": "该论文探讨了Nonaka的知识螺旋理论，指出人工智能引入了新的隐性机器知识。创新是隐性知识与显性知识持续交互的结果。组织需要创造共享环境以促进不同类型知识的融合，进而推动创新循环。论文强调了知识创造公司在AI时代的核心作用仍是搭建不同知识类型的交流场域。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "innovation",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.29502v1",
+      "source": "arxiv",
+      "title": "UCOB: Learning to Utilize and Evolve Agentic Skills via Credit-Aware On-Policy Bidirectional Self-Distillation",
+      "abstract": "Skill memories can improve agentic reinforcement learning by reusing past experience as textual guidance, but retrieved skills are not oracular: they may help in one state while misleading the same policy in another. This makes the common privileged-teacher assumption fragile, namely that a skill-conditioned prompt can be treated as a fixed teacher for the no-skill prompt. We introduce UCOB, a framework for learning to utilize and evolve agentic skills via credit-aware on-policy bidirectional self-distillation. UCOB treats skill-conditioned and no-skill prompts as two on-policy context views of the same model, compares their return-to-go within the same task and anchor state, and uses the higher-return view as the local teacher. This local credit signal internalizes useful skill-conditioned behavior, corrects misleading skill usage, and guides task/state skill memory updates, utility-aware retrieval, and reflection self-training. Experiments on agentic tasks, including ALFWorld, WebShop, and Search-QA, show that UCOB outperforms skill-free RL, skill-memory baselines, and self-distillation methods across model scales, with up to 23.5 and 18.0 point gains over SOTA baselines on ALFWorld and WebShop. Ablations and analyses further validate its core mechanisms and efficiency.",
+      "authors": [
+        "Songjun Tu",
+        "Chengdong Xu",
+        "Qichao Zhang",
+        "Yiwen Ma",
+        "Yaocheng Zhang",
+        "Linjing Li",
+        "Dong Li",
+        "Xiangyuan Lan",
+        "Dongbin Zhao"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-06-28T17:02:18+00:00",
+      "link": "https://arxiv.org/pdf/2606.29502v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "novel algorithm for skill utilization in agentic RL via bidirectional self-distillation",
+      "llm_evidence_cn": "通过双向自蒸馏实现智能体强化学习中技能利用的算法改进",
+      "llm_evidence": "通过双向自蒸馏实现智能体强化学习中技能利用的算法改进",
+      "canonical_evidence": "通过双向自蒸馏实现智能体强化学习中技能利用的算法改进",
+      "llm_tldr_en": "UCOB learns to utilize and evolve agentic skills through credit-aware on-policy bidirectional self-distillation, comparing skill-conditioned and no-skill prompts to select the higher-return view.",
+      "llm_tldr_cn": "针对智能体强化学习中技能记忆可能误导策略的问题，提出UCOB框架。将技能提示与无技能提示视为两种在线上下文视图，比较返回-至-去并选择高回报视图进行自蒸馏。该算法改进了技能利用效率，属于强化学习算法创新。",
+      "llm_tldr": "针对智能体强化学习中技能记忆可能误导策略的问题，提出UCOB框架。将技能提示与无技能提示视为两种在线上下文视图，比较返回-至-去并选择高回报视图进行自蒸馏。该算法改进了技能利用效率，属于强化学习算法创新。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.30473v1",
+      "source": "arxiv",
+      "title": "Field Order Should Not Matter: Permutation-Invariant Embedding Model Fine-Tuning for Structured Metadata Retrieval",
+      "abstract": "We study retrieval over catalogs of structured metadata, where each record is a small schema whose fields answer different kinds of query. Embedding a record with a text encoder first serializes its fields into a string, which forces a choice of field order. We show this choice, usually treated as an implementation detail, silently controls retrieval quality once the encoder is fine-tuned. A standard fine-tune loses 7.4 nDCG@10 points when the index is rebuilt under a different field order, because it reads absolute position instead of the field labels. We propose permutation-invariant fine-tuning ($\\textbf{PI-FT}$), which serializes each record under a freshly sampled field order with random field dropout, so meaning binds to the labels rather than to position. The change is about two lines in the data loader; it costs negligible in-distribution accuracy and cuts the order-change penalty to 0.2 points. We study this in the discovery of development statistics, a catalog of nearly 10,000 indicators that should be searchable in many languages by a model small enough to self-host. As AI assistants and agents increasingly mediate access to public data and statistics, this retrieval step decides whether an answer is grounded in the right indicator or series, making discoverability a precondition for disseminating data through AI. Because usage logs cannot provide training signal for indicators no one has searched, we generate the queries instead. $\\textbf{DevDataBench}$ is a fully LLM-generated benchmark of grounded, facet-targeted queries across 15 languages, covering every indicator for both training and evaluation. A fine-tuned 118M-parameter CPU encoder outperforms every zero-shot baseline, including $\\texttt{text-embedding-3-large}$ (0.707 vs.\\ 0.556 nDCG@10), with the largest gains in low-resource languages. We release the benchmark, pipeline, models, and a reusable PI-FT framework.",
+      "authors": [
+        "Aivin V. Solatorio",
+        "Olivier Dupriez",
+        "Rafael Macalaba"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI",
+        "cs.IR",
+        "cs.LG",
+        "econ.GN"
+      ],
+      "published": "2026-06-29T15:33:04+00:00",
+      "link": "https://arxiv.org/pdf/2606.30473v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "permutation-invariant fine-tuning for embeddings, algorithm improvement",
+      "llm_evidence_cn": "置换不变微调，算法改进",
+      "llm_evidence": "置换不变微调，算法改进",
+      "canonical_evidence": "置换不变微调，算法改进",
+      "llm_tldr_en": "Proposes PI-FT, a fine-tuning method that makes embedding models invariant to field order, improving retrieval consistency by 7.4 nDCG@10.",
+      "llm_tldr_cn": "针对结构化元数据检索中字段顺序导致嵌入模型性能下降的问题，提出置换不变微调方法PI-FT。该方法在微调时随机采样字段顺序并做随机字段丢弃，使模型学习字段标签而非绝对位置，从而保证检索质量不因字段顺序变化而受损。实验表明，标准微调在字段顺序改变时nDCG@10下降7.4点，而PI-FT消除了这一下降，为结构化数据检索提供了更鲁棒的嵌入微调方案。",
+      "llm_tldr": "针对结构化元数据检索中字段顺序导致嵌入模型性能下降的问题，提出置换不变微调方法PI-FT。该方法在微调时随机采样字段顺序并做随机字段丢弃，使模型学习字段标签而非绝对位置，从而保证检索质量不因字段顺序变化而受损。实验表明，标准微调在字段顺序改变时nDCG@10下降7.4点，而PI-FT消除了这一下降，为结构化数据检索提供了更鲁棒的嵌入微调方案。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.01852v1",
+      "source": "arxiv",
+      "title": "Evaluating Chunking Strategies for Retrieval-Augmented Generation on Academic Texts",
+      "abstract": "Retrieval-Augmented Generation (RAG) systems use the question-answering capabilities of Large Language Models (LLMs) to access information outside their parameters. We evaluate if cluster-based semantic chunking improves retrieval and answer quality compared to fixed-size and recursive chunking evaluating on long, structured academic theses using the Retrieval Augmented Generation Assessment (RAGAs) framework. RAGAs based faithfulness shows limited reliability in this setup. Performance on fixed versus document specific questions varied substantially, likely related to the formatting of documents and preprocessing. Under the tested configuration, cluster-based chunking did not outperform simpler strategies.",
+      "authors": [
+        "Valentin J. J. Kreileder",
+        "Johannes Reisinger",
+        "Andreas Fischer"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-07-02T08:12:35+00:00",
+      "link": "https://arxiv.org/pdf/2607.01852v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "evaluates and compares chunking strategies providing insights for RAG algorithm improvement",
+      "llm_evidence_cn": "评估比较不同分块策略，为RAG算法改进提供见解",
+      "llm_evidence": "评估比较不同分块策略，为RAG算法改进提供见解",
+      "canonical_evidence": "评估比较不同分块策略，为RAG算法改进提供见解",
+      "llm_tldr_en": "This paper evaluates cluster-based semantic chunking against fixed-size and recursive chunking for RAG on academic theses, finding no clear advantage and highlighting metric limitations.",
+      "llm_tldr_cn": "该论文在长篇幅学术论文上评估了基于聚类的语义分块与固定大小和递归分块在检索增强生成中的效果。使用RAGAs框架评估发现，在本实验配置下，基于聚类的分块并未显著优于简单策略。同时揭示了RAGAs忠实度指标在这种设置下可靠性有限，为RAG系统算法改进提供了实证指导。",
+      "llm_tldr": "该论文在长篇幅学术论文上评估了基于聚类的语义分块与固定大小和递归分块在检索增强生成中的效果。使用RAGAs框架评估发现，在本实验配置下，基于聚类的分块并未显著优于简单策略。同时揭示了RAGAs忠实度指标在这种设置下可靠性有限，为RAG系统算法改进提供了实证指导。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.01040v1",
+      "source": "arxiv",
+      "title": "As It Was: Aligning LLM Search Evaluation with Historical User Preferences",
+      "abstract": "Large-scale search systems evolve faster than human quality assurance can scale, especially for long-tail intents and multilingual queries. LLM-as-a-judge approaches provide a scalable alternative for evaluating the relevance of search engine result pages (SERPs), but judgments based solely on semantic similarity or world knowledge can drift from actual user preferences, particularly for ambiguous queries. We introduce a behavior-grounded LLM judge that augments each SERP item with a lightweight and auditable behavioral prior in the form of a Query-Relevance-Impressions (QRI) card. Each card summarizes how users have historically interacted with similar queries and results, providing compact empirical evidence that the judge can cite to resolve ambiguity and make more consistent relevance judgments while still relying on semantic reasoning. In a large-scale music search evaluation at Spotify, using relevance estimates derived from historical user interactions across 6,000 recomposed SERPs, the behavior-grounded judge achieves stronger alignment with user preferences, improving Spearman rank correlation by approximately 5% overall and yielding a 91% relative improvement on disagreement cases. On a multilingual human-judged dataset spanning five languages, grounding further increases correlation with human relevance judgments by 15%. Importantly, when evaluated against outcomes from a live A/B test, the grounded judge shows consistently higher alignment with the observed winning model. While absolute alignment remains moderate, these findings demonstrate that lightweight behavioral grounding can improve the reliability and practical usefulness of LLM-based evaluation in real-world search systems.",
+      "authors": [
+        "Ali Vardasbi",
+        "Gustavo Penha",
+        "Enrico Palumbo",
+        "Claudia Hauff",
+        "Hugues Bouchard",
+        "Mounia Lalmas"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR"
+      ],
+      "published": "2026-07-01T15:05:10+00:00",
+      "link": "https://arxiv.org/pdf/2607.01040v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "aligns LLM judge with historical user preferences, related to reward modeling for human preferences",
+      "llm_evidence_cn": "将LLM法官与历史用户偏好对齐，与人类偏好奖励建模相关",
+      "llm_evidence": "将LLM法官与历史用户偏好对齐，与人类偏好奖励建模相关",
+      "canonical_evidence": "将LLM法官与历史用户偏好对齐，与人类偏好奖励建模相关",
+      "llm_tldr_en": "Introduces a behavior-grounded LLM judge that uses historical user interaction data to align search evaluation with actual user preferences, similar to reward modeling.",
+      "llm_tldr_cn": "针对LLM法官评估搜索相关性时偏离真实用户偏好的问题，提出行为驱动的LLM法官方法。该方法为每个搜索结果附加轻量级历史行为卡片，包含用户以往与类似查询的交互统计，使法官能够引用经验证据来分辨歧义查询。实验表明，该对齐方法显著提升评估与用户偏好的匹配度，其思路可迁移至RLHF中的奖励建模场景。",
+      "llm_tldr": "针对LLM法官评估搜索相关性时偏离真实用户偏好的问题，提出行为驱动的LLM法官方法。该方法为每个搜索结果附加轻量级历史行为卡片，包含用户以往与类似查询的交互统计，使法官能够引用经验证据来分辨歧义查询。实验表明，该对齐方法显著提升评估与用户偏好的匹配度，其思路可迁移至RLHF中的奖励建模场景。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

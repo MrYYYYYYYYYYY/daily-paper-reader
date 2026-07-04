@@ -6,34 +6,37 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-03
-- 运行时间：2026-07-03 21:49:44 UTC
+- 最新运行日期：2026-07-04
+- 运行时间：2026-07-04 20:32:55 UTC
 - 运行状态：成功
-- 本次总论文数：4
-- 精读区：2
-- 速读区：2
+- 本次总论文数：5
+- 精读区：1
+- 速读区：4
 
 ### 今日简报（AI）
-1) 今日精读论文聚焦强化学习与视觉语言模型反馈对齐（CoRe评分9.0）及RAG逻辑查询规划（8.0），速读覆盖知识图谱多跳检索与对话记忆系统。  
-2) 最值得关注的方向是结合视觉语言奖励的强化学习对齐方法，以及用逻辑查询树提升RAG在探索性推理中的表现。  
-3) 建议优先阅读精读论文，关注它们在实际部署中的可复现性；后续可留意二者在复杂任务中的协同应用。
-- 详情：[/202607/03/README](/202607/03/README)
+1) 今日推荐5篇论文，精读《The Human-Machine Knowledge Spiral》（9.0分），速读聚焦智能体技能进化、RAG分块策略与结构化元数据检索。
+2) 最值得关注的方向：人机协同知识螺旋模型，以及基于信用感知的智能体技能双向自蒸馏方法（7.0分）。
+3) 建议普通读者优先精读评分最高的《The Human-Machine Knowledge Spiral》，并关注RAG分块策略论文以优化长文本检索效果。
+- 详情：[/202607/04/README](/202607/04/README)
 
 ### 精读区论文标签
-1. [CoRe: Combined Rewards with Vision-Language Model Feedback for Preference-Aligned Reinforcement Learning](/202607/03/2607.01721v1-core-combined-rewards-with-vision-language-model-feedback-for-preference-aligned-reinforcement-learning)  
+1. [The Human-Machine Knowledge Spiral](/202607/04/2606.29227v1-the-human-machine-knowledge-spiral)  
    标签：评分：9.0/10、query:lpt
-   evidence：提出CoRe框架，使用组合奖励进行偏好对齐强化学习
-2. [When RAG Meets Query Planning: Logical Query Trees for Resolving Exploratory Reasoning Problems](/202607/03/2607.00508v2-when-rag-meets-query-planning-logical-query-trees-for-resolving-exploratory-reasoning-problems)  
-   标签：评分：8.0/10、query:lpt
-   evidence：逻辑查询树用于RAG规划，探索性推理的算法改进
+   evidence：直接讨论知识螺旋中的创新
 
 ### 速读区论文标签
-1. [Query-Aware Spreading Activation for Multi-Hop Retrieval over Knowledge Graphs](/202607/03/2606.30133v1-query-aware-spreading-activation-for-multi-hop-retrieval-over-knowledge-graphs)  
+1. [UCOB: Learning to Utilize and Evolve Agentic Skills via Credit-Aware On-Policy Bidirectional Self-Distillation](/202607/04/2606.29502v1-ucob-learning-to-utilize-and-evolve-agentic-skills-via-credit-aware-on-policy-bidirectional-self-distillation)  
    标签：评分：7.0/10、query:lpt
-   evidence：通过查询感知的图遍历提升RAG检索相关性，减少幻觉风险
-2. [Mandol: An Agglomerative Agent Memory System for Long-Term Conversations](/202607/03/2606.29778v1-mandol-an-agglomerative-agent-memory-system-for-long-term-conversations)  
+   evidence：通过双向自蒸馏实现智能体强化学习中技能利用的算法改进
+2. [Evaluating Chunking Strategies for Retrieval-Augmented Generation on Academic Texts](/202607/04/2607.01852v1-evaluating-chunking-strategies-for-retrieval-augmented-generation-on-academic-texts)  
+   标签：评分：7.0/10、query:lpt
+   evidence：评估比较不同分块策略，为RAG算法改进提供见解
+3. [Field Order Should Not Matter: Permutation-Invariant Embedding Model Fine-Tuning for Structured Metadata Retrieval](/202607/04/2606.30473v1-field-order-should-not-matter-permutation-invariant-embedding-model-fine-tuning-for-structured-metadata-retrieval)  
    标签：评分：6.0/10、query:lpt
-   evidence：提出聚合记忆系统以提升大模型准确性与效率
+   evidence：置换不变微调，算法改进
+4. [As It Was: Aligning LLM Search Evaluation with Historical User Preferences](/202607/04/2607.01040v1-as-it-was-aligning-llm-search-evaluation-with-historical-user-preferences)  
+   标签：评分：6.0/10、query:lpt
+   evidence：将LLM法官与历史用户偏好对齐，与人类偏好奖励建模相关
 
 
 <div class="dpr-home-promo-card">

@@ -1,0 +1,176 @@
+Title: The Human-Machine Knowledge Spiral
+
+URL Source: https://arxiv.org/pdf/2606.29227v1
+
+Published Time: Tue, 30 Jun 2026 00:59:57 GMT
+
+Number of Pages: 12
+
+Markdown Content:
+# The Human-Machine Knowledge Spiral ∗
+
+Aaron Chatterji †
+
+Duke University Daniel Rock ‡
+
+University of Pennsylvania Eduard Talamàs §
+
+IESE Business School June 30, 2026 
+
+Abstract 
+
+Nonaka emphasized that innovation is the result of a continuous back-and-forth between tacit and explicit knowledge. Artificial intelligence introduces a fundamentally new object into this process— tacit machine knowledge —but Nonaka’s ideas are more relevant than ever. The central role of the knowledge-creating company remains the same: to create the shared context in which different kinds of knowledge can feed off each other, become organizational knowledge, and set off further cycles of innovation. 
+
+# 1 Introduction 
+
+Recent advances in AI are forcing a cognitive version of the Copernican revolution. Just as it once required a profound conceptual leap to accept that the Earth is not the center of the universe, we may now need to accept that human intelligence is not at the center of intelligence (Klowden and Tao, 2026). In organizational terms, this means confronting a possibility that lies outside the assumptions of traditional theories of the firm: human knowledge may no longer occupy a central place in organizational intelligence (Ide and Talamàs, 2025, 2026; Chatterji, Rock, and Talamàs, 2025b; Beraja and Talamàs, 2026). This transformation implicates one of the most influential theories in our field, the knowledge-based view of the firm. We revisit this theory with this new orientation and argue that Ikujiro Nonaka’s insights are more relevant than ever. Building on Polanyi’s (1966) famous observation that “we know more than we can tell,” Nonaka (1991) conceptualizes innovation as a process of organizational knowledge creation. Tacit knowl-edge —acquired through experience and practice—is articulated into explicit knowledge that can be shared across the organization. This explicit knowledge is then internalized through action and use, further expanding tacit knowledge. Through repeated cycles of articulation and internalization, human knowledge is amplified at progressively broader organizational levels—and eventually across 
+
+> ∗We are grateful to Seth Benzell for useful feedback. All errors are our own.
+> †Aaron Chatterji is the Chief Economist of OpenAI but this work is not supported by OpenAI and does not necessarily represent its views.
+> ‡Daniel Rock is grateful to Schmidt Sciences and Kathy Xu for generous financial support.
+> §Eduard Talamàs is grateful to IESE’s High Impact Initiative-course 2024/2026 for generous financial support.
+
+1
+
+> arXiv:2606.29227v1 [econ.GN] 28 Jun 2026
+
+organizational boundaries as well. The central role of the knowledge-creating company is to provide the shared context in which this spiral of knowledge can recur. Artificial intelligence introduces a fundamentally new form of knowledge into organizations (Bryn-jolfsson, Li, and Raymond, 2025; Ide and Talamàs, 2025, 2026; Chatterji, Rock, and Talamàs, 2025b). Unlike earlier technologies, AI learns from data and does not follow explicitly specified rules, so it acquires forms of knowledge that are also difficult to articulate or explain. In other words, machines now also “know more than they can tell” (Brynjolfsson and Mitchell, 2017; Brynjolfsson, Mitchell, and Rock, 2018; Autor, 2024). Thus, a new type of knowledge has been born: tacit machine knowl-edge (Ide and Talamàs, 2025; Chatterji, Rock, and Talamàs, 2025b). Like its human counterpart, tacit machine knowledge is hard to articulate. But unlike its human counterpart, it need not remain local: once embodied in a model, it can be made available at scale through software. 1
+
+In the age of AI, knowledge no longer moves only between tacit and explicit forms as Nonaka en-visioned, but also into and out of machines. Tacit machine knowledge also amplifies the transfer of knowledge across teams and organizations that Nonaka described. But we argue that Nonaka’s in-sights are more relevant than ever. In particular, the central role of the knowledge-creating company continues to be to provide the shared context in which a virtuous spiral of knowledge can recur. 
+
+Related literature and contribution. This article follows the knowledge-based tradition that asks why firms exist when knowledge is difficult to create, transfer, and use (Epple et al., 1991; Kogut and Zander, 1992; Zander and Kogut, 1995; Kogut and Zander, 1996; Grant, 1996; Argote, 1999). Nonaka’s (1991) distinctive contribution is to show that knowledge creation requires making different kinds of knowledge available to one another in a shared context (Nonaka, 1994; Nonaka and Takeuchi, 1995; Nonaka and Konno, 1998; Nonaka and von Krogh, 2009). A growing literature has begun to revisit this literature in light of AI and generative AI. Sanzogni et al. (2017) connects artificial intelligence to the knowledge-management debate by asking whether AI changes how we should understand the tacit dimension of knowledge. More recent work treats ChatGPT and related systems as tools that can support Nonaka’s original spiral of knowledge (Sumbal and Amber, 2025). Other work goes further and asks how generative AI can be treated as a participant in knowledge creation (Matsumoto et al., 2025; Böhm and Durst, 2026; Kirchner and Scarso, 2026; Uchihira, 2026). A related line of work asks whether AI-mediated interaction can itself become a new form of shared context (He et al., 2026). This literature is important because it recognizes that AI can participate in the processes through which organizations create knowledge. The novelty of this paper is to revisit Nonaka’s ideas in the context of the rise of a fundamentally new form of knowledge—tacit machine knowledge—which does not sit comfortably in the traditional 
+
+> 1Machines may not necessarily seek knowledge as “justified true belief” as independent agents, but nevertheless can store and act upon information in ways resembling human knowledge processes. Nonaka’s (1994) emphasis on the necessity of action, though initially describing human knowledge workers, offers a prescient lens for understanding these AI dynamics.
+
+2tacit–explicit divide that Polanyi (1966) emphasizes and Nonaka (1991) builds on. We argue that Nonaka’s insights and prescriptions apply mutatis mutandis once the relevant spiral includes tacit machine knowledge. The key property of this new type of tacit knowledge is portability: it can be deployed at scale while remaining opaque to humans. AI therefore dramatically amplifies the transfer across teams and organizational boundaries that Nonaka emphasizes, as well as the importance of shared context for the knowledge-creating company. 
+
+# 2 The Human–Machine Knowledge Spiral 
+
+Nonaka (1991) emphasizes that making personal knowledge available to others is the central activity of the knowledge-creating company. As the following example illustrates, in the age of AI, a new but analogous activity becomes central for innovation: to make human and machine knowledge available to one another. In 2015, Matías Muchnick, Karim Pichara, and Pablo Zamora founded NotCo with an ambitious goal: to reproduce familiar animal-based foods using plants. They built an artificial-intelligence system called Giuseppe, after the Renaissance painter Giuseppe Arcimboldo, who composed human faces out of fruits and vegetables. 2
+
+Giuseppe searched across ingredient data, chemical analyses, scientific publications, previous for-mulations, and sensory results on a scale no food scientist could match. Given a target such as milk, it proposed plant combinations that might reproduce its flavor, aroma, texture, appearance, nutrition, and behavior in cooking. Because Giuseppe could explore a vastly larger space than any human team, it was tempting to think that NotCo’s creative problem had been solved. Experience proved otherwise. In one early attempt to create NotMilk, Giuseppe proposed a for-mulation containing dill. The milk came out green. Giuseppe had detected properties in dill that appeared useful in the data, but it missed something obvious to anyone standing in NotCo’s kitchen: whatever else milk may be, people do not expect it to be green. The failure made it obvious to ev-eryone involved that—despite having access to large amounts of data—Giuseppe had a serious lack of context. 3
+
+The green milk vividly illustrates the different nature of machine knowledge. Giuseppe excels at detecting potentially useful relationships among ingredients and molecular compounds. But it cannot taste the product, smell it, or understand everything people expect from a glass of milk. In contrast, chefs can recognize if a prototype is too grassy, too thin, too sweet, or simply wrong. They can appreciate color, aroma, mouthfeel, aftertaste, stability, and performance under heat. Much of this knowledge has been acquired through experience and is difficult to reduce to rules. 
+
+> 2See “Chef Giuseppe Heralds a New Culinary Era,” UNESCO Courier, June 25, 2018 (updated May 12, 2023) and “The Evolution of Giuseppe, an AI System That Generates Fake Meat and Dairy Recipes,” Tech Brew, August 18, 2021.
+> 3See “Let’s take a look at how AI is changing food production” Food Processing, December 9, 2022.
+
+3NotCo’s response to the green milk fiasco was to orchestrate a spiral of knowledge between Giuseppe and its human teams. Giuseppe proposed formulas. Research chefs made them. Chefs, food scientists, and sensory panels tasted, smelled, measured, and modified the results. Their judgments about color, flavor, texture, mouthfeel, and appearance were recorded and returned to Giuseppe, which then generated new proposals in light of the feedback. 4 By 2021, more than twenty chefs and food scientists were working with Giuseppe—testing more than one hundred recipes a month. 5
+
+Many proposals failed. Others opened paths that the human teams were unlikely to have explored. In searching for a plant formulation with the aromatic qualities of cow’s milk, Giuseppe helped direct the team toward an improbable but winning combination: pineapple and cabbage. 6 NotMilk—with its pineapple and cabbage—reached Whole Foods stores nationwide in the United States in 2020. 7
+
+A 2021 financing round valued NotCo at $1.5 billion. 8
+
+Nonaka emphasized that products embody organizational knowledge. They are the concrete forms in which organizational knowledge is crystallized, and they are also triggers that set off the next cycle of knowledge creation (Nonaka, 1991, 1994). Matsushita’s bread machine carried the baker’s “twist dough” insight beyond the team that had created it. The machine made that insight available outside the original process in a durable form. In this sense, the spiral of knowledge in one team can help set further spirals in motion in other teams. 9
+
+Similarly, NotMilk embodies the formula created through NotCo’s human-machine knowledge spi-ral. Its ingredient list makes the pineapple-and-cabbage combination visible. Other consumers and companies can taste the result, inspect it, and learn from it. But NotCo can now make a second object travel: Giuseppe itself. Giuseppe embodies tacit machine knowledge accumulated through years of formulas, sensory evalu-ations, failures, and corrections. This knowledge cannot be articulated as a set of explicit rules, but can be transferred at scale through software. Indeed, this possibility has become part of NotCo’s business. In 2022, the company raised $70 million to develop a business-to-business unit through which other consumer-goods companies could use  
+
+> 4See NotCo’s patent “Systems and methods to mimic target food items using artificial intelligence,” U.S. Patent No. 11,164,478 B2 and “Formula and recipe generation with feedback loop,” U.S. Patent No. 11,205,101 B1. See also “The Evolution of Giuseppe, an AI System That Generates Fake Meat and Dairy Recipes,” Tech Brew, August 18, 2021.
+> 5See “The evolution of Giuseppe, an AI system that generates fake meat and dairy recipes” Tech Brew, August 18, 2021.
+> 6See “Inside NotCo’s plant-based empire” Food Business News, April 26, 2021.
+> 7See “Bezos backed NotCo launches NotMilk ™in the United States at Whole Foods Market Stores” Business Wire, November 2, 2020.
+> 8See “Food Tech Pioneer NotCo Announces $235M Series D Round at $1.5 Billion Valuation” Business Wire, Series D, July 26, 2021.
+> 9For a critical analysis of the stronger claim that the baker’s tacit knowledge was made explicit and incorporated into the bread-making machine, see Ribeiro and Collins (2007). Our point does not require that stronger knowledge-capture thesis. The weaker Nonaka point is enough: product-development work can crystallize knowledge in a durable artifact and trigger further knowledge creation.
+
+4Giuseppe in their own product development. NotCo continues to sell food, while NotCo AI offers Giuseppe’s tacit knowledge as an innovation platform for other firms. 10 This is Nonaka’s movement of knowledge across organizations—at a new scale. For example, in 2025, NotCo AI announced a partnership with the chocolate maker Barry Callebaut. The announced partnership is intended to combine NotCo AI’s learned capabilities with Barry Calle-baut’s century of chocolate expertise, ingredient knowledge, manufacturing infrastructure, supply chain, and distribution infrastructure. In other words, Giuseppe is being moved into a new do-main: from the plant-based milk problem that made NotCo famous to the development of chocolate recipes. 11 
+
+NotCo’s case suggests that making different types of knowledge available to one another continues to be the central activity of the knowledge-creating company. The distinctive organizational prob-lem is that the relevant spiral now includes tacit machine knowledge. This adds five movements to Nonaka’s four modes of knowledge conversion (socialization, externalization, combination, and in-ternalization). The first four connect human and machine knowledge. The fifth connects machine to machine—and highlights why tacit machine knowledge can scale beyond the local setting in which it was created. 
+
+From explicit knowledge to tacit machine knowledge. An organization can incorporate documents, formulas, scientific relationships, technical specifications, and experimental records into a learning system. Machines can use this material to form internal relationships that shape what they can recognize and propose. We call this process encoding . At NotCo, ingredient specifications, chemical measurements, prior recipes, and production constraints become part of Giuseppe’s learned capabilities. Yet encoding alone is limited: a machine may absorb everything an organization has written down and still miss what its members take for granted—like the fact that milk is not green. 
+
+From tacit human knowledge to tacit machine knowledge. Human tacit knowledge can be partially transferred to machines through choices, demonstrations, corrections, ratings, and mod-ifications. We call this process embedding . This process is akin to socialization of machines. By repeatedly distinguishing better from worse formulations, NotCo’s chefs make part of their tacit knowledge available to Giuseppe. 
+
+From tacit machine knowledge to explicit human knowledge. Machines can express im-plications of what they have learned in the form of predictions, designs, hypotheses, or recipes. We call this process extraction , analogous to Nonaka’s externalization when done from human tacit 
+
+> 10 See “Global Food Tech Unicorn NotCo Closes $70M in Funding to Fuel New B2B Platform” Business Wire, December 12, 2022. See also NotCo AI.
+> 11 See “Barry Callebaut Partners with NotCo AI to Unlock Next-Level Chocolate Innovation,” Barry Callebaut, November 18, 2025. See also “Barry Callebaut to Use NotCo AI to Develop Chocolate Recipes,” Reuters, November 18, 2025, and NotCo AI.
+
+5knowledge to human explicit knowledge. A formula containing pineapple and cabbage turned an in-accessible machine insight into an explicit proposal that people could make, examine, and test. More generally, Giuseppe makes part of its tacit knowledge available to NotCo’s human teams through its wild recipe proposals—regardless of whether they are successful. 
+
+From tacit machine knowledge to tacit human knowledge. People can also learn from machines through observation, experimentation, and practice. We call this process assimilation .When a chef repeatedly makes and refines combinations she would never have considered on her own, Giuseppe’s insights begin to alter what she notices, expects, and imagines. Assimilation is the mirror image of embedding: tacit human knowledge shapes machine knowledge, and tacit machine knowledge reshapes human knowledge. 
+
+From tacit machine knowledge to tacit machine knowledge Machine tacit knowledge is expensive to create, but the marginal cost of transferring it to other machines is relatively low. Once knowledge is embodied in model weights, architectures, embeddings, memories, or other machine-readable representations, it can be copied, distilled, fine-tuned, deployed through an API, or incor-porated into another system. This differs substantially from tacit human knowledge. Human tacit knowledge usually travels slowly through interpersonal interaction. Tacit machine knowledge can remain tacit while moving at software speed. A model trained in one organization can therefore become the starting point for another model, product, workflow, or organization. This gives the human-machine knowledge spiral a new scaling mechanism: knowledge created in one local setting can be replicated and recombined across many other settings without ever being fully articulated. We call this machine transfer . When NotCo creates copies or new versions of Giuseppe, there is no need to bring Giuseppe’s latent knowledge to human collaborators first. NotCo illustrates how—when these five knowledge movements feed off each other—something pow-erful happens: 1. First, the company encodes scientific knowledge, ingredient data, recipes, and experimental records into Giuseppe. 2. Next, chefs and food scientists embed aspects of their tacit judgment through repeated eval-uations and corrections. 3. Giuseppe then extracts its tacit insights in the form of new formulas that human teams can test. 4. By making and refining Giuseppe’s wild formulas, human teams assimilate new possibilities into their own tacit knowledge. 5. Finally, through machine transfer, Giuseppe’s learned capabilities can contribute to new sys-tems, partner workflows, and product-development contexts beyond the original NotCo team. 6This starts the spiral all over again, but at a higher level. The human teams’ enlarged tacit knowledge produces new experiments and evaluations. These create new explicit records and new traces of human experience. Both return to the machine, which generates new possibilities for extraction and assimilation. Through machine transfer, the resulting tacit machine knowledge can also seed other spirals before it has been fully articulated. Nonaka’s (1991) original spiral of knowledge between tacit and explicit knowledge remains rele-vant. Chefs still learn from one another through practice, articulate discoveries, combine explicit knowledge, and internalize it through action. But these conversions now interact with the second spiral connecting people and machines—and this is the human-machine knowledge spiral that the knowledge-creating company must deliberately orchestrate and nurture in the age of AI. 
+
+# 3 From Chaos to Concept—Again 
+
+Nonaka (1991) emphasizes the value of redundancy : the conscious overlap of information, activity, and responsibility. Redundancy creates the common cognitive ground on which people situated in different contexts can sense what others are struggling to articulate. It places different participants around the same problem and allows their different perspectives to interact. At NotCo, Giuseppe, the chefs, the food scientists, and the sensory panels repeatedly confronted the same prototype. The machine examined relationships among ingredients and molecular properties. The chefs experienced its color, aroma, taste, texture, mouthfeel, and culinary behavior. Food scientists measured stability, nutrition, and production performance. Their work overlapped at the prototype on the kitchen table. The prototype was a shared context—what Nonaka and Konno (1998) call ba —in which knowledge could acquire meaning through interaction. From the standpoint of information processing, having multiple expert chefs carefully evaluating Giuseppe’s formulas may look like duplication. From the standpoint of knowledge creation, this redundancy creates the common cognitive ground whose value Nonaka emphasized. 12 
+
+Discrepancies are especially valuable. Nonaka argued that ambiguity, conflict, and breakdown can force members of an organization to reexamine what they take for granted. The green milk did exactly that. The fiasco exposed the distance between molecular resemblance and the lived meaning of milk, and made part of the chefs’ tacit knowledge visible: milk has a color, and that color belongs to what people understand milk to be. 13 
+
+Giuseppe’s successful proposals also echo Nonaka’s movement from metaphor to model. “Pineapple and cabbage as milk” brought distant domains together before anyone possessed a complete expla-
+
+> 12 See “NotCo Built a Unicorn Using AI To Accelerate Food Innovation. CEO Matias Muchnick Tells The Spoon How They Did It,” The Spoon, March 3, 2022.
+> 13 See “Let’s Take a Look at How AI Is Changing Food Production,” Food Processing, December 9, 2022.
+
+7nation of their connection. The chefs and scientists had to examine precisely how these ingredients were and were not like the product they hoped to reproduce. A wild proposal turned into useful shared knowledge through a process that sounds very similar to the one Nonaka described. 14 
+
+Knowledge creation also requires direction. Nonaka insisted that the knowledge-creating company is as much about ideals as it is about ideas. Giuseppe could search what was possible. NotCo’s ideal—familiar food made from plants without surrendering the qualities people valued—gave that search a purpose. The ideal does not specify dill, pineapple, or cabbage. Instead, it gives the team a way to decide which wild proposals deserve another turn of the spiral. 15 
+
+Nonaka’s account of organizational roles reads with similar force today. Frontline employees possess detailed knowledge of “what is.” Senior leaders give voice to “what ought to be.” Middle managers operate between the two, translating broad ideals into concepts that can encounter the reality of products, technologies, and markets. They are, in Nonaka’s (1991) words, the knowledge engineers of the company. AI adds another source of knowledge to this structure. Domain experts understand the reality of the product and the customer, AI specialists know AI’s capabilities, and managers have a sense of where these can be useful. The machine contributes patterns and proposals that neither group may have anticipated. The work of connecting these perspectives to one another and to the organiza-tion’s purpose is analogous to the work Nonaka emphasized was central to the knowledge-creating company. Nonaka’s insights also suggest that knowledge creation cannot reside inside an isolated AI unit. Nonaka gives no department or group of experts exclusive responsibility for creating knowledge. Senior managers, middle managers, and frontline employees all participate. Their contributions matter because of what they add to the knowledge-creating system as a whole. In the age of AI, the same principle includes model builders, domain experts, operating employees, and the machines themselves. The importance of shared context becomes clearest when tacit machine knowledge crosses organiza-tional boundaries via machine transfer. The partnership announced in 2025 between NotCo AI and Barry Callebaut can be read in these terms. From Nonaka’s perspective, the partnership has the el-ements of a new ba : a setting in which NotCo’s portable machine knowledge and Barry Callebaut’s situated knowledge can acquire meaning through interaction. Giuseppe can supply possibilities, while chocolate experts make, taste, interpret, and revise them. If the process follows the feedback logic described in NotCo’s own patents and interviews, their responses can create new knowledge that returns to Giuseppe. In this sense, the spiral created at NotCo can feed Barry Callebaut’s spiral, which may continue the innovation process in its own context. 
+
+> 14 See “Inside NotCo’s Plant-Based Empire,” Food Business News, April 26, 2021.
+> 15 See “Chef Giuseppe Heralds a New Culinary Era,” UNESCO Courier, June 25, 2018, updated May 12, 2023. See also NotCo Foodservice Brochure.
+
+84 Conclusion 
+
+While everything about Giuseppe would have been unimaginable when Nonaka wrote about Mat-sushita’s bread machine 35 years ago, we believe the organizational process shaping it would have been very familiar to him. An insight appears in one place, encounters a different form of knowledge, acquires meaning in a shared context, and returns to begin another cycle of the knowledge spiral. The AI revolution itself offers another illustration of how relevant Nonaka’s insights are today. Before ChatGPT could converse with the world, human trainers staged conversations in which they played both the user and the assistant. They were given model-written suggestions to help compose their responses. They then ranked alternative replies generated by the model, and those judgments shaped subsequent training (Ouyang et al., 2022). 16 
+
+The same movements seen at NotCo appear here at a different scale. Vast bodies of explicit text are encoded in the model. Human demonstrations and rankings embed judgments about what constitutes a useful response. Model outputs make learned capabilities available for inspection and evaluation. By observing unexpected successes and failures, the people building and using the system acquire new knowledge about what the model can do and where it remains limited. This is the human–machine knowledge spiral operating inside an AI laboratory. The main product of this spiral is tacit machine knowledge that can be made available far beyond the laboratory. Through software products and APIs, tacit machine knowledge formed inside one laboratory is now becoming central to people and organizations around the world (Chatterji et al., 2025a; Johnston et al., 2026). The spiral operating inside a small number of AI laboratories is therefore feeding the knowledge spirals of countless other companies—at scale. Here again, Nonaka explains why access to tacit machine knowledge alone—no matter how impressive— does not create organizational knowledge. AI models arrive to an organization without its context or ideals. The imported knowledge becomes organizational knowledge only after it enters the human-machine knowledge spiral. The rise of AI will transform firms, but the knowledge-creating company still has to provide the shared context in which a virtuous spiral of knowledge can recur. 
+
+# References 
+
+Argote, L. (1999): Organizational Learning: Creating, Retaining and Transferring Knowledge ,Boston, MA: Kluwer Academic Publishers. 
+
+Autor, D. H. (2024): “Applying AI to Rebuild Middle Class Jobs,” Working Paper 32140, National Bureau of Economic Research. 
+
+Beraja, M. and E. Talamàs (2026): “The Value of Organizational Learning Technologies,” Work-ing paper, IESE Business School. 
+
+> 16 See “Introducing ChatGPT” OpenAI, November 30, 2022.
+
+9Brynjolfsson, E., D. Li, and L. Raymond (2025): “Generative AI at work,” The Quarterly Journal of Economics , 140, 889–942. 
+
+Brynjolfsson, E. and T. Mitchell (2017): “What Can Machine Learning Do? Workforce Im-plications,” Science , 358, 1530–1534. 
+
+Brynjolfsson, E., T. Mitchell, and D. Rock (2018): “What Can Machines Learn, and What Does It Mean for Occupations and the Economy?” AEA Papers and Proceedings , 108, 43–47. 
+
+Böhm, K. and S. Durst (2026): “Knowledge Management in the Age of Generative Artificial Intelligence: From SECI to GRAI,” VINE Journal of Information and Knowledge Management Systems , 56, 106–121. 
+
+Chatterji, A., T. Cunningham, D. J. Deming, Z. Hitzig, C. Ong, C. Y. Shan, and K. Wadman (2025a): “How People Use ChatGPT,” Tech. rep., National Bureau of Economic Research. 
+
+Chatterji, A., D. Rock, and E. Talamàs (2025b): “Transformative AI and Firms,” in The Economics of Transformative AI , ed. by A. K. Agrawal, E. Brynjolfsson, and A. Korinek, Chicago: University of Chicago Press, chap. 7. 
+
+Epple, D., L. Argote, and R. Devadas (1991): “Organizational Learning Curves: A Method for Investigating Intra-Plant Transfer of Knowledge Acquired Through Learning by Doing,” Or-ganization Science , 2, 58–70. 
+
+Grant, R. M. (1996): “Toward a Knowledge-Based Theory of the Firm,” Strategic Management Journal , 17, 109–122. 
+
+He, X., L. Antonczak, and T. Burger-Helmchen (2026): “Revisiting Ba: How Generative AI Transforms Knowledge Creation,” Journal of Knowledge Management , 30, 846–869. 
+
+Ide, E. and E. Talamàs (2025): “Artificial Intelligence in the Knowledge Economy,” Journal of Political Economy , 133, 3762–3800. ——— (2026): “The Turing Valley: How AI Capabilities Shape Labor Income,” Working paper, IESE Business School. 
+
+Johnston, D., D. Holtz, A. M. Richmond, C. Ong, P. Tambe, and A. Chatterji (2026): “The Shift to Agentic AI: Evidence from Codex,” Working paper, OpenAI. 
+
+Kirchner, K. and E. Scarso (2026): “Revisiting the SECI Model: The Impact of Generative AI on Organizational Knowledge Creation,” in Managing Human and Artificial Knowledge , ed. by E. Bolisani, M. Nakash, C. Bratianu, and R. Bejinaru, Cham: Springer, vol. 17 of Knowledge Management and Organizational Learning , 105–125. 10 Klowden, T. and T. Tao (2026): “Mathematical Methods and Human Thought in the Age of AI,” Working Paper. 
+
+Kogut, B. and U. Zander (1992): “Knowledge of the Firm, Combinative Capabilities, and the Replication of Technology,” Organization Science , 3, 383–397. ——— (1996): “What Firms Do? Coordination, Identity, and Learning,” Organization Science , 7, 502–518. 
+
+Matsumoto, T., R. Nishikawa, and C. Morimoto (2025): “Human-AI-Collaboration SECI Model: The Knowledge Management Model of the Experts’ Tacit Knowledges with Augmented LLM-Based AI,” in Agents and Multi-agent Systems: Technologies and Applications 2024 , ed. by G. Jezic, Y.-H. Chen-Burger, M. Kušek, R. Šperka, R. J. Howlett, and L. C. Jain, Singapore: Springer, vol. 406 of Smart Innovation, Systems and Technologies , 135–145. 
+
+Nonaka, I. (1991): “The Knowledge-Creating Company,” Harvard Business Review , 69, 96–104. ——— (1994): “A Dynamic Theory of Organizational Knowledge Creation,” Organization Science ,5, 14–37. 
+
+Nonaka, I. and N. Konno (1998): “The Concept of “Ba”: Building a Foundation for Knowledge Creation,” California Management Review , 40, 40–54. 
+
+Nonaka, I. and H. Takeuchi (1995): The Knowledge-Creating Company: How Japanese Com-panies Create the Dynamics of Innovation , New York: Oxford University Press. 
+
+Nonaka, I. and G. von Krogh (2009): “Tacit Knowledge and Knowledge Conversion: Contro-versy and Advancement in Organizational Knowledge Creation Theory,” Organization Science ,20, 635–652. 
+
+Ouyang, L., J. Wu, X. Jiang, D. Almeida, C. L. Wainwright, P. Mishkin, C. Zhang, S. Agarwal, K. Slama, A. Ray, J. Schulman, J. Hilton, F. Kelton, L. Miller, M. Simens, A. Askell, P. Welinder, P. Christiano, J. Leike, and R. Lowe (2022): “Training Language Models to Follow Instructions with Human Feedback,” in Advances in Neural Information Processing Systems , vol. 35, 27730–27744. 
+
+Polanyi, M. (1966): The Tacit Dimension , Garden City, NY: Doubleday. 
+
+Ribeiro, R. and H. Collins (2007): “The Bread-Making Machine: Tacit Knowledge and Two Types of Action,” Organization Studies , 28, 1417–1433. 
+
+Sanzogni, L., G. Guzman, and P. Busch (2017): “Artificial Intelligence and Knowledge Man-agement: Questioning the Tacit Dimension,” Prometheus , 35, 37–56. 
+
+Sumbal, M. S. and Q. Amber (2025): “ChatGPT: A Game Changer for Knowledge Management in Organizations,” Kybernetes , 54, 3217–3237. 11 Uchihira, N. (2026): “Tacit Knowledge Management with Generative AI: Proposal of the GenAI SECI Model,” Working Paper. 
+
+Zander, U. and B. Kogut (1995): “Knowledge and the Speed of the Transfer and Imitation of Organizational Capabilities: An Empirical Test,” Organization Science , 6, 76–92. 12

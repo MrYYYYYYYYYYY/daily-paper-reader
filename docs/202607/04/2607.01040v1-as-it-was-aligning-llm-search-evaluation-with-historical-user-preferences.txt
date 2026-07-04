@@ -1,0 +1,189 @@
+Title: As It Was: Aligning LLM Search Evaluation with Historical User Preferences
+
+URL Source: https://arxiv.org/pdf/2607.01040v1
+
+Published Time: Thu, 02 Jul 2026 01:28:41 GMT
+
+Number of Pages: 6
+
+Markdown Content:
+# As It Was: Aligning LLM Search Evaluation with Historical User Preferences 
+
+# Ali Vardasbi 
+
+Spotify Netherlands aliv@spotify.com 
+
+# Gustavo Penha 
+
+Spotify United States gustavop@spotify.com 
+
+# Enrico Palumbo 
+
+Spotify Italy enricop@spotify.com 
+
+# Claudia Hauff 
+
+Spotify Netherlands claudiah@spotify.com 
+
+# Hugues Bouchard 
+
+Spotify Spain hb@spotify.com 
+
+# Mounia Lalmas 
+
+Spotify United Kingdom mounia@acm.org 
+
+## Abstract 
+
+Large-scale search systems evolve faster than human quality assur-ance scales, especially for long-tail intents and multilingual queries. LLM-as-a-judge approaches are a scalable alternative for evaluating the relevance of search engine result pages (SERPs), but judgments based solely on semantic similarity or world knowledge can drift from actual user preferences, particularly for ambiguous queries. We introduce a behavior-grounded LLM judge that augments each SERP item with a lightweight, auditable behavioral prior in the form of a Query–Relevance–Impressions (QRI ) card. Each card summarizes how users have historically interacted with similar queries and results, providing compact empirical evidence that the judge can cite to resolve ambiguity and make more consistent relevance judgments, while still relying on semantic reasoning. In a large-scale music search evaluation at Spotify, using rele-vance estimates derived from historical user interactions across 6,000 recomposed SERPs, the behavior-grounded judge achieves stronger alignment with user preferences, improving Spearman rank correlation by approximately +5% overall and yielding a +91% relative improvement on disagreement cases. On a multilingual human-judged dataset spanning five languages, grounding further increases correlation with human relevance judgments by +15%. Importantly, when evaluated against outcomes from a live A/B test, the grounded judge shows consistently higher alignment with the observed winning model. While absolute alignment remains moderate, these findings demonstrate that lightweight behavioral grounding can improve the reliability and practical usefulness of LLM-based evaluation in real-world search systems. 
+
+## CCS Concepts 
+
+• Information systems → Information retrieval .
+
+## Keywords 
+
+LLM-as-a-judge, behavioral grounding, user preference alignment  
+
+> This work is licensed under a Creative Commons Attribution 4.0 International License.
+> SIGIR ’26, Melbourne, VIC, Australia
+> ©2026 Copyright held by the owner/author(s). ACM ISBN 979-8-4007-2599-9/2026/07 https://doi.org/10.1145/3805712.3808488
+
+ACM Reference Format: 
+
+Ali Vardasbi, Gustavo Penha, Enrico Palumbo, Claudia Hauff, Hugues Bouchard, and Mounia Lalmas. 2026. As It Was: Aligning LLM Search Evaluation with Historical User Preferences. In Proceedings of the 49th International ACM SI-GIR Conference on Research and Development in Information Retrieval (SIGIR ’26), July 20–24, 2026, Melbourne, VIC, Australia. ACM, New York, NY, USA, 6 pages. https://doi.org/10.1145/3805712.3808488 
+
+## 1 Introduction 
+
+Search systems in production evolve continuously, with frequent updates to ranking models, retrieval stacks, and user experiences. Ensuring that evaluation keeps pace with these changes requires scalable and reliable assessment methods. As a result, LLM-as-a-judge approaches have become attractive as a scalable evaluation layer, enabling relevance assessment and rationales directly from a query, context, and the SERP. This work is grounded in production music search at Spotify, where search surfaces, ranking models, and user expectations evolve rapidly across languages and regions. 
+
+Plain LLM judges that rely solely on semantic similarity and catalog-centric reasoning may not fully capture how users interpret and engage with results [ 4, 8]. While effective for clearly specified queries, their judgments can diverge from observed user prefer-ences for underspecified or ambiguous queries, regionally dominant interpretations, and SERPs containing closely related variants. Grounding through retrieval or external evidence has emerged as a common strategy for improving factual consistency and reliability in LLM systems [ 1, 10 ]. Modern search systems already contain a rich signal of user intent in the form of aggregated interaction data, yet this signal is rarely incorporated into LLM-based evaluation. We argue that behavioral signals provide empirical evidence of how queries are interpreted in practice, including which results users engage with most frequently and how preferences are distributed across competing interpretations or variants. To leverage this signal, we propose behavior grounding for LLM judges via aggregated interaction summaries. For each SERP item, we attach a Query–Relevance–Impressions card that summa-rizes historically associated queries and their interaction statistics. The behavior-grounded judge is particularly useful when direct rele-vance estimates for the evaluated SERP are unavailable or unreliable. This occurs in long-tail or emerging queries with limited historical coverage, and in off-policy evaluation settings where the current ranking configuration has not been previously exposed to users.  
+
+> arXiv:2607.01040v1 [cs.IR] 1 Jul 2026 SIGIR ’26, July 20–24, 2026, Melbourne, VIC, Australia Ali Vardasbi et al.
+
+Across evaluation setups, behavior grounding improves align-ment with both interaction signals and human judgments. Its impact is most pronounced when semantic reasoning alone is insufficient. 
+
+## 2 Related Work 
+
+LLMs for evaluation. In Information Retrievl (IR), LLMs are in-creasingly used for scalable relevance labeling and scoring [ 7 , 8, 17 ]. Prior work highlights that LLM judgments can be poorly calibrated, prompt-sensitive, and may diverge from human annotators in some settings [ 4, 8]. They may also hallucinate or drift when not grounded in external evidence [ 3, 13 ]. Recent studies emphasize the impor-tance of evidence-grounded and auditable evaluation mechanisms to improve reliability and alignment [ 2, 14 ]. Our work builds on these insights by grounding the LLM judge with compact, auditable behavioral evidence, with the goal of improving robustness and alignment with observed user preferences. 
+
+Behavioral signals and debiasing. User interaction logs provide rich implicit feedback (e.g., clicks), but are inherently biased [ 9, 15 ,21 ]. Counterfactual and propensity-based methods are widely used to correct these biases and obtain more reliable relevance estimates from logged data [ 12 , 16 , 20 ]. However, even debiased estimates re-flect historical interaction patterns rather than underlying semantic intent [ 18 ], which can limit their suitability as standalone relevance judgments. We therefore combine debiased query–entity relevance estimates with an LLM judge, using behavioral signals as grounded quantitative evidence. 
+
+Grounded decision-making and auditability. Grounding is a com-mon strategy for improving reliability in LLM-based systems, often by incorporating external evidence through retrieval-augmented generation (RAG) [ 1 , 10 ]. Prior work highlights that grounding can improve factual consistency, transparency, and trustworthi-ness [ 1 , 19 ]. In industry evaluation workflows, auditability is critical: reviewers must be able to verify the evidence underlying a judg-ment [ 6, 11 ]. QRI cards are designed to support this requirement by providing interpretable behavioral summaries that fit within prompt budgets while remaining explicit enough to be cited in judge rationales, enabling grounded and reviewable evaluation decisions. 
+
+## 3 Behavior-Grounded LLM Judge 
+
+We formalize SERP evaluation as follows. Given a query 𝑞 , optional context 𝑐 (e.g., locale), and a SERP containing items E = {𝑒 1, . . . , 𝑒 𝑛 },an LLM judge assigns a graded relevance label 𝑦 ∈ { 0, 0.5, 1}. Each result item is presented with standard descriptive metadata such as title, type, and basic attributes. 
+
+Evaluation variants. We compare two LLM-based evaluation variants that share the same relevance rubric, output space, and prompting structure, differing only in the information provided to the judge. The first, Plain (P) , evaluates the SERP using only the query, context, and item metadata, without access to behavioral evidence. Judgments are therefore based on semantic similarity, available metadata, and the model’s general knowledge. The sec-ond, Behavior-Grounded (BG) , receives the same inputs as P,augmented with a lightweight behavioral summary for each result item in the form of QRI cards. The prompt further specifies that 
+
+QRI should be used as supporting behavioral context rather than as direct ground truth for the current query. 
+
+QRI Cards: Query–Relevance–Impressions. QRI cards summarize historical interactions associated with each result item. They are constructed by aggregating a recent window of search logs, cap-turing how users engaged with similar queries and results prior to evaluation. Each log entry corresponds to a historical query 𝑞 ′ ≠ 𝑞 
+
+and an entity 𝑒 ∈ E shown in response. We aggregate both inter-acted and non-interacted impressions to record overall exposure volume and downstream engagement signals (e.g., clicks). From these data, we compute a debiased relevance estimate for each 
+
+(𝑒, 𝑞 ′) pair, yielding a signal that reflects user preference while mit-igating systematic exposure effects. Each (𝑒, 𝑞 ′) pair contributes a single QRI line of the form {𝑞 ′ :  ˆ𝑟 (𝑒, 𝑞 ′), 𝐼 (𝑒, 𝑞 ′) }, where ˆ𝑟 is the relevance estimate and 𝐼 is the total impressions of 𝑒 for 𝑞 ′. This line is appended to the result item 𝑒 in the input of BG judge. 
+
+Debiased relevance estimate. We compute the debiased relevance estimate ˆ𝑟 (𝑒, 𝑞 ′) using an inverse propensity scoring (IPS) correc-tion over result positions [ 5]. Propensities, representing the proba-bility of examination at each rank, can be obtained from randomized experiments when available or estimated using standard click mod-els. Our approach requires only a monotonic propensity curve and does not depend on a specific click model formulation. For a given result item, many historical queries may be asso-ciated with it. To limit prompt length, we rank these queries by semantic similarity to the evaluated query 𝑞 and retain only the top-𝑘 entries. We set 𝑘 =10 as a conservative cap to bound prompt length and prevent highly popular entities from dominating the evidence budget. In practice, many items have fewer than 𝑘 eligible historical queries after filtering, so the effective evidence size is often much smaller. 
+
+Why QRI helps. QRI cards provide an empirical prior that com-plements semantic reasoning by indicating which results users most frequently engage with for similar queries. Importantly, ground-ing does not override semantic or instructional reasoning. Instead, behavioral evidence is applied selectively: serving as a tie-breaker under ambiguity, or as a comparator among plausible candidates (Section 6). For clearly specified queries, QRI typically plays a con-firmatory rather than decisive role. 
+
+## 4 Experimental Design 
+
+We evaluate whether grounding LLM-based judges with behavioral evidence improves alignment with user preferences and human judgments, using real-world music search data from Spotify. All experiments are conducted on production SERPs, with behavioral summaries constructed from user interaction logs aggregated the month preceding evaluation. Judgments are produced by a recent-generation commercial large language model accessed via API. 
+
+## 4.1 Log-Derived Preference Evaluation 
+
+To measure alignment with relevance estimated from historical user interactions at scale, we construct a log-derived evaluation dataset (hereafter, Logs ). We sample approximately 5,000 queries issued by between 20 and 400 users over a 10-day period. This sampling Aligning LLM Search Evaluation with Historical User Preferences SIGIR ’26, July 20–24, 2026, Melbourne, VIC, Australia 
+
+Table 1: Correlation between judge predictions and relevance. “Flipped” refers to instances where P and BG disagree; “Equal” denotes agreement.                                             
+
+> Dataset Subset Size Spearman 𝜌 Kendall 𝜏
+> PBG PBG Logs All 5965 0.416 0.438 0.336 0.354
+> Logs Flipped 918 0.147 0.281 †0.114 0.221 †
+> Logs Equal 5047 0.457 0.371
+> HJM All 265 0.450 0.516 0.413 0.476
+> HJM Flipped 27 -0.127 0.530 †-0.108 0.486 †
+> HJM Equal 238 0.525 0.486
+> †: statistically significant improvement ( 𝑝 <0.05 ).
+
+ensures sufficient interaction volume for reliable relevance estima-tion while excluding highly popular head queries whose relevance is typically unambiguous. For each sampled query, we compute unbiased item-level rele-vance estimates from interaction logs. We then construct recom-posed SERPs by recombining real items previously associated with each query, sampling 3–5 items per SERP. This recomposition cre-ates SERPs with controlled differences in quality, including cases where highly relevant items (according to the log-derived estimates) are omitted or ranked lower than less relevant ones. The result-ing dataset contains 5,965 SERPs spanning both high-quality and degraded configurations. Because the judge assigns labels at the page level, we compute a page relevance score as a DCG-weighted average of item relevance estimates. 
+
+Preventing query leakage. If a QRI card were to include the evalu-ation query itself, the BG judge could effectively recover prior user behavior, overstating the incremental contribution of grounding. To prevent this, we exclude historical queries that are near-duplicates of the evaluation query, defined as having a cosine similarity greater than 0.9. For example, for the query “basketball warmup music” ,the near-duplicate “basketball warmup playlist” is excluded, while 
+
+“basketball training music” is retained. This filtering is applied only in the controlled evaluation setting to assess generalization. In pro-duction, near-duplicate queries are retained to leverage all available historical evidence. 
+
+## 4.2 Human-Judged Multilingual Evaluation 
+
+Alignment with human annotators is a key evaluation criterion for LLM judges [ 4, 14 ]. We therefore assess whether behavior ground-ing also improves agreement with human relevance judgments, using an internal multilingual dataset of 265 SERP instances across five languages, referred to as the HJM (Human-Judged Multilingual) dataset. Each instance is annotated by human raters using a three-level graded relevance scale. For both Logs and HJM , we report Spearman’s 𝜌 and Kendall’s 𝜏 
+
+between judge predictions and human-assigned relevance scores, and analyze the subset of instances where P and BG disagree. 
+
+## 5 Alignment with Logs-Derived Relevance and Human Judgments 
+
+We first evaluate alignment with historical user preferences using the Logs dataset. On the full set of instances, the behavior-grounded (BG) judge achieves higher correlation with page relevance than the plain (P) judge (Table 1, Logs , All), indicating improved alignment with user preference at scale. The effect of behavior grounding is most pronounced on flipped instances ( Logs , Flipped), where the two judges assign different graded relevance levels. On this subset, BG substantially outperforms P, achieving more than a twofold increase in both Spearman’s 𝜌 and Kendall’s 𝜏 . This suggests that grounding is particularly effective in cases where semantic-only reasoning is insufficient to resolve ambiguity or ranking trade-offs. In contrast, on the much larger subset of instances where the two judges agree ( Logs , Equal), both variants exhibit similarly strong correlation with interaction-derived relevance. This indicates that grounding concentrates its impact on ambiguous or contested cases without degrading performance on straightforward evaluations. We next assess alignment with human judgments using the HJM 
+
+dataset. As in the log-derived evaluation, BG achieves higher rank correlation with human-assigned graded relevance than the P judge (Table 1, HJM , All), indicating more consistent ordering of pages by perceived usefulness. Absolute correlations remain moderate, leav-ing a substantial gap to perfect agreement with human annotators. However, on the disagreement subset ( HJM , Flipped), BG exhibits substantially higher correlation with human judgments, while P shows negative correlation. As in the log-derived setting, grounding consistently shifts predictions closer to human judgments when it changes a decision. 
+
+Diagnostic Analysis of Flipped Instances. Figure 1 analyzes flipped instances (P ≠ BG), where grounding alters the predicted label. Fig-ure 1a shows the distribution of interaction-derived page relevance conditioned on the graded relevance level predicted by each judge. For pages assigned the highest level (label=1), BG’s predictions are consistently associated with higher relevance than those of P. Conversely, pages that BG assigns low relevance labels tend to have lower underlying page relevance than pages receiving the same low labels from P. Figures 1b and 1c further decompose this effect across page-relevance quantiles. Across both datasets, BG assigns high relevance more frequently to pages in the top relevance buckets and avoids over-assigning high relevance to pages with low interaction-derived or human-assigned relevance. Taken together, these diagnostics indicate that grounding reallo-cates labels toward empirically supported pages, particularly where semantic-only judgments are least reliable. 
+
+## 6 Analysis of Grounding Effects 
+
+Our findings show that QRI grounding changes judgments in sys-tematic and interpretable ways, rather than inducing a uniform shift toward higher or lower relevance labels. Across both datasets, BG diverges from P along recurring patterns: resolving ambiguous intent, recalibrating the severity of near-miss cases, and adjusting judgments when multiple plausible results are ranked differently. These differences are auditable, as they can be traced directly to specific QRI evidence surfaced to the judge. 
+
+Resolving ambiguity. Grounding is most impactful for ambiguous or underspecified queries, such as lyric fragments, short titles with multiple plausible referents, or regionally overloaded terms. In these cases, QRI provides of how users interpret the query in practice. SIGIR ’26, July 20–24, 2026, Melbourne, VIC, Australia Ali Vardasbi et al.     
+
+> (a) Flipped Logs : interaction-derived rele-vance vs. judge label.
+> (b) Flipped Logs : relevance buckets. (c) Flipped HJM : human labels.
+
+Figure 1: Diagnostics on flipped instances (where P and BG disagree). 
+
+BG often anchors a different primary entity than P, based on on observed engagement patterns. For example, for the query “when you say you love me” , P assumes a title-based search and penalizes the SERP for missing a track with that exact title. In contrast, QRI 
+
+shows strong engagement with Miley Cyrus’ Adore You , suggesting that users interpret the query as a lyric search. BG therefore assigns a higher relevance score to the SERP accordingly. 
+
+Calibrating severity. Grounding also affects how strongly errors are penalized in near-miss scenarios. When QRI indicates strong demand for a specific entity, BG is stricter than P if that entity is missing or poorly ranked. For example, for query “dark til day-light” , P assigns partial credit because thematically related results are present, whereas BG assigns a clear failure after observing that the track with the exact same title (by Morgan Wallen) is absent and substitutes receive little engagement from similar historical queries. Conversely, when QRI indicates that users consistently engage with related but indirect results, BG may assign a more lenient judgment. For instance, if a playlist surfaces the intended track prominently, BG treats the SERP as acceptable in practice rather than than applying a stricter penalty. 
+
+Ranking sensitivity. A third effect of grounding is increased sen-sitivity to ranking quality. When multiple plausible results are present, BG compares their relative QRI strength and penalizes cases where the entity most strongly favored by user engagement is not ranked first, even when P considers the SERP acceptable. For example, if a later re-recording is ranked above the historically preferred original, BG is more likely to assign a lower relevance score to the page by recognizing that user interactions consistently favor the original version. In such cases, grounding reinforces rank-ing distinctions that are weakly signaled by semantics alone but strongly supported by user behavior. 
+
+## 7 Online A/B Test Alignment 
+
+Beyond offline alignment with interaction and human signals, we evaluate whether grounding improves agreement with live system outcomes. We therefore test the judges against results from a pro-duction A/B experiment comparing two ranking systems (Model A and Model B). The experiment ran for one week, from which we sampled 904 queries. Behavioral evidence used to construct QRI cards was drawn from one month of historical search interactions ending one week prior to the A/B test, ensuring no temporal overlap between interaction signals and evaluation outcomes. As in our offline setup, we applied the same leakage-avoidance procedure (cosine similarity threshold of 0.9) when constructing QRI cards. For each query, we sampled 
+
+Table 2: Sign alignment with online A/B outcomes.       
+
+> Query Count P aligned (%) BG aligned (%) 904 30.6 36.8 †
+> †: statistically significant improvement ( 𝑝 <0.01 ).
+
+Figure 2: Offline judge preference Δ( ˆ𝑦 ) as a function of the minimum SERP-level qri_count threshold 𝑡 . Each data point represents a cumulative subset of queries where qri_count ≥
+
+𝑡 . The online ground truth indicates a preference for Model A ( Δ(𝑦 ) > 0). 
+
+three SERP instances from each model. Judge predictions and online outcomes were aggregated at the query level by averaging across the three instances per model. We then measure sign alignment :whether the judge predicts the same winning model per query as observed online. As shown in Table 2, BG achieves higher alignment than P, and the difference is statistically significant. To understand when behavior grounding is most beneficial, we further analyze performance as a function of qri_count , the total number of historical queries included across all QRI cards in a SERP. This measure reflects the amount of available behavioral support for the evaluated items—a loose proxy for their historical exposure and relative popularity. Online results indicate that Model A outperforms Model B (i.e., 
+
+Δ(𝑦 ) > 0). Figure 2 illustrates the evolution of the judges’ implied preference difference, Δ( ˆ𝑦 ), as a function of the qri_count thresh-old. Specifically, each point on the 𝑥 -axis represents a cumulative subset; for instance, the value at 𝑥 = 5 aggregates all queries with at least five QRI cards. At low qri_count , BG remains closer to the neutral (zero) line, indicating smaller directional error, whereas P exhibits a larger deviation. As behavioral support increases, BG crosses the zero threshold earlier and moves more decisively into the positive region, aligning with the online result at moderate levels of support. Specifically, BG becomes directionally consistent with the online preference for thresholds qri_count ≥ 5, with statistically significant positive alignment by qri_count ≥ 9. In contrast, P approaches zero more gradually and does not reach Aligning LLM Search Evaluation with Historical User Preferences SIGIR ’26, July 20–24, 2026, Melbourne, VIC, Australia 
+
+statistically significant positive alignment. Low qri_count cor-responds to the cold-start/long-tail regime where behavioral evi-dence is sparse; here BG largely falls back to semantic reasoning. At the other extreme, the highest qri_count bins contain relatively few queries (see the count bars), so the estimated Δ( ˆ𝑦 ) is higher-variance and more sensitive to bucket composition. Overall, these results suggest that behavior grounding enables faster and more reliable convergence toward the observed online preference as be-havioral evidence accumulates. Taken together, these findings indicate that grounding improves alignment not only with interaction data and human judgments, but also with live A/B outcomes. Absolute alignment remains moderate, reflecting the difficulty of predicting online preferences. Further gains may require richer behavioral signals. 
+
+## 8 Conclusion 
+
+We studied the impact of incorporating user behavior signals into LLM-based evaluation of music search SERPs at Spotify. Our frame-work bridges counterfactual estimation from interaction logs [ 9]with grounding mechanisms developed for reliable LLM systems [ 1]. By comparing a plain semantic judge with a behavior-grounded variant multiple evaluation settings—including interaction-derived relevance, human judgments, and live A/B outcomes, we showed that behavioral evidence leads to systematic and interpretable changes in evaluation decisions, rather than indiscriminate shifts toward higher or lower relevance labels. Behavior grounding is most impactful in three recurring scenar-ios: resolving ambiguous intent, calibrating the severity of near-miss cases, and increasing sensitivity to ranking differences among plausible results. These findings highlight the value of behavior-grounded LLM evaluation in practice. Behavioral signals comple-ment rubric-driven judgment by providing targeted, auditable evi-dence that improves alignment with observed user preferences. Future work should investigate stronger safeguards to ensure behavioral evidence is used appropriately and does not amplify residual biases in interaction logs, as well as improved debiasing and aggregation methods. 
+
+## 9 Presenter Bio 
+
+Ali Vardasbi is a Research Scientist for Tech Research at Spotify, where he works on improving Search and Recommendation systems using LLMs. His work centers on evaluation, optimization, and advancing the effectiveness of LLM-powered experiences. 
+
+## Acknowledgements 
+
+The authors would like to thank Anders Nyman, Tyra Areskoug, Nicolo Felicioni, and Poppy Newdick for their invaluable assistance with data collection and for sharing their insights. 
+
+## References 
+
+[1] Yunfan Gao, Yun Xiong, Xinyu Gao, Kangxiang Jia, Jinliu Pan, Yuxi Bi, Yi Dai, Jiawei Sun, Meng Wang, and Haofen Wang. 2024. Retrieval-Augmented Generation for Large Language Models: A Survey. arXiv:2312.10997 [cs.CL] https://arxiv.org/abs/2312.10997 [2] Ariana Genovese, Lars Hegstrom, Srinivasagam Prabha, Cesar A. Gomez-Cabello, Syed Ali Haider, Bernardo Collaco, Nadia G. Wood, and Antonio Jorge Forte. 2026. Artificial Authority: The Promise and Perils of LLM Judges in Healthcare. 
+
+Bioengineering 13, 1 (2026). doi:10.3390/bioengineering13010108 [3] Gabriele Cesar Iwashima, Claudia Susie Rodrigues, Claudio Dipolitto, and Geraldo Xexéo. 2025. Factors That Support Grounded Responses in LLM Conversations: A Rapid Review. arXiv:2511.21762 [cs.CL] https://arxiv.org/abs/2511.21762 [4] Ruili Jiang, Kehai Chen, Xuefeng Bai, Zhixuan He, Juntao Li, Muyun Yang, Tiejun Zhao, Liqiang Nie, and Min Zhang. 2025. A Survey on Human Preference Learning for Aligning Large Language Models. ACM Comput. Surv. 58, 6, Article 152 (Dec. 2025), 39 pages. doi:10.1145/3773279 [5] Thorsten Joachims, Adith Swaminathan, and Tobias Schnabel. 2017. Unbiased Learning-to-Rank with Biased Feedback. In Proceedings of the Tenth ACM Interna-tional Conference on Web Search and Data Mining (Cambridge, United Kingdom) 
+
+(WSDM ’17) . Association for Computing Machinery, New York, NY, USA, 781–789. doi:10.1145/3018661.3018699 [6] Krishnaram Kenthapadi, Mehrnoosh Sameki, and Ankur Taly. 2024. Grounding and Evaluation for Large Language Models: Practical Challenges and Lessons Learned (Survey). In Proceedings of the 30th ACM SIGKDD Conference on Knowl-edge Discovery and Data Mining (Barcelona, Spain) (KDD ’24) . Association for Computing Machinery, New York, NY, USA, 6523–6533. doi:10.1145/3637528. 3671467 [7] Dawei Li, Bohan Jiang, Liangjie Huang, Alimohammad Beigi, Chengshuai Zhao, Zhen Tan, Amrita Bhattacharjee, Yuxuan Jiang, Canyu Chen, Tianhao Wu, Kai Shu, Lu Cheng, and Huan Liu. 2025. From Generation to Judgment: Opportunities and Challenges of LLM-as-a-judge. In Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing , Christos Christodoulopoulos, Tanmoy Chakraborty, Carolyn Rose, and Violet Peng (Eds.). Association for Computational Linguistics, Suzhou, China, 2757–2791. doi:10.18653/v1/2025. emnlp-main.138 [8] Haitao Li, Qian Dong, Junjie Chen, Huixue Su, Yujia Zhou, Qingyao Ai, Ziyi Ye, and Yiqun Liu. 2024. LLMs-as-Judges: A Comprehensive Survey on LLM-based Evaluation Methods. arXiv:2412.05579 [cs.CL] https://arxiv.org/abs/2412.05579 [9] Lihong Li, Shunbao Chen, Jim Kleban, and Ankur Gupta. 2015. Counterfactual Estimation and Optimization of Click Metrics in Search Engines: A Case Study. In Proceedings of the 24th International Conference on World Wide Web (Florence, Italy) (WWW ’15 Companion) . Association for Computing Machinery, New York, NY, USA, 929–934. doi:10.1145/2740908.2742562 [10] Bo Ni, Zheyuan Liu, Leyao Wang, Yongjia Lei, Yuying Zhao, Xueqi Cheng, Qingkai Zeng, Luna Dong, Yinglong Xia, Krishnaram Kenthapadi, Ryan Rossi, Franck Dernoncourt, Md Mehrab Tanjim, Nesreen Ahmed, Xiaorui Liu, Wenqi Fan, Erik Blasch, Yu Wang, Meng Jiang, and Tyler Derr. 2025. Towards Trustwor-thy Retrieval Augmented Generation for Large Language Models: A Survey. arXiv:2502.06872 [cs.CL] https://arxiv.org/abs/2502.06872 [11] Victor Ojewale, Harini Suresh, and Suresh Venkatasubramanian. 2026. Audit Trails for Accountability in Large Language Models. arXiv:2601.20727 [cs.CY] https://arxiv.org/abs/2601.20727 [12] Yuta Saito. 2020. Unbiased Pairwise Learning from Biased Implicit Feedback. In Proceedings of the 2020 ACM SIGIR on International Conference on Theory of Information Retrieval (Virtual Event, Norway) (ICTIR ’20) . Association for Computing Machinery, New York, NY, USA, 5–12. doi:10.1145/3409256.3409812 [13] Ravneet Singh, Parminder Singh, Arun Malik, and Dede Sukmawan. 2025. Under-standing and Mitigating Hallucinations in Large Language Models: Insights from a Systematic Literature Review. In 2025 International Conference on Metaverse and Current Trends in Computing (ICMCTC) . 1–10. doi:10.1109/ICMCTC62214. 2025.11196493 [14] Agus Sudjianto, Aijun Zhang, Srinivas Neppalli, Tarun Joshi, and Michal Mal-ohlava. 2024. Human-Calibrated Automated Testing and Validation of Generative Language Models. arXiv:2411.16391 [cs.CL] https://arxiv.org/abs/2411.16391 [15] Ali Vardasbi, Maarten de Rijke, and Ilya Markov. 2020. Cascade Model-Based Propensity Estimation for Counterfactual Learning to Rank. In Proceedings of the 43rd International ACM SIGIR Conference on Research and Development in Infor-mation Retrieval (Virtual Event, China) (SIGIR ’20) . Association for Computing Machinery, New York, NY, USA, 2089–2092. doi:10.1145/3397271.3401299 [16] Ali Vardasbi, Harrie Oosterhuis, and Maarten de Rijke. 2020. When Inverse Propensity Scoring Does Not Work: Affine Corrections for Unbiased Learning to Rank. In Proceedings of the 29th ACM International Conference on Information & Knowledge Management (Virtual Event, Ireland) (CIKM ’20) . Association for Computing Machinery, New York, NY, USA, 1475–1484. doi:10.1145/3340531. 3412031 [17] Ali Vardasbi, Gustavo Penha, Claudia Hauff, and Hugues Bouchard. 2026. Adap-tive Repetition for Mitigating Position Bias in LLM-Based Ranking. In Advances in Bias, Fairness, and Understudied Users in Information Retrieval . Springer Nature Switzerland, Cham, 3–15. doi:10.1007/978-3-032-12717-4_1 [18] Xiangmeng Wang, Qian Li, Dianer Yu, Peng Cui, Zhichao Wang, and Guandong Xu. 2023. Causal Disentanglement for Semantic-Aware Intent Learning in Recom-mendation. IEEE Transactions on Knowledge and Data Engineering 35, 10 (2023), 9836–9849. doi:10.1109/TKDE.2022.3159802 [19] Yujia Zhou, Yan Liu, Xiaoxi Li, Jiajie Jin, Hongjin Qian, Zheng Liu, Chaozhuo Li, Zhicheng Dou, Tsung-Yi Ho, and Philip S. Yu. 2024. Trustworthiness in SIGIR ’26, July 20–24, 2026, Melbourne, VIC, Australia Ali Vardasbi et al. 
+
+Retrieval-Augmented Generation Systems: A Survey. arXiv:2409.10102 [cs.IR] https://arxiv.org/abs/2409.10102 [20] Ziwei Zhu, Yun He, Yin Zhang, and James Caverlee. 2020. Unbiased Implicit Recommendation and Propensity Estimation via Combinational Joint Learning. In Proceedings of the 14th ACM Conference on Recommender Systems (Virtual Event, Brazil) (RecSys ’20) . Association for Computing Machinery, New York, NY, USA, 551–556. doi:10.1145/3383313.3412210 [21] Shengyao Zhuang, Hang Li, and Guido Zuccon. 2022. Implicit Feedback for Dense Passage Retrieval: A Counterfactual Approach. In Proceedings of the 45th International ACM SIGIR Conference on Research and Development in Information Retrieval (Madrid, Spain) (SIGIR ’22) . Association for Computing Machinery, New York, NY, USA, 18–28. doi:10.1145/3477495.3531994
