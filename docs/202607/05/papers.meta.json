@@ -1,0 +1,69 @@
+{
+  "label": "2026-07-05",
+  "date": "2026-07-05",
+  "generated_at": "2026-07-05T21:25:59",
+  "count": 4,
+  "papers": [
+    {
+      "paper_id": "202607/05/2606.30840v1-contrastive-reflection-for-iterative-prompt-optimization",
+      "section": "quick",
+      "title_en": "Contrastive Reflection for Iterative Prompt Optimization",
+      "authors": "Derek Koh, Jinghui Mo, Benjamin H. Le, Jiening Zhan, Baofen Zheng, Kevin Bevis, Nathaniel C. Owen, Lauren Elizabeth Charney, Wenqiong Liu, Jingwei Wu",
+      "date": "2026-06-29",
+      "pdf": "https://arxiv.org/pdf/2606.30840v1",
+      "score": "7.0",
+      "evidence": "用于LLM智能体的迭代提示优化算法",
+      "tldr": "针对LLM agent在信息检索中prompt优化缺乏可解释性的问题，提出Contrastive Reflection框架。它利用结构化trace识别错误行为切片，并对比邻近成功案例，由Teacher LLM生成针对性prompt编辑，仅在验证集性能提升时接受。在HotpotQA上，检索增强QA的准确率从51.4%提升至60.4%，优于MIPROv2和GEPA。该工作实现了可解释、验证驱动的prompt优化循环，使调试过程更透明。",
+      "tags": "query:lpt",
+      "abstract_en": "LLM agents are becoming central to information retrieval: they issue retrieval queries, synthesize answers, and increasingly serve as judges for IR evaluation. Improving the prompts that control these agents is an optimization problem, but in applied IR settings it often looks less like blind search and more like debugging. Engineers need to know which behavior failed, which nearby behavior still worked, what distinguishes the two, and whether a prompt edit improves held-out quality without introducing regressions.   We present Contrastive Reflection, an iterative prompt-optimization framework for agentic IR workflows. The framework starts from a task-centric quality definition: QA agents expose retrieval or reasoning traces, and grading agents expose dimension-level scores and rationales. These structured traces are used to identify error-anchored behavioral slices, add nearby successful examples from the same region, and ask a Teacher LLM to propose a targeted prompt edit. Candidate edits are accepted only when validation performance improves, optionally subject to regression checks. We instantiate the framework with a tree-based slice selector, but the contribution is the contrastive reflection loop rather than the tree itself.   On a public HotpotQA retrieval-augmented QA setup, one tree-selected contrastive repair improves held-out exact-match accuracy from 51.4% to 60.4%. Failure-only and random-evidence variants improve less and break more previously correct examples. A light instruction-only comparison places the method near modern prompt optimizers: MIPROv2 reaches 59.4% and GEPA 57.0%. The result is an interpretable optimization loop for IR agents, aimed at making prompt repair more inspectable and validation-driven.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/05/2606.28955v1-modification-considering-value-learning-for-reward-hacking-mitigation-in-rl",
+      "section": "quick",
+      "title_en": "Modification-Considering Value Learning for Reward Hacking Mitigation in RL",
+      "authors": "Evgenii Opryshko, Umangi Jain, Igor Gilitschenski",
+      "date": "2026-06-27",
+      "pdf": "https://arxiv.org/pdf/2606.28955v1",
+      "score": "6.0",
+      "evidence": "通过考虑修改的价值学习缓解奖励黑客，与RLHF中的奖励建模相关",
+      "tldr": "强化学习智能体可能利用错误指定的奖励信号导致奖励黑客攻击。现有防御方法通过约束策略更新靠近安全参考，但造成安全与改进之间的张力。本文提出修改考虑的价值学习(MCVL)，包装离策略学习器，将每个转移视为候选修改，预测包含与否的训练路径并用冻结引导回报估计器评分，仅当包含不降低分数才接受。我们形式化了过滤安全性和允许性的条件。在四个安全网格世界和三个修正MuJoCo任务中，MCVL缓解黑客攻击同时继续优化预期目标。MCVL提供了一种安全且允许改进的通用框架。",
+      "tags": "query:lpt",
+      "abstract_en": "Reinforcement learning agents can exploit misspecified reward signals to achieve high apparent returns while failing on the intended objective, a failure mode known as reward hacking. Existing practical defenses typically constrain policy updates to stay near a known safe reference, creating a tension between suppressing hacking and permitting legitimate improvement. We propose Modification-Considering Value Learning (MCVL), which operationalizes the theoretical idea of current utility optimization for standard value-based RL. MCVL wraps an off-policy learner and treats each incoming transition as a candidate modification: it forecasts two training paths, one that includes the transition and one that does not, and scores both with a frozen bootstrapped-return estimator derived from a learned reward model and value function. The transition is admitted only if inclusion does not decrease the score. We formalize conditions under which this filtering is both safe and permissive, and instantiate MCVL with DDQN and TD3. Across four safety-relevant gridworlds and three modified MuJoCo continuous-control tasks with diverse hacking mechanisms, MCVL mitigates reward hacking while continuing to improve the intended objective. Project website: ktolnos.github.io/mcvl/.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/05/2606.29573v2-reliability-prioritized-fine-grained-generation-in-multimodal-large",
+      "section": "quick",
+      "title_en": "Reliability-Prioritized Fine-Grained Generation in Multimodal Large",
+      "authors": "Xiaomeng Fan, Wei Wu, Yuwei Wu, Zhi Gao, Shiyu Luo, Mingyang Gao, Haoyu Zhao, Zhenxin Diao, Yuxuan Ba, Lijia Feng, Yunde Jia, Mehrtash Harandi",
+      "date": "2026-06-28",
+      "pdf": "https://arxiv.org/pdf/2606.29573v2",
+      "score": "6.0",
+      "evidence": "关注细粒度生成的可靠性问题，与多模态大模型幻觉抑制相关",
+      "tldr": "多模态大语言模型生成细粒度描述时可靠性下降。为此构建了细粒度基准GranFact，包含多目标图像及粗细粒度标注，并设计层次感知评估算法。提出基于DPO的可靠性优先偏好优化方法，惩罚不可靠的细粒度生成。实验表明该方法在提升细粒度的同时保持了可靠性。",
+      "tags": "query:lpt",
+      "abstract_en": "Multimodal large language models (MLLMs) are increasingly expected to generate fine-grained descriptions of visual content. However, we observe and theoretically show that generating fine-grained responses poses a reliability challenge, \\textit{i.e.}, fine-grained generation is more error-prone than coarse-grained generation. This phenomenon suggests that models should generate the finest description that remains reliable rather than simply produce more specific outputs. To investigate this problem, we develop \\textsc{GranFact}, a granularity-aware benchmark consisting of expert-verified multi-object images with coarse-to-fine category annotations. Then, we design a hierarchy-aware evaluation algorithm, which assesses both whether model predictions are visually correct and how specific the correct predictions are. We also propose a reliability-prioritized preference optimization method based on Direct Preference Optimization, which penalizes unreliable fine-grained claims while rewarding reliable specificity. Experiments on \\textsc{GranFact} show that our method improves fine-grained generation while preserving reliability. Code and data are available \\href{https://github.com/WeiWu2025/GranFact}{here}.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/05/2607.01468v1-cadenza-in-action-breaking-the-monolith-with-intent-dependent-plan-spaces-for-semantic-queries",
+      "section": "quick",
+      "title_en": "CADENZA in Action: Breaking the Monolith with Intent-Dependent Plan Spaces for Semantic Queries",
+      "authors": "Jaehyun Ha, Yongjoo Park, Wook-Shin Han",
+      "date": "2026-07-01",
+      "pdf": "https://arxiv.org/pdf/2607.01468v1",
+      "score": "6.0",
+      "evidence": "通过算法改进优化基于LLM的语义查询算子",
+      "tldr": "语义查询处理依赖模型推断，现有优化器将算子视为整体实现（如LLM），在昂贵模型与廉价替代间被迫权衡，丢失意图语义。CADENZA将自然语言意图编译为分解步骤，为每步选择物理实现并调参，构建意图依赖的计划空间。在用户指定质量-延迟-成本偏好下自动搜索最优计划，打破整体实现的局限。该工作首次实现基于意图语义的细粒度优化，显著提升多模态查询的效率与灵活性。",
+      "tags": "query:lpt",
+      "abstract_en": "Semantic query processing engines execute semantic operators, whose behavior is specified by natural-language intents, via model inference over multimodal data. Most existing optimizers optimize the operators at the granularity of monolithic implementations -- such as LLMs and embedding models -- forcing a trade-off between expensive model calls and cheaper alternatives that fail to capture intent-dependent semantics. We present CADENZA, a semantic operator optimizer that compiles an intent into decomposed steps, selects concrete physical implementations for each step, and tunes their parameters under user-specified quality-latency-cost preferences. In this demonstration, users interact with CADENZA through a web interface over multimodal databases, exploring how an intent is decomposed into alternative plans, how each plan is optimized, and how different preferences yield different winning plans.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

@@ -6,37 +6,33 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-04
-- 运行时间：2026-07-04 20:32:55 UTC
+- 最新运行日期：2026-07-05
+- 运行时间：2026-07-05 21:25:51 UTC
 - 运行状态：成功
-- 本次总论文数：5
-- 精读区：1
+- 本次总论文数：4
+- 精读区：0
 - 速读区：4
 
 ### 今日简报（AI）
-1) 今日推荐5篇论文，精读《The Human-Machine Knowledge Spiral》（9.0分），速读聚焦智能体技能进化、RAG分块策略与结构化元数据检索。
-2) 最值得关注的方向：人机协同知识螺旋模型，以及基于信用感知的智能体技能双向自蒸馏方法（7.0分）。
-3) 建议普通读者优先精读评分最高的《The Human-Machine Knowledge Spiral》，并关注RAG分块策略论文以优化长文本检索效果。
-- 详情：[/202607/04/README](/202607/04/README)
+今日速读4篇论文，聚焦提示优化与强化学习中的价值学习挑战。最值得关注的是《Contrastive Reflection for Iterative Prompt Optimization》（7.0/10）提出的对比反思方法，以及《Modification-Considering Value Learning for Reward Hacking Mitigation》对奖励黑客问题的缓解。建议优先精读第一篇，其迭代优化思路对提示工程有直接启发。
+- 详情：[/202607/05/README](/202607/05/README)
 
 ### 精读区论文标签
-1. [The Human-Machine Knowledge Spiral](/202607/04/2606.29227v1-the-human-machine-knowledge-spiral)  
-   标签：评分：9.0/10、query:lpt
-   evidence：直接讨论知识螺旋中的创新
+- 本次无精读推荐。
 
 ### 速读区论文标签
-1. [UCOB: Learning to Utilize and Evolve Agentic Skills via Credit-Aware On-Policy Bidirectional Self-Distillation](/202607/04/2606.29502v1-ucob-learning-to-utilize-and-evolve-agentic-skills-via-credit-aware-on-policy-bidirectional-self-distillation)  
+1. [Contrastive Reflection for Iterative Prompt Optimization](/202607/05/2606.30840v1-contrastive-reflection-for-iterative-prompt-optimization)  
    标签：评分：7.0/10、query:lpt
-   evidence：通过双向自蒸馏实现智能体强化学习中技能利用的算法改进
-2. [Evaluating Chunking Strategies for Retrieval-Augmented Generation on Academic Texts](/202607/04/2607.01852v1-evaluating-chunking-strategies-for-retrieval-augmented-generation-on-academic-texts)  
-   标签：评分：7.0/10、query:lpt
-   evidence：评估比较不同分块策略，为RAG算法改进提供见解
-3. [Field Order Should Not Matter: Permutation-Invariant Embedding Model Fine-Tuning for Structured Metadata Retrieval](/202607/04/2606.30473v1-field-order-should-not-matter-permutation-invariant-embedding-model-fine-tuning-for-structured-metadata-retrieval)  
+   evidence：用于LLM智能体的迭代提示优化算法
+2. [Modification-Considering Value Learning for Reward Hacking Mitigation in RL](/202607/05/2606.28955v1-modification-considering-value-learning-for-reward-hacking-mitigation-in-rl)  
    标签：评分：6.0/10、query:lpt
-   evidence：置换不变微调，算法改进
-4. [As It Was: Aligning LLM Search Evaluation with Historical User Preferences](/202607/04/2607.01040v1-as-it-was-aligning-llm-search-evaluation-with-historical-user-preferences)  
+   evidence：通过考虑修改的价值学习缓解奖励黑客，与RLHF中的奖励建模相关
+3. [Reliability-Prioritized Fine-Grained Generation in Multimodal Large](/202607/05/2606.29573v2-reliability-prioritized-fine-grained-generation-in-multimodal-large)  
    标签：评分：6.0/10、query:lpt
-   evidence：将LLM法官与历史用户偏好对齐，与人类偏好奖励建模相关
+   evidence：关注细粒度生成的可靠性问题，与多模态大模型幻觉抑制相关
+4. [CADENZA in Action: Breaking the Monolith with Intent-Dependent Plan Spaces for Semantic Queries](/202607/05/2607.01468v1-cadenza-in-action-breaking-the-monolith-with-intent-dependent-plan-spaces-for-semantic-queries)  
+   标签：评分：6.0/10、query:lpt
+   evidence：通过算法改进优化基于LLM的语义查询算子
 
 
 <div class="dpr-home-promo-card">
