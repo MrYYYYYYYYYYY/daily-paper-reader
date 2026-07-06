@@ -1,0 +1,2566 @@
+Title: Don't Let Gains FADE: Breaking Down Policy Gradient Weights in RL
+
+URL Source: https://arxiv.org/pdf/2607.01490v1
+
+Published Time: Fri, 03 Jul 2026 00:22:22 GMT
+
+Number of Pages: 33
+
+Markdown Content:
+# Don’t Let Gains FADE: Breaking Down Policy Gradient Weights in RL 
+
+Juliette Decugis 1,2, Sean O’Brien ∗, Francis Bach 2, Gabriel Synnaeve 1, Taco Cohen 11FAIR at Meta, 2Inria, Ecole Normale Supérieure 
+
+> ∗
+
+Work done at Meta, now working at the University of California, San Diego 
+
+Reinforcement learning post-training dramatically improves LLM reasoning, but suffers from training instability and diversity collapse. Advantage functions offer an appealing fix: they reshape the train-ing objective, reweight which rollouts drive learning, and are trivial to implement. Yet a proliferation of methods makes it unclear which advantage to use and when. We cut through the confusion with a unifying framework that decomposes any advantage into its positive and negative gradient mass (mS , mF ) along two orthogonal axes. On the sign axis, imbalanced updates collapse either entropy or weight geometry. On the difficulty axis, hard-problem focus sharpens signal but costs sample size. Both trade-offs shift during training: exploration favors balance and hard focus; exploitation favors suppression and medium focus. This motivates FADE (Focal Advantage with Dynamic Entropy), a self-adapting advantage that reads training dynamics to schedule the gradient weight automatically. FADE reaches peak pass@ 1 20 k steps earlier than the best static baseline at the 7B scale and 2ksteps earlier at the 32B , while achieving the best accuracy-diversity trade-off across all pass@ k on LiveCodeBench and AIME.  
+
+> Date:
+
+July 3, 2026  
+
+> Correspondence:
+
+Juliette Decugis at jdecugis@meta.com 
+
+## 1 Introduction 
+
+Recent developments in reinforcement learning with verifiable rewards (RLVR) have unlocked rapid gains in language models’ capabilities, especially in easily-verifiable domains like code generation and mathematics (OpenAI, 2024; Guo et al., 2025; Shao et al., 2024; Liu et al., 2025a). Although sparse rewards over long sequences make credit assignment challenging (Minsky, 1961; Sutton, 1988; Zhang, 2026), pretrained LLMs provide strong behavioral priors (Gan and Isola, 2026; Yan et al., 2025) and fully resettable environments enable parallel rollout collection. These methods therefore follow a common recipe: sample multiple rollouts per problem, score them with a binary verifier, and update the policy via a weighted policy gradient (Williams, 1992; Schulman et al., 2015). The weights, commonly called “advantage functions,” rarely correspond to the classical advantage (value of an action minus the value of the average action in a state); they simply determine how much each rollout contributes to the gradient. To avoid this overloading, we use the term policy weights 
+
+throughout this paper. Since GRPO (Shao et al., 2024), which uses the mean reward as a baseline for updates, a host of alternative policy weights have appeared: DAPO (Yu et al., 2025), DR-GRPO (Liu et al., 2025a), pass@ k-based objec-tives (Tang et al., 2025; Chen et al., 2025), log-mean-exp weighting (Jiang et al., 2025), and more. Each claims improvements, yet comparing them is difficult because they differ along multiple axes simultaneously. Consider for example the pass@ 8 normalization (Tang et al., 2025), which only upweights a correct rollout when it is the sole success in a batch of eight. This simultaneously shifts gradient mass toward hard problems, drops all negative gradient signal since incorrect rollouts receive zero weight, and reduces the overall gradi-ent magnitude because most batches contain either zero or more than one success. Other methods such as Skew-R (Thrampoulidis et al., 2025) keep the sign balance of GRPO E[A] = 0 but emphasize high variance samples. When these methods under or outperform GRPO, it is unclear which change is responsible. We argue that the confusion stems from conflating three orthogonal design axes. Similar to Thrampoulidis et al. (2025), we decompose policy weights into positive mS and negative mF mass on the gradient (Section 2) 1                  
+
+> arXiv:2607.01490v1 [cs.LG] 1 Jul 2026 10 20 30
+> Training Step (k)
+> 0.32
+> 0.34
+> 0.36
+> 0.38
+> 0.40
+> 0.42
+> pass@1
+> pass@1
+> FADE
+> GRPO
+> Power = 2
+> Asym GRPO =0.5
+> Asym GRPO =0.8
+> 10 20 30
+> Training Step (k)
+> 0.46
+> 0.48
+> 0.50
+> 0.52
+> 0.54
+> 0.56
+> 0.58
+> pass@10
+> pass@10
+> 10 20 30
+> Training Step (k)
+> 0.56
+> 0.58
+> 0.60
+> 0.62
+> 0.64
+> 0.66
+> 0.68
+> pass@100
+> pass@100
+> 246810
+> Training Step (k)
+> 0.52
+> 0.54
+> 0.56
+> 0.58
+> 0.60
+> 0.62
+> 0.64
+> pass@1
+> pass@1
+> 246810
+> Training Step (k)
+> 0.68
+> 0.70
+> 0.72
+> 0.74
+> 0.76
+> 0.78
+> pass@10
+> pass@10
+> Qwen 2.5 7B CWM 32B
+
+Figure 1 FADE learns faster and better for all pass@k on LiveCodeBench v6 when compared to GRPO and the best static advantages power α and Asymmetric GRPO with the best δ per model. 
+
+which are dependent on a prompt’s solve rate p. We show policy weights can differe along: 1. Difficuly Axis : whether gradient mass peaks on easy prompts (high p) or hard ones (low p); 2. Sign Axis : whether the positive and negative masses are equal or not; 3. Scale Axis : the overall magnitude of the gradient, which implicitely rescales the learning rate. We identify three trade-offs driven by the representational asymmetry between correct and incorrect trajec-tories: • Reinforcing successes collapses entropy. Because correct solutions cluster tightly, amplifying them con-centrates the policy onto a narrow mode, with the drift rate predictable from the sign ratio alone (Section 4.1). • Suppressing failures induces rank-1 update collapse. Because failures are diverse and decorrelated, am-plifying them drives the weight update toward a single suppression direction, progressively blocking multi-dimensional learning (Section 4.2). • Harder problems trade information for variance. Focusing gradient mass on low-solve-rate prompts yields more informative updates, but at the cost of more variance (Section 4.3). Since a fixed advantage cannot adapt to all three trade-offs during training, we propose FADE (Focal Advan-tage with Dynamic Entropy) which shapes its gradient weight based on the policy’s past entropies and solve rates. It achieves fast early learning with sustained diversity and accuracy across model scales (7B, 32B) (Section 5). 
+
+## 2 Framework for Policy Weight Analysis 
+
+We view the LLM as a policy πθ that generates a trajectory of tokens τ := ( a1, . . . , a T ) given a prompt q
+
+with log πθ (τ ) = ∑Tt=0 log πθ (at|q, a <t ). In LLM post-training, the reward r(τ ) is typically a single scalar assigned at the end of the trajectory (e.g., correctness of the final answer) which we maximize using the policy gradient estimator (Williams, 1992): Eτ ∼πθ [r(τ )] = Eτ ∼πθ [r(τ )∇θ log πθ (τ )] .Compared to supervised learning, the model learns from its own generations reweighted by a verifier which can introduce noise. To reduce variance (Schulman et al., 2015), the reward is replaced by a weight function 
+
+W (τ ), originally the advantage A(st, a t) = Q(st, a t) − V (st) (Baird, 1993), and more recently a variety of alternatives based on the average solve rate per problem (Table 1). We will show that balancing between positive and negative gradient mass is the key to stable, efficient and diverse RL at scale. 
+
+2.1 Positive and Negative Gradient Mass 
+
+We will assume that rewards are binary, with r(τ ) ∈ { 0, 1}, and that the policy weight is a function of success/failure only. In this setting, we can consider the set of successful and unsuccessful trajectories 
+
+S = r−1(1) and F = r−1(0) . Since r is deterministic and binary-valued, the joint distribution P(r = 1 , τ ) = 
+
+20 0.25 0.5 0.75 1.0 
+
+> Batch Solve Rate (p)
+> 1.00
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> mS (Successes) mF (Failures)
+
+Existing Methods      
+
+> Mix pass@1 + pass@2
+> W-REINFORCE ( = 0.5)
+> Pass@8
+> 00.25 0.5 0.75 1.0
+> Batch Solve Rate (p)
+> 0.4
+> 0.3
+> 0.2
+> 0.1
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+
+Difficulty Axis     
+
+> = 2
+> = 3
+> = 1 (GRPO)
+> 00.25 0.5 0.75 1.0
+> Batch Solve Rate (p)
+> 0.4
+> 0.3
+> 0.2
+> 0.1
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+
+Sign Axis 
+
+> = 0.5
+> = 1.5
+> = 1.0 (GRPO)
+
+Figure 2 Effect of Policy Weights on Batch Level Gradients based on the estimated solve rate p. (Left) Existing methods: mixing pass@ k Chen et al. (2025) and W-REINFORCE Zhu et al. (2025) modify the sign, difficulty focus and scale of advantages. We design weights that isolate (Middle) the difficulty axis with the Power α series p(1 − p)α and (Right) 
+
+sign axis with the AsymGRPO series where p(1 −p) 
+
+> δ
+
+for failed trajectories. 
+
+P(r = 1 |τ )πθ (τ ) = I[τ ∈ S]πθ (τ ), and similarly for r = 0 . Hence the probability of success is given by 
+
+p = ∑
+
+τ ∈S πθ (τ ), and failure q = 1 − p = ∑
+
+τ ∈F πθ (τ ) and we write the policy weight as: 
+
+W (τ ) = wS · I[τ ∈ S] − wF · I[τ ∈ F ]. (1) Adapting the notation from previous work (Thrampoulidis et al., 2025), we can write the policy gradient as 
+
+∇θ J = wS · p · E [∇θ log πθ (τ ) | τ ∈ S] − wF · q · E [∇θ log πθ (τ ) | τ ∈ F ] . (2) In practice, when doing online reinforcement learning we don’t have access to the true solve rate p but estimate via G Monte Carlo rollouts from our policy πθ :
+
+∇θ J ≈ wS · ¯p
+
+︸ ︷︷ ︸ 
+
+¯mS
+
+1
+
+| ¯S|
+
+∑
+
+τ ∈ ¯S
+
+∇θ log πθ (τ )
+
+︸ ︷︷ ︸
+
+¯∇S
+
+− wF · ¯q
+
+︸ ︷︷ ︸ 
+
+¯mF
+
+1
+
+| ¯F |
+
+∑
+
+τ ∈ ¯F
+
+∇θ log πθ (τ )
+
+︸ ︷︷ ︸
+
+¯∇F
+
+, (3) where ¯S and ¯F are the positive and negative trajectories in G, ¯p = | ¯S|/|G| and ¯q = | ¯F |/|G| are the empirical estimates of the success and failure probability, respectively. Here ¯∇S , ¯∇F are the average log-probability gradients over successful and failed trajectories in the batch. For notational convenience, we will often leave out the bar when discussing estimates when it can be inferred from context. 
+
+2.2 GRPO as an Example 
+
+Consider a group of G rollouts per prompt, we take as policy weight the reward minus the mean (mean only GRPO by GRPO (Liu et al., 2025a)). With r ∈ { 0, 1}, we have E[A] = ¯ p and successful trajectories receive 
+
+As = 1 −¯p, failed ones Af = 0 − ¯p, yielding 
+
+∇GRPO = ∑
+
+τ ∈ ¯S
+
+As∇ log πθ (τ ) + ∑
+
+τ ∈ ¯F
+
+Af ∇ log πθ (τ )= (1 −p)∑
+
+τ ∈ ¯S
+
+∇ log πθ (τ ) − p∑
+
+τ ∈ ¯F
+
+∇ log πθ (τ ) (4) 
+
+= | ¯S|(1 −p) 1
+
+| ¯S|
+
+∑
+
+τ ∈ ¯S
+
+∇ log πθ (τ )
+
+︸ ︷︷ ︸
+
+¯∇S
+
+−| ¯F | p 1
+
+| ¯F |
+
+∑
+
+τ ∈ ¯F
+
+∇ log πθ (τ )
+
+︸ ︷︷ ︸
+
+¯∇F
+
+(5) 
+
+≈ Gp (1 −p) ¯∇S − G(1 −p) p ¯∇F
+
+3= Gp (1 −p)[ ¯∇S − ¯∇F
+
+]. (6) Mean based GRPO reweights gradients by the estimated variance of rewards (Suk and Duan, 2025). It focuses on medium difficulty problems since arg max p p(1 − p) = 12 (Figure 2). Similarly many recent policy weights depend only on the average solve rate per batch so we can define their positive and negative mass as functions of ¯p (see examples in Table 1, complete derivations in Appendix A). We distinguish sign-balanced advantages ( mS = mF ) and sign-biased methods ( mS̸ = mF ). 
+
+Table 1 Weight functions as positive mS vs. negative mass mF on our policy gradients where our final update consists of 
+
+mS · ¯∇S − mF · ¯∇F . We assume binary rewards for successful vs. failed trajectories and use ri ∈ { 0, 1} for simplicity (one can generalize to other ranges with a multiplier) so E[r] = ˆ p. Notation: expected number of correct p and incorrect q := 1 − p samples per batch.   
+
+> Method Weight
+
+W (τ ) mS mF 
+
+> Sign-balanced
+
+(mS = mF )GRPO (Shao et al., 2024) ri− ¯pσR
+
+√pq 
+
+Dr. GRPO (Liu et al., 2025a) ri − ¯p pq 
+
+RLOO (Ahmadian et al., 2024) ri − 1
+
+> G−1
+
+∑  
+
+> j̸=i
+
+rj GG−1 pq 
+
+Skew-R (Thrampoulidis et al., 2025; Kimi Team et al., 2025) (ri − ¯p) ri− ¯pσR pq √pq 
+
+Binary Contrastive (Greensmith et al., 2004) [1r=1 − ¯p  
+
+> 1−¯p
+
+1r=0 ] p
+
+Power Norm (Andrychowicz et al., 2021) ri− ¯p  
+
+> [ ¯ p(1 −¯p)] γ
+
+p1−γ q1−γ
+
+Softmax (Shao et al., 2024) softmax β (r) − 1  
+
+> G
+> (eβ−1) pq
+> 1+ p(eβ−1)
+
+MaxRL (Tajwar et al., 2026) ri− ¯p 
+
+> ¯p
+
+q
+
+Analytical pass@ k (Chen et al., 2025) qk−1(ri− ¯p) 
+
+> σk
+
+p
+
+√ qk
+
+> 1−qk
+
+Mix pass@1/pass@ k (Chen et al., 2025) p ˆApass @k + q ˆApass @1 p
+
+(
+
+p ˆApass @k + q ˆApass @1
+
+)
+
+F-GRPO (Plyusov et al., 2026) (1 − p)α r i− ¯pσR (1 − p)γ √p(1 − p)
+
+T2T (Lin et al., 2026) (ri− ¯p)(1 −αp ¯LS −αq ¯LF )
+
+> σR
+
+√pq (1 −αp ¯LS −αq ¯LF )
+
+Power α (ours) (ri−¯p)qα−1 pq α
+
+Positive Power α (ours) (ri − ¯p) · ¯p1+ 1[r< ¯p] · (1 − ¯p)α pαq 
+
+> Sign-biased
+
+(mS̸ = mF )REINFORCE (Sutton et al., 1999) ri p q
+
+Constant Baseline (Sutton et al., 1999) ri − C (1 − C)p Cq 
+
+Symmetric clip (Schulman et al., 2017) clip (ri − ¯p, −c, c ) p min (c, q ) q min (c, p )
+
+W-REINFORCE (Zhu et al., 2025) min (λr, r ) λp q
+
+Pass@ k (Tang et al., 2025) max k (r) − max k (r−i) kpq k−1 0
+
+Quantile baseline (Dabney et al., 2018) ri − 1τ >q p 1τ ≤q q 1τ >q 
+
+Logmeanexp (Jiang et al., 2025) lme β (r) − lme β (r−i) pe β  
+
+> pe β+qqpe β+q
+
+MC-GRPO (Kim, 2026) ri − med (r) p 1[p ≤ 12 ] q 1[p > 12 ]
+
+CoRPO (Garg and Venkatesh, 2025) ri − max (rmin , ¯p) p(1 −rmin ) qr min 
+
+AsymRL (Arnal et al., 2026) ri − (¯ p + δ) p(q−δ) q(p+δ)
+
+HA-DW (Yang et al., 2026) A · λ exp 
+
+(
+
+− sgn ( ˆA) sgn (ˆ r − Ct) |ˆr − Ct|
+
+)
+
+f (Ct, p )qp qp 
+
+ReLU (Srinivasan et al., 2018) max (0 , r i − ¯p) pq 0
+
+Asym. power α (ours) (r−¯p)[ 1r≥ ¯pqαs−1+1r< ¯ppαn−1] pq αs pαf q
+
+Asym. GRPO (ours) (r−¯p)[ 1r≥ ¯p+ 1 
+
+> δ
+
+1r< ¯p] pq pq δ
+
+## 3 Experimental Setup 
+
+The framework above shows that each advantage function induces a different balance of positive and negative gradient mass, but it does not predict which balance leads to the best policies. To answer this, we compare advantage functions along different weight axes within the PPO clipping framework (Schulman et al., 2017) using two model sizes: the Qwen 2.5 7B (Hui et al., 2024), and the Code World Model 32B SFT check-point (FAIR CodeGen team et al., 2025) (CWM 32B). All evaluations use temperature 1.0 and top-p 1.0 to promote sampling diversity, at reasoning budgets from 8k to 30k tokens. 4Reasoning SFT. The Qwen 2.5 7B model lacks chain-of-thought capability, so we first fine-tune it on a mix of reasoning chains including OpenCodeReasoning-2 (Ahmad et al., 2025) and OpenMathReasoning (Moshkov et al., 2025) generated by DeepSeek-R1 (Guo et al., 2025) using the same <think> tags formatting. CWM 32B is already trained to produce long chain-of-thought responses so we skip the supervised fine-tuning (SFT).  
+
+> RL training.
+
+We train with binary rewards (format and answer correctness) on 25,000 competitive program-ming problems including the CodeContest (Li et al., 2022) and TACO (Li et al., 2023) training sets. The dataset is fixed throughout training and epoched over: for Qwen 2.5 7B we use the full problem mix (initial solve rate ≈ 0.3), while for CWM 32B we filter out easy problems to start at a similar difficulty frontier ( ≈ 0.5
+
+solve rate). In this work we do not modify the training data distribution and instead focus on maximizing gradient learning through the policy weight given a fixed dataset. See Appendix D.1 for infrastructure details. Starting from the same SFT checkpoint, we train models with different advantage functions and analyze poli-cies along four complementary axes: accuracy (pass@ 1 (Chen et al., 2021)), diversity (pass@ 100 ), reasoning generalization on AIME 2024/2025 math competitions (OpenAI, 2024) a task unseen during RL training, and learning speed. Full results across all methods, models, and benchmarks are in Tables 4 and 5 in Appendix D.2. 
+
+## 4 Where to learn from? Balancing gradient signs and problem difficulty 
+
+Should we focus on reinforcing successes or suppressing failures within a batch? And on easy, medium, or hard problems across batches? During online RL, we are simultaneously doing gradient descent to down-weight failed trajectories and gradient ascent to upweight successful trajectories. We analyze how to balance reinforcing successes (Section 4.1), suppressing failures (Section 4.2), and adjusting the focus per difficulty (Section 4.3) to reach +14 % pass@ 1 in 2× less training steps over the default reward weight (REINFORCE Sutton (1988)). 
+
+4.1 Reinforcing Successes Collapses Entropy 
+
+Takeaway 
+
+Entropy collapse is proportional to the sign ratio and success rates ⇒ Bias toward successes only at low solve rates. 
+
+We introduce AsymGRPO , a single-parameter variant of GRPO that keeps the same positive mass mS =
+
+p(1 − p) and rescales the negative mass by δ, mF = p(1 −p) 
+
+> δ
+
+. With this δ knob we can either amplify or downweight failures; with δ = 1 we recover standard mean based GRPO. Because correct solutions are few and similar, amplifying them ( δ > 1) rapidly concentrates the policy onto a narrow set of actions. Adapting the analysis of Cui et al. (2025) (Appendix F), a first-order Taylor expansion of the entropy after a gradient step with learning rate η is: 
+
+∆H ≈ η
+
+(mS − mF ) H
+
+︸ ︷︷ ︸
+
+> entropy drift
+
+− Cov (A, log πθ )
+
+ + O(η2). (7) The covariance term drives entropy loss for all methods it is the standard mechanism studied in prior work (Cui et al., 2025). The drift term, however, is unique to sign-imbalanced advantages where mS̸ = mF and introduces entropy-proportional feedback. Under AsymGRPO this feedback is controlled entirely by δ:• δ = 1 : drift is zero, entropy collapses through the covariance term alone, with no mechanism to recover. • δ > 1: drift is positive ( mS > m F ), accelerating collapse beyond what the covariance predicts. Entropy loss feeds into itself since the drift is proportional to H.• δ < 1: drift is negative ( mS < m F ), providing a restoring force that slows entropy loss. Empirically we find entropy correlates tightly with the advantage ratio As 
+
+> Af
+
+:= mS ×pmF ×q (Figure 4) so it can be steered by changing the training data (adjusting average solve rates p) or by rebalancing gradient mass 54 6 8 10 12 14                 
+
+> Training Steps (k)
+> 0.000
+> 0.005
+> 0.010
+> 0.015
+> 0.020
+> 0.025
+> Perpendicular Correlation
+> 3.4×
+> 2.9×
+> 3.9×
+> correct
+> failed
+> R-predicted failed
+> Excess gap
+> 0246810 12
+> Training Steps (k)
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> 1.25
+> 1.50
+> Policy Entropy
+> Entropy
+> collapse
+> 0.3 0.5 1.1 1.5 2.0
+> 0
+> 20
+> 40
+> 60
+> 80
+> 100
+> Output Head Total Change (%)  97.2% 95.7%
+> 26.1%
+> 15.4%
+> 11.2%
+> Rank collapse
+> = 0.3 = 0.5 = 1.0 (GRPO) = 1.5 = 2.0
+
+Figure 3 Scaling negative gradients of mean GRPO ( δ < 1: up, δ > 1: down) on Qwen 2.5 7B. (Left) For AsymGRPO with δ = 0 .5, correct samples are far more correlated than failures, whose pairwise residual correlation ρ⊥ is 2× below the value predicted by the higher-rank residual R = E[Aivi ⊗ h⊥
+
+i ] (Appendix H). (Middle) Over-reinforcing ( δ > 1)causes entropy collapse; (Right) over-suppressing ( δ < 1) causes rank-1 update collapse. 0.61 0.62 0.63 0.64 0.65 0.66 0.67 
+
+Best pass@100       
+
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> 1.2
+> Final Entropy
+> Asym =0.3
+> PA asym (2,0.5)
+> Asym =1.5
+> GRPO
+> Imp p@2
+> LME
+> Imp p@8 PA =2
+> Asym norm Pass@8
+> Asym =0.5
+> R²=0.50
+
+Performance vs Entropy       
+
+> Novel
+> Existing
+> 0.24 0.26 0.28 0.30 0.32 0.34 0.36
+
+pass@1 at 5k steps     
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> 1.2
+> 1.4
+> 1.6
+> Entropy at 5k steps
+> No norm
+> Pass@8
+> Asym =0.3
+> Asym =0.5
+> Asym =1.5
+> Unlikely GRPO
+> LME
+> Imp p@2
+> Asym norm
+> Imp p@8 PA =2
+> GRPO
+> R²=0.31
+
+Learning Speed vs Entropy      
+
+> 0.5 1.0 1.5 2.0 3.0 5.0
+
+|pos_adv|/|neg_adv| at p=0.3     
+
+> 0.0
+> 0.5
+> 1.0
+> 1.5
+> 2.0
+> Entropy at 16k steps
+> No norm
+> Asym =0.3
+> PA asym (2,0.5)
+> Asym =0.5
+> Asym =1.5
+> GRPO
+> LME
+> Imp p@2
+> Pass@8
+> Imp p@8
+> PA =2
+> R²=0.93
+
+Advantage Ratio vs Entropy 
+
+Figure 4 The policy’s entropy is not correlated with pass@ 100 or learning speed; instead, it is proportional to the advantage sign: mS · p / mF · (1 − p) with mS , mF the mass of successful and failed trajectories respectively, p our solve rate. 
+
+between reinforcing and suppressing ( mS vs. mF ). Since LLMs are prone to entropy collapse in online RL (Park et al., 2025; Khatri et al., 2025), δ < 1 delays overfitting and accelerates exploration at the start of training (Figure 3). However, as we show next, pushing δ too far below 1 trades one pathology for another. 
+
+4.2 Suppressing failures induces rank-1 update collapse 
+
+Takeaway 
+
+Failure bias learns fast but collapses the update to rank-1. ⇒ Reserve failure bias for late-stage exploita-tion. 
+
+Failure-biased methods (our own AsymGRPO with δ < 1, Asymmetric Power α and existing methods such as AsymNorm Arnal et al. (2026)) maintain high entropy and show fast early reward and pass@1. Yet the gains are fragile: reward eventually degrades, answer diversity (pass@ 100 ) drops, and GRPO catches up (Tables 4 and 5). What makes learning from failures unreliable? Analyzing the weight change W∆ = Wrl − Wsft throughout training (Appendix H), we find that all methods start rank-1 dominant in the output weight change (using SVD analysis on W∆). Sign-balanced and success-biased methods gradually escape (Figure 5), while failure-biased methods ( δ < 1) remain locked in rank-1, with RL change concentrating almost entirely in the output head (up to 90% of ∥W∆∥2 at 7B, Table 9, Figure 3). We call this the rank-1 funnel : it enables fast early exploitation but progressively blocks further learning as the model can only update along one axis, ultimately reducing diversity (pass@ 100 ) and out-of-distribution generalization on AIME 2024/2025 (Tables 4 and 5). 6What causes this rank-1 funnel? We formalize this by decomposing the output-head of the RL change W∆
+
+gradient into a rank-1 signal and a higher-rank residual (see details in Appendix H.1): 
+
+W∆ =
+
+> N
+
+∑
+
+> i=1
+
+Ai vi ⊗ hi =
+
+( N∑
+
+> i=1
+
+Aiαi vi
+
+)
+
+⊗ u1
+
+︸ ︷︷ ︸ 
+
+> M1(rank 1)
+
++
+
+> N
+
+∑
+
+> i=1
+
+Ai vi ⊗ h⊥
+
+> i
+
+︸ ︷︷ ︸ 
+
+> M2(higher rank)
+
+. (8) We measure collapse via r1 = σ21 (W∆)
+
+> ∥W∆∥2
+> F
+
+: the fraction of the update’s energy in its leading singular direction, which arises from two conditions: 1. Per-step: We project each hidden state hi onto the leading shared direction u1 and measure how correlated the residuals h⊥ 
+
+> i
+
+= hi−(h⊤ 
+
+> i
+
+u1)u1 are across samples. The average pairwise correlation of these residuals, ρ⊥, controls the higher-rank term M2: when ρ⊥ → 0 the residuals are mutually uncorrelated and their weighted sum cancels out, so M2 vanishes and r1 → 1 (Appendix H.1). Empirically, failure hidden states are far more diverse than correct ones ( ρ⊥,fail ≪ ρ⊥,correct , Appendix H): summing over many uncorrelated failure residuals leaves only the shared “suppress non-code tokens” direction u1.Setting δ < 1 amplifies this noisy failure mass while downweighting the correlated successes, pushing 
+
+M2 toward zero and r1 toward 1 (Figure 3). 2. Across steps: if each per-step gradient aligns in the same direction, the accumulated W∆ is itself rank-1. Empirically, cosine similarity between successive batch gradients converges to ≈ 1 from step 600 
+
+on for negatively biased methods, turning per-step dominance into cumulative collapse. In contrast, sign-balanced methods have lower alignment or switch rank-1 direction (Appendix H.3). 1k             
+
+> 2k
+> 4k
+> 6k
+> 8k
+> 10k
+> 12k
+> 14k
+> 15k
+> Training Step
+> 1
+> 2
+> 3
+> 4
+> 5
+> 6
+> 7
+> s1/s2 Ratio
+> 1k
+> 2k
+> 4k
+> 6k
+> 8k
+> 10k
+> 12k
+> 14k
+> 15k
+> Training Step
+> 10
+> 12
+> 14
+> 16
+> 18
+> Srank  = 0.1
+> Asym GRPO
+> GRPO
+> Exploitation
+> Output Head Rank Analysis (Qwen 2.5 7B) 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8
+> Difficulty Focus arg max
+> p
+> mS(p)
+> 0.60
+> 0.62
+> 0.64
+> 0.66
+> 0.68
+> 0.70
+> pass@100
+> GRPO (mean)
+> Power = 2
+> Power = 3
+> Pass@8
+> Mix pass@1 / pass@2
+> LME =0.4
+> Easy Power = 2
+> optimal difficulty
+> Focusing on Hard Problems Helps Diversity
+
+Figure 5 (Left) Failure-biased methods converge to a lower-rank weight update than sign-balanced methods as shown by the singular-value ratio s1/s2 of the ouput head of W∆ = Wsf t −Wrl , and its srank δ = min {k : ∑ki=1 si / ∑di=1 si ≥
+
+1 − δ} (Kumar et al., 2020). (Right) Pass@100 on LCB v6 as a function of the difficulty focus in policy weights. 
+
+4.3 Harder problems trade information for variance 
+
+Takeaway 
+
+Hard problems yield more informative gradients but fewer usable batches ⇒ Focus on hard problems early, relax toward medium difficulty as solve rates rise. 
+
+We showed biasing batch updates towards reinforcing or supressing trajectories can lead to overexploitation either in the policy or weight space. For now, we only reweighted successes and failures based on the weight sign, but in practice some batches deserve more gradient attention than others. For example, our policy should explore new ways of reasoning to solve harder problems rather than overfit to the easy ones. Approximating the k vs. pass@ k curve as pass@ k = exp (−a(k + c)−b) (Brown et al., 2024; Schaeffer et al., 2025, see also Appendix E), we also notice the difficulty axis is relevant to preserve diversity. All methods lose scaling slope 
+
+b during training except pass@ k-driven weights (evaluations done on LCB v6, Figure 6, Figure 13), which also achieve the highest final pass@ 100 for competitive programming and math at both model scales (Table 3, 5). To understand how this difficulty axis shapes learning, we introduce Power α: mS = mF = C · pq α (C
+
+75k 10k                 
+
+> Training step
+> 0.80
+> 0.85
+> 0.90
+> 0.95
+> 1.00
+> 1.05
+> Fitted a
+> Power Law Intercept ( better)
+> 5k 10k
+> Training step
+> 0.115
+> 0.120
+> 0.125
+> 0.130
+> 0.135
+> 0.140
+> Fitted b
+> Power Law Slope ( better)
+> 0.34 0.36 0.38 0.40
+> pass@1
+> 0.48
+> 0.50
+> 0.52
+> 0.54
+> 0.56
+> 0.58
+> 0.60
+> 0.62
+> pass@100
+> Implicit p@2
+> Implicit p@8
+> Asym =1.5
+> Power asym (2,2)
+> LME =0.4
+> Policy weight:
+> SFT model GRPO (mean) Power = 2 Asym =0.5 Pass@8 FADE
+
+Figure 6 Accuracy vs. Diversity per Policy Weight We estimate the k vs. pass@ k curve by a shifted power law G(k) = 
+
+exp (−a(k + c)−b) where a controls the uniform level and b controls the steepness. (Left) Evolution during training of these coefficients where diverse RL should increase b or at least maintain b and lower a. (Right) pass@100 vs. pass@1 where diverse accurate advantages maximize both. 
+
+normalizes the peak to match the GRPO scale), a smooth approximation of pass@ k advantages (Chen et al., 2025) (Figure 2) inspired by the focal loss of Lin et al. (2017). Higher α biases the gradient towards harder problems. Its easy counterpart uses C · pαq.0.0 0.2 0.4 0.6 0.8 1.0     
+
+> Estimated p
+> 0.000
+> 0.001
+> 0.002
+> 0.003
+> 0.004
+> 0.005
+> 0.006
+> 0.007
+> Variance
+> Lower Variance
+> Variance of Weight Estimators (G=16)
+> p(1 p)
+> Cp (1 p)2
+> Cp (1 p)3
+
+Figure 7 Variance of the gradient weight p(1 −
+
+p)α at different solve rates for 16 MC rollouts. 
+
+Sweeping α values, we find focusing on solve rates ˆp ∈
+
+[0 .3, 0.5] (Figure 5) maximizes both pass@ 1 and pass@ 100 .We analyze why this optimal difficulty exists. Across batches, the most valuable gradients at a solve rate p are the ones with high signal s(p), low variance Var (w(ˆ p)ˆ g), and high frequency. Since we estimate the empirical success rate ¯p via G Monte Carlo rollouts, the variance of the weight ¯w = w(ˆ p) is a ran-dom variable. Using the Delta method, we can estimate the total per-update noise as: Var (w(ˆ p)ˆ g) ≈ w(p)2v0(p) + s(p)2Var (w(ˆ p)) (9) where v0(p) ∝ 1
+
+G p (1 −p) is the raw gradient variance (which blows up when successes or failures are rare see Figure 7), and Var (w(ˆ p)) ≈ [w′(p)] 2 p(1 −p)
+
+G is the variance introduced by weight estimation (Appendix G). Treating updates as independent, we define the per-prompt learning quality q(p, w ) = s(p)2/V ar (w(ˆ p)) , the signal-to-noise ratio of the weighted gradient at solve rate p. The total update quality over the difficulty distribution f (p) is: 
+
+Q(w) = Neff 
+
+︸︷︷︸ 
+
+effective count 
+
+× Ep∼f [q(p, w )] 
+
+︸ ︷︷ ︸
+
+per-sample quality 
+
+= Neff × Ep∼f
+
+[ s(p)
+
+Var (w(ˆ p)ˆ g)
+
+]
+
+(10) where Neff = M (E[w]) 2/E[w2] ≤ M is Kish’s effective sample size. Increasing α selectively filters out easy prompts, which can raise q(p, w ) at the mode but reduces Neff .Since w must serve all difficulties simultaneously, we seek w⋆ = arg max w Q(w) over the current distribution 
+
+f (p), which may shift over the course of training. In practice, our gradient signal s(p) is unknown, so we consider two hypotheses. If gradient updates carry the same signal regardless of difficulty ( s(p) ≡ s), the only lever is variance reduction: the optimal strategy assigns weight proportional to the inverse noise, 
+
+w⋆(p) ∝ 1/ v0(p) ∝ p(1 −p), concentrating on medium-difficulty prompts where both successes and failures are frequent enough to yield low-variance gradient estimates. This corresponds to α = 1 (mean GRPO) and is the case for larger models (CWM 32B) (Figure 1). 8If instead harder problems carry a stronger learning signal ( s′(p) < 0), the optimal filter tilts toward low p
+
+(α > 1), placing the weight mode at 11+ α (see Figure 7). At a solve rate of 0.5, α = 3 is justified only if hard problems carry at least 2.25 × more signal than the average prompt (Table 8). This matches the 7B regime, where Power α=2 gives +5 % pass@ k over GRPO (Tables 3, 4), suggesting smaller models have more to learn from hard problems. However as the policy improves, problems that once provided signal become easy, and the pool of hard problems shrinks, reducing Neff and degrading update quality for large α. Methods like pass@ k advantages that target tail-end difficulties are especially vulnerable, waiting for signal on unsolvable problems while ignoring steady progress on medium-difficulty prompts (Figure 5). 
+
+## 5 The FADE Scheduler 
+
+The previous sections revealed two trade-offs that a fixed policy weight cannot satisfy simultaneously: • Sign axis (§4.1, §4.2): failure-biased methods ( δ < 1) learn faster but induce rank-1 update collapse; sign-balanced methods ( δ = 1 ) preserve multi-dimensional learning but converge slowly. • Difficulty axis (§4.3): focusing on hard problems maximizes gradient informativeness but at the cost of higher variance and less relevant batches. To maximize gradient efficiency, we propose to adapt the policy weight to online learning dynamics. Com-bining Asym GRPO and Power α, we propose Focal Advantage with Dynamic Entropy (FADE) which adapts the policy weight to the moving average of solve rate ˆp and entropy ˆH:
+
+Ai = (1 − ¯r)α−1 ·
+
+
+
+ri − ¯r if ri ≥ ¯r, ri − ¯rδ if ri < ¯r, α = clip 
+
+( 3(1 − ˆp)2ˆ p , 1, α max 
+
+)
+
+, δ = clip (1 + ˆH − H∗, 0.3, 1). (11) Algorithm 2 shows how FADE can be used in practice. We found αmax = 3 and a target entropy H∗ of half the initial entropy worked best (Appendix C). FADE can be seen as delayed exploitation. In a typical training run (Figure 8), α starts high making the policy focus on frontier problems and develop diverse reasoning strategies. When the entropy drops below H∗ we force exploitation by making the gradients failure-biased with δ < 1. The initial sign-balanced phase ( δ = 1 ) prevents premature rank-1 collapse in the update weights. On the other hand, the decaying α power avoids the gradient allocation trap where we overfit to hard problems. Figure 1 shows that FADE achieves the best performance across all pass@ k metrics while reaching peak pass@ 1 20k steps earlier than the best static baseline (Power α=2 ) at the 7B scale and 2k steps earlier at the 32B scale. We ablate each component independently (Figure 9): removing δ causes entropy collapse while removing α
+
+loses diversity. We also test two simplifications: (1) replacing both signals with a deterministic logarithmic schedule f (t) ∝ log (1 + t/τ ), and (2) driving both α and δ from entropy alone. Both degrade diversity (pass@10, pass@100), confirming that α and δ must respond to distinct signals to balance exploration and exploitation effectively. FADE’s entropy target provides a single interpretable knob controlling the exploration-exploitation in the learned update weights W∆ (see Figure 6). We track the SVD of the output-head weight change W∆ (singular-value ratio s1/s2 and rank-1 fraction) alongside its L2 norm across three FADE runs with H∗ ∈ { 0.5, 1.0, 1.3}
+
+on Qwen 2.5 7B (Table 8). The result is a clean, continuous transition: H∗=0 .5 keeps ∥W∆∥ small and the update full-rank; H∗=1 .0 grows ∥W∆∥ to 67% with moderate rank concentration; H∗=1 .3 reproduces the rank-1 collapse seen in static failure-biased methods ( s1/s2 > 5, rank-1 fraction 91%). 
+
+## 6 Related Works  
+
+> Test-time scaling and diversity collapse.
+
+Test-time compute scaling, sampling k candidate solutions and select-ing the best, has become a standard strategy for improving LLM reasoning, through self-consistency (Wang et al., 2023), multi-turn verification (Lightman et al., 2024), or simply majority voting. Brown et al. (2024) and Schaeffer et al. (2025) characterized the resulting pass@ k curves as a power law governed by the distri-bution of per-problem solve rates. Training-time scaling laws for RL have been studied along complementary 90 10000 20000 30000                                                          
+
+> 1.92
+> 1.94
+> 1.96
+> 1.98
+> 2.00
+> Qwen 2.5 7B
+> 010000 20000 30000
+> 0.80
+> 0.85
+> 0.90
+> 0.95
+> 1.00
+> 02000 4000 6000 8000 10000
+> Training Step
+> 2.2
+> 2.4
+> 2.6
+> 2.8
+> CWM 32B
+> 02000 4000 6000 8000 10000
+> Training Step
+> 0.85
+> 0.90
+> 0.95
+> 1.00
+> Controllers of FADE H∗Step OH L2s1/s2rank-1% Inner 0.5 10k 6.1% 4.10 38.7% 3.32% 0.5 33k 6.3% 3.84 54.4% 3.32% 1.0 10k 13.2% 3.51 55.9% 3.07% 1.0 40k 66.9% 5.34 88.2% 1.17% 1.3 10k 23.9% 3.25 68.3% 2.69% 1.3 30k 72.7% 5.77 91.2% 0.96%
+> Asym. ∼90% 6.96–8.51 78–96% ∼0.3%
+> Sym. <10% 3.61–3.98 61–62% ∼3.2%
+> Figure 8 (Left)
+
+FADE controller dynamics: α and δ adapt the policy gradient weight p(1 −p)α/δ; δ decays once entropy hits H∗ and α decays as solve rates rise. (Right) Output-head SVD metrics at different entropy targets confirm that 
+
+H∗ continuously controls the sign-balanced-to-failure-biased transition (Table 8). 
+
+axes: environment interactions (Hilton et al., 2023), entropy budgets (Cui et al., 2025), and algorithmic choices (Khatri et al., 2025; Kaplan et al., 2020; Tan et al., 2025). At the intersection of training and in-ference, several works observed that RL fine-tuning “sharpens” the policy: pass@ 1 improves while pass@ k
+
+degrades as the model collapses onto a narrow set of solutions (Huang et al., 2025; Karan and Du, 2025; Levi, 2026). Barakat et al. (2026) formalized this as a gradient-level trade-off, showing that pass@ 1 and pass@ k
+
+optimization apply opposing forces on the policy. Focusing on GRPO, Cheng et al. (2026) showed failed trajectories serve as credit assignment for positive tokens. 
+
+Policy weights and advantage functions. The advantage function (Baird, 1993) separates the effect of an action from the quality of a state and can be estimated via batch-average baselines (Marbach and Tsitsiklis, 2001; Kool et al., 2019; Mnih and Rezende, 2016), learned value networks (Wang et al., 2016), or GAE (Schulman et al., 2015). Using Monte Carlo rollouts to estimate the value function was popularized by GRPO (Shao et al., 2024; Guo et al., 2025). To preserve test-time diversity, (Amini et al., 2024; Chow et al., 2024; Walder and Karkhanis, 2025; Tang et al., 2025) propose pass@ k reweighting. Other works design policy weights based on likelihood (Tajwar et al., 2026), sign reweighting (Zhu et al., 2025; He et al., 2025), or more complex proxies such as the top-k redistribution (Peng et al., 2025), or in-context guidance (Qu et al., 2026). Beyond fixed policy weights, The Microsoft AI Team (2026) adjust the upper clip bound to maintain a target policy entropy similar our δ scheduler in FADE but at the PPO clipping level. Zhao et al. (2026) directly rescale the GRPO weight based on the average entropy. Our framework is inspired by Thrampoulidis et al. (2025), Chen et al. (2025) and Davis and Recht (2025), who analyze the reward shaping of advantage functions and their gradient weights. We extend this line of work to a broader range of advantages identifying general structural properties validated via large scale RL experiments. 
+
+Weight-space analysis of RL training. Kumar et al. (2020) studied rank collapse in Q-learning with gradient descent, attributing it to bootstrapping. In contrast, we’re interested in the rank of the update weight since in RL with LLMs we have relatively few changes in the model weights. Cai et al. (2025) observed rank-1 dominance of the parameter update matrix, more pronounced in RL than in SFT or distillation. Ye et al. (2026) showed that non-rank-1 directions encode out-of-domain abilities beyond reasoning, framing rank-1 collapse as a form of overfitting. Moalla et al. (2024) showed update weights become lower rank in high-entropy regimes correlating with our observations for δ > 1.
+
+## 7 Conclusion 
+
+By decomposing policy weights into their positive and negative gradient masses ( mS , mF ), we revealed two orthogonal axes that jointly govern training dynamics. Balancing the sign balance of mS and mF can push 10 the policy to entropy collapse if mS ≫ mF or rank-1 update collapse if mF ≫ mS , accelerating training at the cost of less diverse features. On the other hand, looking at mS (p), m F (p) so the policy gradient mass as functions of the batch’s solve rate p, we showed another trade-off between the signal to noise per batch. Combining these two directions, we notice two paradigms: the explorative mode where we should have a balanced sign ratio and focus on hard problems; and the exploitative mode where we want fast learning and no variance. Building on this analysis, we introduced FADE, which adapts both axes to online training dynamics. It reaches peak pass@ 1 20k steps earlier than the best static baseline at 7B and 2k steps earlier at 32B, while maintaining the best diversity-accuracy trade-off across models and benchmarks (LiveCodeBench, AIME). Several directions remain open. Our framework assumes binary, terminal rewards; extending the mS /mF
+
+decomposition to process reward models with per-step credit assignment would clarify whether the sign and difficulty trade-offs persist at finer granularity. Similarly, when only a few Monte Carlo rollouts per prompt are available, the estimate ¯p becomes noisy. Understanding which policy weights are robust to this estimation error, and how the optimal choice shifts in the low-rollout regime, deserves further study. Finally, all experiments use single-turn code and math generation; multi-turn and agentic settings, where intermediate feedback is available, may shift the exploration-exploitation balance in ways our trajectory-level analysis does not capture. 11 References 
+
+Wasi Uddin Ahmad, Somshubra Majumdar, Aleksander Ficek, Sean Narenthiran, Mehrzad Samadi, Jocelyn Huang, Siddhartha Jain, Vahid Noroozi, and Boris Ginsburg. Opencodereasoning-ii: A simple test time scaling approach via self-critique. arXiv preprint arXiv:2507.09075 , 2025. Arash Ahmadian, Chris Cremer, Matthias Gallé, Marzieh Fadaee, Julia Kreutzer, Olivier Pietquin, Ahmet Üstün, and Sara Hooker. Back to basics: Revisiting reinforce-style optimization for learning from human feedback in llms. In 
+
+Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) ,pages 12248–12267, 2024. Afra Amini, Tim Vieira, Elliott Ash, and Ryan Cotterell. Variational best-of-n alignment. arXiv preprint arXiv:2407.06057 , 2024. Marcin Andrychowicz, Anton Raichuk, Piotr Stańczyk, Manu Orsini, Sertan Girgin, Raphaël Marinier, Léonard Hussenot, Matthieu Geist, Olivier Pietquin, Marcin Michalski, et al. What matters in on-policy reinforcement learning? a large-scale empirical study. In ICLR 2021-Ninth International Conference on Learning Representations ,2021. Charles Arnal, Gaëtan Narozniak, Vivien Cabannes, Yunhao Tang, Julia Kempe, and Remi Munos. Asymmetric rein-force for off-policy reinforcement learning: Balancing positive and negative rewards. Advances in Neural Information Processing Systems , 38:9640–9664, 2026. Leemon C Baird. Advantage updating. Technical report, Wright Laboratory, 1993. Anas Barakat, Souradip Chakraborty, Khushbu Pahwa, and Amrit Singh Bedi. Why pass@ k optimization can degrade pass@ 1: Prompt interference in llm post-training. arXiv preprint arXiv:2602.21189 , 2026. Bradley Brown, Jordan Juravsky, Ryan Ehrlich, Ronald Clark, Quoc V Le, Christopher Ré, and Azalia Mirhoseini. Large language monkeys: Scaling inference compute with repeated sampling. arXiv preprint arXiv:2407.21787 ,2024. Yuchen Cai, Ding Cao, Xin Xu, Zijun Yao, Yuqing Huang, Zhenyu Tan, Benyi Zhang, Guangzhong Sun, Guiquan Liu, and Junfeng Fang. On predictability of reinforcement learning dynamics for large language models. arXiv preprint arXiv:2510.00553 , 2025. Mark Chen, Jerry Tworek, Heewoo Jun, Qiming Yuan, Henrique Ponde De Oliveira Pinto, Jared Kaplan, Harri Edwards, Yuri Burda, Nicholas Joseph, Greg Brockman, et al. Evaluating large language models trained on code. 
+
+arXiv preprint arXiv:2107.03374 , 2021. Zhipeng Chen, Xiaobo Qin, Youbin Wu, Yue Ling, Qinghao Ye, Wayne Xin Zhao, and Guang Shi. Pass@ k training for adaptively balancing exploration and exploitation of large reasoning models. arXiv preprint arXiv:2508.10751 ,2025. Tianhao Cheng, Zeyu Huang, Zihan Qiu, Yu Cheng, Edoardo Ponti, Yinghui Xu, Ivan Titov, and Zenglin Xu. The cancellation hypothesis in critic-free rl: From outcome rewards to token credits. arXiv preprint arXiv:2605.08666 ,2026. Yinlam Chow, Guy Tennenholtz, Izzeddin Gur, Vincent Zhuang, Bo Dai, Sridhar Thiagarajan, Craig Boutilier, Rishabh Agarwal, Aviral Kumar, and Aleksandra Faust. Inference-aware fine-tuning for best-of-n sampling in large language models. arXiv preprint arXiv:2412.15287 , 2024. Ganqu Cui, Yuchen Zhang, Jiacheng Chen, Lifan Yuan, Zhi Wang, Yuxin Zuo, Haozhan Li, Yuchen Fan, Huayu Chen, Weize Chen, et al. The entropy mechanism of reinforcement learning for reasoning language models. arXiv preprint arXiv:2505.22617 , 2025. Will Dabney, Mark Rowland, Marc Bellemare, and Rémi Munos. Distributional reinforcement learning with quantile regression. In Proceedings of the AAAI conference on artificial intelligence , volume 32, 2018. Damek Davis and Benjamin Recht. What is the objective of reasoning with reinforcement learning? arXiv preprint arXiv:2510.13651 , 2025. FAIR CodeGen team, :, Jade Copet, Quentin Carbonneaux, Gal Cohen, Jonas Gehring, Jacob Kahn, Jannik Kossen, Felix Kreuk, Emily McMilin, Michel Meyer, Yuxiang Wei, David Zhang, Kunhao Zheng, Jordi Armengol-Estapé, Pedram Bashiri, Maximilian Beck, Pierre Chambon, Abhishek Charnalia, Chris Cummins, Juliette Decugis, Zacharias V. Fisches, François Fleuret, Fabian Gloeckle, Alex Gu, Michael Hassid, Daniel Haziza, Badr Youbi Idrissi, Christian Keller, Rahul Kindi, Hugh Leather, Gallil Maimon, Aram Markosyan, Francisco Massa, Pierre-Emmanuel 
+
+12 Mazaré, Vegard Mella, Naila Murray, Keyur Muzumdar, Peter O’Hearn, Matteo Pagliardini, Dmitrii Pedchenko, Tal Remez, Volker Seeker, Marco Selvi, Oren Sultan, Sida Wang, Luca Wehrstedt, Ori Yoran, Lingming Zhang, Taco Cohen, Yossi Adi, and Gabriel Synnaeve. Cwm: An open-weights llm for research on code generation with world models. arXiv preprint arXiv:2510.02387 , 2025. Yulu Gan and Phillip Isola. Neural thickets: Diverse task experts are dense around pretrained weights. arXiv preprint arXiv:2603.12228 , 2026. Anisha Garg and Ganesh Venkatesh. The peril of preference: Why grpo fails on ordinal rewards. arXiv preprint arXiv:2511.04439 , 2025. Jonas Gehring, Kunhao Zheng, Jade Copet, Vegard Mella, Taco Cohen, and Gabriel Synnaeve. Rlef: Grounding code llms in execution feedback with reinforcement learning. In International Conference on Machine Learning , pages 19034–19055. PMLR, 2025. Evan Greensmith, Peter L Bartlett, and Jonathan Baxter. Variance reduction techniques for gradient estimates in reinforcement learning. Journal of Machine Learning Research , 5(Nov):1471–1530, 2004. Daya Guo, Dejian Yang, Haowei Zhang, Junxiao Song, Peiyi Wang, Qihao Zhu, Runxin Xu, Ruoyu Zhang, Shirong Ma, Xiao Bi, et al. Deepseek-r1 incentivizes reasoning in llms through reinforcement learning. Nature , 645(8081): 633–638, 2025. Andre Wang He, Daniel Fried, and Sean Welleck. Rewarding the unlikely: Lifting grpo beyond distribution sharpening. In Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing , pages 25559–25571, 2025. Jacob Hilton, Jie Tang, and John Schulman. Scaling laws for single-agent reinforcement learning. arXiv preprint arXiv:2301.13442 , 2023. Audrey Huang, Adam Block, Dylan Foster, Dhruv Rohatgi, Cyril Zhang, Max Simchowitz, Jordan Ash, and Akshay Krishnamurthy. Self-improvement in language models: The sharpening mechanism. In International Conference on Learning Representations , volume 2025, pages 76687–76739, 2025. Binyuan Hui, Jian Yang, Zeyu Cui, Jiaxi Yang, Dayiheng Liu, Lei Zhang, Tianyu Liu, Jiajun Zhang, Bowen Yu, Keming Lu, et al. Qwen2. 5-coder technical report. arXiv preprint arXiv:2409.12186 , 2024. Yuhua Jiang, Jiawei Huang, Yufeng Yuan, Xin Mao, Yu Yue, Qianchuan Zhao, and Lin Yan. Risk-sensitive rl for alleviating exploration dilemmas in large language models. arXiv preprint arXiv:2509.24261 , 2025. Jared Kaplan, Sam McCandlish, Tom Henighan, Tom B. Brown, Benjamin Chess, Rewon Child, Scott Gray, Alec Radford, Jeffrey Wu, and Dario Amodei. Scaling laws for neural language models. arXiv preprint arXiv:2001.08361 ,2020. Aayush Karan and Yilun Du. Reasoning with sampling: Your base model is smarter than you think. arXiv preprint arXiv:2510.14901 , 2025. Devvrit Khatri, Lovish Madaan, Rishabh Tiwari, Rachit Bansal, Sai Surya Duvvuri, Manzil Zaheer, Inderjit S Dhillon, David Brandfonbrener, and Rishabh Agarwal. The art of scaling reinforcement learning compute for llms. arXiv preprint arXiv:2510.13786 , 2025. Youngeun Kim. Mc-grpo: Median-centered group relative policy optimization for small-rollout reinforcement learning. 
+
+arXiv preprint arXiv:2601.22582 , 2026. Kimi Team, Angang Du, Bofei Gao, Bowei Xing, Changjiu Jiang, Cheng Chen, Cheng Li, Chenjun Xiao, Chenzhuang Du, Chonghua Liao, et al. Kimi k1. 5: Scaling reinforcement learning with llms. arXiv preprint arXiv:2501.12599 ,2025. Wouter Kool, Herke van Hoof, and Max Welling. Buy 4 reinforce samples, get a baseline for free! arXiv preprint arXiv:1901.10280 , 2019. Aviral Kumar, Rishabh Agarwal, Dibya Ghosh, and Sergey Levine. Implicit under-parameterization inhibits data-efficient deep reinforcement learning. arXiv preprint arXiv:2010.14498 , 2020. Noam Levi. Learning shrinks the hard tail: Training-dependent inference scaling in a solvable linear model. arXiv preprint , 2026. Rongao Li, Jie Fu, Bo-Wen Zhang, Tao Huang, Zhihong Sun, Chen Lyu, Guang Liu, Zhi Jin, and Ge Li. Taco: Topics in algorithmic code generation dataset. arXiv preprint arXiv:2312.14852 , 2023. 
+
+13 Yujia Li, David Choi, Junyoung Chung, Nate Kushman, Julian Schrittwieser, Rémi Leblond, Tom Eccles, James Keeling, Felix Gimeno, Agustin Dal Lago, et al. Competition-level code generation with alphacode. Science , 378 (6624):1092–1097, 2022. Hunter Lightman, Vineet Kosaraju, Yuri Burda, Harrison Edwards, Bowen Baker, Teddy Lee, Jan Leike, John Schulman, Ilya Sutskever, and Karl Cobbe. Let’s verify step by step. In The Twelfth International Conference on Learning Representations , 2024. Tsung-Yi Lin, Priya Goyal, Ross Girshick, Kaiming He, and Piotr Dollár. Focal loss for dense object detection. In 
+
+Proceedings of the IEEE international conference on computer vision , pages 2980–2988, 2017. Wenze Lin, Zhen Yang, Xitai Jiang, Pony Ma, and Gao Huang. Thickening-to-thinning: Reward shaping via human-inspired learning dynamics for llm reasoning. arXiv preprint arXiv:2602.04265 , 2026. Zi-Yan Liu, Changyu Chen, Wenjun Li, Penghui Qi, Tianyu Pang, Chao Du, Wee Sun Lee, and Min Lin. Understand-ing r1-zero-like training: A critical perspective. ArXiv , abs/2503.20783, 2025a. Zichen Liu, Changyu Chen, Wenjun Li, Penghui Qi, Tianyu Pang, Chao Du, Wee Sun Lee, and Min Lin. Understanding r1-zero-like training: A critical perspective. arXiv preprint arXiv:2503.20783 , 2025b. Peter Marbach and John N Tsitsiklis. Simulation-based optimization of markov reward processes. IEEE Transactions on Automatic Control , 46(2):191–209, 2001. Marvin Minsky. Steps toward artificial intelligence. Proceedings of the IRE , 49(1):8–30, 1961. Andriy Mnih and Danilo Rezende. Variational inference for monte carlo objectives. In International Conference on Machine Learning , pages 2188–2196. PMLR, 2016. Skander Moalla, Andrea Miele, Daniil Pyatko, Razvan Pascanu, and Caglar Gulcehre. No representation, no trust: Connecting representation, collapse, and trust issues in ppo. Advances in Neural Information Processing Systems ,37:69652–69699, 2024. Ivan Moshkov, Darragh Hanley, Ivan Sorokin, Shubham Toshniwal, Christof Henkel, Benedikt Schifferer, Wei Du, and Igor Gitman. Aimo-2 winning solution: Building state-of-the-art mathematical reasoning models with open-mathreasoning dataset. arXiv preprint arXiv:2504.16891 , 2025. Michael Noukhovitch, Shengyi Huang, Sophie Xhonneux, Arian Hosseini, Rishabh Agarwal, and Aaron Courville. Asynchronous rlhf: Faster and more efficient off-policy rl for language models. In International Conference on Learning Representations , volume 2025, pages 4003–4029, 2025. OpenAI. Learning to reason with LLMs. https://openai.com/index/learning-to-reason-with-llms/ , September 2024. Jaesung R Park, Junsu Kim, Gyeongman Kim, Jinyoung Jo, Sean Choi, Jaewoong Cho, and Ernest K Ryu. Clip-low increases entropy and clip-high decreases entropy in reinforcement learning of large language models. arXiv preprint arXiv:2509.26114 , 2025. Ruotian Peng, Yi Ren, Zhouliang Yu, Weiyang Liu, and Yandong Wen. Simko: Simple pass@ k policy optimization. 
+
+arXiv preprint arXiv:2510.14807 , 2025. Daniil Plyusov, Alexey Gorbatovski, Boris Shaposhnikov, Viacheslav Sinii, Alexey Malakhov, and Daniil Gavrilov. F-grpo: Don’t let your policy learn the obvious and forget the rare. arXiv preprint arXiv:2602.06717 , 2026. Yuxiao Qu, Amrith Setlur, Virginia Smith, Ruslan Salakhutdinov, and Aviral Kumar. Pope: Learning to reason on hard problems via privileged on-policy exploration. arXiv preprint arXiv:2601.18779 , 2026. Rylan Schaeffer, Joshua Kazdan, John Hughes, Jordan Juravsky, Sara Price, Aengus Lynch, Erik Jones, Robert Kirk, Azalia Mirhoseini, and Sanmi Koyejo. How do large language monkeys get their power (laws)? In International Conference on Machine Learning , pages 53132–53176. PMLR, 2025. John Schulman, Philipp Moritz, Sergey Levine, Michael Jordan, and Pieter Abbeel. High-dimensional continuous control using generalized advantage estimation. arXiv preprint arXiv:1506.02438 , 2015. John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, and Oleg Klimov. Proximal policy optimization algorithms. arXiv preprint arXiv:1707.06347 , 2017. Zhihong Shao, Peiyi Wang, Qihao Zhu, Runxin Xu, Junxiao Song, Xiao Bi, Haowei Zhang, Mingchuan Zhang, YK Li, et al. Deepseekmath: Pushing the limits of mathematical reasoning in open language models. arXiv preprint arXiv:2402.03300 , 2024. 
+
+14 Sriram Srinivasan, Marc Lanctot, Vinicius Zambaldi, Julien Pérolat, Karl Tuyls, Rémi Munos, and Michael Bowling. Actor-critic policy optimization in partially observable multiagent environments. Advances in Neural Information Processing Systems , 31, 2018. Joe Suk and Yaqi Duan. On the optimization dynamics of rlvr: Gradient gap and step size thresholds. arXiv preprint arXiv:2510.08539 , 2025. Richard S Sutton. Learning to predict by the methods of temporal differences. Machine learning , 3(1):9–44, 1988. Richard S. Sutton, David McAllester, Satinder Singh, and Yishay Mansour. Policy gradient methods for reinforcement learning with function approximation. In Proceedings of the 13th International Conference on Neural Information Processing Systems (NIPS) , pages 1057–1063, Cambridge, MA, USA, 1999. MIT Press. Fahim Tajwar, Guanning Zeng, Yueer Zhou, Yuda Song, Daman Arora, Yiding Jiang, Jeff Schneider, Ruslan Salakhutdinov, Haiwen Feng, and Andrea Zanette. Maximum likelihood reinforcement learning. arXiv preprint arXiv:2602.02710 , 2026. Zelin Tan, Hejia Geng, Xiaohang Yu, Mulei Zhang, Guancheng Wan, Yifan Zhou, Qiang He, Xiangyuan Xue, Heng Zhou, Yutao Fan, et al. Scaling behaviors of llm reinforcement learning post-training: An empirical study in mathematical reasoning. arXiv preprint arXiv:2509.25300 , 2025. Yunhao Tang, Kunhao Zheng, Gabriel Synnaeve, and Rémi Munos. Optimizing language models for inference time objectives using reinforcement learning. arXiv preprint arXiv:2503.19595 , 2025. The Microsoft AI Team. Mai-thinking-1: Building a hill-climbing machine. Technical report, Microsoft AI, 2026. 
+
+https://microsoft.ai/pdf/mai-thinking-1.pdf .Christos Thrampoulidis, Sadegh Mahdavi, and Wenlong Deng. Advantage shaping as surrogate reward maximization: Unifying pass@ k policy gradients. arXiv preprint arXiv:2510.23049 , 2025. Christian Walder and Deep Karkhanis. Pass@ k policy optimization: Solving harder reinforcement learning problems. 
+
+arXiv preprint arXiv:2505.15201 , 2025. Xuezhi Wang, Jason Wei, Dale Schuurmans, Quoc V Le, Ed H Chi, Sharan Narang, Aakanksha Chowdhery, and Denny Zhou. Self-consistency improves chain of thought reasoning in language models. In The Eleventh International Conference on Learning Representations , 2023. Ziyu Wang, Tom Schaul, Matteo Hessel, Hado Hasselt, Marc Lanctot, and Nando Freitas. Dueling network architec-tures for deep reinforcement learning. In International conference on machine learning , pages 1995–2003. PMLR, 2016. Ronald J. Williams. Simple statistical gradient-following algorithms for connectionist reinforcement learning. Machine Learning , 8(3–4):229–256, 1992. doi: 10.1007/BF00992696. Xue Yan, Yan Song, Xidong Feng, Mengyue Yang, Haifeng Zhang, Haitham Bou Ammar, and Jun Wang. Efficient reinforcement learning with large language model priors. In International Conference on Learning Representations ,volume 2025, pages 48691–48715, 2025. Fengkai Yang, Zherui Chen, Xiaohan Wang, Xiaodong Lu, Jiajun Chai, Guojun Yin, Wei Lin, Shuai Ma, Fuzhen Zhuang, Deqing Wang, et al. Your group-relative advantage is biased. arXiv preprint arXiv:2601.08521 , 2026. Hao Ye, Jisheng Dang, Junfeng Fang, Bimei Wang, Yizhou Zhang, Ning Lv, Wencan Zhang, Hong Peng, Bin Hu, and Tat-Seng Chua. On the implicit reward overfitting and the low-rank dynamics in rlvr. arXiv preprint arXiv:2605.06523 , 2026. Qiying Yu, Zheng Zhang, Ruofei Zhu, Yufeng Yuan, Xiaochen Zuo, Yu Yue, Weinan Dai, Tiantian Fan, Gaohong Liu, Lingjun Liu, et al. Dapo: An open-source llm reinforcement learning system at scale. arXiv preprint arXiv:2503.14476 , 2025. Chenchen Zhang. From reasoning to agentic: Credit assignment in reinforcement learning for large language models. 
+
+arXiv preprint arXiv:2604.09459 , 2026. Haotian Zhao, Songlin Zhou, Yuxin Zhang, Stephen S-T Yau, Wenyu Zhang, Lun Tian, Tianshu Zhu, Yifeng Huang, Yucheng Zeng, Jingnan Gu, et al. Aem: Adaptive entropy modulation for multi-turn agentic reinforcement learning. 
+
+arXiv preprint arXiv:2605.00425 , 2026. Xinyu Zhu, Mengzhou Xia, Zhepei Wei, Wei-Lin Chen, Danqi Chen, and Yu Meng. The surprising effectiveness of negative reinforcement in llm reasoning. arXiv preprint arXiv:2506.01347 , 2025. 
+
+15 Appendix 
+
+## A Deriving Positive and Negative Weights 
+
+Throughout, τS and τF denote successful and failed trajectories (positive and negative weights), ¯r := 1
+
+> B
+
+∑ 
+
+> i
+
+ri
+
+the batch reward mean, σr =
+
+√ 1
+
+> B
+
+∑
+
+> i
+
+(ri − ¯r)2 the reward standard deviation, and all gradients are estimated over B independent rollouts from πθ .
+
+A.1 GRPO 
+
+The GRPO advantage is Ai = ( ri − ¯r)/ σr . For binary rewards ri ∈ { 0, 1} with ¯r = ˆ p, the empirical standard deviation reduces to the Bernoulli form σr = √ˆp(1 − ˆp) = √pq , since: 
+
+σ2 
+
+> r
+
+= 1
+
+> B
+
+∑Bi=1 (ri − ˆp)2 = 1
+
+> B
+
+[Bp (1 −p)2 + Bq p 2] = pq (q + p) = pq. 
+
+The per-trajectory advantages are: 
+
+As = q
+
+√pq =
+
+√ qp , Af = −p
+
+√pq = −
+
+√ pq .
+
+With |S| = Bp and |F | = Bq in expectation: 
+
+∇GRPO = q 
+
+> √pq
+
+· Bp · mS − p 
+
+> √pq
+
+· Bq · mF = Bpq  
+
+> √pq
+
+[mS − mF ] = B√pq [mS − mF ] .
+
+Hence mS = mF = Bpq /σr = B√pq , confirming sign balance. Skew-R introduced by Thrampoulidis et al. (2025) combines regular and mean based GRPO by taking the product of both giving mS = mF = pq × √pq .
+
+A.2 Multiplier Rescaled GRPO 
+
+The 1 
+
+> σr
+
+multiplier in GRPO is unstable (Liu et al., 2025b) (Yu et al., 2025), as it can lead to exploding or noisy gradient updates. Instead, we can keep the mean normalization and introduce other multipliers: 
+
+∇rescale = ∑
+
+> i∈S
+
+Cs(r, i ) · (ri − ¯r)∇ log πθ (τi) − ∑
+
+> i∈F
+
+Cf (r, i ) · (¯ r − ri)∇ log πθ (τi),
+
+where Cs(r, i ) and Cf (r, i ) are arbitrary non-negative functions that may depend on the full reward vector 
+
+r = ( r1, . . . , r B ) and the sample index i. Mirroring the logic behind the focal loss (Lin et al., 2017), we introduce the power α series (PA) where the functions are powers of |ri − ¯r|.Our proposed methods: 1. Power α (sign-balanced): The intuition is to reduce the gradient magnitude when the model already performs well ( ¯r high): samples that are easy to solve should contribute less to the update. We set 
+
+Cs(r, i ) = Cf (r, i ) = (1 − ¯r)α−1 for all i, so the advantage becomes: 
+
+ˆAi = ( ri − ¯r)(1 − ¯r)α−1.
+
+For binary rewards where ¯r = p, this simplifies to Cs = Cf = qα−1, giving: 
+
+mS = mF = Bpq · qα−1 = Bpq α.
+
+As α increases, the masses decay faster with q: gradients are suppressed on prompts the model has mostly solved, focusing optimization on harder problems. 2. Asymmetric Power α: We decouple the exponents: Cs(r, i ) = (1 − ¯r)αs−1 for i ∈ S and Cf (r, i ) = ¯ rαf −1
+
+for i ∈ F . The positive mass derivation is identical to the sign-balanced case: 
+
+mS = Bpq αs .
+
+16 For the negative side, with binary rewards ¯r = p:
+
+mF = Bp αf −1 · p · q = Bp αf q. 
+
+If αs > α f we suppress the positive gradient more than the negative one (or vice versa), giving explicit control over the diversity–performance tradeoff. Note that αs = αf = 1 recovers GRPO ( mS = mF =
+
+pq ). 3. Asymmetric GRPO: keeps the GRPO advantage intact on the positive side and rescales only the negative side by a fixed scalar 1 
+
+> δ
+
+: Cs = 1 and Cf = 1 
+
+> δ
+
+. This gives: 
+
+mS = Bpq, mF = Bpq δ .
+
+When δ < 1, the negative gradient is amplified relative to the positive one ( mF > m S ), pushing the model more aggressively away from failed trajectories. When δ > 1, the negative gradient is suppressed (mF < m S ), preserving diversity by reducing the penalty on incorrect solutions. At δ = 1 we recover standard GRPO. Unlike Power α, this method does not adapt to the difficulty of the prompt ( p). It modifies only the strength of negative advantages.  
+
+> Thickening to Thinning (T2T)
+
+propose another type of Cs and Cf multiplier for GRPO based on the aver-age normalized lengths of successful and failed responses, ¯LS and ¯LF . They define the reward as Ri ={
+
+1 − αpL i if Vi = 1 
+
+α(1 − p)Li if Vi = 0 within a GRPO normalization. The batch mean is: 
+
+μ = 1
+
+> B
+
+(∑  
+
+> i∈S
+
+(1 − αpL i) + ∑ 
+
+> j∈F
+
+α(1 −p)Lj
+
+) = p − αp 2 ¯LS + α(1 −p)2 ¯LF . (12) Defining C := 1 − αp ¯LS − α(1 − p) ¯LF , the positive and negative advantages are: 
+
+¯AS = 1
+
+> σR
+
+((1 − αp ¯LS ) − μ) = (1 −p)
+
+> σR
+
+[1 − αp ¯LS − α(1 −p) ¯LF
+
+] = (1 −p) CσR , (13) 
+
+¯AF = 1
+
+> σR
+
+(α(1 −p) ¯LF − μ) = −pσR
+
+[1 − αp ¯LS − α(1 −p) ¯LF
+
+] = −p C σR . (14) The gradient takes the form: 
+
+∇GRPO-T2T ≈ Bp (1 − p)CσR
+
+[∇S − ∇ F
+
+]
+
+A.3 Maximum Likelihood RL 
+
+As introduced in Tajwar et al. (2026), the MaxRL advantage is A = ri−¯r 
+
+> ¯r
+
+. With r ∈ { 0, 1}, we have As = 1−pp
+
+and Af = 0−pp = −1. Similar to the GRPO gradient we can write: 
+
+∇MaxRL = ∑
+
+> τs∈S
+
+As∇ log πθ (τs) + ∑ 
+
+> τf∈F
+
+Af ∇θ log πθ (τf )= 1 − pp
+
+∑
+
+> τs∈S
+
+∇ log πθ (τS ) − ∑ 
+
+> τf∈F
+
+∇ log πθ (τF )= (1 − p)
+
+p · Bp · mS − B(1 − p) · mF = B(1 − p) [ mS − mF ] .
+
+A.4 Pass@ k Based Methods  
+
+> A.4.1 Pass@
+
+k (Tang et al.) 
+
+The leave-one-out advantage of Tang et al. (2025) is Ai = max k(r) − max k(r−i), where max k(r) = 1[∃ j :
+
+rj = 1] is the pass@ k indicator over a group of k samples and r−i excludes sample i.
+
+Failed samples ( ri = 0 ). Removing a zero does not change the maximum: max k(r) = max k(r−i) regardless of the other samples, so Ai = 0 for all i ∈ F .17 Successful samples ( ri = 1 ). We have max k(r) = 1 . The leave-one-out is max k(r−i) = 1[∃ j̸ = i : rj = 1] , so: 
+
+Ai = 1 − 1[∃ j̸ = i : rj = 1] = 1[sample i is the only success ].
+
+Hence Ai = 1 when |S| = 1 and i is the unique success, and Ai = 0 when |S| ≥ 2.
+
+Gradient. Since only the unique-success case contributes: 
+
+∇ =
+
+> k
+
+∑
+
+> i=1
+
+Ai∇ log πθ (τi) = 
+
+{∇ log πθ (τs) = mS if |S| = 1 ,
+
+0 otherwise. Taking expectations, Pr [|S| = 1] = (k
+
+> 1
+
+)p q k−1 = kpq k−1, so: 
+
+E[∇] = kpq k−1 mS − 0 · mF ,
+
+giving mS = kpq k−1 and mF = 0 .Unlike the sign-balanced methods (where the masses are deterministic for any fixed batch), here the gradient is zero in most batches and only fires when exactly one of k samples succeeds. 
+
+A.4.2 Analytical Pass@ k (Chen et al.) 
+
+Chen et al. (2025) define the group pass@ k estimator Rk = 1 − (Fk
+
+)/(Gk
+
+) over G rollouts with F failures and 
+
+S = G − F successes, with σk = √Rk(1 − Rk). The per-sample advantages are: 
+
+As = 1 − Rk
+
+σk
+
+, Af = 1
+
+σk
+
+(
+
+1 − Rk −
+
+(F −1
+
+> k−1
+
+)(G−1
+
+> k−1
+
+))
+
+.
+
+Simplification. Define Q′ 
+
+> k−1
+
+:= (F −1
+
+> k−1
+
+)/(G−1
+
+> k−1
+
+). The identity (Fk
+
+)/(Gk
+
+) = ( F /G) Q′ 
+
+> k−1
+
+gives 1 − Rk = ˆ q Q ′
+
+> k−1
+
+,so: 
+
+As = ˆq Q ′
+
+> k−1
+
+σk
+
+, Af = Q′
+
+> k−1
+
+(ˆ q − 1) 
+
+σk
+
+= −ˆp Q ′
+
+> k−1
+
+σk
+
+.
+
+Both cases unify into Ai = Q′
+
+> k−1
+
+(ri − ˆp)/ σk, which is exact for any finite G and has the C · (ri − ˆp) structure guaranteeing sign balance. Following the GRPO pattern with |S| = Gˆp and |F | = Gˆq:
+
+∇ = ˆq Q ′
+
+> k−1
+
+σk
+
+· S · mS − ˆp Q ′
+
+> k−1
+
+σk
+
+· F · mF = Gˆpˆq Q ′
+
+> k−1
+
+σk
+
+[mS − mF ] .
+
+Substituting Q′ 
+
+> k−1
+
+= (1 − Rk)/ˆ q and σk = √Rk(1 − Rk):
+
+mS = mF = ˆ p 1 − Rk
+
+σk
+
+= ˆ p
+
+√ 1 − Rk
+
+Rk
+
+.
+
+At k = 1 , R1 = S/G = ˆ p, so mS = mF = √ˆpˆq, recovering GRPO. In the population limit ( G → ∞ ), 
+
+Rk → 1 − qk and Q′ 
+
+> k−1
+
+→ qk−1, giving Ai → qk−1(ri − p)/ σk and mS = mF = p√qk/(1 − qk).
+
+Remark. If one were to naively set the baseline to Rk instead of ˆp, i.e. Ai = ( ri − Rk)/ σk, one would obtain 
+
+mS = p(1 −Rk)/ σk̸ = mF = qR k/σk for k > 1. The per-sample baseline must remain at ˆp for sign symmetry to hold. 
+
+A.4.3 Mix Pass@1/Pass@ k (Chen et al.) 
+
+Chen et al. (2025) also propose a convex combination of pass@1 and pass@ k advantages: 
+
+Amix i = p · ˆApass @k + q · ˆApass @1.
+
+18 Both components have the mean-centered structure C · (ri − p):
+
+ˆApass @1 = ri − pσ1
+
+, ˆApass @k = qk−1(ri − p)
+
+σk
+
+.
+
+A linear combination of mean-centered terms remains mean-centered: 
+
+Amix i =
+
+( pq k−1
+
+σk
+
++ qσ1
+
+)
+
+(ri − p) =: Cmix (ri − p).
+
+Since this is of the form C · (ri − p), it is automatically sign-balanced. Following the GRPO pattern: 
+
+∇ = Cmix 
+
+[
+
+q ∑
+
+> i∈S
+
+∇ log πθ (τi) −p ∑
+
+> i∈F
+
+∇ log πθ (τi)
+
+]
+
+= Cmix · Bpq [mS − mF ] .
+
+So mS = mF = Cmix · pq . Noting that the success-side advantages are ˆA(k) 
+
+> s
+
+= Ckq = qk/σk and ˆA(1)  
+
+> s
+
+= q/σ1:
+
+Cmix · pq = p
+
+p · Ckq
+
+︸︷︷︸ 
+
+> ˆA(k)
+> s
+
++q · C1q
+
+︸︷︷︸ 
+
+> ˆA(1)
+> s
+
+ = p
+
+(
+
+p ˆApass @k + q ˆApass @1
+
+)
+
+,
+
+confirming mS = mF = p
+
+(
+
+p ˆApass @k + q ˆApass @1
+
+)
+
+.
+
+A.5 Biasing towards Negatives with a Shifted Baseline 
+
+A series of policy weights propose to shift up or down the positive weights by adding a fixed offset to GRPO (Arnal et al., 2026) or to REINFORCE (Sutton, 1988), or using the minimum reward over the batch as an offset (Garg and Venkatesh, 2025). We’ll derive the advantage weight of AsymRL which can be generalized to other types of offsets, the advantage of AsymRL is: 
+
+Ai = ri − (¯ r + δ).
+
+With binary rewards ri ∈ { 0, 1} and ¯r = p, the per-trajectory weights are: 
+
+As = 1 − p − δ = q − δ, Af = −p − δ = −(p + δ).
+
+Splitting the gradient over successful and failed trajectories: 
+
+∇AsymRL = ∑
+
+> i∈S
+
+(q − δ) ∇ log πθ (τi) − ∑
+
+> i∈F
+
+(p + δ) ∇ log πθ (τi)= ( q − δ) · | S| · mS − (p + δ) · | F | · mF
+
+= Bp (q − δ) mS − Bq (p + δ) mF ,
+
+At δ = 0 we recover mean GRPO but in practice, Arnal et al. (2026) recommend δ = 0 .01 .
+
+A.6 Quantile Baseline and MC-GRPO 
+
+The quantile baseline (Dabney et al., 2018) replaces the mean baseline with the τ -quantile of the batch rewards: Ai = ri − Qτ (r), where Qτ is the τ -th quantile. With binary rewards ri ∈ { 0, 1}, the quantile is a step function of the solve rate: 
+
+Qτ (r) = 
+
+{
+
+0 if p ≤ τ, 
+
+1 if p > τ. 
+
+Case 1: p ≤ τ (hard problems). The baseline is 0, so As = 1 , Af = 0 . Only successes contribute: 
+
+∇ = ∑
+
+> i∈S
+
+∇ log πθ (τi) = Bp ¯∇S .
+
+Hence mS = p and mF = 0 .19 Case 2: p > τ (easy problems). The baseline is 1, so As = 0 , Af = −1. Only failures contribute: 
+
+∇ = − ∑
+
+> i∈F
+
+∇ log πθ (τi) = −Bq ¯∇F .
+
+Hence mS = 0 and mF = q.Combining both cases: mS = p 1[p ≤ τ ] and mF = q 1[p > τ ]. The quantile baseline is always sign-biased for binary rewards: it learns only from successes on hard problems and only from failures on easy ones, never both simultaneously. MC-GRPO (Kim, 2026) uses the median as the baseline, Ai = ri − med (r), which is the special case τ = 12 .With binary rewards, med (r) = 1[p > 12 ], so the masses reduce to mS = p 1[p ≤ 12 ] and mF = q 1[p > 12 ]: the method switches abruptly from pure positive reinforcement to pure negative reinforcement at p = 12 .
+
+A.7 Binary Contrastive 
+
+The binary contrastive weight (Greensmith et al., 2004) is W (τ ) = 1r=1 − ¯p  
+
+> 1−¯p
+
+1r=0 so we have mS = p × 1
+
+and mF = (1 − p) × p 
+
+> 1−p
+
+= p.
+
+A.8 Power Norm 
+
+The Power Norm advantage (Andrychowicz et al., 2021) is Ai = ri−¯r 
+
+> [¯ r(1 −¯r)] γ
+
+. With binary rewards and ¯r = p:
+
+As = q
+
+(pq )γ , Af = p
+
+(pq )γ .
+
+The gradient is: 
+
+∇ = q
+
+(pq )γ · Bp mS − p
+
+(pq )γ · Bq mF = Bpq 
+
+(pq )γ [mS − mF ] .
+
+Hence mS = mF = pq /( pq )γ = p1−γ q1−γ . At γ = 1/2 this recovers GRPO; at γ = 0 it recovers Dr. GRPO. 
+
+A.9 Function-Based Policy Weights 
+
+Both Softmax and Logmeanexp aggregate rewards through the exponential partition function. With |S| = Gp 
+
+successes and |F | = Gq failures in a batch of G rollouts, the partition function is: 
+
+Z := |S| eβ + |F | = G(pe β + q) = G[1 + p(eβ − 1) ].
+
+The per-sample softmax weights are softmax β (1) = eβ /Z and softmax β (0) = 1/ Z.
+
+Softmax (Shao et al., 2024). The advantage Ai = softmax β (ri) − 1/ G subtracts a uniform baseline. Substi-tuting: 
+
+As = eβ
+
+Z − 1
+
+G = (eβ − 1) qZ , Af = 1
+
+Z − 1
+
+G = −p(eβ − 1) 
+
+Z .
+
+The gradient is: 
+
+∇ = As · Gp mS − | Af | · Gq mF = (eβ − 1) pq pe β + q [mS − mF ] .
+
+Hence mS = mF = (eβ −1) pq   
+
+> 1+ p(eβ−1)
+
+, which is sign-balanced. As β → 0, this recovers Dr. GRPO; as β → ∞ , it converges to the pass@ k advantage. 20 Logmeanexp (Jiang et al., 2025). The advantage Ai = lme β (r) − lme β (r−i) uses the same partition function through a leave-one-out log-difference, where lme β (r) = 1 
+
+> β
+
+log (Z/G). Removing a success shifts Z → Z − eβ
+
+while removing a failure shifts Z → Z − 1. Taking the log breaks the sign symmetry: removing a high-weight success changes log Z more than removing a failure. In expectation: 
+
+mS = pe β
+
+pe β + q , mF = qpe β + q .
+
+The ratio mS /mF = pe β /q is sign-biased: successes are exponentially upweighted. As β → 0, mS → p and 
+
+mF → q (REINFORCE). As β → ∞ , mS → 1 and mF → 0 (pure positive reinforcement). 
+
+A.10 HA-DW 
+
+HA-DW (Yang et al., 2026) uses a hardness-aware dynamic weight: W (τ ) = A · λ exp (−sgn ( ˆA) sgn (ˆ r −
+
+Ct) |ˆr − Ct|), where Ct is a running baseline. With binary rewards, letting A denote the base advantage and the exponential modulate based on whether the reward exceeds the baseline: 
+
+mS = f (Ct, p ) qp, mF = qp, 
+
+where f (Ct, p ) depends on the exponential modulation. The negative mass matches Dr. GRPO while the positive mass is scaled by a hardness-dependent factor. 
+
+A.11 ReLU Advantage 
+
+The ReLU advantage (Srinivasan et al., 2018) is Ai = max (0 , r i − ¯r). With binary rewards: As = max (0 , q ) = 
+
+q, A f = max (0 , −p) = 0 . gives a purely positive gradient: ∇ = q · Bp mS = Bpq mS . Hence mS = pq and 
+
+mF = 0 . ReLU is sign-biased: it reinforces successes with the same magnitude as Dr. GRPO but completely ignores failures. 
+
+## B Extension to Multi-Turn and Connection to Resampling 
+
+B.1 Generalizing the framework to multi-turn rollouts 
+
+The decomposition ∇θ J = mS ¯∇S − mF ¯∇F relies only on linearity of expectation over per-token weights and is therefore agnostic to whether a trajectory is generated in a single turn or interleaved with environment / tool feedback across multiple turns. We make the extension explicit here. 
+
+Setup. A multi-turn rollout decomposes a trajectory as τ = ( τ1, τ 2, . . . , τ T ), where turn t is generated from a state st that depends on (τ1, . . . , τ t−1) and any intervening environment observations o<t . Tokens generated by the policy carry a per-token weight wt; environment-supplied tokens are masked from the gradient. The policy gradient is: 
+
+∇θ J = Eτ
+
+[ T∑
+
+> t=1
+
+∑
+
+> a∈τt
+
+wt,a ∇θ log πθ (a | st)
+
+]
+
+. (15) Splitting wt,a = w+ 
+
+> t,a
+
+− w− 
+
+> t,a
+
+and summing over turns yields 
+
+∇θ J =
+
+> T
+
+∑
+
+> t=1
+
+[ m(t) 
+
+> S
+
+¯∇(t) 
+
+> S
+
+− m(t) 
+
+> F
+
+¯∇(t)
+
+> F
+
+], (16) with per-turn masses 
+
+m(t) 
+
+> S
+
+= ρt · E[ w+
+
+> t
+
+∣∣ turn t reached ] ,m(t) 
+
+> F
+
+= ρt · E[ w−
+
+> t
+
+∣∣ turn t reached ] ,
+
+where ρt := Pr πθ (turn t is reached ) is the reachability factor of turn t. Single-turn is the special case T = 1 ,
+
+ρ1 = 1 , recovering Section 2 exactly. 21 Algorithm 1 Power α (static)  
+
+> Require:
+
+Policy πθ , prompts Q, unit tests Tq , power α ≥ 1  
+
+> 1: for
+
+step t = 1 , . . . , T do  
+
+> 2:
+
+Sample G rollouts per prompt; score ri ← Exec (τi, Tq ) 
+
+> 3:
+
+¯r ← 1
+
+> |B|
+
+∑ 
+
+> i
+
+ri  
+
+> 4: for
+
+each rollout i ∈ B do  
+
+> 5:
+
+Ai ← (1 −¯r)α−1(ri − ¯r)  
+
+> 6: end for
+> 7:
+
+Update θ via PPO clipping ( ε=0 .2) using advantages {Ai} 
+
+> 8: end for
+
+B.2 Resampling failures with fixed context ≡ Power α = 2 
+
+A natural multi-turn schedule is to retry only failed prompts. We show that when the retry uses the same prompt context (no information added between attempts), one round of GRPO-on-failures produces an update with the same gradient mass as Power α = 2 (Table 1). 
+
+Setup. Fix a prompt with success rate p and let q := 1 − p. Round 1 samples a batch of B rollouts and applies GRPO. Round 2 only fires for prompts that failed in round 1 (probability q); it samples a fresh batch of B rollouts from the same prompt context and applies GRPO again. For round 1 mass we have the standard GRPO m(1)  
+
+> S
+
+= m(1)  
+
+> F
+
+= Bpq. . The reachability factor for round 2 is ρ2 = q. Because the resample shares the same context, the within-round success rate is again p and within-round GRPO yields the same closed form Bpq . Multiplying by reachability: m(2)  
+
+> S
+
+= m(2)  
+
+> F
+
+= ρ2 · Bpq =
+
+q · Bpq = Bpq 2.
+
+Interpretation. The qα−1 multiplier in the Power-α family is therefore not arbitrary: for integer α, it is exactly the marginal contribution of one extra GRPO retry on the failed prompts. It can be implemented either as a within-batch reweighting (cheap, no extra rollouts) or as an explicit resample loop. 
+
+## C FADE Scheduler Additional Results 
+
+Algorithm 2 details the full FADE procedure. Two exponential moving averages track the online solve rate 
+
+ˆp and policy entropy ˆH, which respectively control the difficulty focus α and the sign bias δ. Crucially, α
+
+and δ are updated from the smoothed EMAs, while the per-sample advantage uses the batch-level mean ¯r.For binary rewards, the resulting per-prompt gradient masses are mS = pq α and mF = pq α/δ, so the sign ratio is mS /mF = δ: when entropy exceeds H∗, δ = 1 (sign-balanced); as entropy drops, δ decreases and the negative mass dominates, triggering exploitation. Figure 9 summarizes our ablation study on each FADE component. 
+
+δ(t) = δ0 − (δ0 − δmin ) log (1 + t/τδ )
+
+log (1 + T /τδ ) ,δ0 = 1 .0, δ min = 0 .802 , τ δ = 12264 , (17) 
+
+α(t) = α0 − (α0 − αmin ) log (1 + t/τα)
+
+log (1 + T /τα) ,α0 = 2 .0, α min = 1 .917 , τ α = 8500 , (18) where T is the total number of training steps. We fitted a logarithmic decay curve to the Qwen 2.5 7B results 
+
+α, δ evolution per timestep to estimate these parameters. 22 Algorithm 2 FADE: Focal Advantage with Dynamic Entropy (additions over Alg. 1) 
+
+Require: Policy πθ , prompts Q, unit tests Tq , target entropy H∗, max power αmax , EMA coefficient β=0 .02 
+
+1: Initialize ˆp ← 0.5, ˆH ← H0(πθ )
+
+2: for step t = 1 , . . . , T do 
+
+3: Sample G rollouts per prompt; score ri ← Exec (τi, Tq )
+
+4: ¯r ← 1
+
+> |B|
+
+∑ 
+
+> i
+
+ri, Ht ← 1
+
+> |B|
+
+∑ 
+
+> i1
+> Ti
+
+∑ 
+
+> t
+
+− log πθ (a(i) 
+
+> t
+
+| q, a (i)
+
+> <t
+
+)
+
+5: ˆp ← β ˆp + (1 −β) ¯ r, ˆH ← β ˆH + (1 −β) Ht
+
+6: α ← clip ( 3(1 − ˆp)2 ˆ p , 1, α max 
+
+), δ ← clip (1 + ˆH − H∗, 0.3, 1)
+
+7: for each rollout i ∈ B do 
+
+8: Ai ← (1 −¯r)α−1(ri − ¯r) / 
+
+{
+
+1 ri ≥ ¯rδ ri < ¯r
+
+9: end for 
+
+10: Update θ via PPO clipping ( ε=0 .2) using advantages {Ai}
+
+11: end for 5 10 15 20 25 30                 
+
+> Training Step (k)
+> 0.34
+> 0.36
+> 0.38
+> 0.40
+> 0.42
+> pass@1
+> pass@1
+> 510 15 20 25 30
+> Training Step (k)
+> 0.50
+> 0.52
+> 0.54
+> 0.56
+> 0.58
+> pass@10
+> pass@10
+> 510 15 20 25 30
+> Training Step (k)
+> 0.58
+> 0.60
+> 0.62
+> 0.64
+> 0.66
+> 0.68
+> pass@100
+> pass@100
+> FADE no parameter no parameter adaptive to entropy Log Decay Scheduler
+
+Figure 9 Ablation Study on FADE reveals adaptive α only collapses whereas scheduling both on entropy and ablation α
+
+worsens pass@ 100 diversity with Qwen 2.5 7B on LiveCodeBench at 8k reasoning. 
+
+## D Training and Evaluation Details 
+
+D.1 Infrastructure and Hyperparameters 
+
+Similar to Gehring et al. (2025); Noukhovitch et al. (2025), we use an asynchronous distributed RL framework and a separate CPU cluster for code evaluations. Concretely we have a set of GPUs and CPUs that are divided into: • samplers (H-100): produce code generations and send them to the CPUs, • evaluators (CPU): evaluate the generated code against unit tests, • trainers (H-100): receive the code tokens, their log probabilities and rewards to perform a backward update on our model. The model travels between samplers and trainers so we always have the most updated model for generations. In practice, sampling is much slower than training so we have a trainer/sampler ratio of roughly 0.14 for Qwen 2.5 7B and 0.375 for CWM 32B. For Qwen 2.5 7B runs, we use 8 nodes ( 64 GPUs) with 1 trainer node and 7 sampler nodes. For CWM 32B runs, we use 32 nodes with 12 trainer nodes and 20 sampler nodes. Since we train with reasoning, we have varying sequence length and batch our answers by tokens rather than per sample using max tokens per batch = 32768 . Since we generate maximum 8192 tokens for the Qwen 2.5 23 7B and 32768 for the CWM 32B, we have respectively at least 4 and 1 sample per batch.     
+
+> Table 2 Qwen 2.5 7B: gradient ratio vs. baseline and learning rate required to equalize gradient magnitude across normalization schemes (baseline LR = 1 e−7).
+> Run / Normalization Grad Ratio vs Baseline LR to Equalize
+
+pass_at_(8) 0.04x 2.67e-06 
+
+logmeanexp(0.4) 0.07x 1.52e-06 
+
+power_alpha(3) 0.20x 5.03e-07 
+
+power_alpha(2) 0.27x 3.67e-07 
+
+implicit_pass_at(8) 0.61x 1.63e-07 
+
+implicit_pass_at(2) 0.66x 1.51e-07 
+
+AsymRL 0.97x ∼1e-7 
+
+GRPO mean 1.00x 1e-7 
+
+MaxRL 2.82x 3.54e-08 We use all advantages within the PPO clipping framework 
+
+rt(θ) = πθ (at | st)
+
+πθold (at | st) , (19) 
+
+Lt(θ) = − min 
+
+(
+
+rt(θ) ˆAi, clip (rt(θ), 1−εlow , 1+ εhigh 
+
+) ˆAi
+
+)
+
+(20) with εlow = εhigh = 0 .2 for Qwen 2.5 7B and εlow = 0 .2, εhigh = 0 .25 for CWM 32B. The aggregated loss is 
+
+L(θ) = 1
+
+> Tmax
+
+∑
+
+> i
+
+∑ 
+
+> t∈A i
+
+Lt(θ) where Ai is the set of agent (model-generated) token positions in rollout i, and 
+
+Tmax is the maximum token budget per microbatch (8192 × batch_size for the 7B model and 32768 × batch size for the 32B model). 
+
+D.2 Full Evaluation Results 
+
+We evaluate models trained with different advantage functions at their peak performance during training (typically around 20 ×10 3 RL steps), using the same training setup across all runs and varying only the reward normalization. To reduce variance across checkpoints, we select evaluation points where pass@ k has stabilized, meaning at least 1000 consecutive steps yield similar results. For each advantage their required number of training steps can be found in table 6. For each pass@ k metric, we draw 2k samples and compute the mean over 400 groups of size 2k to estimate the standard deviation. Results can be found for LiveCodeBench v6 in table 3, v5 in table 6 and for AIME benchmarks in table 4 and table 5. 
+
+D.3 Gradient Ratios in Practice 
+
+In Section 4.1, we claim the speed of entropy collapse depends on the positive-to-negative ratio ρ(p) = mS pmF q
+
+and show empirically in Figure 4 a strong correlation between this ratio and the final policy entropy after a fixed number of training steps. Mid-way through training (at approximately 15k gradient steps), we observed an average solve rate of 0.3 for Qwen 2.5 7B and 0.5 for the CWM 32B. Using those values for ¯p, Table 7 shows the positive to negative mass ratios used per policy weight. All sign-balanced methods share ρ(p) = p
+
+> 1−p
+
+since mS = mF .To compare entropy collapse under equalized gradient scales, we adapt the learning rate η for each method using their η · max i |Ai| magnitude. The reference η is 1e−7 for the Qwen 2.5 7B and 1.8e−7 for CWM 32B (see table 2). Using GRPO as a reference, policy weights with smaller maximum values get larger learning rates and vice versa. This ensures differences are due to the policy weight function, not its overall scale. Figure 14 shows how non-equalized learning rate can speed up or slow down entropy collapse. 24 Qwen 2.5 7B SFT CWM 32B 
+
+8k budget 30k budget  
+
+> Method
+
+p@1 p@10 p@100 p@1 p@10 p@100 p@200 
+
+Baselines 
+
+SFT model 15.2 42.3 52.2 37.5 ±3.4 54.0 ±4.0 69.0 72.5 REINFORCE 29.4 ±0.0 45.3 ±5.2 55.8 ±3.0 — — — —GRPO 37.4 ±2.4 53.6 ±2.1 62.5 ±0.2 62.0 ±1.6 76.7 ±0.6 83.7 85.0 
+
+Existing methods 
+
+Implicit p@2 39.7 ±1.7 56.2 ±0.8 65.2 ±0.9 — — — —Implicit p@8 38.0 ±2.0 54.3 ±1.6 64.7 ±0.6 — — — —LME β = 0 .4 35.9 ±2.8 52.5 ±3.1 62.0 ±1.0 — — — —Pass@8 33.8 ±2.5 51.7 ±3.1 61.1 ±1.0 — — — —Asym. norm 38.1 ±1.7 53.4 ±1.0 63.0 ±0.6 — — — —
+
+New Methods 
+
+Asym δ = 0 .5 35.7 ±2.0 51.8 ±1.4 60.5 ±0.1 — — — —Power α = 2 40.3 ±1.2 56.6 ±0.7 66.0 ±0.9 61.2 ±1.4 76.7 ±0.6 82.9 83.9 Power α asym (2,2) 40.0 ±1.7 56.0 ±1.3 64.9 ±0.2 62.8 ±1.1 76.2 ±0.8 83.3 84.6 FADE h∗ = 1 .0 40.7 ±1.0 58.0 ±0.7 68.2 ±1.2 63.1 ±1.2 77.9 ±0.9 85.3 86.3 
+
+Table 3 Pass@ k evaluation results with standard deviations on LiveCodeBench v6 (454 problems, Aug 2024-May 2025). 
+
+## E Pass@ k Scaling Law: Proof and Fitting Details 
+
+We frame diversity as: how fast does pass@ k increase with k? If we define pass@ k = Ep[1 − (1 − p)k] = 1 − Ep[(1 − p)k] where p is the per-problem pass@ 1 rate, the asymptotic behavior depends on the distribution of p near 0.
+
+E.1 Theory of Scaling Laws of Pass@k 
+
+We adapt the proof from Schaeffer et al. (2025). Let pD (p) be the density of pass@ 1 rates over a dataset D,and pass D@k = Ep∼D [1 − (1 − p)k].
+
+Theorem E.1 (Dichotomy of Scaling Behavior) . The asymptotic behavior of pass D@k as k → ∞ is deter-mined by pD (p) near p = 0 :1. Power-law regime: If pD (p) = Cp b−1 + O(pb−1+ θ ) as p → 0+ (C, b, θ > 0), then pass D@k = 1 −
+
+C Γ( b) k−b + o(k−b).2. Rapidly decaying regime: If pD (p) ≤ C exp (−c/pα) as p → 0+ (c, α > 0), then 1 − pass D@k = o(k−b)
+
+for all b > 0.Proof. Since (1 − p)k ≈ e−kp for large k, we have 1 − pass D@k ≈ ∫ 10 e−kp pD (p) dp , a Laplace-type integral dominated by small p.
+
+Case 1. With pD (p) ∼ Cp b−1, the tail [ϵ, 1] is exponentially small in k, so 1 − pass D@k ≈ C ∫ ∞ 
+
+> 0
+
+pb−1e−kp dp =
+
+C k −b Γ( b), where the last step uses u = kp .
+
+Case 2. The integrand e−kp −c/pα
+
+is maximized at p∗ ∼ k−1/(1+ α), giving ∫ 10 e−kp pD (p) dp ≤ exp (−Ω( kα/(1+ α))) ,which decays faster than any power of k.
+
+E.2 From Asymptotic to Empirical Fits 
+
+As shown above, the k vs. pass@ k scaling law follows an exponential or polynomial growth as k → ∞ based on the distribution of solve rates near p. We analyze the distribution of per-prompt solve rates ˆp across the training set at fixed checkpoint steps for the Qwen 2.5 7B (Figures 10a) and CWM 32B models (Figure 10b). Rather than shifting smoothly from hard to easy, the solve-rate distribution is strongly bimodal at both 25 Table 4 Pass@k evaluation on AIME benchmarks for Qwen 2.5 7B SFT (14k training budget) (%). 
+
+AIME2024 AIME2025 
+
+Method p@1 p@10 p@100 p@1 p@10 p@100 
+
+Baselines 
+
+SFT baseline 32.6 ±4.2 65.3 ±1.2 78.1 ±4.2 21.3 ±3.5 46.2 ±3.0 70.8 ±5.0 
+
+GRPO 37.9 ±5.2 70.4 ±1.9 81.4 ±2.7 24.6 ±3.2 50.3 ±2.5 68.3 ±3.3 
+
+Existing methods 
+
+Implicit p@2 36.0 ±4.2 66.1 ±2.8 73.3 ±0.0 24.9 ±3.0 45.0 ±3.3 63.7 ±4.7 
+
+Implicit p@8 40.3 ±4.0 69.6 ±1.9 76.7 ±1.7 27.5 ±3.4 52.5 ±3.3 69.1 ±5.0 
+
+Asym. norm 40.2 ±4.2 69.1 ±1.7 78.3 ±4.3 27.5 ±3.4 52.0 ±2.4 63.3 ±3.3 
+
+Pass@8 35.7 ±4.6 68.0 ±2.9 82.1 ±3.2 24.4 ±3.0 49.3 ±2.4 70.4 ±6.9 
+
+LME β = 0 .4 39.3 ±4.7 71.0 ±3.4 82.4 ±1.9 25.4 ±3.1 51.0 ±4.0 72.5 ±6.9 
+
+New methods 
+
+Asym. GRPO δ = 0 .5 43.1 ±4.6 69.1 ±1.0 79.2 ±2.7 26.6 ±3.0 48.3 ±3.2 66.0 ±3.2 
+
+Power α = 2 41.8 ±4.4 70.4 ±1.3 77.9 ±1.7 26.6 ±2.8 50.0 ±3.0 64.9 ±1.7 
+
+Power α asym (2,2) 41.1 ±4.2 71.9 ±1.9 86.1 ±5.0 27.4 ±3.4 53.3 ±2.2 66.6 ±2.7 
+
+FADE (ours) 
+
+FADE h∗ = 0 .5 41.9 ±4.2 70.9 ±1.1 79.6 ±3.2 27.8 ±2.7 52.9 ±2.2 67.5 ±4.3 
+
+FADE h∗ = 1 .0 44.5 ±4.6 72.3 ±2.2 83.7 ±5.0 28.6 ±3.4 53.8 ±1.8 68.3 ±1.9 
+
+FADE h∗ = 1 .3 44.3 ±3.6 71.8 ±2.0 80.8 ±0.0 31.3 ±3.7 55.4 ±2.9 70.7 ±1.9 
+
+Table 5 Pass@k evaluation on AIME benchmarks for CWM 32B (30k training budget) (%). 
+
+AIME2024 AIME2025 
+
+Method p@1 p@10 p@100 p@1 p@10 p@100 
+
+Baselines 
+
+GRPO 58.4 ±5.0 87.4 ±0.8 94.9 ±1.7 46.1 ±4.8 77.2 ±2.0 80.0 ±0.0 
+
+New methods (ours) 
+
+Power α = 2 41.2 ±5.3 81.9 ±2.6 91.7 ±1.7 27.4 ±4.6 70.4 ±2.9 84.6 ±3.2 
+
+Power asym (2,2) 70.3 ±3.5 89.2 ±1.5 93.3 ±1.7 58.7 ±4.2 78.1 ±1.4 83.3 ±3.2 
+
+Asym FADE h∗ = 1 .0 64.6 ±4.7 89.5 ±2.6 93.3 52.7 ±5.1 78.5 ±1.6 83.1 
+
+scales, with most mass concentrated near p = 0 (unsolved) and p = 1 (fully solved) and relatively little weight in the intermediate range. We found both the power and exponential laws tended to overestimate pass@ k values for lower k so for geometric fitting rather than asymptotic behavior prediction, we opted for a shifted power law. We use 
+
+G(k) = exp (−a(k + k0)−b) with three parameters: a (scale), b (exponent), and k0 (horizontal shift) (see Figure 11, 12, 13) which in practice has the lowest MSE across problem difficulty splits. 
+
+## F Proof Entropy Change 
+
+We adapt the proof of Cui et al. (2025) to the discrete update setting and generalize to advantages with 
+
+E[A]̸ = 0 .
+
+Theorem F.1 (Entropy change per update step) . Let πθ (a|s) be a policy parameterized by θ, with entropy 
+
+H(π) = − ∑
+
+a π(a|s) log π(a|s). Suppose the parameters are updated via a policy gradient step θt+1 = θt +
+
+η Ea∼π [A∇θ log πθ (a|s)] where A is an advantage function with E[A] = mS − mF . Then, under a local projection assumption, the per-step entropy change satisfies: ∆H ≈ η [( mS − mF ) H − Cov (A, log πθ )]+ O(η2),where the approximation is a first-order Taylor expansion in the learning rate η.Proof. Step 1: First-order approximation. The entropy after one update is H(θt+1 ) = H(θt + η E[A∇θ log π]) .26 Qwen 2.5 7B SFT CWM 32B 
+
+8k budget 30k budget  
+
+> Method
+
+Steps p@1 p@10 p@100 Steps p@1 p@10 p@100 p@200 
+
+Baselines 
+
+SFT model 0 21.9 ±0.8 59.7 ±0.4 71.2 ±0.2 0 51.6 ±0.8 75.6 ±0.4 85.1 86.9 REINFORCE 17.5k 40.7 ±0.6 60.2 ±0.4 69.8 ±0.2 — — — — —GRPO 20k 52.6 ±0.7 71.8 ±0.4 80.6 ±0.2 13.4k 77.3 ±0.6 89.0 ±0.2 92.0 92.6 
+
+Existing methods 
+
+Implicit p@2 30k 55.3 ±0.7 73.3 ±0.4 80.9 ±0.2 — — — — —Implicit p@8 30k 55.7 ±0.6 72.5 ±0.4 80.9 ±0.2 — — — — —LME β = 0 .4 20k 51.0 ±0.6 70.8 ±0.4 79.9 ±0.2 — — — — —Pass@8 30k 48.3 ±0.7 70.5 ±0.4 80.0 ±0.2 — — — — —Asym. norm 20k 54.1 ±0.6 70.9 ±0.4 79.2 ±0.2 — — — — —
+
+New Methods 
+
+Asym δ = 0 .5 40k 53.4 ±0.6 71.1 ±0.4 79.6 ±0.2 — — — — —Power α = 2 50k 56.3 ±0.6 73.8 ±0.4 82.1 ±0.2 17.5k 77.9 ±0.6 89.4 ±0.2 92.3 92.7 Power α asym (2,2) 20k 56.1 ±0.6 73.6 ±0.4 81.5 ±0.2 15k 78.7 ±0.5 88.9 ±0.2 92.0 92.6 FADE h∗ = 1 .0 30k 56.1 ±0.6 73.6 ±0.3 82.0 ±0.2 15k 78.9 ±0.5 89.3 ±0.2 92.5 93.2 
+
+Table 6 Pass@ k evaluation results with standard deviations on LiveCodeBench v5 (879 problems: 279 easy, 330 medium, 270 hard). 7B at 8k token budget, CWM 32B at 30k. Steps is the RL step selected for evaluation when evaluation results plateau (SFT = 0 , i.e. no RL). 
+
+(a) 7B (b) 32B 
+
+Figure 10 Solve-rate distribution during training. Distribution of per-prompt solve rates at fixed checkpoint steps for (a) 7B and (b) 32B. We compare fits minimizing the mean squared error (MSE) with a Beta-Binomial distribution BetaBin (G, a, b ) and a two component Beta mixture π, Beta (a1, b 1) + (1 − π), Beta (a2, b 2).
+
+Expanding to first order in η:
+
+∆H := H(θt+1 ) − H (θt) = η ∇θ H⊤ E[A∇θ log π] + O(η2). (21) This linearization is the source of the approximation: higher-order terms in η are neglected, so the result is accurate for small learning rates. 
+
+Step 2: Entropy gradient. Applying the product rule to ∇θ H:
+
+∇θ H(π) = − ∑
+
+> a
+
+(∇θ π(a|s) log π(a|s) + π(a|s)∇θ log π(a|s)). (22) Using the log-derivative trick ∇θ π = π∇θ log π and the identity ∑ 
+
+> a
+
+π(a|s)∇θ log π(a|s) = ∇θ
+
+∑ 
+
+> a
+
+π(a|s) = 0 ,this simplifies to ∇θ H(π) = −Ea∼π [log π ∇θ log π]
+
+Step 3: Substitution. Inserting (22) into (21): 
+
+∆H ≈ − η E[log π ∇θ log π]⊤E[A ∇θ log π]. (23) 
+
+Step 4: Local projection assumption. When the score vectors ∇θ log π span the relevant variation space, as holds exactly under natural policy gradients with the Fisher information metric, the inner product in parameter 27 Figure 11 Shifted power-law fits across budgets. Pass@ k curves and their fitted shifted power laws at budget 10 (left) and budget 50 (right). 
+
+Figure 12 Shifted Power Law Predicts Pass@k across different diffi-culty splits for an estimated pass@ 1 distribution (from 200 sam-ples) with small (left), medium (middle) and high mass near 0. 
+
+Method ρ(p) ρ(0 .3) ρ(0 .5) 
+
+Sign-balanced ( mS = mF )
+
+All (GRPO, MaxRL, T2T, PA) pq 0.43 1.00 
+
+Sign-biased ( mS̸ = mF )
+
+REINFORCE p2 
+
+> q2
+
+0.18 1.00 W-REINFORCE λp 2 
+
+> q2
+
+0.18 λ λ
+
+LogMeanExp ( β = 0 .4) p2eβ 
+
+> q2
+
+0.27 1.49 CoRPO ( rmin =0 .25 ) p2(1 −rmin ) 
+
+> q2rmin
+
+0.55 3.00 Asym. GRPO δ = 0 .5 δp q 0.21 0.50 
+
+Asym. Power α (2,2) p2−αf qαs−2 1.00 1.00 
+
+Table 7 Positive-to-negative ratio ρ(p) = mS ·pmF ·q for each advantage function, evaluated at two training solve rates. Since Pass@ k only has positive weights we remove it from the calculation. 
+
+space reduces to an expectation in action space: 
+
+E[log π ∇θ log π]⊤E[A ∇θ log π] ≈ E[A log π]. (24) This gives ∆H ≈ − η E[A log π].
+
+Step 5: Mean-covariance decomposition. Decomposing E[A log π] using E[A] = mS − mF and Ea∼π [log π] = 
+
+−H :
+
+E[A log π] = E[A] E[log π] + Cov (A, log π) = −(mS − mF ) H + Cov (A, log π). (25) Substituting: 
+
+∆H ≈ η [( mS − mF ) H − Cov (A, log π)] . (26) When mS = mF (sign-balanced advantages), the drift term vanishes and entropy dynamics are governed by the covariance alone: ∆H ≈ − η Cov (A, log π).
+
+## G Weight-Estimation Variance of Power α
+
+The Power α weight is w(p) = C p (1 −p)α, where C normalizes the peak to match GRPO: max  
+
+> p
+
+C p (1 −p)α = max  
+
+> p
+
+p(1 −p) = 14 . (27) 28 10 0 10 1 10 2 10 3 10 4                  
+
+> k
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> 0.8
+> pass@k
+> PA =2
+> 10 010 110 210 310 4
+> k
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> 0.8 Implicit p@2
+> 10 010 110 210 310 4
+> k
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> 0.8
+> Asym =0.5
+> 10 010 110 210 310 4
+> k
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> 0.8
+> PA asym (2,2)
+> SFT model step 900 step 10000 step 20000
+
+Figure 13 Evolution of the k vs. pass@k curve during RL for different advantage functions with similar pass@100 perfor-mances. We shorten the power α series to PA. 
+
+The maximum of p(1 −p)α is attained at p⋆ = 1/(1+ α), giving C = (1+ α)1+ α
+
+4 αα .In practice p is unknown; we estimate it from G independent rollouts as ˆp = k/G, where k ∼ Binomial (G, p ),so Var (ˆ p) = p(1 −p)/ G. Because the weight is a nonlinear function of ˆp, it inherits estimation noise. By the delta method ( G reasonably large), Var (w(ˆ p)) ≈ [w′(p)]2 Var (ˆ p). (28) Differentiating w(p) = C p (1 −p)α:
+
+w′(p) = C (1 −p)α−1[1 − (1+ α) p], (29) so the absolute variance is Var (w(ˆ p)) = C2 p (1 −p)2α−1 [1 − (1+ α) p]2
+
+G , (30) and the relative variance (coefficient of variation squared) is Var (w)
+
+w2 =
+
+[1 − (1+ α) p]2
+
+G p (1 −p) . (31) This vanishes at the weight mode p = 1/(1+ α) and grows quadratically in α away from it. Figure 7 shows the variance per solve rate p induced by different α powers. Larger α amplifies the weight-estimation noise for prompts away from the mode, adding a penalty Var (w)
+
+w2 (s2 +v) to the effective per-prompt noise (see Eq. (10)). This is a further downward force on the optimal α, beyond the Neff trade-off discussed in Section 4.3. The effect scales as O(1/ G).At mean solve rate ¯p, replacing GRPO ( α=1 ) with α=3 is justified only if harder prompts are more informative by s(p)/ s(¯ p) ≥ [2(1 −p)] 2. Table 8 gives the concrete multipliers. 
+
+Table 8 Minimum signal enrichment s(p)/ s(0 .5) required for α=3 to outperform GRPO at mean solve rate ¯p=0 .5 (iid noise, G=∞). At finite G the multipliers ease by ≤30 % because the p=0 .5 reference is itself penalized away from 
+
+α=3 ’s weight mode at 0.25 .
+
+solve rate p 0.10 0.20 0.25 0.30 0.40 signal needed vs. GRPO 3.2× 2.6× 2.25 × 2.0× 1.4×
+
+G.1 Sweet spot and the α–p relationship 
+
+The most informative difficulty is where the per-prompt ratio peaks, SNR 2(p) = s(p)2/v(p) ∝ s(p)2 p(1 − p).For s = e−cp :29 0 5 10 15 20 25 30 35 40 
+
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> 1.2
+> Entropy
+
+Non-Equalized LR Runs         
+
+> 0510 15 20 25 30 35 40
+
+Equalized LR Runs            
+
+> Steps (k)
+> GRPO (mean) PA =2 PA =3 Implicit p@2 Implicit p@8 Asym =0.5 Asym =1.5 Figure 14 Lower scale preserves entropy.
+
+Different advantages at the same learning rate (right) vs. at equalized learning rates (left). Higher gradient ratios correlate with faster entropy collapse. 
+
+s = e−cp sweet spot p⋆ α (G=∞) α (G=16) α (G=8) 
+
+c = 0 (flat) 0.50 1.00 0.90 0.92 
+
+c = 0 .5 (mild) 0.38 1.20 1.06 1.06 
+
+c = 1 (moderate) 0.29 1.44 1.26 1.22 
+
+c = 2 (strong) 0.19 2.09 1.74 1.64 The flat case peaks at p = 12 ; a mild-to-moderate slope ( c ≈ 0.5–1) moves the sweet spot into [0 .3, 0.5] ,with α ≈ 1.2–1.45 for known weights falling to ≈ 1.05 -1.25 once the weight-estimation correction is included (G=8 –16 ). 
+
+## H Weight-Space Analysis Details 
+
+H.1 Rank-1 Collapse Theory 
+
+The per-token policy gradient with advantage Ai is gi = Ai vi ⊗ hi, where vi = eyi − πi ∈ RV and hi ∈ Rd is the hidden state. Decomposing hi = αiu1 + h⊥ 
+
+> i
+
+along the top right singular vector u1 of G = E[gi] separates the batch gradient into a rank-1 signal and a higher-rank residual: 
+
+W∆ =
+
+> N
+
+∑
+
+> i=1
+
+Ai vi ⊗ hi =
+
+( N∑
+
+> i=1
+
+Aiαi vi
+
+)
+
+⊗ u1
+
+︸ ︷︷ ︸ 
+
+> M1(rank 1)
+
++
+
+> N
+
+∑
+
+> i=1
+
+Ai vi ⊗ h⊥
+
+> i
+
+︸ ︷︷ ︸ 
+
+> M2(higher rank)
+
+. (32) We quantify the degree of rank-1 collapse with r1 = σ21 (W∆)/ ∥W∆∥2 
+
+> F
+
+, the fraction of the update’s Frobenius energy captured by its leading singular component: r1 = 1 means W∆ is exactly rank-1. 
+
+Proposition H.1. Let {(Ai, v i, h i)}Ni=1 be i.i.d. with hi = αiu1 + h⊥ 
+
+> i
+
+, h⊥ 
+
+> i
+
+⊥ u1, u1 the top right singular vector of G, E[A2 
+
+> i
+
+∥vi∥2∥hi∥2] < ∞, and E[Aiαivi]̸ = 0 . Then 
+
+r1 
+
+> N→∞
+
+−−−−→ ∥E[Aiαivi]∥2
+
+∥E[Aiαivi]∥2 + ∥R∥2
+
+> F
+
+, (33) 
+
+where R = E[Ai vi ⊗ h⊥ 
+
+> i
+
+] is the higher-rank residual. In particular, r1 → 1 iff R = 0 .
+
+30 Table 9 Rank-1 dominance of the output head ∆W . (a) At 500 steps, all methods are rank-1 dominant. (b) Over longer training, sign-biased methods maintain rank-1 while sign-balanced methods lose it; the effect weakens with model scale.                                                    
+
+> (a) 500 steps (7B)
+> Method Rank-1% REINFORCE 95.4% GRPO 91.4% AsymGRPO 92.4% Power α=2 83.9%
+> (b) Converged
+> Scale Method Sym OH frac s1/s2Rank-1% 7B 8k AsymGRPO( δ=0 .3)A∼97% 7.07 ∼78% 7B 16k AsymGRPO( δ=0 .5)A88.5% 6.96 96% 7B 8k REINFORCE A—8.51 ∼81% 7B 8k GRPO(mean) S<10% 3.98 62% 7B 8k PA( α=2 )S<10% 3.61 61% 14B GRPO(mean) S3.2% 4.52 11% 32B AsymGRPO( δ=0 .8)A3.96% 8.87 45.6% 32B GRPO(mean) S0.69% 2.24 2.2%
+
+Proof. Orthogonality. Since h⊥ 
+
+> i
+
+⊥ u1 for all i, we have M2 u1 = ∑ 
+
+> i
+
+Aivi(h⊥⊤  
+
+> i
+
+u1) = 0 . Therefore ⟨M1, M 2⟩F =
+
+w⊤(M2 u1) = 0 , giving ∥W∆∥2 
+
+> F
+
+= ∥M1∥2 
+
+> F
+
++ ∥M2∥2 
+
+> F
+
+.
+
+Signal. M1 = w ⊗ u1 where w = ∑ 
+
+> i
+
+Aiαivi. Since u1 is a fixed (non-random) direction, the summands 
+
+Aiαivi are i.i.d. with finite variance ( E[A2 
+
+> i
+
+α2 
+
+> i
+
+∥vi∥2] ≤ E[A2 
+
+> i
+
+∥vi∥2∥hi∥2] < ∞). By Kolmogorov’s strong law of large numbers, w/N → E[Aiαivi] a.s., so ∥M1∥2 
+
+> F
+
+/N 2 = ∥w/N ∥2 → ∥ E[Aiαivi]∥2.
+
+Residual. Each entry of M2/N = 1
+
+> N
+
+∑ 
+
+> i
+
+Aivi ⊗ h⊥ 
+
+> i
+
+converges a.s. to the corresponding entry of R =
+
+E[Aivi ⊗ h⊥ 
+
+> i
+
+] by the same SLLN argument (finite variance is guaranteed by the second-moment condition). By continuity of ∥ · ∥ F , ∥M2∥2 
+
+> F
+
+/N 2 → ∥ R∥2 
+
+> F
+
+a.s. 
+
+Combine. By the SLLN, W∆/N → G entry-wise a.s. Since G u 1 = E[Aiαivi] (the residual contributes nothing: R u 1 = 0 ), u1 is the top right singular vector of G with singular value σ1(G) = ∥E[Aiαivi]∥. By continuity of singular values (Weyl’s inequality: |σ1(W∆/N ) − σ1(G)| ≤ ∥ W∆/N − G∥F → 0), σ1(W∆/N ) →
+
+σ1(G). Therefore r1 = σ21 (W∆/N )/ ∥W∆/N ∥2 
+
+> F
+
+→ σ21 (G)/ ∥G∥2 
+
+> F
+
+, which equals Eq. (33) by the orthogonal decomposition ∥G∥2 
+
+> F
+
+= ∥E[Aiαivi]∥2 + ∥R∥2 
+
+> F
+
+.
+
+Corollary H.2. Suppose failures arise from K independent reasoning modes with equal probability 1/ K,and let μk = E[h⊥ 
+
+> i
+
+| mode k] denote the mean perpendicular hidden state of mode k. Split the residual by outcome: R = p R S + qδ RF . The failure residual decomposes as RF = 1
+
+> K
+
+∑Kk=1 E[Ai vi | k] ⊗ μk. If the μk
+
+If the μk are mutually orthogonal with ∥μk∥ = μ and ∥E[Aivi | k]∥ = c for all k, then ∥RF ∥2 
+
+> F
+
+= c2μ2/K, so 
+
+∥RF ∥ ∼ 1/ √K: more diverse failure modes yield a smaller residual. Setting δ < 1 amplifies the weight q/δ
+
+on this shrinking RF relative to the surviving RS from correlated successes, accelerating the collapse r1 → 1.
+
+Table 9 highlights the rank 1 funnel effect. We analyze how RL training with different advantage functions modifies the weights across three model scales: • Qwen 2.5 7B: d=3584 , 28 layers, 28 heads, 4 KV heads, vocab =152 ,064 . 26 runs at 8k context, 8 runs at 16k. • Qwen 2.5 14B: d=5120 , 48 layers, 40 heads, 8 KV heads, vocab =152 ,064 . 1 run (GRPO mean), 5 checkpoints. • CWM 32B: d=6144 , 64 layers, 48 heads, vocab =128 ,256 . 6 runs. 
+
+Analysis techniques. For each run we compute ∆ = Wrl − Wsft and measure global L2 distance, per-layer 
+
+L2 decomposition, pairwise cosine similarity of weight-change vectors with hierarchical clustering, full SVD of the output head delta, rank-1 decomposition ∆ ≈ s1 u v ⊤ with cross-run alignment of u/v vectors, and per-layer SVD across all weight matrices. 
+
+Hidden-state analysis. To measure the geometric structure of correct vs. failed trajectories, we extract the last-layer hidden states hi ∈ Rd for all tokens across a batch and project out the top right singular vector 31 u1 of the batch gradient, yielding the perpendicular component h⊥ 
+
+> i
+
+= hi − (h⊤ 
+
+> i
+
+u1)u1. We then compute the mean pairwise cosine similarity ˆρ of these h⊥ vectors separately for correct and failed trajectory groups. This measures how much hidden-state structure survives beyond the dominant rank-1 direction. We also compute group-conditional residual norms ∥Rgroup ∥F = ∥ 1
+
+> N
+
+∑ 
+
+> i∈group
+
+vi ⊗ h⊥ 
+
+> i
+
+∥F , where vi = eyi − πi is the softmax error vector. 1
+
+The rank-1 left singular vector u ∈ R|V| of the output head delta reveals a universal “suppress non-code” direction shared across sign-biased runs: 99.93–99.97% of tokens have negative u values (Chinese, Russian, Thai, Arabic text; non-code identifiers), u is not sparse (50% of energy in ∼22% of vocab), and u vectors are nearly identical across sign-biased runs (cos = 0 .93 –0.99 ) and context lengths (cos = 0 .82 –0.96 ). 
+
+H.2 Empirical Verification of Rank-1 Collapse 
+
+Correct trajectories are 3-4× more correlated than failed ones in the perpendicular subspace, consistent across methods and training steps (Table 10).  
+
+> Table 10
+
+Perpendicular correlation ˆρ by trajectory outcome. 
+
+Method Step ˆρcorrect ˆρfailed Ratio r⊥ 
+
+> eff
+
+(C / F) AsymGRPO 300 0.0177 0.0046 3.8 × 614 / 727 AsymGRPO 3000 0.0193 0.0057 3.4 × 644 / 765 AsymGRPO 10000 0.0157 0.0054 2.9 × 674 / 797 AsymGRPO 15000 0.0126 0.0032 3.9 × 699 / 824 GRPO 8000 0.0121 0.0050 2.4 × 706 / 746 GRPO 60000 0.0294 0.0067 4.4 × 913 / 948 
+
+Residual norms and CLT baseline. For each group g ∈ { success , failure } with Ng tokens, we compute the group-conditional residual Rg = 1
+
+> Ng
+
+∑ 
+
+> i∈g
+
+vi ⊗ h⊥ 
+
+> i
+
+, where vi = eyi − πi and h⊥ 
+
+> i
+
+is the hidden state with the top SVD direction projected out. Under the null hypothesis that both groups have the same per-token covariance structure and differ only in sample size, each entry of Rg is an average of Ng i.i.d. terms with common variance σ2. By the CLT, 
+
+∥Rg ∥2 
+
+> F
+
+≈ V d · σ2/Ng (where V is the vocabulary size and d the hidden dimension), so the ratio of residual norms scales as ∥RF ∥∥RS ∥ ≈
+
+√ NS 
+
+> NF
+
+, With NS = 8 ,968 and NF = 54 ,700 in our batches during the AsymGRPO 
+
+δ = 0 .5 training with Qwen 2.5 7B, this gives √NS /NF ≈ 0.40 . The measured ratio is ∥RF ∥/∥RS ∥ = 0 .73 –
+
+0.79 (Table 11), nearly twice the CLT prediction. This confirms that the gap is not an artifact of having more failure tokens: failures are genuinely more decorrelated in the perpendicular subspace, producing a smaller residual per token than successes do.  
+
+> Table 11
+
+Group-conditional residual norms for the AsymGRPO δ = 0 .5 run where S, F are the set of correct and incorrect trajectories at a given timestep over a subset of samples from the training set. 
+
+Step ∥RS ∥F ∥RF ∥F ∥RF ∥/∥RS ∥ |S| / |F |
+
+3000 1.97 1.51 0.77 8,968 / 54,700 10000 2.00 1.46 0.73 8,968 / 54,700 15000 2.02 1.60 0.79 8,968 / 54,700 
+
+Causal verification. Since the rank-1 signal originates at the output head and propagates backward (Fig-ure 5), Proposition H.1 predicts that asymmetric learning should be concentrated in the last few layers.               
+
+> 1These norms are unweighted by advantages ( E[v⊗h⊥|group ]rather than E[Av ⊗h⊥|group ]), since advantages vary per-problem and across advantage functions. The projection direction is the top right singular vector of H, which may differ from u1in Proposition H.1.
+
+32 Table 12 Cross-checkpoint direction alignment for a GRPO run (Qwen 2.5 7B, no-KL, 8k). Each entry is | cos | between the leading singular vector of ∆W = Wt − WSFT at step t and at the final step ( 15 ,000 ). The output-head direction converges by step 1,200 (| cos (u)| = 0 .97 ), while inner layers remain exploratory ( | cos (u)| < 0.25 ) until step ∼6,000 ,after which the model rescales the same directions with diminishing magnitude. 
+
+Output head Inner layers (mean | cos (u)|)Step | cos (u)| L0–9 L10–19 L20–27 300 0.82 0.03 0.02 0.03 600 0.90 0.08 0.06 0.07 800 0.95 0.13 0.12 0.10 1,200 0.97 0.21 0.18 0.22 2,000 0.98 0.34 0.31 0.38 2,700 0.98 0.42 0.38 0.44 4,000 0.99 0.51 0.50 0.54 6,000 0.99 0.64 0.64 0.65 8,000 0.99 0.75 0.75 0.76 10,000 1.00 0.83 0.83 0.85 12,000 1.00 0.89 0.91 0.91 14,000 1.00 0.97 0.97 0.97 
+
+Periodically resetting the last 4 layers toward SFT weights erases most of AsymGRPO’s gains (with δ = 0 .5), with pass@ 1 dropping back to the starting policy performance, while symmetric GRPO, with more distributed learning, benefits from the reset. This trade-off is scale-dependent: at 32B the rank-1 fraction drops from 78– 96% to 45.6% for AsymGRPO (Table 9), and performance gaps between symmetric and asymmetric methods shrink accordingly (Tables 4 and 5). 
+
+Corollary H.3 (Cross-step accumulation) . If at each optimization step t the batch gradient at the output head satisfies gt ≈ wt ⊗ u for a shared direction u ∈ Rd, then the accumulated weight update W∆ = ∑ 
+
+> t
+
+ηtgt ≈
+
+(∑ 
+
+> t
+
+ηtwt) ⊗ u is exactly rank-1. 
+
+The corollary gives a sufficient condition: if gradient directions align across steps, then rank-1 structure compounds. Empirically, cosine similarity between successive batch-gradient directions at the output head converges to | cos | ≈ 1.0 from step ∼600 onward for asymmetric methods, confirming the condition during the exploitation phase. For symmetric methods the alignment remains lower, consistent with the higher effective rank of their accumulated updates. 
+
+H.3 Alignment Dynamics in GRPO 
+
+Tracking a GRPO run at Qwen 2.5 7B across 16 checkpoints (step 300 to 15,000), cross-checkpoint direction alignment (Table 12) reveals a clear exploration-to-exploitation transition. The output head direction con-verges by step 1,200, while inner layers remain exploratory until step ∼6,000 . After that, the model scales up the same directions with diminishing magnitude. All values are | cos | of the leading singular vector at each checkpoint’s W∆ = Wsf t − Wrl versus the final (step 15,000) checkpoint: u (left/output-token direction) for the output head, and the layer-averaged | cos (u)| for the transformer blocks grouped into early/mid/late thirds. 33

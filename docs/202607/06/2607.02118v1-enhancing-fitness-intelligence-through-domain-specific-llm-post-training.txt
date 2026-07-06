@@ -1,0 +1,378 @@
+Title: Enhancing Fitness Intelligence through Domain-Specific LLM Post-Training
+
+URL Source: https://arxiv.org/pdf/2607.02118v1
+
+Published Time: Fri, 03 Jul 2026 01:02:20 GMT
+
+Number of Pages: 8
+
+Markdown Content:
+# Enhancing Fitness Intelligence through Domain-Specific LLM Post-Training 
+
+1st Xingtao Zhao ∗
+
+School of Cyber Science and Technology Beihang University 
+
+Beijing, China xtaozhao@buaa.edu.cn 
+
+2nd Tian Yang 
+
+School of Information Renmin University of China 
+
+Beijing, China yangt@ruc.edu.cn 
+
+3nd Han Jiang 
+
+School of Cyber Science and Technology Beihang University 
+
+Beijing, China hanjiang950@gmail.com 
+
+Abstract —Scientific Fitness Coaching (SFC) is typically deliv-ered by human professionals, making it costly and inaccessible to many. While recent advances in Large Language Models (LLMs) show considerable promise for more inclusive fitness coaching, directly deploying prevailing general-purpose LLMs in SFC reveals critical limitations. These models often lack sufficient domain-specific knowledge integration, leading to weak perfor-mance on complex SFC scenarios. In this paper, we introduce FitOne, a series of fitness LLMs (with 8B and 32B parameters) designed to improve reliability and domain specialization for SFC applications. Built upon the Qwen3 foundation models, FitOne is developed through a three-stage post-training pipeline consisting of continual pre-training, supervised fine-tuning, and reinforce-ment learning, using large-scale, high-quality datasets derived from rigorous knowledge engineering. We conduct comprehensive evaluations of FitOne on professional fitness certification exams, including ACSM-EP and NSCA-CSCS, as well as general capa-bilities such as knowledge reasoning and instruction following. Experimental results show that, while retaining strong general capabilities, FitOne-8B/32B achieves average improvements of up to 10.09%/9.29% and 12.73%/7.01% on the ACSM-EP and NSCA-CSCS exams, respectively, compared with the Qwen3 base models. Furthermore, in-depth ablation studies confirm the necessity of each training stage, highlighting the pipeline’s effectiveness in balancing domain expertise enhancement with general ability retention. We believe this research advances LLM systems toward more reliable fitness intelligence and will inspire future research on developing domain-specific LLMs. 
+
+Index Terms —Fitness Intelligence, Scientific Fitness Coaching, Large Language Model, Domain Post-Training 
+
+I. I NTRODUCTION 
+
+Driven by growing health awareness, fitness has evolved from a simple exercise routine into a health concept deeply integrated into people’s daily lives [1], [2]. An increasing num-ber of people rely on scientific fitness to improve their body aesthetics, physical function, and overall well-being including cardiovascular, metabolic, immune and mental health [3], [4]. However, achieving these goals remains challenging for the general public, as it requires specialized knowledge spanning exercise physiology, sports medicine, and nutrition [5], [6]. The gold standard for Scientific Fitness Coaching (SFC) is one-on-one guidance from credentialed professionals [7], such as those holding ACSM-EP (American College of Sports Medicine Certified Exercise Physiologist) [8] or NSCA-CSCS 
+
+> ∗Corresponding author
+
+(National Strength and Conditioning Association Certified Strength and Conditioning Specialist) [9] certifications. De-spite their effectiveness, such human-led coaching services are often expensive, inaccessible to many, and difficult to scale [10]. Recently, Large Language Models (LLMs) have achieved rapid performance improvements [11]–[17], creating new op-portunities to address the aforementioned challenges in SFC. However, directly applying general-purpose LLMs to this domain reveals critical limitations [18], [19]. Unlike conven-tional natural language generation tasks, SFC requires not only the integration of interdisciplinary knowledge but also verifiable, step-by-step reasoning capabilities due to its safety-sensitive nature. In practice, professional fitness coaches are responsible for dynamically tailoring training plans based on users’ physiological conditions and exercise goals, adjusting exercise programs when health constraints arise or recovery status changes, and designing targeted nutritional strategies to support post-training recovery [8], [9], [20]. General reasoning LLMs often struggle with such complex, multi-faceted tasks because they lack deep integration of domain-specific knowl-edge. Although several studies have explored adapting LLMs to fitness applications [21]–[25], these solutions typically focus on narrow sub-fields and therefore struggle to meet the comprehensive demands of real-world SFC. To address the challenges faced by general-purpose LLMs in SFC applications, we introduce FitOne , a family of domain-optimized fitness LLMs built upon the Qwen3 [26] foundation models. FitOne is developed through a domain-specialized, three-stage post-training pipeline utilizing large-scale, high-quality datasets constructed through rigorous knowledge engi-neering. The pipeline comprises cntinual pre-training (CPT), supervised fine-tuning (SFT), and reinforcement learning (RL). In the CPT stage, the model acquires comprehensive SFC knowledge from a carefully structured large-scale domain corpus. Building on this foundation, we enhance the model’s step-by-step reasoning capabilities in the SFT stage through training on a high-quality fitness reasoning dataset. Finally, in the RL stage, we further consolidate prior gains and stabilize model behavior via Decoupled Clip and Dynamic sAmpling Policy Optimization (DAPO) [27] algorithm, maximizing its practical utility in real-world deployments. 
+
+> arXiv:2607.02118v1 [cs.AI] 2 Jul 2026
+
+Extensive experiments demonstrate that FitOne not only maintains competitive results on general capability bench-marks, but also achieves superior performance across profes-sional fitness certification exams, significantly outperforming prevailing closed- or open-source LLMs. Further ablation stud-ies verify the necessity of each training stage and validate the effectiveness of our domain-specialized post-training pipeline in enhancing domain expertise without catastrophic forgetting. Our contributions can be summarized as follows:  
+
+> •
+
+We introduce FitOne, a domain-specific model series (8B and 32B parameters) built upon the Qwen3 foundation models, which effectively improves the reliability and domain specialization of LLMs in SFC applications.  
+
+> •
+
+We propose a three-stage post-training pipeline that can effectively enhance the model’s performance in SFC scenarios while maintaining strong general capabilities.  
+
+> •
+
+Extensive experiments and ablation studies demonstrate the effectiveness of FitOne and our domain-specialized training methodology. II. F IT ONE MODELS 
+
+As shown in Figure 1, the post-training pipeline of Fi-tOne consists of three sequential stages, each building on the preceding one to gradually adapt the base model to the SFC domain while preserving its general capabilities. First, in Section II-A, we conduct continual pre-training to enhance the model’s grasp of foundational scientific fitness knowledge. Subsequently, in Section II-B, we further optimize the model’s verifiable reasoning capabilities through supervised fine-tuning using a high-quality chain-of-thought (CoT) dataset. Finally, in Section II-C, we apply DAPO-based reinforcement learning to consolidate the model’s previously acquired professional competencies and align its outputs with practical SFC require-ments, ultimately yielding FitOne with superior real-world performance in SFC scenarios. 
+
+A. Continual Pre-training 
+
+To enhance the base model’s fundamental domain knowl-edge, we conduct continual pre-training through three sub-stages: data collection, knowledge engineering, and domain-aware continual pre-training. 
+
+1) Data Collection: We curate a large-scale corpus from both the SFC domain and the general domain. To ensure comprehensive coverage of the fitness domain, under the guidance of domain experts, we categorize SFC into eight key sub-domains (Table I), each corresponding to a core capability essential for SFC. Specifically, we collect the SFC corpus from authoritative sources to ensure scientific rigor, including well-established exercise guidelines(e.g., ACSM’s Guidelines for Exercise Testing and Prescription [28]), peer-reviewed scientific literature, and professional university textbooks. This establishes a solid data foundation for adapting FitOne to a wide range of real-world SFC applications. For the general-domain data, we integrate open-source datasets that have been widely validated by the community [29]–[31] to prevent catastrophic forgetting during continual pre-training. 
+
+2) Knowledge Engineering: Then, the raw data undergoes comprehensive knowledge engineering to ensure authenticity and domain alignment through a systematic four-step prepro-cessing pipeline: 1) Data Parsing: Convert raw documents with diverse formats into the unified, machine-readable Markdown format using Optical Character Recognition (OCR) and NLP techniques, removing irrelevant layout elements like page numbers and headers. 2) Data Normalization: Standardize heterogeneous data formats and reconstruct data structures to achieve uniform fitness data representation, thereby facilitating down-stream semantic understanding. 3) Data Refinement: Remove outdated, noisy, and dupli-cate content from the dataset to generate a high-fidelity, refined corpus. 4) Data Mixture: Apply the RegMix method [32] to iden-tify an optimal data mixture distribution and filter out unnecessary data. Through this preprocessing process, we construct a high-quality training dataset of 30B tokens. The final refined dataset 
+
+K comprises high-quality, structured fitness knowledge units that have undergone rigorous validation: 
+
+K = KSFC ∪ K GEN , K = {k1, k 2, . . . , k n} (1) where KSFC and KGEN denote the SFC-domain and general-domain subsets, respectively, each consisting of refined knowl-edge units ki.
+
+3) Domain-aware Continual Pre-training: After data con-struction, we conduct continual pre-training on the complete dataset K. Specifically, leveraging the strong language un-derstanding capabilities inherent in the base Qwen3 model, FitOne is initialized from its original checkpoint and trained using the officially recommended configuration settings [26]. Through this domain-aware continual pre-training process, we obtain a model that effectively captures SFC-specific linguistic patterns and domain knowledge while sustaining minimal degradation of general capabilities. 
+
+B. Supervised Fine-Tuning 
+
+We further perform supervised fine-tuning through areasoning-enhanced instruction dataset and a two-stage hy-brid fine-tuning strategy. This fine-tuning process effectively enhances the model’s verifiable reasoning capabilities, which is essential for meeting the transparency and traceability requirements in safety-sensitive fitness applications. 
+
+1) Data Construction: We design a data synthesis pipeline that combines domain-specific knowledge-guided generation with multi-dimensional verification. The final instruction dataset comprises high-quality, verifiable (Query, Thinking, Answer) triplets that are semantically aligned with the fitness domain. 
+
+Domain-specific Knowledge-Guided Generation: Ac-cording to Table I, we define a structured label system of SFC tasks as T = {t1, t 2, . . . , t m}, where each label tj ∈ T repre-sents a distinct sub-domain category. For each tj , a dedicated Data Collection 
+
+SFC 
+
+Data 
+
+General 
+
+Data 
+
+Knowledge Engineering 
+
+> {“text”: “Ice is in
+> the solid state …”},
+> {“text”: “The
+> capital of the …”}
+> Fitness Domain
+> Corpus
+> DOMAIN
+> DOMAIN
+> DOMAIN
+
+Parsing Normalization 
+
+Refinement Mixture 
+
+> Domain-aware
+> Continual Pre-training
+
+SFC Core Tasks  
+
+> Exercise Prescription Customization
+> Nutrition Guidance Technique Explanation
+> Hybrid Supervised
+> Fine-tuning
+
+Step 1 : Complete Dataset 
+
+Step 2 : SFC Core Dataset 
+
+Data Construction 
+
+> Professional Self-QA Agent
+> Multi-dimensional Veri fi cation
+> Query
+
+Reward Function 
+
+> Closed-ended Tasks
+> Exact Match
+> A
+> B,C,D
+> True
+> False
+> Dual Reward-driven
+> Refinement Learning
+
+DAPO 
+
+> Open-ended Tasks
+> Reward Model as a Judge
+> Human Annotation
+> General Domain
+> Corpus
+> Thinking
+> Answer
+
+Fig. 1: Overview of our training pipeline. TABLE I: Overview of SFC domains and their corresponding capabilities. 
+
+Domain Capability 
+
+Weight Loss Body weight management and body composition optimization Biochemistry Elucidating how physical activity impacts internal physiological processes Sports Medicine Sports injury prevention and rehabilitation Sports Nutrition Evidence-based personalized exercise nutrition guidance Exercise Physiology Analysis of body system adaptive changes to exercise Strength and Endurance Muscle strength and physical endurance enhancement Exercise Methods and Techniques Optimizing physical performance through diversified exercise methods Exercise Prescription Customization Generating exercise plans based on Frequency, Intensity, Time, and Type principles [28] 
+
+generation agent Atj is instantiated. Given a label tj ∈ T and a domain-specific knowledge snippet ki ∈ K tj ⊆ K SFC , the agent Atj generates a reasoning triplet: 
+
+(qi, t i, a i) = Atj (ki, t j ; θAtj ), (2) where qi is the question, ti is the step-by-step reasoning process (thinking), and ai is the final answer. This ensures the generated instructions are strictly grounded in professional fitness knowledge. 
+
+Multi-dimensional Verification: To ensure data validity and reasoning reliability across all generated instances, we employ an independent third-party LLM to validate the cor-rectness of answers and analyze the reasoning trajectory along seven key dimensions: internal consistency, term overlap rate, number of reasoning steps, logical coherence, content diversity, task-domain relevance, and alignment with task instructions. Based on these evaluations, we systematically filter the reasoning paths, retaining only high-quality instances, denoted as DSFC .Furthermore, to maintain robust general capabilities and pre-vent catastrophic forgetting, we integrate open-source general instruction datasets [33]–[35], denoted as DGEN . The combined dataset D = DSFC ∪ D GEN is then utilized for SFT. 
+
+2) Hybrid Supervised Fine-tuning: We implement a two-stage hybrid SFT strategy to balance domain specialization and general capability retention. In the first stage, the model is trained on a broad mixture of the complete DSFC and a large proportion of general data DGEN . This approach enables the model to learn diverse reasoning paths within the SFC domain while preserving its generalization capabilities. In the second stage, we increase the sampling weight of DSFC , fine-tuning the model to reinforce its performance on domain-critical tasks. Given an input question Q and a target output sequence Y =[T ; A], the SFT objective is formally defined as: 
+
+LSFT = −E(Q,Y )∼D 
+
+ 
+
+> |Y|
+
+X
+
+> t=1
+
+log πθ (yt | Q, Y <t )
+
+ (3) where πθ denotes the model policy and yt is the t-th token in the target sequence Y .
+
+C. Reinforcement Learning 
+
+To consolidate prior gains and align the model’s behavior with real-world application requirements, we build upon the SFT model and conduct reinforcement learning using SFC-centric reward signals. 1) Data Construction: We construct the RL dataset, de-noted as DRL , by combining subsets from both DSFC and 
+
+DGEN . To maximize RL efficiency, we upweight hard exam-ples identified during SFT evaluations and rare but critical edge cases such as exercise scenarios with complex medical constraints. This targeted data mixture strategy ensures that the model focuses on its weakest reasoning areas rather than repeatedly training on mastered tasks. 
+
+2) Reward Function Design: Constructing a reliable reward function is the most critical component of our RL pipeline. While prior reinforcement learning algorithms [36] rely heav-ily on rule-based rewards for domains with deterministic answers (e.g., mathematics and coding), SFC applications span both objective certification questions and open-ended exercise prescriptions. To accommodate this task diversity, we design a hybrid reward function for a given query Q, reference answer 
+
+A, and model output O:
+
+1) Accuracy Reward. This reward ensures factual cor-rectness and aligns with human preferences, dynamically adapting based on task verifiability. For closed-ended tasks such as multiple-choice questions with determinate answers, we employ an Exact Match (EM) reward based on the ground truth A:
+
+REM (O, A ) = 
+
+(
+
+1, if O exactly matches A, 
+
+0, otherwise . (4) For open-ended tasks such as personalized nutrition planning, where a single ground truth is infeasible, we train a reward model (RM) using domain-expert preference annotations to provide a continuous scalar reward. 
+
+RRM (O, A ) = RM (O, A ) (5) 
+
+2) Pattern Reward. Additionally, given the instability of generative LLM output formats, we define a pattern-matching reward for tasks requiring strictly structured outputs. For instance, exercise prescriptions must explicitly cover the FITT-VP principles (i.e., Frequency, Intensity, Time, Type, Volume, Progression) [28]. We use predefined heuristics to verify structural compliance independently of semantic correctness: 
+
+RPattern (O, A ) = 
+
+(
+
+1, if O satisfies the predefined format ,
+
+0, otherwise .
+
+(6) Finally, the total reward R(O, A ) combines both accuracy and pattern signals based on the specific task category c:
+
+R(O, A ) = RAcc (O, A, c ) + RPattern (O, A ) (7) where RAcc applies either REM or RRM depending on whether the task category c is closed-ended or open-ended. 
+
+3) DAPO-based Reinforcement Learning: We initialize the RL policy πθ from the prior stage to provide a strong starting base model, and then apply preference-based DAPO [27]. Compared with the standard GRPO [36], DAPO’s asymmetric clipping encourages broader exploration, and its dynamic sam-pling prevents gradient vanishing when all candidate outputs receive identical rewards, making it particularly effective for learning complex reasoning in SFC tasks. For a given instance 
+
+(Q, A ) ∼ D RL , DAPO samples a group of G candidate outputs 
+
+{Oi}Gi=1 using the reference policy πθold . The policy πθ is then updated by minimizing the following token-level loss: 
+
+LDAPO (θ) = − E(Q,A )∼D RL ,{Oi}Gi=1 ∼πθold (·| Q)
+
+"
+
+1
+
+PGi=1 |Oi|
+
+> G
+
+X
+
+> i=1
+> |Oi|
+
+X
+
+> t=1
+
+min 
+
+
+
+ri,t (θ) ˆAi,
+
+clip( ri,t (θ), 1 − εlow , 1 + εhigh ) ˆAi
+
+#
+
+s.t. std( {R i}Gi=1 ) > 0 (8) where εlow and εhigh control the clipping range, and 
+
+ri,t (θ) = πθ (Oi,t | Q, O i,<t )
+
+πθold (Oi,t | Q, O i,<t ) (9) 
+
+ˆAi = Ri − mean( {R i}Gi=1 )std( {R i}Gi=1 ) (10) Compared to the previous stage, FitOne learns to consis-tently explore and exploit high-reward reasoning trajectories after reinforcement learning, ensuring stable and robust behav-ioral adaptation to both SFC-specific and general tasks. III. E XPERIMENTS 
+
+A. Implementation Details 
+
+During the CPT stage, we follow the standard Qwen3 [26] training process using a mixed corpus of general and SFC-specific data. In the SFT stage, we train the models for one epoch in both steps. We use a maximum sequence length of 8,192 tokens with sequence packing, a global batch size of 128, and a linear warm-up ratio of 0.03. The learning rates are scaled based on model size: for the 8B model, we use 2×10 −5
+
+in step one and 1 × 10 −5 in step two; for the 32B model, we use 1 × 10 −5 across both steps. Optimization is performed using AdamW [44] ( β1 = 0 .9, β2 = 0 .95 , ϵ = 10 −8). In the RL stage, we train for 500 rollout steps. The maximum prompt and response lengths are set to 10,000 and 8,192 tokens, respectively, with an additional 4,096-token overlong buffer using a 1.0 penalty factor. We use a prompt batch size of 1,024 and sample 16 responses per prompt, resulting in a global batch size of 16,384. The mini-batch size covers 256 prompts, yielding 4 gradient updates per rollout. We set the asymmetric clipping parameters εlow = 0 .2 and εhigh = 0 .28 
+
+and use AdamW optimizer with a constant learning rate of 
+
+1 × 10 −6, a weight decay of 0.01, and a linear warmup over the first 20 rollout steps. 
+
+B. Benchmarks 
+
+We perform a comprehensive evaluation of FitOne and base-lines in both the general and SFC domain capabilities using mainstream benchmarks. To evaluate FitOne’s performance in SFC domain, we select professional fitness certification exams including ACSM-EP [8] and NSCA-CSCS [9], covering eleven SFC performance domains. For general capabilities TABLE II: Results of 8B -scale models. Bold entries indicate the best model, while underlined entries denote the second one. 
+
+Total represents the comprehensive score calculated based on the percentages of each domain, and Promotion is the percentage improvement of FitOne over the Qwen3 foundation model. All results are the average values of five repeated experiments.                                                                                                                    
+
+> Models General-Bench ACSM-EP NSCA-CSCS Avg. HFS EC&BM EPI RM&PR Total ES SP Nutr PD ET PI OA Total
+> Llama-3.1-8B [37] 52.41 45.12 46.99 37.19 44.21 42.26 51.80 66.16 56.20 53.87 63.63 89.31 51.51 60.37 Ministral-3-8B [38] 50.93 41.93 59.04 45.21 40.91 46.59 66.93 71.82 58.90 54.61 52.67 87.43 48.87 63.03 InternLM3-8B [39] 55.35 44.44 54.32 30.02 30.18 39.65 56.14 66.34 59.32 44.35 52.43 74.03 48.12 55.69 GLM-4-9B-0414 [40] 62.27 51.44 55.26 48.83 42.87 50.56 69.44 73.30 56.86 68.99 50.11 75.99 47.30 65.12 Qwen3-8B [26] 67.90 52.64 59.84 45.93 55.36 51.59 68.18 74.83 62.76 69.03 64.12 89.98 53.84 69.64 FitOne-8B (Ours) 70.83 54.21 61.77 56.44 56.78 56.79 72.78 87.26 67.68 78.68 79.72 90.59 71.57 78.51
+> Promotion +4.32% +2.98% +3.23% +22.88% +2.57% +10.09% +6.75% +16.61% +7.84% +13.98% +24.33% +0.68% +32.93% +12.73%
+
+* ACSM-EP Performance Domains: HFS (33%) : Health and Fitness Assessment EC&BM (20%) : Exercise Counseling and Behavior Modification 
+
+EPI (40%) : Exercise Prescription and Implementation RM&PR (7%) : Risk Management and Professional Responsibilities * NSCA-CSCS Performance Domains: ES (25%) :Exercise Science SP (11%) : Sport Psychology Nutr (6%) : Nutrition PD (23%) : Program Design 
+
+ET (15%) : Exercise Technique PI (12%) : Program Implementation OA (8%) : Organization and Administration 
+
+TABLE III: Results of 32B -scale models. Bold entries indicate the best model, while underlined entries denote the second one. 
+
+Total represents the comprehensive score calculated based on the percentages of each domain, and Promotion is the percentage improvement of FitOne over the Qwen3 foundation model. All results are the average values of five repeated experiments. 
+
+Models General-Bench ACSM-EP NSCA-CSCS Avg. HFS EC&BM EPI RM&PR Total ES SP Nutr PD ET PI OA Total 
+
+10B <The Scale of Large Language Models <100B 
+
+Gemma-3-27B [41] 75.71 64.72 69.43 64.29 66.20 65.59 76.61 82.38 77.41 73.24 76.41 94.95 71.02 78.24 GPT-OSS-20B [42] 74.76 62.74 70.58 65.41 62.88 65.39 70.18 82.89 79.15 79.37 75.78 93.36 78.52 78.52 Qwen3-30B-A3B [26] 72.76 62.60 66.67 60.37 62.37 62.51 71.41 81.91 74.11 73.35 76.93 92.44 73.13 76.66 GLM-4-32B-0414 [43] 73.49 70.69 64.06 67.50 66.35 67.78 73.77 78.63 74.22 76.00 77.37 92.05 78.94 77.99 
+
+The Scale of Large Language Models >100B 
+
+Deepseek-V3.2 [12] 78.02 71.22 73.88 73.07 75.05 72.76 78.75 81.54 84.29 79.16 84.14 93.93 80.20 82.23 Doubao-Seed-2-Lite [14] 80.13 73.18 72.58 71.71 71.21 72.33 75.22 86.12 84.92 80.78 82.04 99.40 80.71 82.64 Gemini-3.1-Flash [15] 80.25 69.44 70.96 72.98 71.11 71.28 73.32 81.94 89.93 80.67 79.57 93.02 82.29 80.97 Qwen3.5-Flash [13] 84.42 71.82 75.41 77.40 75.89 75.05 72.00 83.05 88.96 78.97 81.15 91.40 82.46 80.37 GPT-5.4-Mini [17] 80.72 69.39 73.85 70.89 75.45 71.31 75.54 87.20 88.79 76.23 76.59 91.90 79.14 80.19 Claude-Haiku-4.5 [16] 85.10 73.78 69.68 76.18 75.95 74.07 69.10 85.87 86.15 77.10 83.43 91.20 76.88 79.23 Qwen3-32B [26] 72.67 70.15 68.54 70.44 68.85 69.85 74.52 84.04 79.39 74.56 76.76 91.19 74.48 78.20 FitOne-32B (Ours) 75.19 74.76 75.10 78.06 77.58 76.35 77.02 87.99 86.76 80.92 85.15 95.87 83.19 83.68 
+
+Promotion +3.47% +6.57% +9.57% +10.82% +12.68% +9.29% +3.35% +4.70% +9.28% +8.53% +10.93% +5.13% +11.69% +7.01% 
+
+evaluation, we systematically assess six capabilities, including knowledge reasoning (i.e., MMLU-Redux [45], CMMLU [46], 
+
+C-Eval [47], GPQA-Diamond [48], BIG-Bench [49], and 
+
+GAOKAO-Bench [50]), mathematical reasoning (i.e., MATH-500 [51], AIME 2024 [52] and AIME 2025 [52]), code generation (i.e., HumanEval [53], MBPP [54], and Live-CodeBench v5 [55]), machine translation (i.e., WMT-24 [56] and FLORES [57]), instruction following (i.e., IFEval [58]), and hallucination detection (i.e., HaluEval [59]). 
+
+C. Main Results 
+
+Tables II and III report the performance of FitOne against prevailing open- and closed-source models on both general competency assessment benchmarks and domain-specific pro-fessional fitness certification exams (ACSM-EP and NSCA-CSCS). Figure 2 further visualizes the comparative distribution of general capabilities compared to the Qwen3 base models. These results demonstrate that FitOne at all scales not only preserve strong general capabilities, often surpassing their base models, but also achieve substantial improvements in the SFC domain. Specifically, FitOne-8B scores 56.79 on the ACSM-EP and 78.51 on the NSCA-CSCS, outperforming the Qwen3-8B base model by 10.09% and 12.73%, respectively. This performance gain scales consistently to the 32B variant, Instruction Following    
+
+> Reasoning
+> Code
+> Translation
+> Math
+> Hallucination Detection
+> SFC
+> 50 60 70 80
+> Qwen3-8B
+> FitOne-8B
+> Qwen3-32B
+> FitOne-32B
+
+Fig. 2: Radar chart of model capabilities under different task categories. aligning with established scaling laws [60]. Notably, FitOne-32B matches even exceeds the SFC-domain performance of massive proprietary models with over 100B parameters, including DeepSeek-V3.2, Gemini-3.1-Flash, and GPT-5.4-TABLE IV: Ablation study results of FitOne-8B. 
+
+CPT SFT RL General ACSM-EP NSCA-CSCS 
+
+67.90 51.59 69.64 
+
+✓ 66.24 53.82 72.15 
+
+✓ 69.45 52.91 73.80 
+
+✓ ✓ 70.12 55.48 76.92 
+
+✓ ✓ 69.80 54.10 75.33 
+
+✓ ✓ ✓ 70.83 56.79 78.51 
+
+TABLE V: Performance comparison of task-specific fine-tuned on Qwen3-8B and FitOne-8B.                               
+
+> Models HFS EC&BM EPI
+> Qwen3-8B (Fine-tuned) 53.50 60.90 50.20 FitOne-8B (Zero-shot) 54.21 (+1.33%) 61.77 (+1.43%) 56.44 (+12.43%)
+> FitOne-8B (Fine-tuned) 56.80 (+6.17%) 64.30 (+5.58%) 60.50 (+20.52%)
+> Models ES PD ET
+> Qwen3-8B (Fine-tuned) 70.50 73.40 72.10 FitOne-8B (Zero-shot) 72.78 (+3.23%) 78.68 (+7.19%) 79.72 (+10.57%)
+> FitOne-8B (Fine-tuned) 75.60 (+7.23%) 82.40 (+12.26%) 83.50 (+15.81%)
+
+Mini, with minor performance gaps observed in only a few specific sub-domains. These findings validate the effectiveness of our post-training pipeline, highlighting both its potential for further advances through continued scaling and FitOne’s promise for real-world SFC deployment. 
+
+D. Ablation Study 
+
+We evaluate the incremental impact and necessity of each stage in our post-training pipeline based on the 8B model, with results summarized in Table IV. First, the CPT stage es-tablishes a strong domain foundation, improving performance to 53.82 on the ACSM-EP and 72.15 on the NSCA-CSCS. However, this domain-specific knowledge injection causes a slight degradation in general capabilities (dropping from 67.90 to 66.24 on General-Bench) due to domain shift. Subsequent SFT effectively resolves this issue by enhancing the model’s reasoning capabilities, raising domain scores to 55.48 and 76.92 while significantly recovering and boosting the General-Bench score to 70.12. Finally, the RL stage further aligns the model with practical requirements, resulting in the peak scores across all metrics. Additionally, removing the CPT stage from the pipeline consistently yields sub-optimal domain performance compared to their full-pipeline counterparts. For instance, the complete CPT+SFT+RL pipeline outperforms the SFT+RL configuration by 2.69 points on the ACSM-EP and 3.18 points on the NSCA-CSCS. This confirms that founda-tional knowledge injection during CPT is an indispensable prerequisite for maximizing the model’s domain expertise, validating the necessity of our three-stage design. 
+
+E. Task-specific SFT Comparison 
+
+To evaluate whether a domain-adapted base model serves as a better initialization point for downstream tasks compared to a general-purpose model, we compare three setups at the 8B scale across six core sub-domains from the professional TABLE VI: Performance generalization across different model scales and architectures. We report the average performance for General-Bench, ACSM-EP and NSCA-CSCS certification exams.                                  
+
+> Models General-Bench ACSM-EP NSCA-CSCS
+> Qwen3-4B 64.12 47.35 63.80 FitOne-4B 66.25 52.40 65.15 Qwen3-8B 67.90 51.59 69.64 FitOne-8B 70.83 56.79 78.51 Qwen3-14B 70.15 58.42 74.10 FitOne-14B 71.80 64.30 80.65 Qwen3-32B 72.67 69.85 78.20 FitOne-32B 75.19 76.35 83.68 Qwen3-30B-A3B 72.76 62.51 76.66 FitOne-30B-A3B 76.85 73.15 86.40
+
+exams: (1) Qwen3-8B (Fine-tuned): task-specific SFT applied directly to the Qwen3 base model; (2) FitOne-8B (Zero-shot): our domain model evaluated directly without further downstream tuning; and (3) FitOne-8B (Fine-tuned): task-specific SFT applied to our domain-adapted model. As shown in Table V, FitOne-8B (Fine-tuned) outperforms Qwen3-8B (Fine-tuned) across all evaluated domains. For instance, in the Program Design (PD) and Exercise Technique (ET) domains, FitOne-8B (Fine-tuned) achieves 82.40 and 83.50, outperforming the fine-tuned Qwen3-8B by 12.26% and 15.81% percentages, respectively. This demonstrates that our domain-aligned post-training provides a stronger foundation for task-specific adaptation. Meanwhile, even without any task-specific tuning, the zero-shot FitOne-8B surpasses the fine-tuned Qwen3-8B across all selected sub-domains. Overall, these findings indicate that domain-specific post-training not only instills robust zero-shot capabilities but also raises the performance ceiling for downstream fine-tuning, validating the necessity of developing specialized foundational models for the SFC domain. 
+
+F. Generalization Across Different Model Scales 
+
+Table VI shows that our three-stage post-training pipeline generalizes effectively across base models of varying scales and architectures. The pipeline consistently improves per-formance across all benchmarks, proving its robustness re-gardless of model capacity. Furthermore, scaling up the base model increases FitOne’s absolute performance, indicating that larger capacities better absorb domain-specific knowledge. Notably, the mixture-of-experts (MoE) variant (Qwen3-30B-A3B) achieves the largest gains on SFC-related benchmarks, improving by 17.02% on ACSM-EP and 12.71% on NSCA-CSCS, while maintaining top-tier general capabilities. We think this is because the decoupled expert routing mechanism of the MoE architecture provides an expansive representational space to internalize complex, interdisciplinary SFC domain knowledge. This architecture effectively mitigates gradient conflicts between general and domain-specific data distribu-tions during post-training, preventing catastrophic forgetting and enabling robust domain adaptation. IV. C ONCLUSION 
+
+In this paper, we introduce FitOne, a domain-specific LLM trained through a three-stage post-training pipeline that en-hances SFC capabilities while preserving general performance. Extensive evaluations confirm that FitOne provides a reliable, high-performance solution for safety-sensitive fitness applica-tions. We believe our approach can advance the real-world deployment of LLMs in fitness coaching and will inspire future research in developing specialized models in other vertical domains. REFERENCES [1] A. Kramer, “An overview of the beneficial effects of exercise on health and performance,” Physical exercise for human health , pp. 3–22, 2020. [2] M. N. A’Naja, A. Batrakoulis, S. M. Camhi, C. McAvoy, J. S. Sansone, R. Reed et al. , “2025 acsm worldwide fitness trends: future directions of the health and fitness industry,” ACSM’s Health & Fitness Journal ,vol. 28, no. 6, pp. 11–25, 2024. [3] P. Mehta, “Optimizing neurological and cardiovascular health through exercise,” in Advancing Science and Innovation in Healthcare Research .Elsevier, 2025, pp. 179–210. [4] I. Yermolenko, “Fitness as a tool of psycho-physiological correction,” 
+
+Baltic Journal of Legal and Social Sciences , no. 2, pp. 97–103, 2024. [5] E. De Vet, A. Oenema, and J. Brug, “More or better: Do the number and specificity of implementation intentions matter in increasing physical activity?” Psychology of Sport and Exercise , vol. 12, no. 4, pp. 471– 477, 2011. [6] K. Xu, X. Yan, and M. W. Newman, “Understanding people’s experience for physical activity planning and exploring the impact of historical records on plan creation and execution,” in Proceedings of the CHI Conference on Human Factors in Computing Systems , 2022, pp. 1–15. [7] C. P. Oi, S. K. Vijayan, and H. Y. Ler, “Qualified fitness trainers prac-tice scientifically based judgement in prescribing exercise programs,” 
+
+Psychology of Sport and Exercise , vol. 74, p. 102659, 2024. [8] M. Magal and F. B. Neric, “Acsm certifications: defining an exercise profession from concept to assessment,” ACSM’s Health & Fitness Journal , vol. 24, no. 1, pp. 12–18, 2020. [9] B. M. Altiner, M. A. Dixon, C. Nite, and M. S. Stock, “Toward professionalization of the strength and conditioning field,” Strength & Conditioning Journal , vol. 45, no. 6, pp. 733–744, 2023. [10] C. A. Pelletier, A. Pousette, K. Ward, R. Keahey, G. Fox, S. Allison, D. Rasali, and G. Faulkner, “Implementation of physical activity inter-ventions in rural, remote, and northern communities: A scoping review,” 
+
+INQUIRY: The Journal of Health Care Organization, Provision, and Financing , vol. 57, 2020. [11] Y. Chang, X. Wang, J. Wang et al. , “A survey on evaluation of large language models,” ACM transactions on intelligent systems and technology , vol. 15, no. 3, pp. 1–45, 2024. [12] DeepSeek-AI, “Deepseek-v3.2: Pushing the frontier of open large language models,” 2025. [Online]. Available: https://arxiv.org/abs/2512. 02556 [13] Qwen Team, “Qwen3.5: Towards native multimodal agents,” February 2026. [Online]. Available: https://qwen.ai/blog?id=qwen3.5 [14] ByteDance Seed, “Seed2.0 model card: Towards intelligence frontier for real-world complexity,” https://lf3-static.bytednsdoc.com/obj/eden-cn/ lapzild-tss/ljhwZthlaukjlkulzlp/seed2/0214/Seed2.0%20Model%20Card. pdf, February 2026, accessed: 2026-04-11. [15] Google AI, “Gemini 3.1 flash-lite: Built for intelligence at scale,” https://blog.google/innovation-and-ai/models-and-research/ gemini-models/gemini-3-1-flash-lite/, March 2026, accessed: 2026-04-11. [16] Anthropic, “Introducing claude haiku 4.5,” https://www.anthropic.com/ news/claude-haiku-4-5, October 2025, accessed: 2026-04-11. [17] OpenAI, “Introducing gpt-5.4,” https://openai.com/zh-Hans-CN/index/ introducing-gpt-5-4/, March 2026, accessed: 2026-04-11. [18] X. Lai, J. Chen, Y. Lai, S. Huang, Y. Cai, Z. Sun, X. Wang, K. Pan, Q. Gao, and C. Huang, “Using large language models to enhance exercise recommendations and physical activity in clinical and healthy populations: Scoping review,” JMIR Medical Informatics , vol. 13, p. e59309, May 2025. [19] Z. A. Nazi and W. Peng, “Large language models in healthcare and medical domain: A review,” in Informatics , vol. 11, no. 3. MDPI, 2024, p. 57. [20] N.-N. S. . C. Association, Essentials of strength training and condition-ing . Human kinetics, 2021. [21] D. Shin, G. Hsieh, and Y.-H. Kim, “Planfitting: Personalized exercise planning with large language model-driven conversational agent,” in Pro-ceedings of the 7th ACM Conference on Conversational User Interfaces ,2025, pp. 1–19. [22] K. R. Str¨ omel, S. Henry, T. Johansson, J. Niess, and P. W. Wo´ zniak, “Narrating fitness: Leveraging large language models for reflective fitness tracker data interpretation,” in Proceedings of the CHI Conference on Human Factors in Computing Systems , 2024. [23] J. Khasentino, A. Belyaeva, X. Liu et al. , “A personal health large language model for sleep and fitness coaching,” Nature Medicine ,vol. 31, no. 10, pp. 3394–3403, 2025. [24] M. A. Merrill, A. Paruchuri, N. Rezaei et al. , “Transforming wearable data into personal health insights using large language model agents,” 
+
+Nature Communications , vol. 17, 2024. [25] A. A. Heydari, K. Gu, V. Srinivas et al. , “The anatomy of a personal health agent,” arXiv preprint arXiv:2401.12954 , 2025. [26] Q. Team, “Qwen3 technical report,” 2025. [Online]. Available: https://arxiv.org/abs/2505.09388 [27] Q. Yu, Z. Zhang, R. Zhu et al. , “Dapo: An open-source llm reinforcement learning system at scale,” 2025. [Online]. Available: https://arxiv.org/abs/2503.14476 [28] C. Ozemek, A. Bonikowske, J. Christle, and P. Gallo, ACSM’s Guide-lines for Exercise Testing and Prescription, 12th edition . Lippincott Williams & Wilkins, 2025. [29] R.-Z. Fan, Z. Wang, and P. Liu, “Megascience: Pushing the frontiers of post-training datasets for science reasoning,” 2025. [Online]. Available: https://arxiv.org/abs/2507.16812 [30] M. Weber, D. Fu, Q. Anthony et al. , “Redpajama: an open dataset for training large language models,” Advances in neural information processing systems , vol. 37, pp. 116 462–116 492, 2024. [31] G. Penedo, H. Kydl´ ıˇ cek, A. Lozhkov et al. , “The fineweb datasets: Decanting the web for the finest text data at scale,” Advances in Neural Information Processing Systems , vol. 37, pp. 30 811–30 849, 2024. [32] Q. Liu, X. Zheng, N. Muennighoff, G. Zeng, L. Dou, T. Pang, J. Jiang, and M. Lin, “Regmix: Data mixture as regression for language model pre-training,” in The Thirteenth International Conference on Learning Representations , 2025. [Online]. Available: https://openreview.net/forum?id=5BjQOUXq7i [33] J. Li, L. Du, H. Zhao, B. wen Zhang, L. Wang, B. Gao, G. Liu, and Y. Lin, “Infinity instruct: Scaling instruction selection and synthesis to enhance language models,” 2025. [Online]. Available: https://arxiv.org/abs/2506.11116 [34] E. K. Guha, R. Marten, S. Keh, N. Raoof, G. Smyrnis, H. Bansal 
+
+et al. , “Openthoughts: Data recipes for reasoning models,” in First Workshop on Foundations of Reasoning in Language Models , 2025. [Online]. Available: https://openreview.net/forum?id=mbqvBA12Dx [35] Y. Ye, Z. Huang, Y. Xiao, E. Chern, S. Xia, and P. Liu, “LIMO: Less is more for reasoning,” in Second Conference on Language Modeling , 2025. [Online]. Available: https://openreview.net/forum?id= T2TZ0RY4Zk [36] D. Guo, D. Yang, H. Zhang et al. , “Deepseek-r1 incentivizes reasoning in llms through reinforcement learning,” Nature , vol. 645, no. 8081, p. 633–638, September 2025. [Online]. Available: http://dx.doi.org/10.1038/s41586-025-09422-z [37] M. L. Team, “The llama 3 herd of models,” 2024. [Online]. Available: https://arxiv.org/abs/2407.21783 [38] M. AI, “Ministral 3,” 2026. [Online]. Available: https://arxiv.org/abs/ 2601.08584 [39] InternLM, “Internlm2 technical report,” 2024. [Online]. Available: https://arxiv.org/abs/2403.17297 [40] T. GLM, “Chatglm: A family of large language models from glm-130b to glm-4 all tools,” 2024. [Online]. Available: https: //arxiv.org/abs/2406.12793 [41] G. Team, “Gemma 3 technical report,” 2025. [Online]. Available: https://arxiv.org/abs/2503.19786 [42] OpenAI, “gpt-oss-120b and gpt-oss-20b model card,” 2025. [Online]. Available: https://arxiv.org/abs/2508.10925 [43] G. Team, “Glm-4.5: Agentic, reasoning, and coding (arc) foundation models,” 2025. [Online]. Available: https://arxiv.org/abs/2508.06471 [44] I. Loshchilov and F. Hutter, “Decoupled weight decay regularization,” in 
+
+International Conference on Learning Representations , 2019. [Online]. Available: https://openreview.net/forum?id=Bkg6RiCqY7 [45] A. P. Gema, J. O. J. Leang, G. Hong, A. Devoto, A. C. M. Mancino, R. Saxena, X. He, Y. Zhao, X. Du, M. R. G. Madani et al. , “Are we done with mmlu?” in Proceedings of the 2025 Conference of the Nations of the Americas Chapter of the Association for Computational Linguistics: Human Language Technologies (Volume 1: Long Papers) ,2025, pp. 5069–5096. [46] H. Li, Y. Zhang, F. Koto, Y. Yang, H. Zhao, Y. Gong, N. Duan, and T. Baldwin, “Cmmlu: Measuring massive multitask language understanding in chinese,” in ACL (Findings) , 2024, pp. 11 260–11 285. [Online]. Available: https://doi.org/10.18653/v1/2024.findings-acl.671 [47] Y. Huang, Y. Bai, Z. Zhu et al. , “C-eval: A multi-level multi-discipline chinese evaluation suite for foundation models,” Advances in neural information processing systems , vol. 36, pp. 62 991–63 010, 2023. [48] D. Rein, B. L. Hou, A. C. Stickland, J. Petty, R. Y. Pang, J. Dirani, J. Michael, and S. R. Bowman, “Gpqa: A graduate-level google-proof q&a benchmark,” in First Conference on Language Modeling , 2024. [49] M. Suzgun, N. Scales, N. Sch¨ arli et al. , “Challenging big-bench tasks and whether chain-of-thought can solve them,” in Findings of the Association for Computational Linguistics: ACL 2023 , 2023, pp. 13 003– 13 051. [50] X. Zhang, C. Li, Y. Zong, Z. Ying, L. He, and X. Qiu, “Evaluating the performance of large language models on gaokao benchmark,” 2024. [Online]. Available: https://arxiv.org/abs/2305.12474 [51] D. Hendrycks, C. Burns, S. Kadavath, A. Arora, S. Basart, E. Tang, D. Song, and J. Steinhardt, “Measuring mathematical problem solving with the MATH dataset,” in Thirty-fifth Conference on Neural Information Processing Systems Datasets and Benchmarks Track (Round 2) , 2021. [Online]. Available: https://openreview.net/forum?id= 7Bywt2mQsCe [52] M. A. of America, “American invitational mathematics examination.” [Online]. Available: https://maa.org/maa-invitational-competitions/ [53] M. Chen, J. Tworek, and er al., “Evaluating large language models trained on code,” CoRR , vol. abs/2107.03374, 2021. [Online]. Available: https://arxiv.org/abs/2107.03374 [54] J. Austin, A. Odena, M. Nye, M. Bosma, H. Michalewski, D. Dohan, E. Jiang, C. Cai, M. Terry, Q. Le, and C. Sutton, “Program synthesis with large language models,” 2021. [Online]. Available: https://arxiv.org/abs/2108.07732 [55] N. Jain, K. Han, A. Gu, W.-D. Li, F. Yan, T. Zhang, S. Wang, A. Solar-Lezama, K. Sen, and I. Stoica, “Livecodebench: Holistic and contamination free evaluation of large language models for code,” in 
+
+The Thirteenth International Conference on Learning Representations ,2025. [Online]. Available: https://openreview.net/forum?id=chfJJYC3iL [56] T. Kocmi, E. Avramidis, R. Bawden et al. , “Findings of the wmt24 general machine translation shared task: The llm era is here but mt is not solved yet,” in Proceedings of the Ninth Conference on Machine Translation , 2024, pp. 1–46. [57] N. Goyal, C. Gao, V. Chaudhary et al. , “The flores-101 evaluation benchmark for low-resource and multilingual machine translation,” 
+
+Transactions of the Association for Computational Linguistics , vol. 10, pp. 522–538, 2022. [58] J. Zhou, T. Lu, S. Mishra, S. Brahma, S. Basu, Y. Luan, D. Zhou, and L. Hou, “Instruction-following evaluation for large language models,” 2023. [Online]. Available: https://arxiv.org/abs/2311.07911 [59] J. Li, X. Cheng, W. X. Zhao, J.-Y. Nie, and J.-R. Wen, “Halueval: A large-scale hallucination evaluation benchmark for large language models,” in Proceedings of the 2023 conference on empirical methods in natural language processing , 2023, pp. 6449–6464. [60] J. Kaplan, S. McCandlish, T. Henighan, T. B. Brown, B. Chess, R. Child, S. Gray, A. Radford, J. Wu, and D. Amodei, “Scaling laws for neural language models,” 2020. [Online]. Available: https://arxiv.org/abs/2001.08361
