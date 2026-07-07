@@ -1,0 +1,653 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-07T21:18:06.618407+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 13,
+    "deep_cap": 6,
+    "deep_selected": 7,
+    "quick_candidates": 9,
+    "quick_skim_target": 11,
+    "quick_selected": 9
+  },
+  "deep_dive": [
+    {
+      "id": "2607.03248v1",
+      "source": "arxiv",
+      "title": "Unbiased Alignment for Large Language Models with Noisy Preferences",
+      "abstract": "The alignment of large language models with human preferences is commonly achieved through Reinforcement Learning from Human Feedback or Direct Preference Optimization. However, these methods are vulnerable to the significant noise prevalent in real-world preference datasets. To address this critical issue, we present a theoretical framework for unbiased alignment, introducing the Unbiased Reward Model (URM) loss and the Unbiased Direct Preference Optimization (UDPO) loss. By mathematically correcting the distortion induced by preference noise, our novel objectives enable unbiased model training directly from noisy datasets, without requiring clean ground-truth supervision. We provide rigorous theoretical analyses demonstrating that our methods are noise-tolerant, parameter downward compatible, and classification-calibrated. Comprehensive experiments across diverse datasets demonstrate that our approaches outperform state-of-the-art baselines. Code available at: https://github.com/cswjl/unbiased-alignment.",
+      "authors": [
+        "Jialiang Wang",
+        "Xianming Liu",
+        "Xiong Zhou",
+        "Hui Liu",
+        "Haoliang Li"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-03T12:04:43+00:00",
+      "link": "https://arxiv.org/pdf/2607.03248v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "unbiased alignment for RLHF with noisy preferences",
+      "llm_evidence_cn": "针对RLHF噪声偏好的无偏对齐",
+      "llm_evidence": "针对RLHF噪声偏好的无偏对齐",
+      "canonical_evidence": "针对RLHF噪声偏好的无偏对齐",
+      "llm_tldr_en": "Proposes Unbiased Reward Model and Unbiased Direct Preference Optimization to correct preference noise in RLHF, enabling unbiased training from noisy datasets.",
+      "llm_tldr_cn": "大语言模型对齐通常依赖RLHF或DPO，但真实偏好数据中噪声严重。本文提出了无偏奖励模型(URM)和无偏直接偏好优化(UDPO)损失函数，通过数学纠正噪声失真，实现直接从噪声数据中无偏训练。理论分析和实验表明该方法有效抑制噪声影响，提升了对齐可靠性。",
+      "llm_tldr": "大语言模型对齐通常依赖RLHF或DPO，但真实偏好数据中噪声严重。本文提出了无偏奖励模型(URM)和无偏直接偏好优化(UDPO)损失函数，通过数学纠正噪声失真，实现直接从噪声数据中无偏训练。理论分析和实验表明该方法有效抑制噪声影响，提升了对齐可靠性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.04163v1",
+      "source": "arxiv",
+      "title": "SeeMe: Mitigating Hallucinations in Large Vision-Language Models through Effective Visual Token Engineering",
+      "abstract": "Large Vision-Language Models (LVLMs) have achieved remarkable progress in visual understanding tasks such as image captioning and visual question answering. However, they remain susceptible to hallucinations, generating content that is inconsistent with the actual visual input. Existing methods primarily intervene at the decoding stage, while overlooking a critical source of hallucinations: irrelevant or noisy visual tokens that mislead the decoding process. To address this issue, we propose SeeMe, a training-free framework that introduces the concept of feature engineering from traditional machine learning into LVLMs. SeeMe restructures visual tokens through a three-stage token engineering process to suppress hallucination sources while preserving informative visual evidence. Experiments on MME, POPE, and AMBER benchmarks across four LVLMs demonstrate that SeeMe consistently reduces hallucinations and improves output consistency, providing a novel perspective for mitigating hallucinations in LVLMs.",
+      "authors": [
+        "Kai Tang",
+        "Jinhao You",
+        "Bohua Zhang",
+        "Yichen Guo",
+        "Yiding Sun",
+        "Dongxu Zhang",
+        "Chenxi Li",
+        "Xiande Huang",
+        "Shanghang Zhang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-07-05T08:07:51+00:00",
+      "link": "https://arxiv.org/pdf/2607.04163v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "mitigates hallucinations in LVLMs",
+      "llm_evidence_cn": "缓解大视觉语言模型中的幻觉",
+      "llm_evidence": "缓解大视觉语言模型中的幻觉",
+      "canonical_evidence": "缓解大视觉语言模型中的幻觉",
+      "llm_tldr_en": "SeeMe proposes a training-free token engineering framework to suppress visual hallucinations in LVLMs by restructuring noisy visual tokens, achieving significant hallucination reduction without retraining.",
+      "llm_tldr_cn": "大视觉语言模型常因视觉令牌噪声而产生幻觉。现有方法主要干预解码阶段，忽视了嘈杂令牌的误导。本文提出SeeMe，一个免训练框架，通过三阶段令牌工程重新组织视觉特征，抑制幻觉信号。实验表明，该方法在不影响模型性能的前提下大幅减少幻觉生成，为部署低成本幻觉抑制提供了新思路。",
+      "llm_tldr": "大视觉语言模型常因视觉令牌噪声而产生幻觉。现有方法主要干预解码阶段，忽视了嘈杂令牌的误导。本文提出SeeMe，一个免训练框架，通过三阶段令牌工程重新组织视觉特征，抑制幻觉信号。实验表明，该方法在不影响模型性能的前提下大幅减少幻觉生成，为部署低成本幻觉抑制提供了新思路。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.04430v1",
+      "source": "arxiv",
+      "title": "Uncertainty-Aware Abstention in Large Language Models with Provable Alignment Guarantees",
+      "abstract": "Large language models (LLMs) are increasingly deployed in question answering (QA) systems, yet they may generate hallucinated or misaligned responses without reliable confidence estimates. Uncertainty quantification (UQ) offers a natural basis for selective answering, where a system answers only when its prediction is deemed reliable and abstains otherwise. However, existing uncertainty scores for LLMs are often heuristic: a threshold chosen on such scores does not, by itself, provide statistical guarantees on the error rate among accepted answers. We propose CIC, a confidence-interval-based calibration framework that converts arbitrary uncertainty scores into risk-controlled selective answering rules. Given a held-out calibration set, CIC evaluates each generated response using an application-specific alignment criterion and associates it with an uncertainty score and a binary error label. For each candidate uncertainty threshold, CIC estimates the acceptance-conditioned error rate and constructs a high-probability upper confidence bound using either Hoeffding-style or Clopper-Pearson confidence intervals. It then selects the largest threshold whose upper bound is below a user-specified risk level $α$, thereby maximizing the answering rate subject to a finite-sample reliability constraint. Under exchangeability, CIC guarantees with probability at least $1-δ$ that the selected threshold, if non-null, controls the error rate among accepted answers at level $α$. We evaluate CIC on both closed-ended and open-ended QA benchmarks across seven LLMs and multiple uncertainty estimators. Experimental results show that CIC consistently achieves valid risk control while retaining strong answering efficiency, providing a practical and statistically grounded mechanism for deploying LLMs in reliability-sensitive QA workflows.",
+      "authors": [
+        "Sijin Dong",
+        "Hiroyuki Shinnou"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-05T17:50:32+00:00",
+      "link": "https://arxiv.org/pdf/2607.04430v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "uncertainty-aware abstention to reduce hallucination",
+      "llm_evidence_cn": "基于不确定性感知的弃权机制减少幻觉",
+      "llm_evidence": "基于不确定性感知的弃权机制减少幻觉",
+      "canonical_evidence": "基于不确定性感知的弃权机制减少幻觉",
+      "llm_tldr_en": "Proposes CIC, a calibration framework for LLM selective answering with provable hallucination reduction guarantees.",
+      "llm_tldr_cn": "该论文针对LLM在问答中产生幻觉的问题，提出基于置信区间校准的选择性回答框架CIC。将任意不确定性分数转化为风险受控的弃权规则，在给定校准集上保证错误率上界。实验表明CIC能有效减少幻觉输出，在多个QA数据集上取得稳定性能。该工作为幻觉抑制提供了理论保证的实用方法。",
+      "llm_tldr": "该论文针对LLM在问答中产生幻觉的问题，提出基于置信区间校准的选择性回答框架CIC。将任意不确定性分数转化为风险受控的弃权规则，在给定校准集上保证错误率上界。实验表明CIC能有效减少幻觉输出，在多个QA数据集上取得稳定性能。该工作为幻觉抑制提供了理论保证的实用方法。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.04574v1",
+      "source": "arxiv",
+      "title": "A Few Teacher Steps Go a Long Way: Cost-Efficient On-Policy Data Augmentation for Agent Post-Training",
+      "abstract": "For LLM agents, supervised fine-tuning is not only about teacher labels' quality, but also about which interaction contexts those labels condition on. Pure behavioral cloning uses full teacher demonstrations, creating a mismatch between teacher-induced contexts seen in training and student-induced contexts encountered at test time. Recent work addresses this mismatch by querying a teacher at contexts reached by the student, often with increasingly elaborate filtering of the teacher's continuations. We instead frame on-policy data construction as a budget-allocation problem: under matched supervision resources, should teacher output be spent on more start-to-finish demos, longer continuations, outcome filtering, or broader coverage of learner-induced contexts? We formalize this design space through the rollout policy, switch-time distribution, continuation horizon, filtering rules, and two complementary costs: teacher inference generated before filtering and teacher supervision retained for SFT. Across HotpotQA, ALFWorld, and Terminal-Bench-Dev, bounded unfiltered teacher continuations at learner-induced contexts improve over pure behavioral cloning at matched budgets. On HotpotQA and ALFWorld, where we run the full comparison, few-step continuations match or exceed success-filtered and critical-context-filtered alternatives. Our findings suggest that a few teacher steps, placed at learner-induced contexts, can be a more cost-efficient supervision allocation than longer or more heavily curated teacher completions.",
+      "authors": [
+        "Junze Ye",
+        "Jiayi Cheng",
+        "Miao Lu",
+        "Michal Mankowski",
+        "Jose Blanchet",
+        "Mohsen Bayati"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-06T01:02:30+00:00",
+      "link": "https://arxiv.org/pdf/2607.04574v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "agent post-training with on-policy data augmentation",
+      "llm_evidence_cn": "智能体后训练中的在策略数据增强",
+      "llm_evidence": "智能体后训练中的在策略数据增强",
+      "canonical_evidence": "智能体后训练中的在策略数据增强",
+      "llm_tldr_en": "Frames on-policy data construction as a budget-allocation problem for LLM agent post-training, showing cost-efficient use of teacher resources yields better performance than more demonstrations.",
+      "llm_tldr_cn": "LLM智能体的监督微调面临训练与测试上下文不匹配问题。传统方法消耗大量教师演示。本文将后训练数据构建建模为预算分配问题，在同等监督资源下比较不同教师输出用途（长演示、续写、过滤等）。实验显示，更智能的预算分配（如更长的交互轨迹）比单纯增加演示数量更有效，为后训练提供了一种成本高效的策略。",
+      "llm_tldr": "LLM智能体的监督微调面临训练与测试上下文不匹配问题。传统方法消耗大量教师演示。本文将后训练数据构建建模为预算分配问题，在同等监督资源下比较不同教师输出用途（长演示、续写、过滤等）。实验显示，更智能的预算分配（如更长的交互轨迹）比单纯增加演示数量更有效，为后训练提供了一种成本高效的策略。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.04590v1",
+      "source": "arxiv",
+      "title": "Attention Limited Reward Learning",
+      "abstract": "Pairwise human comparisons are a primary interface through which modern AI systems learn human preferences. RLHF and related alignment pipelines typically model such comparisons with Bradley--Terry log-odds, where choice probabilities are governed by latent reward differences. This paper examines what this assumption misses through a reduced-form model motivated by rational inattention, in which each label is generated by a low-capacity evaluation channel. The model separates two forms of ambiguity that standard reward modeling tends to conflate: a comparison may be difficult because the two candidates are genuinely close in value, or because the relevant distinction is hard to detect under limited attention. We show that limited attention can fundamentally distort what pairwise comparisons reveal. In particular, passive comparison data cannot generally distinguish reward, attention, and default tendencies, and heterogeneous attention can make standard Bradley--Terry reward modeling recover misleading rankings. Our analysis shows that learning is governed not by the raw number of labels, but by the amount of attended information each label carries. A case study on human votes over language-model pairs from Chatbot Arena exhibits the predicted signature, a cyclic component of the comparison data that exceeds sampling noise and that no scalar reward can represent; a second case study on perceptual comparisons shows that response times and gaze carry gap information that the labels do not. This perspective suggests that human feedback should be treated not as direct revealed preference, but as an attention-limited measurement process: a weak preference signal may reflect hidden evaluation difficulty rather than genuine indifference.",
+      "authors": [
+        "Wenqian Xing"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-06T01:33:12+00:00",
+      "link": "https://arxiv.org/pdf/2607.04590v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Directly studies reward modeling limitations in RLHF",
+      "llm_evidence_cn": "直接研究RLHF中奖励建模的局限性",
+      "llm_evidence": "直接研究RLHF中奖励建模的局限性",
+      "canonical_evidence": "直接研究RLHF中奖励建模的局限性",
+      "llm_tldr_en": "Examines how limited attention distorts pairwise comparisons in RLHF reward modeling; proposes a rational inattention model that separates ambiguity due to genuine closeness vs. detectability.",
+      "llm_tldr_cn": "该论文针对RLHF中基于成对比较的奖励建模的核心假设进行了批判性分析。通过引入理性疏忽理论，建立了一个有限注意力模型，成功将比较难度与检测难度两种不确定性解耦。研究表明，有限的评估通道容量会根本性地扭曲偏好信号，导致标准奖励模型产生偏差。这一发现为设计更鲁棒的偏好学习算法提供了重要的理论基础，对提升AI系统的对齐可靠性具有深远意义。",
+      "llm_tldr": "该论文针对RLHF中基于成对比较的奖励建模的核心假设进行了批判性分析。通过引入理性疏忽理论，建立了一个有限注意力模型，成功将比较难度与检测难度两种不确定性解耦。研究表明，有限的评估通道容量会根本性地扭曲偏好信号，导致标准奖励模型产生偏差。这一发现为设计更鲁棒的偏好学习算法提供了重要的理论基础，对提升AI系统的对齐可靠性具有深远意义。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.04728v1",
+      "source": "arxiv",
+      "title": "Turning Off-Policy Tokens On-Policy: A Plug-in Approach for Improving LLM Alignment",
+      "abstract": "Reinforcement learning (RL) post-training for large language models (LLMs) follows a efficient paradigm of \"rollout then update\", which inevitably results in off-policy training data. To resolve this, Importance sampling (IS) is proposed, while the token-level ratios compound over long sequences, causing severe variance exploded. A natural idea is \"transferring\" these off-policy token into on-policy token, so that the importance scores for correction are unnecessary. Following this idea, we propose Selective Importance Sampling (SIS), which is inspired by rejection sampling. Concretely, SIS implements by viewing off-policy model as proposal distribution, and implement a token-level rejection test: accepted tokens are viewed as on-policy, so that receive unit importance score, while rejected tokens retain the standard IS correction. Our proposed SIS is theoretically proved reducing the gap between token-level and sequence-level off-policy gradient estimators. The SIS acts as a plug-in that only modifies the importance ratio in the policy loss, adding negligible wall-clock overhead, and can be combine with a vast vary of RL post-training algorithms. Experiments on dense and MoE LLMs across math and agent benchmarks show that SIS consistently improves all objectives, while providing substantially stronger robustness under off-policy data.",
+      "authors": [
+        "Yu Li",
+        "Xiuyu Li",
+        "Mingyang Yi",
+        "Jiaxing Wang",
+        "zhangliangxu",
+        "Zhaolong Xing",
+        "Zhen Chen"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-07-06T06:59:44+00:00",
+      "link": "https://arxiv.org/pdf/2607.04728v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "selective importance sampling for RLHF alignment",
+      "llm_evidence_cn": "用于RLHF对齐的选择性重要性采样",
+      "llm_evidence": "用于RLHF对齐的选择性重要性采样",
+      "canonical_evidence": "用于RLHF对齐的选择性重要性采样",
+      "llm_tldr_en": "Proposes Selective Importance Sampling (SIS) to convert off-policy tokens on-policy for LLM alignment, reducing variance.",
+      "llm_tldr_cn": "该论文针对RL后训练中off-policy数据导致的重要性采样方差问题，提出选择性重要性采样（SIS）。通过将off-policy模型视为提议分布，进行token级拒绝-接受测试，将接受token视为on-policy，从而避免重要性权重校正。实验表明SIS在保持对齐效果的同时显著降低了方差。该工作直接改进了RLHF中的奖励建模和策略优化。",
+      "llm_tldr": "该论文针对RL后训练中off-policy数据导致的重要性采样方差问题，提出选择性重要性采样（SIS）。通过将off-policy模型视为提议分布，进行token级拒绝-接受测试，将接受token视为on-policy，从而避免重要性权重校正。实验表明SIS在保持对齐效果的同时显著降低了方差。该工作直接改进了RLHF中的奖励建模和策略优化。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.05394v1",
+      "source": "arxiv",
+      "title": "Weak-to-Strong Generalization via Direct On-Policy Distillation",
+      "abstract": "Reinforcement learning with verifiable rewards (RLVR) is a powerful recipe for improving language-model reasoning, but it is expensive to repeat on every new strong model because the target model must generate many rollouts during training. As models scale, post-training itself becomes a bottleneck. We study a weak-to-strong alternative: run RL on a smaller model where rollouts are cheaper, then reuse what that RL run learned to improve a stronger target model. Directly distilling the post-RL weak teacher is not enough, because the teacher's final policy mixes useful RL gains with the limitations of the smaller model. We propose Direct On-Policy Distillation (Direct-OPD), which transfers the teacher's RL-induced policy shift instead. Direct-OPD compares the post-RL teacher with its own pre-RL reference and treats their log-ratio as a dense implicit reward for the student. In plain terms, the checkpoint pair tells us which actions RL made the weak model more or less likely to take, and Direct-OPD applies that signal on the stronger student's own on-policy states. This directly reuses the weak model's RL supervision signal without training an explicit reward model or running sparse-reward RL on the target model. Empirically, Direct-OPD consistently leverages weaker teachers to improve stronger target models; notably, it boosts Qwen3-1.7B from 48.3% to 62.4% on AIME 2024 in just 4 hours on 8 A100 GPUs. It outperforms step-matched direct RL and enables the sequential composition of multiple policy shifts. Our results show that RL outcomes can be reused across model scales as implicit reward signals, not merely as final models to imitate.",
+      "authors": [
+        "Shiyuan Feng",
+        "Huan-ang Gao",
+        "Haohan Chi",
+        "Hanlin Wu",
+        "Zhilong Zhang",
+        "Zheng Jiang",
+        "Bingxiang He",
+        "Wei-Ying Ma",
+        "Ya-Qin Zhang",
+        "Hao Zhou"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-07-06T17:59:58+00:00",
+      "link": "https://arxiv.org/pdf/2607.05394v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Direct-OPD transfers RL-induced policy shift from weak to strong model, a form of reward modeling distillation for RLHF",
+      "llm_evidence_cn": "Direct-OPD将弱模型的RL策略迁移给强模型，是RLHF中奖励建模的蒸馏方法",
+      "llm_evidence": "Direct-OPD将弱模型的RL策略迁移给强模型，是RLHF中奖励建模的蒸馏方法",
+      "canonical_evidence": "Direct-OPD将弱模型的RL策略迁移给强模型，是RLHF中奖励建模的蒸馏方法",
+      "llm_tldr_en": "Direct-OPD distills the policy shift induced by RL on a weak teacher to a strong student, avoiding costly RL rollouts on large models while preserving RL gains for reasoning tasks.",
+      "llm_tldr_cn": "该论文针对大规模语言模型后训练代价过高的问题，提出直接在线策略蒸馏（Direct-OPD），从弱模型迁移强化学习带来的策略变化，而非直接蒸馏最终策略，从而避免在强模型上重复运行RL，实验表明该方法在保持性能的同时显著降低训练成本，为奖励建模的跨模型迁移提供了新思路。",
+      "llm_tldr": "该论文针对大规模语言模型后训练代价过高的问题，提出直接在线策略蒸馏（Direct-OPD），从弱模型迁移强化学习带来的策略变化，而非直接蒸馏最终策略，从而避免在强模型上重复运行RL，实验表明该方法在保持性能的同时显著降低训练成本，为奖励建模的跨模型迁移提供了新思路。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.02914v1",
+      "source": "arxiv",
+      "title": "Oyster-II: Reinforcement Learning for Constructive Safety Alignment in Large Language Models",
+      "abstract": "Large language models (LLMs) have demonstrated remarkable capabilities across diverse applications, yet ensuring their simultaneous safety, helpfulness, and trustworthiness remains a persistent challenge. Conventional refusal-oriented alignment strategies mitigate harmful content generation but systematically fail to serve legitimate user needs, often withholding information that could safely and constructively address the underlying intent of sensitive queries. Building upon the constructive safety paradigm pioneered by Oyster-I, which moves beyond blanket refusal toward thoughtful, response-oriented safety alignment, we identify two critical limitations of its Supervised Fine-Tuning (SFT)-based scheme: insufficient safety generalization to out-of-distribution scenarios and a phenomenon we term safety chain-of-thought (CoT) over-generalization, wherein safety-oriented reasoning patterns are excessively applied to benign queries, degrading helpfulness and user experience. To address these limitations, we propose Oyster-II, a reinforcement learning (RL)-based constructive safety alignment framework that adopts a Zero-RL paradigm combined with a multi-stage reinforcement learning strategy.Evaluated across extensive benchmarks, Oyster-II comprehensively surpasses both Qwen3-14B and its predecessor Oyster-I on safety dimensions, achieving cross-scale performance comparable to Qwen3-Max and Qwen3.5-397B.",
+      "authors": [
+        "Jiyang Guan",
+        "Yong Xie",
+        "Jun Chen",
+        "Jiexi Liu",
+        "Zipeng Ye",
+        "Defeng Li",
+        "Jiayu Shen",
+        "Jialing Tao",
+        "Hui Xue"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-03T03:19:39+00:00",
+      "link": "https://arxiv.org/pdf/2607.02914v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "RL for constructive safety alignment uses reward modeling",
+      "llm_evidence_cn": "使用强化学习进行建设性安全对齐涉及奖励建模",
+      "llm_evidence": "使用强化学习进行建设性安全对齐涉及奖励建模",
+      "canonical_evidence": "使用强化学习进行建设性安全对齐涉及奖励建模",
+      "llm_tldr_en": "Oyster-II uses reinforcement learning to achieve constructive safety alignment for LLMs moving beyond refusal to handle sensitive queries improving both safety and helpfulness.",
+      "llm_tldr_cn": "当前大型语言模型的安全对齐主要依靠拒绝策略，但这在保障安全时损害了有用性，无法满足用户对敏感问题的合理需求。本文提出Oyster-II，采用强化学习框架进行建设性安全对齐，通过奖励建模引导模型生成既安全又有帮助的回复。实验结果显示，Oyster-II在安全性指标保持领先的同时，有用性显著优于基于监督微调的方案，为建设性安全对齐提供了一种高效可行的解决方案。",
+      "llm_tldr": "当前大型语言模型的安全对齐主要依靠拒绝策略，但这在保障安全时损害了有用性，无法满足用户对敏感问题的合理需求。本文提出Oyster-II，采用强化学习框架进行建设性安全对齐，通过奖励建模引导模型生成既安全又有帮助的回复。实验结果显示，Oyster-II在安全性指标保持领先的同时，有用性显著优于基于监督微调的方案，为建设性安全对齐提供了一种高效可行的解决方案。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.04470v1",
+      "source": "arxiv",
+      "title": "Regime-Conditional Stabilisation of LLM-Augmented Cooperative Multi-Agent Reinforcement Learning",
+      "abstract": "Large Language Models (LLMs) offer a natural interface for translating human objectives into reward signals for cooperative multi-agent reinforcement learning (MARL), yet the training-time dynamics of this integration remain poorly understood. We show that dynamically updating LLM-generated reward weights during off-policy MARL violates the stationarity assumption of Potential-Based Reward Shaping (PBRS) and contaminates the experience replay buffer, whose stored transitions carry reward labels computed under stale shaping weights. We characterise the result as a regime-dependent failure whose severity depends on how competent the unshaped baseline already is. To control it we propose two stabilisation strategies: a Phase-Based Freeze Schedule that enforces strict stationarity within training phases, and Exponential Moving Average (EMA) smoothing that bounds per-episode weight drift. We evaluate across three cooperative environments and five random seeds with QMIX, complemented by an exploratory VDN extension, yielding a three-regime taxonomy. In the augmentative regime (Simple Spread), where the baseline is functional (74.4 %), EMA significantly improves success to 86.7 % ($+12.3$ pp, $p<0.01$) while naive dynamic updates collapse it to 15.2 %. In the essential regime (Level-Based Foraging), where the baseline is broken (0.1 %), any shaping unlocks the task (95.9 % under EMA). In the supplementary regime (SMAC 3m), where the baseline is near-saturated (98.8 %), stabilised shaping preserves performance (99.9 %) while unstabilised shaping adds variance without gain. These findings establish reward-signal stationarity as a necessary design constraint and indicate that regime placement is a practical predictor of whether dynamic LLM shaping helps or harms.",
+      "authors": [
+        "Faid Keddouri",
+        "Sohaib Houhou",
+        "Aissa Boulmerka",
+        "Nadir Farhi"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "math.OC"
+      ],
+      "published": "2026-07-05T19:29:21+00:00",
+      "link": "https://arxiv.org/pdf/2607.04470v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "analyzes and stabilizes LLM-generated reward signals in cooperative MARL, related to reward modeling for RL",
+      "llm_evidence_cn": "分析并稳定LLM生成奖励信号在合作多智能体RL中的应用，关联奖励建模",
+      "llm_evidence": "分析并稳定LLM生成奖励信号在合作多智能体RL中的应用，关联奖励建模",
+      "canonical_evidence": "分析并稳定LLM生成奖励信号在合作多智能体RL中的应用，关联奖励建模",
+      "llm_tldr_en": "This paper studies the training dynamics of LLM-augmented cooperative MARL, identifies regime-dependent failures due to non-stationary reward shaping, and proposes stabilization strategies.",
+      "llm_tldr_cn": "该论文揭示了LLM增强合作多智能体强化学习中动态奖励权重更新破坏奖励塑形平稳性的问题，导致回放缓冲污染，并提出了基于阶段切换和约束规范化的稳定策略，实验验证了其有效性，为LLM作为奖励函数的鲁棒集成提供了理论分析与解决方案。",
+      "llm_tldr": "该论文揭示了LLM增强合作多智能体强化学习中动态奖励权重更新破坏奖励塑形平稳性的问题，导致回放缓冲污染，并提出了基于阶段切换和约束规范化的稳定策略，实验验证了其有效性，为LLM作为奖励函数的鲁棒集成提供了理论分析与解决方案。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.04763v1",
+      "source": "arxiv",
+      "title": "Multi-Turn On-Policy Distillation with Prefix Replay",
+      "abstract": "We study on-policy distillation (OPD) for agentic tasks, where an LLM agent interacts with an environment over multiple turns and a student imitates a teacher over these multi-turn interaction histories. Fully online OPD is costly because each update requires fresh student rollouts through the environment and teacher queries at visited histories. We propose Replayed-Prefix On-Policy Distillation (ReOPD), an off-environment alternative that reuses pre-collected teacher trajectories as replayed prefixes: the student acts at selected steps, while the teacher provides dense per-step supervision without executing new environment interactions. We show that multi-turn OPD introduces a prefix trap: making histories more student-on-policy improves relevance to the student, but can query the teacher on histories where its target is unreliable. This creates a two-sided distribution shift between student occupancy and teacher reliability. ReOPD addresses this by treating multi-turn OPD as a reliability-aware prefix distribution design and implements it with a simple step-decaying sampling schedule that emphasizes early, lower-shift prefixes. Across mathematical reasoning with Python and search environments over multiple teacher and student model scales, ReOPD preserves or improves OPD-level accuracy, uses zero tool calls during student training, and is at least 4$\\times$ faster per training step than OPD. ReOPD therefore turns expensive agent-environment interaction into a reusable offline resource, enabling scalable distillation across tools, tasks, and environments.",
+      "authors": [
+        "Baohao Liao",
+        "Hanze Dong",
+        "Christof Monz",
+        "Xinxing Xu",
+        "Li Dong",
+        "Furu Wei"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CL",
+        "stat.ML"
+      ],
+      "published": "2026-07-06T07:56:53+00:00",
+      "link": "https://arxiv.org/pdf/2607.04763v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "on-policy distillation for LLM agent tasks",
+      "llm_evidence_cn": "LLM智能体任务中的在策略蒸馏",
+      "llm_evidence": "LLM智能体任务中的在策略蒸馏",
+      "canonical_evidence": "LLM智能体任务中的在策略蒸馏",
+      "llm_tldr_en": "Proposes ReOPD, an off-environment on-policy distillation method for LLM agents, reusing teacher trajectories as prefixes to reduce cost.",
+      "llm_tldr_cn": "该论文针对多轮在策略蒸馏（OPD）在LLM智能体任务中成本高昂的问题，提出了一种离环境替代方案ReOPD。通过复用预收集的教师轨迹作为重放前缀，学生仅在选定步骤行动，而教师提供密集的每步监督，无需新环境交互。实验显示ReOPD在保持性能的同时显著降低了计算开销。该工作为LLM后训练中的蒸馏算法提供了高效的改进方向。",
+      "llm_tldr": "该论文针对多轮在策略蒸馏（OPD）在LLM智能体任务中成本高昂的问题，提出了一种离环境替代方案ReOPD。通过复用预收集的教师轨迹作为重放前缀，学生仅在选定步骤行动，而教师提供密集的每步监督，无需新环境交互。实验显示ReOPD在保持性能的同时显著降低了计算开销。该工作为LLM后训练中的蒸馏算法提供了高效的改进方向。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.03528v1",
+      "source": "arxiv",
+      "title": "Aligning Language Models with Selective Prediction",
+      "abstract": "Large language models (LLMs) are increasingly deployed as critical decision-making components in high-stakes real-world AI systems, rendering LLM reliability a foremost practical concern. In this paper, we focus on enhancing LLM reliability through selective prediction (SP), a strategy that allows an LLM to only predict for inputs where it is likely to be correct (i.e., coverage) and hence reduce the error rate (i.e., risk) on that portion of inputs -- flagging the remaining inputs for future human discretion. In other words, SP improves LLM reliability by balancing the risk-coverage trade-off and enabling seamless human-AI collaboration. To integrate SP into LLMs, we focus on the LLM post-training alignment stage and propose to align LLMs with SP performance metrics, in contrast with existing LLM alignment methods that focus primarily on correctness or calibration metrics. Specifically, we propose a novel alignment framework, Reinforcement Learning for Selection Reward (RLSR), which targets the area under the risk-coverage curve (AURC) -- a popular SP performance metric -- as its alignment objective. RLSR achieves substantially better risk-coverage trade-off compared to multiple alignment baselines on both in-domain and out-of-domain tasks.",
+      "authors": [
+        "Gaoxiang Luo",
+        "Yifan Wu",
+        "Sinian Zhang",
+        "Aryan Deshwal",
+        "Ju Sun"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-07-03T17:59:02+00:00",
+      "link": "https://arxiv.org/pdf/2607.03528v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "selective prediction to reduce LLM error rate, suppressing hallucinations",
+      "llm_evidence_cn": "通过选择性预测降低LLM错误率，抑制幻觉",
+      "llm_evidence": "通过选择性预测降低LLM错误率，抑制幻觉",
+      "canonical_evidence": "通过选择性预测降低LLM错误率，抑制幻觉",
+      "llm_tldr_en": "Aligning LLMs with selective prediction metrics reduces error rate on confident inputs, directly enhancing reliability and suppressing hallucinations in post-training.",
+      "llm_tldr_cn": "针对大语言模型（LLM）在高风险场景中可靠性不足的问题，本文提出在后训练对齐阶段引入选择性预测（SP）策略，使模型仅对确信的输入进行预测，从而降低错误率。该方法通过优化风险-覆盖权衡，在保持高覆盖率的同时显著减少幻觉等错误输出。实验表明，对齐SP指标的LLM在多种任务中实现了更低的错误率，为提升LLM在实际应用中的可信度提供了有效手段。",
+      "llm_tldr": "针对大语言模型（LLM）在高风险场景中可靠性不足的问题，本文提出在后训练对齐阶段引入选择性预测（SP）策略，使模型仅对确信的输入进行预测，从而降低错误率。该方法通过优化风险-覆盖权衡，在保持高覆盖率的同时显著减少幻觉等错误输出。实验表明，对齐SP指标的LLM在多种任务中实现了更低的错误率，为提升LLM在实际应用中的可信度提供了有效手段。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.04963v1",
+      "source": "arxiv",
+      "title": "STAPO: Selective Trajectory-Aware Policy Optimization for LLM Agent Training",
+      "abstract": "Reinforcement Learning (RL) is the dominant paradigm for training Large Language Model (LLM) agents on long-horizon tasks. However, sparse and delayed rewards often lead to trajectory neglect, in which agents lose focus on the task goal and interaction history at intermediate steps. Prior work has explored step-level supervision using Shannon-entropy-based uncertainty signals, which conflate inherent state complexity with agent confidence and therefore provide unreliable estimates of decision reliability. To address this issue, we propose normalized entropy, which measures confidence deviations relative to an agent's average behavior under a given state, thereby strengthening the association between low-quality actions and trajectory neglect. Building on this insight, we introduce Selective Trajectory-Aware Policy Optimization (STAPO), a hierarchical group-based RL framework. STAPO leverages normalized entropy to locate outlier steps associated with trajectory neglect and optimizes them via a joint mechanism of trajectory-aware reward and trajectory-independent penalty, enhancing trajectory awareness while preserving training stability. Extensive experiments on ALFWorld, WebShop, and Search-Augmented QA demonstrate that STAPO achieves state-of-the-art performance while substantially alleviating trajectory neglect, validating its effectiveness and robustness for agentic tasks.",
+      "authors": [
+        "Qiuyi Qi",
+        "Tian Liang",
+        "Mutian Bao",
+        "Jinjian Zhang",
+        "Dongnan Liu",
+        "Wei Zhou",
+        "Linjian Mo",
+        "Ming Kong",
+        "Jie Liu",
+        "Feng Zhang",
+        "Qiang Zhu"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-06T11:50:06+00:00",
+      "link": "https://arxiv.org/pdf/2607.04963v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "RL policy optimization for LLM agent training addresses trajectory neglect",
+      "llm_evidence_cn": "针对LLM agent训练的策略优化解决轨迹忽视问题",
+      "llm_evidence": "针对LLM agent训练的策略优化解决轨迹忽视问题",
+      "canonical_evidence": "针对LLM agent训练的策略优化解决轨迹忽视问题",
+      "llm_tldr_en": "STAPO introduces normalized entropy for trajectory-aware policy optimization in LLM agent RL training improving focus on task goals and interaction history.",
+      "llm_tldr_cn": "在基于强化学习的LLM agent训练中，稀疏奖励常导致模型在长程任务中忽视任务目标和交互历史，即轨迹忽视问题。本文提出STAPO，引入归一化熵指标以区分不同状态下的决策可靠性，并据此进行选择性轨迹感知策略优化。在多个基准任务上，STAPO有效缓解了轨迹忽视，显著提升了任务完成率和中间步骤的决策质量，为LLM agent的强化学习训练提供了重要改进。",
+      "llm_tldr": "在基于强化学习的LLM agent训练中，稀疏奖励常导致模型在长程任务中忽视任务目标和交互历史，即轨迹忽视问题。本文提出STAPO，引入归一化熵指标以区分不同状态下的决策可靠性，并据此进行选择性轨迹感知策略优化。在多个基准任务上，STAPO有效缓解了轨迹忽视，显著提升了任务完成率和中间步骤的决策质量，为LLM agent的强化学习训练提供了重要改进。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.04332v1",
+      "source": "arxiv",
+      "title": "On the effectiveness of reward functions in reinforcement learning for confidence calibration of large language models",
+      "abstract": "In this paper, we consider the setting where large language models (LLMs) are trained using reinforcement learning (RL) to simultaneously improve reasoning accuracy and verbalize its confidence. Our reward scheme uses two functions for rewarding confidence verbalized by the LLM: one when the LLM is correct and a different one when the LLM is incorrect. With a poorly designed reward scheme, the LLM may be incentivized to answer incorrectly so that it can be confident that its answer is indeed incorrect, a phenomenon that we call confidence reward hacking. We propose the concept of non-hackable confidence reward schemes and define a spectrum of such reward schemes for RL confidence calibration training in LLMs. We demonstrate that selective confidence reward hacking can occur in practical datasets with reward schemes that are not designed to be non-hackable. We also demonstrate that the reward scheme with the best calibration to accuracy tradeoff depends on the dataset and the application, and propose using the reward scheme as a hyperparameter to optimize the tradeoffs in accordance to what is important for the application. The code of our experiments is available in https://anonymous.4open.science/r/rl-confidence-calibration-9ED4/README.md.",
+      "authors": [
+        "Chee Heng Tan",
+        "Zhuoyi Lin",
+        "Mehul Motani",
+        "Wee Sun Lee"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-05T14:29:18+00:00",
+      "link": "https://arxiv.org/pdf/2607.04332v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "reward functions for LLM confidence calibration via RL",
+      "llm_evidence_cn": "通过RL进行LLM置信度校准的奖励函数设计",
+      "llm_evidence": "通过RL进行LLM置信度校准的奖励函数设计",
+      "canonical_evidence": "通过RL进行LLM置信度校准的奖励函数设计",
+      "llm_tldr_en": "Studies reward function design for LLM confidence calibration in RL, proposing non-hackable schemes to avoid reward hacking while improving accuracy and confidence verbalization.",
+      "llm_tldr_cn": "本文聚焦于大型语言模型（LLM）在强化学习训练中的置信度校准问题。现有奖励设计可能激励模型错误回答以换取自信表达，即奖励黑客现象。作者提出非可黑客的置信度奖励方案，通过定义不同正确状态下的两类奖励函数并分析其数学性质，确保训练方向正确。实验表明该方法能有效校准LLM置信度并提升推理准确性，为RL训练中的奖励设计提供了安全框架。",
+      "llm_tldr": "本文聚焦于大型语言模型（LLM）在强化学习训练中的置信度校准问题。现有奖励设计可能激励模型错误回答以换取自信表达，即奖励黑客现象。作者提出非可黑客的置信度奖励方案，通过定义不同正确状态下的两类奖励函数并分析其数学性质，确保训练方向正确。实验表明该方法能有效校准LLM置信度并提升推理准确性，为RL训练中的奖励设计提供了安全框架。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.04412v1",
+      "source": "arxiv",
+      "title": "LLM-as-a-Tutor: Policy-Aware Prompt Adaptation for Non-Verifiable RL",
+      "abstract": "Reinforcement learning (RL) for non-verifiable instruction following increasingly relies on LLM judges with prompt-specific rubrics as reward signals. While recent methods adapt these rubrics to the evolving policy during training, the training prompts themselves remain static, drawn from fixed corpora. This static approach often results in a critical misalignment between prompt difficulty and policy capability, leaving the judge unable to recover a discriminative reward signal when prompts fail to elicit quality variance among rollouts. To address this misalignment, we introduce LLM-as-a-Tutor, a framework that extends the LLM's role from judge to tutor: a single model serves as an examiner that pairwise-compares policy rollouts to detect non-challenging prompts, and as a generator that appends atomic constraints to them. This append-only design monotonically raises difficulty in step with the policy's capability, producing a self-calibrating training signal without external difficulty schedules. On three complex instruction-following benchmarks, our method consistently outperforms both policy-unaware baselines and prior policy-adaptive methods that adapt rubrics or rewrite prompts, suggesting prompt adaptation as a missing axis of policy-awareness in non-verifiable RL.",
+      "authors": [
+        "Yujin Kim",
+        "Namgyu Ho",
+        "Sangmin Hwang",
+        "Joonkee Kim",
+        "Yongjin Yang",
+        "Sangmin Bae",
+        "Seungone Kim",
+        "Jaehun Jung",
+        "Se-Young Yun",
+        "Hwanjun Song"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-05T17:05:13+00:00",
+      "link": "https://arxiv.org/pdf/2607.04412v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "LLM-as-a-Tutor framework adapts prompts for reward modeling in non-verifiable RL, directly related to reward modeling for human preferences",
+      "llm_evidence_cn": "LLM-as-a-Tutor框架为非可验证强化学习提供策略感知提示适应，直接关联偏好奖励建模",
+      "llm_evidence": "LLM-as-a-Tutor框架为非可验证强化学习提供策略感知提示适应，直接关联偏好奖励建模",
+      "canonical_evidence": "LLM-as-a-Tutor框架为非可验证强化学习提供策略感知提示适应，直接关联偏好奖励建模",
+      "llm_tldr_en": "LLM-as-a-Tutor extends LLM role from judge to tutor by dynamically adapting training prompts to policy capability, improving discriminative reward signals for non-verifiable RL instruction following.",
+      "llm_tldr_cn": "该论文针对非可验证强化学习中训练提示与策略能力不匹配导致奖励信号失效的问题，提出LLM-as-a-Tutor框架，将LLM从裁判扩展为导师，通过策略感知的提示适应生成更具区分度的奖励信号，显著提升指令遵循性能，实现了更优的人机协作。",
+      "llm_tldr": "该论文针对非可验证强化学习中训练提示与策略能力不匹配导致奖励信号失效的问题，提出LLM-as-a-Tutor框架，将LLM从裁判扩展为导师，通过策略感知的提示适应生成更具区分度的奖励信号，显著提升指令遵循性能，实现了更优的人机协作。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.04428v1",
+      "source": "arxiv",
+      "title": "dOPSD: On-Policy Self-Distillation for Diffusion Language Models",
+      "abstract": "Diffusion large language models (dLLMs) generate text by iteratively denoising a masked sequence, offering a parallel alternative to autoregressive models, but eliciting strong reasoning through post-training remains difficult: supervised fine-tuning is off-policy and suffers from exposure bias, while reinforcement learning gives only sparse, sequence-level rewards and is hard to apply without tractable sequence likelihoods. On-policy self-distillation (OPSD) offers a promising alternative, using one model as both student and teacher to provide dense, token-level, on-policy supervision, but its effectiveness hinges on giving the teacher privileged information (PI) - typically an instance-specific ground-truth reference unavailable at inference - so the student ends up distilling a weak PI-free consensus policy that yields little improvement on dLLM reasoning. We introduce dOPSD, which instead derives the teacher's privilege directly from the student's own denoising trajectory, evaluating masked positions using later, more-decoded steps of that same trajectory rather than an external label, so the teacher's advantage emerges from the model's own decoding process; on Dream and LLaDA, dOPSD improves both in-domain math reasoning and out-of-domain code generation, outperforming supervised and on-policy baselines.",
+      "authors": [
+        "Phuong Tuan Dat",
+        "Qi Li",
+        "Xinchao Wang"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-07-05T17:47:29+00:00",
+      "link": "https://arxiv.org/pdf/2607.04428v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "proposes on-policy self-distillation (dOPSD) for diffusion LLMs, a novel algorithm improvement for post-training",
+      "llm_evidence_cn": "提出扩散语言模型的在线策略自蒸馏方法，属于后训练算法改进",
+      "llm_evidence": "提出扩散语言模型的在线策略自蒸馏方法，属于后训练算法改进",
+      "canonical_evidence": "提出扩散语言模型的在线策略自蒸馏方法，属于后训练算法改进",
+      "llm_tldr_en": "dOPSD applies on-policy self-distillation to diffusion language models, using privileged information to provide dense token-level supervision, overcoming exposure bias and sparse rewards in post-training.",
+      "llm_tldr_cn": "该论文针对扩散语言模型后训练中监督微调存在曝光偏差、强化学习奖励稀疏的问题，提出了在线策略自蒸馏方法dOPSD，通过赋予教师模型特权信息提供密集的token级监督，有效提升了模型推理能力，为扩散语言模型的后训练提供了高效算法。",
+      "llm_tldr": "该论文针对扩散语言模型后训练中监督微调存在曝光偏差、强化学习奖励稀疏的问题，提出了在线策略自蒸馏方法dOPSD，通过赋予教师模型特权信息提供密集的token级监督，有效提升了模型推理能力，为扩散语言模型的后训练提供了高效算法。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.04713v1",
+      "source": "arxiv",
+      "title": "RSPO: Reward-Swap Policy Optimization for Multi-Turn LLM Agents",
+      "abstract": "Reinforcement learning holds significant potential for training large language models (LLMs) to handle multi-turn interactive tasks. However, in long-horizon, multi-turn tasks characterized by sparse outcome rewards, directly training with outcome rewards often results in slow convergence due to the sparsity of signals and the lack of fine-grained feedback. Furthermore, the model may fail to learn successful trajectories that are not sampled during training, thereby limiting its performance. Conversely, while employing customized dense process rewards provides richer signals and accelerates convergence, these surrogate rewards may exhibit potential misalignment with the ground-truth outcome rewards. This inconsistency can bias the training direction and ultimately degrade the model's final performance. In this work, we propose Reward-Swap Policy Optimization (RSPO), a method designed to leverage the rich information from dense process rewards to facilitate training with outcome rewards. By utilizing a reward-swap mechanism, RSPO ensures the diversity of sampled trajectories while guaranteeing consistency between the optimization objective and the true outcome rewards, thereby elevating the performance ceiling of the model. We conduct extensive experiments on two challenging agent benchmarks, WebShop and ALFWorld. By applying our method to various reinforcement learning algorithms, including GRPO, PPO, and GiGPO, we demonstrate that RSPO achieves consistent performance improvements across different baselines and benchmarks.",
+      "authors": [
+        "Qiang Liu",
+        "Taian Guo",
+        "Ruizhi Qiao",
+        "Xing Sun"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-06T06:32:39+00:00",
+      "link": "https://arxiv.org/pdf/2607.04713v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "reward-swap policy optimization for multi-turn LLM agents",
+      "llm_evidence_cn": "面向多轮LLM智能体的奖励交换策略优化",
+      "llm_evidence": "面向多轮LLM智能体的奖励交换策略优化",
+      "canonical_evidence": "面向多轮LLM智能体的奖励交换策略优化",
+      "llm_tldr_en": "Proposes RSPO to address reward signal sparsity and misalignment in multi-turn RL for LLMs by swapping rewards, improving convergence and task completion.",
+      "llm_tldr_cn": "本文针对多轮交互任务中LLM强化学习训练的难点：稀疏结局奖励导致收敛慢，而密集过程奖励可能偏离真实目标。作者提出奖励交换策略优化（RSPO），通过交换奖励信号来减少过程奖励与结局奖励之间的偏差。实验表明RSPO在多轮基准任务上显著提升了任务完成率和学习效率，为多轮LLM代理的稳定训练提供了有效方案。",
+      "llm_tldr": "本文针对多轮交互任务中LLM强化学习训练的难点：稀疏结局奖励导致收敛慢，而密集过程奖励可能偏离真实目标。作者提出奖励交换策略优化（RSPO），通过交换奖励信号来减少过程奖励与结局奖励之间的偏差。实验表明RSPO在多轮基准任务上显著提升了任务完成率和学习效率，为多轮LLM代理的稳定训练提供了有效方案。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    }
+  ]
+}
