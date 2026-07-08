@@ -1,0 +1,363 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-08T21:43:42.088926+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 5,
+    "deep_cap": 6,
+    "deep_selected": 5,
+    "quick_candidates": 4,
+    "quick_skim_target": 11,
+    "quick_selected": 4
+  },
+  "deep_dive": [
+    {
+      "id": "2607.04029v1",
+      "source": "arxiv",
+      "title": "CrossHallu: Do Hallucination Signals Generalize Across Languages and Domains in Large Language Model's Internals?",
+      "abstract": "Recent hallucination detection techniques in large language models (LLMs) focus on directly extracting features from a model's internal representations and training a classifier on these features to detect hallucinations, demonstrating promising results. Notwithstanding this advancement, most internal-state hallucination detection techniques have been explored predominantly in English, raising the question of whether such internal signals generalize across different languages and domains. To address this gap, we present CrossHallu, the first study to evaluate the cross-lingual and cross-domain generalization of hallucination detection using internal representations from six LLMs on the generative question-answering task. We conduct a systematic Arabic <-> English evaluation using TruthfulQA, an Arabic translated version of TruthfulQA, and HalluScore. This evaluation encompasses monolingual training and testing, cross-lingual transfer, cross-domain transfer, and combined cross-lingual and cross-domain transfer. The results reveal that internal-state hallucination signals in LLMs transfer across languages and domains for most models, with cross-lingual performance highly dependent on both class separability and language alignment in the feature space, whereas cross-domain transfer within Arabic varies depending on the training and testing datasets used for the hallucination detector. The code is publicly available at https://github.com/aishaalansari57/CrossHal.",
+      "authors": [
+        "Aisha Alansari",
+        "Malak Alkhorasani",
+        "Hamzah Luqman"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-04T21:01:37+00:00",
+      "link": "https://arxiv.org/pdf/2607.04029v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "cross-lingual hallucination detection in LLM internals",
+      "llm_evidence_cn": "跨语言幻觉检测在LLM内部表示中的应用",
+      "llm_evidence": "跨语言幻觉检测在LLM内部表示中的应用",
+      "canonical_evidence": "跨语言幻觉检测在LLM内部表示中的应用",
+      "llm_tldr_en": "CrossHallu evaluates whether internal hallucination detection signals from LLMs generalize across languages and domains, testing six LLMs on generative QA; provides insights for building robust hallucination suppressors.",
+      "llm_tldr_cn": "大型语言模型的内部表示已被用于幻觉检测，但现有研究主要集中于英文。CrossHallu首次跨语言跨领域评估了六种模型在生成式问答上的内部信号泛化能力，发现信号存在显著的语言和领域漂移。这一发现表明直接迁移英文幻觉检测器效果有限，需要针对多语言场景进行适配。本文为构建跨语言鲁棒的幻觉抑制器提供了基础研究和指导。",
+      "llm_tldr": "大型语言模型的内部表示已被用于幻觉检测，但现有研究主要集中于英文。CrossHallu首次跨语言跨领域评估了六种模型在生成式问答上的内部信号泛化能力，发现信号存在显著的语言和领域漂移。这一发现表明直接迁移英文幻觉检测器效果有限，需要针对多语言场景进行适配。本文为构建跨语言鲁棒的幻觉抑制器提供了基础研究和指导。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.06140v1",
+      "source": "arxiv",
+      "title": "CurateEvo: Data-Curation Evolving for Agentic Post-Training",
+      "abstract": "Large language model (LLM) agents require post-training methods that can improve long-horizon decision making from environment feedback. However, existing agentic post-training pipelines often treat data curation as a fixed preprocessing step, focusing mainly on data augmentation while neglecting filtering, refinement, and adaptation to downstream failures. We propose CurateEvo, a failure-driven dynamic evolution framework for agentic post-training data curation. CurateEvo represents the curation strategy as executable code and iteratively rewrites it using failed trajectories from a held-out development set. At each epoch, the evolved strategy transforms a fixed raw corpus into supervised fine-tuning data, reinforcement learning data, and an inference-time memory bank. The evolution process first improves effectiveness by diagnosing recurring failure modes and augmenting, filtering, or refining data accordingly, and then improves efficiency by pruning redundant or low-utility training turns under a cost-aware objective. Experiments on ACEBench-Agent, BFCL-V4, and τ^2-Bench under both labeled and wild-data settings show that CurateEvo consistently outperforms prior curation methods, improving average scores by 3.2 and 2.7 points, respectively. Further analyses demonstrate that CurateEvo is compatible with different post-training recipes and substantially reduces curation overhead.",
+      "authors": [
+        "Dingzirui Wang",
+        "Xuanliang Zhang",
+        "Keyan Xu",
+        "Qingfu Zhu",
+        "Wanxiang Che"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-07T11:07:00+00:00",
+      "link": "https://arxiv.org/pdf/2607.06140v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "failure-driven dynamic data curation evolution for LLM agent post-training",
+      "llm_evidence_cn": "面向LLM智能体后训练的失败驱动动态数据策展演化",
+      "llm_evidence": "面向LLM智能体后训练的失败驱动动态数据策展演化",
+      "canonical_evidence": "面向LLM智能体后训练的失败驱动动态数据策展演化",
+      "llm_tldr_en": "Proposes CurateEvo, a framework that iteratively evolves data curation strategies as executable code, using failed trajectories to generate diverse training data for LLM agent post-training.",
+      "llm_tldr_cn": "现有智能体后训练将数据策展视为固定预处理步骤，忽略过滤与自适应。本文提出CurateEvo，将策展策略表示为可执行代码，并利用开发集上的失败轨迹迭代重写策略，自动生成监督微调、强化学习和推理时记忆数据。实验证明该方法在长期决策任务上显著提升性能，实现了数据策展的动态演化。",
+      "llm_tldr": "现有智能体后训练将数据策展视为固定预处理步骤，忽略过滤与自适应。本文提出CurateEvo，将策展策略表示为可执行代码，并利用开发集上的失败轨迹迭代重写策略，自动生成监督微调、强化学习和推理时记忆数据。实验证明该方法在长期决策任务上显著提升性能，实现了数据策展的动态演化。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.02966v1",
+      "source": "arxiv",
+      "title": "Distill Where the Student Goes: Teacher-Regularized RL for English-Evidence Cross-Lingual RAG",
+      "abstract": "Cross-lingual retrieval-augmented generation (RAG) is often deployed in an English-evidence regime, where users query in diverse languages but retrieved passages remain English. In this setting, generation can fail despite strong base models: English evidence induces language drift (English or code-switching outputs) and models use evidence unreliably when producing non-English answers. We attribute these failures to two post-training challenges: (i) errors are prefix-dependent, so fixed-trajectory supervision suffers from prefix mismatch; and (ii) sequence-level (partly discrete / judge-based) rewards yield noisy credit assignment and high-variance updates. We propose TR-RAG, a teacher-regularized RL recipe that couples reward optimization with on-policy distillation on student-visited prefixes. A compact student samples on-policy answers, while a stronger frozen teacher is queried only on those prefixes and provides a prefix-wise student-to-teacher reverse-KL anchor. We further introduce a reward decomposition for English-evidence multilingual generation, combining language consistency, character 3-gram recall, and an LLM-judge score for evidence-grounded correctness. Across three benchmarks -- BioASQ-ENKB5, Hotpot-ENKB5, and naturally multilingual MKQA -- and two backbones, TR-RAG improves the composite of language adherence and evidence-grounded correctness over strong baselines. Crucially, the teacher anchor acts as a safety net: on in-domain languages it prevents the large language-consistency collapses (up to ~27 percentage points) that reward-only RL can suffer by drifting below even the base model, while on distant out-of-distribution languages -- where reward-only RL stalls at the base model's ceiling -- it still improves evidence grounding; and on character 3-gram recall the compact student sometimes surpasses its 70B teacher.",
+      "authors": [
+        "Haotian Zhou",
+        "Weiran Huang",
+        "Siqi Liu",
+        "Xiting Wang",
+        "Xin Zhang",
+        "Zhihao Wen"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-03T05:17:48+00:00",
+      "link": "https://arxiv.org/pdf/2607.02966v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "addresses language drift and unreliable evidence use in cross-lingual RAG, key hallucination sources",
+      "llm_evidence_cn": "处理跨语言RAG中的语言漂移和不可靠证据使用，这是幻觉的关键来源",
+      "llm_evidence": "处理跨语言RAG中的语言漂移和不可靠证据使用，这是幻觉的关键来源",
+      "canonical_evidence": "处理跨语言RAG中的语言漂移和不可靠证据使用，这是幻觉的关键来源",
+      "llm_tldr_en": "TR-RAG uses teacher-regularized RL to mitigate language drift and improve evidence reliability in cross-lingual RAG, addressing post-training challenges of prefix mismatch and noisy rewards.",
+      "llm_tldr_cn": "跨语言检索增强生成（RAG）中，英语证据会导致语言漂移和不可靠的答案生成。针对后训练中的前缀不匹配和奖励噪声问题，提出TR-RAG方法，结合教师正则化的强化学习，有效抑制幻觉并提升输出语言一致性。实验表明该方法在多项指标上优于基线。",
+      "llm_tldr": "跨语言检索增强生成（RAG）中，英语证据会导致语言漂移和不可靠的答案生成。针对后训练中的前缀不匹配和奖励噪声问题，提出TR-RAG方法，结合教师正则化的强化学习，有效抑制幻觉并提升输出语言一致性。实验表明该方法在多项指标上优于基线。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.04164v1",
+      "source": "arxiv",
+      "title": "BrownoutMoE: Structure-Aware Expert Grouping for Efficient and Accurate LLM Web-based Services",
+      "abstract": "Mixture-of-Experts (MoE) large language models (LLMs) are increasingly deployed in Web-facing services, where inference must be both accurate and responsive under bursty demand. Although MoE models improve parameter efficiency through sparse expert activation, efficient MoE inference remains challenging in practice. A major reason is the highly imbalanced expert access pattern during inference: a few hot experts process most routed tokens, while many cold experts are rarely activated, leaving GPU parallelism underutilized. Existing systems mainly optimize runtime execution, such as scheduling, communication overlap, and kernel fusion, but usually preserve the original expert organization and therefore do not address the structural inefficiency caused by fragmented expert usage. In this paper, we present \\textbf{BrownoutMoE}, a structure-aware optimization framework for efficient and accurate MoE inference services. Inspired by the brownout paradigm in service computing, BrownoutMoE reorganizes experts into groups to improve utilization and system efficiency while maintaining service quality. Specifically, we formulate layer-wise expert grouping as a learning problem and employ reinforcement learning to discover grouping strategies that minimize accuracy degradation. We further introduce a grouping-consistent distillation process to produce deployable models that are compatible with standard inference pipelines. Experimental results demonstrate that BrownoutMoE reduces accuracy degradation by up to 71.4% and improves throughput by up to 2.24x over baselines.",
+      "authors": [
+        "Yi Ding",
+        "Minxian Xu",
+        "Zhengxin Fang",
+        "Kejiang Ye",
+        "Chengzhong Xu"
+      ],
+      "primary_category": "cs.DC",
+      "categories": [
+        "cs.DC"
+      ],
+      "published": "2026-07-05T08:08:26+00:00",
+      "link": "https://arxiv.org/pdf/2607.04164v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "LLM inference optimization via expert grouping",
+      "llm_evidence_cn": "通过专家分组优化大模型推理",
+      "llm_evidence": "通过专家分组优化大模型推理",
+      "canonical_evidence": "通过专家分组优化大模型推理",
+      "llm_tldr_en": "BrownoutMoE proposes structure-aware expert grouping to address imbalanced expert access in MoE LLMs, improving inference efficiency and accuracy under bursty demand.",
+      "llm_tldr_cn": "混合专家模型（MoE）在大模型推理中存在专家访问不平衡问题，少数热门专家处理大部分令牌而冷门专家利用率低。BrownoutMoE提出结构感知的专家分组方法，通过调整专家组织结构来提升并行度，在不牺牲准确性的前提下显著降低推理延迟。该方法直接面向Web服务场景，对提升LLM部署效率具有重要意义。",
+      "llm_tldr": "混合专家模型（MoE）在大模型推理中存在专家访问不平衡问题，少数热门专家处理大部分令牌而冷门专家利用率低。BrownoutMoE提出结构感知的专家分组方法，通过调整专家组织结构来提升并行度，在不牺牲准确性的前提下显著降低推理延迟。该方法直接面向Web服务场景，对提升LLM部署效率具有重要意义。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.05970v1",
+      "source": "arxiv",
+      "title": "Faithful or Findable? Evaluating LLM-Generated Metadata for RDF Dataset Search",
+      "abstract": "Dataset search depends heavily on metadata, making LLM-generated metadata a consequential form of synthetic content in retrieval systems. We study six metadata-generation settings for RDF datasets, ranging from simple rewriting to profile-grounded and agentic graph-based generation, and evaluate them jointly for retrieval effectiveness and faithfulness. Unconstrained metadata rewriting delivers the strongest retrieval gains over the original metadata, but it is also the least faithful, showing that search improvements can be driven by unsupported semantic expansion. More grounded settings substantially improve faithfulness, and profile-grounded rewriting provides the most balanced trade-off between retrieval effectiveness and grounding. These findings position synthetic metadata as a system-level IR problem in which effectiveness, provenance, and trust must be evaluated together.",
+      "authors": [
+        "Riccardo Terrenzi",
+        "Serkan Ayvaz"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR",
+        "cs.AI"
+      ],
+      "published": "2026-07-07T08:04:47+00:00",
+      "link": "https://arxiv.org/pdf/2607.05970v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "evaluates faithfulness of LLM-generated metadata; directly addresses hallucination suppression",
+      "llm_evidence_cn": "评估LLM生成元数据的忠实度，直接涉及幻觉抑制",
+      "llm_evidence": "评估LLM生成元数据的忠实度，直接涉及幻觉抑制",
+      "canonical_evidence": "评估LLM生成元数据的忠实度，直接涉及幻觉抑制",
+      "llm_tldr_en": "Studies six LLM metadata-generation settings for RDF datasets, finding that unconstrained rewriting improves retrieval but sacrifices faithfulness, while profile-grounded rewriting offers best trade-off.",
+      "llm_tldr_cn": "数据集搜索依赖元数据，LLM生成的元数据可能不忠实。本文系统研究了从简单重写到基于图谱生成的六种元数据生成方式。发现无约束重写虽然检索效果最好但忠实度最低，而基于概要的重写在检索效果和忠实度之间取得了最佳平衡。这些发现对于构建可靠的数据集搜索系统至关重要，也凸显了LLM生成内容中幻觉抑制的必要性。",
+      "llm_tldr": "数据集搜索依赖元数据，LLM生成的元数据可能不忠实。本文系统研究了从简单重写到基于图谱生成的六种元数据生成方式。发现无约束重写虽然检索效果最好但忠实度最低，而基于概要的重写在检索效果和忠实度之间取得了最佳平衡。这些发现对于构建可靠的数据集搜索系统至关重要，也凸显了LLM生成内容中幻觉抑制的必要性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.03702v1",
+      "source": "arxiv",
+      "title": "Agent Reinforcement Learning via Pivotal-Aware Self-Feedback Retry",
+      "abstract": "Large language model (LLM) agents have shown strong decision-making capabilities in long-horizon interactive tasks, yet they still struggle to effectively leverage failed trajectories: full retries incur high interaction costs, while experience retrieval tends to dilute critical experience signals. To address this, we propose PivoARL, a self-feedback retry framework for experience exploitation in LLM agents. PivoARL identifies the pivotal erroneous turn through structured reflection and performs local retry only from the corresponding pivotal state, thereby reusing the correct prefix and reducing redundant interactions. From an information-gain perspective, we further show that pivotal retry concentrates useful experience signals near the error boundary, mitigating the signal dilution caused by state-agnostic experience utilization. Based on this insight, we design a pivotal-aware credit assignment mechanism that rewards correct prefixes while isolating erroneous suffixes, and optimize reflection quality through implicit reflection returns. We conduct a systematic evaluation on 4 agent tasks and 7 search-based QA benchmarks. Results show that PivoARL achieves significant improvements on Pass@2/3 across all tasks, with an average gain of about 11.5\\% over MetaRL. Moreover, benefiting from contrastive preference signals induced by pivotal turns, PivoARL also consistently improves Pass@1 on over 80\\% of the tasks. On Minesweeper environment, PivoARL improves over GiGPO by more than 45\\% and reduces interaction turns by about 42\\% on average compared with full-retry methods. Code is available at https://github.com/yuki-younai/PivoARL.",
+      "authors": [
+        "Weiyang Guo",
+        "Zesheng Shi",
+        "Longhui Zhang",
+        "Zeen Zhu",
+        "Min Zhang",
+        "Jing Li"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-04T04:45:05+00:00",
+      "link": "https://arxiv.org/pdf/2607.03702v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "algorithm improvement for LLM agents via self-feedback retry",
+      "llm_evidence_cn": "通过自反馈重试改进大语言模型智能体的算法",
+      "llm_evidence": "通过自反馈重试改进大语言模型智能体的算法",
+      "canonical_evidence": "通过自反馈重试改进大语言模型智能体的算法",
+      "llm_tldr_en": "PivoARL improves LLM agent decision-making by identifying pivotal erroneous turns and performing local retry, reusing correct prefix and reducing interaction costs.",
+      "llm_tldr_cn": "论文针对大语言模型智能体在长程交互任务中难以有效利用失败轨迹的问题，提出了PivoARL框架。该框架通过结构化反思识别关键错误轮次，并仅从该状态进行局部重试，从而复用正确前缀，减少冗余交互。从信息增益角度分析了该机制的有效性。实验表明，PivoARL在多个交互环境下提升了任务成功率并降低了交互成本，为LLM智能体经验利用提供了高效算法改进。",
+      "llm_tldr": "论文针对大语言模型智能体在长程交互任务中难以有效利用失败轨迹的问题，提出了PivoARL框架。该框架通过结构化反思识别关键错误轮次，并仅从该状态进行局部重试，从而复用正确前缀，减少冗余交互。从信息增益角度分析了该机制的有效性。实验表明，PivoARL在多个交互环境下提升了任务成功率并降低了交互成本，为LLM智能体经验利用提供了高效算法改进。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-06-29-735142-v1",
+      "source": "biorxiv",
+      "title": "Spatial synaptic regularization stabilizes learning across biological and artificial neural networks",
+      "abstract": "How the spatial organization of synapses contributes to stable learning remains a fundamental question in neuroscience. Using the H01 electron microscopy connectome of human temporal cortex, we found that dendritic spines clustered morphologically, whereas synaptic weights followed a center-elevated, surround-suppressed arrangement along dendrites. A regularized Hebbian model formalized this spatial signature, showing that strong synapses lower the probability that neighboring synapses reach high-weight states. Translating this principle into Spatial Synaptic Regularization (SSR) reduced forgetting and stabilized learning across diverse artificial networks and tasks, including continual visual learning, large language-model knowledge editing, and parameter-efficient adaptation of vision-language models, by preserving high-rank, low-overlap representations. These findings identify spatial synaptic organization as an unrecognized dimension for stabilizing learning and show that structural connectomics can yield actionable AI methods.",
+      "authors": [
+        "Zhu, H.",
+        "Chen, Y.",
+        "Zhao, P.",
+        "Xiong, Z.",
+        "Peng, H.",
+        "Wu, F.",
+        "Zhang, R."
+      ],
+      "primary_category": "neuroscience",
+      "categories": [
+        "neuroscience"
+      ],
+      "published": "2026-06-30T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.06.29.735142v1.full.pdf",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "spatial synaptic regularization as algorithm improvement for stable learning in LLMs",
+      "llm_evidence_cn": "空间突触正则化作为稳定LLM学习的算法改进",
+      "llm_evidence": "空间突触正则化作为稳定LLM学习的算法改进",
+      "canonical_evidence": "空间突触正则化作为稳定LLM学习的算法改进",
+      "llm_tldr_en": "Spatial Synaptic Regularization (SSR), inspired by biological synaptic organization, reduces forgetting and stabilizes learning in artificial neural networks including LLMs, offering a novel algorithmic improvement for continual learning.",
+      "llm_tldr_cn": "受生物突触空间组织启发，本文提出空间突触正则化（SSR）方法。在人类颞叶皮层连接组中，突触权重呈现中心高周围低的抑制模式。将此原理形式化为SSR后，其在持续视觉学习和大语言模型训练中显著降低了遗忘，同时保持了学习稳定性。SSR提供了一种生物启发的算法改进，可集成到后训练过程中防止灾难性遗忘。",
+      "llm_tldr": "受生物突触空间组织启发，本文提出空间突触正则化（SSR）方法。在人类颞叶皮层连接组中，突触权重呈现中心高周围低的抑制模式。将此原理形式化为SSR后，其在持续视觉学习和大语言模型训练中显著降低了遗忘，同时保持了学习稳定性。SSR提供了一种生物启发的算法改进，可集成到后训练过程中防止灾难性遗忘。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.03929v1",
+      "source": "arxiv",
+      "title": "Probe, Don't Prompt: A Hidden-State Probe for Metadata Filtering in Multi-Meta-RAG",
+      "abstract": "Multi-Meta-RAG improves retrieval for multi-hop question answering by filtering a vector store on metadata (the news source) that it extracts from each query by prompting gpt-3.5-turbo. We show this proprietary, free-form extractor can be replaced by a local, deterministic probe trained on the hidden states of a small open-source language model. On all 2556 MultiHop-RAG queries the probe reaches 90.9% set-exact accuracy against 88.0% for a model-free substring baseline and 80.9% for GPT-3.5, a margin that comes entirely from null queries, on which GPT-3.5 never abstains; on non-null queries all three stay within about a point. Because the probe's output space is exactly the fixed 49-source vocabulary, it cannot drift outside the allow-list as the prompted model does. Three design choices make it work: selecting a shallow layer, mean pooling, and class-imbalance-aware multi-label training over the long tail of sources. A 135M-parameter model lands within ~1.5 points of a 1.5B one, so the filter is cheap to output: a partial forward pass through the first few layers plus one linear head, with no API. The code is available at https://github.com/mxpoliakov/Multi-Meta-RAG.",
+      "authors": [
+        "Mykhailo Poliakov",
+        "Nadiya Shvai"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-07-04T15:47:38+00:00",
+      "link": "https://arxiv.org/pdf/2607.03929v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "hidden-state probe replaces prompt-based metadata extraction for RAG",
+      "llm_evidence_cn": "使用隐状态探针替代基于提示的元数据提取以改进RAG",
+      "llm_evidence": "使用隐状态探针替代基于提示的元数据提取以改进RAG",
+      "canonical_evidence": "使用隐状态探针替代基于提示的元数据提取以改进RAG",
+      "llm_tldr_en": "Replaces GPT-3.5 prompt-based metadata extraction in Multi-Meta-RAG with a local probe trained on hidden states, achieving higher accuracy on null queries.",
+      "llm_tldr_cn": "Multi-Meta-RAG中使用GPT-3.5提示进行元数据提取，但存在漂移和成本问题。本文提出用小型开源语言模型的隐状态训练确定性探针，替换专有提取器。在MultiHop-RAG基准上，探针达到90.9%的集合精确准确率，超过GPT-3.5的80.9%，尤其在空查询上优势明显，且输出空间固定，不会越界。",
+      "llm_tldr": "Multi-Meta-RAG中使用GPT-3.5提示进行元数据提取，但存在漂移和成本问题。本文提出用小型开源语言模型的隐状态训练确定性探针，替换专有提取器。在MultiHop-RAG基准上，探针达到90.9%的集合精确准确率，超过GPT-3.5的80.9%，尤其在空查询上优势明显，且输出空间固定，不会越界。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.06223v1",
+      "source": "arxiv",
+      "title": "Information Gain-based Rollout Policy Optimization: An Adaptive Tree-Structured Rollout Approach for Multi-Turn LLM Agents",
+      "abstract": "Reinforcement learning has become a promising paradigm for improving large language model (LLM) agents on long-horizon search tasks, where the agent must make a sequence of intermediate decisions before receiving a final outcome. However, existing methods still face a key limitation: the rollout budget is often allocated without explicitly assessing the utility of intermediate states. As a result, substantial computation may be spent on low-value states, even though different branches can vary drastically in their informativeness. In this paper, we propose Information Gain-based Rollout Policy Optimization (IGRPO), a policy optimization framework that treats intermediate-state informativeness as the organizing principle of rollout collection. Specifically, IGRPO performs budget-aware tree-structured rollouts by allocating expansion budget according to node-level informativeness, so that more informative branches are expanded more frequently while unpromising branches are progressively suppressed. We further demonstrate that the information gain-based rollout induces an explicit limiting teacher distribution over trajectories, which naturally yields a clear policy optimization target, thereby unifying adaptive tree-structured exploration with principled policy learning under a single framework. Experiments on seven challenging search-augmented QA benchmarks demonstrate that IGRPO consistently outperforms strong baselines under the same rollout budget constraints, validating the effectiveness of leveraging the induced teacher distribution to guide policy optimization for long-horizon search agents.",
+      "authors": [
+        "Yijun Zhang",
+        "Fan Xu",
+        "Jiaxin Ding",
+        "Yule Xie",
+        "Shiqing Gao",
+        "Xin Ding",
+        "Haoxiang Zhang",
+        "Luoyi Fu",
+        "Xinbing Wang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-07T12:47:23+00:00",
+      "link": "https://arxiv.org/pdf/2607.06223v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "improves LLM agents via rollout policy optimization",
+      "llm_evidence_cn": "通过展开策略优化改进LLM智能体",
+      "llm_evidence": "通过展开策略优化改进LLM智能体",
+      "canonical_evidence": "通过展开策略优化改进LLM智能体",
+      "llm_tldr_en": "Proposes IGRPO, an information gain-based policy optimization framework that adaptively allocates rollout budget to informative states, enhancing multi-turn LLM agent performance on long-horizon tasks.",
+      "llm_tldr_cn": "针对多轮对话LLM智能体在长期任务中展开预算分配低效的问题，提出基于信息增益的展开策略优化（IGRPO），通过评估中间状态的信息量自适应分配计算资源，实验证明该方法能有效提升任务完成效率，为LLM后训练提供新思路。",
+      "llm_tldr": "针对多轮对话LLM智能体在长期任务中展开预算分配低效的问题，提出基于信息增益的展开策略优化（IGRPO），通过评估中间状态的信息量自适应分配计算资源，实验证明该方法能有效提升任务完成效率，为LLM后训练提供新思路。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

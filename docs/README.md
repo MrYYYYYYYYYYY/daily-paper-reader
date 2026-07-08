@@ -6,68 +6,47 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-07
-- 运行时间：2026-07-07 21:29:55 UTC
+- 最新运行日期：2026-07-08
+- 运行时间：2026-07-08 21:49:34 UTC
 - 运行状态：成功
-- 本次总论文数：16
-- 精读区：7
-- 速读区：9
+- 本次总论文数：9
+- 精读区：5
+- 速读区：4
 
 ### 今日简报（AI）
-今日推荐16篇论文，重点聚焦大语言模型的对齐技术和视觉语言模型的幻觉缓解。最值得关注的两篇9分精读论文，分别提出应对噪声偏好的无偏对齐方法和通过视觉令牌工程降低幻觉。建议优先阅读这两篇，深入理解无偏训练和视觉幻觉控制的最新思路。
-- 详情：[/202607/07/README](/202607/07/README)
+今日精选9篇论文，精读5篇重点聚焦大模型幻觉跨语言泛化与智能体后训练数据策展。推荐精读《CrossHallu》探究幻觉信号在语言与领域间的通用性，以及《CurateEvo》提出的演化式数据策展方法。建议普通读者从这两篇入手，理解模型内部机制与数据质量提升的关键思路。
+- 详情：[/202607/08/README](/202607/08/README)
 
 ### 精读区论文标签
-1. [Unbiased Alignment for Large Language Models with Noisy Preferences](/202607/07/2607.03248v1-unbiased-alignment-for-large-language-models-with-noisy-preferences)  
+1. [CrossHallu: Do Hallucination Signals Generalize Across Languages and Domains in Large Language Model's Internals?](/202607/08/2607.04029v1-crosshallu-do-hallucination-signals-generalize-across-languages-and-domains-in-large-language-models-internals)  
    标签：评分：9.0/10、query:lpt
-   evidence：针对RLHF噪声偏好的无偏对齐
-2. [SeeMe: Mitigating Hallucinations in Large Vision-Language Models through Effective Visual Token Engineering](/202607/07/2607.04163v1-seeme-mitigating-hallucinations-in-large-vision-language-models-through-effective-visual-token-engineering)  
+   evidence：跨语言幻觉检测在LLM内部表示中的应用
+2. [CurateEvo: Data-Curation Evolving for Agentic Post-Training](/202607/08/2607.06140v1-curateevo-data-curation-evolving-for-agentic-post-training)  
    标签：评分：9.0/10、query:lpt
-   evidence：缓解大视觉语言模型中的幻觉
-3. [Uncertainty-Aware Abstention in Large Language Models with Provable Alignment Guarantees](/202607/07/2607.04430v1-uncertainty-aware-abstention-in-large-language-models-with-provable-alignment-guarantees)  
-   标签：评分：9.0/10、query:lpt
-   evidence：基于不确定性感知的弃权机制减少幻觉
-4. [A Few Teacher Steps Go a Long Way: Cost-Efficient On-Policy Data Augmentation for Agent Post-Training](/202607/07/2607.04574v1-a-few-teacher-steps-go-a-long-way-cost-efficient-on-policy-data-augmentation-for-agent-post-training)  
-   标签：评分：9.0/10、query:lpt
-   evidence：智能体后训练中的在策略数据增强
-5. [Attention Limited Reward Learning](/202607/07/2607.04590v1-attention-limited-reward-learning)  
-   标签：评分：9.0/10、query:lpt
-   evidence：直接研究RLHF中奖励建模的局限性
-6. [Turning Off-Policy Tokens On-Policy: A Plug-in Approach for Improving LLM Alignment](/202607/07/2607.04728v1-turning-off-policy-tokens-on-policy-a-plug-in-approach-for-improving-llm-alignment)  
-   标签：评分：9.0/10、query:lpt
-   evidence：用于RLHF对齐的选择性重要性采样
-7. [Weak-to-Strong Generalization via Direct On-Policy Distillation](/202607/07/2607.05394v1-weak-to-strong-generalization-via-direct-on-policy-distillation)  
-   标签：评分：9.0/10、query:lpt
-   evidence：Direct-OPD将弱模型的RL策略迁移给强模型，是RLHF中奖励建模的蒸馏方法
+   evidence：面向LLM智能体后训练的失败驱动动态数据策展演化
+3. [Distill Where the Student Goes: Teacher-Regularized RL for English-Evidence Cross-Lingual RAG](/202607/08/2607.02966v1-distill-where-the-student-goes-teacher-regularized-rl-for-english-evidence-cross-lingual-rag)  
+   标签：评分：8.0/10、query:lpt
+   evidence：处理跨语言RAG中的语言漂移和不可靠证据使用，这是幻觉的关键来源
+4. [BrownoutMoE: Structure-Aware Expert Grouping for Efficient and Accurate LLM Web-based Services](/202607/08/2607.04164v1-brownoutmoe-structure-aware-expert-grouping-for-efficient-and-accurate-llm-web-based-services)  
+   标签：评分：8.0/10、query:lpt
+   evidence：通过专家分组优化大模型推理
+5. [Faithful or Findable? Evaluating LLM-Generated Metadata for RDF Dataset Search](/202607/08/2607.05970v1-faithful-or-findable-evaluating-llm-generated-metadata-for-rdf-dataset-search)  
+   标签：评分：8.0/10、query:lpt
+   evidence：评估LLM生成元数据的忠实度，直接涉及幻觉抑制
 
 ### 速读区论文标签
-1. [Oyster-II: Reinforcement Learning for Constructive Safety Alignment in Large Language Models](/202607/07/2607.02914v1-oyster-ii-reinforcement-learning-for-constructive-safety-alignment-in-large-language-models)  
-   标签：评分：8.0/10、query:lpt
-   evidence：使用强化学习进行建设性安全对齐涉及奖励建模
-2. [Aligning Language Models with Selective Prediction](/202607/07/2607.03528v1-aligning-language-models-with-selective-prediction)  
-   标签：评分：8.0/10、query:lpt
-   evidence：通过选择性预测降低LLM错误率，抑制幻觉
-3. [On the effectiveness of reward functions in reinforcement learning for confidence calibration of large language models](/202607/07/2607.04332v1-on-the-effectiveness-of-reward-functions-in-reinforcement-learning-for-confidence-calibration-of-large-language-models)  
-   标签：评分：8.0/10、query:lpt
-   evidence：通过RL进行LLM置信度校准的奖励函数设计
-4. [LLM-as-a-Tutor: Policy-Aware Prompt Adaptation for Non-Verifiable RL](/202607/07/2607.04412v1-llm-as-a-tutor-policy-aware-prompt-adaptation-for-non-verifiable-rl)  
-   标签：评分：8.0/10、query:lpt
-   evidence：LLM-as-a-Tutor框架为非可验证强化学习提供策略感知提示适应，直接关联偏好奖励建模
-5. [dOPSD: On-Policy Self-Distillation for Diffusion Language Models](/202607/07/2607.04428v1-dopsd-on-policy-self-distillation-for-diffusion-language-models)  
-   标签：评分：8.0/10、query:lpt
-   evidence：提出扩散语言模型的在线策略自蒸馏方法，属于后训练算法改进
-6. [RSPO: Reward-Swap Policy Optimization for Multi-Turn LLM Agents](/202607/07/2607.04713v1-rspo-reward-swap-policy-optimization-for-multi-turn-llm-agents)  
-   标签：评分：8.0/10、query:lpt
-   evidence：面向多轮LLM智能体的奖励交换策略优化
-7. [Regime-Conditional Stabilisation of LLM-Augmented Cooperative Multi-Agent Reinforcement Learning](/202607/07/2607.04470v1-regime-conditional-stabilisation-of-llm-augmented-cooperative-multi-agent-reinforcement-learning)  
+1. [Agent Reinforcement Learning via Pivotal-Aware Self-Feedback Retry](/202607/08/2607.03702v1-agent-reinforcement-learning-via-pivotal-aware-self-feedback-retry)  
    标签：评分：7.0/10、query:lpt
-   evidence：分析并稳定LLM生成奖励信号在合作多智能体RL中的应用，关联奖励建模
-8. [STAPO: Selective Trajectory-Aware Policy Optimization for LLM Agent Training](/202607/07/2607.04963v1-stapo-selective-trajectory-aware-policy-optimization-for-llm-agent-training)  
+   evidence：通过自反馈重试改进大语言模型智能体的算法
+2. [Probe, Don't Prompt: A Hidden-State Probe for Metadata Filtering in Multi-Meta-RAG](/202607/08/2607.03929v1-probe-dont-prompt-a-hidden-state-probe-for-metadata-filtering-in-multi-meta-rag)  
    标签：评分：7.0/10、query:lpt
-   evidence：针对LLM agent训练的策略优化解决轨迹忽视问题
-9. [Multi-Turn On-Policy Distillation with Prefix Replay](/202607/07/2607.04763v1-multi-turn-on-policy-distillation-with-prefix-replay)  
+   evidence：使用隐状态探针替代基于提示的元数据提取以改进RAG
+3. [Information Gain-based Rollout Policy Optimization: An Adaptive Tree-Structured Rollout Approach for Multi-Turn LLM Agents](/202607/08/2607.06223v1-information-gain-based-rollout-policy-optimization-an-adaptive-tree-structured-rollout-approach-for-multi-turn-llm-agents)  
+   标签：评分：7.0/10、query:lpt
+   evidence：通过展开策略优化改进LLM智能体
+4. [Spatial synaptic regularization stabilizes learning across biological and artificial neural networks](/202607/08/biorxiv-10-64898-2026-06-29-735142-v1-spatial-synaptic-regularization-stabilizes-learning-across-biological-and-artificial-neural-networks)  
    标签：评分：6.0/10、query:lpt
-   evidence：LLM智能体任务中的在策略蒸馏
+   evidence：空间突触正则化作为稳定LLM学习的算法改进
 
 
 <div class="dpr-home-promo-card">
