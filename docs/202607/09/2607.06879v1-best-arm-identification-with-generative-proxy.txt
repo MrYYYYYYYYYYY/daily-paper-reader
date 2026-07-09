@@ -1,0 +1,1883 @@
+Title: Best-Arm Identification with Generative Proxy
+
+URL Source: https://arxiv.org/pdf/2607.06879v1
+
+Published Time: Thu, 09 Jul 2026 00:17:47 GMT
+
+Number of Pages: 33
+
+Markdown Content:
+# Best-Arm Identification with Generative Proxy 
+
+Tianyi Ma 
+
+School of Operations Research and Information Engineering, Cornell University tm693@cornell.edu 
+
+Hanzhang Qin 
+
+Department of Industrial Systems Engineering and Management, National University of Singapore hzqin@nus.edu.sg 
+
+Ruihao Zhu 
+
+SC Johnson College of Business, Cornell University ruihao.zhu@cornell.edu 
+
+Jierui Zuo 
+
+Michael G. Foster School of Business, University of Washington jzuo4@uw.edu 
+
+Best-arm identification is a canonical model for data-driven decision-making, but in many applications each reward observation is costly. Motivated by the growing availability of cheap predictions from machine learning and large language models, we study fixed-confidence best-arm identification in which each costly reward pull is paired with a cheap but correlated proxy score. The marginal mean of the proxy can be estimated offline and is treated as known, whereas its correlation ρ with the reward, which governs how much the proxy helps, is unknown and must be learned online in pair with real rewards. We show that a control-variate adjustment turns this model into a heteroscedastic identification problem whose oracle sample complexity improves by residual variance 1 − ρ2. The central difficulty is that the correlation must be learned from the same costly samples that identification consumes online, and that a plug-in estimate of the residual variance is anti-conservative and can compromise correctness. We propose PROBE (PR oxy O LS for B est-arm Exploration), a phase-elimination algorithm that directly maintains an upper certificate on the residual variance with an ordinary least squares fit, whose exact χ2 law keeps the certificate valid regardless of the unknown correlation. We prove that PROBE is δ-PAC and attains the known-correlation oracle sample complexity up to a constant multiplicative factor and a constant additive calibration cost. The guarantee extends to the ( ϵ, δ )-PAC setting under minimal changes to the algorithm. Numerical experiments on synthetic instances and on an auto-loan pricing replay with large language model and tabular proxies confirm that the sample savings of PROBE scale with the strength of the reward-proxy correlation, exactly as the theory predicts. 
+
+Key words : online learning, generative model, dynamic pricing, control variates 
+
+## 1. Introduction 
+
+Best-arm identification is a canonical formulation for decision making: among a finite set of alternatives, the decision maker seeks to identify the best one using as few samples as possible facing observation uncertainty. In many applications that motivate best-arm identification, these samples are online and expensive, e.g. , a reward observation may require exposing a user to a 
+
+1arXiv:2607.06879v1 [cs.LG] 8 Jul 2026 2
+
+recommendation, running a pricing experiment, or deploying a candidate policy in a real environment. Fortunately, cheap proxy evaluations for decision units can be produced with modern predictive and generative models. Such proxies are not reliable enough to replace the real reward, but they can be informative about its variation. Following the same philosophy of prediction-powered inference (Angelopoulos et al. 2023a), the cheap proxy prediction can explain part of the uncertainty in an expensive target quantity and thereby reduce the number of costly observations needed for inference. In this paper, we study how to use such proxy scores as control variates in fixed-confidence best-arm identification. These proxy scores finds its place in many real world best-arm identification problems:  
+
+> •
+
+Recommendation Systems: In personalized recommendation, item cold-start is a tough problem. When a set of items (or themes) is newly launched to a user, the recsys needs to find which item (or theme) is the favorite of the user by click-through rate or watching time, facing uncertainty in user behavior due to many aspects. However, online samples are expensive as the user needs to be exposed to the items and usually only a few interactions are allowed. With the help of large language model (LLM), we are able to prompt the LLM with the item information, user interaction history, and all context information including session state, time and device, other recommended items, etc., to receive a proxy score, e.g. , a score from 0 to 3 where 0 corresponds to no interest and 3 corresponds to very interested. During the preparation for the item launch, LLM can be called for many times for different user and different possible contexts, and we can acquire an accurate offline proxy score for each item, but the correlation between this proxy score and the real CTR or watching time remains unknown. Only after the items (or themes) are launched, the correlation can be estimated at the same time recsys explores the user’s favorite. Due to the requirement of high concurrency and low latency, only a few or only one LLM call is available after each user interaction.  
+
+> •
+
+Pricing Policy Selection: A firm choosing among a set of candidate pricing rules, each mapping a customer to an offered price, need to identify the rule that yields the largest expected revenue. Here, online samples are expensive because each one requires offering a price to a real customer. A predictive model or an LLM-based scorer can instead produce a cheap proxy score for any customer-policy pair. Before the pricing experiment is deployed, this scorer can be queried offline on a large pool of historical contexts, so that the average proxy score of each policy is estimated to high accuracy. The correlation between the proxy score and the realized revenue, however, is not available offline and can only be estimated once the experiment is running. Moreover, because pricing decisions must be made in real time, only a few proxy evaluations, can be afforded for each realized customer interaction. 3
+
+These two examples share the same structure. The proxy is correlated with the real reward and is therefore useful for variance reduction, serving to identify the best arm with fewer costly observations. Underlying both examples is an asymmetry between two kinds of proxy information: proxy-only information is cheap and abundant before the experiment begins, whereas reward-paired proxy information is scarce and must be acquired online. On the offline side, proxy-only scores can be generated in large quantities before the experiment by repeatedly querying the generator or predictive model at essentially no cost, so the marginal proxy mean can be estimated to arbitrary accuracy and treated as known. This does not require the proxy to be calibrated to the true reward mean. On the online side, the proxy information that actually reduces variance is the part paired with the same unit that generates the realized reward, and such paired evaluations are far more costly than offline ones, limited by latency and scalability. This asymmetry is the source of both the opportunity and the difficulty in our setting. The opportunity is clear: had the reward-proxy correlation been known in advance, a classical control-variate adjustment by Angelopoulos et al. (2023a) would remove the predictable part of the reward noise, leaving each arm with a smaller residual variance and saving a large number of online samples in proxy-aided best-arm identification. The difficulty is that this correlation, unlike the proxy mean, must be estimated from the same costly reward-proxy paired samples that the identification is trying to economize. This naturally suggests learning the correlation as a first step and reducing the residual noise accordingly. However, aiming at the correlation is myopic. Estimating the correlation and proceeding with the estimated result may trust the observed reward more than warranted and commit to a decision before the arms are reliably separated, which jeopardizes correctness and not merely efficiency. In fact, simply being cautious about the correlation still does not repair this, because a guarantee on the correlation translates poorly into a guarantee on the variance reduction, and the translation degrades exactly when the proxy is most informative. In this paper, we show that such a cheap but unreliable proxy can be turned into a provable reduction in the number of costly online samples needed for best-arm identification. 
+
+1.1. Main Contribution 
+
+In this work, we formulate proxy-augmented fixed-confidence best-arm identification and propose 
+
+PROBE , PR oxy O LS for Best-arm Exploration, an algorithm that turns an unreliable but cheap proxy into provable savings in costly online samples with reward-proxy correlation. Our main contributions are summarized as follows.  
+
+> •
+
+In Section 2, we formalize a best-arm identification problem in which each costly reward pull is paired with a cheap proxy score whose marginal mean is known but reward-proxy correlation is not. We show that a control-variate adjustment turns this model into a heteroscedastic BAI 4
+
+problem, in which the proxy reduces the effective noise variance of each arm from one to the residual variance. This yields a clean oracle benchmark: were the correlation ρ known, the sample complexity would improve by the arm-wise factor 1 − ρ2. We further show that this single-proxy model is without loss of generality, as a batch of repeated proxy queries at one pull reduces exactly to a single averaged proxy. 
+
+• In Section 3, we design PROBE (PR oxy OLS for B est-arm Exploration), a phase-elimination algorithm that learns the variance reduction while performing identification. The central difficulty is that the correlation, and hence the variance reduction it implies, is unknown and must be learned from the same costly samples; a plug-in estimate of the reduced variance is anti-conservative and can compromise correctness. PROBE instead maintains a one-sided residual-variance upper certificate obtained from an ordinary least squares fit, whose exact χ2 law makes the certificate valid regardless of the unknown correlation. A calibration stage and monotone updates keep the certificate within a factor 1 + κ of the true residual variance throughout, and a deliberate one-round lag decouples mean estimation from variance calibration so that the concentration of mean estimates remain Gaussian. 
+
+• In Section 4, we prove that PROBE is δ-PAC and, with high probability, attains the oracle gap-and variance-dependent sample complexity up to a multiplicative factor 1 + κ and an additive calibration cost of order eO(K/κ 2) that is independent of the gaps and correlations. The parameter 
+
+κ admits a clean interpretation as the price of not knowing the correlation, trading the tightness of the variance certificate against the cost of establishing it. Fixing κ to a small constant recovers the known-correlation oracle rate up to constants. We also show that PROBE extends to the (ϵ, δ )-PAC setting with a minimal change to the stopping rule, preserving the same improvement. 
+
+• In Sections 5 and 6, we validate PROBE on synthetic instances and on an auto-loan pricing replay environment. A paired Gaussian benchmark shows that PROBE closely tracks the known-correlation oracle across the whole range of correlations, and a nonlinear environment with proxies learned by standard regression models confirms that the sample saving is governed by the induced reward-proxy correlation rather than by how the proxy is produced. In the replay study, proxy scores generated by large language models and by a structured tabular predictor reduce the fixed-confidence stopping time by up to 61% relative to a reward-only baseline, with the savings tracking the strength of the same-unit reward-proxy correlation. 
+
+1.2. Related Work 
+
+Fixed-confidence identification and pure-exploration objectives. Our work builds on fixed-confidence best-arm identification (BAI), where an algorithm adaptively samples arms and stops with a recommendation that is correct with probability at least (1-δ). This objective is related to 5
+
+ranking and selection in stochastic simulation (Bechhofer 1954, Kim and Nelson 2001, Chen et al. 2000, Frazier et al. 2008, Hong et al. 2021) and to classical BAI algorithms based on elimination, confidence bounds, and information-theoretic sampling (Mannor and Tsitsiklis 2004, Even-Dar et al. 2006, Gabillon et al. 2012, Audibert et al. 2010, Karnin et al. 2013, Jamieson et al. 2014, Kaufmann et al. 2016, Garivier and Kaufmann 2016). Related pure-exploration objectives include top-(m) identification, thresholding, PAC subset selection, and all-( ϵ)-good arms (Kalyanakrishnan et al. 2012, Bubeck et al. 2013, Locatelli et al. 2016, Abernethy et al. 2016, Mason et al. 2020, Li et al. 2025, Feng et al. 2024). These works study identification from reward observations alone; we study how paired proxy observations reduce reward-sample complexity. 
+
+Model-generated feedback and LLM-assisted decisions. Our motivation comes from decision problems where model-generated signals are informative but unreliable. Ji et al. (2025) study regret minimization with correlated surrogate rewards, and related work uses biased offline or model-assisted data to improve bandit learning (Yang et al. 2025, Zhang et al. 2025). In experimentation, Ao et al. (2026) study BAI with LLM judges audited by human feedback, and Ye et al. (2025) use LLMs to cold-start content experiments. Marketing and economics work similarly treats LLM responses as synthetic data and documents both useful preference signals and systematic deviations from humans (Brand et al. 2023, Goli and Singh 2024, Gui and Toubia 2023, Wu et al. 2024, Ludwig et al. 2025, Wang et al. 2026, Yin and Xin 2026). Different from the regret-minimization setting of Ji et al. (2025), we study fixed-confidence identification, where the proxy enters through within-arm residualization and fresh-batch OLS mean estimation is separated from χ2-based residual-variance certification. 
+
+Structured information in BAI. Several pure-exploration models exploit additional structure, including arm-level variances (Lu et al. 2021), linear or transductive features (Soare et al. 2014, Fiez et al. 2019, Jedra and Proutiere 2020, R´ eda et al. 2021a,b, Ochoa Rivera and Tewari 2024), and delayed, correlated, or covariance-aware feedback (Grover et al. 2018, Gupta et al. 2021, Saad et al. 2023). These works change the cross-arm sampling structure. Our proxy is paired with the reward from the same pull, so the useful dependence is within an arm and within a sampled unit. 
+
+Control variates and prediction-assisted inference. Our variance reduction is a control-variate mechanism (Glasserman 2003), related to stochastic bandits with correlated side observations for regret minimization (Verma and Hanawal 2021, Verma et al. 2023). It also connects to prediction-powered inference and proxy-data transfer, which use predictions to improve efficiency while correcting bias (Angelopoulos et al. 2023a,b, Bastani 2021). In fixed-confidence BAI, however, the learned residual variance determines future sampling effort. PROBE therefore uses one-sided OLS variance certificates rather than a plug-in estimate of the reward-proxy correlation. 6
+
+## 2. Problem Formulation 
+
+In this section, we introduce the fixed-confidence best-arm identification problem and the proxy-augmented observation model studied. We first recall the classical benchmark without proxies, then discuss the oracle benchmark in which the reward-proxy correlation is known in advance. 
+
+2.1. BAI Baseline 
+
+We consider a fixed-confidence best-arm identification (BAI) problem in finite-armed bandit with 
+
+K arms indexed by i ∈ [K] = {1, . . . , K }. At each time step t = 1 , 2, . . . , the learner pulls an arm i
+
+for the l-th time and receives a reward Xi,l . For each arm i, the sequence {Xi,l }l≥1 are i.i.d. samples from normal distribution N (pi, 1) with unknown mean pi = E[Xi, 1] ∈ [0 , 1], and reward sequences are independent across arms with unit variance. Denote the unique best arm as i∗ = arg max 1≤i≤K pi,the reward gap can be defined for each suboptimal arm i̸ = i∗ as ∆ i = pi∗ − pi, and we further let ∆ i∗ = min i̸=i∗ ∆i for notation consistency. Given δ ∈ (0 , 1) The objective of BAI is to find the best arm i∗ with probability at least 1 − δ. To be specific, with single input δ, we need to find an algorithm that adaptively samples arms, stops at time T , and returns a recommendation ˆi, and such algorithm is called δ-PAC (probably approximately correct) if Pr(ˆ i = i∗) ≥ 1 − δ.The sample complexity of such algorithms is typically governed by the gap-dependent quantity 
+
+PKi=1 ∆−2 
+
+> i
+
+. A standard fixed-confidence BAI baseline to obtain such gap-dependent guarantees is by phase elimination with exponential-gap (Even-Dar et al. 2006, Karnin et al. 2013). The algorithm maintains an active set of arms and runs in rounds r = 1 , 2, . . . , with a target accuracy εr that decreases geometrically, for example εr = 2 −r . In each round, every active arm is sampled enough times, e.g. , ˜O(ε−2 
+
+> r
+
+), to estimate its mean up to order εr . The algorithm then selects a reference arm, either by a robust subroutine such as median elimination (Karnin et al. 2013) or simply by the empirical maximum among active arms, and removes arms whose empirical means are worse than the reference value by a constant multiple of εr . Intuitively, a suboptimal arm with gap ∆ i
+
+survives only until the first round in which εr is smaller than a constant multiple of ∆ i. Then, such algorithm identifies the best arm with sample complexity of order 
+
+> K
+
+X
+
+> i=1
+
+1∆2
+
+> i
+
+log 
+
+ 1
+
+δ log 
+
+ 1∆i
+
+ 
+
+, (1) up to universal constants and lower-order logarithmic terms. 
+
+2.2. BAI with proxy scores 
+
+We now augment each reward observation with a proxy score. At each time arm i is pulled (for the 
+
+l-th time), the learner observes a paired reward ( Xi,l , Y i,l ), where Xi,l is the noisy version of the unknown real reward pi and Yi,l is the proxy score (or reward) on the the same arm i. The proxy score may be produced by a predictive model, a simulator, or an AI evaluator, e.g. , a pre-trained or 7
+
+fine-tuned AI models like large language models (LLMs). For each arm i, the pairs {(Xi,s , Y i,s )}s≥1
+
+are i.i.d., and the sequences are independent across arms. The proxy score is informative through its statistical dependence with the true reward: it can help estimate pi by its correlation with Xi,l , even if its own mean is not calibrated to the reward mean. Formally, for each arm i, the reward and proxy score as a bivariate Gaussian pair (Ji et al. 2025) as Xi,l 
+
+Yi,l 
+
+
+
+∼ N 
+
+ pi
+
+mi
+
+
+
+,
+
+ 1 ρi
+
+ρi 1
+
+ 
+
+, ρi ∈ (−1, 1) . (2) Here, pi = E[Xi, 1] is the unknown reward mean to be learned, while mi = E[Yi, 1] is known and used only to center the proxy score, e.g. , by define Wi,l = Yi,l − mi we have Wi,l with zero mean. The correlation coefficient ρi = Cov (Xi,l , Y i,l ) captures the quality of the proxy information, where larger |ρi| means that the centered proxy Wi,l carries more information about the reward noise. Importantly, we do not require mi = pi, or even that mi be close to pi. The proxy may therefore be biased as a direct surrogate for reward, as long as its centered variation is informative about Xi,l .
+
+Remark 1 (Proxy asymmetry between offline and online) . The formulation in (2) reflects the offline-online asymmetry in proxy scores highlighted in Section 1, which makes the proxy mean mi
+
+treated as known while leaving the correlation ρi to be learned. 
+
+Known proxy mean. Before the online phase, proxy calls are cheap, so the generator or predictive model can be queried repeatedly on each arm to estimate the marginal mean mi to arbitrary accuracy, and we therefore treat mi as known. The correlation ρi, by contrast, is a joint property of the reward and the proxy on the same online unit due to shared underlying features or explicit contexts, and can only be estimated from the costly paired samples drawn during the online phase. 
+
+Single proxy per pull. During the online phase, latency and concurrency constraints permit only a restricted number of proxy calls per interaction. Assuming a single proxy per pull is nonetheless without loss of generality: when the proxy is repeatedly called independently, they can be averaged into one control variate, as we formalize in Proposition 3. 
+
+In bandit problems, the estimation of mean rewards plays an important role. With the help of proxy scores, the variance of estimation can be reduced through a control-variate adjustment (Glasserman 2003). To be specific, for each arm i with unknown mean pi, we can define the adjusted observation 
+
+Xi,l − β(Yi,l − mi) (3) based on observed arm reward Xi,l and proxy score Yi,l for any coefficient β ∈ R.
+
+Proposition 1. For any coefficient β ∈ R, the adjusted observation with proxy score is unbiased with variance Var (Xi,l − β(Yi,l − mi)) = 1 + β2 − 2ρiβ. 8
+
+The variance is minimized at β = ρi, in which case Var (Xi,l − ρi(Yi,l − mi)) = 1 − ρ2 
+
+> i
+
+=: vi.
+
+Note that in current model (2) and (3) , we have assumed a single proxy per pull. Although in real world application, proxy calls can be repeated more than once, if the samples share the same underlying feature or explicit context, more proxy scores are redundant without additional correlation information. Otherwise, the averaged proxy is a sufficient summary of the whole proxy vector, discussed in detail in Section C in the appendix. If ρi is known before sampling, then the control-variate adjusted random variable Xi,l −ρi(Yi,l −mi)is a Gaussian observation with mean pi and residual variance vi = 1 − ρ2 
+
+> i
+
+. Consequently, the fixed-confidence best-arm identification problem with known-correlation proxy reduces to a heteroscedastic BAI problem in which arm i has noise variance vi in place of one. To be specific, the variance of each arm i is reduced from 1 to 1 − ρ2 
+
+> i
+
+. Rerunning the phase-elimination argument behind (1) with each arm’s sampling times scaling by its own residual variance vi, the baseline complexity with known proxy becomes KX
+
+> i=1
+
+1 − ρ2
+
+> i
+
+∆2
+
+> i
+
+log 
+
+ 1
+
+δ log 
+
+ 1∆i
+
+ 
+
+, (4) up to universal constants and lower-order logarithmic terms, and serves as the oracle benchmark. This shows the informative value of a proxy: when a proxy can explain part of the reward fluctuation for the same sampled unit, the variance of remaining noise reduces from one to 1 − ρ2 
+
+> i
+
+after subtracting this predictable component. As how much fluctuation is explained can be measured by the correlation ρi, a highly correlated proxy improves BAI by reducing the residual uncertainty in the estimation of mean reward. Despite the 1 − ρ2 
+
+> i
+
+reduction in sample complexity given in (4) , the main challenge is that the correlation ρi, and hence the residual variance 1 − ρ2 
+
+> i
+
+that the oracle schedule relies on, is not known in advance. As we will discuss in Remark 2, estimating ρi and plugging it into 1 − ˆρ2 
+
+> i
+
+is not enough as |ρi| might be overestimated and the sampling is not enough before an elimination decision. A conservative bound on ρi cannot yields a reliable certificate for the residual variance either especially when ρi is large. Our algorithm instead estimates and certifies the residual variance directly through a linear-regression formulation, which we develop next. 
+
+## 3. PROBE : Proxy OLS for Best-arm Exploration 
+
+In this section, we propose our algorithm PROBE that learns the control-variate coefficient while maintaining conservative residual-variance upper certificates. The algorithm uses ordinary least squares (OLS) to estimate the reward mean and the reward-proxy correlation. The residual-variance estimate is then converted into a residual-variance upper certificate that determines future batch sizes. 9
+
+3.1. OLS Preliminaries 
+
+Under (2) , and plugging into Wi,l = Yi,l − mi, we note that control-variate adjusted observation in (3) of each pull of arm i can be written as the regression model 
+
+Xi,l = pi + ρiWi,l + εi,l , Wi,l ∼ N (0 , 1) , εi,l ∼ N (0 , v i),
+
+where vi = 1 − ρ2 
+
+> i
+
+and Wi,l is independent of εi,l . Here, ρi is the slope, and pi is the intercept in OLS. Fix arm i and a fresh batch of size s ≥ 3, with observations {(Xi,l , W i,l )}sl=1 , the OLS estimator is (ˆ pi, ˆρi) = arg min 
+
+> a,b s
+
+X
+
+> l=1
+
+(Xi,l − a − bW i,l )2. (5) Equivalently, with ¯Xi = s−1 Psl=1 Xi,l and ¯Wi = s−1 Psl=1 Wi,l ,ˆρi =
+
+Psl=1 (Xi,l − ¯Xi)( Wi,l − ¯Wi)
+
+Psl=1 (Wi,l − ¯Wi)2 , ˆpi = ¯Xi − ˆρi ¯Wi.
+
+Let 
+
+hi = 1
+
+s + ¯W 2
+
+> i
+
+Psl=1 (Wi,l − ¯Wi)2 ,
+
+and define the unbiased OLS residual-variance estimator for arm i by ˆvi = 1
+
+s − 2
+
+> s
+
+X
+
+> l=1
+
+(Xi,l − ˆpi − ˆρiWi,l )2. (6) Then, the OLS estimator ˆ pi and ˆ vi satisfy the following statistical backbone of the algorithm. 
+
+Proposition 2. For any fixed arm i, conditional on Wi, 1, . . . , W i,s , the OLS intercept satisfies 
+
+ˆpi − pi ∼ N (0 , v ihi).
+
+Moreover, 
+
+(s − 2)ˆ vi
+
+vi
+
+∼ χ2
+
+> s−2
+
+.
+
+Remark 2 (Estimate ˆvi instead of ˆρi). The χ2-distribution of ˆvi/v i plays an important role in our algorithm that bypasses the challenge caused by estimating ˆρi to be plugged into vi. To be specific, if we only estimate ˆρi, then 
+
+• Overestimating ρi is problematic: When ρi (assumed to be positive without loss of generality) is overestimated by an error e > 0, i.e., ˆρi = ρi + e, we have 1 − ˆρ2 
+
+> i
+
+≈ vi − 2ρe < v i. Because the correctness of δ-PAC usually requires at least ˜O(vi/ε 2 
+
+> r
+
+) samples to distinguish a reward gap of width εr , the sample size based on 1 − ˆρ2 
+
+> i
+
+is less than required and the correctness then collapses due to lack of confidence. The underlying problem of naive plug-in is that 1 − ˆρ2 
+
+> i
+
+is biased estimator for the residual variance vi, i.e., E[1 − ˆρ2 
+
+> i
+
+] = 1 − ρ2 
+
+> i
+
+− Var (ˆ ρi) < v i.10 
+
+• Conservative LCB of ˆρi also fails: If we simply use a lower confidence bound of ˆρi to avoid overestimating, sample complexity might explode when the proxy is informative. For example, we use ˆρi − rad to plug into the residual variance where rad = ˜O  s−1/2 is the confidence radius under sample size s. With similar order of confidence provided by rad , ρi − rad /2 ≤ ˆρi ≤ ρi + rad /2 holds and implies ˆρi − rad ≤ ρi − rad /2. Because we still want 1 − ( ˆρi − rad )2 close enough to the real residual variance vi from above (otherwise it cannot reduce sample complexity and might collapse to the case without proxy), we require, e.g., 1−( ˆρi −rad )2 ≤ (1+ κ)vi then 1−(ρi −rad /2) 2 ≤ (1+ κ)vi.This implies s ≥ ˜O(ρ2 
+
+> i
+
+κ−2v−2 
+
+> i
+
+). When ρi is close to 1 and vi is close to 0, the sample size s diverges to infinite for any fixed constant κ.Instead, the advantages of estimation and concentration on ˆvi are 
+
+• ˆvi is an unbiased estimator for vi.
+
+• The χ2-distribution provides a scale-free concentration for ˆvi/v .
+
+3.2. The PROBE Algorithm 
+
+For a batch of size s ≥ 3, define the residual-variance upper certificate given residual-variance estimation ˆ v as 
+
+U (s, ˆv, η ) = 
+
+
+
+ˆv
+
+1 − 2
+
+q log(1 /η )
+
+> s−2
+
+, if s − 2 > 4 log(1 /η ),
+
++∞, otherwise. (7) The lower tail of the χ2-distribution and Proposition 2 imply that vi ≤ U (s, ˆvi, η ) with probability at least 1 − η. The algorithm uses this residual-variance upper certificate rather than the plug-in estimate ˆ vi.We now present PROBE , short for PR oxy OLS for B est-arm Exploration, in Algorithm 1. The algorithm has two parts. First, it draws a calibration batch from every arm to initialize a conservative upper bound Ui, 0 on the residual variance vi. Second, it runs phased elimination. In each round r,active arms with smaller residual-variance upper certificates Ui,r receive smaller fresh batches, and the OLS intercept from the fresh batch is used as the reward-mean estimate for elimination. 
+
+Remark 3 (Key design choices of PROBE ). The correctness and efficiency of PROBE rest on the interplay of three design choices: a residual-variance upper certificate that replaces the plug-in estimate, a monotone update that keeps this certificate valid throughout, and a one-round lag that decouples mean estimation from variance calibration. 
+
+Residual-variance upper certificate. The upper certificate Ui,r defined in (7) is pivotal because it sandwiches the residual variance as vi ≤ Ui,r −1 ≤ (1 + κ)vi. The lower guarantee vi ≤ Ui,r −1 delivers correctness: the round-r batch is then large enough to estimate the OLS intercept ˆpi,r to the target accuracy εr , so no arm is eliminated before its mean has been estimated reliably. The upper guarantee 
+
+Ui,r −1 ≤ (1 + κ)vi delivers efficiency: the batch size exceeds the oracle allocation (1 − ρ2 
+
+> i
+
+)ε−2 
+
+> r
+
+by at 11 
+
+Algorithm 1 PROBE 
+
+Input: δ, K, κ
+
+Initialization: tcal ← 2 + ⌈64 log(8 K/δ )/κ 2⌉, S1 ← { 1, . . . , K }, r ← 1, si,r ← 1 + tcal .
+
+for Each arm i ∈ [K] do 
+
+Pull arm i for tcal times and compute the OLS residual variance ˆ vi, 0.Set Ui, 0 ← U (tcal , ˆvi, 0, δ/ (8 K)). 
+
+end for while |Sr | > 1 do 
+
+Set δr ← δ/ (16 Kr 2), εr ← 2−r .
+
+for Each active arm i ∈ Sr do 
+
+Set batch size ti,r ← max {3, ⌈1 + 16 log(2 /δ r )⌉ , ⌈8 log(4 /δ r )⌉ , ⌈64 Ui,r −1 log(2 /δ r )ε−2 
+
+> r
+
+⌉} .Pull arm i for ti,r times. Observe arm rewards {Xi,s i,r , . . . , X i,s i,r +ti,r −1} and proxy scores {Yi,s i,r , . . . , Y i,s i,r +ti,r −1}.Compute the OLS estimator (ˆ pi,r , ˆρi,r ) ← arg min   
+
+> a,b si,r +ti,r −1
+
+X
+
+> l=si,r
+
+(Xi,l − a − b(Yi,l − mi)) 2.
+
+Compute the residual variance ˆ vi,r 
+
+ˆvi,r ← 1
+
+ti,r − 2  
+
+> si,r +ti,r −1
+
+X
+
+> l=si,r
+
+(Xi,l − ˆpi,r − ˆρi,r (Yi,l − mi)) 2
+
+Set eUi,r ← U (ti,r , ˆvi,r , δ r ), Ui,r ← min {Ui,r −1, eUi,r }, si,r +1 ← si,r + ti,r .
+
+end for 
+
+Let ir ∈ arg max i∈Sr ˆpi,r , set Sr+1 ← Sr \ { i ∈ Sr : ˆ pi,r < ˆpir ,r − εr }.
+
+r ← r + 1. 
+
+end while 
+
+most a factor 1 + κ, so the total sample complexity stays controlled. Using a plug-in estimate ˆvi in place of Ui,r would forfeit the lower guarantee, and hence correctness, for the reasons detailed in Remark 2. 
+
+Monotone certificate updates. The sandwich vi ≤ Ui,r −1 ≤ (1 + κ)vi on residual variance is established by induction from the calibration stage. Drawing tcal = 2 + ⌈64 log (8 K/δ )/κ 2⌉ samples per arm gives vi ≤ Ui, 0 ≤ (1 + κ)vi at r = 0 for all arms with high probability, using the χ2 concentration of ˆvi/v i in Proposition 2. Each subsequent batch produces a fresh residual-variance upper certificate 
+
+eUi,r , and the monotone update Ui,r = min {Ui,r −1, eUi,r } preserves both sides of the sandwich: taking 12 
+
+the minimum of valid upper bounds keeps the lower guarantee vi ≤ Ui,r , while never worsening the initial factor-(1 + κ) tightness. Hence vi ≤ Ui,r ≤ (1 + κ)vi holds throughout the algorithm. 
+
+One-round lag between mean and variance certificate. PROBE sizes the round-r batch through 
+
+Ui,r −1, computed from data collected before round r, while it estimates ˆpi,r only from the fresh round-r observations. This deliberate lag decouples estimation on mean from residual-variance upper certificate: since the accuracy of ˆpi,r is certified by the fixed Ui,r −1 ≥ vi from earlier rounds, Proposition 2 applies directly conditional on the fresh proxy values, and concentration of ˆpi,r remains exactly Gaussian. Reusing a single batch for both purposes would instead couple them and complicate the concentration of ˆpi,r to follow a Student-t law rather than a Gaussian one, as in Ji et al. (2025). Instead, the lag yields a sharper concentration without changing the leading sample complexity as the geometrically growing phase lengths ε−2 
+
+> r
+
+absorb the one-round delay. 
+
+## 4. Sample Complexity 
+
+In this section, we show that PROBE matches the gap-dependent sample complexity reduced by the residual variance 1 − ρ2 
+
+> i
+
+up to the multiplicative factor 1 + κ and an initial calibration cost. 
+
+4.1. δ-PAC Analysis Theorem 1. Under the proxy observation model (2) , PROBE is δ-PAC. Moreover, with probability at least 1 − δ, its total number of arm pulls is at most 
+
+T ≤ K
+
+
+
+2 + 
+
+ 64 log(8 K/δ )
+
+κ2
+
+ 
+
++
+
+> K
+
+X
+
+> i=1
+
+1536(1 + κ)(1 − ρ2 
+
+> i
+
+)∆2
+
+> i
+
+log 
+
+ 12 Kδ log 2
+
+ 32∆ i
+
+ 
+
++ log 
+
+ 32∆ i
+
+  
+
+64 log 
+
+ 12 Kδ log 2
+
+ 32∆ i
+
+ 
+
++ 6 
+
+ ! (8) 
+
+Proof Sketch. The proof works on a clean event under which two properties hold uniformly over arms and rounds: every residual-variance upper certificate is valid and tight enough as 
+
+vi ≤ Ui,r ≤ (1 + κ)vi,
+
+and every OLS intercept used for elimination is accurate as 
+
+|ˆpi,r − pi| ≤ εr /4.
+
+The clean event follows from three parts. First, the calibration event gives vi ≤ Ui, 0 ≤ (1 + κ)vi,then the monotone updates and the χ2-distribution gives vi ≤ Ui,r ≤ (1 + κ)vi for all round r ≥ 0with induction. Second, the OLS intercept estimation ˆpi,r is concentrated at pi. Third, the leverage event hi,r ≤ 2/t i,r happens (established by the first three terms in ti,r ), which further (by the final term in ti,r ) implies |ˆpi,r − pi| ≤ εr /4 with the OLS intercept estimation. 13 
+
+Conditioned on this clean event which happens with probability at least 1 − δ, correctness follows from the standard phase-elimination argument. The best arm is never removed: if i∗ ∈ Sr , then the empirical reference arm ir satisfies ˆpir ,r ≤ pi∗ + εr /4, ˆpi∗,r ≥ pi∗ − εr /4,
+
+so ˆ pir ,r − ˆpi∗,r ≤ εr /2 < ε r . Conversely, a suboptimal arm i is eliminated once εr < 2∆ i/3 because ˆpi∗,r − ˆpi,r ≥ ∆i − εr /2 > ε r .
+
+Since the empirical reference arm has value at least ˆ pi∗,r , arm i is removed if it is still active. It remains to count samples. A suboptimal arm i is sampled only until the first round in which 
+
+εr < 2∆ i/3, namely r ≥ O( log 2(1 /∆i)), and the best arm is sampled only until the analogous round with ∆ i∗ = min i̸=i∗ ∆i. Conditioned on the clean event, arm i is sampled for 
+
+tcal +
+
+> log 2(1 /∆i)
+
+X
+
+> r=1
+
+ti,r ≤ ˜O 1
+
+κ2 +
+
+> log 2(1 /∆i)
+
+X
+
+> r=1
+
+(1 + κ)(1 − ρ2 
+
+> i
+
+)4−r
+
+!
+
+≤ ˜O
+
+ 1
+
+κ2 + (1 + κ)(1 − ρ2 
+
+> i
+
+)∆2
+
+> i
+
+
+
+Summing this display for every arm i yields the bound in (8) . The full proof is deferred to Section A in the appendix. Note that, Algorithm 1 can be easily extended to the ( ϵ, δ )-PAC setting. In the previous δ-PAC setting, we focus on exact best-arm identification, where the algorithm must return i∗ with probability at least 1 − δ. In many applications, it is sufficient to identify an arm whose mean reward is within a prescribed accuracy level ϵ > 0 of the best arm. Formally, an algorithm is called (ϵ, δ )-PAC if its recommendation ˆ i satisfies Pr( pˆi ≥ pi∗ − ϵ) ≥ 1 − δ. 
+
+To accommodate this relaxation, the modification of PROBE is minimal. The only change is the stopping rule: the algorithm is terminated at round min {r : εr < 2ϵ/ 3} even if |Sr | > 1 and an arbitrary arm in Sr is returned. The sample complexity is obtained from Theorem 1 by replacing each gap ∆ i with the effective gap max {∆i, ϵ }. In particular, with probability at least 1 − δ, the total number of arm pulls is at most 
+
+Tϵ ≤ K
+
+
+
+2 + 
+
+ 64 log(8 K/δ )
+
+κ2
+
+ 
+
++
+
+> K
+
+X
+
+> i=1
+
+1536(1 + κ)(1 − ρ2 
+
+> i
+
+)max {∆i, ϵ }2 log 
+
+ 12 Kδ log 2
+
+ 32 max {∆i, ϵ }
+
+ 
+
++ log 2
+
+ 32 max {∆i, ϵ }
+
+  
+
+64 log 
+
+ 12 Kδ log 2
+
+ 32 max {∆i, ϵ }
+
+ 
+
++ 6 
+
+ !
+
+.
+
+(9) Ignoring constants and lower-order logarithmic terms, (9) gives 
+
+eO Kκ2 +
+
+> K
+
+X
+
+> i=1
+
+(1 + κ)(1 − ρ2 
+
+> i
+
+)max {∆i, ϵ }2
+
+!
+
+,
+
+preserving the same variance-adaptive improvement as the exact-identification guarantee. 14 
+
+4.2. Comparison with Benchmarks 
+
+We then compare the sample complexity of PROBE in Theorem 1 with two benchmarks given in (1) and (4). The sample complexity in Theorem 1 can be expressed in leading dependence 
+
+> K
+
+X
+
+> i=1
+
+ (1 + κ)(1 − ρ2 
+
+> i
+
+)∆2
+
+> i
+
+log 
+
+ Kδ log 
+
+ 1∆i
+
+ 
+
++ log( K/δ )
+
+κ2
+
+
+
+(10) where the first term corresponds to the phase elimination stage and the second terms corresponds to the calibration stage. Recall that the sample complexity of the fixed-confidence best-arm identification without proxy has leading dependence 
+
+> K
+
+X
+
+> i=1
+
+1∆2
+
+> i
+
+log 
+
+ 1
+
+δ log 
+
+ 1∆i
+
+ 
+
+.
+
+and the one with proxy and known correlation ρi has leading dependence 
+
+> K
+
+X
+
+> i=1
+
+1 − ρ2
+
+> i
+
+∆2
+
+> i
+
+log 
+
+ 1
+
+δ log 
+
+ 1∆i
+
+ 
+
+,
+
+PROBE pays only a multiplicative factor 1 + κ in the main gap-dependent term and an additive calibration cost of order ˜O(κ−2). The parameter κ captures the exploration and exploitation tradeoff facing unknown correlation: a tradeoff between the accuracy in residual variance vi estimation (exploitation) and the sample size in calibration for this accuracy (exploration). On one hand, κ quantifies the relative accuracy with which the algorithm learns an upper certificate Ui,r for vi. To be specific, PROBE maintains 
+
+Ui,r ≤ (1 + κ)vi throughout the algorithm and provides tolerance towards overestimating Ui,r . This tolerance in upper bound further ensures that the batch size is not much larger than the oracle batch size based on the unknown residual variance vi = 1 − ρ2 
+
+> i
+
+by a factor of 1 + κ during elimination. On the other hand, a lower tolerance in estimation accuracy requires more samples by an additive factor of κ−2 to establish the certificate reliably during calibration. In a word, κ represents the price of not knowing ρi and quantifies the tradeoff between exploring and exploiting this correlation. Thanks to the χ2-distribution of the residual variance, the additive exploration term is independent of the gaps ∆ i and the correlations ρi. We can fix it as a small constant value then the instance enjoys the same leading dependence as the known-ρi oracle eO ((1 − ρ2 
+
+> i
+
+)/∆2 
+
+> i
+
+) for each arm i, up to a constant multiplicative factor. 
+
+## 5. Numerical Experiments on Synthetic Data 
+
+We use synthetic experiments to isolate the statistical mechanism behind PROBE : a proxy is useful when its centered within-arm variation explains reward noise, even if its mean is biased or rank-reversed. We study two settings. The first is a paired Gaussian benchmark in which the proxy 15 
+
+is prescribed by hand and its correlation with the reward is a controlled parameter. The second is a nonlinear environment in which the proxy is a learned predictor, so that its correlation is an outcome of model fit rather than a chosen quantity. Throughout, the performance metric is the fixed-confidence stopping time, measured by the total number of online reward pulls before stopping. 
+
+5.1. Gaussian Instance Setup: We consider a synthetic Gaussian instance with K = 8 arms. The reward means are (1 .00 , 0.90 , 0.84 , 0.76 , 0.70 , 0.62 , 0.54 , 0.44), and the proxy means are (0 .00 , 0.25 , 0.50 , 0.75 , 1.00 , 1.25 , 1.50 , 1.75), following model (2) . Thus, the proxy means are deliberately ordered in the opposite direction from the reward means, so that the proxy cannot be useful through mean ranking alone. For each arm i, we generate paired Gaussian observations with reward variance one, proxy variance one, and common reward-proxy correlation ρ. We vary 
+
+ρ ∈ { 0, 0.2, 0.4, 0.6, 0.8, 0.9}.We compare three classes of methods. The first is PROBE without proxy, which ignores the proxy and uses reward observations only and the calibration step in Algorithm 1 is skipped. The second is a known-correlation oracle, which residualizes the reward using the true value of ρ and runs the same phase-elimination procedure with residual variance 1 − ρ2. The third is PROBE with unknown correlation, and we test among κ ∈ { 0.1, 0.2, 0.5, 1.0}. We set δ = 0 .05, repeat each configuration 1000 times, and report the average stopping time and its ratio relative to PROBE witout proxy at the same value of ρ.
+
+Results: The results are shown in Figure 1. When ρ = 0, the proxy carries no information about the reward noise. In this case, proxy-assisted PROBE pays a learning overhead. This is consistent with the role of calibration, and when there is no variance reduction to learn, the proxy can only add estimation cost leading to a sample complexity even higher than not using proxy. As ρ
+
+increases, the proxy becomes more useful, the stopping time decreases, and exceed the no proxy baseline after ρ ≥ 0.4. Note that, although for all ρ the sample complexity of PROBE is higher than the known-correlation baseline, due to the multiplicative factor 1 + κ, PROBE is very close to the known-proxy baseline and the 1 − ρ2 theoretical reference. These results confirm that the improvement comes from same-unit reward-proxy covariance rather than from the proxy mean itself. Although the proxy means are non-rank-preserving, PROBE 
+
+substantially reduces the fixed-confidence stopping time once the proxy explains a nontrivial portion of the reward noise. The empirical error rates remain close to the nominal level, with the largest observed error rate below 5% across all configurations. 16   
+
+> Figure 1 Sample Complexity under Gaussian Instance. The left panel plots stopping time measured in thousands, and the right panel plots stopping time normalized by reward-only PROBE .
+
+5.2. Nonlinear Instance Setup: We consider K = 5 arms, where arm i corresponds to an action ai on an evenly spaced grid, ai ∈ {− 1, −0.5, 0, 0.5, 1}. Each sampled unit carries a latent feature vector u = ( u1, . . . , u 5) with independent standard normal entries. Given action a and features u, the reward is driven by the nonlinear signal 
+
+g(u, a ) = 0 .9 sin( u1 + a) + 0 .55 a u 2 + 0 .35 ( u23 − 1)( a + 0 .4) + 0 .4 cos( u4 − 0.5a) + 0 .2 u5,
+
+which mixes sinusoidal, quadratic, and action-feature interaction terms. The realized reward of arm 
+
+i on a unit is 
+
+Xi = pi + g(u, a i) + 0 .45 ξ − μai
+
+σai
+
+, ξ ∼ N (0 , 1) ,
+
+where ξ is independent observation noise, and ( μai , σ ai ) are the mean and standard deviation of 
+
+g(u, a i) + 0 .45 ξ, estimated once from a large pretabulated sample. Subtracting μai and dividing by 
+
+σai standardizes each arm to unit reward variance and mean pi, matching the unit-variance model of the analysis. The arm means p = (1 .00 , 0.90 , 0.84 , 0.76 , 0.70) decrease across arms, so arm 1 is the best. As in the Gaussian benchmark, the proxy means m = (0 .00 , 0.30 , 0.60 , 0.90 , 1.20) increase across arms and are therefore non-rank-preserving. The proxy is a regression model fitted to predict the reward from the feature map ϕ(u, a ) = (u, a, au 1, au 2, a 2). This map deliberately omits the terms through which g actually depends on the features, namely the sinusoid sin (u1 + a), the quadratic u23, the cosine cos (u4 − 0.5a), and the linear term u5. No model built on ϕ can therefore reproduce the reward exactly, and the achievable reward-proxy correlation is limited by how much of g each model recovers from ϕ. We fit three standard models of increasing flexibility on an offline training set of 12 ,000 units: linear regression, a depth-limited decision tree, and gradient boosting. Each fitted model then scores a separate pool 17 
+
+of 40 ,000 units per arm, and each score is paired with the realized reward on the same unit. We use δ = 0 .05 and κ = 1 .0, repeat each configuration 120 times, and report the stopping-time ratio relative to PROBE without proxy, together with the mean and minimum armwise correlations of each proxy. 
+
+Results: The three models differ only in how much of the nonlinear structure omitted from the feature map ϕ(u, a ) they can recover, and Figure 2 shows that this is exactly the order in which they shorten the stopping time. Gradient boosting, the most flexible model, recovers the most of the omitted structure in (5.2) and is the most strongly aligned with the reward, so it attains the largest sample saving. The decision tree and linear regression recover less and are correspondingly less aligned, so their savings are smaller and close to each other. All three proxies still identify the best arm in every repetition. The ordering matches the Gaussian benchmark and the theory: a proxy that explains more within-arm reward variation leaves a lower OLS residual variance and a shorter fixed-confidence stopping time, regardless of how the proxy is produced or whether its mean is rank-preserving.     
+
+> Figure 2 Nonlinear synthetic instance. The left panel reports the mean and minimum armwise reward-proxy correlations. The right panel reports the corresponding stopping-time ratio of PROBE relative to reward-only PROBE .
+
+## 6. Numerical Experiments on Real Data: Auto-loan Replay Experiment 
+
+We now evaluate PROBE on a pricing policy-selection task built from real auto-loan data. This is the setting of the pricing example in Section 1: a lender must decide which of two pricing rules (two arms) earns more revenue, each online sample is a costly interaction with a real applicant, and a machine-learning model supplies a cheap proxy for the outcome. The experiment tests whether the variance reduction isolated in the synthetic study still materializes when the proxy is an LLM or a tabular predictor, and when the reward is a realized acceptance rather than Gaussian noise. 18 
+
+6.1. Data and Setup 
+
+We use the “On-Line Auto Lending” data set from the Center for Pricing and Revenue Management at Columbia University (Columbia University Center for Pricing and Revenue Management 2012), first studied by Phillips et al. (2015). Each record is an auto-loan application together with the contract offered to the applicant, described by customer and loan features ( e.g. , FICO score, approved amount, term, and competitor rate), the offered monthly-payment margin price, and a binary label indicating whether the applicant accepted the offer. We sort the applications chronologically and split them into a historical block of the first 50 ,000 records and a replay pool of the next 40 ,000 records. The historical block is used only to build the environment and to train the proxies, and the replay pool supplies the applicant contexts encountered online. We fit an acceptance model q(C, P ) for each context C and provided price P on the historical block and treat it as the ground-truth demand environment. At each arm pull on the pricing rule, a fresh applicant context C is drawn from the replay pool, and the pricing rule π computes the price 
+
+P = π(C) to offer, which together generates a Bernoulli acceptance from q and realized to 0 or 1. The realized reward is the margin revenue, equal to the offered price when the applicant accepts and zero otherwise, with mean reward 
+
+m(π) = EC∼Dcontext [π(C) · q(C, π (C))] as an expectation over context (applicant) distribution. Rewards are scaled to unit variance to match the normalization of the analysis. We emphasize that q defines the environment only and is never revealed to the proxies. We consider a best-arm identification on the two arms which are both fixed pricing rules. The historical rule πhist re-offers the price actually observed for each applicant. The improved rule πimp 
+
+instead offers, for each applicant, the revenue-maximizing price among {0.8, 0.9, 1.0, 1.1, 1.2} times the historical price within the empirical price support, where the maximization uses the fitted environment. Under the fitted environment, the historical rule earns expected margin revenue 133 .0 and the improved rule earns 177 .7, so the identification target is the improved rule. The fixed-confidence task is to recover this pricing rule (arm) with probability at least 1 − δ.Each proxy predicts an applicant’s acceptance probability from the context and offered price, which we convert to a proxy revenue score by multiplying by the offered price. This score is paired with the realized reward on the same applicant-rule pull. Intuitively, the proxy helps whenever it tracks which applicants are unusually likely or unlikely to accept, so that residualizing the reward on the centered proxy removes part of the predictable, context-driven variation in revenue and leaves a smaller residual for the mean estimate. What remains after residualization, the idiosyncratic 19 
+
+acceptance shock, cannot be predicted from the context and sets a floor on the achievable variance reduction. We compare five variants of PROBE . The baseline is reward-only PROBE , which ignores the proxy. Three variants use LLM proxies: Qwen2.5-7B (Qwen et al. 2025) with in-context learning run locally, GPT-5.5 (OpenAI 2026) with in-context learning through its API, and Qwen2.5-7B fine-tuned on the historical block with LoRA, whose raw acceptance-classification score is used as the proxy. The last variant uses TabPFN (Hollmann et al. 2023), a pretrained tabular predictor, as a strong structured (non-LLM) proxy that calibrates how PROBE behaves when the proxy is highly accurate. We run every variant with δ = 0 .05 and κ = 1 .0, and average over 3 ,000 independent replay repetitions. Besides the mean stopping time, we report its median and 90th percentile, the empirical correctness at stopping, the sample saving relative to reward-only PROBE , and the absolute reward-proxy correlation on each arm. We report absolute correlations because the sign of the association is absorbed by the OLS slope, so only its strength governs the residual-variance reduction.                                                    
+
+> Method Mean Median 90% Correct |ρhist ||ρimp |Saving Reward-only PROBE 105.2 105.2 106.7 1.000 ––0.0% Qwen2.5-7B local ICL 101.7 101.8 103.5 1.000 0.275 0.011 3.3% GPT-5.5 API ICL 95.6 95.7 97.6 1.000 0.264 0.327 9.1% Qwen2.5-7B LoRA raw CLS 52.0 52.3 54.5 1.000 0.725 0.707 50.5% TabPFN structured proxy 40.6 40.8 43.1 1.000 0.822 0.760 61.4%
+> Table 1 Stopping times (in thousands) of auto-loan replay across different proxies. The columns |ρhist |and |ρimp |
+> report absolute reward-proxy correlations. Savings are relative to reward-only PROBE .
+> Figure 3 Empirical CDFs of fixed-confidence stopping times in the auto-loan replay experiment. Leftward shifts indicate fewer online reward pulls before PROBE stops at the target confidence level. 20
+
+6.2. Results 
+
+Table 1 and Figure 3 report the results. Every variant identifies the improved rule in all 3 ,000 repetitions, so all methods are exactly correct and none exhausts the sampling budget; the variants differ only in how quickly they stop. Reward-only PROBE stops after 105 .2k pulls on average. The two in-context-learning proxies help modestly, cutting the stopping time to 101 .7k pulls (Qwen2.5-7B, 3.3% saving) and 95 .6k pulls (GPT-5.5, 9 .1%). The fine-tuned and structured proxies help far more: Qwen2.5-7B LoRA reaches 52 .0k pulls (50 .5% saving) and TabPFN reaches 40 .6k pulls (61 .4%). Figure 3 shows the same ordering as a uniform leftward shift of the entire stopping-time distribution, not merely of its mean. The savings track the strength of the reward-proxy correlation, exactly as the theory predicts. The in-context proxies are weakly and unevenly aligned with the reward: the local Qwen proxy correlates at 0 .275 on the historical arm but essentially zero (0 .011) on the improved arm, so it can residualize only one of the two policies and saves little. The fine-tuned and structured proxies are strongly aligned on both arms (0 .725 and 0 .707 for LoRA; 0 .822 and 0 .760 for TabPFN), so 
+
+PROBE removes a large predictable component of revenue from each arm and needs far fewer pulls to separate the two policies. 
+
+## 7. Conclusion 
+
+In this paper, we study fixed-confidence best-arm identification when each costly reward pull is paired with a cheap proxy score whose marginal mean is known but whose correlation with the reward is not. We propose PROBE , a phase-elimination algorithm that uses the proxy as a control variate and maintains a residual-variance upper certificate, from an ordinary least squares fit, that stays valid regardless of the unknown correlation. We prove that PROBE is δ-PAC and attains the known-correlation oracle sample complexity up to a factor 1 + κ and an additive calibration cost of order eO(K/κ 2), and that it extends to the ( ϵ, δ )-PAC setting. Experiments on synthetic instances and on an auto-loan pricing replay with large language model and tabular proxies confirm that its sample savings scale with the strength of the reward-proxy correlation, as the theory predicts. Our results suggest two directions for future study. First, the proxy here is fixed throughout identification; understanding how an online-refined proxy, for instance one fine-tuned as reward-proxy pairs accumulate, interacts with variance-adaptive sampling is a natural next step. Second, the same control-variate mechanism may reduce sampling cost in other pure-exploration objectives, such as top-m identification and thresholding bandits. 
+
+## Acknowledgments 
+
+> The authors gratefully acknowledge Columbia University Center for Pricing and Revenue Management for providing us the dataset on auto loans. We express sincere gratitude to Qing Feng for valuable feedbacks.
+
+21 
+
+## References 
+
+Abernethy, Jacob D., Kareem Amin, Ruihao Zhu. 2016. Threshold bandits, with and without censored feedback. Advances in Neural Information Processing Systems , vol. 29. 4889–4897. Angelopoulos, Anastasios N., Stephen Bates, Clara Fannjiang, Michael I. Jordan, Tijana Zrnic. 2023a. Prediction-powered inference. Science 382 (6671) 669–674. doi:10.1126/science.adi6000. Angelopoulos, Anastasios N., John C. Duchi, Tijana Zrnic. 2023b. PPI++: Efficient prediction-powered inference. doi:10.48550/arXiv.2311.01453. Ao, Ruicheng, Hongyu Chen, Siyang Gao, Hanwei Li, David Simchi-Levi. 2026. Best arm identification with LLM judges and limited human. Audibert, Jean-Yves, S´ ebastien Bubeck, R´ emi Munos. 2010. Best arm identification in multi-armed bandits. 
+
+Proceedings of the 23rd Annual Conference on Learning Theory . 41–53. Bastani, Hamsa. 2021. Predicting with proxies: Transfer learning in high dimension. Management Science 
+
+67 (5) 2964–2984. doi:10.1287/mnsc.2020.3729. Bechhofer, Robert E. 1954. A single-sample multiple decision procedure for ranking means of normal populations with known variances. The Annals of Mathematical Statistics 25 (1) 16–39. doi:10.1214/ aoms/1177728845. Brand, James, Ayelet Israeli, Donald Ngwe. 2023. Using LLMs for market research. doi:10.2139/ssrn.4395751. Harvard Business School Marketing Unit Working Paper No. 23-062. Bubeck, S´ ebastien, Tengyao Wang, Nitin Viswanathan. 2013. Multiple identifications in multi-armed bandits. 
+
+Proceedings of the 30th International Conference on Machine Learning , Proceedings of Machine Learning Research , vol. 28. PMLR, 258–265. Chen, Chun-Hung, Jianwu Lin, Enver Y¨ ucesan, Stephen E. Chick. 2000. Simulation budget allocation for further enhancing the efficiency of ordinal optimization. Discrete Event Dynamic Systems 10 (3) 251–270. doi:10.1023/A:1008349927281. Columbia University Center for Pricing and Revenue Management. 2012. CPRM-12-001: On-Line Auto Lending Data Set. Data set, Center for Pricing and Revenue Management, Columbia Business School. URL https://business.columbia.edu/cprm-new/research . Accessed July 2, 2026. Even-Dar, Eyal, Shie Mannor, Yishay Mansour. 2006. Action elimination and stopping conditions for the multi-armed bandit and reinforcement learning problems. Journal of Machine Learning Research 7(39) 1079–1105. Feng, Qing, Tianyi Ma, Ruihao Zhu. 2024. Satisficing regret minimization in bandits: Constant rate and light-tailed distribution. arXiv preprint arXiv:2406.06802 .Fiez, Tanner, Lalit Jain, Kevin G. Jamieson, Lillian Ratliff. 2019. Sequential experimental design for transductive linear bandits. Advances in Neural Information Processing Systems , vol. 32. 10667–10677. 22 Frazier, Peter I., Warren B. Powell, Savas Dayanik. 2008. A knowledge-gradient policy for sequential information collection. SIAM Journal on Control and Optimization 47 (5) 2410–2439. doi:10.1137/ 070693424. Gabillon, Victor, Mohammad Ghavamzadeh, Alessandro Lazaric. 2012. Best arm identification: A unified approach to fixed budget and fixed confidence. Advances in Neural Information Processing Systems ,vol. 25. 3212–3220. Garivier, Aur´ elien, Emilie Kaufmann. 2016. Optimal best arm identification with fixed confidence. Proceedings of the 29th Conference on Learning Theory , Proceedings of Machine Learning Research , vol. 49. PMLR, 998–1027. Glasserman, Paul. 2003. Monte Carlo Methods in Financial Engineering , Stochastic Modelling and Applied Probability , vol. 53. Springer, New York, NY. doi:10.1007/978-0-387-21617-1. Goli, Ali, Amandeep Singh. 2024. Frontiers: Can large language models capture human preferences? Marketing Science 43 (4) 709–722. doi:10.1287/mksc.2023.0306. Grover, Aditya, Todor Markov, Peter Attia, Norman Jin, Nicolas Perkins, Bryan Cheong, Michael Chen, Zi Yang, Stephen Harris, William Chueh, Stefano Ermon. 2018. Best arm identification in multi-armed bandits with delayed feedback. Proceedings of the Twenty-First International Conference on Artificial Intelligence and Statistics , Proceedings of Machine Learning Research , vol. 84. PMLR, 833–842. Gui, George, Olivier Toubia. 2023. The challenge of using LLMs to simulate human behavior: A causal inference perspective. doi:10.48550/arXiv.2312.15524. Gupta, Samarth, Gauri Joshi, Osman Yagan. 2021. Best-arm identification in correlated multi-armed bandits. 
+
+IEEE Journal on Selected Areas in Information Theory 2(2) 549–563. doi:10.1109/JSAIT.2021.3082028. Hollmann, Noah, Samuel M¨ uller, Katharina Eggensperger, Frank Hutter. 2023. TabPFN: A transformer that solves small tabular classification problems in a second. Hong, L. Jeff, Weiwei Fan, Jun Luo. 2021. Review on ranking and selection: A new perspective. Frontiers of Engineering Management 8(3) 321–343. doi:10.1007/s42524-021-0152-6. Jamieson, Kevin, Matthew Malloy, Robert Nowak, S´ ebastien Bubeck. 2014. lil’ UCB: An optimal exploration algorithm for multi-armed bandits. Proceedings of the 27th Conference on Learning Theory , Proceedings of Machine Learning Research , vol. 35. PMLR, 423–439. Jedra, Yassir, Alexandre Proutiere. 2020. Optimal best-arm identification in linear bandits. Advances in Neural Information Processing Systems , vol. 33. 10007–10017. Ji, Wenlong, Yihan Pan, Ruihao Zhu, Lihua Lei. 2025. Multi-armed bandits with machine learning-generated surrogate rewards. doi:10.48550/arXiv.2506.16658. Kalyanakrishnan, Shivaram, Ambuj Tewari, Peter Auer, Peter Stone. 2012. PAC subset selection in stochastic multi-armed bandits. Proceedings of the 29th International Conference on Machine Learning . 655–662. 23 Karnin, Zohar, Tomer Koren, Oren Somekh. 2013. Almost optimal exploration in multi-armed bandits. 
+
+Proceedings of the 30th International Conference on Machine Learning , Proceedings of Machine Learning Research , vol. 28. PMLR, 1238–1246. Kaufmann, Emilie, Olivier Capp´ e, Aur´ elien Garivier. 2016. On the complexity of best-arm identification in multi-armed bandit models. Journal of Machine Learning Research 17 (1) 1–42. Kim, Seong-Hee, Barry L. Nelson. 2001. A fully sequential procedure for indifference-zone selection in simulation. ACM Transactions on Modeling and Computer Simulation 11 (3) 251–273. doi:10.1145/ 502109.502111. Li, Zhekai, Tianyi Ma, Cheng Hua, Ruihao Zhu. 2025. Identifying all ϵ-best arms in (misspecified) linear bandits. doi:10.48550/arXiv.2510.00073. Locatelli, Andrea, Maurilio Gutzeit, Alexandra Carpentier. 2016. An optimal algorithm for the thresholding bandit problem. Proceedings of the 33rd International Conference on Machine Learning , Proceedings of Machine Learning Research , vol. 48. PMLR, 1690–1698. Lu, Pinyan, Chao Tao, Xiaojin Zhang. 2021. Variance-dependent best arm identification. Proceedings of the Thirty-Seventh Conference on Uncertainty in Artificial Intelligence , Proceedings of Machine Learning Research , vol. 161. PMLR, 1120–1129. Ludwig, Jens, Sendhil Mullainathan, Ashesh Rambachan. 2025. Large language models: An applied econometric framework. Working Paper 33344, National Bureau of Economic Research. doi:10.3386/w33344. Mannor, Shie, John N. Tsitsiklis. 2004. The sample complexity of exploration in the multi-armed bandit problem. Journal of Machine Learning Research 5 623–648. Mason, Blake, Lalit Jain, Ardhendu Tripathy, Robert Nowak. 2020. Finding all ϵ-good arms in stochastic bandits. Advances in Neural Information Processing Systems , vol. 33. 20707–20718. Ochoa Rivera, Eduardo, Ambuj Tewari. 2024. Optimal thresholding linear bandit. doi:10.48550/arXiv.2402. 09467. OpenAI. 2026. Introducing GPT-5.5. URL https://openai.com/index/introducing-gpt-5-5/ .Phillips, Robert, A. Serdar S¸ im¸ sek, Garrett van Ryzin. 2015. The effectiveness of field price discretion: Empirical evidence from auto lending. Management Science 61 (8) 1741–1759. doi:10.1287/mnsc.2014. 2084. Qwen, An Yang, Baosong Yang, Beichen Zhang, Binyuan Hui, Bo Zheng, Bowen Yu, Chengyuan Li, Dayiheng Liu, Fei Huang, Haoran Wei, Huan Lin, Jian Yang, Jianhong Tu, Jianwei Zhang, Jianxin Yang, Jiaxi Yang, Jingren Zhou, Junyang Lin, Kai Dang, Keming Lu, Keqin Bao, Kexin Yang, Le Yu, Mei Li, Mingfeng Xue, Pei Zhang, Qin Zhu, Rui Men, Runji Lin, Tianhao Li, Tianyi Tang, Tingyu Xia, Xingzhang Ren, Xuancheng Ren, Yang Fan, Yang Su, Yichang Zhang, Yu Wan, Yuqiong Liu, Zeyu Cui, Zhenru Zhang, Zihan Qiu. 2025. Qwen2.5 technical report. doi:10.48550/arXiv.2412.15115. 24 R´ eda, Cl´ emence, Emilie Kaufmann, Andr´ ee Delahaye-Duriez. 2021a. Top-m identification for linear bandits. 
+
+Proceedings of the 24th International Conference on Artificial Intelligence and Statistics , Proceedings of Machine Learning Research , vol. 130. PMLR, 1108–1116. R´ eda, Cl´ emence, Andrea Tirinzoni, R´ emy Degenne. 2021b. Dealing with misspecification in fixed-confidence linear top-m identification. Advances in Neural Information Processing Systems , vol. 34. 25489–25501. Saad, El Mehdi, Gilles Blanchard, Nicolas Verzelen. 2023. Covariance-adaptive best arm identification. 
+
+Advances in Neural Information Processing Systems , vol. 36. 73287–73298. Soare, Marta, Alessandro Lazaric, R´ emi Munos. 2014. Best-arm identification in linear bandits. Advances in Neural Information Processing Systems , vol. 27. 828–836. Verma, Arun, Zhongxiang Dai, Yao Shu, Bryan Kian Hsiang Low. 2023. Exploiting correlated auxiliary feedback in parameterized bandits. Advances in Neural Information Processing Systems , vol. 36. 4430–4451. Verma, Arun, Manjesh K. Hanawal. 2021. Stochastic multi-armed bandits with control variates. Advances in Neural Information Processing Systems , vol. 34. 27592–27603. Wang, Mengxin, Dennis J. Zhang, Heng Zhang. 2026. Large language models for market research: A data-augmentation approach. Marketing Science 0(0). doi:10.1287/mksc.2025.0009. Articles in Advance. Wu, Yuhang, Yingfei Wang, Chu Wang, Zeyu Zheng. 2024. Large language model enhanced machine learning estimators for classification. doi:10.48550/arXiv.2405.05445. Yang, Le, Vincent Y. F. Tan, Wang Chi Cheung. 2025. Best arm identification with possibly biased offline data. Proceedings of the Forty-First Conference on Uncertainty in Artificial Intelligence , Proceedings of Machine Learning Research , vol. 286. PMLR, 4715–4730. Ye, Zikun, Hema Yoganarasimhan, Yufeng Zheng. 2025. LOLA: LLM-assisted online learning algorithm for content experiments. Marketing Science 44 (5) 995–1016. doi:10.1287/mksc.2024.0990. Yin, Qichuan, Linwei Xin. 2026. Synthetic but not infinite: How much LLM-generated data to use in market research. doi:10.2139/ssrn.6078686. Available at SSRN 6078686. Zhang, Yixuan, Ruihao Zhu, Qiaomin Xie. 2025. Contextual online pricing with (biased) offline data. Advances in Neural Information Processing Systems , vol. 38. 25 
+
+# Appendix 
+
+## A. Proof of Theorem 1 
+
+We prove the result on the clean event. We first define the clean initialization on Ui, 0 for every arm 
+
+i as 
+
+Ecal = {vi ≤ Ui, 0 ≤ (1 + κ)vi} .
+
+For every arm i and round r, define the leverage event 
+
+Ehi,r =
+
+
+
+hi,r ≤ 2
+
+ti,r 
+
+
+
+.
+
+Define the variance-certificate update event 
+
+EUi,r =
+
+n
+
+vi ≤ eUi,r 
+
+o
+
+.
+
+Finally, define the mean-estimation event 
+
+Epi,r =
+
+
+
+|ˆpi,r − pi| ≤ 
+
+q
+
+2vihi,r log(2 /δ r )
+
+
+
+.
+
+Combining these four events, we can define the global clean event 
+
+E = Ecal ∩ \
+
+> r≥1
+> K
+
+\
+
+> i=1
+
+ Ehi,r ∩ E Ui,r ∩ E pi,r 
+
+ ,
+
+where events for inactive arms are treated as the whole sample space. Then, E happens with probability at least 1 − δ with proof given in Section A.1. 
+
+Lemma 1. The event E implies bounded upper bound Ui,r for all arm i and round r ≥ 0 as 
+
+vi ≤ Ui,r ≤ (1 + κ)vi (11) 
+
+and the concentration in estimation ˆpi,r for all arm i and round r ≥ 1 as 
+
+|ˆpi,r − pi| ≤ εr /4. (12) 
+
+Furthermore, E happens with probability Pr (E) ≥ 1 − δ. 
+
+Then, we prove conditioned on clean event E. Denote for every arm i,
+
+Ri = min 
+
+
+
+r ≥ 1 : 2 −r < 2∆ i
+
+3
+
+
+
+,
+
+namely, Ri = ⌈log(3 /(2∆ i)) ⌉ ≤ 2 log(3 /(2∆ i)) because ∆ i ≤ 1. 26 
+
+Elimination correctness. First, the best arm is never removed conditioned on E. Suppose i∗ ∈ Sr .Since ir maximizes ˆ pi,r over Sr ,ˆpir ,r ≤ pir + εr
+
+4 ≤ pi∗ + εr
+
+4 ,
+
+and ˆpi∗,r ≥ pi∗ − εr
+
+4 .
+
+Hence ˆpir ,r − ˆpi∗,r ≤ εr
+
+2 < ε r .
+
+Therefore the elimination condition ˆpi∗,r < ˆpir ,r − εr cannot hold. By induction, the best arm remains active in every round. Second, every suboptimal arm is removed once the round resolution is below its gap. Let i̸ = i∗.If r ≥ Ri, since the best arm is still active, we have ˆpi∗,r − ˆpi,r ≥
+
+
+
+pi∗ − εr
+
+4
+
+
+
+−
+
+
+
+pi + εr
+
+4
+
+
+
+= ∆ i − εr
+
+2 > ε r .
+
+where the final inequality is based on εr ≤ εRi < 2∆ i/3. Because ˆ pir ,r ≥ ˆpi∗,r ,ˆpi,r < ˆpir ,r − εr .
+
+Thus arm i is eliminated in round r ≥ Ri if it is still active. Hence suboptimal arm i is sampled only through round Ri, and the best arm is sampled only through round Ri∗ .
+
+Sample complexity. The arm pull of each i at round r is upper bounded by 
+
+ti,r ≤
+
+ 64 Ui,r −1 log(2 /δ r )
+
+ε2
+
+> r
+
+
+
++ max 
+
+
+
+3,
+
+
+
+1 + 16 log 2
+
+δr
+
+
+
+,
+
+
+
+8 log 4
+
+δr
+
+ 
+
+≤ 64(1 + κ)(1 − ρ2 
+
+> i
+
+) log(2 /δ r )
+
+ε2
+
+> r
+
++ 1 + 2 + 16 log(2 /δ r )where first inequality is based on the definition of ti,r , the second inequality is Ui,r −1 ≤ (1 + κ)vi =(1 + κ)(1 − ρ2 
+
+> i
+
+) implied by E, and log (4 /δ r ) ≤ 2 log (2 /δ r ) and log (2 /δ r ) ≥ log (32 K/δ ) > 1. Since log(2 /δ r ) is increasing in r,
+
+> Ri
+
+X
+
+> r=1
+
+log(2 /δ r )
+
+ε2
+
+> r
+
+≤ log(2 /δ r )
+
+> Ri
+
+X
+
+> r=1
+
+4r ≤ 43 log(2 /δ Ri )4 Ri
+
+≤ 12 log(2 /δ Ri )∆2
+
+> i
+
+,
+
+where the final inequality is based on the definition of Ri, where either Ri = 1 or 2 −(Ri−1) ≥ 2∆ i/3which implies 2 −Ri ≥ ∆i/3 in both cases with ∆ i ≤ 1/. We further plug Ri ≤ 2 log (3 /(2∆ i)) into the definition of δRi as log 2
+
+δRi
+
+= log 32 KR 2
+
+> i
+
+δ ≤ log 128 Kδ
+
+
+
+log 2
+
+ 32∆ i
+
+ 2!
+
+≤ 2 log 
+
+ 12 Kδ log 2
+
+ 32∆ i
+
+ 
+
+.27 
+
+The post-calibration samples of arm i are at most 
+
+> Ri
+
+X
+
+> r=1
+
+ti,r ≤ 1536(1 + κ)(1 − ρ2 
+
+> i
+
+)∆2
+
+> i
+
+log 
+
+ 12 Kδ log 2
+
+ 32∆ i
+
+ 
+
++log 
+
+ 32∆ i
+
+  
+
+64 log 
+
+ 12 Kδ log 2
+
+ 32∆ i
+
+ 
+
++ 6 
+
+
+
+.
+
+Adding the tcal calibration samples for each arm proves the stated total sample bound. 
+
+A.1. Proof of Lemma 1 
+
+Proof. To prove Lemma 1, we need two additional lemmas with proofs in Section A.2 and A.3. 
+
+Lemma 2. For every η ∈ (0 , 1) , if the sample size s ≥ max {3, 1 + 16 log (2 /η ), 8 log (4 /η )}, then the leverage factor follows Pr 
+
+
+
+h ≤ 2
+
+s
+
+
+
+≥ 1 − η. 
+
+Lemma 3. For each arm, draw tcal samples and compute the OLS residual variance ˆv0. Define 
+
+U0 = U (tcal , ˆv0, δ/ (8 K)) , then Pr (v ≤ U0 ≤ (1 + κ)v) ≥ 1 − δ
+
+4K .
+
+We first prove the implied statement of clean event E. To prove (11) for all r ≥ 0, we prove by induction. Assuming vi ≤ Ui,r ≤ (1 + κ)vi, because EUi,r +1 implies vi ≤ eUi,r +1 , and recall Ui,r +1 =min { eUi,r +1 , U i,r }, we get 
+
+vi ≤ Ui,r +1 .
+
+On the other hand, we know 
+
+Ui,r +1 = min { eUi,r +1 , U i,r } ≤ Ui,r ≤ Ui,r ≤ (1 + κ)vi.
+
+Starting from r = 0 given by Ecal , we show (11) holds for all r ≥ 0. Because we have proved vi ≤ Ui,r −1 holds for r ≥ 1, Epi,r implies that 
+
+|ˆpi,r − pi| ≤ 
+
+q
+
+2vihi,r log(2 /δ r )
+
+≤
+
+q
+
+2Ui,r −1hi,r log(2 /δ r )
+
+≤
+
+s
+
+4Ui,r −1 log(2 /δ r )
+
+ti,r 
+
+≤ εr
+
+4 ,
+
+where the third inequality is given by Ehi,r = {hi,r ≤ 2/t i,r } and the final inequality is based on definition ti,r ≥ 64 Ui,r −1 log(2 /δ r )/ε 2 
+
+> r
+
+, and then (12) is proved. We then prove the probability of the clean event E. By Lemma 3 and a union bound over the K
+
+arms, Pr( Ec
+
+> cal
+
+) ≤ δ
+
+4 .28 
+
+Since ti,r satisfies the lower bounds required in Lemma 2, the lemma gives Pr  (Ehi,r )c ≤ δr .
+
+For the variance-certificate update event EUi,r , given current fresh proxy variables {Wi,r,l }ti,r 
+
+> l=1
+
+, Propo-sition 2 gives ( ti,r − 2)ˆ vi,r /v i ∼ χ2 
+
+> ti,r −2
+
+, then Pr  (EUi,r )c ≤ Pr 
+
+vi ≥ ˆvi,r 
+
+1 − 2
+
+q log(1 /δ r ) 
+
+> ti,r −2
+
+
+
+=Pr 
+
+ (ti,r − 2)ˆ vi,r 
+
+vi
+
+≤ (ti,r − 2) − 2
+
+q
+
+(ti,r − 2) log(1 /δ r )
+
+
+
+≤ δr ,
+
+where the final inequality is based on the lower-tail part of Laurent-Massart inequality. For the mean-estimation event Epi,r , given current fresh proxy variables {Wi,r,l }ti,r 
+
+> l=1
+
+, the leverage hi,r is fixed, and Proposition 2 gives ˆ pi,r − pi ∼ N (0 , v ihi,r ) and implies Pr 
+
+
+
+|ˆpi,r − pi| >
+
+r
+
+2vihi,r log 2
+
+δr
+
+
+
+≤ 2 exp 
+
+
+
+− log 2
+
+δr
+
+
+
+= δr .
+
+Finally, by a union bound and plugging into δr = δ/ (16 Kr 2), we have Pr( Ec) ≤ Pr( Ec
+
+> cal
+
+) + 
+
+> ∞
+
+X
+
+> r=1
+> K
+
+X
+
+> i=1
+
+ Pr(( Ehi,r )c) + Pr(( EUi,r )c) + Pr(( Epi,r )c)
+
+≤ δ
+
+4 + 3 K
+
+> ∞
+
+X
+
+> r=1
+
+δr = δ
+
+4 + 3 K
+
+> ∞
+
+X
+
+> r=1
+
+δ
+
+16 Kr 2
+
+≤= δ
+
+4 + 3δ
+
+16 · 2 = δ
+
+4 + 3δ
+
+8 < δ. 
+
+A.2. Proof of Lemma 2 
+
+Proof. We have ¯W ∼ N (0 , 1/s ) and 
+
+> s
+
+X
+
+> l=1
+
+(Wl − ¯W )2 ∼ χ2
+
+> s−1
+
+.
+
+The Gaussian tail bound gives Pr | ¯W | ≤ 
+
+r 2 log(4 /η )
+
+s
+
+!
+
+≥ 1 − η
+
+2 . (13) Laurent-Massart inequality gives Pr 
+
+> s
+
+X
+
+> l=1
+
+(Wl − ¯W )2 ≥ (s − 1) − 2p(s − 1) log(2 /η )
+
+!
+
+≥ 1 − η
+
+2 . (14) 29 
+
+Since s ≥ 1 + 16 log (2 /η ), we have 2 p(s − 1) log(2 /η ) ≤ (s − 1) /2. Thus, on an event of probability at least 1 − η, ¯W 2
+
+Psl=1 (Wl − ¯Ws)2 ≤ 2 log(4 /η )/s 
+
+(s − 1) /2
+
+≤ 2 log(4 /η )/s s/ 3 = 6 log(4 /η )
+
+s2
+
+≤ 1
+
+s .
+
+where the first inequality is by plugging into high probability events in (13) and (14) , the second inequality is because ( s − 1) /2 ≥ s/ 3 based on s ≥ 3, and the third inequality is based on definition 
+
+s ≥ 8 log(4 /η ). Therefore, we have Pr( hs ≤ 2/s ) ≥ 1 − η. 
+
+A.3. Proof of Lemma 3 
+
+Proof. Fix an arm and omit the arm index. By Proposition 2, (tcal − 2)ˆ v0/v ∼ χ2
+
+> tcal −2
+
+. Then, Laurent-Massart inequalities also states Pr 
+
+ (tcal − 2)ˆ v0
+
+v ≥ (tcal − 2) + 2 p(tcal − 2) log(8 K/δ ) + 2 log(8 K/δ )
+
+
+
+≤ e− log(8 K/δ ) = δ
+
+8K ,
+
+which provides the high probability upper bound on U0/v . Namely, ˆv0
+
+v ≤ 1 + 2 
+
+s
+
+log(8 K/δ )
+
+tcal − 2 + 2 log(8 K/δ )
+
+tcal − 2with probability at least 1 − δ/ (8 K). Let y = plog(8 K/δ )/(tcal − 2) , recall U0 = ˆv0/(1 − 2y), we have 
+
+U0
+
+v − 1 ≤ 1 + 2 y + 2 y2
+
+1 − 2y − 1 = 4y + 2 y2
+
+1 − 2y ≤ 8y ≤ κ
+
+where the second inequality is because the definition of tcal implies tcal − 2 ≥ 64 log(8 K/δ )/κ 2 and further y ≤ κ/ 8 ≤ 1/8. Therefore we have Pr ( U0 ≤ (1 + κ)v) ≥ 1 − δ
+
+8K . (15) At the same time, Laurent-Massart inequalities state that Pr 
+
+ (tcal − 2)ˆ v0
+
+v ≤ (tcal − 2) − 2p(tcal − 2) log(8 K/δ )
+
+
+
+≤ e− log(8 K/δ ) = δ
+
+8K ,
+
+which provides the high probability lower bound on ˆ v0/v . Namely, ˆv0
+
+v ≥ 1 − 2
+
+s
+
+log(8 K/δ )
+
+tcal − 2with probability at least 1 − δ/ (8 K). Plug into the definition of U0, we have U0 ≥ v with probability at least 1 − δ/ (8 K). Pr ( U0 ≥ v) ≥ 1 − δ
+
+8K . (16) Combining the (15) and (16) with a union bound, we finish the proof. 30 
+
+## B. Omitted Proofs 
+
+B.1. Proof of Proposition 1 
+
+Proof. Since Yi,l − mi has mean zero, for any β ∈ R,
+
+E [Xi,l − β(Yi,l − mi)] = E[Xi,l ] − βE[Yi,l − mi] = pi.
+
+Thus the adjusted observation is unbiased for pi.For the variance, using Var (Xi,l ) = 1, Var (Yi,l − mi) = Var (Yi,l ) = 1, and Cov (Xi,l , Y i,l − mi) = Cov( Xi,l , Y i,l ) = ρi, we have Var ( Xi,l − β(Yi,l − mi)) = Var( Xi,l ) + β2Var( Yi,l − mi) − 2βCov( Xi,l , Y i,l − mi)= 1 + β2 − 2ρiβ. 
+
+Therefore the variance is minimized at β = ρi, and the minimum variance is 1 − ρ2 
+
+> i
+
+.
+
+B.2. Proof of Proposition 2 
+
+Proof. Fix an arm i and omit the arm index. Conditional on W1, . . . , W s, the regression model (5) is a fixed-design Gaussian linear model Xl = p + ρW l + ϵl, where ϵli.i.d. 
+
+∼ N (0 , v ). Let 
+
+Z =
+
+
+
+1 W1
+
+... ...1 Ws
+
+ , θ =
+
+pρ
+
+
+
+, X = ( X1, . . . , X s)⊤.
+
+Then, (5) can be rewritten as 
+
+X = Zθ + ϵ, ϵ | W1, . . . , W s ∼ N (0 , vI s).
+
+The OLS estimator is ˆθ = ( Z⊤Z)−1Z⊤X. Therefore, conditional on W1, . . . , W s,ˆθ − θ = ( Z⊤Z)−1Z⊤ϵ ∼ N  0, v (Z⊤Z)−1 .
+
+The intercept estimator ˆ p is the first coordinate of ˆθ. Hence ˆp − p | W1, . . . , W s ∼ N  0, v (Z⊤Z)−1
+
+> 11
+
+ .
+
+where (Z⊤Z)−1 
+
+> 11
+
+=
+
+ s Psl=1 WlPsl=1 Wl
+
+Psl=1 W 2
+
+> l
+
+−1
+
+> 11
+
+=
+
+Psl=1 W 2
+
+> l
+
+s Psl=1 W 2 
+
+> l
+
+− (Psl=1 Wl)2
+
+= 1
+
+s + ¯W 2
+
+Psl=1 W 2 
+
+> l
+
+− s ¯W 2 = h
+
+Thus ˆp − p | W1, . . . , W s ∼ N (0 , vh ).31 
+
+It remains to prove the residual variance statement. Let PZ = Z(Z⊤Z)−1Z⊤ be the projection matrix onto the column space of Z. The residual vector is 
+
+X − Z ˆθ = ( I − PZ )X = ( I − PZ )ϵ, 
+
+because ( I − PZ )Zθ = 0. Conditional on W1, . . . , W s,1
+
+v ∥X − Z ˆθ∥22 = 1
+
+v ϵ⊤(I − PZ )ϵ. 
+
+The matrix I − PZ is symmetric and idempotent. Since the design has two linearly independent columns whenever SW W > 0, we have rank( I − PZ ) = s − 2.
+
+For a Gaussian vector ϵ ∼ N (0 , vI s), the quadratic form with a symmetric idempotent matrix of rank s − 2 satisfies 1
+
+v ϵ⊤(I − PZ )ϵ ∼ χ2
+
+> s−2
+
+.
+
+By the definition (6), ˆ v = ∥X − Z ˆθ∥22/(s − 2), we obtain (s − 2)ˆ vv ∼ χ2
+
+> s−2
+
+.
+
+This completes the proof. 
+
+## C. Repeated Proxy Calls 
+
+Consider a limited number of proxy query for d times (where d might be determined by the latency or concurrency in real world sequential decisions), the real reward Xi,l is paired with a proxy vector (Y (1)  
+
+> i,l
+
+, . . . , Y (d) 
+
+> i,l
+
+), which follow a multivariate gaussian distribution similar to (2) as 
+
+
+
+Xi,l 
+
+Y (1) 
+
+> i,l
+
+...
+
+Y (d)
+
+> i,l
+
+ ∼ N 
+
+ pi
+
+mi1d
+
+
+
+,
+
+ 1 ρi1⊤
+
+> d
+
+ρi1d Σd
+
+ 
+
+, ρi ∈ (−1, 1) , (17) where Σ d is a positive semi-definite matrix with unit diagonal. Similar to the single proxy case, we can introduce W (j) 
+
+> i,l
+
+= Y (j) 
+
+> i,l
+
+− mi for all j ∈ [d] then E[W (j) 
+
+> i,l
+
+] = 0 and Var (W (j) 
+
+> i,l
+
+) = 1. Assuming 
+
+Y (1)  
+
+> i,l
+
+, . . . , Y (d) 
+
+> i,l
+
+are conditional i.i.d given Xi,l , the repeated proxies ¯W (d) 
+
+> i,l
+
+= 1
+
+d
+
+> d
+
+X
+
+> j=1
+
+W (j) 
+
+> i,l
+
+,
+
+can be reduced to a single averaged proxy, i.e. , using all d proxies as linear control variates is equivalent to using their average as a single proxy. 32 
+
+Proposition 3. Under the multivariate Gaussian model in (17) , and assume Y (1)  
+
+> i,l
+
+, . . . , Y (d) 
+
+> i,l
+
+are conditionally i.i.d. given Xi,l for all j ∈ [d]. Then, for every j̸ = k, Cov 
+
+
+
+Y (j) 
+
+> i,l
+
+, Y (k)
+
+> i,l
+
+
+
+= ρ2 
+
+> i
+
+, or equivalently 
+
+Σd = (1 − ρ2 
+
+> i
+
+)Id + ρ2 
+
+> i
+
+1d1⊤ 
+
+> d
+
+.
+
+Moreover, using the single averaged proxy ¯W (d) 
+
+> i,l
+
+instead of the full vector. The effective correlation and residual variance are 
+
+ρ(d) 
+
+> i
+
+=
+
+√d ρ i
+
+p1 + ( d − 1) ρ2
+
+> i
+
+, v(d) 
+
+> i
+
+= 1 − ρ2
+
+> i
+
+1 + ( d − 1) ρ2
+
+> i
+
+.
+
+Proof. We omit the arm i and pull indices l, and write X = Xi,l , Y (j) = Y (j) 
+
+> i,l
+
+, and W (j) = Y (j) − mi.Then E[W (j)] = 0, Var( X) = Var( W (j)) = 1, and Cov( X, W (j)) = Cov( X, Y (j)) = ρi .We first identify the covariance matrix of the repeated proxies. Extracting the principal sub-matrix indexed by ( X, W (j), W (k)) from the covariance matrix in (17), by Schur complement, we have 0 = Cov( W (j), W (k) | X) = Cov( W (j), W (k)) − Cov( W (j), X )Var( X)−1Cov( X, W (k))= Cov( W (j), W (k)) − ρi · 1 · ρi,
+
+we obtain Cov (W (j), W (k)) = ρ2 
+
+> i
+
+for all j̸ = k and j, k ∈ [d]. Equivalently, for W =: ( W (1) , . . . , W (d))⊤,Cov( W ) = (1 − ρ2 
+
+> i
+
+)Id + ρ2 
+
+> i
+
+1d1⊤ 
+
+> d
+
+.
+
+We now show that the full vector proxy is equivalent to the averaged proxy. Consider the best linear control variate based on the full vector W ,
+
+α∗ ∈ arg min 
+
+> α∈Rd
+
+Var  X − α⊤W  .
+
+Since E[W ] = 0, the solution is 
+
+α∗ = Cov( W )−1Cov( W, X ).
+
+Recall that Cov( W ) = (1 − ρ2 
+
+> i
+
+)Id + ρ2 
+
+> i
+
+1d1⊤ 
+
+> d
+
+, Cov( W, X ) = ρi1d.
+
+By the Sherman-Morrison formula, Cov( W )−1 = 11 − ρ2
+
+> i
+
+Id − ρ2
+
+> i
+
+(1 − ρ2 
+
+> i
+
+)(1 + ( d − 1) ρ2 
+
+> i
+
+) 1d1⊤ 
+
+> d
+
+.
+
+Therefore, 
+
+α∗ =
+
+ 11 − ρ2
+
+> i
+
+Id − ρ2
+
+> i
+
+(1 − ρ2 
+
+> i
+
+)(1 + ( d − 1) ρ2 
+
+> i
+
+) 1d1⊤
+
+> d
+
+
+
+ρi1d = ρi
+
+1 + ( d − 1) ρ2
+
+> i
+
+1d.
+
+Thus the optimal vector control term satisfies (α∗)⊤W = ρi
+
+1 + ( d − 1) ρ2
+
+> id
+
+X
+
+> j=1
+
+W (j) = dρ i
+
+1 + ( d − 1) ρ2
+
+> i
+
+¯W (d).
+
+Therefore the optimal linear control variate based on the full proxy vector only depends on the averaged proxy ¯W (d), which proves the claimed equivalence. 33 
+
+Proposition 3 shows that the averaged proxy ¯W (d) 
+
+> i,l
+
+is a sufficient summary of the whole proxy vector for the control-variate adjustment: the best linear adjustment built from ( Y (1)  
+
+> i,l
+
+, . . . , Y (d) 
+
+> i,l
+
+)coincides with the one built from their average alone. Consequently, the d-proxy observation reduces exactly to a single-proxy observation of the form (2) , with the correlation and residual variance replaced by the effective quantities ρ(d) 
+
+> i
+
+and v(d) 
+
+> i
+
+. Therefore, we are able to develop the algorithm and its analysis for a single proxy per pull without loss of generality, and recover the guarantee for any fixed d by substituting ρ(d) 
+
+> i
+
+and v(d) 
+
+> i
+
+for ρi and vi.

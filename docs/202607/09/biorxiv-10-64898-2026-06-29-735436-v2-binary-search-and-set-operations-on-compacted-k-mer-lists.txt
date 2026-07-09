@@ -1,0 +1,434 @@
+Title: Binary search and set operations on compacted k-mer lists
+
+URL Source: https://www.biorxiv.org/content/10.64898/2026.06.29.735436v2.full.pdf
+
+Number of Pages: 11
+
+Markdown Content:
+# Binary search and set operations on compacted 
+
+# k-mer lists 
+
+Yoann Dufresne 1⋆[0000 −0002 −0930 −8920] and Francesco Andreace 2⋆[0009 −0008 −0566 −200 X] 
+
+> 1
+
+Univ. Lille, CNRS, Centrale Lille, UMR 9189 CRIStAL, F-59000 Lille, France 
+
+yoann.dufresne@univ-lille.fr  
+
+> 2
+
+Department of Computational Biology, Institut Pasteur, Université Paris Cité, F-75015 Paris, France 
+
+francesco.andreace@pasteur.fr 
+
+Abstract. Sorted lists of elements are particularly good for computing set operations. A single scan of the two lists is sufficient to materialize or count the results of the union, intersection, difference, and xor operators. In bioinformatics, only a few tools are designed to perform these operations on k -mers. A fast tool like KMC allows set operations at the cost of storing individual k -mers. In this paper, we introduce a novel way to represent sorted k -mers as a collection of recomposed super-k -mer sorted lists. We introduce the concept of virtual super-k -mer and show how to construct, query and perform set operations on sorted lists of virtual super-k -mers. In the implementation sklib , we demonstrate high throughput of the data structure for construction and set operations, while remaining competitive in query capabilities, within a controlled memory footprint (2–5x decrease in bits/element compared to KMC). 
+
+Keywords: k-mers · minimizers · super-k-mers · compact data structures · set operations · bioinformatics. 
+
+## 1 Introduction 
+
+The analysis of massive high-throughput sequencing collections is increasingly formulated as an indexing problem over sets of fixed-length substrings, termed 
+
+k -mers. Representing datasets by their k -mer sets lets petabase-scale collections be stored in searchable structures, as demonstrated by MetaGraph [ 6] and Lo-gan [ 4]. Analysis is no longer limited to asserting element presence: it increasingly requires operations over entire k -mer sets—intersections to identify shared con-tent, differences to subtract contaminants, unions to incorporate new data, and symmetric differences to isolate dataset-specific variation—positioning k -mer indexing close to database and information-retrieval workloads where Boolean queries reduce to primitive set operations as in vizitig [5].  
+
+> ⋆
+
+These authors contributed equally to this work.  
+
+> .CC-BY 4.0 International license available under a was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint (which this version posted July 4, 2026. ;https://doi.org/10.64898/2026.06.29.735436 doi: bioRxiv preprint 2Y. Dufresne and F. Andreace
+
+Sorted lists intrinsically support these operations: given two sorted k -mer sets, union, intersection, difference, and symmetric difference are computed by a single merge-like scan, and their cardinalities can be obtained without materializing the output. KMC [ 7] exploits this, but sorted lists store each element of a set K
+
+independently, so their space grows with k|K| despite adjacent genomic k -mers sharing k −1 characters. Compact representations reduce this redundancy—filters and dictionaries [ 10 , 8, 9] favor membership, BWT/FM-index structures [ 3, 2,11 ]favor succinct queries—but they often require auxiliary indexes and hide the ordering needed for merge-based set algebra (Appendix A, Table 2). We address this gap with virtual-super-k -mers: a representation of a k -mer set as a sorted list of recomposed super-k -mer-like objects that maintain an ordering over k -mers. Union, intersection, difference, and symmetric difference are thus still computed by sequential scans, but over compact virtual-super-k -mers rather than individual k -mers. 
+
+## 2 Super-k -mer representation 
+
+To exploit single-scan set operations and binary search, we must keep k -mers ordered in a list. We first outline the general idea of a compact sorted list of super-k -mers, then show how to construct them, query and perform set operations, and the optimizations enabling an efficient implementation. 
+
+2D k -mer sorted list. A classical sorted list of k -mers cannot be directly compacted while preserving order; we therefore introduce a 2D sorting . The real implementation never materializes it explicitly, but the whole method builds on this idea. A minimizer of size m is the smallest string of this size in a k -mer regarding a certain order (usually hash value). We partition the k -mer set into lists according to minimizer position. There are exactly k − m + 1 possible positions for a minimizer inside a word of size k, so we construct k − m + 1 lists (Fig 1). A 
+
+k -mer whose minimizer starts at nucleotide x is sent to list k − m − x (corresponds to the number of nucleotides after minimizer). This minimizer position is the first dimension of sorting. The second dimension is the standard sort within each individual list, by a total order ≺ (alphabetical in our examples). We write Ci for the list of index i, henceforth called its column ; the 2D list is thus the sequence of ≺-sorted columns C0, . . . , C k−m, and we write u ∈ Ci for a k -mer occurring at column i. Note that querying this set of lists for k -mer membership does not change the complexity of a binary search: we first determine which list to search by computing the minimizer, then perform a standard binary search on that list to return the presence or absence of the element. 
+
+Construction of super-k -mer lists. From the 2D list of the previous section, we want to produce a single 1D list of virtual-super-k -mers. We first distinguish classical super-k -mers from virtual-super-k -mers: the k -mers inside a classical super-k -mer are collocated , i.e. consecutive in the genome from which they are extracted, whereas virtual-super-k -mers drop this collocation requirement on their component k -mers. Virtual-super-k -mers are constructions needed for compaction, not objects carrying a biological meaning. 
+
+> .CC-BY 4.0 International license available under a was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint (which this version posted July 4, 2026. ;https://doi.org/10.64898/2026.06.29.735436 doi: bioRxiv preprint
+
+Compacted and Sorted k-mer Lists 3    
+
+> Input sequences
+> >seq1 GAACT >seq2 CAAG >seq3 CAC
+> Enumerated
+> k-mers
+> AAG CAC ACT CAA GAA AAC
+> k-mers divided in columns by minimizer position
+> pos = 1 pos = 0
+> CAC CAA GAA AAG ACT AAC
+> k-mers sorted by columns
+> pos = 1 pos = 0
+> CAA CAC GAA AAC AAG ACT
+
+Fig. 1. 2D sorting for k=3 m=2. k -mer enumerated from sequences, minimizers high-lighted. Then, k -mers are partitioned by minimizer position and column sorted. 
+
+Formally, a virtual-super-k -mer v covers a non-empty interval of consecutive columns [av , b v ] ⊆ [0 , k − m] and selects one k -mer per covered column, vi ∈ Ci
+
+for each i ∈ [av , b v ], such that consecutive selections overlap on k − 1 nucleotides: 
+
+suffix k−1(vi) = prefix k−1(vi+1 ) for all i ∈ [av , b v − 1] . Each index i ∈ [av , b v ] is a 
+
+position of v, and vi is the k -mer of v at that position; v spells a string of length 
+
+k + ( bv − av ). A classical super-k -mer is the special case where the k -mers vi are, in addition, collocated in a source sequence. Our goal is to output a list lst of virtual-super-k -mers that respects the order ≺ of every column. Two virtual-super-k -mers can be compared only on the columns they share, which form an interval; writing [ax, b x] for the span of lst [x].
+
+∀x < y lst [x]i ≺ lst [y]i for every shared column i ∈ [ax, b x] ∩ [ay , b y ].
+
+The quantifier thus ranges over the actual span shared by the two virtual-super-
+
+k -mers, not over the full range [0 ..k − m]. We build lst in two steps: we first 
+
+select , between each pair of adjacent columns, a valid set of overlapping k -mers; we then materialize the resulting chains into the sorted list. 
+
+Selecting overlaps between adjacent columns. Two k -mers at adjacent columns Cj and Cj+1 overlap when the suffix k − 1 nucleotides of the former equal the prefix k − 1 of the latter; such a pair (u, w ) ∈ Cj × Cj+1 is a candidate join and could later be stored once, as a longer virtual-super-k -mer. A single 
+
+k -mer may have several candidate joins (see Fig. 2). This step does not merge anything yet; it only selects which candidate joins will be used, subject to two constraints. First, the selection is a matching: each k -mer is kept in at most one join on each side, so selecting a join discards the remaining candidates of its two k -mers. Second, selected joins must not cross : two joins (u, w ) and (u′, w ′)
+
+cross when their k -mers appear in opposite orders in the two columns ( u ≺ u′
+
+but w′ ≺ w), and keeping both would invert the column order on one side. For instance, in Fig. 2, selecting the overlap between CAA and AAG (which would later form CAAG) forbids selecting the one between GAA and AAC (GAAC): column j orders CAAG before GAAC, whereas column j+1 orders GAAC before CAAG, so no ordering of the two virtual-super-k -mers respects both columns. 
+
+sklib implementation has two algorithms that select as many overlaps as possible between two columns. The first, collinear chaining [1], is an O(n log n)
+
+dynamic program based on Fenwick trees that selects a maximum non-crossing set. The second is a greedy heuristic that always takes the first available overlap  
+
+> .CC-BY 4.0 International license available under a was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint (which this version posted July 4, 2026. ;https://doi.org/10.64898/2026.06.29.735436 doi: bioRxiv preprint 4Y. Dufresne and F. Andreace
+> 1. Computed overlaps
+
+CAA CAC GAA AAC AAG ACT 
+
+> 2. Colinear Chaining
+
+CAA CAC GAA AAC AAG ACT 
+
+> 3. Non Valid
+
+CAA CAC GAA AAC AAG ACT      
+
+> Fig. 2. Co-linear chaining to select valid k-mer overlapping. Computed overlaps (1) are filtered to retain order-preserving chains between k-mer columns (2); invalid crossing chains are shown for comparison (3). Other valid selections shown in Appendix C.
+
+while sweeping the two lists from top to bottom; it is faster and, in practice, selects the same number of overlaps, though with no guarantee. Selecting overlaps for one pair of columns has no effect on the selection for any other pair, since the k -mers keep their order in every column. Moreover, two equivalent (equally large) selections between the same pair yield the same 
+
+number of virtual-super-k -mers; only their contents differ. 
+
+Materializing the virtual-super-k -mer list. The selected joins chain k -mers across columns: each k -mer lies in one chain, and each chain spells one virtual-super-k -mer. These must be emitted as a sorted 1D list. We sweep all columns top-down in parallel, one pointer per column starting at the top. A virtual-super-
+
+k -mer is complete when all its component k -mers are pointed simultaneously in the columns it spans; otherwise it waits on a k -mer lower in some column. At each step we materialize the smallest complete virtual-super-k -mer and advance the pointers of its columns. Simultaneously complete virtual-super-k -mers occupy disjoint columns—so no column orders them—and ties break on the smallest interleaved encoding value (Section 2, Fig. 3). This yields a globally sorted, de-duplicated virtual-super-k -mer list per bucket. These records match enumerated super-k -mers in form (span ≤ 2k − m), but their boundaries come from the sort, not the reads; the represented k -mer set is unchanged. Since the only virtual-super-
+
+k -mer interaction—the overlap join—links k -mers sharing the central (k−1) -mer, hence the same minimizer, each bucket is materialized independently . The final index concatenates the per-bucket sub-lists behind a directory mapping each bucket to its lowest minimizer value and record count. 
+
+Membership queries and set operations on sorted virtual-super-k -mer lists. Querying a k -mer is almost a plain binary search. At each step we mask the middle virtual-super-k -mer of the current range to expose the k -mer at the column given by the query’s minimizer position. When the masked virtual-super-
+
+k -mer carries no k -mer at that column, the algorithm scans linearly to the next virtual-super-k -mer that does, instead of the usual binary-search jump; the worst case scans the whole list but does not occur in practice. Set operations on sorted lists are linear: a single scan of the two lists is enough to produce the result. On virtual-super-k -mer lists, every supported operation (union, intersection, difference, symmetric difference) follows the same path. The two lists are scanned top to bottom, with one pointer per k -mer column. At each step, the k -mer pointed to in the first list is compared with the k -mer pointed to at the same column in the second list; the smaller k -mer,or the shared one, when 
+
+> .CC-BY 4.0 International license available under a was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint (which this version posted July 4, 2026. ;https://doi.org/10.64898/2026.06.29.735436 doi: bioRxiv preprint
+
+Compacted and Sorted k-mer Lists 5             
+
+> T
+> 0
+> G
+> 1
+> C
+> 2
+> A
+> 3
+> A
+> 4
+> C
+> 5
+> T
+> 6
+> G
+> 7
+> Super-k-mer k= 5 , m = 2 ACGTACTG
+> ←Prefix
+> ←Suffix
+> ←Interleaved bit representation
+> 00
+> 4
+> 00
+> 3
+> 01
+> 5
+> 01
+> 2
+> 10
+> 6
+> 11
+> 1
+> 10
+> 0
+> 11
+> 7input sequence position Minimizer Prefix/Suffix nibble
+
+Fig. 3. Interleaved, minimizer-centered encoding of a super-k -mer. The most significant bits contain the minimizer; prefix and suffix nucleotides are interleaved 4 bits at a time from the centre outward: a plain integer comparison realizes the centre-first sort key. 
+
+they are equal,is emitted or skipped according to the operation, and the pointers advance as in a merge: if the first k -mer is smaller, its pointer moves to the next virtual-super-k -mer with a valid k -mer at that column; if it is larger, the second list’s pointer moves; and if they are equal, both move. An example is presented in Appendix D. sklib implements two optimizations for this step. The first lets several set operations be computed together: a single pass produces them all. The second computes cardinalities without materializing the result, making it orders of magnitude faster, by amounting to a single pass of memory reads. 
+
+Optimization: minimizer-centered interleaving. Each nucleotide takes two bits ( A=0, C=1, T = 2, G=3), but instead of classical bit packing we use what we call an interleaved layout (see Fig. 3). Each super-k -mer is folded onto itself, with the folding point at the middle of the minimizer. This places the minimizer in the most significant bits, while the extreme nucleotides—present in only one k -mer of the super-k -mer—fall in the least significant bits. Shared nucleotides therefore have a strong influence on the integer value, whereas k -mer-specific nucleotides have little. This also ensures that two consecutive k -mers sharing a minimizer have similar values, and hence similar positions once their column is sorted, which allows more non-crossing overlaps between k -mers in adjacent columns. Two further optimizations make the implementation efficient: bucketing the records into 2b independent lists (default b=12 ) for parallelism, and quotienting , which drops the b bucket-implied bits per record since they are shared by all k -mers of a bucket. Both are detailed in Appendix E. 
+
+## 3 Experiments 
+
+We benchmark E. coli , yeast, and human chr1 (204.2 M) at k = 31 (m = 15 ) and 
+
+k = 63 (m = 31 ), using t = 1 and t = 8 threads. The compared tools are listed in Appendix A (Table 2); all exact tools build canonical indexes, and KMC has no point-query mode. Experimental setup and tests described in Appendix G. 
+
+Construction. On one thread sklib builds within 1.6–1.9× of KMC , the fastest constructor, and slightly faster than sshash ; with 8 threads it builds chr1 ( k= 31 )in 4.06 s. It uses far less memory: 139 MB peak RSS versus 735 MB for sshash and 
+
+1.8–9.2 GB for the others. Its space is intermediate— 21 –24 bits/ k -mer, against 
+
+64 –66 for KMC and 57 –65 for cbl , yet above membership-oriented indexes ( 2–
+
+> .CC-BY 4.0 International license available under a was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint (which this version posted July 4, 2026. ;https://doi.org/10.64898/2026.06.29.735436 doi: bioRxiv preprint
+
+6 Y. Dufresne and F. Andreace 
+
+Table 1. Set operations: time (s), single-threaded ( t = 1 ), median over operations 
+
+(∩, ∪, A \ B, B \ A) and Jaccard targets. “–” marks unsupported or capped configurations. Thread scaling and memory on chr1 are reported in Appendix B (Table 3). 
+
+k = 31 k = 63 
+
+Tool E. coli Yeast C. elegans Chr1 E. coli Yeast C. elegans Chr1 
+
+sklib 0.194 0.489 4.415 10.360 0.220 0.633 5.246 12.441 
+
+KMC 0.221 0.885 4.895 8.655 0.439 0.926 7.103 13.116 
+
+cbl 0.697 1.647 24.145 50.908 – – – –
+
+sbwtrs 19.55 33.441 – – – 83.69 – –
+
+fmsi 21.86 62.314 – – 23.51 72.79 – –
+
+12 bits/ k -mer)—thus much smaller than explicit sorted k -mer databases while retaining native set operations (full per-tool table in Appendix F). 
+
+Membership queries and set operations. Membership queries, though not 
+
+sklib ’s primary target, remain competitive: on chr1 at k= 31 sklib matches sbwtrs 
+
+(0.345 vs 0.347 Mk -mer/s, with sshash faster at 0.633 ), and is more robust at larger k, overtaking sbwtrs for k ≥ 41 and reaching 0.246 vs 0.181 Mk -mer/s at k=63 (full results in the repository). We compare exact set-operation tools to test whether virtual super-k -mers preserve merge-based performance under compaction. Table 1 shows that sklib is as fast as KMC , while cbl is slower and 
+
+sbwtrs /fmsi are one to two orders of magnitude slower or limited to smaller inputs. On chr1, sklib becomes faster than KMC with threads ( 3.0× at k = 31 , 3.2× at 
+
+k = 63 , t = 8 ; Table 3) while using far less memory: 54 MB versus 2.5 GB for 
+
+KMC and 15 .9 GB for cbl at k = 31 , t = 1 .
+
+## 4 Conclusion and future work 
+
+We presented a compact representation of sorted k -mer sets as ordered list of virtual super-k -mers. The key idea is to compact overlapping k -mers into minimizer-based objects while preserving the sorted-list structure that enables efficient merge-based set operations. Our experiments show that our implementa-tion, sklib , occupies an intermediate point between highly compact membership indexes and explicit sorted k -mer databases: it uses substantially fewer bits per element than KMC , remains competitive for membership queries, and is faster than KMC on set-operation with much lower memory usage. These results suggest that virtual super-k -mers provide a practical way to compact k -mer sets without losing the advantages of sorted representations. In the near future we will apply these set operations to construct de novo pangenome over bacteria and try to improve database operations on k -mers with the vizitig group. 
+
+Acknowledgments. F.A. was supported by ANR Full-RNA and Inception grants (ANR-22-CE45-0007, PIA/ANR16-CONV-0005). This project has received funding from the European Union’s Horizon 2020 research and innovation programme under the Marie Skłodowska-Curie grants agreements No. 872539 and 956229. 
+
+> .CC-BY 4.0 International license available under a was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint (which this version posted July 4, 2026. ;https://doi.org/10.64898/2026.06.29.735436 doi: bioRxiv preprint
+
+Compacted and Sorted k-mer Lists 7
+
+Disclosure of Interests. The authors have no competing interests to declare. 
+
+## References 
+
+1. Abouelhoda, M.I., Ohlebusch, E.: A local chaining algorithm and its applications in comparative genomics. In: Algorithms in Bioinformatics (WABI 2003). Lecture Notes in Computer Science, vol. 2812, pp. 1–16. Springer (2003). https://doi. org/10.1007/978-3-540-39763-2_1 
+
+2. Alanko, J.N.: sbwt-rs: a rust implementation of the SBWT. https://github.com/ jnalanko/sbwt-rs (2024), rust reimplementation of SBWT [ 3 ]; lifts the k ≤ 32 
+
+cap and adds set operations 3. Alanko, J.N., Puglisi, S.J., Vuohtoniemi, J.: Small searchable k-spectra via subset rank queries on the spectral Burrows-Wheeler transform. In: SIAM Conference on Applied and Computational Discrete Algorithms (ACDA). pp. 225–236 (2023). 
+
+https://doi.org/10.1137/1.9781611977714.20 
+
+4. Chikhi, R., Lemane, T., Loll-Krippleber, R., Montoliu-Nerin, M., Raffestin, B., Camargo, A.P., Miller, C.J., Fiamenghi, M.B., Agustinho, D.P., Majidian, S., et al.: Logan: planetary-scale genome assembly surveys life’s diversity. bioRxiv pp. 2024–07 (2025) 5. Degardins, B., Paperman, C., Marchet, C.: Vizitig: context-rich exploration of sequencing datasets. bioRxiv pp. 2025–04 (2025) 6. Karasikov, M., Mustafa, H., Danciu, D., Kulkov, O., Zimmermann, M., Barber, C., Rätsch, G., Kahles, A.: Efficient and accurate search in petabase-scale sequence repositories. Nature 647 (8091), 1036–1044 (2025) 7. Kokot, M., Długosz, M., Deorowicz, S.: KMC 3: counting and manipulating k-mer statistics. Bioinformatics 33 (17), 2759–2761 (2017). https://doi.org/10.1093/ bioinformatics/btx304 
+
+8. Levallois, V., Andreace, F., Le Gal, B., Dufresne, Y., Peterlongo, P.: The Backpack quotient filter: a dynamic and space-efficient data structure for querying k-mers with abundance. iScience (2024). https://doi.org/10.1101/2024.02.15.580441 ,preprint DOI; verify the iScience volume/article no. before camera-ready 9. Martayan, I., Cazaux, B., Limasset, A., Marchet, C.: Conway-bromage-lyndon (CBL): an exact, dynamic representation of k-mer sets. Bioinformatics 
+
+40 (Supplement_1), i48–i57 (2024). https://doi.org/10.1093/bioinformatics/ btae217 
+
+10. Pibiri, G.E.: Sparse and skew hashing of k-mers. Bioinformatics 38 (Supplement_1), i185–i194 (2022). https://doi.org/10.1093/bioinformatics/btac245 
+
+11. Sladký, O., Veselý, P., Břinda, K.: Masked superstrings as a unified framework for textual k-mer set representations. bioRxiv (2024). https://doi.org/10.1101/ 2023.02.01.526717 
+
+12. Wellons, C.: hash-prospector: Automated integer hash function discovery. https: //github.com/skeeto/hash-prospector (2018) 
+
+> .CC-BY 4.0 International license available under a was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint (which this version posted July 4, 2026. ;https://doi.org/10.64898/2026.06.29.735436 doi: bioRxiv preprint
+
+8 Y. Dufresne and F. Andreace 
+
+## Supplementary Material A Compared tools 
+
+Table 2 details the tools benchmarked in Section 3. 
+
+Table 2. Tools compared in Section 3. “Set-ops” marks native set operations between two 
+
+k -mer sets; “Threaded” lists the workloads each tool parallelizes. ⋆bqf is an approximate filter (false positives), shown for reference only. Tool Representation k range Query Set-ops Threaded 
+
+sklib sorted (virtual) super-k -mer list ≤ 127 ✓ ✓ construct, query, set-ops 
+
+KMC [7] k -mer counter / on-disk database all – ✓ construct, set-ops 
+
+sshash [10] minimal perfect hash ≤ 31 ✓ – no 
+
+sbwt [3] spectral BWT (C++) ≤ 32 ✓ – no 
+
+sbwtrs [2] spectral BWT (Rust) ≤ 255 ✓ ✓ construct, set-ops 
+
+cbl [9] Conway–Bromage–Lyndon (dynamic) odd ≤ 59 ✓ ✓ no 
+
+fmsi [11] masked superstring (FM-index) ≤ 127 ✓ ✓ no 
+
+bqf ⋆ [8] quotient filter (approximate) any ✓ – no 
+
+## B Set operations: thread scaling on chr1 
+
+Table 3 reports thread scaling and peak memory on chr1, complementing the single-threaded results of Section 3. 
+
+Table 3. Set operations on chr1: thread scaling and memory for sklib and KMC .time k = 31 time k = 63 RAM k = 31 (MB) Tool t=1 t=8 t=1 t=8 t=1 t=8 
+
+sklib 10.36 2.50 12.44 3.60 54 321 
+
+KMC 8.66 7.42 13.12 11.54 2514 2514 
+
+## C Co-linear chaining 
+
+A more detailed description of valid overlaps that can be selected using co-linear chaining is showin in Figure 4. 
+
+> .CC-BY 4.0 International license available under a was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint (which this version posted July 4, 2026. ;https://doi.org/10.64898/2026.06.29.735436 doi: bioRxiv preprint
+
+Compacted and Sorted k-mer Lists 9
+
+> 1. Computed overlaps
+
+CAA CAC GAA AAC AAG ACT 
+
+> 2. Colinear Chaining
+
+CAA CAC GAA AAC AAG ACT 
+
+> 3. Greedy Chaining
+
+CAA CAC GAA AAC AAG ACT 
+
+> 6. Non Valid
+
+CAA CAC GAA AAC AAG ACT 
+
+> 4. Equivalent solution
+
+CAA CAC GAA AAC AAG ACT 
+
+> 5. Less compact
+
+CAA CAC GAA AAC AAG ACT 
+
+Fig. 4. Co-linear chaining to select valid k -mer overlapping. Computed overlaps (1) are filtered to retain order-preserving chains between k -mer columns (2); greedy, equivalent, less compact, and invalid crossing chains are shown for comparison (3–6). 
+
+List A 
+
+CAA CAC GAA AAC AAG ACT 
+
+List B 
+
+AAA TAG GAG AAT AAG ACA 
+
+List A 
+
+CAA CAC GAA AAC AAG ACT 
+
+List B 
+
+AAA TAG GAG AAT AAG ACA 
+
+List A 
+
+CAA CAC GAA AAC AAG ACT 
+
+List B 
+
+AAA TAG GAG AAT AAG ACA 
+
+List A 
+
+CAA CAC GAA AAC AAG ACT 
+
+List B 
+
+AAA TAG GAG AAT AAG ACA 
+
+List A 
+
+CAA CAC GAA AAC AAG ACT 
+
+List B 
+
+AAA TAG GAG AAT AAG ACA 
+
+List A 
+
+CAA CAC GAA AAC AAG ACT 
+
+List B 
+
+AAA TAG GAG AAT AAG ACA 
+
+Fig. 5. Set operaton scan of the virtual super-k -mer sorted list visualized as 2D sorting of k -mers. 
+
+## D Set operation merging example 
+
+Figure 5 shows an example of set operation merge-like scan of two lists. Consider two lists A ∩ B, each made up by two columns of k -mers. The set operation scan starts by placing pointers on top of each column to keep track of k -mers to be compared. To make comparison clear, the left column of each list is pointed, in the figure, by an arrow, while the right is pointed by a small circle. At the beginning, list A exposes CAA and AAC , while list B exposes AAA then AAT : CAA 
+
+of A is compared to AAA of B and AAC of A is compared to AAT of B. Therefore as AAA ≺CAA , AAA is discarded and the little arrow advances in list B to the next virtual-super-k -mer in the column. In the same way, AAC ≺AAT , so AAC is discarded and the little circle advances in list A to the next virtual-super-k -mer with a 
+
+k -mer in the right column . Comparison by column continues, and in the right column both list A and B expose AAG : as the two k -mers are equal, AAG is emitted and the little circle pointer advances in both lists. Comparison is continued until both lists maintain elements in the same column, else the remaining elements in the list are discarded (or emitted for other set operations). Replacing the emit rule turns the same single scan into ∪, A \ B, or the symmetric difference. 
+
+> .CC-BY 4.0 International license available under a was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint (which this version posted July 4, 2026. ;https://doi.org/10.64898/2026.06.29.735436 doi: bioRxiv preprint
+
+10 Y. Dufresne and F. Andreace 
+
+## E Implementation optimizations: bucketing and quotienting 
+
+These two optimizations complement the minimizer-centered interleaving of Section 2; they leave every operation described in the main text unchanged. 
+
+Bucketing. sklib holds not one k -mer list but 2b lists, the buckets (b is a user parameter, default 12 ). The bucket of a k -mer is chosen by a hash function with good distribution properties: we hash every m-mer of the k -mer and keep the smallest hash (the minimizer), then take its b lowest bits, in reversed order, to select the bucket. We use the low bits because they are the most random—after the minimum search, the high bits are more likely to be zero. So that the k -mers can still be enumerated, the hash function is reversible; we use an xor-shift from the hash-prospector project [ 12 ]. Every operation described in the main text is unchanged, except that it first selects the relevant bucket before performing the list operations. 
+
+Quotienting. Because each k -mer is sent to a deterministic bucket based on b of its bits, those bits need not be stored: the bucket address holds them implicitly, since they are shared by all the k -mers it contains. This saves b bits per super-k -mer. 
+
+## F Construction space: bits per k -mer 
+
+Table 4 reports the space usage of all benchmarked tools, complementing the summary given in Section 3. 
+
+Table 4. Space usage in bits per k -mer for all tools at k = 31 .Tool E.coli Yeast C.elegans Chr1 
+
+fmsi 2.13 2.15 2.20 2.25 
+
+sshash 7.12 7.34 8.33 9.67 
+
+sbwtrs 11.84 10.73 10.09 10.04 
+
+sbwt 12.34 11.23 10.59 10.54 Tool E.coli Yeast C.elegans Chr1 
+
+sklib 21.43 21.55 23.54 24.27 
+
+bqf 38.68 29.02 24.27 21.04 
+
+cbl 64.90 60.20 57.34 56.76 
+
+KMC 66.30 64.91 64.11 64.05 
+
+## G Experimental Setup 
+
+Experiments were run on an Intel Core Ultra 7 165H machine with 62 GiB RAM and Linux 6.17. Wall time and peak RSS were measured with /usr/bin/time -v ;we report median time over three runs and maximum RSS. For the threaded tools the first rep of each configuration is a cold-page-cache run: the median discards it, so the tables show warm steady-state. We benchmark E. coli (4.6 MB, 4.5 M 
+
+> .CC-BY 4.0 International license available under a was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint (which this version posted July 4, 2026. ;https://doi.org/10.64898/2026.06.29.735436 doi: bioRxiv preprint
+
+Compacted and Sorted k-mer Lists 11 
+
+distinct k -mers), yeast (12 MB, 11.6 M), C. elegans (98 MB, 94.0 M), and human chr1 from CHM13 (224 MB, 204.2 M) at k = 31 (m = 15 ) and k = 63 (m = 31 ), using t = 1 and t = 8 threads. The compared tools are listed in Appendix A (Table 2); all exact tools build canonical indexes, and KMC has no point-query mode. Full tables and scripts at https://github.com/yoann-dufresne/sklib .

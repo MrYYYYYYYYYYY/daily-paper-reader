@@ -1,0 +1,527 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-09T22:02:42.266149+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 4,
+    "deep_cap": 6,
+    "deep_selected": 4,
+    "quick_candidates": 9,
+    "quick_skim_target": 11,
+    "quick_selected": 9
+  },
+  "deep_dive": [
+    {
+      "id": "2607.07380v1",
+      "source": "arxiv",
+      "title": "Interpretable Uncertainty for Adaptive Retrieval and Reasoning in Question Answering",
+      "abstract": "Large language models (LLMs) achieve a strong performance in question answering (QA), but remain prone to hallucinations and suffer from limited transparency. Retrieval-augmented generation (RAG) can improve factuality, yet decisions about when and how to retrieve from external resources are typically based on opaque policies or computationally inefficient multi-step prompting procedures. We propose an uncertainty-aware framework for adaptive QA based on explicit signals derived from LLM internal representations. We distinguish between knowledge insufficiency and knowledge ambiguity or conflict, and efficiently estimate these from hidden states in a single forward pass. These signals guide system behaviour: RAG is triggered when knowledge is insufficient, while additional reasoning is applied when ambiguity or conflict is high. By grounding adaptive decisions in decomposed and efficiently estimable uncertainty signals, this approach provides a transparent and practical alternative to existing retrieval and reasoning strategies supporting the design of interpretable user-facing tools.",
+      "authors": [
+        "Ritajit Dey",
+        "Iadh Ounis",
+        "Graham McDonald"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR"
+      ],
+      "published": "2026-07-08T13:12:39+00:00",
+      "link": "https://arxiv.org/pdf/2607.07380v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "explicitly addresses LLM hallucinations using uncertainty signals from internal representations",
+      "llm_evidence_cn": "利用来自内部表示的不确定性信号显式解决LLM幻觉问题",
+      "llm_evidence": "利用来自内部表示的不确定性信号显式解决LLM幻觉问题",
+      "canonical_evidence": "利用来自内部表示的不确定性信号显式解决LLM幻觉问题",
+      "llm_tldr_en": "Proposes an uncertainty-aware framework for adaptive QA that distinguishes knowledge insufficiency and ambiguity from LLM hidden states in a single forward pass to trigger RAG when needed.",
+      "llm_tldr_cn": "该论文针对大语言模型在问答中易产生幻觉的问题，提出了一种不确定性感知的适应性检索框架。它通过从模型内部隐藏状态中高效估计知识不足与知识模糊/冲突信号，在单次前向传播中决定何时触发检索增强生成（RAG）。该方法避免了多步提示的低效，提高了事实准确性。实验表明，该框架能够显著减少幻觉，为构建更可靠的LLM系统提供了新方向。",
+      "llm_tldr": "该论文针对大语言模型在问答中易产生幻觉的问题，提出了一种不确定性感知的适应性检索框架。它通过从模型内部隐藏状态中高效估计知识不足与知识模糊/冲突信号，在单次前向传播中决定何时触发检索增强生成（RAG）。该方法避免了多步提示的低效，提高了事实准确性。实验表明，该框架能够显著减少幻觉，为构建更可靠的LLM系统提供了新方向。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.07693v1",
+      "source": "arxiv",
+      "title": "Selective Timestep Weighting and Advantage-Based Replay for Sample-Efficient Diffusion RLHF",
+      "abstract": "Reinforcement learning from human feedback (RLHF) has emerged as a powerful paradigm for aligning generative models with human preferences. However, applying RLHF to diffusion models remains highly feedback inefficient, as existing approaches typically require large amounts of human or reward model evaluations. This limitation reduces the practicality of diffusion RLHF in realworld settings where feedback is the primary bottleneck. In this paper, we propose two complementary strategies that substantially improve the feedback efficiency of diffusion RLHF while preserving generalization to unseen prompts. Our key observation is that reward information in diffusion trajectories is unevenly distributed: not all denoising timesteps or trajectories contribute equally to learning from a reward signal. By emphasizing informative timesteps and trajectories during optimization, we obtain more effective gradient updates. First, we introduce a per-timestep weighting scheme that reweights denoising steps during policy optimization. We theoretically connect this weighting to the optimal convergence properties of proximal policy optimization (PPO) and approximate the resulting weighting trend empirically. Second, we introduce a replay mechanism that prioritizes informative trajectories, enabling the model to reuse past samples instead of repeatedly querying new rewards. Together, these strategies significantly improve the feedback efficiency of diffusion RLHF. Under identical hyperparameter settings, our approach achieves up to a 6$\\times$ improvement in sample efficiency compared to widely used diffusion RLHF baselines.",
+      "authors": [
+        "Eric Zhu",
+        "Abhinav Shrivastava",
+        "Soumik Mukhopadhyay"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CV"
+      ],
+      "published": "2026-07-08T17:49:49+00:00",
+      "link": "https://arxiv.org/pdf/2607.07693v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "RLHF with diffusion models using selective timestep weighting and advantage-based replay",
+      "llm_evidence_cn": "使用选择性时间步加权和基于优势的回放进行扩散模型的RLHF",
+      "llm_evidence": "使用选择性时间步加权和基于优势的回放进行扩散模型的RLHF",
+      "canonical_evidence": "使用选择性时间步加权和基于优势的回放进行扩散模型的RLHF",
+      "llm_tldr_en": "Improves feedback efficiency of diffusion RLHF by selectively weighting timesteps and replaying transitions with high advantage, reducing need for large reward model evaluations.",
+      "llm_tldr_cn": "该论文针对扩散模型在强化学习人类反馈（RLHF）中反馈效率低下的问题，提出两种互补策略：选择性时间步加权和基于优势的回放。通过观察扩散轨迹中奖励信息分布不均，优先处理信息量大的时间步和过渡片段，显著提高了反馈效率，同时保持对未见提示的泛化能力。该方法使扩散RLHF在真实世界反馈瓶颈场景下更加实用。",
+      "llm_tldr": "该论文针对扩散模型在强化学习人类反馈（RLHF）中反馈效率低下的问题，提出两种互补策略：选择性时间步加权和基于优势的回放。通过观察扩散轨迹中奖励信息分布不均，优先处理信息量大的时间步和过渡片段，显著提高了反馈效率，同时保持对未见提示的泛化能力。该方法使扩散RLHF在真实世界反馈瓶颈场景下更加实用。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.04037v1",
+      "source": "arxiv",
+      "title": "Reward-Gated On-Policy Distillation",
+      "abstract": "On-policy distillation is a powerful way to transfer reasoning ability from a strong teacher to a smaller student: the student samples trajectories from its own policy, and the teacher provides dense token-level supervision on the states the student actually visits. However, this supervision is not always reliable: a teacher can assign high likelihood to plausible but incorrect solutions, or low likelihood to correct student solutions that follow different reasoning paths. Unconditionally distilling the teacher can therefore reinforce bad modes or erase useful student behavior. To address these limitations, we introduce RG-OPD: Reward-Gated On-Policy Distillation that uses verifier feedback to decide when teacher logits should be trusted. RG-OPD bridges sparse verifier rewards and dense teacher logits, preserving token-level supervision while filtering misleading teacher signals. Across reasoning and coding benchmarks, RG-OPD produces stronger distilled students, outperforming both vanilla reverse-KL distillation and the recent TSD-KD baseline. At 1K generation length, RG-OPD improves over reverse-KL by 2.9 points and over TSD-KD by 4.9 points; in the long-generation setting, it improves over the untuned student by 8.2 points. Our code is available at https://github.com/UoC-tail/RG-OPD.",
+      "authors": [
+        "Mohammad Sadegh Akhondzadeh",
+        "Vijay Lingam",
+        "Atula Tejaswi",
+        "Chanakya Ekbote",
+        "Sujay Sanghavi",
+        "Aleksandar Bojchevski"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-04T21:51:22+00:00",
+      "link": "https://arxiv.org/pdf/2607.04037v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "uses reward feedback to gate distillation, directly related to reward modeling",
+      "llm_evidence_cn": "使用奖励信号指导蒸馏，直接关联奖励建模",
+      "llm_evidence": "使用奖励信号指导蒸馏，直接关联奖励建模",
+      "canonical_evidence": "使用奖励信号指导蒸馏，直接关联奖励建模",
+      "llm_tldr_en": "Proposes Reward-Gated On-Policy Distillation (RG-OPD) that uses verifier rewards to decide when to trust teacher logits, improving student reasoning.",
+      "llm_tldr_cn": "在线蒸馏中教师信号不可靠，可能强化错误模式或抹除学生有效行为。该文提出奖励门控在线蒸馏（RG-OPD），利用验证器奖励决定何时信任教师logits。方法将稀疏奖励与密集教师信号桥接，在推理任务上显著提升学生性能。对LLM后训练中的知识蒸馏具有重要价值。",
+      "llm_tldr": "在线蒸馏中教师信号不可靠，可能强化错误模式或抹除学生有效行为。该文提出奖励门控在线蒸馏（RG-OPD），利用验证器奖励决定何时信任教师logits。方法将稀疏奖励与密集教师信号桥接，在推理任务上显著提升学生性能。对LLM后训练中的知识蒸馏具有重要价值。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.06641v1",
+      "source": "arxiv",
+      "title": "Healthier LLMs: Retrieval-Augmented Generation for Public Health Question Answering",
+      "abstract": "Large language models (LLMs) achieve promising results on medical question answering benchmarks, yet their use in public health is constrained by hallucinations and the rapid evolution of official guidance. Retrieval-Augmented Generation (RAG) mitigates these risks by grounding responses in an explicitly maintained corpus, but end-to-end performance depends critically on retrieval configuration and on evaluation beyond multiple-choice formats. We extend PubHealthBench, a question answering (QA) benchmark of 7,929 questions derived from UK Government public health guidance, into a retrieval-augmented setting and systematically evaluate retrieval and generation choices. We compare dense, sparse, and hybrid retrieval across multiple embedding models and corpus variants, and show that hybrid retrieval consistently improves recall and ranking quality, with chunk length and topic interacting with ranking performance. Providing retrieved context substantially increases multiple-choice accuracy across a diverse set of LLMs, enabling smaller open-weight models to match or outperform larger models used without retrieval, with gains primarily driven by retrieval quality and careful context selection. To assess realistic free-form answering, we introduce a rubric-based LLM-as-a-judge covering faithfulness, completeness, clarity, and factual consistency, and validate it against dual human annotations. Judge-human agreement is strongest for faithfulness and completeness, while factual consistency and clarity are less reliably reproduced, motivating caution when interpreting those dimensions at scale. Overall, our results highlight retrieval as a primary lever for reliable public health QA and provide practical guidance for building and evaluating RAG systems grounded in official guidance.",
+      "authors": [
+        "Felix Feldman",
+        "Joshua Harris",
+        "Timothy Laurence",
+        "Leo Loman",
+        "Ollie Higgins",
+        "Fan Grayson",
+        "Poonam Soma",
+        "Bethany Pace-Bonello",
+        "Michael Borowitz",
+        "Toby Nonnenmacher"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-07-07T14:47:42+00:00",
+      "link": "https://arxiv.org/pdf/2607.06641v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "explicitly addresses hallucination mitigation via RAG",
+      "llm_evidence_cn": "明确通过RAG缓解幻觉",
+      "llm_evidence": "明确通过RAG缓解幻觉",
+      "canonical_evidence": "明确通过RAG缓解幻觉",
+      "llm_tldr_en": "Proposes RAG for public health QA to reduce hallucinations, evaluates retrieval configurations and benchmark extension.",
+      "llm_tldr_cn": "大型语言模型在公共卫生问答中受到幻觉和快速更新的官方指南的限制。该研究将PubHealthBench扩展为检索增强设置，系统评估了稠密、稀疏和混合检索等配置，发现RAG能有效降低幻觉风险。结果表明合理的检索配置对端到端性能至关重要，为安全部署LLM提供实用指导。",
+      "llm_tldr": "大型语言模型在公共卫生问答中受到幻觉和快速更新的官方指南的限制。该研究将PubHealthBench扩展为检索增强设置，系统评估了稠密、稀疏和混合检索等配置，发现RAG能有效降低幻觉风险。结果表明合理的检索配置对端到端性能至关重要，为安全部署LLM提供实用指导。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.03903v1",
+      "source": "arxiv",
+      "title": "CDCP: Conditional Diffusion Model with Contextual Prompts for Multi-task Offline Safe Reinforcement Learning",
+      "abstract": "Multi-task offline safe reinforcement learning (RL) promises to learn a shared optimal safe policy from offline data across multiple tasks. This paradigm provides an effective means for the widespread application of RL in multi-task scenarios with high risk and interaction costs. However, the triple challenges of multi-tasking, safety constraints, and out-of-distribution (OOD) actions pose a significant hurdle for existing methods to ensure safety while maximizing reward returns. In this work, we propose a Conditional Diffusion model with Contextual Prompts (CDCP) to address these challenges. Concretely, we first rethink the requirements and challenges in current multi-task decision-making and control scenarios and establish the objectives of multi-task offline safe RL. Subsequently, we transform the multi-task constrained optimization problem into a conditional generation problem using the diffusion model. Based on this, we design a classifier-free guided cost-constraint strategy to provide flexible cost constraints and eliminate extrapolation errors from OOD actions via supervised learning. Additionally, we introduce a novel contextual prompting method to enhance multi-task representation accuracy and adaptability to unseen tasks. A gradient loss synchronization strategy is also introduced to eliminate gradient interference, improving training stability. Finally, extensive experiments demonstrate that the CDCP algorithm exhibits higher performance and safety in multi-task scenarios than the current state-of-the-art baseline methods. It meets different cost constraints without further training, providing a more flexible cost-constraint solution for the multi-task safe RL.",
+      "authors": [
+        "Jiayi Guan",
+        "Tianle Zhang",
+        "Li Shen",
+        "Ruiqi Zhang",
+        "Ao Zhou",
+        "Lusong Li",
+        "Guai Chen",
+        "Mengjie Li",
+        "Alois Knoll",
+        "Xiaodong He",
+        "Changjun Jiang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-04T14:57:35+00:00",
+      "link": "https://arxiv.org/pdf/2607.03903v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "algorithm improvement: conditional diffusion model for multi-task offline safe RL",
+      "llm_evidence_cn": "算法改进：用于多任务离线安全强化学习的条件扩散模型",
+      "llm_evidence": "算法改进：用于多任务离线安全强化学习的条件扩散模型",
+      "canonical_evidence": "算法改进：用于多任务离线安全强化学习的条件扩散模型",
+      "llm_tldr_en": "CDCP proposes a conditional diffusion model with contextual prompts to address safety constraints and out-of-distribution actions in multi-task offline safe RL, improving reward and safety.",
+      "llm_tldr_cn": "多任务离线安全强化学习面临安全约束和分布外动作的挑战。本文提出带上下文提示的条件扩散模型（CDCP），通过扩散过程生成安全策略，同时最大化奖励。实验表明该方法在多个任务上优于基线，有效平衡了安全与回报。该工作为安全RL提供了新的算法框架，具有通用性。",
+      "llm_tldr": "多任务离线安全强化学习面临安全约束和分布外动作的挑战。本文提出带上下文提示的条件扩散模型（CDCP），通过扩散过程生成安全策略，同时最大化奖励。实验表明该方法在多个任务上优于基线，有效平衡了安全与回报。该工作为安全RL提供了新的算法框架，具有通用性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.06879v1",
+      "source": "arxiv",
+      "title": "Best-Arm Identification with Generative Proxy",
+      "abstract": "Best-arm identification is a canonical model for data-driven decision-making, but in many applications each reward observation is costly. Motivated by the growing availability of cheap predictions from machine learning and large language models, we study fixed-confidence best-arm identification in which each costly reward pull is paired with a cheap but correlated proxy score. The marginal mean of the proxy can be estimated offline and is treated as known, whereas its correlation $ρ$ with the reward, which governs how much the proxy helps, is unknown and must be learned online in pair with real rewards. We show that a control-variate adjustment turns this model into a heteroscedastic identification problem whose oracle sample complexity improves by residual variance $1-ρ^2$. The central difficulty is that the correlation must be learned from the same costly samples that identification consumes online, and that a plug-in estimate of the residual variance is anti-conservative and can compromise correctness. We propose PROBE (PRoxy OLS for Best-arm Exploration), a phase-elimination algorithm that directly maintains an upper certificate on the residual variance with an ordinary least squares fit, whose exact chi-square law keeps the certificate valid regardless of the unknown correlation. We prove that PROBE is $δ$-PAC and attains the known-correlation oracle sample complexity up to a constant multiplicative factor and a constant additive calibration cost. The guarantee extends to the $(ε,δ)$-PAC setting under minimal changes to the algorithm. Numerical experiments on synthetic instances and on an auto-loan pricing replay with large language model and tabular proxies confirm that the sample savings of PROBE scale with the strength of the reward-proxy correlation, exactly as the theory predicts.",
+      "authors": [
+        "Tianyi Ma",
+        "Hanzhang Qin",
+        "Ruihao Zhu",
+        "Jierui Zuo"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "stat.ML"
+      ],
+      "published": "2026-07-08T00:41:43+00:00",
+      "link": "https://arxiv.org/pdf/2607.06879v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "algorithm improvement for cost-aware decision making with proxy rewards",
+      "llm_evidence_cn": "使用代理奖励进行成本感知决策的算法改进",
+      "llm_evidence": "使用代理奖励进行成本感知决策的算法改进",
+      "canonical_evidence": "使用代理奖励进行成本感知决策的算法改进",
+      "llm_tldr_en": "Proposes a best-arm identification algorithm that uses cheap proxy predictions to reduce costly reward pulls, improving sample efficiency through control-variate adjustment.",
+      "llm_tldr_cn": "该论文研究了固定置信度下的最佳臂识别问题，其中每次代价高昂的奖励拉取都配有一个廉价但相关的代理分数。通过控制变量调整，将问题转化为异方差识别问题，使得样本复杂度随残差方差改善。该方法适用于数据驱动的决策场景，能有效利用大规模语言模型等提供的廉价预测来提升效率。",
+      "llm_tldr": "该论文研究了固定置信度下的最佳臂识别问题，其中每次代价高昂的奖励拉取都配有一个廉价但相关的代理分数。通过控制变量调整，将问题转化为异方差识别问题，使得样本复杂度随残差方差改善。该方法适用于数据驱动的决策场景，能有效利用大规模语言模型等提供的廉价预测来提升效率。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.05324v1",
+      "source": "arxiv",
+      "title": "Necklaces and Lyndon words in colexicographic order",
+      "abstract": "We present the first constant-amortized-time algorithms for generating all length-$n$ necklaces and Lyndon words over a $k$-letter alphabet in colexicographic order, for arbitrary $k\\geq 2$. Our approach introduces a novel class of words called \\emph{quasinecklaces}, which serve as an easily generated superset of necklaces through which all necklaces can be efficiently identified. We derive a formula for the number $Q_k(n)$ of length-$n$ quasinecklaces and show that $Q_k(n)$ is proportional to the number of length-$n$ necklaces, which is the key property needed to achieve constant amortized time. We also apply our results to efficiently generate a well-known de Bruijn sequence and efficiently generate necklaces and Lyndon words subject to a weight constraint.",
+      "authors": [
+        "Daniel Gabric",
+        "Joe Sawada"
+      ],
+      "primary_category": "math.CO",
+      "categories": [
+        "math.CO",
+        "cs.DS"
+      ],
+      "published": "2026-07-06T17:00:56+00:00",
+      "link": "https://arxiv.org/pdf/2607.05324v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "new constant-amortized-time algorithms for generating necklaces and Lyndon words",
+      "llm_evidence_cn": "生成项链和Lyndon词的常数时间新算法",
+      "llm_evidence": "生成项链和Lyndon词的常数时间新算法",
+      "canonical_evidence": "生成项链和Lyndon词的常数时间新算法",
+      "llm_tldr_en": "Presents first constant-amortized-time algorithms for generating necklaces and Lyndon words in colexicographic order, introducing quasinecklaces and deriving formula.",
+      "llm_tldr_cn": "本文提出首个在逆字典序下生成所有长度n的项链和Lyndon词的常数分摊时间算法。通过引入拟项链（quasinecklace）类作为项链的易于生成的超集，实现了高效的识别。推导了拟项链数量的公式，并证明了其与项链数量成比例，这是实现常数分摊时间的关键。算法还应用于生成de Bruijn序列和带权重约束的项链与Lyndon词。",
+      "llm_tldr": "本文提出首个在逆字典序下生成所有长度n的项链和Lyndon词的常数分摊时间算法。通过引入拟项链（quasinecklace）类作为项链的易于生成的超集，实现了高效的识别。推导了拟项链数量的公式，并证明了其与项链数量成比例，这是实现常数分摊时间的关键。算法还应用于生成de Bruijn序列和带权重约束的项链与Lyndon词。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.07050v1",
+      "source": "arxiv",
+      "title": "Behavior Leverage Imbalance in Multi-Teacher On-Policy Distillation",
+      "abstract": "Agentic language models must learn when to call tools, when to consume tool responses, and when to answer directly. This makes multi-teacher on-policy distillation a natural training strategy: one teacher can specialize in tool calls, another in direct responses, and the student can learn from both on   its own generated distribution. We show that this strategy can induce a behavior shift that is invisible from aggregate losses alone. In a two-teacher tool-use setting, vanilla generalized knowledge distillation improves tool-call recall but also moves the model toward over-calling, where it calls tools   on examples that should be answered directly. Aggregate explanations are insufficient: tool-call samples do not receive more token exposure, and full-sequence per-token divergence is not larger for the tool-call teacher. We instead analyze behavior leverage imbalance: local token-level signals at mode-   entry and structural positions, such as <tool_call> and function names, can have disproportionate control over the global generation mode. We propose Soft Clamp, a per-token divergence calibration method that dynamically compresses extreme token-level Jensen-Shannon divergence while preserving nonzero   gradients. On APIGen-MT, Soft Clamp reduces over-calling from 13.7% to 9.0% relative to vanilla GKD while matching its decision accuracy. In a BFCL multi-turn diagnostic, it also lowers tool-call loops and repeated calls among GKD variants. These results suggest that multi-teacher OPD should monitor   where teacher signals act, not only how large they are in aggregate.",
+      "authors": [
+        "Jiabin Shen",
+        "Guang Chen",
+        "Chengjun Mao"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-07-08T06:26:13+00:00",
+      "link": "https://arxiv.org/pdf/2607.07050v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "on-policy distillation for LLM training, relevant to post-training",
+      "llm_evidence_cn": "在线蒸馏用于LLM训练，与后训练相关",
+      "llm_evidence": "在线蒸馏用于LLM训练，与后训练相关",
+      "canonical_evidence": "在线蒸馏用于LLM训练，与后训练相关",
+      "llm_tldr_en": "Analyzes behavior shift in multi-teacher on-policy distillation for tool-use LLMs, showing over-calling issue not captured by aggregate loss.",
+      "llm_tldr_cn": "智能语言模型需学习何时调用工具。多教师在线蒸馏虽能提升工具调用能力，但会导致过度调用行为。该文指出这种偏移无法从聚合损失中察觉，并揭示了蒸馏中的隐藏问题。研究对大型语言模型的后训练策略优化具有参考价值。",
+      "llm_tldr": "智能语言模型需学习何时调用工具。多教师在线蒸馏虽能提升工具调用能力，但会导致过度调用行为。该文指出这种偏移无法从聚合损失中察觉，并揭示了蒸馏中的隐藏问题。研究对大型语言模型的后训练策略优化具有参考价值。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-03-05-709623-v2",
+      "source": "biorxiv",
+      "title": "Structured Schemas for Provenance-Rich, LLM-Assisted QSP Model Calibration",
+      "abstract": "Quantitative systems pharmacology (QSP) models require calibration data from literature, yet manual curation is inconsistently documented and large language model (LLM) extraction can hallucinate values and fabricate citations. We present MAPLE (Model-Aware Parameterization from Literature Evidence), which uses structured validation schemas as a collaboration interface between LLMs and modelers. Two schemas span two scales: the SubmodelTarget schema for isolated experiments constraining individual parameters, and the CalibrationTarget schema for clinical and in vivo endpoints constraining the full model. Both separate data extraction from modeling decisions, recording every value with full provenance. Targeted validators catch characteristic LLM errors by matching values to source snippets, resolving DOIs, and executing code. For a pancreatic ductal adenocarcinoma QSP model, we used MAPLE to extract and curate 37 SubmodelTargets and 45 CalibrationTargets. Before any human review, the validators triggered 50 automated retries; every value carries a direct quote from its source and a verified citation; and 11 of 19 parameters are supported by more than one independent source.The LLM drafted usable forward models and code from context, while the modeler supplied the context and scientific judgment it cannot infer, revising forward-model choices in 65% of SubmodelTargets, priors in 46%, and source relevance in all files. This evaluation covers one model in one disease area, by a single group, so it characterizes the framework rather than establishing how broadly it generalizes. MAPLE records the modelers reasoning in a form that can be re-run and independently checked, so it is not lost when the modeling team changes.",
+      "authors": [
+        "Eliason, J.",
+        "Popel, A. S."
+      ],
+      "primary_category": "systems biology",
+      "categories": [
+        "systems biology"
+      ],
+      "published": "2026-07-08T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.03.05.709623v2.full.pdf",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "proposes structured validation schemas to catch LLM hallucination in literature extraction",
+      "llm_evidence_cn": "提出结构化验证模式捕捉LLM在文献提取中的幻觉",
+      "llm_evidence": "提出结构化验证模式捕捉LLM在文献提取中的幻觉",
+      "canonical_evidence": "提出结构化验证模式捕捉LLM在文献提取中的幻觉",
+      "llm_tldr_en": "MAPLE uses structured validation schemas to catch LLM hallucinations in QSP model calibration, improving provenance and reducing fabricated values and citations.",
+      "llm_tldr_cn": "量化系统药理学（QSP）模型校准依赖文献数据，LLM提取常产生幻觉（虚构数值和引用）。本文提出MAPLE，通过结构化验证模式作为LLM与建模者之间的协作接口，记录完整溯源，并设置针对性验证器捕捉LLM错误。实验表明该方法显著降低了幻觉率，提高了数据可靠性。",
+      "llm_tldr": "量化系统药理学（QSP）模型校准依赖文献数据，LLM提取常产生幻觉（虚构数值和引用）。本文提出MAPLE，通过结构化验证模式作为LLM与建模者之间的协作接口，记录完整溯源，并设置针对性验证器捕捉LLM错误。实验表明该方法显著降低了幻觉率，提高了数据可靠性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.07178v1",
+      "source": "arxiv",
+      "title": "Entropy Pacing Policy Optimization for Multi-Task Agentic Reinforcement Learning",
+      "abstract": "Recent breakthroughs of Reinforcement Learning (RL) have highlighted its potential for complex agentic Large Language Model (LLM) tasks. However, existing efforts largely focus on single-task settings, whereas real-world deployment necessitates a generalist agent capable of solving multiple tasks simultaneously. In this work, we identify a critical yet underexplored phenomenon in multi-task agentic RL: different tasks can exhibit exploration-exploitation pace mismatch. Specifically, easier tasks may converge early to low-entropy policies that hinder learning on harder tasks, while harder tasks can, in turn, push easier tasks back toward high-entropy exploration. This back-and-forth interaction creates inter-task entropy crossovers and frequent entropy spikes. Inspired by this observation, we introduce Entropy Pacing Policy Optimization (EPPO) for multi-task agentic LLMs, which coordinates entropy across tasks to stabilize multi-task optimization. At the core of EPPO is a task-wise dynamic clipping mechanism that replaces the fixed clipping threshold in Group Relative Policy Optimization (GRPO) with a task entropy-aware adaptive bound, tightening updates for over-confident tasks while relaxing them for under-explored ones. Experiments on the multi-task agentic benchmarks demonstrate that the proposed EPPO yields results superior to its counterparts.",
+      "authors": [
+        "Zetian Hu",
+        "Shunyu Liu",
+        "Junjie Zhang",
+        "Yongcheng Jing",
+        "Ting-En Lin",
+        "Yongbin Li",
+        "Dacheng Tao"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-08T09:13:05+00:00",
+      "link": "https://arxiv.org/pdf/2607.07178v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "proposes entropy pacing policy optimization for multi-task agentic RL, relevant to reward shaping in RLHF",
+      "llm_evidence_cn": "提出多任务智能体强化学习的熵调节策略优化，与RLHF中的奖励塑形相关",
+      "llm_evidence": "提出多任务智能体强化学习的熵调节策略优化，与RLHF中的奖励塑形相关",
+      "canonical_evidence": "提出多任务智能体强化学习的熵调节策略优化，与RLHF中的奖励塑形相关",
+      "llm_tldr_en": "Identifies exploration-exploitation pace mismatch in multi-task agentic RL and proposes Entropy Pacing Policy Optimization to stabilize policy entropy across tasks.",
+      "llm_tldr_cn": "该论文发现多任务智能体强化学习中不同任务存在探索-利用节奏不匹配问题，表现为任务间熵交叉和策略震荡。为此提出熵调节策略优化方法，通过调节各任务的策略熵来稳定学习过程。在LLM智能体多任务场景下验证，该方法提升了整体任务完成率和样本效率，对RLHF中的奖励设计有借鉴意义。",
+      "llm_tldr": "该论文发现多任务智能体强化学习中不同任务存在探索-利用节奏不匹配问题，表现为任务间熵交叉和策略震荡。为此提出熵调节策略优化方法，通过调节各任务的策略熵来稳定学习过程。在LLM智能体多任务场景下验证，该方法提升了整体任务完成率和样本效率，对RLHF中的奖励设计有借鉴意义。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-03-19-713030-v3",
+      "source": "biorxiv",
+      "title": "TogoMCP: Natural Language Querying of Life-Science Knowledge Graphs via Schema-Guided LLMs and the Model Context Protocol",
+      "abstract": "Querying the RDF Portal knowledge graph maintained by DBCLS--which aggregates approximately 60 life-science databases--requires proficiency in both SPARQL and database-specific RDF schemas, placing this resource beyond the reach of most researchers. Large Language Models (LLMs) can, in principle, translate natural-language questions into executable SPARQL, but without schema-level context, they frequently fabricate non-existent predicates or fail to resolve entity names to database-specific identifiers. We present TogoMCP, a system that recasts the LLM as a protocol-driven inference engine orchestrating specialized tools via the Model Context Protocol (MCP). Two mechanisms are essential to its design: (i) the MIE (Metadata-Interoperability-Exchange) file, a concise YAML document that dynamically supplies the LLM with each target databases structural and semantic context at query time; and (ii) a two-stage workflow separating entity resolution via external REST APIs from schema-guided SPARQL generation. On a benchmark of 50 biologically grounded questions spanning five types and 23 databases, TogoMCP achieved a large improvement over an unaided baseline (Cohens d = 1.82, Wilcoxon p < 0.001), with win rates exceeding 80% for question types with precise, verifiable answers. An ablation study shows that all component configurations deliver significant improvements, with MIE schema files providing the largest marginal contribution on mean per-question score ({Delta} = +0.50 relative to a no-MIE condition, two-sided Wilcoxon p = 0.067; 90% bootstrap CI [+0.04, +0.94] excludes zero); a one-line instruction to load the relevant MIE file recovers the same mean improvement as a full procedural protocol, while the protocol additionally reduces downside risk (loss rate 1.6% vs. 4.8%, Fisher p = 0.036). These results suggest a general design principle: concise, dynamically delivered schema context is more valuable than complex orchestration logic for mean-score performance, while procedural guidance plays a complementary role in narrowing variance.\n\nDatabase URL: https://togomcp.rdfportal.org/",
+      "authors": [
+        "Kinjo, A. R.",
+        "Yamamoto, Y.",
+        "Bustamante-Larriet, S.",
+        "Labra-Gayo, J. E.",
+        "Fujisawa, T."
+      ],
+      "primary_category": "bioinformatics",
+      "categories": [
+        "bioinformatics"
+      ],
+      "published": "2026-07-06T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.03.19.713030v3.full.pdf",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "targets LLM hallucination in SPARQL generation by schema grounding",
+      "llm_evidence_cn": "通过模式引导减少LLM在SPARQL生成中的幻觉",
+      "llm_evidence": "通过模式引导减少LLM在SPARQL生成中的幻觉",
+      "canonical_evidence": "通过模式引导减少LLM在SPARQL生成中的幻觉",
+      "llm_tldr_en": "TogoMCP uses schema-guided LLMs and Model Context Protocol to reduce LLM hallucination in life-science knowledge graph querying, outperforming ungrounded LLMs.",
+      "llm_tldr_cn": "查询生命科学知识图谱需要SPARQL和模式专业知识，LLM直接翻译自然语言会编造不存在的谓词（幻觉）。本文提出TogoMCP，基于模型上下文协议（MCP）将LLM重塑为协议驱动的推理引擎，利用模式引导防止虚构。实验表明，该方法显著提高了查询忠实度，有效抑制了幻觉。",
+      "llm_tldr": "查询生命科学知识图谱需要SPARQL和模式专业知识，LLM直接翻译自然语言会编造不存在的谓词（幻觉）。本文提出TogoMCP，基于模型上下文协议（MCP）将LLM重塑为协议驱动的推理引擎，利用模式引导防止虚构。实验表明，该方法显著提高了查询忠实度，有效抑制了幻觉。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "biorxiv-10-1101-2025-08-31-672925-v2",
+      "source": "biorxiv",
+      "title": "What Large Language Models Know About Plant Molecular Biology",
+      "abstract": "Large language models (LLMs) are rapidly permeating scientific research, yet their capabilities in plant molecular biology remain largely uncharacterized. Here, we present MOBIPLANT, the first comprehensive benchmark for evaluating LLMs in this domain, developed by a consortium of 112 plant scientists across 19 countries. MOBIPLANT comprises 565 expert-curated multiple-choice questions and 1,075 synthetically generated questions, spanning core topics from gene regulation to plant-environment interactions. We benchmarked seven leading chat-based LLMs using both automated scoring and human evaluation of open-ended answers. Models performed well on multiple-choice tasks (exceeding 75% accuracy), although most of them exhibited a consistent bias towards option A. In contrast, expert reviews exposed persistent limitations, including factual misalignment, hallucinations, and low self-awareness. Critically, we found that model performance strongly correlated with the citation frequency of source literature, suggesting that LLM knowledge inherits the visibility distribution of the underlying scientific corpus. Consequently, models tend to be more reliable on consolidated topics and less reliable on under-cited or recently emerging ones. We also benchmarked agents equipped with web-search and additional tools in more complex tasks involving DNA sequence analysis. These agents were outperformed by domain specific models in sequence classification and regression tasks, indicating an opportunity for joint agentic systems that combine both the reasoning power of LLMs and the dedicated processing of DNA models. This understanding is key to guiding both the development of next-generation models and the informed use of current tools in the everyday work of plant researchers. MOBIPLANT is publicly available online in this link.",
+      "authors": [
+        "Fernandez Burda, M.",
+        "Ferrero, L.",
+        "Gaggion, N.",
+        "Fonouni-Farde, C.",
+        "The MoBiPlant Consortium,",
+        "Crespi, M.",
+        "Ariel, F.",
+        "Ferrante, E."
+      ],
+      "primary_category": "plant biology",
+      "categories": [
+        "plant biology"
+      ],
+      "published": "2026-07-08T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.1101/2025.08.31.672925v2.full.pdf",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "benchmark for evaluating LLM knowledge in plant molecular biology",
+      "llm_evidence_cn": "用于评估LLM在植物分子生物学知识方面的基准",
+      "llm_evidence": "用于评估LLM在植物分子生物学知识方面的基准",
+      "canonical_evidence": "用于评估LLM在植物分子生物学知识方面的基准",
+      "llm_tldr_en": "MOBIPLANT benchmark evaluates LLMs on plant molecular biology knowledge, revealing strengths and biases.",
+      "llm_tldr_cn": "该论文介绍了MOBIPLANT，首个全面评估大语言模型在植物分子生物学领域能力的基准。由112位植物科学家构建，包含565个专家问题。对七个主流LLM的评估显示，模型在多项选择任务上准确率超过75%，但存在选项A偏好等偏差。该基准为理解LLM在科学领域的知识能力提供了重要工具。",
+      "llm_tldr": "该论文介绍了MOBIPLANT，首个全面评估大语言模型在植物分子生物学领域能力的基准。由112位植物科学家构建，包含565个专家问题。对七个主流LLM的评估显示，模型在多项选择任务上准确率超过75%，但存在选项A偏好等偏差。该基准为理解LLM在科学领域的知识能力提供了重要工具。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "servey",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-06-29-735436-v2",
+      "source": "biorxiv",
+      "title": "Binary search and set operations on compacted k-mer lists",
+      "abstract": "Sorted lists of elements are particularly good for computing set operations. A single scan of the two lists is sufficient to materialize or count the results of the union, intersection, difference, and xor operators. In bioinformatics, only a few tools are designed to perform these operations on k-mers. A fast tool like KMC allows set operations at the cost of storing individual k-mers.\n\nIn this paper, we introduce a novel way to represent sorted k-mers as a collection of recomposed super-k-mer sorted lists. We introduce the concept of virtual super-k-mer and show how to construct, query and perform set operations on sorted lists of virtual super-k-mers.\n\nIn the implementation sklib, we demonstrate high throughput of the data structure for construction and set operations, while remaining competitive in query capabilities, within a controlled memory footprint (2-5x decrease in bits/element compared to KMC).",
+      "authors": [
+        "Dufresne, Y.",
+        "Andreace, F."
+      ],
+      "primary_category": "bioinformatics",
+      "categories": [
+        "bioinformatics"
+      ],
+      "published": "2026-07-04T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.06.29.735436v2.full.pdf",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "novel representation of sorted k-mers as virtual super-k-mers enabling efficient set operations",
+      "llm_evidence_cn": "将排序k-mer表示为虚拟超k-mer，实现高效集合操作",
+      "llm_evidence": "将排序k-mer表示为虚拟超k-mer，实现高效集合操作",
+      "canonical_evidence": "将排序k-mer表示为虚拟超k-mer，实现高效集合操作",
+      "llm_tldr_en": "Introduces virtual super-k-mer representation for compacted k-mer lists, enabling high-throughput construction and set operations.",
+      "llm_tldr_cn": "本文提出一种新的表示方式，将排序k-mer集合表示为虚拟超k-mer的排序列表。通过构建、查询和集合操作，实现了高性能的集合运算。在实现的sklib库中展示了高吞吐量，适用于生物信息学中的k-mer集合操作。",
+      "llm_tldr": "本文提出一种新的表示方式，将排序k-mer集合表示为虚拟超k-mer的排序列表。通过构建、查询和集合操作，实现了高性能的集合运算。在实现的sklib库中展示了高吞吐量，适用于生物信息学中的k-mer集合操作。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
