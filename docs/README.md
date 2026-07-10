@@ -6,61 +6,38 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-09
-- 运行时间：2026-07-09 22:09:06 UTC
+- 最新运行日期：2026-07-10
+- 运行时间：2026-07-10 21:34:54 UTC
 - 运行状态：成功
-- 本次总论文数：13
+- 本次总论文数：6
 - 精读区：4
-- 速读区：9
+- 速读区：2
 
 ### 今日简报（AI）
-今日13篇论文聚焦可解释不确定性检索、扩散模型RLHF优化及多任务安全强化学习。  
-最值得精读的两篇：问答中可解释不确定性的自适应检索推理，以及通过时序加权与优势回放提升扩散RLHF样本效率。  
-建议优先阅读这两篇9.0分论文，关注不确定性引导检索机制与扩散模型在RLHF中的采样效率突破。
-- 详情：[/202607/09/README](/202607/09/README)
+今日精读4篇速读2篇，聚焦幻觉自博弈检测与全球价值对齐数据集两大核心方向。最值得关注的两篇满分精读：《Hallucination Self-Play》通过生成器迭代增强幻觉检测能力，《PLURAL》构建了首个全球价值观对齐数据集。下一步建议优先精读这两篇，前者为AI幻觉治理提供自博弈新范式，后者为多文化价值观对齐奠定数据基础。
+- 详情：[/202607/10/README](/202607/10/README)
 
 ### 精读区论文标签
-1. [Interpretable Uncertainty for Adaptive Retrieval and Reasoning in Question Answering](/202607/09/2607.07380v1-interpretable-uncertainty-for-adaptive-retrieval-and-reasoning-in-question-answering)  
+1. [Hallucination Self-Play: Bootstrapping Reinforced Detector via Evolved Generator](/202607/10/2607.07993v1-hallucination-self-play-bootstrapping-reinforced-detector-via-evolved-generator)  
+   标签：评分：10.0/10、query:lpt
+   evidence：通过自对弈进行幻觉检测与抑制
+2. [PLURAL: A Global Dataset for Value Alignment](/202607/10/2607.08034v1-plural-a-global-dataset-for-value-alignment)  
    标签：评分：9.0/10、query:lpt
-   evidence：利用来自内部表示的不确定性信号显式解决LLM幻觉问题
-2. [Selective Timestep Weighting and Advantage-Based Replay for Sample-Efficient Diffusion RLHF](/202607/09/2607.07693v1-selective-timestep-weighting-and-advantage-based-replay-for-sample-efficient-diffusion-rlhf)  
-   标签：评分：9.0/10、query:lpt
-   evidence：使用选择性时间步加权和基于优势的回放进行扩散模型的RLHF
-3. [Reward-Gated On-Policy Distillation](/202607/09/2607.04037v1-reward-gated-on-policy-distillation)  
+   evidence：用于大型语言模型价值对齐的偏好数据集，直接支持奖励建模
+3. [When Implausible Tokens Get Reinforced: Tail-Aware Credit Calibration for LLM Reinforcement Learning](/202607/10/2607.07976v1-when-implausible-tokens-get-reinforced-tail-aware-credit-calibration-for-llm-reinforcement-learning)  
    标签：评分：8.0/10、query:lpt
-   evidence：使用奖励信号指导蒸馏，直接关联奖励建模
-4. [Healthier LLMs: Retrieval-Augmented Generation for Public Health Question Answering](/202607/09/2607.06641v1-healthier-llms-retrieval-augmented-generation-for-public-health-question-answering)  
+   evidence：LLM强化学习中的信用校准
+4. [MORES: Mobile Reasoning-as-a-Service via Distributed LLM Inference-Time Scaling](/202607/10/2607.08116v1-mores-mobile-reasoning-as-a-service-via-distributed-llm-inference-time-scaling)  
    标签：评分：8.0/10、query:lpt
-   evidence：明确通过RAG缓解幻觉
+   evidence：LLM推理时扩展提升推理能力
 
 ### 速读区论文标签
-1. [CDCP: Conditional Diffusion Model with Contextual Prompts for Multi-task Offline Safe Reinforcement Learning](/202607/09/2607.03903v1-cdcp-conditional-diffusion-model-with-contextual-prompts-for-multi-task-offline-safe-reinforcement-learning)  
+1. [Compete Then Collaborate: Frontier AI Teachers Build a Verifiable Curriculum to Improve a Coding Student Beyond Imitation](/202607/10/2607.08255v1-compete-then-collaborate-frontier-ai-teachers-build-a-verifiable-curriculum-to-improve-a-coding-student-beyond-imitation)  
    标签：评分：7.0/10、query:lpt
-   evidence：算法改进：用于多任务离线安全强化学习的条件扩散模型
-2. [Necklaces and Lyndon words in colexicographic order](/202607/09/2607.05324v1-necklaces-and-lyndon-words-in-colexicographic-order)  
+   evidence：使用基于执行的验证器作为奖励进行多教师课程学习
+2. [PolyUQuest: Verifiable Structure-Aware Web RAG over Heterogeneous Graphs](/202607/10/2607.08269v1-polyuquest-verifiable-structure-aware-web-rag-over-heterogeneous-graphs)  
    标签：评分：7.0/10、query:lpt
-   evidence：生成项链和Lyndon词的常数时间新算法
-3. [Structured Schemas for Provenance-Rich, LLM-Assisted QSP Model Calibration](/202607/09/biorxiv-10-64898-2026-03-05-709623-v2-structured-schemas-for-provenance-rich-llm-assisted-qsp-model-calibration)  
-   标签：评分：7.0/10、query:lpt
-   evidence：提出结构化验证模式捕捉LLM在文献提取中的幻觉
-4. [TogoMCP: Natural Language Querying of Life-Science Knowledge Graphs via Schema-Guided LLMs and the Model Context Protocol](/202607/09/biorxiv-10-64898-2026-03-19-713030-v3-togomcp-natural-language-querying-of-life-science-knowledge-graphs-via-schema-guided-llms-and-the-model-context-protocol)  
-   标签：评分：7.0/10、query:lpt
-   evidence：通过模式引导减少LLM在SPARQL生成中的幻觉
-5. [Binary search and set operations on compacted k-mer lists](/202607/09/biorxiv-10-64898-2026-06-29-735436-v2-binary-search-and-set-operations-on-compacted-k-mer-lists)  
-   标签：评分：7.0/10、query:lpt
-   evidence：将排序k-mer表示为虚拟超k-mer，实现高效集合操作
-6. [Best-Arm Identification with Generative Proxy](/202607/09/2607.06879v1-best-arm-identification-with-generative-proxy)  
-   标签：评分：6.0/10、query:lpt
-   evidence：使用代理奖励进行成本感知决策的算法改进
-7. [Behavior Leverage Imbalance in Multi-Teacher On-Policy Distillation](/202607/09/2607.07050v1-behavior-leverage-imbalance-in-multi-teacher-on-policy-distillation)  
-   标签：评分：6.0/10、query:lpt
-   evidence：在线蒸馏用于LLM训练，与后训练相关
-8. [Entropy Pacing Policy Optimization for Multi-Task Agentic Reinforcement Learning](/202607/09/2607.07178v1-entropy-pacing-policy-optimization-for-multi-task-agentic-reinforcement-learning)  
-   标签：评分：6.0/10、query:lpt
-   evidence：提出多任务智能体强化学习的熵调节策略优化，与RLHF中的奖励塑形相关
-9. [What Large Language Models Know About Plant Molecular Biology](/202607/09/biorxiv-10-1101-2025-08-31-672925-v2-what-large-language-models-know-about-plant-molecular-biology)  
-   标签：评分：6.0/10、query:lpt
-   evidence：用于评估LLM在植物分子生物学知识方面的基准
+   evidence：可验证的RAG通过将声明追溯到结构证据来减少幻觉
 
 
 <div class="dpr-home-promo-card">

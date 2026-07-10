@@ -1,0 +1,249 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-10T21:31:23.856198+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 4,
+    "deep_cap": 6,
+    "deep_selected": 4,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [
+    {
+      "id": "2607.07993v1",
+      "source": "arxiv",
+      "title": "Hallucination Self-Play: Bootstrapping Reinforced Detector via Evolved Generator",
+      "abstract": "Identifying faithfulness hallucinations in LLM-generated outputs remains challenging due to the scarcity of high-quality annotated data. Recent work relies on advanced LLMs to synthesize training data, including rationales, labels, and hallucinated claims. However, these methods treat the generator as a static component, limiting iterative improvement of the detector. To address this limitation, we introduce Hallucination Self-Play (HSP), a novel framework that enables the detector to bootstrap with an evolved generator. HSP involves two roles initialized from the same base model, a detector that assesses the faithfulness of model outputs, and a generator that produces increasingly hard-to-detect hallucinated responses. Specifically, the detector is first fine-tuned on human-labeled data and then employed as a reward model to train the generator via reinforcement learning from AI feedback (RLAIF). In turn, the evolved generator synthesizes hallucination data to further optimize the detector through rule-based reinforcement learning. Experiments on RAGTruth benchmark and two model families demonstrate that the proposed framework can progressively enhance a small LLM to match or even outperform advanced LLMs without external supervision. Our code is available at https://anonymous.4open.science/r/Hallucination-Self-Play-50B5 .",
+      "authors": [
+        "Shiping Yang",
+        "Shining Liang",
+        "Weihao Liu",
+        "Wenbiao Ding",
+        "Linjun Shou",
+        "Lu Cheng",
+        "Angel X. Chang"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-07-08T23:54:36+00:00",
+      "link": "https://arxiv.org/pdf/2607.07993v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "hallucination detection and suppression via self-play",
+      "llm_evidence_cn": "通过自对弈进行幻觉检测与抑制",
+      "llm_evidence": "通过自对弈进行幻觉检测与抑制",
+      "canonical_evidence": "通过自对弈进行幻觉检测与抑制",
+      "llm_tldr_en": "HSP bootstraps a hallucination detector by evolving a generator that produces harder-to-detect hallucinations, iteratively improving both.",
+      "llm_tldr_cn": "针对LLM输出中的忠实性幻觉检测缺乏高质量标注数据的问题，本文提出幻觉自对弈（HSP）框架。该框架从同一基础模型初始化检测器和生成器，生成器不断产生更难检测的幻觉，检测器则随之提升。这种自举方式突破了传统将生成器视为静态组件的局限。实验表明HSP显著提高了幻觉检测的准确性和鲁棒性，为幻觉抑制提供了新的范式。",
+      "llm_tldr": "针对LLM输出中的忠实性幻觉检测缺乏高质量标注数据的问题，本文提出幻觉自对弈（HSP）框架。该框架从同一基础模型初始化检测器和生成器，生成器不断产生更难检测的幻觉，检测器则随之提升。这种自举方式突破了传统将生成器视为静态组件的局限。实验表明HSP显著提高了幻觉检测的准确性和鲁棒性，为幻觉抑制提供了新的范式。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.08034v1",
+      "source": "arxiv",
+      "title": "PLURAL: A Global Dataset for Value Alignment",
+      "abstract": "Large language models (LLMs) are used worldwide, yet disproportionately reflect Western values, limiting their ability to represent diverse value systems. We introduce PLURAL, a large-scale, value-focused preference dataset grounded in the Integrated Values Survey (IVS), a nationally representative survey spanning 92 countries. Using a two-stage generation pipeline, we transform survey responses into synthetic preference triplets that preserve normative value signals while producing realistic scenarios. We release an initial version of PLURAL containing ~500,000 preference triplets representing people in 20 diverse countries. We evaluate PLURAL in three ways: (i) dataset-level validation showing that it preserves both cross-country value differences and within-country diversity from the original survey; (ii) automated evaluation showing that training on PLURAL improves alignment with target countries' cultural profiles, reducing mean absolute error by up to 27.7% relative to strong baselines; and (iii) blind human evaluation with 176 evaluators in India, Brazil, and Japan, who judge PLURAL-aligned responses as more representative of their national values. Together, these results show that PLURAL contains learnable signal for value steering, offering a scalable resource for pluralistic alignment. Dataset: https://huggingface.co/datasets/agdhruv/plural-alignment",
+      "authors": [
+        "Dhruv Agarwal",
+        "Anya Shukla",
+        "Tanya Goyal",
+        "Aditya Vashistha"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI",
+        "cs.CY"
+      ],
+      "published": "2026-07-09T01:18:17+00:00",
+      "link": "https://arxiv.org/pdf/2607.08034v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "value alignment dataset for LLM preferences; directly supports reward modeling",
+      "llm_evidence_cn": "用于大型语言模型价值对齐的偏好数据集，直接支持奖励建模",
+      "llm_evidence": "用于大型语言模型价值对齐的偏好数据集，直接支持奖励建模",
+      "canonical_evidence": "用于大型语言模型价值对齐的偏好数据集，直接支持奖励建模",
+      "llm_tldr_en": "PLURAL provides a large-scale, value-focused preference dataset for LLM alignment, derived from a global survey of 92 countries. It contains ~500k preference triplets spanning 20 diverse countries, preserving both cross-country and within-country value diversity. The dataset enables training reward models that better represent global value systems.",
+      "llm_tldr_cn": "该论文提出了PLURAL，一个基于全球92国价值观调查的大规模偏好数据集，用于大型语言模型的价值对齐。数据采用两阶段生成流水线将调查响应转化为合成偏好三元组，保留国家间和国家内的价值多样性。初始版本包含约50万偏好三元组，涵盖20个不同国家。实验验证了数据集能捕捉价值差异并支持奖励模型训练，有助于构建更公平、包容的AI系统。",
+      "llm_tldr": "该论文提出了PLURAL，一个基于全球92国价值观调查的大规模偏好数据集，用于大型语言模型的价值对齐。数据采用两阶段生成流水线将调查响应转化为合成偏好三元组，保留国家间和国家内的价值多样性。初始版本包含约50万偏好三元组，涵盖20个不同国家。实验验证了数据集能捕捉价值差异并支持奖励模型训练，有助于构建更公平、包容的AI系统。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.07976v1",
+      "source": "arxiv",
+      "title": "When Implausible Tokens Get Reinforced: Tail-Aware Credit Calibration for LLM Reinforcement Learning",
+      "abstract": "Reinforcement learning (RL) has achieved remarkable success in enhancing the reasoning capabilities of large language models (LLMs). However, widely used critic-free RL methods rely on uniform credit assignment, broadcasting the same advantage to all tokens regardless of their differences. We identify a critical failure mode of this design, which we refer to as Positive-Credit Contamination: low-probability tail tokens that are contextually erroneous receive identical positive credit to plausible ones within the same trajectory, resulting in the indiscriminate reinforcement of flawed reasoning behavior. To mitigate this issue, we propose Tail-Aware Credit calibratiOn (TACO), a method that calibrates uniform credit assignment to suppress undesirable positive updates. TACO first computes a tail-risk score that incorporates the local generation context to assess each token's risk of falling into the unreliable tail, distinguishing unexpected rarity from uncertainty-driven exploration. TACO then uses this score to tune positive credit for risky tokens without removing their gradients entirely, so that recurring useful rare patterns can accumulate reinforcement while incidental noise is progressively dampened. Experimental results across three LLMs and eight benchmarks show that TACO consistently outperforms GRPO-style baselines. Notably, TACO improves training stability, supporting sustained performance gains in long-horizon RL. The source code is available at: https://github.com/xiuyilou/TACO.",
+      "authors": [
+        "Xiuyi Lou",
+        "Zicheng Xu",
+        "Yu-Neng Chuang",
+        "Hoang Anh Duy Le",
+        "Zhaozhuo Xu",
+        "Guanchu Wang",
+        "Vladimir Braverman"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-07-08T23:00:54+00:00",
+      "link": "https://arxiv.org/pdf/2607.07976v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "credit calibration for LLM RL",
+      "llm_evidence_cn": "LLM强化学习中的信用校准",
+      "llm_evidence": "LLM强化学习中的信用校准",
+      "canonical_evidence": "LLM强化学习中的信用校准",
+      "llm_tldr_en": "TACO mitigates Positive-Credit Contamination by calibrating uniform credit assignment in critic-free RL for LLMs, improving reasoning.",
+      "llm_tldr_cn": "该论文指出在无评判器的LLM强化学习中，统一分配优势会导致低概率错误Token也被强化，称为Positive-Credit Contamination问题。为此，作者提出TACO方法，通过尾部感知的信用校准来修正统一信用分配。实验表明该方法有效减少了错误推理行为的强化，提升了LLM推理性能。该成果为LLM后训练中的RL方法提供了重要的算法改进。",
+      "llm_tldr": "该论文指出在无评判器的LLM强化学习中，统一分配优势会导致低概率错误Token也被强化，称为Positive-Credit Contamination问题。为此，作者提出TACO方法，通过尾部感知的信用校准来修正统一信用分配。实验表明该方法有效减少了错误推理行为的强化，提升了LLM推理性能。该成果为LLM后训练中的RL方法提供了重要的算法改进。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.08116v1",
+      "source": "arxiv",
+      "title": "MORES: Mobile Reasoning-as-a-Service via Distributed LLM Inference-Time Scaling",
+      "abstract": "Inference-time scaling has emerged as an effective approach for enhancing the capabilities of Large Language Models (LLMs), addressing the growing demand for stronger reasoning without increasing model size. This novel form of LLM scaling comprises two representative approaches: explicit reasoning, which generates intermediate chain-of-thought tokens during an explicit thinking phase, and implicit reasoning, which iteratively updates hidden states in the latent space without producing explicit outputs. Despite their effectiveness, both paradigms incur substantial computational and memory overhead, raising challenges for deployment on resource-constrained edge devices. To address these issues, we propose a Mobile Reasoning-as-aService (MORES) framework that treats reasoning as a computational service accessible to edge devices over wireless networks. Focusing on implicit reasoning, we leverage its recursive structure to partition hiddenstate updates between edge devices and servers, enabling cooperative inference that allows devices to access additional cloud computation on demand. To optimize long-term performance, we formulate a joint computation and communication scheduling problem and solve it using a semantic Mixture-of-Experts (MoE)-based Deep Reinforcement Learning (DRL) algorithm to address heterogeneity in wireless conditions and task demands. The agent adaptively allocates resources by adjusting the number of recurrent steps and the transmission pruning rate, while a semantic router enables high-speed gating for real-time expert selection. Experimental results show that the proposed method achieves an approximately 18% improvement in system throughput over the baseline Soft Actor-Critic (SAC) algorithm. Our code is available at https://github.com/NICE-HKU/MORES.",
+      "authors": [
+        "Guanchen Liu",
+        "Hongyang Du",
+        "Kaibin Huang"
+      ],
+      "primary_category": "cs.NI",
+      "categories": [
+        "cs.NI"
+      ],
+      "published": "2026-07-09T05:24:31+00:00",
+      "link": "https://arxiv.org/pdf/2607.08116v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "LLM inference-time scaling improves reasoning",
+      "llm_evidence_cn": "LLM推理时扩展提升推理能力",
+      "llm_evidence": "LLM推理时扩展提升推理能力",
+      "canonical_evidence": "LLM推理时扩展提升推理能力",
+      "llm_tldr_en": "Proposes MORES framework for distributed LLM inference-time scaling on mobile devices, enabling stronger reasoning without model size increase.",
+      "llm_tldr_cn": "当前LLM推理时扩展技术计算开销大，难以部署在边缘设备。本文提出MORES框架，通过分布式推理时扩展（包括显式和隐式推理）在移动设备上实现更强推理能力。实验表明该方法在资源受限环境下有效提升了推理性能，为LLM后训练中推理增强提供了新思路。",
+      "llm_tldr": "当前LLM推理时扩展技术计算开销大，难以部署在边缘设备。本文提出MORES框架，通过分布式推理时扩展（包括显式和隐式推理）在移动设备上实现更强推理能力。实验表明该方法在资源受限环境下有效提升了推理性能，为LLM后训练中推理增强提供了新思路。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.08255v1",
+      "source": "arxiv",
+      "title": "Compete Then Collaborate: Frontier AI Teachers Build a Verifiable Curriculum to Improve a Coding Student Beyond Imitation",
+      "abstract": "Large language models increasingly serve as teachers generating training data for smaller students. Prior multi-teacher knowledge distillation methods merge outputs without determining which frontier model teaches best, often relying on an LLM judge biased toward its own outputs. We introduce a compete-then-collaborate framework where four frontier AI teachers (Claude, Codex-GPT, Grok, Gemini) are ranked head-to-head by an execution-based judge (unit tests and stdin-stdout checks) with fairness controls, and then collaborate to build a verifiable curriculum for a student (Qwen2.5-Coder). We report three findings. (1) Under execution verification, all teachers solve standard problems near-perfectly after self-correction (99-100%) due to a saturation effect, but harder competition problems separate them (Gemini 77% > Claude 69% = Codex 69% > Grok 50%); however, the robust student-side results do not depend on teacher ranking. (2) Imitation (SFT) on verified solutions does not improve, and can degrade, an already-competent student at 7B and 32B (e.g., from 76.7% to 72.7% on MBPP-test, and 5.9% to 2.9% on competition problems). (3) Using the same collaborative curriculum as a reinforcement learning with verifiable rewards (RLVR) environment improves the student (from 5.9% to 8.8% peak on competition problems, a +49% relative gain), reversing SFT's direction. The value of AI-teacher collaboration lies not in pooling answers to imitate, but in jointly constructing a verifiable environment where the student learns by doing. We release a reproducible on-prem pipeline (NVIDIA GB10) with framework patches for running GRPO on a bleeding-edge stack.",
+      "authors": [
+        "Miseong Shawn Kim"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-09T09:00:52+00:00",
+      "link": "https://arxiv.org/pdf/2607.08255v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "uses execution-based judge as reward for multi-teacher curriculum learning",
+      "llm_evidence_cn": "使用基于执行的验证器作为奖励进行多教师课程学习",
+      "llm_evidence": "使用基于执行的验证器作为奖励进行多教师课程学习",
+      "canonical_evidence": "使用基于执行的验证器作为奖励进行多教师课程学习",
+      "llm_tldr_en": "Proposes a compete-then-collaborate framework where frontier LLMs compete via execution verification, then collaborate to build a verifiable curriculum for a student, effectively using execution-based reward for training.",
+      "llm_tldr_cn": "现有知识蒸馏依赖LLM法官存在偏见。本文提出先竞争后合作框架：四个前沿LLM通过基于单元测试的执行验证器进行排序，然后合作构建可验证课程训练学生模型。实验表明该方法在编程任务上超越传统蒸馏，且学生模型性能接近教师。该工作展示了用执行奖励替代人工偏好进行模型训练的新范式。",
+      "llm_tldr": "现有知识蒸馏依赖LLM法官存在偏见。本文提出先竞争后合作框架：四个前沿LLM通过基于单元测试的执行验证器进行排序，然后合作构建可验证课程训练学生模型。实验表明该方法在编程任务上超越传统蒸馏，且学生模型性能接近教师。该工作展示了用执行奖励替代人工偏好进行模型训练的新范式。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.08269v1",
+      "source": "arxiv",
+      "title": "PolyUQuest: Verifiable Structure-Aware Web RAG over Heterogeneous Graphs",
+      "abstract": "Existing retrieval-augmented generation (RAG) systems treat web pages as flat text, losing the structural and semantic signals encoded in HTML. We present PolyUQuest, a verifiable, structure-aware web RAG framework built on a heterogeneous graph that unifies hyperlink topology between pages, DOM hierarchy within pages, and entity-relation knowledge across pages. A two-tier router dispatches each query to one of three retrieval modes matched to its structural need, including direct block retrieval, cross-page graph traversal, and multi-hop entity reasoning. Every answer is fully verifiable, as each cited block carries its source page, heading path, and entity links so that users can trace any claim back to its structural evidence. We evaluate on the official websites of the Hong Kong Polytechnic University (PolyU), comprising 4,240 pages, 31,086 DOM blocks, 29,119 entities, and 37,680 relations, together with a multi-type evaluation benchmark. PolyUQuest outperforms existing RAG systems in answer correctness, coverage, and faithfulness, while consuming significantly fewer LLM tokens per query. The demonstration provides an interactive interface for inspecting cited answers, comparing retrieval traces across routing modes, and exploring evidence graph paths. PolyUQuest is being prepared for deployment as a student-facing QA service at PolyU.",
+      "authors": [
+        "Ying Liu",
+        "Yi Ye",
+        "Quanyu Feng",
+        "Mingxi Ye",
+        "Mingtao Zhang",
+        "Haoyang Li",
+        "Chen Jason Zhang",
+        "Qing Li"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-09T09:10:52+00:00",
+      "link": "https://arxiv.org/pdf/2607.08269v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "verifiable RAG reduces hallucination by tracing claims to structural evidence",
+      "llm_evidence_cn": "可验证的RAG通过将声明追溯到结构证据来减少幻觉",
+      "llm_evidence": "可验证的RAG通过将声明追溯到结构证据来减少幻觉",
+      "canonical_evidence": "可验证的RAG通过将声明追溯到结构证据来减少幻觉",
+      "llm_tldr_en": "Proposes PolyUQuest, a structure-aware web RAG using heterogeneous graphs for verifiable answers, reducing hallucination through traceable citations.",
+      "llm_tldr_cn": "现有RAG系统将网页视为纯文本，丢失结构信息且不可验证。本文提出PolyUQuest，基于异构图统一超链接、DOM结构和实体关系，实现结构感知检索。每个引用携带来源页面、标题路径和实体链接，支持完全可验证。在复杂问题上，PolyUQuest相比基线RAG提升准确率并降低幻觉。",
+      "llm_tldr": "现有RAG系统将网页视为纯文本，丢失结构信息且不可验证。本文提出PolyUQuest，基于异构图统一超链接、DOM结构和实体关系，实现结构感知检索。每个引用携带来源页面、标题路径和实体链接，支持完全可验证。在复杂问题上，PolyUQuest相比基线RAG提升准确率并降低幻觉。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
