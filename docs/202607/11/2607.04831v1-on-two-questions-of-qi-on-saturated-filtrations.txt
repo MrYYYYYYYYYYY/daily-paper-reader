@@ -1,0 +1,479 @@
+Title: On two questions of Qi on saturated filtrations
+
+URL Source: https://arxiv.org/pdf/2607.04831v1
+
+Published Time: Tue, 07 Jul 2026 03:09:00 GMT
+
+Number of Pages: 6
+
+Markdown Content:
+ON TWO QUESTIONS OF QI ON SATURATED FILTRATIONS 
+
+JIHAO LIU AND HAOFENG ZHANG 
+
+Abstract. We answer two questions of Qi [J. Reine Angew. Math. 830 (2026)] on the metric space of saturated filtrations, one affirmatively and one negatively. The main result of this paper was obtained by Chatgpt 5.5 pro, and the Danus system based on the Rethlas system. 
+
+1. Introduction 
+
+Let ( R, m) be a Noetherian local ring of dimension n. An m-filtration is a decreasing family 
+
+a• = ( aλ)λ∈R+ of m-primary ideals together with a0 := R satisfying aλaμ ⊆ aλ+μ and aλ =T 
+
+> μ<λ
+
+aμ. Its (normalized) multiplicity is 
+
+e(a•) = lim 
+
+> m→∞
+
+ℓ(R/ am)
+
+mn/n ! ,
+
+which exists for linearly bounded filtrations by [Qi26, §2.1.5] (see also [LM09, Theorem 3.8]). Following Qi [Qi26, Lemma 2.13 and §2.2], write Fil R, m for the space of linearly bounded m-filtrations, equivalently those of positive multiplicity, and Fil sR, m for the subspace of saturated 
+
+filtrations, that is, those that are intersections of valuation filtrations. On Fil R, m Qi introduced the function (1.1) d1(a•, b•) = 2 e(a• ∩ b•) − e(a•) − e(b•),
+
+a multiplicity-theoretic analogue of the Darvas d1-metric in K¨ ahler geometry [Dar15]; it is a pseudometric on Fil R, m and restricts to a genuine metric on Fil sR, m [Qi26, Theorem 1.1]. A decreasing sequence a•,1 ⊇ a•,2 ⊇ · · · in Fil sR, m always has a termwise intersection a• =T 
+
+> k≥1
+
+a•,k , and when it is still an m-filtration, it is moreover saturated by [Qi26, Corollary 2.21]. It is natural to ask whether the metric d1 is compatible with such monotone limits, and Qi raised the following. 
+
+Question 1.1 ([Qi26, Question 6.5]) . Let {a•,k }k≥1 be a decreasing sequence in Fil sR, m such that a• := T 
+
+> k≥1
+
+a•,k belongs to Fil sR, m. Must d1(a•, a•,k ) → 0 as k → ∞ ?We answer Question 1.1 in the negative, already on the two-dimensional smooth local ring. 
+
+Theorem 1.2. Let R = C[[ x, y ]] and m = ( x, y ). Then there is a decreasing sequence {a•,k }k≥1
+
+in Fil sR, m whose termwise intersection a• = T 
+
+> k≥1
+
+a•,k lies in Fil sR, m, yet 
+
+d1(a•, a•,k ) −→ 12̸ = 0 .
+
+In particular, monotone convergence fails for (Fil sR, m, d 1).
+
+The sequence is explicit. Fix pairwise distinct ti ∈ C, set ℓi = y − tix and Mi = 2 i, and let vi be the monomial valuation with weights (1 , 1 + Mi) in the regular parameters ( x, ℓ i). The finite intersections a•,k = Tki=1 a•(vi) form a decreasing sequence of saturated filtrations with e(a•,k ) = 1−2−k 
+
+> 2−2−k
+
+→ 12 . Because the linear forms ℓi point in infinitely many directions, the termwise intersection collapses to the m-adic filtration m•, which is saturated of multiplicity 1; 
+
+Date : July 7, 2026. 2020 Mathematics Subject Classification. 13H15, 13A18, 14B05. 
+
+Key words and phrases. filtration, multiplicity, metric geometry, valuation, monotone convergence, contractibil-ity, analytically irreducible local domain.  
+
+> 1
+> arXiv:2607.04831v1 [math.AC] 6 Jul 2026 2JIHAO LIU AND HAOFENG ZHANG
+
+since m• ⊆ a•,k , the containment formula (2.1) gives d1(m•, a•,k ) = 1 − e(a•,k ) → 12 . Thus the intersection sits at d1-distance bounded away from every term of the sequence. Qi also proved that, when R is analytically irreducible, (Fil sR, m, d 1) is a geodesic metric space, and asked the following. 
+
+Question 1.3 ([Qi26, Question 6.6]) . Is the metric space (Fil sR, m, d 1) contractible? We answer Question 1.3 affirmatively, in full generality. 
+
+Theorem 1.4. Let (R, m) be a Noetherian analytically irreducible local domain. Then the metric space (Fil sR, m, d 1) is contractible. 
+
+The proof is an explicit contraction (null-homotopy of the identity) to the saturated m-adic filtration o• = fm•. Writing Tc for the rescaling Tc(a•)λ = acλ , we contract along 
+
+H(a•, t ) = Tta• ∩ T1−to•, 0 < t < 1.
+
+The scaling identity e(Tca•) = cne(a•) and the rooftop inequality for d1 make H Lipschitz in the space variable and continuous in time, with H( · , 0) ≡ o• and H( · , 1) = id. In particular the argument uses neither a field assumption nor the geodesic structure of Fil sR, m.
+
+Remark 1.5. The sketch of the proof of the main result of this paper was obtained by Chatgpt 5.5 pro, and later summed up, verified, and properly written by the Danus system, a specialized agent built on Rethlas and substantially more capable for fundamental mathematical research based on the Rethlas system. Human verification and polishing were done afterwards. See [Ju +26] for a detailed introduction to the Rethlas system. Due to the limitation of automated systems, it is possible that we have missed some related references in the literature, and we welcome any comments from experts. 
+
+Acknowledgements. The first author was partially supported by the National Key R&D Program of China #2024YFA1014400. The first author would like to thank the Rethlas team, namely Haocheng Ju, Jiedong Jiang, Shurui Liu, Guoxiong Gao, Yuefeng Wang, Zeming Sun, Bin Wu, Liang Xiao, and Bin Dong, for their contributions to the development of Rethlas and its customized version used for the problem studied in this paper. The authors would like to thank Yuan Lu for useful discussions. The first author would like to thank Ruochuan Liu and Gang Tian for constant support and encouragement. The second author would like to thank Jie Liu for constant support. 2. Preliminaries 
+
+In this section, we collect the facts from [Qi26] that will be used in the proofs of Theorems 1.2 and 1.4. We will use freely that d1 is a pseudometric on Fil R, m that restricts to a metric on Fil sR, m. For a• ⊆ b• we have (2.1) d1(a•, b•) = e(a•) − e(b•).
+
+We also use that a filtration lies in Fil sR, m if and only if it is an intersection of valuation filtrations 
+
+a•(v) with v centered at m of positive volume [Qi26, Proposition 2.20], and that an intersection of saturated filtrations is saturated whenever it remains linearly bounded [Qi26, Corollary 2.21]. Finally, we use the rooftop estimate (2.2) d1(c• ∩ a•, c• ∩ b•) ≤ d1(a•, b•)from [Qi26, Lemma 3.3]. ON TWO QUESTIONS OF QI ON SATURATED FILTRATIONS 3
+
+3. Failure of monotone convergence 
+
+In this section, we prove Theorem 1.2. Throughout this section R = C[[ x, y ]], m = ( x, y ), and 
+
+n = dim R = 2. We use the terminology recalled in Sections 1 and 2. 
+
+Construction 3.1. Fix pairwise distinct ti ∈ C for i ≥ 1, and set 
+
+ℓi = y − tix, Mi = 2 i.
+
+Since ( x, ℓ i) is a regular system of parameters of R, every 0 ̸ = f ∈ R has a unique expansion 
+
+f = P 
+
+> a,b ≥0
+
+ca,b xaℓ bi with ca,b ∈ C. Define the monomial valuation 
+
+vi(f ) = min {a + (1 + Mi)b | ca,b ̸ = 0 }, vi(0) = + ∞,
+
+of weights (1 , 1 + Mi) in the parameters ( x, ℓ i), with valuation filtration aλ(vi) = {f ∈ R |
+
+vi(f ) ≥ λ}. For each integer k ≥ 1 put 
+
+a•,k =
+
+> k
+
+\
+
+> i=1
+
+a•(vi).
+
+Lemma 3.2. Each vi is centered at m with e(a•(vi)) = 1 
+
+> Mi+1
+
+> 0. Consequently every a•,k is a linearly bounded saturated filtration, and a•,k +1 ⊆ a•,k .Proof. For 0 ̸ = g ∈ R one has vi(g) ≥ ord m(g), with vi(g) > 0 exactly when g ∈ m; hence vi is centered at m. The single-valuation multiplicity is computed as in Lemma 3.3 below with k = 1 and weight Mi, giving e(a•(vi)) = (1 /M i)1+(1 /M i) = 1 
+
+> Mi+1
+
+> 0, so vi is a valuation of positive volume. By [Qi26, Proposition 2.20] the finite intersection a•,k = Tki=1 a•(vi) is therefore saturated, provided it is linearly bounded. The latter holds: for i = 1 the weight is 1 + M1 = 3, so 
+
+v1(f ) ≤ 3 ord m(f ) for all f , whence f ∈ (a•,k )λ forces v1(f ) ≥ λ and thus f ∈ m⌈λ/ 3⌉. Finally 
+
+a•,k +1 = a•,k ∩ a•(vk+1 ) ⊆ a•,k . □
+
+Lemma 3.3. For every integer k ≥ 1,
+
+e(a•,k ) = Sk
+
+1 + Sk
+
+= 1 − 2−k
+
+2 − 2−k , Sk := 
+
+> k
+
+X
+
+> i=1
+
+1
+
+Mi
+
+= 1 − 2−k.
+
+Proof. Fix k and an integer q ≥ 1. For a homogeneous form P of degree d, write P =
+
+Pdb=0 cb xd−bℓ bi in the parameters ( x, ℓ i); since vi(xd−bℓ bi ) = d + Mib, we have 
+
+vi(P ) ≥ q ⇐⇒ ℓ ri,d,q  
+
+> i
+
+| P, ri,d,q := max 
+
+
+
+0,
+
+l q − dMi
+
+m
+
+.
+
+As ℓ1, . . . , ℓ k are pairwise nonproportional linear forms, vi(P ) ≥ q for all 1 ≤ i ≤ k if and only if Qki=1 ℓ ri,d,q  
+
+> i
+
+| P , so the subspace of degree-d forms satisfying all k conditions has codimension min  d + 1 , Pki=1 ri,d,q 
+
+ in the ( d + 1)-dimensional space of degree-d forms. Write f = P 
+
+> d≥0
+
+Pd for the decomposition into homogeneous parts. Since vi(f ) = min d vi(Pd), the condition vi(f ) ≥ q for all i ≤ k is imposed degree by degree. Moreover mq ⊆ (a•,k )q, so only the degrees 0 ≤ d < q contribute to R/ (a•,k )q, and 
+
+ℓ R/ (a•,k )q
+
+ =
+
+> q−1
+
+X
+
+> d=0
+
+min 
+
+
+
+d + 1 ,
+
+> k
+
+X
+
+> i=1
+
+l q − dMi
+
+m 
+
+.
+
+The ceiling sum differs from Sk(q − d) by at most k uniformly in d, so the total error is O(kq )and is negligible after division by q2. Writing t = d/q , the Riemann sum converges: lim 
+
+> q→∞
+
+ℓ(R/ (a•,k )q)
+
+q2 =
+
+Z 10
+
+min {t, S k(1 − t)} dt = Sk
+
+2(1 + Sk) ,4 JIHAO LIU AND HAOFENG ZHANG 
+
+where the two integrands meet at t = Sk/(1 + Sk). Since n = 2, the normalization gives 
+
+e(a•,k ) = lim 
+
+> q→∞
+
+ℓ(R/ (a•,k )q)
+
+q2/2 = Sk
+
+1 + Sk
+
+= 1 − 2−k
+
+2 − 2−k . □
+
+Lemma 3.4. The termwise intersection is the m-adic filtration: 
+
+\
+
+> k≥1
+
+a•,k = m•, (m•)λ = m⌈λ⌉.
+
+Moreover m• ∈ Fil sR, m and e(m•) = 1 .Proof. Let bλ = T
+
+> k≥1
+
+(a•,k )λ = T
+
+> i≥1
+
+{f | vi(f ) ≥ λ}. Since vi ≥ ord m, we have m⌈λ⌉ ⊆ bλ.Conversely, let 0 ̸ = f / ∈ m⌈λ⌉ and set d = ord m(f ) < λ , with lowest homogeneous part Pd. As Pd
+
+has only finitely many linear factors while the ℓi point in infinitely many distinct directions, we may choose i with ℓi ∤ Pd; then the coefficient of ℓ 0 
+
+> i
+
+in the ( x, ℓ i)-expansion of Pd is nonzero, so 
+
+vi(Pd) = d, while every higher homogeneous part has vi-value at least d+1. Hence vi(f ) = d < λ 
+
+and f / ∈ bλ. This proves bλ = m⌈λ⌉.The m-adic filtration m• is the valuation filtration of ord m: for nonzero power series the lowest homogeneous part of a product is the product of the lowest homogeneous parts, so ord m(f g ) = ord m(f ) + ord m(g) and m⌈λ⌉ = {f | ord m(f ) ≥ λ}. Thus ord m is a valuation centered at m, and from ℓ(R/ mq) = q(q + 1) /2 we get e(m•) = lim q→∞ ℓ(R/ mq)/(q2/2) = 1 > 0. By [Qi26, Proposition 2.20], m• ∈ Fil sR, m. □
+
+Proof of Theorem 1.2. By Lemma 3.2 the sequence {a•,k }k≥1 of Construction 3.1 is a decreasing sequence in Fil sR, m, and by Lemma 3.4 its termwise intersection is m• ∈ Fil sR, m. Since m• =T 
+
+> i≥1
+
+a•(vi) ⊆ a•,k , the two filtrations are comparable, so the containment formula (2.1) and Lemmas 3.3 and 3.4 give 
+
+d1(m•, a•,k ) = e(m•) − e(a•,k ) = 1 − 1 − 2−k
+
+2 − 2−k −−−−−→ 
+
+> k→∞
+
+1 − 12 = 12̸ = 0 .
+
+Hence the decreasing sequence {a•,k }k≥1 in Fil sR, m, whose termwise intersection m• again lies in Fil sR, m, does not converge to that intersection in d1. This answers Question 1.1 in the negative. 
+
+□
+
+4. Contractibility 
+
+In this section, we prove Theorem 1.4. Throughout this section ( R, m) is a Noetherian ana-lytically irreducible local domain of dimension n, and we use the terminology and facts recalled in Sections 1 and 2. Let 
+
+o• := fm•
+
+be the saturation of the m-adic filtration mλ = m⌈λ⌉, that is, the intersection of all valuation filtrations centered at m that contain m•. Being such an intersection, o• is saturated, and it is the canonical element of Fil sR, m [Qi26, §2.2]; in particular o• ∈ Fil sR, m. As an element of Fil sR, m ⊆ Fil R, m, the filtration o• is linearly bounded, hence of positive multiplicity, so 0 <e(o•). Throughout this section we use that R is analytically irreducible only through [Qi26, Theorem 1.1], which guarantees that d1 restricts to a genuine metric on Fil sR, m.
+
+Lemma 4.1 (Scaling) . For c > 0, define Tc(a•)λ = acλ . Then Tc preserves Fil R, m and Fil sR, m,and 
+
+Tc(a• ∩ b•) = Tca• ∩ Tcb•, e(Tca•) = cne(a•), d1(Tca•, T cb•) = cnd1(a•, b•).
+
+Proof. By definition Tca• is again an m-filtration. If a• ⊆ mα• for some α > 0, then Tca• ⊆ mαc •,so Tca• is linearly bounded. ON TWO QUESTIONS OF QI ON SATURATED FILTRATIONS 5
+
+Assume that a• is saturated. By the characterization of saturated filtrations as intersections of valuation filtrations, there is a nonempty set Σ of valuations centered at m with a• = T 
+
+> v∈Σ
+
+a•(v). For each v ∈ Σ, 
+
+Tc
+
+ a•(v) 
+
+> λ
+
+= {f | v(f ) ≥ cλ } = {f | (v/c )( f ) ≥ λ} = a•(v/c )λ,
+
+and v/c is again centered at m. Hence Tca• = T 
+
+> v∈Σ
+
+a•(v/c ) is again an intersection of valuation filtrations, so Tca• is saturated. The intersection identity holds termwise. For the multiplicity, monotonicity of ℓ(R/ · ) gives 
+
+ℓ(R/ a⌊cm ⌋) ≤ ℓ(R/ acm ) ≤ ℓ(R/ a⌈cm ⌉),
+
+and after division by mn/n ! the two outer terms converge to cne(a•), since ⌊cm ⌋/m, ⌈cm ⌉/m →
+
+c. Since ℓ(R/ acm ) is sandwiched between the two outer terms, it has the same limit; hence 
+
+e(Tca•) = cne(a•). The formula for d1 follows from (1.1), the intersection identity, and the multiplicity-scaling formula. □
+
+Lemma 4.2 (Multiplicity estimates) . For all p•, q• ∈ Fil R, m,
+
+e(p• ∩ q•) ≤ e(p•) + e(q•), and |e(p•) − e(q•)| ≤ d1(p•, q•).
+
+Proof. For every λ > 0 the natural map 
+
+R/ (pλ ∩ qλ) −→ R/ pλ ⊕ R/ qλ
+
+is injective, so ℓ R/ (pλ ∩ qλ) ≤ ℓ(R/ pλ) + ℓ(R/ qλ). Passing to the asymptotic multiplicity gives 
+
+e(p• ∩ q•) ≤ e(p•) + e(q•). Applying the containment formula (2.1) to p• ∩ q• ⊆ p• and p• ∩ q• ⊆ q•, the quantities 
+
+e(p• ∩ q•) − e(p•), e(p• ∩ q•) − e(q•)are nonnegative and, by (1.1), sum to d1(p•, q•). Their difference is e(q•) − e(p•), whence 
+
+|e(p•) − e(q•)| ≤ d1(p•, q•). □
+
+Lemma 4.3 (Contraction estimates) . For 0 < t < 1, set H(a•, t ) = Tta• ∩ T1−to•. Then 
+
+H(a•, t ) ∈ Fil sR, m, and: 
+
+(1) d1
+
+ H(a•, t ), H (b•, t ) ≤ tn d1(a•, b•);
+
+(2) for 0 < s, t < 1,
+
+d1
+
+ H(a•, s ), H (a•, t ) ≤ | sn − tn| e(a•) + |(1 − s)n − (1 − t)n| e(o•); (3) d1
+
+ H(a•, t ), o •
+
+ ≤ tne(a•) + {1 − (1 − t)n} e(o•);
+
+(4) d1
+
+ H(a•, t ), a•
+
+ ≤ (1 − t)ne(o•) + {1 − tn} e(a•).Proof. The factors Tta• and T1−to• are saturated and linearly bounded by Lemma 4.1. Their termwise intersection is an m-filtration, is linearly bounded because it is contained in either factor, and is saturated by [Qi26, Corollary 2.21]; hence H(a•, t ) ∈ Fil sR, m.(1) By the rooftop estimate (2.2) with fixed factor T1−to• and then Lemma 4.1, 
+
+d1
+
+ H(a•, t ), H (b•, t ) ≤ d1(Tta•, T tb•) = tnd1(a•, b•).
+
+(2) Inserting the intermediate filtration Tta• ∩ T1−so• and applying the triangle inequality and (2.2) to the two factors bounds the distance by 
+
+d1(Tsa•, T ta•) + d1(T1−so•, T 1−to•).
+
+If s ≤ t then Tta• ⊆ Tsa•, so by (2.1) and Lemma 4.1 the first term equals ( tn − sn)e(a•); the opposite order gives the absolute value, and the same argument for o• gives the stated bound. (3) By the triangle inequality, 
+
+d1
+
+ H(a•, t ), o •
+
+ ≤ d1
+
+ H(a•, t ), T 1−to•
+
+ + d1
+
+ T1−to•, o •
+
+.6 JIHAO LIU AND HAOFENG ZHANG 
+
+Since H(a•, t ) = Tta• ∩ T1−to• ⊆ T1−to•, the first term equals e(H(a•, t )) − e(T1−to•) by (2.1), which is at most e(Tta•) = tne(a•) by Lemma 4.2. As o• ⊆ T1−to•, the second term equals 
+
+{1 − (1 − t)n}e(o•) by (2.1) and Lemma 4.1. (4) By the triangle inequality, 
+
+d1
+
+ H(a•, t ), a•
+
+ ≤ d1
+
+ H(a•, t ), T ta•
+
+ + d1
+
+ Tta•, a•
+
+.
+
+As above the first term is at most e(T1−to•) = (1 − t)ne(o•) by Lemma 4.2. Since a• ⊆ Tta•, the second term equals e(a•) − e(Tta•) = {1 − tn}e(a•) by (2.1) and Lemma 4.1. □
+
+Proof of Theorem 1.4. Define H : Fil sR, m ×[0 , 1] → Fil sR, m by 
+
+H(a•, t ) = 
+
+
+
+o•, t = 0 ,Tta• ∩ T1−to•, 0 < t < 1,
+
+a•, t = 1 .
+
+By Lemma 4.3 the values lie in Fil sR, m for 0 < t < 1, and the endpoint values do as well. We prove that H is jointly continuous. Fix ( a•,0, t 0). By Lemma 4.2, |e(a•) − e(a•,0)| ≤ d1(a•, a•,0), so e(a•) is locally bounded in the d1-metric. Suppose first 0 < t 0 < 1. For t near t0, the triangle inequality together with parts (1) and (2) of Lemma 4.3 gives 
+
+d1
+
+ H(a•, t ), H (a•,0, t 0) ≤ tnd1(a•, a•,0) + |tn − tn 
+
+> 0
+
+| e(a•,0) + |(1 − t)n − (1 − t0)n| e(o•),
+
+whose right-hand side tends to 0 as ( a•, t ) → (a•,0, t 0). At t0 = 0, part (3) gives, for 0 < t < 1, 
+
+d1
+
+ H(a•, t ), o •
+
+ ≤ tne(a•) + {1 − (1 − t)n}e(o•),
+
+which tends to 0 as ( a•, t ) → (a•,0, 0) by local boundedness of e(a•); at t = 0 the distance is 0. At t0 = 1, part (4) and the triangle inequality give, for 0 < t < 1, 
+
+d1
+
+ H(a•, t ), a•,0
+
+ ≤ (1 − t)ne(o•) + {1 − tn}e(a•) + d1(a•, a•,0),
+
+which tends to 0; at t = 1 the distance is d1(a•, a•,0), which also tends to 0. Hence H is jointly continuous. Thus H is a homotopy from the constant map at o• to the identity of Fil sR, m, so (Fil sR, m, d 1)is contractible. □
+
+References 
+
+[Dar15] T. Darvas, The Mabuchi geometry of finite energy classes , Adv. Math. 285 (2015), 182–219. [Ju +26] H. Ju, G. Gao, J. Jiang, B. Wu, Z. Sun, S. Liu, L. Chen, Y. Wang, Y. Wang, Z. Wang, W. He, P. Wu, L. Xiao, R. Liu, B. Dai, and B. Dong, Automated Conjecture Resolution with Formal Verification ,arXiv:2604.03789. [LM09] R. Lazarsfeld and M. Mustat ¸˘ a, Convex bodies associated to linear series , Ann. Sci. ´Ec. Norm. Sup´ er. (4) 
+
+42 (2009), no. 5, 783–835. [Qi26] L. Qi, On the geometry of spaces of filtrations on local rings , J. Reine Angew. Math. 830 (2026), 285–333. 
+
+Department of Mathematics, Peking University, No. 5 Yiheyuan Road, Haidian District, Beijing 100871, China Beijing International Center for Mathematical Research, Peking University, No. 5 Yiheyuan Road, Haidian District, Beijing 100871, China 
+
+Email address : liujihao@math.pku.edu.cn 
+
+Department of Mathematics, Peking University, No. 5 Yiheyuan Road, Haidian District, Beijing 100871, China Institute of Mathematics, Academy of Mathematics and Systems Science, Chinese Academy of Sciences, Beijing 100190, China 
+
+Email address : april@aprilg.moe

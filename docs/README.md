@@ -6,38 +6,43 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-10
-- 运行时间：2026-07-10 21:34:54 UTC
+- 最新运行日期：2026-07-11
+- 运行时间：2026-07-11 21:06:55 UTC
 - 运行状态：成功
-- 本次总论文数：6
-- 精读区：4
-- 速读区：2
+- 本次总论文数：7
+- 精读区：3
+- 速读区：4
 
 ### 今日简报（AI）
-今日精读4篇速读2篇，聚焦幻觉自博弈检测与全球价值对齐数据集两大核心方向。最值得关注的两篇满分精读：《Hallucination Self-Play》通过生成器迭代增强幻觉检测能力，《PLURAL》构建了首个全球价值观对齐数据集。下一步建议优先精读这两篇，前者为AI幻觉治理提供自博弈新范式，后者为多文化价值观对齐奠定数据基础。
-- 详情：[/202607/10/README](/202607/10/README)
+今天共处理7篇论文，精读2篇、速读4篇，重点关注饱和滤子理论与远程工作对创新的影响。  
+最值得精读的是评分9.0的《On two questions of Qi on saturated filtrations》和8.0的《Remote Work: Driver or Deterrent of Digital Product Innovation》。  
+建议普通读者优先从这两篇入手，前者深入代数理论，后者探讨远程办公与创新关系，实用性强。
+- 详情：[/202607/11/README](/202607/11/README)
 
 ### 精读区论文标签
-1. [Hallucination Self-Play: Bootstrapping Reinforced Detector via Evolved Generator](/202607/10/2607.07993v1-hallucination-self-play-bootstrapping-reinforced-detector-via-evolved-generator)  
-   标签：评分：10.0/10、query:lpt
-   evidence：通过自对弈进行幻觉检测与抑制
-2. [PLURAL: A Global Dataset for Value Alignment](/202607/10/2607.08034v1-plural-a-global-dataset-for-value-alignment)  
+1. [On two questions of Qi on saturated filtrations](/202607/11/2607.04831v1-on-two-questions-of-qi-on-saturated-filtrations)  
    标签：评分：9.0/10、query:lpt
-   evidence：用于大型语言模型价值对齐的偏好数据集，直接支持奖励建模
-3. [When Implausible Tokens Get Reinforced: Tail-Aware Credit Calibration for LLM Reinforcement Learning](/202607/10/2607.07976v1-when-implausible-tokens-get-reinforced-tail-aware-credit-calibration-for-llm-reinforcement-learning)  
+   evidence：论文解答了饱和滤子的两个数学问题，包含公式证明
+2. [Remote Work: Driver or Deterrent of Digital Product Innovation](/202607/11/2607.03718v1-remote-work-driver-or-deterrent-of-digital-product-innovation)  
    标签：评分：8.0/10、query:lpt
-   evidence：LLM强化学习中的信用校准
-4. [MORES: Mobile Reasoning-as-a-Service via Distributed LLM Inference-Time Scaling](/202607/10/2607.08116v1-mores-mobile-reasoning-as-a-service-via-distributed-llm-inference-time-scaling)  
+   evidence：数字产品创新研究
+3. [When Synthetic Speech Is All You Have: Better Call GRPO](/202607/11/2607.08409v1-when-synthetic-speech-is-all-you-have-better-call-grpo)  
    标签：评分：8.0/10、query:lpt
-   evidence：LLM推理时扩展提升推理能力
+   evidence：使用组相对策略优化（GRPO）在合成语音上进行ASR自适应，性能优于监督微调
 
 ### 速读区论文标签
-1. [Compete Then Collaborate: Frontier AI Teachers Build a Verifiable Curriculum to Improve a Coding Student Beyond Imitation](/202607/10/2607.08255v1-compete-then-collaborate-frontier-ai-teachers-build-a-verifiable-curriculum-to-improve-a-coding-student-beyond-imitation)  
+1. [Online Linear Programming for Multi-Objective Routing in LLM Serving](/202607/11/2607.03948v1-online-linear-programming-for-multi-objective-routing-in-llm-serving)  
    标签：评分：7.0/10、query:lpt
-   evidence：使用基于执行的验证器作为奖励进行多教师课程学习
-2. [PolyUQuest: Verifiable Structure-Aware Web RAG over Heterogeneous Graphs](/202607/10/2607.08269v1-polyuquest-verifiable-structure-aware-web-rag-over-heterogeneous-graphs)  
+   evidence：将路由问题构建为具有可解释奖励的在线线性规划
+2. [Evaluating SageMath-Augmented LLM Agents for Computational and Experimental Mathematics](/202607/11/2607.06820v1-evaluating-sagemath-augmented-llm-agents-for-computational-and-experimental-mathematics)  
    标签：评分：7.0/10、query:lpt
-   evidence：可验证的RAG通过将声明追溯到结构证据来减少幻觉
+   evidence：利用LLM和计算机代数系统进行数学公式化与求解
+3. [MORES: Mobile Reasoning-as-a-Service via Distributed LLM Inference-Time Scaling](/202607/11/2607.08116v1-mores-mobile-reasoning-as-a-service-via-distributed-llm-inference-time-scaling)  
+   标签：评分：7.0/10、query:lpt
+   evidence：提出分布式推理时间缩放方法，改进LLM推理算法
+4. [Self-Improving Diffusion Classifiers with Minority Preference Optimization](/202607/11/2607.03770v1-self-improving-diffusion-classifiers-with-minority-preference-optimization)  
+   标签：评分：6.0/10、query:lpt
+   evidence：少数偏好优化提升扩散分类器感知能力
 
 
 <div class="dpr-home-promo-card">
