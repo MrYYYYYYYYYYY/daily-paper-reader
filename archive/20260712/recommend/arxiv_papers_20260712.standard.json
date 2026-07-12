@@ -1,0 +1,415 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-12T19:46:03.679022+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 7,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 4,
+    "quick_skim_target": 11,
+    "quick_selected": 4
+  },
+  "deep_dive": [
+    {
+      "id": "2607.04574v1",
+      "source": "arxiv",
+      "title": "A Few Teacher Steps Go a Long Way: Cost-Efficient On-Policy Data Augmentation for Agent Post-Training",
+      "abstract": "For LLM agents, supervised fine-tuning is not only about teacher labels' quality, but also about which interaction contexts those labels condition on. Pure behavioral cloning uses full teacher demonstrations, creating a mismatch between teacher-induced contexts seen in training and student-induced contexts encountered at test time. Recent work addresses this mismatch by querying a teacher at contexts reached by the student, often with increasingly elaborate filtering of the teacher's continuations. We instead frame on-policy data construction as a budget-allocation problem: under matched supervision resources, should teacher output be spent on more start-to-finish demos, longer continuations, outcome filtering, or broader coverage of learner-induced contexts? We formalize this design space through the rollout policy, switch-time distribution, continuation horizon, filtering rules, and two complementary costs: teacher inference generated before filtering and teacher supervision retained for SFT. Across HotpotQA, ALFWorld, and Terminal-Bench-Dev, bounded unfiltered teacher continuations at learner-induced contexts improve over pure behavioral cloning at matched budgets. On HotpotQA and ALFWorld, where we run the full comparison, few-step continuations match or exceed success-filtered and critical-context-filtered alternatives. Our findings suggest that a few teacher steps, placed at learner-induced contexts, can be a more cost-efficient supervision allocation than longer or more heavily curated teacher completions.",
+      "authors": [
+        "Junze Ye",
+        "Jiayi Cheng",
+        "Miao Lu",
+        "Michal Mankowski",
+        "Jose Blanchet",
+        "Mohsen Bayati"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-06T01:02:30+00:00",
+      "link": "https://arxiv.org/pdf/2607.04574v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Agent post-training with on-policy data augmentation",
+      "llm_evidence_cn": "智能体后训练中的在策略数据增强",
+      "llm_evidence": "智能体后训练中的在策略数据增强",
+      "canonical_evidence": "智能体后训练中的在策略数据增强",
+      "llm_tldr_en": "This paper formulates on-policy data construction as a budget-allocation problem for LLM agent post-training, improving cost efficiency.",
+      "llm_tldr_cn": "本文针对LLM智能体后训练中监督微调与测试时上下文不匹配的问题，将在策略数据构建建模为预算分配问题，在等量监督资源下比较不同策略的效果，发现少量教师步骤即可显著提升学生智能体的性能，为后训练阶段的数据效率提供了新视角和实用方法。",
+      "llm_tldr": "本文针对LLM智能体后训练中监督微调与测试时上下文不匹配的问题，将在策略数据构建建模为预算分配问题，在等量监督资源下比较不同策略的效果，发现少量教师步骤即可显著提升学生智能体的性能，为后训练阶段的数据效率提供了新视角和实用方法。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.05394v2",
+      "source": "arxiv",
+      "title": "Weak-to-Strong Generalization via Direct On-Policy Distillation",
+      "abstract": "Reinforcement learning with verifiable rewards (RLVR) is a powerful recipe for improving language-model reasoning, but it is expensive to repeat on every new strong model because the target model must generate many rollouts during training. As models scale, post-training itself becomes a bottleneck. We study a weak-to-strong alternative: run RL on a smaller model where rollouts are cheaper, then reuse what that RL run learned to improve a stronger target model. Directly distilling the post-RL weak teacher is not enough, because the teacher's final policy mixes useful RL gains with the limitations of the smaller model. We propose Direct On-Policy Distillation (Direct-OPD), which transfers the teacher's RL-induced policy shift instead. Direct-OPD compares the post-RL teacher with its own pre-RL reference and treats their log-ratio as a dense implicit reward for the student. In plain terms, the checkpoint pair tells us which actions RL made the weak model more or less likely to take, and Direct-OPD applies that signal on the stronger student's own on-policy states. This directly reuses the weak model's RL supervision signal without running sparse-reward RL on the target model. Empirically, Direct-OPD consistently leverages weaker teachers to improve stronger target models; notably, it boosts Qwen3-1.7B from 48.3% to 58.3% on AIME 2024 in just 4 hours on 8 A100 GPUs. It outperforms step-matched direct RL and enables the sequential composition of multiple policy shifts. Our results show that RL outcomes can be reused across model scales as implicit reward signals, not merely as final models to imitate.",
+      "authors": [
+        "Shiyuan Feng",
+        "Huan-ang Gao",
+        "Haohan Chi",
+        "Hanlin Wu",
+        "Zhilong Zhang",
+        "Zheng Jiang",
+        "Bingxiang He",
+        "Wei-Ying Ma",
+        "Ya-Qin Zhang",
+        "Hao Zhou"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-07-06T17:59:58+00:00",
+      "link": "https://arxiv.org/pdf/2607.05394v2",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "post-training via on-policy distillation",
+      "llm_evidence_cn": "基于在线策略蒸馏的后训练方法",
+      "llm_evidence": "基于在线策略蒸馏的后训练方法",
+      "canonical_evidence": "基于在线策略蒸馏的后训练方法",
+      "llm_tldr_en": "Proposes Direct On-Policy Distillation to transfer RL-induced policy shifts from a weak teacher to a strong target model, reducing post-training cost for LLM reasoning.",
+      "llm_tldr_cn": "针对大语言模型后训练成本高的问题，提出直接在线策略蒸馏（Direct-OPD）方法，通过在弱模型上运行强化学习并将策略偏移迁移到强模型，避免重复生成大量轨迹。实验表明该方法在保持推理性能的同时显著降低了计算开销，为弱到强泛化提供了高效的后训练范式。",
+      "llm_tldr": "针对大语言模型后训练成本高的问题，提出直接在线策略蒸馏（Direct-OPD）方法，通过在弱模型上运行强化学习并将策略偏移迁移到强模型，避免重复生成大量轨迹。实验表明该方法在保持推理性能的同时显著降低了计算开销，为弱到强泛化提供了高效的后训练范式。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.06175v1",
+      "source": "arxiv",
+      "title": "Improving LLM-Generated Process Model Quality Through Reinforcement Learning: The Role of Reward Function Design",
+      "abstract": "Large language models (LLMs) can generate BPMN process models from natural-language descriptions, yet supervised fine-tuning (SFT) limits their output quality to the patterns present in the training data. Reinforcement learning (RL) can optimize beyond this ceiling using external quality measures, but how the reward function should be designed when quality is multi-dimensional remains unexplored. We present a systematic investigation of reward function design for RL-based process model generation, training two LLM families (Llama~3.1 8B, Qwen~2.5 14B) under 48 configurations using Group Sequence Policy Optimization with rewards derived from an automated evaluation framework comprising 38 metrics across syntactic, pragmatic, and semantic quality. Three findings emerge. First, RL significantly improves pragmatic and syntactic quality while preserving semantic fidelity, reducing output variability by more than sixfold. Second, equal reward weighting consistently outperforms targeted weighting: emphasizing a specific dimension fails to improve it and can collapse the model into a low-quality mode. Third, design choices interact with model architecture in non-trivial ways: the invalidity penalty is essential for one model but irrelevant for the other, and SFT initialization is indispensable for one architecture but counterproductive for another. These results demonstrate that reward composition is a primary determinant of optimization outcomes, with effects as large as the decision to apply RL itself. The findings generalize to any structured generation task where quality is assessed along multiple automated dimensions. We release our implementation and experimental code at https://github.com/chlauer99/RL_for_process_modeling.",
+      "authors": [
+        "Alexander Rombach",
+        "Chantale Lauer",
+        "Nijat Mehdiyev"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-07-07T11:53:02+00:00",
+      "link": "https://arxiv.org/pdf/2607.06175v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Reward function design in RL for LLM-generated process models",
+      "llm_evidence_cn": "针对LLM生成流程模型的RL奖励函数设计",
+      "llm_evidence": "针对LLM生成流程模型的RL奖励函数设计",
+      "canonical_evidence": "针对LLM生成流程模型的RL奖励函数设计",
+      "llm_tldr_en": "This paper systematically investigates reward function design for RL-based process model generation with LLMs, testing 48 configurations.",
+      "llm_tldr_cn": "本文系统研究了基于强化学习的LLM业务流程模型生成中奖励函数的设计问题，在Llama和Qwen两个模型族上测试了48种配置，使用38个指标的自动评估框架，揭示了多维质量下不同奖励聚合策略的影响，为LLM后训练中的奖励建模提供了重要指导。",
+      "llm_tldr": "本文系统研究了基于强化学习的LLM业务流程模型生成中奖励函数的设计问题，在Llama和Qwen两个模型族上测试了48种配置，使用38个指标的自动评估框架，揭示了多维质量下不同奖励聚合策略的影响，为LLM后训练中的奖励建模提供了重要指导。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.06522v1",
+      "source": "arxiv",
+      "title": "Bridging Physical Reasoning and Task Generalization via Visual Action Outcome Reasoning Alignment",
+      "abstract": "Vision-language models (VLMs) struggle to generalize in interactive physical reasoning, particularly under unseen tasks and environments. Two key failure modes are prominent: hallucinated chain-of-thought (CoT) reasoning that contradicts physical reality, and misalignment between the model's reasoning and actions. We present VAORA (Visual Action Outcome Reasoning Alignment), a novel reward design that directly addresses both issues. VAORA introduces two complementary rewards: Visual Alignment Reward, which anchors VLM reasoning to the visual context independent of the agent action itself, and Visual-Action Alignment Reward, which grounds reasoning in the visual outcome induced by the model's action. Together, these rewards suppress hallucinated CoT and reduce the gap between reasoning and behavior. To improve training stability, we further employ smooth, dense rewards by estimating success probabilities using a pre-trained in-domain expert agent. Experiments on PHYRE and Virtual Tool support our performances across novel-task and unseen-environment settings, confirming that grounded and generalizable physical intelligence can be induced through VAORA.",
+      "authors": [
+        "Han-Jun Ko",
+        "Jr-Jen Chen",
+        "Haobo Yuan",
+        "Hsin-Ying Lee",
+        "Tiancheng Shen",
+        "Ming-Hsuan Yang",
+        "Yu-Chiang Frank Wang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CV"
+      ],
+      "published": "2026-07-07T17:27:59+00:00",
+      "link": "https://arxiv.org/pdf/2607.06522v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "reward design to suppress hallucinated CoT in VLM physical reasoning",
+      "llm_evidence_cn": "通过奖励设计抑制VLM物理推理中的幻觉式思维链",
+      "llm_evidence": "通过奖励设计抑制VLM物理推理中的幻觉式思维链",
+      "canonical_evidence": "通过奖励设计抑制VLM物理推理中的幻觉式思维链",
+      "llm_tldr_en": "Introduces VAORA, a reward design that anchors VLM reasoning to visual context and actions to suppress hallucinated chain-of-thought and improve task generalization.",
+      "llm_tldr_cn": "视觉语言模型在交互式物理推理中常产生与物理现实矛盾的幻觉式思维链，且推理与动作脱节。VAORA提出视觉对齐奖励和视觉-动作对齐奖励，将推理锚定于视觉上下文和动作结果，有效抑制幻觉，提升泛化能力。",
+      "llm_tldr": "视觉语言模型在交互式物理推理中常产生与物理现实矛盾的幻觉式思维链，且推理与动作脱节。VAORA提出视觉对齐奖励和视觉-动作对齐奖励，将推理锚定于视觉上下文和动作结果，有效抑制幻觉，提升泛化能力。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.07478v1",
+      "source": "arxiv",
+      "title": "FourierQK: Spectral Preprocessing of Query-Key Projections Improves Transformer Attention",
+      "abstract": "FFT-based spectral preprocessing of learned query-key (Q/K) projections substantially improves transformer attention on character-level language modelling. On TinyShakespeare: a fixed random spectral filter achieves val=1.031 (Delta=+0.443); a single learned frequency at paragraph scale achieves val=0.608 (Delta=+0.867); and four learned frequencies spanning paragraph to word scale achieve val=0.309 (Delta=+1.166), a 79% reduction over standard dot-product attention. The single-frequency result is confirmed across three random seeds (mean val=0.236, std=0.019). The four frequencies converge to a near-geometric multi-scale ordering (49, 27, 10, 6 tokens/cycle) corresponding to paragraph, sub-paragraph, phrase, and word scales. The gain is specific to spectral preprocessing: random orthogonal and non-orthogonal projections of Q/K produce no measurable improvement, suggesting the benefit comes from global frequency-domain mixing rather than metric distortion. All results are verified by a shuffled-validation diagnostic against positional leakage. Causal filters (Gaussian, Mexican Hat, Morlet) do not improve over standard attention at character-level tokenisation: the bilateral FFT kernel is structurally non-causal, coupling every position to future tokens. This defines an architectural boundary between bilateral spectral attention (this paper) and genuinely causal spectral attention at word-scale tokenisation (companion paper MorletQK). This work is architecturally distinct from FNet (Lee-Thorp et al., 2021), which replaces attention with Fourier mixing of token embeddings. Here, spectral preprocessing applies only to Q/K projections while the full attention score structure is preserved.",
+      "authors": [
+        "Athanasios Zeris"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL",
+        "eess.SP"
+      ],
+      "published": "2026-07-08T14:43:00+00:00",
+      "link": "https://arxiv.org/pdf/2607.07478v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Algorithm improvement for transformer attention via spectral preprocessing",
+      "llm_evidence_cn": "通过频谱预处理改进Transformer注意力机制，属于算法改进",
+      "llm_evidence": "通过频谱预处理改进Transformer注意力机制，属于算法改进",
+      "canonical_evidence": "通过频谱预处理改进Transformer注意力机制，属于算法改进",
+      "llm_tldr_en": "FourierQK applies FFT spectral preprocessing to Q/K projections, achieving 79% reduction in perplexity over standard attention on character-level tasks.",
+      "llm_tldr_cn": "针对Transformer注意力机制的性能瓶颈，本文提出FourierQK，对查询-键投影进行基于FFT的频谱预处理。在字符级语言建模任务上，单学习频率可将验证困惑度降低0.867，四个多尺度频率进一步降低1.166。该方法收敛到近乎几何级数的多尺度顺序，显著优于标准点积注意力，揭示了频谱信息在注意力计算中的关键作用。",
+      "llm_tldr": "针对Transformer注意力机制的性能瓶颈，本文提出FourierQK，对查询-键投影进行基于FFT的频谱预处理。在字符级语言建模任务上，单学习频率可将验证困惑度降低0.867，四个多尺度频率进一步降低1.166。该方法收敛到近乎几何级数的多尺度顺序，显著优于标准点积注意力，揭示了频谱信息在注意力计算中的关键作用。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.07707v1",
+      "source": "arxiv",
+      "title": "Co-LMLM: Continuous-Query Limited Memory Language Models",
+      "abstract": "Limited memory language models (LMLMs) externalize factual knowledge during pretraining to a knowledge base (KB), rather than memorizing it in their weights. During generation, the model then fetches knowledge from the KB as needed. This recently introduced paradigm provides multiple advantages, including knowledge control capabilities that remain beyond conventional LLMs. We propose continuous-query LMLM (CO-LMLM), where the KB pairs continuous keys with textual knowledge values, a significant departure from prior reliance on relational KB and queries. CO-LMLM generates flexible vector queries at minimal cost, while still integrating human-readable and attributable retrieved knowledge into its generation. We pair this design with an annotation pipeline that tags free-form factual spans in arbitrary text, removing prior work's restriction to Wikipedia. Across pretraining on Wikipedia and FineWeb-Edu and at multiple model scales, CO-LMLM outperforms prior LMLMs and vanilla LLMs in both perplexity and factual precision. At 360M scale, this includes lower perplexity than models pretrained on 40x more data, and SimpleQA-verified performance that is in line with gpt-4o-mini and higher than Claude Sonnet 4.5.",
+      "authors": [
+        "Yair Feldman",
+        "Linxi Zhao",
+        "Nathan Godey",
+        "Dongyoung Go",
+        "Yilun Hua",
+        "Kilian Q. Weinberger",
+        "Jennifer J. Sun",
+        "Yoav Artzi"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-07-08T17:59:45+00:00",
+      "link": "https://arxiv.org/pdf/2607.07707v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "external knowledge reduces hallucination via continuous queries",
+      "llm_evidence_cn": "连续查询外部知识减少幻觉",
+      "llm_evidence": "连续查询外部知识减少幻觉",
+      "canonical_evidence": "连续查询外部知识减少幻觉",
+      "llm_tldr_en": "Proposes continuous-query limited memory language model that fetches external knowledge via vector queries, reducing hallucination by not memorizing facts.",
+      "llm_tldr_cn": "大语言模型因记忆事实而产生幻觉，本文提出连续查询有限记忆语言模型（CO-LMLM），将知识存储在外知识库中，通过连续向量查询获取知识。该方法支持可归因检索，显著降低对内部权重的依赖，从根源上抑制幻觉。",
+      "llm_tldr": "大语言模型因记忆事实而产生幻觉，本文提出连续查询有限记忆语言模型（CO-LMLM），将知识存储在外知识库中，通过连续向量查询获取知识。该方法支持可归因检索，显著降低对内部权重的依赖，从根源上抑制幻觉。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.08700v1",
+      "source": "arxiv",
+      "title": "Do You Need a Frontier Model as a Citation Verifier? Benchmarking Rubric LLMs for Deep-Research Source Attribution",
+      "abstract": "Reinforcement learning increasingly relies on an LLM judge to score each rubric criterion, and that judge acts as the reward model during training. Before such a signal can be trusted, we need to know how capable the judge must be and how biased it is. We study this calibration question for citation quality in deep-research systems, where a search-grounded LLM must support each claim it writes with a cited source. Citation quality is a structured rubric task in which each attribution-citation pair is judged along two dimensions that require an LLM, source relevance and factual support. On an adversarial long-form benchmark, we score 8 off-the-shelf LLM judges from 3 model families against gold labels over 1,248 rubric decisions, all of which were human-reviewed and 378 of which were hard cases adjudicated from judge disagreements. Cheaper judges remain competitive across both dimensions, with GPT-5-mini attaining the strongest source-relevance pass-class F1 at 0.908 ($κ$=0.636), while on factual support the judges are statistically indistinguishable (overlapping confidence intervals), so no single model dominates. At comparable F1, the judges still differ substantially in pass-rate drift, false positive rate, and false negative rate. Scalar F1 obscures this directional bias, yet it is exactly what a downstream reinforcement learning loop would reinforce. Calibrating the judge is therefore a prerequisite for using citation rubrics as reward signals, and our results show that this calibration does not require the most expensive available model.",
+      "authors": [
+        "Ethan Leung",
+        "Elias Lumer",
+        "Corey Feld",
+        "Austin Huber",
+        "Vamse Kumar Subbiah",
+        "Kevin Paul"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-09T17:01:40+00:00",
+      "link": "https://arxiv.org/pdf/2607.08700v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "LLM judge as reward model for RLHF citation verification",
+      "llm_evidence_cn": "LLM作为奖励模型用于RLHF的引用验证",
+      "llm_evidence": "LLM作为奖励模型用于RLHF的引用验证",
+      "canonical_evidence": "LLM作为奖励模型用于RLHF的引用验证",
+      "llm_tldr_en": "Benchmarks how capable an LLM judge must be to act as a reward model for citation quality in RL, finding that frontier models are not always necessary but bias must be accounted for.",
+      "llm_tldr_cn": "本文研究在深度研究系统中，LLM裁判作为奖励模型评估引用质量时所需的能力和偏差。通过对抗式长文基准测试，评估了8个现成LLM裁判，发现前沿模型并非总是必要，但偏差需仔细校准，为RLHF中奖励模型的选择提供了指导。",
+      "llm_tldr": "本文研究在深度研究系统中，LLM裁判作为奖励模型评估引用质量时所需的能力和偏差。通过对抗式长文基准测试，评估了8个现成LLM裁判，发现前沿模型并非总是必要，但偏差需仔细校准，为RLHF中奖励模型的选择提供了指导。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.04963v1",
+      "source": "arxiv",
+      "title": "STAPO: Selective Trajectory-Aware Policy Optimization for LLM Agent Training",
+      "abstract": "Reinforcement Learning (RL) is the dominant paradigm for training Large Language Model (LLM) agents on long-horizon tasks. However, sparse and delayed rewards often lead to trajectory neglect, in which agents lose focus on the task goal and interaction history at intermediate steps. Prior work has explored step-level supervision using Shannon-entropy-based uncertainty signals, which conflate inherent state complexity with agent confidence and therefore provide unreliable estimates of decision reliability. To address this issue, we propose normalized entropy, which measures confidence deviations relative to an agent's average behavior under a given state, thereby strengthening the association between low-quality actions and trajectory neglect. Building on this insight, we introduce Selective Trajectory-Aware Policy Optimization (STAPO), a hierarchical group-based RL framework. STAPO leverages normalized entropy to locate outlier steps associated with trajectory neglect and optimizes them via a joint mechanism of trajectory-aware reward and trajectory-independent penalty, enhancing trajectory awareness while preserving training stability. Extensive experiments on ALFWorld, WebShop, and Search-Augmented QA demonstrate that STAPO achieves state-of-the-art performance while substantially alleviating trajectory neglect, validating its effectiveness and robustness for agentic tasks.",
+      "authors": [
+        "Qiuyi Qi",
+        "Tian Liang",
+        "Mutian Bao",
+        "Jinjian Zhang",
+        "Dongnan Liu",
+        "Wei Zhou",
+        "Linjian Mo",
+        "Ming Kong",
+        "Jie Liu",
+        "Feng Zhang",
+        "Qiang Zhu"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-06T11:50:06+00:00",
+      "link": "https://arxiv.org/pdf/2607.04963v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Proposes normalized entropy for improved policy optimization in LLM agent training",
+      "llm_evidence_cn": "提出归一化熵改进LLM智能体训练中的策略优化算法",
+      "llm_evidence": "提出归一化熵改进LLM智能体训练中的策略优化算法",
+      "canonical_evidence": "提出归一化熵改进LLM智能体训练中的策略优化算法",
+      "llm_tldr_en": "STAPO addresses trajectory neglect in LLM agent training by using normalized entropy to measure confidence deviations, enabling selective trajectory-aware policy optimization and improving RL-based training.",
+      "llm_tldr_cn": "在基于强化学习的LLM智能体长程任务训练中，稀疏奖励常导致轨迹忽视问题。本文提出STAPO算法，使用归一化熵衡量决策可靠性，强化低质量动作与轨迹忽视的关联。该方法在多个复杂任务上提升了训练效率和最终性能，提供了一种适用于LLM智能体训练的策略优化改进。该方法属于强化学习算法的改进，可迁移至RLHF等场景。",
+      "llm_tldr": "在基于强化学习的LLM智能体长程任务训练中，稀疏奖励常导致轨迹忽视问题。本文提出STAPO算法，使用归一化熵衡量决策可靠性，强化低质量动作与轨迹忽视的关联。该方法在多个复杂任务上提升了训练效率和最终性能，提供了一种适用于LLM智能体训练的策略优化改进。该方法属于强化学习算法的改进，可迁移至RLHF等场景。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-07-09-737460-v1",
+      "source": "biorxiv",
+      "title": "Humans integrate gaze and decision cues for inferring preferences in social interactions",
+      "abstract": "Social decision-making depends on inferring others' hidden preferences from observable behavior. Yet it remains unclear how humans combine choices with process cues such as response times and gaze when learning about others in real-time interaction. Here, we combine a novel multi-attribute bargaining task with eye-tracking and show that multiple decision-process cues support preference inference. Across 75 buyer-seller dyads, buyers' acceptance rates tracked offer utility, rejection speed reflected decision confidence, and first fixations preferentially targeted the highest-weighted attribute. Sellers adapted subsequent offers using choices, response times, and, when available, gaze cues. A hierarchical inference and choice model suggested that sellers balanced expected utility with expected information gain and updated their beliefs in a Bayesian manner. Although gaze access did not improve overall performance, it changed how sellers used attentional information. These findings shed light on how humans infer others' hidden preferences from decision dynamics in real-time social interaction.",
+      "authors": [
+        "Gopnarayan, M. N.",
+        "Bavard, S.",
+        "Stuchly, E.",
+        "Gluth, S."
+      ],
+      "primary_category": "neuroscience",
+      "categories": [
+        "neuroscience"
+      ],
+      "published": "2026-07-10T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.07.09.737460v1.full.pdf",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "human preference inference from decision cues, relevant to reward modeling in RLHF",
+      "llm_evidence_cn": "人类通过决策线索推断偏好的机制，与RLHF中的奖励建模相关",
+      "llm_evidence": "人类通过决策线索推断偏好的机制，与RLHF中的奖励建模相关",
+      "canonical_evidence": "人类通过决策线索推断偏好的机制，与RLHF中的奖励建模相关",
+      "llm_tldr_en": "This paper studies how humans integrate gaze and decision cues to infer others' preferences in social interactions, using a bargaining task with eye-tracking. It finds that multiple process cues support inference, and sellers adapt offers using these cues. A hierarchical model is proposed.",
+      "llm_tldr_cn": "该论文研究在社交互动中人类如何结合注视和决策线索推断他人偏好。通过一项讨价还价任务和眼动追踪，发现多个决策过程线索（如拒绝速度、注视方向）支持偏好推断，且卖方会利用选择、反应时间和注视线索调整出价。研究提出了一个分层贝叶斯推理模型，揭示了人类偏好学习的认知机制，为RLHF中的人类偏好建模提供了行为证据。",
+      "llm_tldr": "该论文研究在社交互动中人类如何结合注视和决策线索推断他人偏好。通过一项讨价还价任务和眼动追踪，发现多个决策过程线索（如拒绝速度、注视方向）支持偏好推断，且卖方会利用选择、反应时间和注视线索调整出价。研究提出了一个分层贝叶斯推理模型，揭示了人类偏好学习的认知机制，为RLHF中的人类偏好建模提供了行为证据。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.05458v1",
+      "source": "arxiv",
+      "title": "Learning to Control LLM Agent Harnesses with Offline Reinforcement Learning",
+      "abstract": "Large language model (LLM) agents are usually improved by changing prompts, models, or hand-written workflows, while the execution harness around the model is treated as fixed infrastructure. We argue that this harness is itself a learnable control layer. We formalize harness operation as a finite-horizon Harness MDP, where a lightweight controller selects structural execution actions while the LLM executor remains frozen. The controller is trained from offline rollouts using advantage-weighted regression with only terminal task-rubric rewards. We also separate final task quality from a post-hoc Harness Maturity Score, which measures whether the harness follows reliable execution patterns rather than only whether the final answer is correct. This separation gives a finite-buffer view of harness learning: final-quality gains require high-return support in the offline buffer, while process behavior can shift whenever it aligns with advantage-weighted actions. Across six controlled domains and two public-benchmark adapters, the learned controller consistently improves verification behavior and selectively improves final task quality, with the largest gains on adapted tau-bench retail, adapted AgentBench DB-Bench, and coding with a calibrated structural verifier. Ablations against behavior cloning and Forced CHECK show that the gains are not explained by imitation or by simply adding checks. These results identify harness control as a learnable layer for frozen LLM agents, while showing that offline support limits when better process control becomes better final answers.",
+      "authors": [
+        "Haiwen Yi",
+        "Xinyuan Song"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-05T22:11:18+00:00",
+      "link": "https://arxiv.org/pdf/2607.05458v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "offline RL for LLM agent harness control",
+      "llm_evidence_cn": "LLM智能体框架的离线强化学习控制",
+      "llm_evidence": "LLM智能体框架的离线强化学习控制",
+      "canonical_evidence": "LLM智能体框架的离线强化学习控制",
+      "llm_tldr_en": "Proposes offline RL to learn a lightweight controller for LLM agent harness, improving execution reliability without modifying the LLM itself.",
+      "llm_tldr_cn": "现有LLM智能体将执行框架视为固定基础设施，本文将其建模为可学习的控制层。提出基于离线强化学习的Harness MDP，使用优势加权回归训练轻量控制器，并引入Harness Maturity Score衡量执行模式可靠性。实验表明该方法能有效提升任务质量。",
+      "llm_tldr": "现有LLM智能体将执行框架视为固定基础设施，本文将其建模为可学习的控制层。提出基于离线强化学习的Harness MDP，使用优势加权回归训练轻量控制器，并引入Harness Maturity Score衡量执行模式可靠性。实验表明该方法能有效提升任务质量。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
