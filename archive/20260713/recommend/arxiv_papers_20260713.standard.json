@@ -1,0 +1,440 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-13T20:13:48.124015+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 7,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 5,
+    "quick_skim_target": 11,
+    "quick_selected": 5
+  },
+  "deep_dive": [
+    {
+      "id": "2607.05069v1",
+      "source": "arxiv",
+      "title": "MIRAGE: Defending Long-Form RAG Against Misinformation Pollution",
+      "abstract": "Retrieval-Augmented Generation (RAG) improves factuality by grounding LLMs in external evidence, but real-world retrieval is often polluted: semantically relevant passages may contain subtle misinformation, misleading framings, or fabrications. We introduce MIRAGE, a training-free, model-agnostic defense for long-form RAG. MIRAGE builds an NLI-based cross-document claim graph and applies a Defended-Claims Gate to either condition generation on a consistent, multi-source supported subset or to block retrieval and answer parametrically. We also release a minimal-edit pollution protocol spanning four perturbation families (Unambiguous, Conflicting, Misleading, Fabricated) to construct matched clean, mixed, and fully polluted evaluation regimes. Across four long-form QA benchmarks and multiple commercial and open-weight LLMs, pollution severely degrades vanilla RAG, while MIRAGE consistently restores factuality under mixed and fully polluted evidence and outperforms prior robust-RAG methods. Our implementation and datasets are available at https://github.com/SaadElDine/MIRAGE.",
+      "authors": [
+        "Saadeldine Eletter",
+        "Ruihong Zeng",
+        "Yuxia Wang",
+        "Maxim Panov",
+        "Aleksandr Rubashevskii",
+        "Preslav Nakov"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-06T13:36:12+00:00",
+      "link": "https://arxiv.org/pdf/2607.05069v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Directly addresses hallucination via misinformation defense in long-form RAG",
+      "llm_evidence_cn": "直接针对长文本RAG中的错误信息污染进行防御，抑制幻觉",
+      "llm_evidence": "直接针对长文本RAG中的错误信息污染进行防御，抑制幻觉",
+      "canonical_evidence": "直接针对长文本RAG中的错误信息污染进行防御，抑制幻觉",
+      "llm_tldr_en": "MIRAGE uses NLI-based claim graphs and a defended-claims gate to mitigate misinformation in RAG, improving factuality.",
+      "llm_tldr_cn": "针对检索增强生成中检索结果被污染导致幻觉的问题，提出MIRAGE防御方法，构建基于自然语言推理的跨文档声明图，并通过防御声明门控机制有条件地选择一致的多源证据生成回答。在四个长文本数据集上，MIRAGE在混合污染场景下显著提升事实准确性。",
+      "llm_tldr": "针对检索增强生成中检索结果被污染导致幻觉的问题，提出MIRAGE防御方法，构建基于自然语言推理的跨文档声明图，并通过防御声明门控机制有条件地选择一致的多源证据生成回答。在四个长文本数据集上，MIRAGE在混合污染场景下显著提升事实准确性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.09492v1",
+      "source": "arxiv",
+      "title": "Multimodal Reward Hacking in Reinforcement Learning",
+      "abstract": "Reinforcement learning (RL) is increasingly used to align multimodal large language models (MLLMs), but higher rewards do not always imply better task performance. This risk is amplified when visual evidence is evaluated by text-only or weakly grounded rewards. We study reward hacking in MLLM RL across safety VQA, chart VQA, and stress-test settings, varying reward design, data ambiguity, model scale (2B-32B), and RL algorithm (GRPO, RLOO, DAPO). We introduce Newly Rewarded Failure Rate (NRFR), which measures failures among samples whose proxy reward improves over the SFT baseline. Outcome-only rewards cause severe hacking, reaching 48.1% Reward Hacking Rate (RHR), while NRFR exceeding RHR shows that RL creates new failures rather than merely inheriting them. Scaling reduces but does not eliminate hacking: even the 32B model retains a 54.9% worse rate under outcome-only rewards, whereas answer-aware rewards improve the oracle trend at every scale. Robustness is also algorithm- and scale-dependent: GRPO is consistently most resistant, RLOO remains vulnerable, and DAPO improves substantially from 2B to 8B. Visual-evidence rewards help only with reliable verification: keyword-based checks increase hacking, while VLM-as-judge semantic verification reduces it. Overall, multimodal reward hacking is a systematic result of optimizing imperfect rewards, and robust alignment requires rewards and verifiers that remain reliable under optimization pressure.",
+      "authors": [
+        "Jiayu Yao",
+        "Yiwei Wang",
+        "Anmeng Zhang",
+        "Zhe Sun",
+        "Songsong Wang",
+        "Lingrui Mei",
+        "Yuyao Ge",
+        "Shenghua Liu"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-10T15:06:48+00:00",
+      "link": "https://arxiv.org/pdf/2607.09492v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "studies reward hacking in RL for MLLM alignment, directly relevant to reward modeling for RLHF",
+      "llm_evidence_cn": "研究多模态大语言模型RL中的奖励黑客行为，直接关联RLHF的奖励建模",
+      "llm_evidence": "研究多模态大语言模型RL中的奖励黑客行为，直接关联RLHF的奖励建模",
+      "canonical_evidence": "研究多模态大语言模型RL中的奖励黑客行为，直接关联RLHF的奖励建模",
+      "llm_tldr_en": "Analyzes reward hacking in multimodal LLM RL across settings, introduces NRFR metric, shows outcome-only rewards cause severe hacking up to 48.1% RHR.",
+      "llm_tldr_cn": "强化学习越来越多用于对齐多模态大语言模型，但高奖励并不保证性能提升——即奖励黑客问题。该论文系统研究了不同奖励设计、数据模糊性和算法下的奖励黑客现象，提出新注册失败率（NRFR）指标，发现仅结果奖励导致严重黑客行为（最高48.1%），且新故障多于继承故障。该工作强调了鲁棒奖励建模的重要性。",
+      "llm_tldr": "强化学习越来越多用于对齐多模态大语言模型，但高奖励并不保证性能提升——即奖励黑客问题。该论文系统研究了不同奖励设计、数据模糊性和算法下的奖励黑客现象，提出新注册失败率（NRFR）指标，发现仅结果奖励导致严重黑客行为（最高48.1%），且新故障多于继承故障。该工作强调了鲁棒奖励建模的重要性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.04062v1",
+      "source": "arxiv",
+      "title": "Fast, Parallel, Query-Efficient Binary Classification",
+      "abstract": "We study the fundamental classification problem of computing a separating hyperplane for a binary-labeled dataset of size $n$ with normalized $d$-dimensional features. Letting $Φ\\in \\mathbb{R}^{n \\times d}$ denote the feature matrix and $γ$ the margin of the maximum-margin separating hyperplane, we present a randomized algorithm that solves this problem in $\\tilde{O}(γ^{-2/3}\\, \\operatorname{nnz}(Φ) + γ^{-2(ω+1)/3})$-sequential running time (work), $\\tilde{O}(γ^{-2/3})$-parallel (computational) depth, and accesses $Φ$ only through $\\tilde{O}(γ^{-2/3})$-matrix-vector queries (matvecs). We also present a second, faster randomized algorithm with a $\\tilde{O}(γ^{-2/3}\\, \\operatorname{nnz}(Φ) + γ^{-2})$-sequential running time that uses $\\tilde{O}(γ^{-2/3})$-matvecs to $Φ$, but achieves only $\\tilde{O}(γ^{-4/3})$-parallel depth. Both algorithms match the near-optimal deterministic matvec complexity recently established by Kornowski and Shamir [2025], Karmarkar et al. [2026] and achieve improved sequential runtime and parallel depth, albeit at the expense of using randomness.",
+      "authors": [
+        "Ishani Karmarkar",
+        "Liam O'Carroll",
+        "Aaron Sidford"
+      ],
+      "primary_category": "math.OC",
+      "categories": [
+        "math.OC",
+        "cs.DS",
+        "cs.LG"
+      ],
+      "published": "2026-07-05T00:18:56+00:00",
+      "link": "https://arxiv.org/pdf/2607.04062v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Presents randomized algorithm with theoretical complexity analysis, directly matching math formulation and algorithm improvement",
+      "llm_evidence_cn": "提出带有理论复杂度分析的随机算法，直接匹配数学公式化和算法改进需求",
+      "llm_evidence": "提出带有理论复杂度分析的随机算法，直接匹配数学公式化和算法改进需求",
+      "canonical_evidence": "提出带有理论复杂度分析的随机算法，直接匹配数学公式化和算法改进需求",
+      "llm_tldr_en": "Proposes fast, parallel, query-efficient binary classification algorithms with theoretical guarantees on running time and query complexity, relevant to math formulation.",
+      "llm_tldr_cn": "该论文针对二分类问题中计算分离超平面的任务，提出了两种随机算法。第一种算法在序列运行时间、并行深度和矩阵向量查询次数上均达到次线性复杂度，并给出了严格的O记号上界。第二种算法在运行时间上更快但查询次数略多。这两种算法在理论上具有创新性，为大规模分类问题提供了高效的并行解法。",
+      "llm_tldr": "该论文针对二分类问题中计算分离超平面的任务，提出了两种随机算法。第一种算法在序列运行时间、并行深度和矩阵向量查询次数上均达到次线性复杂度，并给出了严格的O记号上界。第二种算法在运行时间上更快但查询次数略多。这两种算法在理论上具有创新性，为大规模分类问题提供了高效的并行解法。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "math formulation",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.09375v1",
+      "source": "arxiv",
+      "title": "Mach-Mind-4-Flash Technical Report",
+      "abstract": "We present Mach-Mind-4-Flash, a 35B-parameter Mixture-of-Experts (MoE) agentic model with 3B activated parameters. Through post-training optimization alone without scaling pre-training compute, the model achieves performance on par with or surpassing that of 100B-parameter-class models. By introducing scalable agentic interaction environments for large-scale reinforcement learning, the model attains significant performance gains on real-world application tasks. Our pipeline comprises three stages: (1) a unified RL/OPD training infrastructure with dynamic multi-teacher scheduling and operator-level acceleration, delivering 17\\% end-to-end training speedup; (2) multiple domain-specific RL experts trained in parallel across Reasoning, General, and Agent tracks, then fused into a single generalist via Multi-Teacher On-Policy Distillation (MOPD) -- a routed reverse-KL objective that eliminates the see-saw degradation of mixed-reward RL; (3) Hybrid Median-length Policy Optimization (HMPO), a single-stage token-efficiency method that compresses reasoning chains by 19--46\\% with $\\le$0.7 percentage-point accuracy loss. Mach-Mind-4-Flash scores 92.70 on AIME'26, 82.82 on IFBench, 80.74 on Behavioral-SafetyBench, 75.80 on BFCL-v4, 72.31 on BrowseComp-zh, and 84.20 on ClawBench -- leading or matching models with 10--30$\\times$ its activated size at a fraction of the inference cost.",
+      "authors": [
+        "Foundation Model Team"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-07-10T12:57:08+00:00",
+      "link": "https://arxiv.org/pdf/2607.09375v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "post-training optimization for MoE LLM with RL",
+      "llm_evidence_cn": "使用强化学习对MoE大模型进行后训练优化",
+      "llm_evidence": "使用强化学习对MoE大模型进行后训练优化",
+      "canonical_evidence": "使用强化学习对MoE大模型进行后训练优化",
+      "llm_tldr_en": "Mach-Mind-4-Flash leverages post-training optimization, domain-specific RL experts, and agentic interaction environments to achieve 100B-class performance with 3B activated parameters.",
+      "llm_tldr_cn": "该技术报告介绍了一种35B参数的MoE模型Mach-Mind-4-Flash，仅通过后训练优化（不扩展预训练计算）即可达到与100B参数模型相当的性能。其训练流程包含统一RL/OPD基础设施、多领域专家并行训练与融合，以及可扩展的智能体交互环境。实验表明，该模型在真实应用任务上取得了显著性能提升，验证了后训练优化的巨大潜力。",
+      "llm_tldr": "该技术报告介绍了一种35B参数的MoE模型Mach-Mind-4-Flash，仅通过后训练优化（不扩展预训练计算）即可达到与100B参数模型相当的性能。其训练流程包含统一RL/OPD基础设施、多领域专家并行训练与融合，以及可扩展的智能体交互环境。实验表明，该模型在真实应用任务上取得了显著性能提升，验证了后训练优化的巨大潜力。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.04574v1",
+      "source": "arxiv",
+      "title": "A Few Teacher Steps Go a Long Way: Cost-Efficient On-Policy Data Augmentation for Agent Post-Training",
+      "abstract": "For LLM agents, supervised fine-tuning is not only about teacher labels' quality, but also about which interaction contexts those labels condition on. Pure behavioral cloning uses full teacher demonstrations, creating a mismatch between teacher-induced contexts seen in training and student-induced contexts encountered at test time. Recent work addresses this mismatch by querying a teacher at contexts reached by the student, often with increasingly elaborate filtering of the teacher's continuations. We instead frame on-policy data construction as a budget-allocation problem: under matched supervision resources, should teacher output be spent on more start-to-finish demos, longer continuations, outcome filtering, or broader coverage of learner-induced contexts? We formalize this design space through the rollout policy, switch-time distribution, continuation horizon, filtering rules, and two complementary costs: teacher inference generated before filtering and teacher supervision retained for SFT. Across HotpotQA, ALFWorld, and Terminal-Bench-Dev, bounded unfiltered teacher continuations at learner-induced contexts improve over pure behavioral cloning at matched budgets. On HotpotQA and ALFWorld, where we run the full comparison, few-step continuations match or exceed success-filtered and critical-context-filtered alternatives. Our findings suggest that a few teacher steps, placed at learner-induced contexts, can be a more cost-efficient supervision allocation than longer or more heavily curated teacher completions.",
+      "authors": [
+        "Junze Ye",
+        "Jiayi Cheng",
+        "Miao Lu",
+        "Michal Mankowski",
+        "Jose Blanchet",
+        "Mohsen Bayati"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-06T01:02:30+00:00",
+      "link": "https://arxiv.org/pdf/2607.04574v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "cost-efficient on-policy data augmentation for LLM agent post-training, algorithm improvement",
+      "llm_evidence_cn": "面向LLM智能体后训练的廉价在策略数据增强，属于算法改进",
+      "llm_evidence": "面向LLM智能体后训练的廉价在策略数据增强，属于算法改进",
+      "canonical_evidence": "面向LLM智能体后训练的廉价在策略数据增强，属于算法改进",
+      "llm_tldr_en": "Proposes a budget-allocation view for on-policy data augmentation in LLM agent post-training, outperforming behavioral cloning with same teacher calls.",
+      "llm_tldr_cn": "LLM智能体的监督微调面临训练与测试上下文不匹配问题。本文将教师调用视为预算分配问题，提出在策略数据构造方法，在不增加总教师调用次数下，相比行为克隆显著提升智能体性能。该方法为后训练阶段提供了高效的算法改进。",
+      "llm_tldr": "LLM智能体的监督微调面临训练与测试上下文不匹配问题。本文将教师调用视为预算分配问题，提出在策略数据构造方法，在不增加总教师调用次数下，相比行为克隆显著提升智能体性能。该方法为后训练阶段提供了高效的算法改进。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.07507v1",
+      "source": "arxiv",
+      "title": "HIVE: Understanding Post-Hallucination Reasoning in Vision Language Models",
+      "abstract": "Hallucinations in vision language models (VLMs) are commonly treated as semantic errors, yet they often arise from partial or ambiguous visual evidence. Prior work mainly focuses on detecting or suppressing hallucinations at generation time, leaving the subsequent reasoning stage largely unexplored. In this work, we study Post Hallucination Reasoning (PHR), the stage in which hallucinated semantics enter the model's inference context and influence downstream predictions. To systematically investigate PHR, we introduce HIVE, Hallucination Inference and Verification Engine, an evaluation infrastructure that enables controlled comparisons between faithful and hallucinated captions. Across nine tasks and nine models, we observe structured modality dependent patterns: hallucinated captions often improve accuracy on vision language tasks, while text only tasks exhibit limited or unstable effects. Further analyses show that hallucinated cues broaden semantic coverage and reshape reasoning dynamics while preserving stable inference. These findings highlight that hallucinated semantics may influence downstream reasoning once they enter the model's inference context. Understanding this post hallucination stage is important for improving the reliability and interpretability of multimodal reasoning systems. Code is publicly available at https://github.com/hefengcs/HIVE.",
+      "authors": [
+        "Feng He",
+        "Zhenting Wang",
+        "Qifan Wang",
+        "Qiang Guan",
+        "Dongfang Liu",
+        "Ruixiang Tang",
+        "Qiankun Li"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-07-08T15:02:11+00:00",
+      "link": "https://arxiv.org/pdf/2607.07507v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "studies post-hallucination reasoning in VLMs, relevant to hallucination suppression",
+      "llm_evidence_cn": "研究视觉语言模型中的幻觉后推理，与幻觉抑制相关",
+      "llm_evidence": "研究视觉语言模型中的幻觉后推理，与幻觉抑制相关",
+      "canonical_evidence": "研究视觉语言模型中的幻觉后推理，与幻觉抑制相关",
+      "llm_tldr_en": "Introduces the concept of Post-Hallucination Reasoning (PHR) in VLMs, where hallucinated content enters the inference context. Proposes HIVE evaluation infrastructure to compare faithful and hallucinated captions. Findings reveal structured modality dependencies in downstream reasoning.",
+      "llm_tldr_cn": "针对视觉语言模型中幻觉的后续影响，本文提出了幻觉后推理（PHR）这一概念，即幻觉语义进入推理上下文并影响下游预测。为此设计了HIVE评估框架，通过控制性对比忠实与幻觉描述，在九个任务和九个模型上揭示了下游推理中的模态依赖结构。这项工作为理解幻觉的传播机制和设计抑制策略提供了新视角。",
+      "llm_tldr": "针对视觉语言模型中幻觉的后续影响，本文提出了幻觉后推理（PHR）这一概念，即幻觉语义进入推理上下文并影响下游预测。为此设计了HIVE评估框架，通过控制性对比忠实与幻觉描述，在九个任务和九个模型上揭示了下游推理中的模态依赖结构。这项工作为理解幻觉的传播机制和设计抑制策略提供了新视角。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "biorxiv-10-64898-2026-07-08-736783-v1",
+      "source": "biorxiv",
+      "title": "Interpreting Rewards from Inverse Reinforcement Learning",
+      "abstract": "Inverse reinforcement learning can recover reward functions from observed behavior, but interpreting those rewards remains a fundamental challenge for understanding intelligent behavior and decision-making. To address this challenge, we introduce a novel framework for reward interpretation that combines reward-function analysis, latent mode assignments, and short-history behavioral analysis to infer latent motivations and behavioral dynamics. As a proof-of-concept, we instantiated the framework using switching inverse reinforcement learning on a large-scale dataset of multi-agent social interactions. Our framework interpreted the learned latent modes as \"cautious\" and \"volatile\" motivational profiles, demonstrating that recovered reward functions can reveal distinct patterns of behavioral dynamics. More broadly, these findings suggest that the proposed framework provides a promising approach for reverse-engineering and interpreting latent rewards underlying intelligent behavior and decision-making.",
+      "authors": [
+        "Chow, J.",
+        "Yang, Y.",
+        "Laschowski, B."
+      ],
+      "primary_category": "neuroscience",
+      "categories": [
+        "neuroscience"
+      ],
+      "published": "2026-07-13T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.07.08.736783v1.full.pdf",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Reward interpretation in inverse RL, relevant to RLHF reward modeling",
+      "llm_evidence_cn": "逆强化学习中的奖励解释，直接关联RLHF奖励建模",
+      "llm_evidence": "逆强化学习中的奖励解释，直接关联RLHF奖励建模",
+      "canonical_evidence": "逆强化学习中的奖励解释，直接关联RLHF奖励建模",
+      "llm_tldr_en": "This paper introduces a novel framework for interpreting rewards from inverse reinforcement learning, combining reward-function analysis with behavioral dynamics to infer latent motivations, directly relevant to reward modeling in RLHF.",
+      "llm_tldr_cn": "逆强化学习虽能恢复奖励函数，但解释奖励仍是理解智能决策的挑战。本文提出一个结合奖励函数分析、潜在模式分配和短历史行为分析的奖励解释框架，用于推断潜在动机和行为动态。在大型多智能体社交互动数据集上，该框架将习得的潜在模式解释为“谨慎”和“易变”动机剖面，证明了恢复的奖励函数能揭示不同行为模式。这项工作为RLHF中的奖励建模提供了可解释性方法论支持。",
+      "llm_tldr": "逆强化学习虽能恢复奖励函数，但解释奖励仍是理解智能决策的挑战。本文提出一个结合奖励函数分析、潜在模式分配和短历史行为分析的奖励解释框架，用于推断潜在动机和行为动态。在大型多智能体社交互动数据集上，该框架将习得的潜在模式解释为“谨慎”和“易变”动机剖面，证明了恢复的奖励函数能揭示不同行为模式。这项工作为RLHF中的奖励建模提供了可解释性方法论支持。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.09015v1",
+      "source": "arxiv",
+      "title": "Correlation-Aware Contextual Bandits with Surrogate Rewards for LLM Routing",
+      "abstract": "We study contextual bandit problems with correlated arms and access to surrogate reward signals produced by a machine learning model, motivated by applications such as large language model (LLM) routing. Unlike classical contextual bandits that rely solely on bandit feedback and assume conditional independence across arms, our setting allows context-dependent inter-arm correlations and auxiliary reward information that may be noisy or misspecified. We propose algorithms that leverage such surrogate rewards through two complementary designs. A coupled reward-mixing approach pools true and surrogate rewards to accelerate learning when surrogate signals are reliable, while a decoupled prediction-mixing approach maintains separate estimators for bandit feedback and surrogate rewards and adaptively combines their predictions. This decoupling yields robustness to surrogate misspecification, recovering regret guarantees comparable to reward-only bandit methods in the worst case, while achieving improved regret when surrogate predictions are sufficiently informative. We provide theoretical regret analyses for both approaches and evaluate them on LLM routing benchmarks under varying accuracy versus cost trade-offs. The results demonstrate improved sample efficiency and consistently better accuracy-cost trade-offs compared to standard contextual bandit baselines and strong static routing methods.",
+      "authors": [
+        "Ajay Narayanan Sridhar",
+        "Ronak Singh",
+        "Mehrdad Mahdavi",
+        "Vijaykrishnan Narayanan"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-10T00:42:10+00:00",
+      "link": "https://arxiv.org/pdf/2607.09015v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "surrogate reward signals for LLM routing with contextual bandits",
+      "llm_evidence_cn": "基于上下文bandit的LLM路由代理奖励信号",
+      "llm_evidence": "基于上下文bandit的LLM路由代理奖励信号",
+      "canonical_evidence": "基于上下文bandit的LLM路由代理奖励信号",
+      "llm_tldr_en": "Addresses contextual bandit with correlated arms and surrogate rewards for LLM routing, proposing coupled and decoupled mixing methods that accelerate learning using proxy reward signals.",
+      "llm_tldr_cn": "在LLM路由场景中，不同LLM的响应相关且可获取代理奖励。本文提出上下文bandit算法，通过耦合或解耦的方式整合真实奖励与代理奖励，在保持理论保证的同时加速学习。该工作涉及奖励建模和算法改进，与偏好学习中的奖励设计有方法上的桥梁作用。",
+      "llm_tldr": "在LLM路由场景中，不同LLM的响应相关且可获取代理奖励。本文提出上下文bandit算法，通过耦合或解耦的方式整合真实奖励与代理奖励，在保持理论保证的同时加速学习。该工作涉及奖励建模和算法改进，与偏好学习中的奖励设计有方法上的桥梁作用。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.05764v1",
+      "source": "arxiv",
+      "title": "Inject or Navigate? Token-Efficient Retrieval for LLM Analysis of Transactional Legal Documents",
+      "abstract": "Answering questions over a set of transactional legal documents is most simply done by injecting the whole corpus into the LLM's context window on every query. That baseline maximises retrieval recall, but its token footprint scales with the corpus rather than the question, and long-context degradation scales with it. We report what it took to replace full-corpus injection in a legal-document analysis system, comparing it against two structured retrieval modes over our proprietary structure-aware chunking: embedding retrieval (NAVEMBED) and LLM navigation over a compact structured index (NAVINDEX). On a 20-question benchmark with verified ground-truth answers, a position-bias-controlled, reference-anchored pairwise judge scored semantic retrieval with reranking tied with injection on 16 of 18 document-bound questions (injection preferred on 2) while attending to 17.3x fewer input tokens (a general-text-embedding (GTE) configuration reaches 29.9x at a lower tie rate); both modes were judged tied on the 2 out-of-scope controls. NAVINDEX was judged tied on all 18 at a 1.61x smaller total token footprint, a ~56x smaller answering context, and 25% lower dollar cost. We derive a closed-form caching-crossover rule: cached injection is cheaper in dollars only while the corpus stays below roughly ten times the retrieval payload. Scope and uncertainty are quantified in Section 8.",
+      "authors": [
+        "Mahmoud Hany",
+        "Mourad ElSheraey",
+        "Mahmoud Said",
+        "Peter Naoum"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.IR"
+      ],
+      "published": "2026-07-07T02:42:06+00:00",
+      "link": "https://arxiv.org/pdf/2607.05764v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Proposes token-efficient retrieval algorithms for LLM document analysis, an algorithmic improvement",
+      "llm_evidence_cn": "提出了面向LLM文档分析的token高效检索算法，属于算法改进",
+      "llm_evidence": "提出了面向LLM文档分析的token高效检索算法，属于算法改进",
+      "canonical_evidence": "提出了面向LLM文档分析的token高效检索算法，属于算法改进",
+      "llm_tldr_en": "Compares full-corpus injection vs structured retrieval for legal document analysis, showing that NAVINDEX achieves better token efficiency while maintaining accuracy.",
+      "llm_tldr_cn": "针对法律文档分析中LLM上下文注入的token开销问题，提出两种结构化检索模式NAVEMBED和NAVINDEX，通过结构感知分块和紧凑索引实现token高效检索。实验表明，NAVINDEX在保持准确率的同时大幅降低token消耗，为长文档分析提供了实用算法改进。",
+      "llm_tldr": "针对法律文档分析中LLM上下文注入的token开销问题，提出两种结构化检索模式NAVEMBED和NAVINDEX，通过结构感知分块和紧凑索引实现token高效检索。实验表明，NAVINDEX在保持准确率的同时大幅降低token消耗，为长文档分析提供了实用算法改进。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.05804v1",
+      "source": "arxiv",
+      "title": "TurnOPD: Making On-Policy Distillation Turn-Aware for Efficient Long-Horizon Agent Training",
+      "abstract": "On-policy distillation (OPD) trains a student policy by matching a stronger teacher on the student's own trajectories, offering a promising framework for language agent training. However, its application to long-horizon agentic tasks remains insufficiently explored. We identify two key inefficiencies in vanilla agent OPD: (1) full-horizon rollouts often waste wall-clock resources on tail turns that provide weak and noisy KL supervision, and (2) trajectory-level KL objectives concentrate most of the loss on shallow tokens, leaving deeper decision turns under-trained once initial behaviors are aligned. To address these challenges, we propose TurnOPD, a turn-level budgeting strategy for efficient on-policy distillation of long-horizon agents. TurnOPD consists of two budget controllers: adaptive rollout-depth budgeting, which uses probe-based turn statistics to determine rollout length, and progressive turn-normalized loss budgeting, which gradually shifts KL weighting from token-level to turn-balanced supervision. Experiments on ALFWorld, WebShop, and Multi-Hop Search with task-specialized teacher models show that TurnOPD achieves superior validation accuracy under equal wall-clock training budgets and advances the accuracy--time frontier beyond vanilla OPD.",
+      "authors": [
+        "Yuhang Zhou",
+        "Kai Zheng",
+        "Haoling Li",
+        "Dengyun Peng",
+        "Can Xu",
+        "Jingjing Chen"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-07-07T03:56:35+00:00",
+      "link": "https://arxiv.org/pdf/2607.05804v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Improves on-policy distillation for long-horizon agent training, a post-training technique",
+      "llm_evidence_cn": "改进长程智能体训练中的在策略蒸馏，属于后训练技术",
+      "llm_evidence": "改进长程智能体训练中的在策略蒸馏，属于后训练技术",
+      "canonical_evidence": "改进长程智能体训练中的在策略蒸馏，属于后训练技术",
+      "llm_tldr_en": "TurnOPD introduces turn-level budgeting to make on-policy distillation efficient for long-horizon language agent tasks.",
+      "llm_tldr_cn": "当前基于在策略蒸馏的智能体训练在长程任务中效率低下：全轨迹 rollout 在末端回合浪费资源，且轨迹级KL目标过度关注浅层token。本文提出 TurnOPD，一个回合级预算策略，为较深决策回合分配更多监督，从而高效蒸馏长程能力。实验验证了其在长程任务上的有效性。",
+      "llm_tldr": "当前基于在策略蒸馏的智能体训练在长程任务中效率低下：全轨迹 rollout 在末端回合浪费资源，且轨迹级KL目标过度关注浅层token。本文提出 TurnOPD，一个回合级预算策略，为较深决策回合分配更多监督，从而高效蒸馏长程能力。实验验证了其在长程任务上的有效性。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.07548v1",
+      "source": "arxiv",
+      "title": "Think Big, Search Small: Where Capacity Matters in Hierarchical Search Agents?",
+      "abstract": "Large language model based search agents increasingly adopt multi-agent architectures in which a main agent decomposes a complex question into sub-queries and dispatches them to parallel sub-agents. However, existing systems instantiate all roles from a single model of identical scale, leaving open how model capacity should be distributed across roles. We factorize hierarchical search into three roles: a delegation role responsible for task decomposition, an execution role responsible for retrieval and evidence extraction, and an answer generation role held fixed as a confound control. We then conduct controlled capacity sweeps along the delegation and execution axes on five multi-hop QA benchmarks. The experiments yield three findings. First, role factorization consistently outperforms a single-agent baseline, improving exact match from 4.5 to 8.6 points across six model scales. Second, capacity sensitivity is asymmetric: scaling the delegation backbone improves EM by ~11 points, whereas scaling the execution sub-agent moves EM by only ~2.6 points, identifying decomposition as the capability bottleneck. Third, a 1.7B-parameter executor trained via quality-filtered trajectory distillation matches a frontier sub-agent in accuracy while consuming 37% fewer sub-agent tokens, advancing the Pareto frontier. These results suggest a concrete recipe for building hierarchical search agents: concentrate capacity at delegation and downsize execution without sacrificing accuracy. Our code is available at https://github.com/QinnanCai0115/role-factorized-search.",
+      "authors": [
+        "Qinnan Cai",
+        "Yibo Zhao",
+        "Xiang Li"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-08T15:46:48+00:00",
+      "link": "https://arxiv.org/pdf/2607.07548v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "multi-agent LLM search agents, capacity allocation",
+      "llm_evidence_cn": "多智能体LLM搜索代理，容量分配",
+      "llm_evidence": "多智能体LLM搜索代理，容量分配",
+      "canonical_evidence": "多智能体LLM搜索代理，容量分配",
+      "llm_tldr_en": "Studies how to allocate model capacity among roles in hierarchical LLM search agents, finding that delegation role benefits from larger models while execution role can be smaller. Provides insights for algorithm improvements.",
+      "llm_tldr_cn": "该研究探讨了分层LLM搜索代理中角色间的容量分配问题。通过将搜索过程分解为委托、执行和答案生成三个角色，并在多跳问答基准上进行容量扫描实验，发现委托角色受益于更大的模型容量，而执行角色可以使用较小模型。结果为后训练阶段的架构优化和算法改进提供了指导，属于大语言模型后训练主题下的方法论贡献。",
+      "llm_tldr": "该研究探讨了分层LLM搜索代理中角色间的容量分配问题。通过将搜索过程分解为委托、执行和答案生成三个角色，并在多跳问答基准上进行容量扫描实验，发现委托角色受益于更大的模型容量，而执行角色可以使用较小模型。结果为后训练阶段的架构优化和算法改进提供了指导，属于大语言模型后训练主题下的方法论贡献。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
