@@ -1,0 +1,630 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-15T21:30:54.312339+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 8,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 10,
+    "quick_skim_target": 11,
+    "quick_selected": 10
+  },
+  "deep_dive": [
+    {
+      "id": "2607.10151v1",
+      "source": "arxiv",
+      "title": "MC-RAG System: A Structure-Driven RAG System for Multi-Constraint Queries",
+      "abstract": "Retrieval-Augmented Generation (RAG) systems are widely adopted in question answering, yet they often fail to satisfy complex multi-constraint queries, leading to constraint violations, factual inconsistencies, or hallucinations. We present Structure-Driven RAG System for Multi-Constraint Queries(MC-RAG), a structure-driven RAG system that reformulates retrieval as a subgraph matching problem over a knowledge graph. By integrating semantic and structural embeddings with path-level indexing, MC-RAG performs interpretable, structure-aware, and constraint-consistent retrieval and generation. During the demonstration, participants can input medical or encyclopedic multi-constraint queries, visualize how the system parses constraints, performs structural matching, and generates answers, thereby experiencing an end-to-end, interactive, and explainable RAG pipeline. A demo video is available at https://youtu.be/J8kahzmAnu0.",
+      "authors": [
+        "Xiao Zhang",
+        "Yang Wan",
+        "Yi Li",
+        "Miao Xie",
+        "Chunli Lv"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR"
+      ],
+      "published": "2026-07-11T06:20:38+00:00",
+      "link": "https://arxiv.org/pdf/2607.10151v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "reduces hallucinations in RAG for multi-constraint queries via structured retrieval",
+      "llm_evidence_cn": "通过结构化检索减少多约束查询中的幻觉",
+      "llm_evidence": "通过结构化检索减少多约束查询中的幻觉",
+      "canonical_evidence": "通过结构化检索减少多约束查询中的幻觉",
+      "llm_tldr_en": "MC-RAG reformulates retrieval as subgraph matching over knowledge graphs to overcome hallucinations and constraint violations in complex queries.",
+      "llm_tldr_cn": "该论文针对RAG系统在处理多约束查询时出现约束违反和幻觉的问题，提出MC-RAG，将检索重构为知识图上的子图匹配。通过集成语义与结构嵌入以及路径级索引，系统实现了可解释、结构感知且约束一致的检索与生成。演示表明MC-RAG在医疗和百科查询中有效减少幻觉。该工作为幻觉抑制提供了结构化方法。",
+      "llm_tldr": "该论文针对RAG系统在处理多约束查询时出现约束违反和幻觉的问题，提出MC-RAG，将检索重构为知识图上的子图匹配。通过集成语义与结构嵌入以及路径级索引，系统实现了可解释、结构感知且约束一致的检索与生成。演示表明MC-RAG在医疗和百科查询中有效减少幻觉。该工作为幻觉抑制提供了结构化方法。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.10555v1",
+      "source": "arxiv",
+      "title": "Tool-Adaptive LLM Reranker",
+      "abstract": "Generative Large Language Models (LLMs) have revolutionized information retrieval, yet their strictly parametric nature frequently leads to severe factual hallucinations when confronted with complex queries beyond their epistemic boundaries. While external tool-calling can mitigate this, indiscriminately invoking search tools for every document during reranking incurs prohibitive latency overheads, creating an intractable accuracy-efficiency dilemma. To address this challenge, we propose TALRanker, a novel framework that formalizes pointwise relevance scoring as an agentic Markov decision process. We optimize it via a two-stage training paradigm. An initial warm-up utilizes a language-preserving hybrid loss to prevent the catastrophic forgetting of native generative capacities. Subsequently, an asymmetric cost-aware reward equipped in reinforcement learning forces the policy to autonomously bypass tools for maximum efficiency when confident, while selectively retrieving external evidence to avert severe hallucination penalties when uncertain. Extensive evaluations demonstrate that TALRanker achieves state-of-the-art performance across standard and reasoning-intensive retrieval benchmarks, matching throughput with pointwise rerankers while outperforming parameter-heavy reasoning models.",
+      "authors": [
+        "Zichuan Liu",
+        "Ruijin Hua"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-07-12T04:04:59+00:00",
+      "link": "https://arxiv.org/pdf/2607.10555v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "factual hallucination suppression in LLM reranking",
+      "llm_evidence_cn": "LLM重排序中的事实幻觉抑制",
+      "llm_evidence": "LLM重排序中的事实幻觉抑制",
+      "canonical_evidence": "LLM重排序中的事实幻觉抑制",
+      "llm_tldr_en": "Proposes TALRanker, an adaptive tool-calling framework for LLM reranking that mitigates factual hallucinations via a two-stage training with language-preserving loss and RL optimization.",
+      "llm_tldr_cn": "该论文针对大语言模型在重排序中因严格参数化导致事实幻觉的问题，提出了TALRanker框架。该框架将相关性评分形式化为马尔可夫决策过程，并通过两阶段训练（语言保留混合损失预热和强化学习优化）自适应调用外部工具来减少幻觉。实验表明，TALRanker在准确性和效率之间取得了良好平衡，显著降低了重排序中的事实错误。",
+      "llm_tldr": "该论文针对大语言模型在重排序中因严格参数化导致事实幻觉的问题，提出了TALRanker框架。该框架将相关性评分形式化为马尔可夫决策过程，并通过两阶段训练（语言保留混合损失预热和强化学习优化）自适应调用外部工具来减少幻觉。实验表明，TALRanker在准确性和效率之间取得了良好平衡，显著降低了重排序中的事实错误。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.10601v1",
+      "source": "arxiv",
+      "title": "Agentic-DPO: From Imitation to Agentic Policy Optimization on Expert Trajectories",
+      "abstract": "Large Language Model (LLM) agents are commonly trained from expert trajectories using supervised fine-tuning (SFT), which treats multi-turn agent behavior as ordinary text imitation. This recipe is simple and low-cost, but it only learns to imitate the sequence of expert actions, rather than training the agent to choose the right action against plausible mistakes at each state. Existing methods to mitigate this problem include preference learning or reinforcement learning, but they usually need high-cost environment rollouts and reward models. We propose Agentic-DPO, a lightweight offline agent policy optimization method that turns expert trajectories into state-conditioned preference supervision. At each expert action state, Agentic-DPO samples a one-step action from the current state, treats plausible wrong actions as negatives, and contrasts them with the expert action using a DPO-style preference objective. To avoid mixing both policy and schema in preference learning, we introduce Policy-Preserving Augmentation (PPA), which renders the same latent trajectory under multiple schemas while keeping the expert policy fixed. Agentic-DPO requires no online environment rollout, reward model, or full-trajectory student exploration. We conduct experiments across StableToolBench, tau-bench retail, and Mind2Web, where Agentic-DPO consistently improves agents at different model scales beyond imitation. In particular, it raises tau-bench accuracy from 21.7% (SFT) to 41.4% for a 9B model, matching online GRPO under the same backbone with only step-level rollouts and without environment interaction during gradient steps. The results suggest that expert trajectories can support low-cost agentic policy optimization when converted from demonstrations into state-level action preferences. Code for Agentic-DPO is released at https://github.com/Schuture/Agentic-DPO.",
+      "authors": [
+        "Yixiong Chen",
+        "Alan Yuille"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-12T06:38:55+00:00",
+      "link": "https://arxiv.org/pdf/2607.10601v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "offline preference optimization for LLM agents, related to reward modeling from human feedback",
+      "llm_evidence_cn": "面向智能体的离线偏好优化，与基于人类反馈的奖励建模相关",
+      "llm_evidence": "面向智能体的离线偏好优化，与基于人类反馈的奖励建模相关",
+      "canonical_evidence": "面向智能体的离线偏好优化，与基于人类反馈的奖励建模相关",
+      "llm_tldr_en": "Agentic-DPO turns expert trajectories into state-conditioned preference supervision for offline agent policy optimization, eliminating need for environment rollouts and reward models.",
+      "llm_tldr_cn": "该论文针对LLM智能体训练中从专家轨迹模仿学习无法区分正确与错误动作的问题，提出Agentic-DPO，将专家轨迹转化为状态条件偏好监督。方法无需环境交互和奖励模型，仅通过离线数据即可优化策略。实验证明在多个Agent任务上，Agentic-DPO优于SFT和在线RL方法。该工作为LLM后训练中的偏好学习提供了高效替代方案。",
+      "llm_tldr": "该论文针对LLM智能体训练中从专家轨迹模仿学习无法区分正确与错误动作的问题，提出Agentic-DPO，将专家轨迹转化为状态条件偏好监督。方法无需环境交互和奖励模型，仅通过离线数据即可优化策略。实验证明在多个Agent任务上，Agentic-DPO优于SFT和在线RL方法。该工作为LLM后训练中的偏好学习提供了高效替代方案。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.12466v1",
+      "source": "arxiv",
+      "title": "Deployable Human Preference Alignment in Robotics: Learning Representative Rewards from Diverse Human Preferences",
+      "abstract": "Aligning robot policies with human preferences is essential for deployment to diverse end users. In per-user alignment approach, preference feedback is often sparse, so learning becomes unstable and vulnerable to human preference noise, and a growing number of individualized policies makes validation difficult before deployment. A single shared policy approach to user alignment avoids this cost but fails to capture heterogeneous preferences and often neglects minority preferences. To address these challenges, we introduce Preference-based REward Clustering (PREC), a novel framework that learns a compact set of policies from binary preference labels provided by diverse users. From a dataset of user trajectories and their preference labels, PREC first sets the labels aside and aggregates trajectories across users to learn a population-level shared trajectory encoder, alleviating limited per-user coverage and avoiding label noise during representation learning. Using this representation, PREC jointly assigns users to preference-coherent clusters and learns a representative reward model per cluster using preference labels, from which a policy is optimized for each cluster. Clustering similar users compensates for the limited number of labels available from each user and mitigates the effect of label noise. At the same time, maintaining a manageable number of reward models reduces the validation burden at deployment. Experiments across diverse simulated locomotion environments show that PREC groups users who label different trajectory subsets into preference-coherent clusters more accurately than baseline methods. Under sparse and noisy feedback, policies trained with PREC improve all three social welfare metrics over an existing single shared-policy user-alignment approach and even outperform per-user alignment approaches.",
+      "authors": [
+        "Taehyung Kim",
+        "Gwangmo Lee",
+        "Minjun Chang",
+        "Sunghyun Lim",
+        "Jongeun Choi"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-07-14T07:50:43+00:00",
+      "link": "https://arxiv.org/pdf/2607.12466v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "human preference reward modeling",
+      "llm_evidence_cn": "人类偏好奖励建模",
+      "llm_evidence": "人类偏好奖励建模",
+      "canonical_evidence": "人类偏好奖励建模",
+      "llm_tldr_en": "Proposes PREC, a framework that learns representative reward functions from diverse human preferences for robot policy alignment, addressing sparse feedback and heterogeneous preferences.",
+      "llm_tldr_cn": "该论文针对机器人策略对齐中人类偏好反馈稀疏且异质的问题，提出了基于偏好奖励聚类的PREC框架。PREC从不同用户的二元偏好标签中学习一组紧凑的策略，能够更好地兼顾多数和少数偏好。实验表明该方法在多种偏好场景下表现稳健，为实际部署提供了可扩展的偏好对齐方案。",
+      "llm_tldr": "该论文针对机器人策略对齐中人类偏好反馈稀疏且异质的问题，提出了基于偏好奖励聚类的PREC框架。PREC从不同用户的二元偏好标签中学习一组紧凑的策略，能够更好地兼顾多数和少数偏好。实验表明该方法在多种偏好场景下表现稳健，为实际部署提供了可扩展的偏好对齐方案。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.10848v1",
+      "source": "arxiv",
+      "title": "Predictive Divergence Masks for LLM RL",
+      "abstract": "Reinforcement learning for large language models (LLMs) typically relies on trust-region masks to stabilize off-policy updates. The dominant PPO-style approach uses the sampled-token importance ratio for two criteria: a proximity criterion, which asks whether the policy has moved too far from the behavior policy, and a direction criterion, which asks whether the update pushes it farther away. Recent work DPPO improves the proximity criterion by replacing PPO's ratio-based test with a probability divergence between the behavior and training policies. However, its direction criterion is still inherited from PPO. A token can be masked only when the sampled-token importance ratio moves away from one. We observe that this ratio-based direction criterion is a single-sample proxy that can disagree in sign with the change of the divergence that defines the proximity criterion. We therefore propose the predictive divergence mask, which asks whether the next policy-gradient step will increase or decrease the same divergence used by the trust region. For the discrete softmax policies used in LLM RL, we derive this prediction in closed form. Because production rollout engines expose only a truncated (top-K) view of the vocabulary, we develop two lightweight top-$K$ estimators for this prediction. Detailed analysis shows the divergence-based direction is better aligned with the realized change of the divergence than the sampled ratio, and the resulting masks improve RL training across model scales and precision settings.",
+      "authors": [
+        "Xiangxin Zhou",
+        "Jiarui Yao",
+        "Penghui Qi",
+        "Bowen Ping",
+        "Jiaqi Tang",
+        "Haonan Wang",
+        "Tianyu Pang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-12T17:20:44+00:00",
+      "link": "https://arxiv.org/pdf/2607.10848v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "improves PPO direction criterion with divergence masks",
+      "llm_evidence_cn": "使用发散掩码改进PPO方向标准",
+      "llm_evidence": "使用发散掩码改进PPO方向标准",
+      "canonical_evidence": "使用发散掩码改进PPO方向标准",
+      "llm_tldr_en": "Proposes predictive divergence masks to fix PPO's single-sample ratio-based direction criterion, improving trust-region update stability for LLM RL.",
+      "llm_tldr_cn": "该论文针对LLM强化学习中PPO方向标准依赖单样本重要性比率的缺陷，提出预测性发散掩码。通过概率发散替代比率测试，方法能更稳定地控制策略更新。实验表明新掩码在多个RL任务上超越现有方法。该工作为LLM后训练中的信任区域方法提供了算法改进。",
+      "llm_tldr": "该论文针对LLM强化学习中PPO方向标准依赖单样本重要性比率的缺陷，提出预测性发散掩码。通过概率发散替代比率测试，方法能更稳定地控制策略更新。实验表明新掩码在多个RL任务上超越现有方法。该工作为LLM后训练中的信任区域方法提供了算法改进。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.11267v1",
+      "source": "arxiv",
+      "title": "Enhancing LLMs through human feedback: a journey towards self-improvement",
+      "abstract": "In the rapidly evolving landscape of information retrieval systems, the ability to adapt and improve through user feedback is paramount. This study introduces a novel methodology for refining the performance of a primary Retrieval Augmented Generation (RAG) system by strategically integrating an auxiliary feedback RAG system. By systematically harnessing human-generated feedback, the approach aims to enhance the accuracy, relevance, and overall quality of responses, driving the system towards self-improvement. Central to this methodology is a human-in-the-loop implementation, where user feedback is continuously collected, classified, and integrated into the inference workflow, enabling the system to learn and evolve iteratively. To validate the effectiveness of this approach, the study employs rigorous testing against three diverse benchmark datasets focused on general and custom domain knowledge, utilizing a LLM-as-a-Judge evaluation strategy. This comprehensive framework not only underscores the transformative potential of feedback-driven enhancements in RAG systems but also sets a precedent for future research in adaptive information retrieval technologies, marking a significant step in the journey towards autonomous refinement and optimization through user engagement.",
+      "authors": [
+        "Tatiana Pelc",
+        "Gila Kamhi",
+        "Asaf Avrahamy",
+        "Adi Fledel-Alon"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-07-13T08:51:08+00:00",
+      "link": "https://arxiv.org/pdf/2607.11267v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "human feedback-based LLM self-improvement with auxiliary RAG system",
+      "llm_evidence_cn": "基于人类反馈的LLM自我改进与辅助RAG系统",
+      "llm_evidence": "基于人类反馈的LLM自我改进与辅助RAG系统",
+      "canonical_evidence": "基于人类反馈的LLM自我改进与辅助RAG系统",
+      "llm_tldr_en": "Introduces a human-in-the-loop methodology integrating an auxiliary feedback RAG system to iteratively collect and integrate human feedback for LLM self-improvement, enhancing accuracy and relevance.",
+      "llm_tldr_cn": "该论文针对LLM在信息检索系统中缺乏自适应改进能力的问题，提出一种结合辅助反馈RAG系统的人机协作方法。通过持续收集、分类和整合人类反馈，使主RAG系统能够迭代学习和进化，实现自我改进。核心在于人机循环实现，将用户反馈融入推理工作流。实验验证该方法显著提升了响应的准确性和相关性，为LLM自我优化提供了实用范式。",
+      "llm_tldr": "该论文针对LLM在信息检索系统中缺乏自适应改进能力的问题，提出一种结合辅助反馈RAG系统的人机协作方法。通过持续收集、分类和整合人类反馈，使主RAG系统能够迭代学习和进化，实现自我改进。核心在于人机循环实现，将用户反馈融入推理工作流。实验验证该方法显著提升了响应的准确性和相关性，为LLM自我优化提供了实用范式。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.11432v1",
+      "source": "arxiv",
+      "title": "Generalizing Preference-based Reinforcement Learning: a Rationality Model for Incomparability",
+      "abstract": "In this work, we study the reinforcement learning (RL) problem from pairwise trajectory comparisons provided by a human expert. We generalize preference-based RL by formalizing a novel setting in which the expert can also label trajectory pairs as incomparable, i.e., when neither trajectory dominates the other. We introduce the learning problem and the desiderata that its solution should satisfy. Then, we propose a novel Bradley-Terry-inspired rationality model that effectively captures incomparabilities and infers a multi-dimensional reward function, and we study its properties. We provide a sample complexity analysis for learning the model parameters when a dataset is available. Finally, we evaluate our model's ability to reconstruct a reward function that aligns with the expert's comparisons in simulated environments and to recover the Pareto frontier of policies, along with a robustness analysis across varying levels of expert rationality.",
+      "authors": [
+        "Simone Drago",
+        "Marco Mussi",
+        "Leonardo Bianconi",
+        "Alberto Maria Metelli"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-13T11:37:27+00:00",
+      "link": "https://arxiv.org/pdf/2607.11432v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "generalizes preference-based RL with incomparability modeling via Bradley-Terry-based multi-dimensional reward",
+      "llm_evidence_cn": "通过基于Bradley-Terry的多维奖励建模泛化基于偏好的强化学习，处理不可比性",
+      "llm_evidence": "通过基于Bradley-Terry的多维奖励建模泛化基于偏好的强化学习，处理不可比性",
+      "canonical_evidence": "通过基于Bradley-Terry的多维奖励建模泛化基于偏好的强化学习，处理不可比性",
+      "llm_tldr_en": "Proposes a rationality model for preference-based RL that handles incomparable trajectory pairs, infers multi-dimensional reward, and provides sample complexity analysis, directly advancing RLHF reward modeling.",
+      "llm_tldr_cn": "本文针对基于偏好的强化学习中专家可能标注不可比轨迹对的情况，提出一种新的理性模型。该模型基于Bradley-Terry框架扩展，能够有效捕捉不可比性并推断多维奖励函数。作者提供了样本复杂度分析，并验证了模型在恢复真实偏好和奖励函数方面的能力。这项工作直接推进了RLHF中的奖励建模方法，为处理现实世界中模棱两可的偏好提供了理论支撑。",
+      "llm_tldr": "本文针对基于偏好的强化学习中专家可能标注不可比轨迹对的情况，提出一种新的理性模型。该模型基于Bradley-Terry框架扩展，能够有效捕捉不可比性并推断多维奖励函数。作者提供了样本复杂度分析，并验证了模型在恢复真实偏好和奖励函数方面的能力。这项工作直接推进了RLHF中的奖励建模方法，为处理现实世界中模棱两可的偏好提供了理论支撑。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.11207v1",
+      "source": "arxiv",
+      "title": "ProgramTab: Boosting Table Reasoning of LLMs via Programmatic Paradigm",
+      "abstract": "Table-based reasoning with large language models (LLMs), which requires reasoning based on natural language questions and structured tabular data, has gained widespread attention. However, a series of issues still constrain the application of this task. The previous approaches suffered from significant performance degradation when faced with large tables due to the difficulty of long text modeling and the limitation of input length for LLMs. The text-to-SQL approach is used to efficiently extract key information from tables and generate smaller sub-tables. However, tabular data, especially web tables, often lack the necessary structure and consistency, making them unsuitable for performing mathematical logic operations using SQL queries. We propose the ProgramTab framework, which guides LLMs employing in-context learning to perform tabular data preprocessing with Python code, as well as the momentous contents extraction with row and column extraction and SQL generation. The experiment results on table reasoning datasets demonstrate that the ProgramTab framework effectively deals with table-based reasoning tasks and outperforms all LLM-based baselines.",
+      "authors": [
+        "Pei Guo",
+        "Enjie Liu",
+        "Yunzhi Tan",
+        "Mochi Gao",
+        "Jianxin Zhang",
+        "Ruichao Zhong",
+        "Juntao Li",
+        "Bo Hu",
+        "Zang Li"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-07-13T07:58:57+00:00",
+      "link": "https://arxiv.org/pdf/2607.11207v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Algorithm improvement for LLM table reasoning via programmatic paradigm",
+      "llm_evidence_cn": "通过编程范式增强LLM表格推理的算法改进",
+      "llm_evidence": "通过编程范式增强LLM表格推理的算法改进",
+      "canonical_evidence": "通过编程范式增强LLM表格推理的算法改进",
+      "llm_tldr_en": "ProgramTab proposes a programmatic paradigm for LLM table reasoning, generating code instead of SQL to handle unstructured web tables, achieving significant improvements over baselines and offering a new algorithmic improvement for LLMs.",
+      "llm_tldr_cn": "表格推理是大语言模型的重要能力，但现有方法在大型非结构化表格上表现不佳。本文提出ProgramTab框架，采用编程范式（生成代码）替代传统的文本到SQL方法，以更好地处理缺乏结构的Web表格。实验表明，ProgramTab在多个基准上显著优于现有方法。该工作为LLM表格推理提供了新的算法改进方向。",
+      "llm_tldr": "表格推理是大语言模型的重要能力，但现有方法在大型非结构化表格上表现不佳。本文提出ProgramTab框架，采用编程范式（生成代码）替代传统的文本到SQL方法，以更好地处理缺乏结构的Web表格。实验表明，ProgramTab在多个基准上显著优于现有方法。该工作为LLM表格推理提供了新的算法改进方向。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.10911v1",
+      "source": "arxiv",
+      "title": "The Nuts and Bolts of Natural Language to SQL Translation: A Systematic Analysis of Model Pipeline Optimisation Approaches and their Interactions",
+      "abstract": "In the age of large language models, Natural Language to SQL (NL2SQL) translation remains an open problem with many useful applications. We explore interactions between several NL2SQL pipeline extensions to inspire development of more lightweight models. Specifically, we integrate the NatSQL intermediate representation, include a preprocessing step and a fine-tuning step based on synthetic data, and develop a novel reranker model to improve SQL selection in the final beam. We perform an ablation study supplemented by a Shapley analysis of these different components integrated with two backbone architectures, SmBoP and RASAT. We find that simply combining all of them does not lead to best results, but that their impact depends on their interactions with the baseline system, as well as each other.",
+      "authors": [
+        "Filip Klubicka",
+        "Vasudevan Nedumpozhimana",
+        "Sneha Rautmare",
+        "Bora Caglayan",
+        "Mingxue Wang",
+        "John D. Kelleher"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI",
+        "cs.DB"
+      ],
+      "published": "2026-07-12T20:30:50+00:00",
+      "link": "https://arxiv.org/pdf/2607.10911v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "systematic analysis of NL2SQL pipeline optimization approaches",
+      "llm_evidence_cn": "自然语言转SQL管道优化的系统分析",
+      "llm_evidence": "自然语言转SQL管道优化的系统分析",
+      "canonical_evidence": "自然语言转SQL管道优化的系统分析",
+      "llm_tldr_en": "Integrates NatSQL, preprocessing, synthetic fine-tuning, and a reranker for NL2SQL; ablation and Shapley analysis reveal component interactions.",
+      "llm_tldr_cn": "本文针对自然语言转SQL（NL2SQL）翻译问题，系统分析了多种管道扩展方法的交互作用。通过集成NatSQL中间表示、预处理、基于合成数据的微调以及新型重排模型，并对两个骨干架构进行消融和Shapley分析，发现简单组合所有组件并不总能带来最优提升。研究为开发更轻量级的NL2SQL模型提供了指导。",
+      "llm_tldr": "本文针对自然语言转SQL（NL2SQL）翻译问题，系统分析了多种管道扩展方法的交互作用。通过集成NatSQL中间表示、预处理、基于合成数据的微调以及新型重排模型，并对两个骨干架构进行消融和Shapley分析，发现简单组合所有组件并不总能带来最优提升。研究为开发更轻量级的NL2SQL模型提供了指导。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "servey",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-07-08-737358-v1",
+      "source": "biorxiv",
+      "title": "EcoXAI: Autonomous Agentic Ecosystem for Explainable Artificial Intelligence and Biomedical Discovery",
+      "abstract": "MotivationAs biomedical datasets and knowledge graphs continue to grow in size, complexity, and heterogeneity, navigating and extracting actionable insights from them presents a major bottleneck for researchers. There is a clear need for autonomous analytical solutions that can utilize recent advancements in agentic AI such as agent harnessing and loop engineering without introducing hallucination or workflow fragmentation. Researchers, regardless of technical expertise, need tools that streamline complex data analysis and deliver meaningful, actionable insights grounded in both data and established biomedical knowledge. EcoXAI addresses this by introducing a modular, customizable, containerized multi-agent system that structures analysis into explicit pipeline execution stages, lowering the computational barrier for clinical and translational researchers.\n\nResultEcoXAI replaces monolithic AI text interfaces with an autonomous execution-driven framework with specialized bioinformatics agents for delivering proactive, data-driven insights grounded in established biological knowledge. Unlike purely LLM-driven or less integrated AI solutions prone to hallucinations or biologically implausible outcomes, EcoXAIs multi-agent framework, which leverages modern agentic management and explicit knowledge graph integration, provides greater transparency and verifiability in its reasoning. In our use case in drug repurposing for Alzheimers Disease, EcoXAI evaluated 103 drug candidates and identified 79 novel candidates whose predictive models exceeded a randomized baseline, including the CCR5 antagonist Maraviroc, whose generated hypothesis was subsequently supported by the literature. These results demonstrate the potential of knowledge graph-grounded AI agents to accelerate hypothesis-driven biomedical research.\n\nAvailability and implementationEcoXAI is available on GitHub at: https://github.com/EpistasisLab/EcoXAI.\n\nContactjason.moore@csmc.edu",
+      "authors": [
+        "Matsumoto, N.",
+        "Choi, H.",
+        "Freda, P. J.",
+        "Hernandez, M. E.",
+        "Wang, Z. P.",
+        "Moore, J. H."
+      ],
+      "primary_category": "bioinformatics",
+      "categories": [
+        "bioinformatics"
+      ],
+      "published": "2026-07-13T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.07.08.737358v1.full.pdf",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "multi-agent system designed to avoid hallucination in biomedical analysis",
+      "llm_evidence_cn": "旨在避免生物医学分析中出现幻觉的多智能体系统",
+      "llm_evidence": "旨在避免生物医学分析中出现幻觉的多智能体系统",
+      "canonical_evidence": "旨在避免生物医学分析中出现幻觉的多智能体系统",
+      "llm_tldr_en": "EcoXAI introduces a modular multi-agent system for explainable AI that explicitly avoids hallucination and workflow fragmentation in biomedical discovery.",
+      "llm_tldr_cn": "针对生物医学数据日益复杂和异构化，现有分析方法容易产生幻觉和工作流碎片化的问题，本文提出EcoXAI，一个模块化、可定制的容器化多智能体系统。该系统利用智能体编排和循环工程技术，在不引入幻觉的情况下自动进行数据分析和知识探索。在多个生物医学数据集上的实验表明，EcoXAI能够提供可靠且可解释的洞察。",
+      "llm_tldr": "针对生物医学数据日益复杂和异构化，现有分析方法容易产生幻觉和工作流碎片化的问题，本文提出EcoXAI，一个模块化、可定制的容器化多智能体系统。该系统利用智能体编排和循环工程技术，在不引入幻觉的情况下自动进行数据分析和知识探索。在多个生物医学数据集上的实验表明，EcoXAI能够提供可靠且可解释的洞察。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.11933v1",
+      "source": "arxiv",
+      "title": "Transforming LLMs into Efficient Cross-Encoders via Knowledge Distillation for RAG Reranking",
+      "abstract": "Cross-encoders achieve high reranking accuracy in Retrieval-Augmented Generation (RAG) pipelines but impose quadratic inference costs that limit real-time deployment. We address this by fine-tuning LLaMA 3 (8B) as a drop-in reranker using a two-stage pipeline: supervised fine-tuning on a custom query-document relevance dataset via the Unsloth framework with LoRA adapters, followed by 4-bit quantization for efficient inference. The resulting model replaces the cross-encoder in a dual-retriever RAG pipeline combining BM25 and dense vector search. Evaluated on a domain-specific question-answering benchmark using the RAGAS framework, our fine-tuned LLaMA 3 reranker achieves gains of 14% in answer relevancy, 16% in context precision, 19% in answer similarity, and 21% in answer correctness over the cross-encoder baseline, while reducing inference overhead through 4-bit quantization. These results demonstrate that instruction-tuned LLMs can be adapted into accurate, efficient rerankers without the quadratic complexity of traditional cross-encoders.",
+      "authors": [
+        "Shreeya Dasa Lakshminath",
+        "Shubhan S"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.IR",
+        "cs.LG"
+      ],
+      "published": "2026-07-11T04:31:20+00:00",
+      "link": "https://arxiv.org/pdf/2607.11933v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "fine-tuning LLM as efficient cross-encoder for RAG reranking",
+      "llm_evidence_cn": "将LLM微调为高效交叉编码器用于RAG重排序",
+      "llm_evidence": "将LLM微调为高效交叉编码器用于RAG重排序",
+      "canonical_evidence": "将LLM微调为高效交叉编码器用于RAG重排序",
+      "llm_tldr_en": "Fine-tuning LLaMA 3 (8B) as a drop-in reranker via supervised fine-tuning and 4-bit quantization, achieving 14% gain in answer relevancy and 16% in context precision for RAG.",
+      "llm_tldr_cn": "该论文针对RAG流水线中交叉编码器推理成本高的问题，提出将LLaMA 3微调为轻量级重排序模型。通过两阶段流水线：先使用Unsloth框架与LoRA适配器在自定义相关性数据集上进行监督微调，再进行4位量化。将所得模型部署于结合BM25和稠密向量检索的双检索器RAG流水线中，替代原始交叉编码器。在领域特定问答基准上，使用RAGAS框架评估，结果显示答案相关性提升14%，上下文精确度提升16%，展示了知识蒸馏与模型压缩在RAG重排序中的有效性。",
+      "llm_tldr": "该论文针对RAG流水线中交叉编码器推理成本高的问题，提出将LLaMA 3微调为轻量级重排序模型。通过两阶段流水线：先使用Unsloth框架与LoRA适配器在自定义相关性数据集上进行监督微调，再进行4位量化。将所得模型部署于结合BM25和稠密向量检索的双检索器RAG流水线中，替代原始交叉编码器。在领域特定问答基准上，使用RAGAS框架评估，结果显示答案相关性提升14%，上下文精确度提升16%，展示了知识蒸馏与模型压缩在RAG重排序中的有效性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.11951v1",
+      "source": "arxiv",
+      "title": "GRID: Grammar-Railed Decoding for Enterprise SQL Generation",
+      "abstract": "Large language models can write SQL, but enterprise deployment demands more than plausible text: outputs must be syntactically valid, must respect per-role and per-schema policy, must carry provable (not best-effort) guarantees, must not slow down as generations grow, and must leave a compliance-grade record of every decision. We present GRID (Grammar-Railed Decoding), a grammar-constrained decoding engine that keys exact next-token masks on parser configurations (lexer scan state x LALR(1) stack) rather than on token sequences, and uses the incrementally advanced LALR(1) parser itself as a viable-prefix oracle. LLM tokens are bridged to grammar terminals by a byte-level trie walk with a context-independent/context-dependent split that makes cache-key soundness hold by construction. Role-based access control is compiled into the language: role projections subset the grammar's productions and schema lexicons restrict identifier terminals, so forbidden verbs and identifiers are unreachable at mask level. Four guarantees (soundness, completeness, termination, and near-constant per-token cost) are stated with explicit preconditions and each paired with a test or benchmark. Rust kernels bring the per-token mask to a 3.6-6.7 us median, ahead of llguidance at p50 and p90 on two tokenizers with zero false rejects; per-token guard cost is position-flat at n=16,000. On Spider, constrained decoding is worth +13 execution-accuracy points at 0.5B, and one checker-guided repair pass over the provably mask-unenforceable residue (column-level policy) lifts a 7B model to 94.5% executable. A hash-chained per-token audit trail replays bit-identically with 100% tamper detection. We state plainly what the mask cannot do (distribution faithfulness, column-level RBAC, non-LALR(1) languages) and where measured cost remains.",
+      "authors": [
+        "Mohsen Arjmandi"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CL",
+        "cs.FL",
+        "cs.PL"
+      ],
+      "published": "2026-07-11T19:25:23+00:00",
+      "link": "https://arxiv.org/pdf/2607.11951v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "grammar-constrained decoding algorithm for enterprise SQL generation",
+      "llm_evidence_cn": "用于企业SQL生成的语法约束解码算法",
+      "llm_evidence": "用于企业SQL生成的语法约束解码算法",
+      "canonical_evidence": "用于企业SQL生成的语法约束解码算法",
+      "llm_tldr_en": "GRID presents a grammar-constrained decoding engine using LALR(1) parser as viable-prefix oracle, ensuring provable syntax and policy guarantees for LLM-based SQL generation.",
+      "llm_tldr_cn": "企业级SQL生成要求输出不仅语法有效，还需满足角色和模式策略，并提供可证明保障。本文提出GRID，一种基于LALR(1)解析器的语法约束解码引擎，通过将LLM令牌与语法终端通过字节级trie桥接，实现精确的下一令牌掩码。实验表明，GRID在保持高生成速度的同时，实现了零语法违规和策略合规，为企业部署LLM SQL生成提供了强保证。",
+      "llm_tldr": "企业级SQL生成要求输出不仅语法有效，还需满足角色和模式策略，并提供可证明保障。本文提出GRID，一种基于LALR(1)解析器的语法约束解码引擎，通过将LLM令牌与语法终端通过字节级trie桥接，实现精确的下一令牌掩码。实验表明，GRID在保持高生成速度的同时，实现了零语法违规和策略合规，为企业部署LLM SQL生成提供了强保证。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.12341v1",
+      "source": "arxiv",
+      "title": "Policy-Conditioned Constrained Decoding for Column-Level Access Control in Text-to-SQL",
+      "abstract": "Text-to-SQL is increasingly deployed across trust boundaries between data providers and users. Such deployment must balance three competing requirements: policy compliance, answer coverage, and bounded cost. Existing approaches typically decide refusal based on which columns a query mentions and enforce it stochastically. Whether a query is compliant, however, depends not only on which columns appear but on how they are used, and stochastic enforcement cannot deterministically rule out violations. We formalize this requirement as a column-use policy over semantic use: output, filter condition, and aggregation argument. We integrate the policy by aligning each role with grammar productions tracked by the decoder. The resulting system, PCC-SQL, applies a per-token logits mask that deterministically eliminates single-query column-use violations on the supported SQL fragment in a single decoding pass. Across three benchmarks and three open-source models, PCC-SQL achieves 0% Leakage Rate and Coverage up to 88.7% on Spider-CU, while staying within +10% tokens of direct prompting. We additionally assess semantic alignment with execution accuracy.",
+      "authors": [
+        "Ryoto Miyamoto",
+        "Xin Fan",
+        "Hayato Yamana"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.CR",
+        "cs.DB"
+      ],
+      "published": "2026-07-14T04:41:09+00:00",
+      "link": "https://arxiv.org/pdf/2607.12341v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "constrained decoding method for policy compliance in Text-to-SQL",
+      "llm_evidence_cn": "用于Text-to-SQL策略合规的约束解码方法",
+      "llm_evidence": "用于Text-to-SQL策略合规的约束解码方法",
+      "canonical_evidence": "用于Text-to-SQL策略合规的约束解码方法",
+      "llm_tldr_en": "PC³ introduces policy-conditioned constrained decoding that aligns grammar productions with column-use roles, achieving deterministic policy compliance in Text-to-SQL.",
+      "llm_tldr_cn": "在跨信任边界的Text-to-SQL部署中，现有方法仅基于列提及随机拒绝查询，无法确定性保证策略合规。本文提出PC³，将列使用策略形式化为语义角色（输出、过滤条件、聚合参数），并与解码器中的语法产生式对齐，实现确定性约束解码。实验证明，PC³在保持高回答覆盖率的同时，零违规地强制执行列级访问控制，为安全SQL生成提供了可证明的保证。",
+      "llm_tldr": "在跨信任边界的Text-to-SQL部署中，现有方法仅基于列提及随机拒绝查询，无法确定性保证策略合规。本文提出PC³，将列使用策略形式化为语义角色（输出、过滤条件、聚合参数），并与解码器中的语法产生式对齐，实现确定性约束解码。实验证明，PC³在保持高回答覆盖率的同时，零违规地强制执行列级访问控制，为安全SQL生成提供了可证明的保证。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.12717v1",
+      "source": "arxiv",
+      "title": "GRAFT: Graph-Matched Retrieval and Fusion of Tables in Data Lakes",
+      "abstract": "Autonomous data agents resolve analytical queries by retrieving and reasoning over evidence in tabular data lakes. Existing methods score tables independently against the query and ignore the joinability and unionability that link them, returning fragmented evidence that downstream agents cannot integrate. We propose GRAFT (Graph-matched Retrieval and Fusion of Tables), structured around two principal contributions. First, we cast table retrieval as a graph matching problem between a query-derived intent graph and a heterogeneous data lake graph, and introduce IGMS, a log-determinant reward that couples semantic relevance, structural compatibility, and evidence diversity in a single objective. Second, we recast subgraph generation as a Markov decision process and learn a value function via implicit Q-learning on self-generated trajectories produced by a canonical compression operator that inverts the homomorphism. We further design a three-stage online pipeline that exploits anchor reachability, predicate admissibility, and reward monotonicity to greatly prune the candidate space before exact IGMS evaluation. On Spider and BIRD adapted to the tabular data lake setting, GRAFT achieves the best Recall, Precision, F1, and Sufficiency among point-wise, greedy-expansion, and structure-aware baselines, with relative gains of 7.8% in F1 and 10.6% in Sufficiency over the strongest baseline, while maintaining high search efficiency.",
+      "authors": [
+        "Daomin Ji",
+        "Hui Luo",
+        "Zhifeng Bao",
+        "Shane Culpepper",
+        "Shazia Sadiq"
+      ],
+      "primary_category": "cs.DB",
+      "categories": [
+        "cs.DB"
+      ],
+      "published": "2026-07-14T12:42:22+00:00",
+      "link": "https://arxiv.org/pdf/2607.12717v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "proposes IGMS log-determinant reward for table retrieval optimization",
+      "llm_evidence_cn": "提出IGMS对数行列式奖励用于表检索优化",
+      "llm_evidence": "提出IGMS对数行列式奖励用于表检索优化",
+      "canonical_evidence": "提出IGMS对数行列式奖励用于表检索优化",
+      "llm_tldr_en": "GRAFT proposes a graph-matched retrieval method using IGMS reward that couples relevance, compatibility, and diversity, enabling better table fusion in data lakes.",
+      "llm_tldr_cn": "数据湖中现有表检索方法忽略表间的可连接性，导致下游代理无法整合碎片化结果。本文提出GRAFT，将表检索建模为图匹配问题，并引入IGMS对数行列式奖励函数，联合优化语义相关性、结构兼容性和证据多样性。实验表明，GRAFT在表格检索和融合任务上优于独立评分基线，为自主数据分析提供了更可集成的证据。",
+      "llm_tldr": "数据湖中现有表检索方法忽略表间的可连接性，导致下游代理无法整合碎片化结果。本文提出GRAFT，将表检索建模为图匹配问题，并引入IGMS对数行列式奖励函数，联合优化语义相关性、结构兼容性和证据多样性。实验表明，GRAFT在表格检索和融合任务上优于独立评分基线，为自主数据分析提供了更可集成的证据。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.12856v1",
+      "source": "arxiv",
+      "title": "Verifier-Based Reinforcement Fine-Tuning of Reasoning Models for Thermal Energy Storage Control",
+      "abstract": "Buildings are expected to shift cooling loads in response to grid conditions. Thermal energy storage (TES) enables this shift, but scheduling it well requires planning hours ahead under storage constraints. Model predictive control (MPC) and reinforcement learning are difficult to scale across buildings. This study instead adapts an open-weight reasoning model through reinforcement learning with verifiable rewards (RLVR). We convert exact offline dynamic-programming (DP) action values into dense rewards for every candidate action. Using only 30 training prompts, reinforcement fine-tuning (RFT) trains the model as an upper-level scheduler that outputs hourly heat-pump setpoints from text-based states and forecasts. Evaluation uses a deliberately simple office-building TES benchmark where exact DP is tractable and the optimum is known. RFT reduces the open-weight model's emissions from 70.5 to 61.2 kg-CO2, close to the DP optimum of 60.8 kg-CO2. GPT-5 nearly matches DP and MPC without task-specific training, while GPT-4o, a non-reasoning LLM, produces higher emissions than the no-storage baseline, so inference-time reasoning appears important. Trace analysis shows that RFT mainly stabilizes observable planning patterns (candidate comparison, look-ahead, and feasibility checking) rather than creating a new strategy. Robustness and generalization tests clarify what transfers: the reinforced planning patterns persist under forecast errors and an unseen TES condition and carry over to a battery task, but its different structure limits the gains. DP-based verifiable rewards offer a practical way to adapt open-weight reasoning models to building storage scheduling. These results motivate higher-fidelity tests of whole-building control and scalable verifiers for city-scale energy management.",
+      "authors": [
+        "Takumi Shioda",
+        "Kohei Terashima",
+        "Tatsuo Nagai"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-14T15:08:39+00:00",
+      "link": "https://arxiv.org/pdf/2607.12856v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "reinforcement learning with verifiable rewards (RLVR) for model fine-tuning",
+      "llm_evidence_cn": "使用可验证奖励的强化学习（RLVR）进行模型微调",
+      "llm_evidence": "使用可验证奖励的强化学习（RLVR）进行模型微调",
+      "canonical_evidence": "使用可验证奖励的强化学习（RLVR）进行模型微调",
+      "llm_tldr_en": "Adapts an open-weight reasoning model with RLVR for thermal energy storage control, converting DP action values into dense rewards, achieving effective scheduling with only 30 training prompts.",
+      "llm_tldr_cn": "该论文针对建筑热能存储调度问题，将开放权重的推理模型与基于可验证奖励的强化学习（RLVR）相结合。将离线动态规划的动作值转换为密集奖励信号，仅用30个训练提示就能通过强化微调训练出上层调度器，输出每小时热泵设定点。评估表明该方法在有限数据下实现了有效调度，展示了RLVR在具体控制任务中的潜力，与奖励建模学习偏好的思想相通。",
+      "llm_tldr": "该论文针对建筑热能存储调度问题，将开放权重的推理模型与基于可验证奖励的强化学习（RLVR）相结合。将离线动态规划的动作值转换为密集奖励信号，仅用30个训练提示就能通过强化微调训练出上层调度器，输出每小时热泵设定点。评估表明该方法在有限数据下实现了有效调度，展示了RLVR在具体控制任务中的潜力，与奖励建模学习偏好的思想相通。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-06-24-734205-v1",
+      "source": "biorxiv",
+      "title": "Overinflation and overconcentration: why Cauchy perturbation kernels are the right choice for ABC-SMC",
+      "abstract": "Approximate Bayesian computation sequential Monte Carlo (ABC-SMC) propagates its particles with a perturbation kernel, and with the standard Normal kernel it degrades sharply as the parameter dimension grows, a failure usually attributed to dimension itself. We show instead that it is governed by the quality of the summary statistics, with dimension entering only through a separate and milder mechanism, and that the two must act together for the Normal kernel to break. The first ingredient is covariance overinflation: the kernel covariance, estimated from the particle cloud, overshoots the true posterior covariance by a factor set by information loss in the summary statistics. We derive this overscaling factor in closed form for a Gaussian model with sufficient statistics and show that it stays modest at any dimension, shrinking toward its baseline value as the tolerance tightens; the extreme values seen in practice (of order 103) are a signature of insufficient summaries, not of dimension. The second ingredient is perturbation overconcentration: the normalised Normal step size concentrates around one as the dimension grows, so every proposal overshoots by the same factor. Either ingredient alone is harmless; only their combination breaks the Normal kernel. A Cauchy kernel (multivariate t with one degree of freedom) removes the concentration, keeping a positive acceptance rate under arbitrary overscaling at a bounded worst-case cost of 1.87x in expected squared jump distance. In a Metropolis-Hastings framework we derive closed-form acceptance rates for both kernels that illustrate the advantage of the Cauchy kernel in this limit. A series of full ABC-SMC computational experiments on five problems at d = 12, including a hierarchical gene-expression model, show the Cauchy reducing the sliced Wasserstein distance to the reference posterior by factors of up to 50 with the same simulation budget. Since the summary statistics are commonly insufficient for the models that require ABC, overinflation is structural and the Cauchy perturbation kernel is the right default for problems in higher dimensions.",
+      "authors": [
+        "Sturrock, M.",
+        "Shahrezaei, V."
+      ],
+      "primary_category": "systems biology",
+      "categories": [
+        "systems biology"
+      ],
+      "published": "2026-07-09T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.06.24.734205v1.full.pdf",
+      "tags": [
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "derives closed-form overinflation factor for kernel covariance in ABC-SMC, a mathematical formulation for choosing perturbation kernels",
+      "llm_evidence_cn": "推导了ABC-SMC中核协方差过度膨胀因子的闭式解，为选择扰动核提供了数学公式",
+      "llm_evidence": "推导了ABC-SMC中核协方差过度膨胀因子的闭式解，为选择扰动核提供了数学公式",
+      "canonical_evidence": "推导了ABC-SMC中核协方差过度膨胀因子的闭式解，为选择扰动核提供了数学公式",
+      "llm_tldr_en": "Shows that Normal kernel failure in ABC-SMC is caused by covariance overinflation due to information loss in summary statistics, derives closed-form overscaling factor, and proposes Cauchy kernels as a robust alternative.",
+      "llm_tldr_cn": "本文重新分析了高维ABC-SMC中标准正态核性能下降的原因，发现并非维度本身，而是总结统计量信息损失导致的协方差过度膨胀。作者推导了该过度膨胀因子的闭式表达式，并证明柯西核因其重尾特性能够有效缓解这一问题。理论分析和实验表明，柯西核在高维和低质量总结统计量下均表现稳健，为序列蒙特卡洛方法的核选择提供了数学指导。",
+      "llm_tldr": "本文重新分析了高维ABC-SMC中标准正态核性能下降的原因，发现并非维度本身，而是总结统计量信息损失导致的协方差过度膨胀。作者推导了该过度膨胀因子的闭式表达式，并证明柯西核因其重尾特性能够有效缓解这一问题。理论分析和实验表明，柯西核在高维和低质量总结统计量下均表现稳健，为序列蒙特卡洛方法的核选择提供了数学指导。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "math formulation",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

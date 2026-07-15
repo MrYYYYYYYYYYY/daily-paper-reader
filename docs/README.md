@@ -6,53 +6,68 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-13
-- 运行时间：2026-07-13 20:22:07 UTC
+- 最新运行日期：2026-07-15
+- 运行时间：2026-07-15 21:37:40 UTC
 - 运行状态：成功
-- 本次总论文数：11
+- 本次总论文数：16
 - 精读区：6
-- 速读区：5
+- 速读区：10
 
 ### 今日简报（AI）
-今日推荐11篇论文，精读6篇聚焦长文本RAG防污染与多模态奖励漏洞，速读5篇覆盖逆强化学习、上下文强盗路由和令牌压缩法律分析。精读中《MIRAGE》防信息污染和《Multimodal Reward Hacking》奖励破解最值得深究，均为前沿安全与对齐热点。建议优先阅读这两篇精读论文，再速读逆强化学习与LLM路由奖励设计，把握奖励机制与鲁棒性趋势。
-- 详情：[/202607/13/README](/202607/13/README)
+今日聚焦6篇精读与10篇速读研究，其中MC-RAG系统和Tool-Adaptive LLM Reranker均获9.0高分。最值得关注的是多约束检索增强生成（MC-RAG）与工具自适应排序器两大方向，它们显著提升了复杂查询与LLM重排效果。建议读者优先阅读这两篇高分解法，并尝试结合速读中EcoXAI的自动化解释思路，深化落地应用。
+- 详情：[/202607/15/README](/202607/15/README)
 
 ### 精读区论文标签
-1. [MIRAGE: Defending Long-Form RAG Against Misinformation Pollution](/202607/13/2607.05069v1-mirage-defending-long-form-rag-against-misinformation-pollution)  
+1. [MC-RAG System: A Structure-Driven RAG System for Multi-Constraint Queries](/202607/15/2607.10151v1-mc-rag-system-a-structure-driven-rag-system-for-multi-constraint-queries)  
    标签：评分：9.0/10、query:lpt
-   evidence：直接针对长文本RAG中的错误信息污染进行防御，抑制幻觉
-2. [Multimodal Reward Hacking in Reinforcement Learning](/202607/13/2607.09492v1-multimodal-reward-hacking-in-reinforcement-learning)  
+   evidence：通过结构化检索减少多约束查询中的幻觉
+2. [Tool-Adaptive LLM Reranker](/202607/15/2607.10555v1-tool-adaptive-llm-reranker)  
    标签：评分：9.0/10、query:lpt
-   evidence：研究多模态大语言模型RL中的奖励黑客行为，直接关联RLHF的奖励建模
-3. [Fast, Parallel, Query-Efficient Binary Classification](/202607/13/2607.04062v1-fast-parallel-query-efficient-binary-classification)  
+   evidence：LLM重排序中的事实幻觉抑制
+3. [Agentic-DPO: From Imitation to Agentic Policy Optimization on Expert Trajectories](/202607/15/2607.10601v1-agentic-dpo-from-imitation-to-agentic-policy-optimization-on-expert-trajectories)  
+   标签：评分：9.0/10、query:lpt
+   evidence：面向智能体的离线偏好优化，与基于人类反馈的奖励建模相关
+4. [Deployable Human Preference Alignment in Robotics: Learning Representative Rewards from Diverse Human Preferences](/202607/15/2607.12466v1-deployable-human-preference-alignment-in-robotics-learning-representative-rewards-from-diverse-human-preferences)  
+   标签：评分：9.0/10、query:lpt
+   evidence：人类偏好奖励建模
+5. [Predictive Divergence Masks for LLM RL](/202607/15/2607.10848v1-predictive-divergence-masks-for-llm-rl)  
    标签：评分：8.0/10、query:lpt
-   evidence：提出带有理论复杂度分析的随机算法，直接匹配数学公式化和算法改进需求
-4. [A Few Teacher Steps Go a Long Way: Cost-Efficient On-Policy Data Augmentation for Agent Post-Training](/202607/13/2607.04574v1-a-few-teacher-steps-go-a-long-way-cost-efficient-on-policy-data-augmentation-for-agent-post-training)  
+   evidence：使用发散掩码改进PPO方向标准
+6. [Enhancing LLMs through human feedback: a journey towards self-improvement](/202607/15/2607.11267v1-enhancing-llms-through-human-feedback-a-journey-towards-self-improvement)  
    标签：评分：8.0/10、query:lpt
-   evidence：面向LLM智能体后训练的廉价在策略数据增强，属于算法改进
-5. [HIVE: Understanding Post-Hallucination Reasoning in Vision Language Models](/202607/13/2607.07507v1-hive-understanding-post-hallucination-reasoning-in-vision-language-models)  
-   标签：评分：8.0/10、query:lpt
-   evidence：研究视觉语言模型中的幻觉后推理，与幻觉抑制相关
-6. [Mach-Mind-4-Flash Technical Report](/202607/13/2607.09375v1-mach-mind-4-flash-technical-report)  
-   标签：评分：8.0/10、query:lpt
-   evidence：使用强化学习对MoE大模型进行后训练优化
+   evidence：基于人类反馈的LLM自我改进与辅助RAG系统
 
 ### 速读区论文标签
-1. [Interpreting Rewards from Inverse Reinforcement Learning](/202607/13/biorxiv-10-64898-2026-07-08-736783-v1-interpreting-rewards-from-inverse-reinforcement-learning)  
+1. [Generalizing Preference-based Reinforcement Learning: a Rationality Model for Incomparability](/202607/15/2607.11432v1-generalizing-preference-based-reinforcement-learning-a-rationality-model-for-incomparability)  
    标签：评分：8.0/10、query:lpt
-   evidence：逆强化学习中的奖励解释，直接关联RLHF奖励建模
-2. [Correlation-Aware Contextual Bandits with Surrogate Rewards for LLM Routing](/202607/13/2607.09015v1-correlation-aware-contextual-bandits-with-surrogate-rewards-for-llm-routing)  
+   evidence：通过基于Bradley-Terry的多维奖励建模泛化基于偏好的强化学习，处理不可比性
+2. [EcoXAI: Autonomous Agentic Ecosystem for Explainable Artificial Intelligence and Biomedical Discovery](/202607/15/biorxiv-10-64898-2026-07-08-737358-v1-ecoxai-autonomous-agentic-ecosystem-for-explainable-artificial-intelligence-and-biomedical-discovery)  
+   标签：评分：8.0/10、query:lpt
+   evidence：旨在避免生物医学分析中出现幻觉的多智能体系统
+3. [ProgramTab: Boosting Table Reasoning of LLMs via Programmatic Paradigm](/202607/15/2607.11207v1-programtab-boosting-table-reasoning-of-llms-via-programmatic-paradigm)  
    标签：评分：7.0/10、query:lpt
-   evidence：基于上下文bandit的LLM路由代理奖励信号
-3. [Inject or Navigate? Token-Efficient Retrieval for LLM Analysis of Transactional Legal Documents](/202607/13/2607.05764v1-inject-or-navigate-token-efficient-retrieval-for-llm-analysis-of-transactional-legal-documents)  
+   evidence：通过编程范式增强LLM表格推理的算法改进
+4. [Transforming LLMs into Efficient Cross-Encoders via Knowledge Distillation for RAG Reranking](/202607/15/2607.11933v1-transforming-llms-into-efficient-cross-encoders-via-knowledge-distillation-for-rag-reranking)  
+   标签：评分：7.0/10、query:lpt
+   evidence：将LLM微调为高效交叉编码器用于RAG重排序
+5. [The Nuts and Bolts of Natural Language to SQL Translation: A Systematic Analysis of Model Pipeline Optimisation Approaches and their Interactions](/202607/15/2607.10911v1-the-nuts-and-bolts-of-natural-language-to-sql-translation-a-systematic-analysis-of-model-pipeline-optimisation-approaches-and-their-interactions)  
    标签：评分：6.0/10、query:lpt
-   evidence：提出了面向LLM文档分析的token高效检索算法，属于算法改进
-4. [TurnOPD: Making On-Policy Distillation Turn-Aware for Efficient Long-Horizon Agent Training](/202607/13/2607.05804v1-turnopd-making-on-policy-distillation-turn-aware-for-efficient-long-horizon-agent-training)  
+   evidence：自然语言转SQL管道优化的系统分析
+6. [GRID: Grammar-Railed Decoding for Enterprise SQL Generation](/202607/15/2607.11951v1-grid-grammar-railed-decoding-for-enterprise-sql-generation)  
    标签：评分：6.0/10、query:lpt
-   evidence：改进长程智能体训练中的在策略蒸馏，属于后训练技术
-5. [Think Big, Search Small: Where Capacity Matters in Hierarchical Search Agents?](/202607/13/2607.07548v1-think-big-search-small-where-capacity-matters-in-hierarchical-search-agents)  
+   evidence：用于企业SQL生成的语法约束解码算法
+7. [Policy-Conditioned Constrained Decoding for Column-Level Access Control in Text-to-SQL](/202607/15/2607.12341v1-policy-conditioned-constrained-decoding-for-column-level-access-control-in-text-to-sql)  
    标签：评分：6.0/10、query:lpt
-   evidence：多智能体LLM搜索代理，容量分配
+   evidence：用于Text-to-SQL策略合规的约束解码方法
+8. [GRAFT: Graph-Matched Retrieval and Fusion of Tables in Data Lakes](/202607/15/2607.12717v1-graft-graph-matched-retrieval-and-fusion-of-tables-in-data-lakes)  
+   标签：评分：6.0/10、query:lpt
+   evidence：提出IGMS对数行列式奖励用于表检索优化
+9. [Verifier-Based Reinforcement Fine-Tuning of Reasoning Models for Thermal Energy Storage Control](/202607/15/2607.12856v1-verifier-based-reinforcement-fine-tuning-of-reasoning-models-for-thermal-energy-storage-control)  
+   标签：评分：6.0/10、query:lpt
+   evidence：使用可验证奖励的强化学习（RLVR）进行模型微调
+10. [Overinflation and overconcentration: why Cauchy perturbation kernels are the right choice for ABC-SMC](/202607/15/biorxiv-10-64898-2026-06-24-734205-v1-overinflation-and-overconcentration-why-cauchy-perturbation-kernels-are-the-right-choice-for-abc-smc)  
+   标签：评分：6.0/10、query:lpt
+   evidence：推导了ABC-SMC中核协方差过度膨胀因子的闭式解，为选择扰动核提供了数学公式
 
 
 <div class="dpr-home-promo-card">
