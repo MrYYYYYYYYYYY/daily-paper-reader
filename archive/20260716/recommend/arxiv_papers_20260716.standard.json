@@ -1,0 +1,532 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-16T21:14:41.570178+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 10,
+    "deep_cap": 6,
+    "deep_selected": 7,
+    "quick_candidates": 6,
+    "quick_skim_target": 11,
+    "quick_selected": 6
+  },
+  "deep_dive": [
+    {
+      "id": "2607.10476v1",
+      "source": "arxiv",
+      "title": "Hallucination Detection in Large Language Models Using Diversion Decoding",
+      "abstract": "Large language models (LLMs) have emerged as a powerful tool for retrieving knowledge through seamless, human-like interactions. Despite their advanced text generation capabilities, LLMs exhibit hallucination tendencies, where they generate factually incorrect statements and fabricate knowledge, undermining their reliability and trustworthiness. Multiple studies have explored methods to evaluate LLM uncertainty and detect hallucinations. However, existing approaches are often probabilistic and computationally expensive, limiting their practical applicability. In this paper, we introduce diversion decoding, a novel method for developing an LLM uncertainty heuristic by actively challenging model-generated responses during the decoding phase. Through diversion decoding, we extract features that capture the LLM's resistance to produce alternative answers and utilize these features to train a machine-learning model to develop a heuristic measure of the LLM's uncertainty. Our experimental results demonstrate that diversion decoding outperforms existing methods with significantly lower computational complexity, making it an efficient and robust solution for evaluating hallucination detection.",
+      "authors": [
+        "Basel Abdeen",
+        "S M Tahmid Siddiqui",
+        "Meah Tahmeed Ahmed",
+        "Anoop Singhal",
+        "Latifur Khan",
+        "Punya Parag Modi",
+        "Ehab Al-Shaer"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-07-11T20:56:42+00:00",
+      "link": "https://arxiv.org/pdf/2607.10476v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "directly addresses hallucination detection/suppression in LLMs",
+      "llm_evidence_cn": "直接针对大语言模型幻觉检测与抑制",
+      "llm_evidence": "直接针对大语言模型幻觉检测与抑制",
+      "canonical_evidence": "直接针对大语言模型幻觉检测与抑制",
+      "llm_tldr_en": "Proposes diversion decoding to detect LLM hallucinations by challenging model responses during decoding, offering an efficient heuristic for uncertainty estimation.",
+      "llm_tldr_cn": "大语言模型在生成文本时容易出现事实性错误，即幻觉问题，现有检测方法概率性强且计算开销大。本文提出分流解码（Diversion Decoding）方法，通过在解码阶段主动挑战模型生成的响应来构建不确定性启发式指标。实验表明该方法能有效检测幻觉，且计算效率高。该工作为提升LLM可靠性提供了实用工具。",
+      "llm_tldr": "大语言模型在生成文本时容易出现事实性错误，即幻觉问题，现有检测方法概率性强且计算开销大。本文提出分流解码（Diversion Decoding）方法，通过在解码阶段主动挑战模型生成的响应来构建不确定性启发式指标。实验表明该方法能有效检测幻觉，且计算效率高。该工作为提升LLM可靠性提供了实用工具。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.10738v1",
+      "source": "arxiv",
+      "title": "To Answer or to Abstain: Mitigating Search-Agent Hallucinations via Abstention-Aware Reinforcement Learning",
+      "abstract": "Recent advances in equipping Large Language Models (LLMs) with search tools and outcome-reward reinforcement learning (RL) have achieved new state-of-the-art results on open-domain QA tasks. However, we argue that current training paradigms harbor a critical vulnerability: they predominantly reward correct answers but fail to penalize fabricated ones when retrieval fails, thereby implicitly exacerbating hallucinations. To address this, we propose Abstention-Aware Reinforcement Learning (AWA-RL), which dynamically shapes the abstention reward utilizing the model's query-specific prior capabilities and continuous on-policy training observations. We also introduce a novel metric, RA-F1, to measure the capability-reliability trade-off. Compared to non-abstaining baselines, AWA-RL boosts absolute precision by up to 10.3% and overall RA-F1 by 2.9%, with only marginal sacrifice in raw accuracy. These results confirm that AWA-RL successfully yields highly capable and reliable search agents. The code, data, and model weights are publicly available at https://github.com/zfj1998/AWA-RL.",
+      "authors": [
+        "Fengji Zhang",
+        "Tianyu Fan",
+        "Yuxiang Zheng",
+        "Xinyao Niu",
+        "Chengen Huang",
+        "Jacky Keung",
+        "Bei Chen"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-07-12T12:43:12+00:00",
+      "link": "https://arxiv.org/pdf/2607.10738v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "directly addresses hallucination mitigation in search-agent LLMs via abstention-aware reinforcement learning",
+      "llm_evidence_cn": "直接针对搜索智能体LLM的幻觉抑制问题，提出弃权感知的强化学习方法",
+      "llm_evidence": "直接针对搜索智能体LLM的幻觉抑制问题，提出弃权感知的强化学习方法",
+      "canonical_evidence": "直接针对搜索智能体LLM的幻觉抑制问题，提出弃权感知的强化学习方法",
+      "llm_tldr_en": "AWA-RL dynamically shapes abstention reward using prior capabilities and on-policy training to penalize hallucinations in search-augmented LLMs, introducing RA-F1 metric for capability-reliability tradeoff.",
+      "llm_tldr_cn": "当前搜索增强LLM的训练范式主要奖励正确回答而忽视检索失败时的捏造，从而加剧了幻觉。本文提出弃权感知强化学习（AWA-RL），利用模型先验能力和在线训练动态调整弃权奖励，有效抑制幻觉。同时引入新指标RA-F1衡量能力与可靠性的平衡，实验表明该方法在开放域问答中显著降低了虚构，提升了系统可信度。",
+      "llm_tldr": "当前搜索增强LLM的训练范式主要奖励正确回答而忽视检索失败时的捏造，从而加剧了幻觉。本文提出弃权感知强化学习（AWA-RL），利用模型先验能力和在线训练动态调整弃权奖励，有效抑制幻觉。同时引入新指标RA-F1衡量能力与可靠性的平衡，实验表明该方法在开放域问答中显著降低了虚构，提升了系统可信度。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.13596v1",
+      "source": "arxiv",
+      "title": "Protective Capacity Hallucination: When Large Language Models Claim Nonexistent Capabilities",
+      "abstract": "When cast as the protector of a vulnerable user yet given no explicit capability boundary, a large language model (LLM) may respond not by acknowledging its limits but by claiming to have taken -- or to be taking -- a real-world protective action it cannot perform, such as contacting emergency services or administering care. We term this phenomenon Protective Capacity Hallucination (PCH): a self-referential misattribution in which a model, acting in a protective role, asserts physical or institutional agency exceeding its affordances as a language model. In a three-phase study spanning eight LLMs and 13{,}600 sessions, we find PCH jointly gated by situational severity and interactional format: multi-party dialogic input drives it toward ceiling in most models across ordinary service domains, whereas in intimate-partner conflict -- a domain explicitly covered by safety alignment -- it remains at floor in all eight models despite greater physical severity. We interpret PCH as the signature of a deployment-design gap between role assignment and capability-boundary specification: a by-product of partial alignment in which a universally trained pressure to help outruns a domain-selective specification of how to help. Because suppression tracks alignment coverage rather than severity, deployment-side specification of capability boundaries emerges as a general mitigation target.",
+      "authors": [
+        "Eunna Lee",
+        "Jungpyo Nam",
+        "Sunjun Hwang"
+      ],
+      "primary_category": "cs.CR",
+      "categories": [
+        "cs.CR",
+        "cs.AI"
+      ],
+      "published": "2026-07-15T08:39:10+00:00",
+      "link": "https://arxiv.org/pdf/2607.13596v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "Directly studies LLM hallucination in protective roles, introducing Protective Capacity Hallucination (PCH)",
+      "llm_evidence_cn": "直接研究LLM在保护角色中的幻觉，提出保护型能力幻觉（PCH）",
+      "llm_evidence": "直接研究LLM在保护角色中的幻觉，提出保护型能力幻觉（PCH）",
+      "canonical_evidence": "直接研究LLM在保护角色中的幻觉，提出保护型能力幻觉（PCH）",
+      "llm_tldr_en": "Identifies and characterizes Protective Capacity Hallucination (PCH) where LLMs claim nonexistent capabilities. Study across 8 LLMs and 13,600 sessions shows situational and interactional gating.",
+      "llm_tldr_cn": "大型语言模型在保护角色中可能声称自身无法执行的物理行动（如联系紧急服务），定义为保护型能力幻觉。通过对8个模型和13600个会话的三阶段研究，发现该幻觉由情境严重性和交互格式共同调控，为LLM幻觉抑制提供了新实证。",
+      "llm_tldr": "大型语言模型在保护角色中可能声称自身无法执行的物理行动（如联系紧急服务），定义为保护型能力幻觉。通过对8个模型和13600个会话的三阶段研究，发现该幻觉由情境严重性和交互格式共同调控，为LLM幻觉抑制提供了新实证。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.13315v1",
+      "source": "arxiv",
+      "title": "Meta-Learning Preferences for Multilingual LLM Alignment",
+      "abstract": "Unequal availability of human preference data across languages poses a significant challenge for aligning large language models in multilingual settings. To address the lack of sufficient data in low-resource language alignment, we propose a meta-learning framework for Reinforcement Learning from Human Feedback and Direct Preference Optimization. By leveraging preference data from other languages, our framework learns a transferable initialization that enables effective adaptation to a target language with minimal data. We provide theoretical guarantees for both the meta-reward modeling and meta-policy optimization settings, and empirically demonstrate the effectiveness of our approach on multilingual benchmarks. In an extremely low-resource setting with only 100 target-language preference samples, our approach achieves up to $28\\%$ win-rate improvements over baseline methods, and consistently outperforms baselines across multiple target languages and model scales. Our approaches retain these advantages across different combinations of meta-training languages and varying linguistic distances from the target languages.",
+      "authors": [
+        "Jiaying Lin",
+        "Seongho Son",
+        "Nam Phuong Tran",
+        "Long Tran-thanh",
+        "Ilija Bogunovic",
+        "Debmalya Mandal"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-14T22:38:39+00:00",
+      "link": "https://arxiv.org/pdf/2607.13315v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Meta-learning framework for reward modeling in RLHF and DPO for multilingual LLM alignment",
+      "llm_evidence_cn": "用于多语言LLM对齐的RLHF和DPO中奖励建模的元学习框架",
+      "llm_evidence": "用于多语言LLM对齐的RLHF和DPO中奖励建模的元学习框架",
+      "canonical_evidence": "用于多语言LLM对齐的RLHF和DPO中奖励建模的元学习框架",
+      "llm_tldr_en": "Proposes meta-learning for reward modeling and policy optimization in multilingual LLM alignment. Provides theoretical guarantees and empirical results on low-resource languages with minimal data.",
+      "llm_tldr_cn": "针对多语言环境中人类偏好数据分布不均导致低资源语言大语言模型对齐困难的问题，提出基于元学习的偏好对齐框架，从高资源语言偏好数据中学习可迁移初始化参数，仅需少量数据即可快速适应。理论证明元奖励建模和元策略优化的收敛性，在极低资源设置下显著提升对齐效果，为多语言LLM对齐提供高效且有理论保证的方案。",
+      "llm_tldr": "针对多语言环境中人类偏好数据分布不均导致低资源语言大语言模型对齐困难的问题，提出基于元学习的偏好对齐框架，从高资源语言偏好数据中学习可迁移初始化参数，仅需少量数据即可快速适应。理论证明元奖励建模和元策略优化的收敛性，在极低资源设置下显著提升对齐效果，为多语言LLM对齐提供高效且有理论保证的方案。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.13399v1",
+      "source": "arxiv",
+      "title": "Demystifying On-Policy Distillation: Roles, Pathologies, and Regulations",
+      "abstract": "On-policy distillation (OPD) has become a key paradigm in LLM post-training, yet its training dynamics remain poorly understood. We present a systematic study examining the role, pathologies, and regulations of OPD. We first clarify the role of OPD as an exploration catalyst: it steers the student toward correct reasoning paths via dense token-level guidance, without expanding capability ceiling. We confirm this by showing that prompt diversity matters more than per-problem sampling numbers, and critically, that the effectiveness of OPD hinges entirely on the quality of its guiding signal. This dependency exposes two pathologies that derail exploration. The Student-Teacher Mismatch occurs when a large teacher-student distributional gap causes the guiding signal to misalign with task correctness, steering exploration in counterproductive directions. Length Exploitation arises when the aggregated token-level objective creates length-dependent shortcuts, allowing the student to game the reward landscape through response truncation or redundant padding, exploring degenerate length modes rather than reasoning strategies. To tame these pathologies, we investigate lightweight signal regulations: advantage clipping and log-scale compression, ensuring exploration is guided by faithful signals. Experiments across seven benchmarks demonstrate that these regulations alleviate length exploitation and enable effective distillation, stably surpassing OPD variants and RLVR baselines, thereby confirming that well-regulated signal quality, rather than mere teacher scale, governs successful exploration in OPD.",
+      "authors": [
+        "Rui Wang",
+        "Hongru Wang",
+        "Yi Chen",
+        "Boyang Xue",
+        "Tianqing Fang",
+        "Wenhao Yu",
+        "Kam-Fai Wong"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-07-15T02:52:37+00:00",
+      "link": "https://arxiv.org/pdf/2607.13399v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "systematic study of on-policy distillation, a key LLM post-training paradigm",
+      "llm_evidence_cn": "系统研究在线策略蒸馏，这是大语言模型后训练的关键范式",
+      "llm_evidence": "系统研究在线策略蒸馏，这是大语言模型后训练的关键范式",
+      "canonical_evidence": "系统研究在线策略蒸馏，这是大语言模型后训练的关键范式",
+      "llm_tldr_en": "Systematically analyzes on-policy distillation in LLM post-training, revealing its role as exploration catalyst and two core pathologies.",
+      "llm_tldr_cn": "在线策略蒸馏（OPD）已成为大语言模型后训练的重要范式，但其训练动态尚不明确。本文系统研究OPD的角色、病理与调节，指出OPD作为探索催化剂通过密集令牌级引导帮助学生走向正确路径，但依赖引导信号质量。发现师生不匹配和误导性教师两种病理，并提出相应调节策略。实验验证了分析的有效性，为LLM后训练提供了理论基础。",
+      "llm_tldr": "在线策略蒸馏（OPD）已成为大语言模型后训练的重要范式，但其训练动态尚不明确。本文系统研究OPD的角色、病理与调节，指出OPD作为探索催化剂通过密集令牌级引导帮助学生走向正确路径，但依赖引导信号质量。发现师生不匹配和误导性教师两种病理，并提出相应调节策略。实验验证了分析的有效性，为LLM后训练提供了理论基础。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.13501v1",
+      "source": "arxiv",
+      "title": "LAPO: Leave-One-Turn Attribution for Self-Generated Process Rewards in Multi-Turn Search Reasoning",
+      "abstract": "Reinforcement learning for multi-turn search reasoning typically relies on terminal outcome rewards, which cannot distinguish useful, redundant, and harmful intermediate interactions. We propose LAPO, a self-generated process-supervision method based on backward leave-one-turn attribution. For each search turn, LAPO replaces the turn and its retrieval observation with a fixed [DELETE] placeholder and measures the resulting change in the current policy's mean log-likelihood of the gold answer. This Answer-Likelihood Gain estimates the turn's contribution while preserving all downstream interactions, allowing early evidence to be evaluated in the complete reasoning context. LAPO further applies sign-consistency gating, retaining only normalized process advantages whose directions agree with their raw attribution scores. The method requires no additional reward model, teacher, verifier, or LLM-as-a-Judge. Across seven knowledge-intensive question-answering datasets with local retrieval, LAPO achieves an average exact-match score of 0.326, outperforming the strongest step-reward baseline, IGPO, by 0.053. Ablations show complementary benefits from backward attribution and sign-consistency gating, demonstrating that policy-derived retrospective attribution can provide effective process supervision for multi-turn search agents.",
+      "authors": [
+        "Qiang Zhu",
+        "Jiajun Wu"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-15T06:55:28+00:00",
+      "link": "https://arxiv.org/pdf/2607.13501v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "self-generated process rewards for multi-turn reasoning, directly related to reward modeling and RLHF",
+      "llm_evidence_cn": "为多轮搜索推理生成过程奖励，直接关联奖励建模和人类反馈强化学习",
+      "llm_evidence": "为多轮搜索推理生成过程奖励，直接关联奖励建模和人类反馈强化学习",
+      "canonical_evidence": "为多轮搜索推理生成过程奖励，直接关联奖励建模和人类反馈强化学习",
+      "llm_tldr_en": "LAPO proposes a self-supervised method to generate process rewards for multi-turn search reasoning by leave-one-turn attribution, improving RL efficiency.",
+      "llm_tldr_cn": "多轮搜索推理中强化学习通常仅依赖最终奖励，无法区分中间步骤的贡献。本文提出LAPO，通过留一回合归因法为每个搜索回合生成过程奖励：替换该回合为占位符并计算对最终答案似然的变化。该方法在无需人工标注的情况下提供细粒度监督，显著提升了多轮推理的样本效率。",
+      "llm_tldr": "多轮搜索推理中强化学习通常仅依赖最终奖励，无法区分中间步骤的贡献。本文提出LAPO，通过留一回合归因法为每个搜索回合生成过程奖励：替换该回合为占位符并计算对最终答案似然的变化。该方法在无需人工标注的情况下提供细粒度监督，显著提升了多轮推理的样本效率。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.13712v1",
+      "source": "arxiv",
+      "title": "Groc-PO: Grounded Context Preference Optimization for Truthful Multimodal LLMs",
+      "abstract": "Despite the rapid progress of Multimodal Large Language Models (MLLMs), they still suffer from untruthfulness issues, such as visual hallucinations, content fabrication, and unfaithful reasoning, which substantially undermine their faithfulness and practical utility. Alignment methods based on human preference, such as Direct Preference Optimization (DPO), have been widely adopted to address these issues. However, multimodal reasoning errors often propagate across stages, and final-answer errors can often be traced to mistakes in early grounding stages, yet standard DPO typically applies preference optimization at the final-answer level. This credit-assignment challenge means that supervision for early grounding stages is indirect rather than stage-specific, making it difficult to suppress error propagation arising from grounding drift and context inconsistency. To address this, we propose Grounded Context Preference Optimization (Groc-PO), a grounded preference optimization framework for MLLMs. We further construct the Grounded Context Preference Dataset (GCPD), organizing multi-stage preference samples around three stages of Object Grounding, Contextual Grounding, and Grounded Reasoning, to capture the formation, integration, and utilization of grounded context. By introducing more explicit preference supervision over multiple grounded stages, Groc-PO strengthens context-dependent reasoning and mitigates cross-stage error propagation. Extensive experiments show that, compared with standard DPO and other strong baselines, Groc-PO achieves improved performance in hallucination mitigation, faithful reasoning, and overall reliability, supporting the value of more explicit grounded supervision for trustworthy multimodal reasoning.",
+      "authors": [
+        "Zhixiao Zheng",
+        "Zheren Fu",
+        "Zhiyuan Yao",
+        "Chunxiao Liu",
+        "Dongming Zhang",
+        "Zhendong Mao"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.CL",
+        "cs.MM"
+      ],
+      "published": "2026-07-15T11:28:27+00:00",
+      "link": "https://arxiv.org/pdf/2607.13712v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "addresses visual hallucinations and untruthfulness via grounded preference optimization",
+      "llm_evidence_cn": "通过基于上下文的偏好优化解决多模态大模型的幻觉和不真实问题",
+      "llm_evidence": "通过基于上下文的偏好优化解决多模态大模型的幻觉和不真实问题",
+      "canonical_evidence": "通过基于上下文的偏好优化解决多模态大模型的幻觉和不真实问题",
+      "llm_tldr_en": "Groc-PO proposes grounded context preference optimization to reduce hallucinations and improve truthfulness in multimodal LLMs, outperforming standard DPO by providing supervision for early grounding stages.",
+      "llm_tldr_cn": "为解决多模态大模型中的幻觉和不真实问题，本文提出Groc-PO方法，通过基于上下文的偏好优化对早期基础阶段进行监督。实验表明，相比标准DPO，Groc-PO显著减少了视觉幻觉和内容编造，提升了模型忠实性。该方法为幻觉抑制提供了更精确的信用分配机制，具有重要实践价值。",
+      "llm_tldr": "为解决多模态大模型中的幻觉和不真实问题，本文提出Groc-PO方法，通过基于上下文的偏好优化对早期基础阶段进行监督。实验表明，相比标准DPO，Groc-PO显著减少了视觉幻觉和内容编造，提升了模型忠实性。该方法为幻觉抑制提供了更精确的信用分配机制，具有重要实践价值。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.09375v1",
+      "source": "arxiv",
+      "title": "Mach-Mind-4-Flash Technical Report",
+      "abstract": "We present Mach-Mind-4-Flash, a 35B-parameter Mixture-of-Experts (MoE) agentic model with 3B activated parameters. Through post-training optimization alone without scaling pre-training compute, the model achieves performance on par with or surpassing that of 100B-parameter-class models. By introducing scalable agentic interaction environments for large-scale reinforcement learning, the model attains significant performance gains on real-world application tasks. Our pipeline comprises three stages: (1) a unified RL/OPD training infrastructure with dynamic multi-teacher scheduling and operator-level acceleration, delivering 17\\% end-to-end training speedup; (2) multiple domain-specific RL experts trained in parallel across Reasoning, General, and Agent tracks, then fused into a single generalist via Multi-Teacher On-Policy Distillation (MOPD) -- a routed reverse-KL objective that eliminates the see-saw degradation of mixed-reward RL; (3) Hybrid Median-length Policy Optimization (HMPO), a single-stage token-efficiency method that compresses reasoning chains by 19--46\\% with $\\le$0.7 percentage-point accuracy loss. Mach-Mind-4-Flash scores 92.70 on AIME'26, 82.82 on IFBench, 80.74 on Behavioral-SafetyBench, 75.80 on BFCL-v4, 72.31 on BrowseComp-zh, and 84.20 on ClawBench -- leading or matching models with 10--30$\\times$ its activated size at a fraction of the inference cost.",
+      "authors": [
+        "Foundation Model Team"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-07-10T12:57:08+00:00",
+      "link": "https://arxiv.org/pdf/2607.09375v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "post-training optimization for LLMs with RL and MoE, aligning with the composite theme",
+      "llm_evidence_cn": "针对大语言模型的后训练优化，涉及强化学习和混合专家，属于复合主题",
+      "llm_evidence": "针对大语言模型的后训练优化，涉及强化学习和混合专家，属于复合主题",
+      "canonical_evidence": "针对大语言模型的后训练优化，涉及强化学习和混合专家，属于复合主题",
+      "llm_tldr_en": "Mach-Mind-4-Flash achieves strong LLM performance via post-training only, using a multi-stage RL pipeline with domain-specific experts and infrastructure improvements.",
+      "llm_tldr_cn": "本文介绍Mach-Mind-4-Flash模型，仅通过后训练优化（不扩展预训练计算）达到与千亿参数模型相当的性能。其核心是统一RL/OPD训练基础设施、多领域专家并行训练与融合，以及大规模RL交互环境。该工作为LLM后训练提供了高效的算法与工程方案，在推理、通用和智能体任务上表现优异。",
+      "llm_tldr": "本文介绍Mach-Mind-4-Flash模型，仅通过后训练优化（不扩展预训练计算）达到与千亿参数模型相当的性能。其核心是统一RL/OPD训练基础设施、多领域专家并行训练与融合，以及大规模RL交互环境。该工作为LLM后训练提供了高效的算法与工程方案，在推理、通用和智能体任务上表现优异。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.10044v1",
+      "source": "arxiv",
+      "title": "FlashTrie: A GPU-Accelerated Constrained Beam Search for Generative Retrieval",
+      "abstract": "Constrained decoding is essential in generative retrieval, where document identifiers generated directly from a query must exactly match a predefined library of valid IDs. At scale, decoding is often constrained using a trie with beam search but most implementations run on CPU. Limited parallelism then makes trie traversal and candidate validation a serving bottleneck as beam width grows.   We present FlashTrie, which addresses this limitation by optimizing constrained beam search on GPUs. It introduces an integer-aware succinct trie layout that uses bit compression to reduce memory footprint while keeping the full index in GPU high-bandwidth memory reducing memory stalls, and a cooperative CUDA kernel that performs beam expansion, validation, and pruning entirely on-device without per-step host orchestration. It further replaces CPU-style irregular lookup and heap maintenance with GPU-aware parallel primitives, improving warp utilization and reducing divergence.   Together, these designs significantly reduce decoding latency and increase throughput while preserving retrieval quality. On a library of 800M keywords with beam widths up to 1000, FlashTrie reduces trie-search latency to under 3 ms, achieving up to 24x speedup over a highly optimized multi-threaded CPU baseline. These improvements enable FlashTrie to scale beam sizes by up to 5x in latency-critical applications such as sponsored search. In a large-scale online A/B experiment on a popular commercial search engine, it delivers a statistically significant +0.71% revenue lift, enabling real-time constrained decoding at a scale previously feasible only offline. The FlashTrie code will be publicly released after the review process.",
+      "authors": [
+        "Dakshitha Anandakumar",
+        "Anurag Mukkara",
+        "Wenxiang Hu",
+        "Jiusheng Chen",
+        "M Akash Kumar",
+        "Ting Ye",
+        "Qiang Lou",
+        "Jian Jiao"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-10T23:52:35+00:00",
+      "link": "https://arxiv.org/pdf/2607.10044v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "GPU-accelerated constrained beam search for generative retrieval, enables efficient decoding algorithm for large-scale generation",
+      "llm_evidence_cn": "GPU加速的约束束搜索用于生成检索，为大规模生成提供了高效解码算法改进",
+      "llm_evidence": "GPU加速的约束束搜索用于生成检索，为大规模生成提供了高效解码算法改进",
+      "canonical_evidence": "GPU加速的约束束搜索用于生成检索，为大规模生成提供了高效解码算法改进",
+      "llm_tldr_en": "FlashTrie introduces a GPU-accelerated constrained beam search for generative retrieval using an integer-aware succinct trie layout and a cooperative CUDA kernel, significantly reducing memory footprint and latency for large beam widths.",
+      "llm_tldr_cn": "生成检索中的约束解码通常受限于CPU上的束搜索性能瓶颈。FlashTrie通过整数感知的紧凑特里树布局和协作CUDA内核，将约束束搜索全流程迁移至GPU，大幅减少了内存占用和延迟。实验表明，该方法在保持高精度的同时显著加速了解码过程，为大规模生成任务提供了实用的算法改进。",
+      "llm_tldr": "生成检索中的约束解码通常受限于CPU上的束搜索性能瓶颈。FlashTrie通过整数感知的紧凑特里树布局和协作CUDA内核，将约束束搜索全流程迁移至GPU，大幅减少了内存占用和延迟。实验表明，该方法在保持高精度的同时显著加速了解码过程，为大规模生成任务提供了实用的算法改进。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.13639v1",
+      "source": "arxiv",
+      "title": "OvisOCR2 Technical Report",
+      "abstract": "We introduce OvisOCR2, a 0.8B document parsing model. OvisOCR2 is designed as an end-to-end parser: given a document page image, it generates a Markdown representation in natural reading order, covering text, formulas, tables, and visual regions. We build a data engine that combines filtered real-document annotations with synthetic pages whose rendered images and Markdown targets are derived from the same HTML source. The training recipe includes supervised fine-tuning, reinforcement learning on a 4B branch with a multi-component reward design, on-policy distillation into the 0.8B model, and model fusion. On OmniDocBench v1.6, OvisOCR2 achieves a state-of-the-art overall score of 96.58, placing an end-to-end model at the top of this leaderboard previously dominated by pipeline methods and highlighting the potential of end-to-end document parsing. On PureDocBench, OvisOCR2 also achieves the highest Avg3 score of 75.06. Beyond these two public benchmarks, we evaluate OvisOCR2 on an in-house benchmark designed to cover a broader set of long-tail and challenging scenarios. OvisOCR2 obtains the best overall performance among the compared methods, providing further evidence of its generalization and robustness. OvisOCR2 is available at https://huggingface.co/ATH-MaaS/OvisOCR2.",
+      "authors": [
+        "Shiyin Lu",
+        "Yinglun Li",
+        "Yu Xia",
+        "Yuhui Chen",
+        "An-Yang Ji",
+        "Jun-Peng Jiang",
+        "Qing-Guo Chen",
+        "Jianshan Zhao",
+        "En Lin",
+        "Haijun Li",
+        "Cheng Qin",
+        "Zhao Xu",
+        "Weihua Luo"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-07-15T09:32:33+00:00",
+      "link": "https://arxiv.org/pdf/2607.13639v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "multi-component reward design used in RL training",
+      "llm_evidence_cn": "使用多组件奖励设计的强化学习训练",
+      "llm_evidence": "使用多组件奖励设计的强化学习训练",
+      "canonical_evidence": "使用多组件奖励设计的强化学习训练",
+      "llm_tldr_en": "OvisOCR2 is a 0.8B document parsing model trained with supervised fine-tuning, reinforcement learning with multi-component reward, on-policy distillation, and model fusion, achieving SOTA on OmniDocBench.",
+      "llm_tldr_cn": "OvisOCR2是一个0.8B参数的文档解析模型，采用端到端方式将页面图像转换为Markdown。其训练策略包括监督微调、基于多组件奖励设计的强化学习、在线蒸馏和模型融合。在OmniDocBench v1.6上以96.58分达到领先水平，证明了该训练组合的有效性。",
+      "llm_tldr": "OvisOCR2是一个0.8B参数的文档解析模型，采用端到端方式将页面图像转换为Markdown。其训练策略包括监督微调、基于多组件奖励设计的强化学习、在线蒸馏和模型融合。在OmniDocBench v1.6上以96.58分达到领先水平，证明了该训练组合的有效性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.10474v1",
+      "source": "arxiv",
+      "title": "Reinforcement Learning with Verifiable Physics: Post-training LLMs with Continuous Rewards",
+      "abstract": "Partial differential equations (PDEs) are foundational to modeling in science and engineering, but constructing reliable numerical solvers remains labor-intensive, demanding expert knowledge of discretization schemes, stability conditions, and boundary treatments. Recent work has begun to frame PDE solving as a code-generation task for large language models (LLMs), yet existing approaches operate primarily at inference time: relying on prompting, debugging, self-refinement, and test-time scaling rather than adapting the model itself. In parallel, reinforcement learning with verifiable rewards has emerged as a post-training paradigm for code and math reasoning, but its verifiers are typically binary: a compiler runs, or a test passes. Such signals discard the graded structure of scientific correctness, where two solvers may both execute and yet differ in solution accuracy by orders of magnitude. In this work, we introduce RLVP: Reinforcement Learning with Verifiable Physics, an RL post-training framework for multi-PDE solver code generation. RLVP addresses this verifiability gap with a hybrid verifier: hard program-validity checks ensure executability, while continuous physics rewards score function-space accuracy and PDE-residual consistency. A single policy is post-trained across diverse PDE families spanning hyperbolic, parabolic, elliptic, and incompressible-flow systems. RLVP improves over both pre-trained and supervised-only baselines on PDE benchmarks, and shows zero-shot improvement transfer to held-out PDEs. We show that a smaller LLM post-trained with RLVP can outperform prompting a frontier model on in-distribution PDE solver generation. The trained policy shows evidence of compositionality in numerical motifs: it recombines stencils, time-stepping schemes, and boundary-handling primitives learned from the PDEs used in training into generated solvers for unseen PDE problems.",
+      "authors": [
+        "Pengfei Cai",
+        "Utkarsh Utkarsh",
+        "Alan Edelman",
+        "Christopher Vincent Rackauckas",
+        "Rafael Gomez-Bombarelli"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CE"
+      ],
+      "published": "2026-07-11T20:53:04+00:00",
+      "link": "https://arxiv.org/pdf/2607.10474v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "uses RL with continuous rewards for post-training LLMs on PDE solving, matching composite requirement",
+      "llm_evidence_cn": "使用带有连续奖励的强化学习对LLM进行后训练用于偏微分方程求解符合复合需求",
+      "llm_evidence": "使用带有连续奖励的强化学习对LLM进行后训练用于偏微分方程求解符合复合需求",
+      "canonical_evidence": "使用带有连续奖励的强化学习对LLM进行后训练用于偏微分方程求解符合复合需求",
+      "llm_tldr_en": "This paper proposes using reinforcement learning with continuous verifiable rewards to post-train large language models for solving partial differential equations, demonstrating improved code generation over inference-time methods.",
+      "llm_tldr_cn": "该论文提出使用具有连续可验证奖励的强化学习来后训练大型语言模型以解决偏微分方程问题。与仅依赖推理时提示和调试的方法不同该方法直接调整模型本身。实验表明后训练模型生成的求解器代码质量更高且无需手动设计离散化方案。这项工作将强化学习后训练范式从离散代码数学推理扩展到连续数值任务具有重要方法意义。",
+      "llm_tldr": "该论文提出使用具有连续可验证奖励的强化学习来后训练大型语言模型以解决偏微分方程问题。与仅依赖推理时提示和调试的方法不同该方法直接调整模型本身。实验表明后训练模型生成的求解器代码质量更高且无需手动设计离散化方案。这项工作将强化学习后训练范式从离散代码数学推理扩展到连续数值任务具有重要方法意义。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.10805v1",
+      "source": "arxiv",
+      "title": "Diagnosing and Mitigating Thinking Collapse in On-Policy Self-Distillation",
+      "abstract": "On-Policy Self-Distillation (OPSD) has emerged as a crucial paradigm for enhancing and aligning Large Language Models (LLMs). However, in complex reasoning tasks, OPSD paradoxically degrades downstream performance. In this paper, we systematically investigate this pathology and identify a severe optimization trap we define as \\textbf{Thinking Collapse} -- a sharp decline in the model's native intermediate reasoning behavior, measured by epistemic-token density (ET per 1k). Through entropy-based gradient masking and token-level target analysis, we show that this collapse is triggered by aggressive teacher gradients at high-student-entropy decision forks, where student epistemic tokens are frequently suppressed into teacher non-epistemic targets and are highly concentrated in high pointwise student-teacher divergence regions. To resolve this optimization pathology, we propose \\textbf{Adaptive Dual-Perspective OPSD (AD-OPSD)}, a robust control framework that dynamically moderates the self-distillation objective. AD-OPSD selectively anchors high-suppression-risk sandboxed tokens to a reference prior derived from the frozen base model via an asymmetrical pointwise divergence gate, preserving native thinking capacity while retaining OPSD's error-correcting power. Extensive experiments across competitive mathematical benchmarks show that AD-OPSD improves over standard OPSD by up to \\textbf{+4.1\\%} absolute average accuracy across diverse model scales and datasets. Further analysis demonstrates that AD-OPSD mitigates thinking collapse and generalizes robustly to different post-training paradigms.",
+      "authors": [
+        "Keqin Peng",
+        "Chen Li",
+        "Yuanxin Ouyang",
+        "Yancheng Yuan",
+        "Liang Ding"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-07-12T15:24:25+00:00",
+      "link": "https://arxiv.org/pdf/2607.10805v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "diagnoses and mitigates thinking collapse in on-policy self-distillation for LLMs, a core post-training issue",
+      "llm_evidence_cn": "诊断并缓解了LLM在策略自蒸馏中的思维崩溃问题这是后训练的核心问题",
+      "llm_evidence": "诊断并缓解了LLM在策略自蒸馏中的思维崩溃问题这是后训练的核心问题",
+      "canonical_evidence": "诊断并缓解了LLM在策略自蒸馏中的思维崩溃问题这是后训练的核心问题",
+      "llm_tldr_en": "This paper identifies a thinking collapse pathology in on-policy self-distillation for LLMs, where intermediate reasoning degrades, and proposes gradient masking and token-level analysis to mitigate it.",
+      "llm_tldr_cn": "该论文发现在复杂推理任务中LLM的在线自蒸馏会导致思维崩溃即模型中间推理行为显著下降。通过熵基梯度掩蔽和词元级分析揭示了崩溃是由高学生熵决策分支处的激进教师梯度触发的。提出的缓解方法有效保持了模型的推理能力为后训练中的对齐技术提供了重要改进。",
+      "llm_tldr": "该论文发现在复杂推理任务中LLM的在线自蒸馏会导致思维崩溃即模型中间推理行为显著下降。通过熵基梯度掩蔽和词元级分析揭示了崩溃是由高学生熵决策分支处的激进教师梯度触发的。提出的缓解方法有效保持了模型的推理能力为后训练中的对齐技术提供了重要改进。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-07-13-738284-v1",
+      "source": "biorxiv",
+      "title": "The unique value of zero prediction errors in reinforcement learning",
+      "abstract": "Learning is typically understood as a process driven by prediction errors, when outcomes differ from expectations. Yet it remains unclear whether outcomes that perfectly match expectations are psychologically and computationally meaningful. Here, we tested whether zero prediction errors shape affect, belief updating, and neural feedback processing in human reinforcement learning. Participants repeatedly predicted rewards in environments varying in uncertainty, with a subset of trial outcomes manipulated to exactly match their predictions. Zero prediction errors produced the highest momentary happiness, and computational modeling showed that behavior was best explained by a model in which zero prediction errors induce a distinct latent belief state that guides subsequent updating, particularly under higher uncertainty and in individuals with greater intolerance of uncertainty. Outcome-locked EEG analyses further showed that zero prediction errors elicited distinct P3-like responses, with residual neural activity predicting attenuated updating after zero prediction errors but enhanced updating after standard prediction errors. These findings suggest that perfect predictions are not neutral, but informative events that actively shape affect, behavior, and neural feedback processing.",
+      "authors": [
+        "Lloyd, B.",
+        "Kikumoto, A.",
+        "Wurm, F.",
+        "Vives, M.-L."
+      ],
+      "primary_category": "neuroscience",
+      "categories": [
+        "neuroscience"
+      ],
+      "published": "2026-07-14T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.07.13.738284v1.full.pdf",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "studies zero prediction errors in human reinforcement learning, directly informing reward modeling",
+      "llm_evidence_cn": "研究人类强化学习中的零预测误差，直接为奖励建模提供见解",
+      "llm_evidence": "研究人类强化学习中的零预测误差，直接为奖励建模提供见解",
+      "canonical_evidence": "研究人类强化学习中的零预测误差，直接为奖励建模提供见解",
+      "llm_tldr_en": "Investigates how zero prediction errors (perfectly matched outcomes) affect happiness, belief updating, and neural processing in human RL, showing they induce a distinct latent belief state.",
+      "llm_tldr_cn": "该研究探讨了强化学习中零预测误差（结果与预期完全匹配）对情绪、信念更新和神经反馈处理的影响。通过让参与者在不同不确定性环境中预测奖励，并操纵部分试次的结果精确匹配其预测，发现零预测误差能带来最高的即时幸福感。计算建模表明，行为的最佳解释模型将零预测误差视为一种独特的潜在信念状态，这挑战了传统上仅关注预测误差的学习理论，对理解人类学习机制和设计奖励模型具有重要启示。",
+      "llm_tldr": "该研究探讨了强化学习中零预测误差（结果与预期完全匹配）对情绪、信念更新和神经反馈处理的影响。通过让参与者在不同不确定性环境中预测奖励，并操纵部分试次的结果精确匹配其预测，发现零预测误差能带来最高的即时幸福感。计算建模表明，行为的最佳解释模型将零预测误差视为一种独特的潜在信念状态，这挑战了传统上仅关注预测误差的学习理论，对理解人类学习机制和设计奖励模型具有重要启示。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    }
+  ]
+}

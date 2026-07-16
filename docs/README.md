@@ -6,68 +6,59 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-15
-- 运行时间：2026-07-15 21:37:40 UTC
+- 最新运行日期：2026-07-16
+- 运行时间：2026-07-16 21:23:35 UTC
 - 运行状态：成功
-- 本次总论文数：16
-- 精读区：6
-- 速读区：10
+- 本次总论文数：13
+- 精读区：7
+- 速读区：6
 
 ### 今日简报（AI）
-今日聚焦6篇精读与10篇速读研究，其中MC-RAG系统和Tool-Adaptive LLM Reranker均获9.0高分。最值得关注的是多约束检索增强生成（MC-RAG）与工具自适应排序器两大方向，它们显著提升了复杂查询与LLM重排效果。建议读者优先阅读这两篇高分解法，并尝试结合速读中EcoXAI的自动化解释思路，深化落地应用。
-- 详情：[/202607/15/README](/202607/15/README)
+今日处理13篇论文，重点精读两篇满分研究《Hallucination Detection》与《To Answer or to Abstain》。最值得关注的方向是大语言模型幻觉检测的Diversion Decoding方法，以及强化学习中零预测误差的独特价值。建议普通读者优先精读这两篇满分论文，并速读Mach-Mind-4-Flash技术报告以了解前沿动态。
+- 详情：[/202607/16/README](/202607/16/README)
 
 ### 精读区论文标签
-1. [MC-RAG System: A Structure-Driven RAG System for Multi-Constraint Queries](/202607/15/2607.10151v1-mc-rag-system-a-structure-driven-rag-system-for-multi-constraint-queries)  
+1. [Hallucination Detection in Large Language Models Using Diversion Decoding](/202607/16/2607.10476v1-hallucination-detection-in-large-language-models-using-diversion-decoding)  
+   标签：评分：10.0/10、query:lpt
+   evidence：直接针对大语言模型幻觉检测与抑制
+2. [To Answer or to Abstain: Mitigating Search-Agent Hallucinations via Abstention-Aware Reinforcement Learning](/202607/16/2607.10738v1-to-answer-or-to-abstain-mitigating-search-agent-hallucinations-via-abstention-aware-reinforcement-learning)  
+   标签：评分：10.0/10、query:lpt
+   evidence：直接针对搜索智能体LLM的幻觉抑制问题，提出弃权感知的强化学习方法
+3. [Protective Capacity Hallucination: When Large Language Models Claim Nonexistent Capabilities](/202607/16/2607.13596v1-protective-capacity-hallucination-when-large-language-models-claim-nonexistent-capabilities)  
+   标签：评分：10.0/10、query:lpt
+   evidence：直接研究LLM在保护角色中的幻觉，提出保护型能力幻觉（PCH）
+4. [Meta-Learning Preferences for Multilingual LLM Alignment](/202607/16/2607.13315v1-meta-learning-preferences-for-multilingual-llm-alignment)  
    标签：评分：9.0/10、query:lpt
-   evidence：通过结构化检索减少多约束查询中的幻觉
-2. [Tool-Adaptive LLM Reranker](/202607/15/2607.10555v1-tool-adaptive-llm-reranker)  
+   evidence：用于多语言LLM对齐的RLHF和DPO中奖励建模的元学习框架
+5. [Demystifying On-Policy Distillation: Roles, Pathologies, and Regulations](/202607/16/2607.13399v1-demystifying-on-policy-distillation-roles-pathologies-and-regulations)  
    标签：评分：9.0/10、query:lpt
-   evidence：LLM重排序中的事实幻觉抑制
-3. [Agentic-DPO: From Imitation to Agentic Policy Optimization on Expert Trajectories](/202607/15/2607.10601v1-agentic-dpo-from-imitation-to-agentic-policy-optimization-on-expert-trajectories)  
+   evidence：系统研究在线策略蒸馏，这是大语言模型后训练的关键范式
+6. [LAPO: Leave-One-Turn Attribution for Self-Generated Process Rewards in Multi-Turn Search Reasoning](/202607/16/2607.13501v1-lapo-leave-one-turn-attribution-for-self-generated-process-rewards-in-multi-turn-search-reasoning)  
    标签：评分：9.0/10、query:lpt
-   evidence：面向智能体的离线偏好优化，与基于人类反馈的奖励建模相关
-4. [Deployable Human Preference Alignment in Robotics: Learning Representative Rewards from Diverse Human Preferences](/202607/15/2607.12466v1-deployable-human-preference-alignment-in-robotics-learning-representative-rewards-from-diverse-human-preferences)  
+   evidence：为多轮搜索推理生成过程奖励，直接关联奖励建模和人类反馈强化学习
+7. [Groc-PO: Grounded Context Preference Optimization for Truthful Multimodal LLMs](/202607/16/2607.13712v1-groc-po-grounded-context-preference-optimization-for-truthful-multimodal-llms)  
    标签：评分：9.0/10、query:lpt
-   evidence：人类偏好奖励建模
-5. [Predictive Divergence Masks for LLM RL](/202607/15/2607.10848v1-predictive-divergence-masks-for-llm-rl)  
-   标签：评分：8.0/10、query:lpt
-   evidence：使用发散掩码改进PPO方向标准
-6. [Enhancing LLMs through human feedback: a journey towards self-improvement](/202607/15/2607.11267v1-enhancing-llms-through-human-feedback-a-journey-towards-self-improvement)  
-   标签：评分：8.0/10、query:lpt
-   evidence：基于人类反馈的LLM自我改进与辅助RAG系统
+   evidence：通过基于上下文的偏好优化解决多模态大模型的幻觉和不真实问题
 
 ### 速读区论文标签
-1. [Generalizing Preference-based Reinforcement Learning: a Rationality Model for Incomparability](/202607/15/2607.11432v1-generalizing-preference-based-reinforcement-learning-a-rationality-model-for-incomparability)  
+1. [Mach-Mind-4-Flash Technical Report](/202607/16/2607.09375v1-mach-mind-4-flash-technical-report)  
    标签：评分：8.0/10、query:lpt
-   evidence：通过基于Bradley-Terry的多维奖励建模泛化基于偏好的强化学习，处理不可比性
-2. [EcoXAI: Autonomous Agentic Ecosystem for Explainable Artificial Intelligence and Biomedical Discovery](/202607/15/biorxiv-10-64898-2026-07-08-737358-v1-ecoxai-autonomous-agentic-ecosystem-for-explainable-artificial-intelligence-and-biomedical-discovery)  
+   evidence：针对大语言模型的后训练优化，涉及强化学习和混合专家，属于复合主题
+2. [Reinforcement Learning with Verifiable Physics: Post-training LLMs with Continuous Rewards](/202607/16/2607.10474v1-reinforcement-learning-with-verifiable-physics-post-training-llms-with-continuous-rewards)  
    标签：评分：8.0/10、query:lpt
-   evidence：旨在避免生物医学分析中出现幻觉的多智能体系统
-3. [ProgramTab: Boosting Table Reasoning of LLMs via Programmatic Paradigm](/202607/15/2607.11207v1-programtab-boosting-table-reasoning-of-llms-via-programmatic-paradigm)  
+   evidence：使用带有连续奖励的强化学习对LLM进行后训练用于偏微分方程求解符合复合需求
+3. [The unique value of zero prediction errors in reinforcement learning](/202607/16/biorxiv-10-64898-2026-07-13-738284-v1-the-unique-value-of-zero-prediction-errors-in-reinforcement-learning)  
+   标签：评分：8.0/10、query:lpt
+   evidence：研究人类强化学习中的零预测误差，直接为奖励建模提供见解
+4. [FlashTrie: A GPU-Accelerated Constrained Beam Search for Generative Retrieval](/202607/16/2607.10044v1-flashtrie-a-gpu-accelerated-constrained-beam-search-for-generative-retrieval)  
    标签：评分：7.0/10、query:lpt
-   evidence：通过编程范式增强LLM表格推理的算法改进
-4. [Transforming LLMs into Efficient Cross-Encoders via Knowledge Distillation for RAG Reranking](/202607/15/2607.11933v1-transforming-llms-into-efficient-cross-encoders-via-knowledge-distillation-for-rag-reranking)  
+   evidence：GPU加速的约束束搜索用于生成检索，为大规模生成提供了高效解码算法改进
+5. [Diagnosing and Mitigating Thinking Collapse in On-Policy Self-Distillation](/202607/16/2607.10805v1-diagnosing-and-mitigating-thinking-collapse-in-on-policy-self-distillation)  
    标签：评分：7.0/10、query:lpt
-   evidence：将LLM微调为高效交叉编码器用于RAG重排序
-5. [The Nuts and Bolts of Natural Language to SQL Translation: A Systematic Analysis of Model Pipeline Optimisation Approaches and their Interactions](/202607/15/2607.10911v1-the-nuts-and-bolts-of-natural-language-to-sql-translation-a-systematic-analysis-of-model-pipeline-optimisation-approaches-and-their-interactions)  
+   evidence：诊断并缓解了LLM在策略自蒸馏中的思维崩溃问题这是后训练的核心问题
+6. [OvisOCR2 Technical Report](/202607/16/2607.13639v1-ovisocr2-technical-report)  
    标签：评分：6.0/10、query:lpt
-   evidence：自然语言转SQL管道优化的系统分析
-6. [GRID: Grammar-Railed Decoding for Enterprise SQL Generation](/202607/15/2607.11951v1-grid-grammar-railed-decoding-for-enterprise-sql-generation)  
-   标签：评分：6.0/10、query:lpt
-   evidence：用于企业SQL生成的语法约束解码算法
-7. [Policy-Conditioned Constrained Decoding for Column-Level Access Control in Text-to-SQL](/202607/15/2607.12341v1-policy-conditioned-constrained-decoding-for-column-level-access-control-in-text-to-sql)  
-   标签：评分：6.0/10、query:lpt
-   evidence：用于Text-to-SQL策略合规的约束解码方法
-8. [GRAFT: Graph-Matched Retrieval and Fusion of Tables in Data Lakes](/202607/15/2607.12717v1-graft-graph-matched-retrieval-and-fusion-of-tables-in-data-lakes)  
-   标签：评分：6.0/10、query:lpt
-   evidence：提出IGMS对数行列式奖励用于表检索优化
-9. [Verifier-Based Reinforcement Fine-Tuning of Reasoning Models for Thermal Energy Storage Control](/202607/15/2607.12856v1-verifier-based-reinforcement-fine-tuning-of-reasoning-models-for-thermal-energy-storage-control)  
-   标签：评分：6.0/10、query:lpt
-   evidence：使用可验证奖励的强化学习（RLVR）进行模型微调
-10. [Overinflation and overconcentration: why Cauchy perturbation kernels are the right choice for ABC-SMC](/202607/15/biorxiv-10-64898-2026-06-24-734205-v1-overinflation-and-overconcentration-why-cauchy-perturbation-kernels-are-the-right-choice-for-abc-smc)  
-   标签：评分：6.0/10、query:lpt
-   evidence：推导了ABC-SMC中核协方差过度膨胀因子的闭式解，为选择扰动核提供了数学公式
+   evidence：使用多组件奖励设计的强化学习训练
 
 
 <div class="dpr-home-promo-card">

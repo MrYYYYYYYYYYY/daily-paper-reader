@@ -1,0 +1,1086 @@
+Title: FlashTrie: A GPU-Accelerated Constrained Beam Search for Generative Retrieval
+
+URL Source: https://arxiv.org/pdf/2607.10044v1
+
+Published Time: Tue, 14 Jul 2026 02:33:07 GMT
+
+Number of Pages: 19
+
+Markdown Content:
+# FlashTrie: A GPU-Accelerated Constrained Beam Search for Generative Retrieval 
+
+Dakshitha Anandakumar 1 Anurag Mukkara 2 Wenxiang Hu 1 Jiusheng Chen 1
+
+M Akash Kumar 1 Ting Ye 1 Qiang Lou 1 Jian Jiao 11Microsoft, Redmond, WA, USA 2Nvidia, Santa Clara, CA, USA 
+
+{danandakumar, tiy }@microsoft.com 
+
+Abstract 
+
+Constrained decoding is essential in generative retrieval, where document identifiers generated directly from a query must exactly match a predefined library of valid IDs. At scale, decod-ing is often constrained using a trie with beam search but most implementations run on CPU. Limited parallelism then makes trie traversal and candidate validation a serving bottleneck as beam width grows. We present FlashTrie , which addresses this limitation by optimizing constrained beam search on GPUs. It introduces an integer-aware succinct trie layout that uses bit compression to reduce memory footprint while keeping the full index in GPU high-bandwidth memory reduc-ing memory stalls, and a cooperative CUDA kernel that performs beam expansion, valida-tion, and pruning entirely on-device without per-step host orchestration. It further replaces CPU-style irregular lookup and heap mainte-nance with GPU-aware parallel primitives, im-proving warp utilization and reducing diver-gence. Together, these designs significantly reduce de-coding latency and increase throughput while preserving retrieval quality. On a library of 800M keywords with beam widths up to 1000 ,FlashTrie reduces trie-search latency to un-der 3 ms, achieving up to 24 × speedup over a highly optimized multi-threaded CPU base-line. These improvements enable FlashTrie to scale beam sizes by up to 5× in latency-critical applications such as sponsored search. In a large-scale online A/B experiment on a com-mercial search engine, it delivers a statistically significant +0 .71% revenue lift, enabling real-time constrained decoding at a scale previously feasible only offline. The FlashTrie code will be publicly released after the review process. 
+
+1 Introduction 
+
+Generative retrieval (Tay et al., 2022; Metzler et al., 2021) reframes document retrieval as a sequence-to-sequence task, mapping a query directly to an identifier (docID), replacing dual-encoder index-ing (Karpukhin et al., 2020). This paradigm is attractive for large-scale search and recommenda-tion systems because it can, in principle, avoid expensive retrieval pipelines while enabling com-pact end-to-end modeling. In practice, however, online serving is constrained by strict latency bud-gets, and the decoding procedure becomes the dom-inant bottleneck. Autoregressive (AR) (Sutskever et al., 2014) decoders are sequential and costly, while non-autoregressive (NAR) (Gu et al., 2018; Sun and Yang, 2020) decoders regain parallelism but their per-position independence frequently pro-duce invalid identifiers that must be filtered by con-strained search (Ziems et al., 2023; Pradeep et al., 2023). 
+
+Prior Work and Challenges. Several strategies restrict decoding to valid outputs, including logit masking (Tay et al., 2022), finite-state compi-lation (Willard and Louf, 2023), and predicate-logic frameworks (Lu et al., 2021; Anderson et al., 2017). As the identifier library scales to mil-lions or billions of entries, a common approach is trie-constrained beam search (Hokamp and Liu, 2017), used across flat-token schemes (DSI (Tay et al., 2022), GENRE (Cao et al., 2021)), and structured semantic-identifiers (NCI (Wang et al., 2022), SEAL (Bevilacqua et al., 2022), and recent work (Penha et al., 2025)). However, pointer-based trie representa-tions (Morrison, 1968; ichi Aoe, 1989) suffer from irregular memory access and poor hardware utilization, leading production systems to rely on optimized CPU implementations (Cao et al., 2021). Succinct designs such as MARISA (Yata, 2011), built on LOUDS (Jacobson, 1989) and minimal acyclic FSAs (Daciuk et al., 2000), improve space efficiency but support only character-level keys, limiting their applicability to generative arXiv:2607.10044v1 [cs.LG] 10 Jul 2026 retrieval with large token vocabularies and batched, beam-aware traversal. These structures also map poorly to GPUs, causing warp divergence and uncoalesced access (Merrill et al., 2012). While modern inference runtimes (Wang et al., 2021; Dao et al., 2022; Kwon et al., 2023) optimize model execution on GPU, constraint enforcement is often implemented outside the core GPU decod-ing path, which can introduce additional orchestra-tion overhead. This motivates three key questions: 
+
+(i) can succinct tries be adapted to token-level vo-cabularies without sacrificing space efficiency; (ii) 
+
+can constrained beam search be executed entirely on GPU; and (iii) can such systems meet produc-tion latency constraints without degrading retrieval quality? 
+
+Our Contribution. We present FlashTrie , a GPU-native constrained decoding framework for generative retrieval that jointly optimizes constraint representation and decoding computation. Building on succinct tries, we redesign MARISA for integer-token vocabularies using a bit-compressed layout that reduces index size and keeps the constraint structure resident in GPU high-bandwidth memory (HBM). We further introduce GPU-friendly search and sort primitives, parallel trie child matching and heap-free beam selection, to replace pointer-heavy traversal and reduce divergence. Constrained beam search is executed fully on-device via a cooperative multi-step CUDA kernel that performs expansion, validation, and pruning without repeated kernel re-launch overhead across decoding steps. Two-level parallelism, beam-parallel and top-K-parallel ex-ecution, exploits hierarchical GPU concurrency, saturating hundreds of streaming multiprocessors (SMs) and maintaining high occupancy across the device. FlashTrie scales constrained decoding to billion-scale constraint libraries on GPU, a regime previously feasible only in offline settings, while achieving up to 24 × speedup over optimized CPU baselines and reducing trie-search latency to under 3 ms. In production A/B testing on a large-scale sponsored-search system, these latency gains en-able wider beam search within strict serving bud-gets, translating to a +0.71% revenue lift. 
+
+2 Design and Implementation 
+
+We consider constrained decoding with a trie T
+
+over vocabulary V. FlashTrie applies to both AR and NAR decoding; we focus on NAR in experi-ments because larger branching factors make con-B2n-1 B1n-1         
+
+> B1b B1c B1a B2b B2a
+> B2[n] B1[n]
+> Topk ∩ ChildNode
+> Merge Sort
+> GPU CTA:
+> B1[n-1]
+> (512 threads)
+> Trie
+> TopK tokens at n
+> Child Labels
+> (sorted) C1 C2 C3 C4
+> Parallel
+> binary search
+> SeqLength
+> TopK
+> Step n
+> t3 t2 t1
+> B1c B1a B2a
+> Trie Node Storage
+> Constraint DocID Input
+> Trie node and Tail
+> link offset : 2-byte low
+> + high part (bit-packed,
+> up to 16 bits) Trim Beams<= BeamWidth
+> Model proposal
+> GPU CTA:
+> B2[n-1]
+> (512 threads)
+> Beam
+> expansion
+> Beam
+> pruning
+> Beam
+> validation
+> Active beams
+
+Figure 1: Overview of FlashTrie pipeline. At each de-coding step, active beam states are mapped to thread blocks (CTAs) and processed in parallel across the threads of a CTA for trie-based validation and beam expansion all executed on-device. ( Inset ) FlashTrie ex-tends Narrow-LOUDS representation to integer tokens stored in compact structured arrays. 
+
+straint checking more expensive. At decoding step 
+
+t the base model emits top-K candidates (xt,i , ℓ t,i )
+
+with ℓt,i = log p(xt,i | x<t ); trie-constrained beam search keeps the top-B valid prefixes under length-normalized log-probability (Wu et al., 2016) (Equa-tion 2, Appendix E). For comparison, we use two CPU baselines built on the same LOUDS+tail/link trie skeleton (Yata, 2011) (Appendix A). 
+
+2.1 CPU Baselines: MARISA-Int and MARISA-Opt MARISA-Int extends open-source MARISA (Yata, 2011) from character-level keys to 32-bit integer tokens and adds a minimal beam-search layer, while preserving the original build pipeline. It runs single-threaded on CPU. 
+
+MARISA-Opt is a stronger CPU baseline: adds trie traversal with prefix-state caching, a multi-threaded worker pool, two-pointer merge between sorted proposals and child labels ( O(K+∆) per beam), and a bounded min-heap for top-B pruning (O(C log B)). Design details and per-operation complexity are in Appendices B and C. 
+
+2.2 FlashTrie: GPU-Resident Constrained Beam Search 
+
+FlashTrie redesigns both the trie data structure and the decoding algorithm for GPU execution. The result is a GPU-resident constraint index that pre-serves succinct-trie space efficiency while reduc-ing memory stalls and exposing hierarchical paral-lelism. 
+
+Narrow LOUDS for integer tokens Published MARISA targets 8-bit alphabets. FlashTrie extends the layout to 32-bit integer tokens to enable large vocabularies (over a million) but narrows the per-node slot by splitting both label and suffix index into a 2-byte low part in the base array and a bit-packed high part in a secondary array for nodes that need them. This halves the dominant array, shrinks the constraint index, and keeps billion-scale libraries in GPU HBM (Figure 1). It also improves locality and reduces pointer-chasing stalls as fewer bits are fetched per access (Section 4.1). 
+
+Kernel Execution and Parallelism. FlashTrie executes constrained beam search in a single co-operative kernel, avoiding per-step CPU-GPU or-chestration. The GPU grid has several multiproces-sors (SM) with each SM having one cooperative thread block (CTA) (NVIDIA Corporation, 2024, 2020). Queries are batched across the SMs. To enable parallel beam search, within each query, an active beam is assigned to one CTA. A CTA has 512 threads that perform top-K expansion and trie-based validation via batched child lookup. A grid-synchronized step then merges and prunes beams using parallel merge sort to enforce beam width. At each decoding step, FlashTrie exposes two levels of parallelism. First, a beam-parallel ex-pansion across all BW active beams. Second, proposal-parallel validation within each beam, where each thread tests one of the top-K language-model proposals through binary search over sorted trie child labels. The full T -step loop runs in one GPU launch (Algorithm 1), hence at BW = K =1000 , this yields up to one million concurrent child-lookups across the GPU grid. After expansion, the CPU heap is replaced by an append-only candidate buffer and a parallel top-
+
+B selection kernel. This removes lock contention and pointer chasing while keeping intermediate candidates in fast on-chip memory (Appendix D). 
+
+3 Experimental Setup 
+
+We evaluate on 13,000 retrieval requests from a production NAR model with a 2.2M-token vocab-ulary. Each request generates top-K proposals (∈ 100 , . . . , 1000 , beamwidth (BW) = K) over 
+
+T = 8 decoding steps. The constraint trie is built with 800M keyword sequences and is resident on 
+
+Algorithm 1 FLASH TRIE beam search. One per-sistent GPU kernel executes all T steps on device, exposing beam-parallel expansion and proposal-parallel validation. Kernel details: Appendix D.                                                                        
+
+> Require: trie T, initial state s0, beam width BW , length T,per-step LM proposals T OP K(s, K )
+> 1: cur ← { s0}
+> 2: for t= 0 to T−1do
+> 3: next ← ∅
+> 4: for each s∈cur in parallel do
+> 5: {(i) beam-parallel }
+> 6: (τ1: K, ρ 1: K)←TOP K(s, K )
+> 7: for k= 1 to Kin parallel do
+> 8: {(ii) proposal-parallel }
+> 9: u←CHILD LOOKUP (T, s.v, τ k)
+> 10: {O(log ∆) binary search }
+> 11: if u̸=⊥and s.σ +ρk> θ sent then
+> 12: append (s, u, ρ k)to next
+> 13: {lock-free }
+> 14: end if
+> 15: end for
+> 16: end for
+> 17: barrier ;cur ←TOP -B(next )
+> 18: {on-device }
+> 19: end for
+> 20: 21: return BACKTRACE (cur )
+
+a single A100 80GB GPU paired with an AMD EPYC 7V13 host. For MARISA-Opt, we use 8 CPU workers to saturate the 8-core allocation; full hardware isolation details in Appendix E. We measure per-request latency (mean, p50/p90/p95/p99), throughput under batched serv-ing ( b ∈ 1, 4, 8, 16 , 32 queries), on-disk index size and wall-clock build time, and Precision@100/200 scored by a transformer teacher (Section 4.5). Latency timing spans the full request path (C++ entry to result return, including GPU stream synchronization). All timings average 10 passes over the full 13,000-request set after one warm-up discard. Details in Appendix E. 
+
+4 Results 
+
+4.1 Trie Build Time and Index Size 
+
+We begin by evaluating how FlashTrie’s stor-age redesign affects two immediate construction outcomes: trie build time and on-disk index size.FlashTrie reduces both as the constraint set grows (Figure 2). Across 10M–800M sequences, the widening gap reflects a shift in the domi-nant cost: at small scales, fixed LOUDS and tail-construction overheads dominate (Appendix A), whereas at larger scales the per-edge link machin-ery and traversal bookkeeping become the bottle-neck (Appendix C). MARISA-Int and MARISA-10 
+
+> 100
+> 200
+> 500
+> 800
+> Keywords indexed (M)
+> 0
+> 25
+> 50
+> 75
+> Build time (min)
+> Original MARISA
+> MARISA-Opt
+> FlashTrie
+> 10
+> 100
+> 200
+> 500
+> 800
+> Keywords indexed (M)
+> 0
+> 2
+> 4
+> Index size (GB)
+
+Figure 2: Trie construction scaling on 10M–800M keyword sequences, ( Left ) Build time, ( Right ) Con-straint index size on disk; at runtime, the full trie is resident in GPU memory. At 10M keys, FlashTrie builds in 0.15 min and uses 0.061 GB, compared with 0.48 min / 0.060 GB for MARISA-Opt and 0.58 min / 0.075 GB for MARISA-Int. At 800M keys, FlashTrie reaches 13.4 min and 3.1 GB, versus 45.3 min / 4 GB for MARISA-Opt and 51.1 min / 4 GB for MARISA-Int. 
+
+Opt remain close because they retain the same full-width node storage layout, while FlashTrie reduces per-node work by narrowing link offsets and split-ting each 32-bit label into a compact base field plus packed high bits (Section 2.2). As the corpus grows, those savings compound. Even at such a large constraint index as 800M, trie size is only around 3 GB in FlashTrie, allowing the trie to fit entirely in GPU HBM and enabling deployment on smaller GPUs like T4 or A100 MIG. Further, FlashTrie achieves 3.4 × faster build time than MARISA-Opt and uses 22% less index space. Taken together, these construction-time gains establish the practi-cal value of the storage redesign, which is one of the key enablers of the latency results that follow. 
+
+4.2 Latency Results 
+
+Next, we evaluate how GPU occupancy-focused kernel optimizations, together with full on-device residency of the constraint index, impact trie-search latency as beam width increases. On the GPU, each request runs in a single persistent cooperative ker-nel that executes every decoding step on-device and synchronises across steps with a grid-wide bar-rier (Section 2.2). The host pays launch overhead once per query rather than once per step, keep-ing latency in a narrow band as BW grows (Fig-ure 3). GPU mean latency rises from 0.56 ms at 
+
+K=100 to 1.91 ms at K=1000 , with p95 below 
+
+2.79 ms and p99 below 3.31 ms. MARISA-Opt in-stead expands beams sequentially on a fixed-size worker pool (Section 2.1), and its mean latency rises from 9.03 ms to 46 .30 ms, while its p99 rises from 15 .08 ms to 76 .71 ms over the same sweep. The resulting mean speedup grows from 16 .3×100 300 500 700 900   
+
+> Beamwidth / Top-K
+> 1
+> 10
+> 80
+> Latency (ms)
+> 100 500 900
+> Beamwidth / Top-K
+> 14
+> 18
+> 22
+> 26
+> Speedup
+> Marisa-Opt
+> p95
+> Flash
+> mean
+
+Figure 3: Per-request trie-search latency and GPU speedup vs. beam width BW at b=1 ( |V| =2.2M, 800M-key trie). (Left) Mean (solid) and p95 (dashed) latency. CPU mean rises from 9.0 ms ( BW =100 ) to 46 .3 ms (BW =1000 ), with p95 65 .5 ms and p99 76 .7 ms at the top end. GPU mean stays sub-2 ms across the sweep (0.55 –1.91 ms), with p95 ≤ 2.79 ms and p99 ≤ 3.31 ms. 
+
+(Right) Mean GPU speedup climbs from 16 × to 24 ×.Full per-percentile table: Appendix F. 
+
+to 24 .2× as BW/K increases (Figure 3). We ob-serve slight dips near K≈ 500 and 800, where the on-device top-B sorter changes thread capacity (Appendix D). MARISA-Int (Section 2.1) is intractable at billion-keyword scale ( >3 h for a single K=1000 
+
+query on a 10-query subsample), so we adopt MARISA-Opt as the primary CPU comparator; full MARISA-Int measurements are in Appendix H. Maintaining low latency as BW increases shows that FlashTrie’s optimizations remain effective at scale; next, we break down kernel runtime by phase to identify which components dominate as BW 
+
+grows. 
+
+4.3 Runtime Breakdown 
+
+To profile the latency trend, we instrument FlashTrie’s cooperative kernel and measure GPU runtime across four phases (Figure 1): beam ex-pansion, validation, pruning and grid sync. Fig-ure 4 (left) shows the dominant cost shifts with beam width: at K=100 , expansion dominates (≈66%) as trie traversal is the bottleneck. As BW 
+
+grows, expansion remains inexpensive because par-allel beams share upper trie nodes. In contrast, the number of surviving candidates scales with 
+
+B×K, increasing validation and pruning cost; at 
+
+BW =1000 , validation becomes dominant ( ≈43% of total runtime). Pruning remains stable at 15 –
+
+19% , while sync overhead stays small ( ≤ 6% , de-creasing to 3.5% ), confirming that the persistent kernel avoids per-step host orchestration with negli-gible barrier overhead. Measurement details are in Appendix D.4. Overall, the bottleneck shifts from trie traversal to candidate processing at larger BW. 100 400 700 1000    
+
+> Beamwidth / Top-K
+> 0.0
+> 0.6
+> 1.2
+> 1.8
+> GPU runtime (ms)
+> BeamExpand
+> BeamValidate
+> BeamPrune
+> Grid sync
+> 100 400 700 1000
+> Beamwidth / Top-K
+> 10 2
+> 10 3
+> 10 4
+> Throughput (q/s)
+> FlashTrie
+> Marisa-Opt
+> BS 1
+> BS 4
+> BS 8
+
+Figure 4: ( Left ) GPU runtime breakdown of FlashTrie’s cooperative beam-search kernel vs. beam width BW 
+
+(b=1 , averaged over 13,000 requests). As BW 
+
+grows, the bottleneck shifts from trie traversal (beam expansion) to candidate handling (beam validation). (Right ) Throughput (mean q/s) vs. BW , per batch size. FlashTrie peaks at b=8 for all BW (6,623 q/s at 
+
+BW =100 , 1,621 q/s at BW =1000 ), while MARISA-Opt flattens earlier. At each system’s own best batch size, FlashTrie delivers 32 ×–71 × more throughput than MARISA-Opt. 
+
+We next quantify the system-level impact using batch-throughput measurements. 
+
+4.4 Throughput Scaling with Batch Size 
+
+Latency improvements are operationally mean-ingful if they convert into higher serving capac-ity under realistic batching. In Figure 4 (right), the throughput curves reflect different batching regimes. FlashTrie’s throughput rises steeply from 
+
+b=1 to b=8 as batching fills more GPU execu-tion resources, peaking at 1,621 q/s for BW =1000 .This is 70 × higher than MARISA-Opt at its own peak batch size. MARISA-Opt scales only mod-estly with batch size because its CPU thread pool is quickly saturated: once all workers are occupied, extra queries mostly queue (Section 2.1). FlashTrie benefits more from batching because each query is mapped to a GPU block with many threads, so larger batches better fill the device’s execution re-sources. Beyond b=8 , however, thread synchro-nization and partition overhead start to dominate, so throughput falls. These throughput gains indi-cate more effective GPU utilization under batched serving, with higher occupancy and better device saturation as workload increases. 
+
+4.5 Retrieval Quality 
+
+Given that FlashTrie maintains only a fraction of MARISA-Opt’s latency even at larger beam widths, we next verify that this highly optimized decoding path does not compromise retrieval quality. Table 1 shows that retrieval quality improves with beam 
+
+Table 1: Retrieval precision at cutoffs 100 and 200 on the 13K-request dataset, scored by a Transformer cross-encoder (Valluri et al., 2025). MARISA-Opt and FlashTrie agree within 0.001 for every BW (col-lapsed into one column). Prec@200 at BW =100 equals Prec@100 due to a truncated denominator                               
+
+> BW 100 200 300 400 500 600 700 800 900 1000
+> P100 .53 .68 .72 .74 .75 .76 .77 .77 .78 .78
+> P200 .52 .46 .56 .61 .64 .65 .67 .66 .68 .69
+
+width. P@100 increases from 0.53 at BW =100 
+
+to 0.78 at BW =1000 , and P@200 increases from 0.52 to 0.69. Gains taper after BW ≈700 , but the trend remains monotonic overall at the operating scale of interest. FlashTrie matches MARISA-Opt to within 0.001 
+
+across all settings, indicating that GPU execution remains in parity with the CPU implementation. More importantly, in latency-critical serving (e.g., sponsored search; Section 4.8), MARISA-Opt be-comes impractical beyond roughly BW ≥200 as beam width grows. Thus, the quality gains from larger beam widths are operationally realizable only with FlashTrie, which keeps constrained de-coding within tight online latency budgets where large-BW MARISA-Opt cannot. 
+
+4.6 Ablations: Isolating Trie and Search-Algorithm Contributions 
+
+Section 4.2 combines three effects: execution sub-strate (CPU vs. GPU), trie-based constraint check-ing, and inner-loop child-search algorithm. We isolate the latter two with GPU-resident ablations that share FlashTrie’s cooperative kernel, scoring rules, thresholds, and length normalization. Per-Position Token (PPT) is a depth-only filter, not a prefix-constrained decoder: at step t, it in-tersects top-K model tokens with a global sorted token list for depth t, then returns all matches re-gardless of beam prefix. Because this depth-level token set is shared, the matched set is computed once and reused across beams. Linear-probe keeps the LOUDS trie unchanged but swaps binary search for a shared-memory linear scan over children, isolating O(∆) vs. O(log ∆) 
+
+behavior. Setup details are in Appendices I and J. Table 2 shows three takeaways. (i) A permis-sive GPU baseline (PPT) is fast but not constraint-equivalent. (ii) adding prefix-constrained trie checking (PPT to FlashTrie) provides an additional gain that grows with BW (from 1.2× to 6.0× in Table 2: Per-request latency (ms) for two GPU ablations vs. FlashTrie at b=1 . PPT removes trie constraints; Linear-probe keeps the trie but replaces binary search with linear scan in the child range. We report p95 speedup as ablation p95 /FlashTrie p95 . Every other K
+
+is shown; full sweep in Appendix J, Table 8.                                            
+
+> PPT on GPU Linear-probe on GPU
+> BW Mean p95 Sp. Mean p95 Sp.
+> 100 0.57 0.79 1.2×110.2 134.1 209 ×
+> 300 1.90 2.69 2.4×123.9 149.1 133 ×
+> 500 3.54 5.20 2.8×128.6 155.7 85 ×
+> 700 6.98 10.30 4.4×141.1 178.8 76 ×
+> 900 9.73 14.36 5.2×151.2 194.3 71 ×
+> 1000 11.28 16.65 6.0×154.3 198.7 71 ×
+
+p95). (iii) binary search over child labels is critical (Linear-probe to FlashTrie), with 71 ×–209 × p95 degradation when replaced by linear scan. These ablations show that both prefix-constrained trie fil-tering and logarithmic child lookup are essential, indicating the gains come from core algorithmic design rather than hardware alone. 
+
+4.7 Public-Dataset Reproducibility 
+
+To reproduce the latency claim on public artifacts, we synthesise a parallel workload from NQ-Open queries (Kwiatkowski et al., 2019; Lee et al., 2019), the GENRE-KILT BART-large checkpoint (Cao et al., 2021; Lewis et al., 2020), and the ∼6M KILT Wikipedia titles (Petroni et al., 2021) as the constraint library. We sweep beam width BW ∈{100 , 200 , . . . , 1000 } over all 3,600 NQ-Open vali-dation queries ( T =16 decoding positions) and mea-sure per-request trie-search latency on the same hardware as Section 3. Figure 5 shows that FlashTrie reproduces the internal-dataset speedup trend (Figure 3) on en-tirely public artifacts. The p99 speedup increases from 12 .8× to 22 .7×, indicating both lower and more predictable tail latency across the full BW -sweep. A detailed noise-injection ablation studying the effect of cross-position incoherence (NAR-style proposal grids) is in Appendix K. Reproducing the same scaling pattern on public data supports gen-erality beyond internal traffic, leading to the final test on live production impact. 
+
+4.8 Online A/B Testing 
+
+We validate our offline findings with a random-ized online A/B experiment on live traffic from a popular commercial search engine. The goal is to test whether the larger beam width enabled by 100 300 500 700 900   
+
+> Beamwidth / Top-K
+> 0.1
+> 1
+> 10
+> 100
+> Latency (ms)
+> 100 500 900
+> Beamwidth / Top-K
+> 10
+> 15
+> 20
+> Speedup
+> Marisa-Opt
+> FlashTrie
+> p95
+> mean
+
+Figure 5: Latency on the NQ+GENRE public work-load (3,600 queries, T =16 , ∼6M-title trie) vs. beam width BW . GPU mean latency rises from 0.28 ms (BW =100 ) to 1.67 ms ( BW =1000 ); MARISA-Opt mean grows from 3.11 ms to 34 .23 ms. Mean speedup: 
+
+11 .0× to 20 .5×.
+
+FlashTrie yields meaningful online gains in user engagement and revenue, i.e., whether offline im-provements transfer to gains in production. The experiment runs for 16 consecutive days across multiple countries, with English and non-English results reported separately in Table 3. Both arms deploy the same NAR generative re-trieval model (Valluri et al., 2025) on an A100 MIG 10 GB slice. In control, production MARISA-Opt at BW =200 is already near the online limit (≈25 ms p95; BW > 200 violates latency con-straints). The treatment swaps MARISA-Opt trie stage for FlashTrie and uses the recovered latency headroom to increase beam width to BW trt =600 ,while keeping the model and downstream ranking stack unchanged. FlashTrie sustains BW =600 at 
+
+15 /17 ms (p50/p95), exploring over 2× more can-didates within the same serving budget. The treatment yields statistically significant gains, including a 0.71% lift in revenue, without degradation in ad quality. We further analyze key metrics ad coverage, impressions, clicks and defect rate. Ad defect, measured using offline relevance models, denotes the proportion of irrelevant ads shown to users. FlashTrie increases user engage-ment, with statistically significant click improve-ments of 0.17% for English queries and 0.20% for non-English queries. Since the underlying model and its top-K proposals are the same, these gains re-sult mainly from increasing beam width, enabling retrieval of more candidate ads and expanding the proposal set passed to downstream ranking. Ad coverage and impressions increase as wider beams recover monetizable candidates that nar-rower beams discard, while revenue gains sug-gest these candidates correspond to higher-value matches. Importantly, defect rates are nonsignif-icant within ±1% , indicating no degradation in Table 3: Online A/B test ( ∆) on a commercial search engine for FlashTrie vs. CPU MARISA-Opt, reported by language segment. All metrics are statistically signif-icant ( α=0 .05 ). See Appendix G for the full protocol.            
+
+> Language Revenue Coverage Impression Clicks Latency
+> English +0 .71% +0 .22% +0 .21% +0 .17% −32%
+> Non-EN +0 .68% +0 .25% +0 .37% +0 .20% −32%
+
+result quality. Overall, the latency headroom en-abled by FlashTrie allows a substantial expansion of beam width, translating directly into improved system performance. 
+
+Discussion 
+
+FlashTrie exemplifies a broader accelerator-era pat-tern: data structures traditionally implemented on CPUs can become effective on GPUs when their ac-cess patterns are redesigned for parallel execution. Our central finding is that constrained decoding need not remain a CPU bottleneck. A static suc-cinct trie can be made GPU-native when lookup and pruning are structured for batched execution and high device utilization. This reduces decod-ing latency even at wider beam widths, translating to lower end-to-end inference latency under strict serving constraints. This shift is important because retrieval qual-ity in generative systems improves at larger beam widths. In our online setting, FlashTrie enables wider beams within strict latency budgets and con-verts that headroom into measurable gains in user engagement and revenue without degrading ad quality. More broadly, FlashTrie applies to con-strained generation tasks with large static vocabu-laries, such as retrieval IDs, product catalogs, or entity linking, that can benefit from accelerator-resident constraint enforcement that is both fast and scalable. 
+
+5 Limitations 
+
+The current implementation requires the full con-straint trie to reside within a single GPU’s VRAM. At 800M keywords the trie occupies 3.1 GB on the A100 80 GB, leaving ample headroom for co-located weights; for larger libraries a natural ex-tension is to shard subtrees across GPUs over NVLink/NVSwitch and aggregate candidates per step. FlashTrie’s batched scheduler allocates a fixed SM partition to each query (Section 4.4), avoiding cross-slot synchronisation but capping multi-query parallelism, dynamic or work-stealing alternatives that preserve persistent-kernel coherence are a nat-ural next step. All experiments use an NVIDIA A100 80 GB PCIe GPU. The persistent-kernel and cooperative-groups patterns are supported on all CUDA Com-pute Capability ≥ 7.0 devices, but quantitative characterisation on H100/B100 remains open. 
+
+References 
+
+Peter Anderson, Basura Fernando, Mark Johnson, and Stephen Gould. 2017. Guided open vocabulary im-age captioning with constrained beam search. In 
+
+EMNLP .Michele Bevilacqua, Giuseppe Ottaviano, Patrick Lewis, Wen tau Yih, Sebastian Riedel, and Fabio Petroni. 2022. Autoregressive search engines: Generating substrings as document identifiers. In Advances in Neural Information Processing Systems (NeurIPS) .Nicola De Cao, Gautier Izacard, Sebastian Riedel, and Fabio Petroni. 2021. Autoregressive entity retrieval. In International Conference on Learning Representa-tions (ICLR) .Jan Daciuk, Stoyan Mihov, Bruce W. Watson, and Richard E. Watson. 2000. Incremental construction of minimal acyclic finite-state automata. Computa-tional Linguistics , 26(1):3–16. Tri Dao, Daniel Y. Fu, Stefano Ermon, Atri Rudra, and Christopher R ´e. 2022. FlashAttention: Fast and memory-efficient exact attention with IO-awareness. In Advances in Neural Information Processing Sys-tems (NeurIPS) .Jiatao Gu, James Bradbury, Caiming Xiong, Victor O.K. Li, and Richard Socher. 2018. Non-Autoregressive Neural Machine Translation. In International Con-ference on Learning Representations .Chris Hokamp and Qun Liu. 2017. Lexically con-strained decoding for sequence to sequence gener-ation using grid beam search. In Proceedings of the 55th Annual Meeting of the Association for Com-putational Linguistics (Volume 1: Long Papers) ,pages 1535–1546, Vancouver, Canada. Association for Computational Linguistics. Jun ichi Aoe. 1989. An efficient digital search algorithm by using a double-array structure. IEEE Transactions on Software Engineering , 15(9):1066–1077. Guy Jacobson. 1989. Succinct Static Data Structures .Ph.D. thesis, Carnegie Mellon University. Vladimir Karpukhin, Barlas Oguz, Sewon Min, Patrick Lewis, Ledell Wu, Sergey Edunov, Danqi Chen, and Wen-tau Yih. 2020. Dense passage retrieval for open-domain question answering. In EMNLP .Tom Kwiatkowski, Jennimaria Palomaki, Olivia Red-field, Michael Collins, Ankur Parikh, Chris Alberti, Danielle Epstein, Illia Polosukhin, Jacob Devlin, Ken-ton Lee, Kristina Toutanova, Llion Jones, Matthew Kelcey, Ming-Wei Chang, Andrew M. Dai, Jakob Uszkoreit, Quoc Le, and Slav Petrov. 2019. Natu-ral questions: A benchmark for question answering research. Transactions of the Association for Compu-tational Linguistics , 7:453–466. Woosuk Kwon, Zhuohan Li, Siyuan Zhuang, Ying Sheng, Lianmin Zheng, Cody Hao Yu, Joseph E. Gonzalez, Hao Zhang, and Ion Stoica. 2023. Effi-cient memory management for large language model serving with PagedAttention. In Proceedings of the ACM SIGOPS 29th Symposium on Operating Systems Principles (SOSP) .Kenton Lee, Ming-Wei Chang, and Kristina Toutanova. 2019. Latent retrieval for weakly supervised open domain question answering. In ACL , pages 6086– 6096. Mike Lewis, Yinhan Liu, Naman Goyal, Marjan Ghazvininejad, Abdelrahman Mohamed, Omer Levy, Veselin Stoyanov, and Luke Zettlemoyer. 2020. Bart: Denoising sequence-to-sequence pre-training for nat-ural language generation, translation, and compre-hension. In ACL , pages 7871–7880. Ximing Lu, Peter West, Rowan Zellers, Ronan Le Bras, Chandra Bhagavatula, and Yejin Choi. 2021. Neuro-Logic decoding: (un)supervised neural text genera-tion with predicate logic constraints. In Proceedings of the 2021 Conference of the North American Chap-ter of the Association for Computational Linguis-tics: Human Language Technologies . Association for Computational Linguistics. Duane Merrill, Michael Garland, and Andrew Grimshaw. 2012. Scalable GPU graph traversal. In 
+
+Proceedings of the 17th ACM SIGPLAN Symposium on Principles and Practice of Parallel Programming (PPoPP) , pages 117–128. Donald Metzler, Yi Tay, Dara Bahri, and Marc Najork. 2021. Rethinking search: Making domain experts out of dilettantes. SIGIR Forum , 55(1):1–27. Donald R. Morrison. 1968. PATRICIA—practical algo-rithm to retrieve information coded in alphanumeric. 
+
+Journal of the ACM , 15(4):514–534. NVIDIA Corporation. 2020. Nvidia a100 tensor core gpu architecture. https: //resources.nvidia.com/en-us-tensor-core/ nvidia-ampere-architecture-whitepaper .Accessed: 2026-06-17. NVIDIA Corporation. 2024. Cuda c++ program-ming guide. https://docs.nvidia.com/cuda/ cuda-c-programming-guide/ . Accessed: 2026-06-17. Gustavo Penha, Edoardo D’Amico, Marco De Nadai, Enrico Palumbo, Alexandre Tamborrino, Ali Var-dasbi, Max Lefarov, Shawn Lin, Timothy Heath, Francesco Fabbri, and Hugues Bouchard. 2025. Se-mantic IDs for joint generative search and recommen-dation. arXiv preprint arXiv:2508.10478 .Fabio Petroni, Aleksandra Piktus, Angela Fan, Patrick Lewis, Majid Yazdani, Nicola De Cao, James Thorne, Yacine Jernite, Vladimir Karpukhin, Jean Maillard, Vassilis Plachouras, Tim Rockt ¨aschel, and Sebastian Riedel. 2021. KILT: A benchmark for knowledge intensive language tasks. In Proceedings of the 2021 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies , pages 2523–2544. Associa-tion for Computational Linguistics. Ronak Pradeep, Kai Hui, Jai Gupta, Honglei Zhuang, Adam Lelkes, Jimmy Lin, Donald Metzler, and Vinh Tran. 2023. Understanding generative retrieval at scale. In EMNLP .Zhiqing Sun and Yiming Yang. 2020. An em approach to non-autoregressive conditional sequence genera-tion. In ICML .Ilya Sutskever, Oriol Vinyals, and Quoc Le. 2014. Se-quence to sequence learning with neural networks. In NeurIPS .Yi Tay, Vinh Q. Tran, Mostafa Dehghani, Jianmo Ni, Dara Bahri, Harsh Mehta, Zhen Qin, Kai Hui, Zhe Zhao, Jai Gupta, Tal Schuster, William W. Cohen, and Donald Metzler. 2022. Transformer memory as a differentiable search index. In Advances in Neural Information Processing Systems (NeurIPS) .Ravisri Valluri, Akash Kumar Mohankumar, Kushal Dave, Amit Singh, Jian Jiao, Manik Varma, and Gaurav Sinha. 2025. Scaling the vocabulary of non-autoregressive models for fast generative retrieval. In Proceedings of the 31st ACM SIGKDD Confer-ence on Knowledge Discovery and Data Mining V.1 ,KDD ’25, page 1409–1420, New York, NY, USA. Association for Computing Machinery. Xiaohui Wang, Ying Xiong, Yang Wei, Mingxuan Wang, and Lei Li. 2021. LightSeq: A high performance in-ference library for transformers. In Proceedings of the 2021 Annual Conference of the North American Chapter of the Association for Computational Lin-guistics: Industry Track (NAACL-Industry) .Yujing Wang, Yingyan Hou, Haonan Wang, Ziming Miao, Shibin Wu, Hao Sun, Qi Chen, Yuqing Xia, Chengmin Chi, Guoshuai Zhao, Zheng Liu, Xing Xie, Hao Allen Sun, Weiwei Deng, Qi Zhang, and Mao Yang. 2022. A neural corpus indexer for doc-ument retrieval. In Advances in Neural Information Processing Systems (NeurIPS) .Brandon T. Willard and R ´emi Louf. 2023. Efficient guided generation for large language models. arXiv preprint .Yonghui Wu, Mike Schuster, Zhifang Chen, Quoc V Le, Mohammad Norouzi, Wolfgang Macherey, Maxim Krikun, Yuan Cao, Qin Gao, Klaus Macherey, and 1 others. 2016. Google’s neural machine translation system: Bridging the gap between human and ma-chine translation. arXiv preprint arXiv:1609.08144 .Susumu Yata. 2011. MARISA-trie: Matching algorithm with recursively implemented StorAge. https:// github.com/s-yata/marisa-trie .Noah Ziems, Wenhao Yu, Zhihan Zhang, and Meng Jiang. 2023. Large language models are built-in au-toregressive search engines. In Findings of the As-sociation for Computational Linguistics (ACL Find-ings) .
+
+Appendix 
+
+A Trie Background: LOUDS with Tail/Link Compression 
+
+All three systems share the same LOUDS back-bone (Yata, 2011; Jacobson, 1989): a 2n+1 -bit topology vector with constant-time rank /select ,plus per-node bases labels and terminal flags .What differs across systems is not the core topology but auxiliary build-time structures (Patricia/TAIL, link flags, and cache) and the search algorithm used on top of this layout (Table 4). 
+
+Patricia single-child compression and the TAIL buffer. Patricia compression (Morrison, 1968) folds maximal single-child chains into a head node plus an offset into tail ; link nodes store offsets, not labels. Without suffix sharing, this is usually a loss for wide labels. MARISA’s trie-of-tails variant implements this same idea with a recursive TAIL buffer (Yata, 2011). The net benefit depends on suffix deduplication, which can be summarized by: folded (k, w, α ) ≈ w + α kw + O(log |tail |).
+
+Folding beats expansion iff α kw + w < kw , i.e., 
+
+α < 1 − 1 
+
+> k
+
+. (1) In byte alphabets this criterion often holds; in wide 32-bit token alphabets suffix sharing is much weaker and the supporting metadata becomes rel-atively expensive. This is why MARISA-Opt disables Patricia/TAIL in our integer-token set-ting (Section 2.1). Recursive TAIL ( num tries )helps only when the same criterion holds at each level (Yata, 2011); we use num tries =1. 
+
+The link flags bit-vector and cache .
+
+link flags tags whether bases holds a label or a TAIL offset; its rank index and high-bit arrays scale with the number of link nodes in MARISA’s succinct-trie layout (Yata, 2011). When Patricia is disabled, these structures largely collapse. MARISA’s optional cache prefetch table speeds common top-of-trie transitions but adds build cost and index bytes (Yata, 2011). These component-level tradeoffs are summarized in Table 4; for full implementation details, see Yata (2011). 
+
+B CPU Baselines: Full Design Details and System Contrast 
+
+This appendix gives the full design description for the two CPU baselines summarised in Section 2.1 and the axis-by-axis contrast between all three sys-tems (Table 4). 
+
+B.1 MARISA-Int 
+
+MARISA-Int extends the open-source MARISA codebase (Yata, 2011) with 32-bit integer-token sequences, reusing the original character-oriented storage layout and traversal routines without modi-fying the build pipeline. Since upstream MARISA provides only single-sequence operations (e.g., 
+
+lookup , predictive search ), MARISA-Int adds a minimal beam-search layer. Each candidate is evaluated by repeatedly invoking these routines on the full prefix from the root, performing up to two root-to-node traversals per (beam, proposal) pair. No trie state is reused across steps, and pruning is implemented via std::partial sort over a flat vector. The search is single-threaded, and all oper-ations execute on the host CPU. 
+
+B.2 MARISA-Opt 
+
+MARISA-Opt builds on MARISA-Int while retain-ing the LOUDS-based trie layout and on-disk for-mat, but introduces a set of implementation opti-mizations that make it a competitive CPU base-line. These include compact link-offset encoding, stateful traversal, multi-threaded execution, effi-cient per-beam expansion, and incremental top-
+
+B pruning (full per-operation derivations in Ap-pendix C). Comparing FlashTrie against this opti-mized baseline ensures that performance gains re-flect on-device parallelism rather than unoptimised CPU execution. MARISA-Opt reduces index size by splitting link offsets across the per-node 32-bit slot and a secondary array, storing only the low-order 8 bits in the slot and packing the remaining bits compactly. The secondary array is allocated only when needed, avoiding unnecessary overhead. Token labels them-selves remain in full in the per-node slot; only the link offsets are split. On CPU, MARISA-Opt does not narrow the per-node slot itself, the slot is still 32 bits, so at each link node 24 of those 32 bits are now unused padding. For integer-token alphabets, MARISA-Opt fur-ther removes structures whose benefit is specific to byte-alphabet inputs (Appendix A). First, Pa-tricia single-child link compression is disabled in the build path: every input token becomes its own LOUDS node, no link nodes are emitted, and the recursive trie-of-tails terminates after the first level regardless of the configured num tries . As a consequence, extras , the TAIL buffer, and the rank/select index over link flags are all empty in the on-disk index, and the link-offset split en-coding described above is exercised only by char-acter workloads. Second, the build-time prefetch cache table ( cache , used to amortize top-of-trie descents at lookup time) is skipped at construction and is absent from the on-disk index. Third, the in-process multikey quicksort over Vector<Key> is replaced by an external sort -u -V Unix pipeline that delivers unique, lexicographically ordered to-ken sequences to the builder, so duplicate keys are removed before any trie work begins. The combined effect is that on a 32-bit alphabet, where each TAIL token would still occupy 4 bytes and each TAIL reference would carry non-trivial 
+
+extras and link flags overhead, the bytes that Patricia compression would remove from bases 
+
+are smaller than the bytes its supporting structures would add. Disabling the compression therefore shrinks the on-disk index and shortens construc-tion simultaneously; this is the dominant driver of MARISA-Opt’s index-size and build-time advan-tage over MARISA-Int in Section 4.1. Unlike MARISA-Int, which performs repeated root-to-node traversals at each decoding step, MARISA-Opt propagates trie state across beams. Each extension requires a single LOUDS navi-gation step from the cached node, making per-candidate cost independent of prefix length. Work is parallelized across beams using a fixed-size CPU worker pool, while per-beam ex-pansion is performed using a linear-time two-pointer merge between sorted proposals and sorted trie children. This reduces matching cost from 
+
+O(K∆) to O(K+∆) with sequential memory ac-cess. Threshold-based pruning is applied during expansion to discard low-probability candidates early. Instead of end-of-step sorting, MARISA-Opt maintains a shared bounded min-heap of size 
+
+BW , reducing pruning cost from O(C log C) to 
+
+O(C log BW ), where C is the number of candi-dates generated per step and BW is the beam width, while keeping the top-B beams continuously up-dated. 
+
+B.3 Axis-by-Axis System Contrast 
+
+C CPU Trie Operations 
+
+The CPU trie operations used by MARISA-Int and MARISA-Opt are inherited from the MARISA framework and are not contributions of this work; we describe them in prose for completeness so that the GPU adaptations in Appendix D have a precise reference point. 
+
+Child enumeration. Locating the children of a node v is two rank/select operations on louds .The position of v’s first child within louds is 
+
+select 0(v) + 1 , and the corresponding child node index is select 0(v) + 1 − v − 1 (subtracting the LOUDS header bits seen so far). The num-ber of children ∆ is the distance from that po-sition to the next 0-bit; on CPU this is a se-quential scan over louds , and on GPU it is replaced by W ARP NEXT UNSET (Appendix D). Labels of the ∆ children sit contiguously at 
+
+bases [base node..base node+ ∆) in sorted or-der. 
+
+FIND CHILD . Given a parent v and a target token 
+
+τ , MARISA does a binary search over the ∆ child labels. The only subtlety is that when a child u
+
+is a link node ( link flags [u] = 1 ), its bases 
+
+slot holds a TAIL offset rather than a token, so the binary-search comparison must peek into tail at that offset to recover the first label of the suffix; the comparison itself is then ordinary integer compari-son. This costs one extra memory indirection per visited link node and is the reason TAIL traversal must read at most one tail byte per binary-search step rather than the entire suffix. Per-call cost is 
+
+O(log ∆) comparisons, each O(1) amortized. 
+
+LOOKUP and predictive search. A whole-key lookup is L successive F IND CHILD calls fol-lowed by a check that the resulting node car-ries a terminal flag; the key identifier is then Table 4: Design and implementation contrast across the three systems. All three share the LOUDS +tail/link trie skeleton (Appendix A); they differ in build-time storage choices and in where/how the beam search is executed. The 
+
+Improves column tags whether each axis primarily affects search latency ( LAT ), build time ( BUILD ), or trie-on-disk size ( SIZE ). Per-operation time complexity is reported separately in Table 5. Background on Patricia single-child compression, the TAIL buffer, the link flags bit-vector, and the prefetch cache table referenced in the rows below is given in Appendix A. 
+
+Aspect MARISA-Int MARISA-Opt FlashTrie Improves 
+
+bases slot type Vector<UInt32> , 4 B/entry Vector<UInt32> , 4 B/entry Vector<UInt16> , 2 B/entry SIZE 
+
+Label storage at non-link nodes full 32-bit token in bases full 32-bit token in bases ; label not split low 16 bits in bases ; high bits in 
+
+extras via split label 
+
+SIZE 
+
+Link-offset storage at link nodes full pointer in bases ; full pointer in bases low 16 bits in bases ; high bits packed in link extras ;
+
+SIZE 
+
+num tries 
+
+(trie-of-tails recursion depth) 1–7, default 1 1–7, default 1 1 only BUILD SIZE 
+
+Recursive TAIL block ( tail )built; tokens stored uncompressed as 
+
+uint32 , one offset entry per link node empty (no link nodes produced, so the recursive build next trie returns immediately and tail is never populated) built; tokens stored as uint32 ,references compressed via bit-packed 
+
+link extras 
+
+BUILD SIZE 
+
+link flags 
+
+rank/select index full bit-vector with rank/select over true link positions identically zero across all nodes; rank/select index collapses to constant overhead full bit-vector with rank/select over true link positions 
+
+SIZE 
+
+Build-time prefetch cache ( cache table) built; size set by cache level , persisted to disk to amortize top-of-trie descents at lookup time skipped ( reserve cache , per-node 
+
+cache<T> , and fill cache all bypassed) built BUILD SIZE 
+
+Build-time key sort and dedup in-process multikey quicksort over 
+
+Vector<Key> ; duplicate inputs not removed in-process multikey quicksort over 
+
+Vector<Key> ; deduplication done outside in-process multikey quicksort over 
+
+Vector<Key> ; deduplication done outside 
+
+BUILD 
+
+Beam-search residency host RAM host RAM GPU HBM (CUDA Unified Memory, eager-prefetched) 
+
+LAT 
+
+Trie cursor primitive in beam search 
+
+lookup then predictive search from root; up to two full root-to-node walks per candidate, no state carried across steps 
+
+predictive find children : one LOUDS step from a cached node id extend beam binary child search :one GPU LOUDS step; state in device buffers 
+
+LAT 
+
+Parallelism axis none (single thread serialises both beams and proposals) across parent beams (proposals serial within a beam) across parent beams and across proposals within a beam 
+
+LAT 
+
+Workers / dispatch unit 1 CPU thread 8 std::thread workers; one parent beam per pool job 
+
+⌊108 /b ⌋ CTAs × 512 threads/CTA per slot 
+
+LAT 
+
+Per-beam inner loop linear scan over BW proposals; trie re-walked per candidate two-pointer merge between sorted child labels and sorted top-B proposals one thread per proposal; parallel binary search against the sorted child-label array 
+
+LAT 
+
+Top-B pruning structure 
+
+std::partial sort over a flat 
+
+std::vector of beam states mutex-protected std::priority queue 
+
+bounded heap on-device block-merge-sort; registers/shared memory 
+
+LAT 
+
+Batched-call mechanism sequential per query shared FIFO of (query, beam) jobs across 8 workers; step barrier 
+
+b cooperative kernels on b CUDA streams; disjoint SM partitions; no cross-slot sync 
+
+LAT 
+
+rank 1(terminal flags , v ) − 1. Common prefix search and predictive search extend this loop with an additional in-order walk of the subtree rooted at the deepest matching node, paying O(R) for R
+
+returned keys on top of the O(L log ∆) descent. All of these operations execute serially on CPU and are the per-beam unit of work that FlashTrie’s expansion kernel parallelises in Appendix D. 
+
+D GPU Implementation Details 
+
+FlashTrie replaces the serial F IND CHILD /L OOKUP 
+
+loop of Appendix C with a cooperative-kernel pipeline that keeps the trie, the beam state, and the top-K output resident on the device for the entire query (NVIDIA Corporation, 2024, 2020). This appendix documents the pieces that genuinely dif-fer from the CPU baseline and are not adequately specified by prose alone: tail-suffix traversal, warp-cooperative LOUDS scanning, and large-BW top-
+
+K selection. Bookkeeping aspects, memory res-idency, output serialization, and per-batch alloca-tion, are described in prose since they involve no concurrency subtleties. Table 5 summarises per-operation time complexity for the GPU primitives used below alongside the CPU counterparts; the 
+
+1/P factor is the per-thread reduction the GPU con-tributes, with P =512 for per-CTA expansion and the full grid for sort passes. 
+
+Memory architecture. GPU memory is parti-tioned into three classes. The static trie (LOUDS bit-vectors, label arrays, tail buffer, rank/select indices) lives in CUDA Unified Memory and is prefetched on demand; this lets a single index back many concurrent search slots without per-Table 5: Per-operation time complexity. L = key length,             
+
+> Q= query length, R= result count, ∆= node out-degree,
+> T= decoding steps, BW = beam width, BW = top-K
+> proposals per step, P= GPU parallelism, BS = Beam Search.
+
+Operation Time 
+
+rank 1(i) O(1) select b(k) O(1) 
+
+WARP NEXT UNSET O(∆ /32) 
+
+Lookup O(L log ∆) 
+
+Common prefix search O(Q) total Predictive search O(Q + R)
+
+MARISA-Opt BS O(T ·B·(K + ∆)) 
+
+FlashTrie BS O
+
+
+
+T BK P log ∆ + T B log BP
+
+
+
+MergeSort top-B O(B log B/P )
+
+slot duplication. Per-batch search state , three frontier arenas, a backtrace arena for parent point-ers, and a beam-history buffer used during out-put reconstruction, is device-resident, allocated once at init tbs gpu time, and reused across re-quests so that no cudaMalloc appears on the hot path. Per-request I/O (input top-K tokens and log-probabilities, output beam sequences and nor-malised scores) is held in pinned host buffers paired with device mirrors, enabling asynchronous DMA that overlaps with kernel execution. 
+
+D.1 Tail Traversal 
+
+Beam expansion on the GPU runs in two passes per decoding step, both driven by the cooperative kernel in Algorithm 1. The first pass handles beams that are already inside a tail suffix ( s.in link ): such a beam has exactly one valid continuation, the next token along the tail chain, so the work is to (i) read that token from tail at s.link offset , (ii) scan the top-K proposals for a match, (iii) apply token- and sentence-level log-prob thresholds, and (iv) emit the resulting beam either to selected (if the proposal closes the chain on a terminal node) or to next . Because the continuation is unique, no binary search is needed and each beam costs 
+
+O(K/P ) work across the CTA’s P threads; this is EXTEND INLINK in Algorithm 2. The second pass handles beams sitting on ordinary LOUDS nodes. For each such beam the kernel first computes the child range 
+
+[base node , base node +∆) using select 0 and WARP NEXT UNSET , then has each thread test one top-K proposal in parallel by binary-searching the sorted child labels. Each comparison transparently peeks into tail when the visited child is a link node, exactly as in CPU F IND CHILD . Surviv-ing proposals become new beams that are routed to selected or next on the same terminal-/link-status rules as the first pass; this is E XTEND NODE 
+
+in Algorithm 3. Splitting the work into two passes keeps the warps that are walking tail chains from interfering with the warps that are doing wider par-allel child search, which keeps lane utilisation high in both modes. 
+
+Algorithm 2 ExtendInLink (device; one CTA per parent beam)  
+
+> 1:
+
+τnext , end ←
+
+tail . next token( s. link offset ) 
+
+> 2:
+
+for k = threadIdx .x to K − 1 step 
+
+blockDim .x do  
+
+> 3:
+
+if topk id [k]̸ = τnext then  
+
+> 4:
+
+continue  
+
+> 5:
+
+end if  
+
+> 6:
+
+ρ ← topk logp [k] 
+
+> 7:
+
+if ρ ≤ θtok or s.σ + ρ ≤ θsent then  
+
+> 8:
+
+break  
+
+> 9:
+
+end if  
+
+> 10:
+
+s′ ← BEAM STATE (parent =s, token =τnext ) 
+
+> 11:
+
+s′.σ ← s.σ + ρ 
+
+> 12:
+
+s′.link offset ← s. link offset + 1;
+
+s′.end link ← end  
+
+> 13:
+
+if end then  
+
+> 14:
+
+if is terminal( s′.v ) then  
+
+> 15:
+
+selected . push( s′) 
+
+> 16:
+
+end if  
+
+> 17:
+
+else  
+
+> 18:
+
+next . push( s′) 
+
+> 19:
+
+end if  
+
+> 20:
+
+break  
+
+> 21:
+
+end for D.2 Warp-Level LOUDS Navigation 
+
+The inner step of child enumeration, finding the next 0-bit in louds starting from a given position, can span many 64-bit words when a node has high out-degree, and a sequential per-thread scan leaves 31 of the 32 lanes of a warp idle. FlashTrie uses a warp-ballot loop in which each lane checks one of the next 32 words simultaneously and the warp votes via ballot sync ; the position of the first word containing a 0-bit is recovered by ffs on the ballot mask, and the final intra-word bit position by another ffs on the negated word. Asymptoti-Algorithm 3 ExtendNode (device; one CTA per parent beam)  
+
+> 1:
+
+Compute child range 
+
+[base node , base node + deg ) via LOUDS 
+
+select 0 and W ARP NEXT UNSET ()  
+
+> 2:
+
+if deg = 0 then  
+
+> 3:
+
+return  
+
+> 4:
+
+end if  
+
+> 5:
+
+for k = threadIdx .x to K − 1 step 
+
+blockDim .x do  
+
+> 6:
+
+τ ← topk id [k]; ρ ← topk logp [k] 
+
+> 7:
+
+if ρ ≤ θtok or s.σ + ρ ≤ θsent then  
+
+> 8:
+
+continue  
+
+> 9:
+
+end if  
+
+> 10:
+
+Binary-search sorted child labels in 
+
+[base node , base node + deg ) for τ ; peek into tail when the visited child is a link node  
+
+> 11:
+
+if not found then  
+
+> 12:
+
+continue  
+
+> 13:
+
+end if  
+
+> 14:
+
+s′ ← BEAM STATE (parent =s, token =τ );
+
+s′.σ ← s.σ + ρ; s′.v ← matched child  
+
+> 15:
+
+Route s′ to selected or next per terminal-and link-status (same rules as Algorithm 2)  
+
+> 16:
+
+end for 
+
+cally this turns the O(∆) inner loop into O(∆ /32) 
+
+memory accesses. Algorithm 4 gives the exact word-level masking and ballot pattern; the lane arithmetic is what prose cannot specify precisely. 
+
+Algorithm 4 WarpNextUnset (device; 32-thread warp)  
+
+> 1:
+
+w ← ⌊ i/ 64 ⌋; word ← B[w] | ∼ (∼0 ≪
+
+(i mod 64))  
+
+> 2:
+
+{mask bits below i} 
+
+> 3:
+
+if (∼word )̸ = 0 then  
+
+> 4:
+
+return w · 64 + ffs( ∼word ) − 1 
+
+> 5:
+
+end if  
+
+> 6:
+
+w ← w + 1 ; lane ← threadIdx .x mod 32  
+
+> 7:
+
+repeat  
+
+> 8:
+
+ballot ← ballot(( ∼B[w + lane ]) ̸ = 0)  
+
+> 9:
+
+if ballot = 0 then  
+
+> 10:
+
+w ← w + 32  
+
+> 11:
+
+else  
+
+> 12:
+
+w ← w + ffs( ballot ) − 1; break  
+
+> 13:
+
+end if  
+
+> 14:
+
+until false  
+
+> 15:
+
+return w · 64 + ffs( ∼B[w]) − 1
+
+D.3 Top-K Selection on the GPU 
+
+After expansion the candidate buffer next is trimmed to the top-B hypotheses by length-normalized score. FlashTrie switches between two implementations depending on BW .
+
+Block merge sort ( B ≤ 1024 ). For small BW 
+
+the entire selection fits in a small number of sort-blocks of size 2B. Each CTA sorts one block in descending order of ˆσ using CUB’s 
+
+BlockMergeSort , then the sorted blocks are com-bined by a tournament-merge tree in ⌈log 2(n/ 2B)⌉
+
+rounds with a grid-wide barrier between rounds. After the final merge round the first BW entries are the top-B beams. Total work is O(n log n/P )
+
+for the initial sort and O(B log( n/B )/P ) for the merge rounds, with P the grid-wide thread count; see Algorithm 5. 
+
+Algorithm 5 BlockMergeSort Top-K (device; all blocks)  
+
+> 1:
+
+remaining ← ⌈| cand |/(2 B)⌉ 
+
+> 2:
+
+{number of sort-blocks } 
+
+> 3:
+
+while remaining ≥ 1 do  
+
+> 4:
+
+{Phase 1: sort each block of 2B elements } 
+
+> 5:
+
+for all block b assigned to this CTA do  
+
+> 6:
+
+Load 2B/P elements per thread (pad with −∞ if OOB)  
+
+> 7:
+
+BLOCK MERGE SORT (thread data ) (de-scending by ˆσ) 
+
+> 8:
+
+write back to sort state  
+
+> 9:
+
+end for  
+
+> 10:
+
+if remaining = 1 then  
+
+> 11:
+
+break  
+
+> 12:
+
+end if  
+
+> 13:
+
+sync( G) 
+
+> 14:
+
+{Phase 2: tournament merge } 
+
+> 15:
+
+remaining ← ⌈ (remaining − 1) /2⌉ + 1  
+
+> 16:
+
+sync( G) 
+
+> 17:
+
+end while  
+
+> 18:
+
+{Phase 3: collect top-B entries into 
+
+cand [0 . . . B − 1] }
+
+Output serialization. The final selected buffer is descending-sorted by ˆσ but the wire for-mat expects ascending order, so G ENERATE RE- 
+
+> SULT
+
+writes the i-th selected beam into slot 
+
+no−1−i of the output arrays. Per-beam to-ken sequences are reconstructed by walking the 
+
+beam history parent pointers in reverse, with a CUB BlockScan converting per-beam lengths into the end-offsets that index the flat tokens 
+
+buffer. The on-wire layout for no beams totalling 
+
+ntok tokens is an 8-byte num beams header fol-lowed by three contiguous arrays: 8no bytes of 
+
+logp norm (float64 ), 8no bytes of sent offset 
+
+(uint64 ), and 4ntok bytes of tokens (uint32 ); se-quence i occupies tokens[sent offset[ i−1] : sent offset[ i]] .
+
+Per-batch GPU memory budget. A single search slot occupies roughly 320 MB of GPU mem-ory, dominated by the persistent device-resident state: three frontier arrays at 56 MB each, a
+
+56 MB beam history, six 8 MB sort-state arrays, a ∼128 MB device-side output buffer paired with pinned host memory, and a ∼12 MB input buffer similarly paired. Top-K scratch is small ( 3 ×
+
+0.5 MB) and the trie struct shell is a few hundred bytes; the trie arrays themselves live in Unified Memory and range from 50 to 500 MB depending on the constraint set, charged once across all slots rather than per-slot. A four-slot batch therefore uses ≈ 1.3 GB plus the trie, which fits comfortably alongside a generation-model weights footprint on a single 80 GB device. 
+
+D.4 Runtime Breakdown Methodology 
+
+Because beam search runs as a single persistent co-operative kernel (Section 2.2), we measure its inter-nal phase breakdown with lightweight on-device in-strumentation rather than separate kernel launches. Under a compile-time flag, a single grid-leader thread reads the GPU cycle counter ( clock64 )along its timeline. We time the wall-clock span 
+
+of each phase region, bracketed by the grid barriers (grid.sync ) that already separate the phases; be-cause each region ends at a barrier, its span includes the slowest CTA, i.e. the phase’s critical-path time across the grid rather than the leader’s own work alone. Cycle counts are converted to milliseconds via the SM clock rate and averaged over the 13,000-request workload. The four buckets map to kernel regions as fol-lows. Expansion is the per-proposal binary search that locates a candidate token among a parent’s chil-dren, including the dependent LOUDS/tail mem-ory accesses at each search step (a single tail read for link-interior beams). Validation is per-candidate admission: the per-token and cumulative log-probability threshold tests, the terminal-node check, and the append into the candidate buffer. 
+
+Pruning is the top-B selection (parallel mergesort) that enforces the beam width. Sync is the residual: inter-phase grid barriers outside the work regions, frontier setup/save, result serialization, and buffer swaps. The expansion and validation regions are in-terleaved per proposal, so we report their combined wall span split by the leader thread’s measured compute ratio; pruning and sync are measured di-rectly. The four phases sum to total kernel time by construction. We report proportions rather than absolute times: the instrumented build incurs mild reg-ister pressure that inflates absolute latency, so all latency numbers in Section 4.2 come from a separate, non-instrumented build. For ref-erence, the measured mean per-phase times at b=1 range from 0.34 /0.07 /0.08 /0.03 ms (ex-pansion/validation/pruning/sync) at BW =100 to 
+
+0.66 /0.79 /0.35 /0.07 ms at BW =1000 , with total kernel time under 2 ms across the full sweep. 
+
+E Experimental Setup: Full Protocol 
+
+This appendix fills in the measurement details ab-breviated in the main body’s Experimental Setup (Section 3/Section 3). The deployment envelope (1 × A100 80 GB, AMD EPYC 7V13 host, 60 GB host RAM, NUMA-pinned to cores 0–7 of socket 0 via numactl --cpunodebind=0 --membind=0 taskset -c 0-7 , Docker container) and the latency-window definition (C++ entry-point timer covering H2D, kernel, and D2H with stream syn-chronisation) are reused from the main body with-out modification. 
+
+Comparability of the timing window. The CPU systems’ timer closes when the search call returns; the FlashTrie timer closes after 
+
+cudaStreamSynchronize . All three systems share the same C++ entry-point boundary and exclude only language-binding marshalling, so reported la-tencies are directly comparable. NUMA-pinning to a single socket also removes cross-socket traffic on the H2D path, so FlashTrie’s speedup is reported under the same deployment-realistic envelope as the CPU baselines. 
+
+Length-normalised scoring. Beams are ranked by the Google-style length-normalised log-probability used in Section 2 (Wu et al., 2016): 
+
+snorm (x0: d) = 
+
+d−1X
+
+> j=0
+
+ℓj,σ (j)
+
+
+
+·
+
+ 65 + d
+
+α
+
+, (2) where α controls the normalisation strength and 
+
+σ(j) indexes the selected candidate at step j.
+
+Per-request latency sampling. Each (BW, b )
+
+configuration is benchmarked over the full 13,000-request dataset at batch size 1. One warm-up pass is discarded; FlashTrie additionally runs a short GPU warm-up before the measurement window opens. The next 10 passes are timed and pooled, producing 130 ,000 samples per configuration from which the mean and the 50th/90th/95th/99th per-centiles are computed. The across-run standard deviation is reported as a variance bar in figures and as the ± value in Table 6. 
+
+Throughput sweep. For the throughput evalua-tion (Figure 4, Section 4) we sweep b ∈ { 1, 4, 8}
+
+at BW ∈ { 100 , 300 , 500 , 700 , 1000 }. For each 
+
+(K, b ) the dataset is run as ⌈13000 /b ⌉ batched calls per pass, and per-pass throughput is total queries divided by total wall-clock duration measured with the same C++ entry-point timer window used for latency. One warm-up pass is discarded and four passes are timed; reported Θ is the mean over those four passes, with the across-pass standard deviation drawn as the error band in Figure 4. 
+
+Precision@K scoring. For the retrieval-quality evaluation (Section 4.5) each request’s top-K trie-admitted output is scored by a transformer teacher model adapted from (Valluri et al., 2025) that takes the request and a candidate keyword se-quence as input and returns a single relevance score. The teacher is identical across all three systems (MARISA-Opt, FlashTrie, and PPT) so that any precision differences are attributable to the candi-date set, not to the scorer. Precision@ BW =100 
+
+and Precision@ BW =200 are reported as the macro-average over the 13,000 requests. 
+
+F Per-Percentile Latency Table 
+
+Table 6 gives the full per-percentile breakdown of the per-request trie-search latency reported in Fig-ure 3: mean, p50, p90, p95 and p99 in milliseconds, for every beam width BW , computed as the me-dian across 10 runs of 13,000 queries each. 
+
+G Online A/B Test Protocol 
+
+This appendix gives the operational protocol of the production A/B test summarised in Section 4.8. 
+
+Deployment motivation. Offline benchmarks (Sections 4.2–4.5) establish that FlashTrie pre-serves retrieval quality at a fraction of the latency budget of CPU-resident MARISA-Opt. The op-erative question for a monetised production sys-tem is whether these system-level wins survive the realities of live traffic: bursty query mixes, stale caches, downstream auction dynamics, and revenue-sensitive guardrails. The flight is designed to answer that question end-to-end. 
+
+Sample-ratio-mismatch (SRM) check. Asample-ratio-mismatch check passed through-out the flight, confirming the realised treat-ment : control event ratio is consistent with the configured allocation after eligibility filtering. This rules out exposure-bias confounds before reading the metric lifts. 
+
+Latency-timing boundary. End-to-end latency is measured from request ingress at the retrieval service to emission of the final top-k candidate set, inclusive of trie traversal, beam expansion, scor-ing, and post-processing. Control and treatment share the entire downstream stack (auction, pacing, allocation, click models); they differ only in the retrieval-stage trie back-end and the beam config-uration the back-end can sustain within the 30 ms end-to-end latency SLA. 
+
+Constraint library and back-end configurations. 
+
+The production constraint library indexes hundreds of millions of docIDs. The control arm runs produc-tion CPU MARISA-Opt at Bctrl =200 , top-k=300 ,with a 3-thread pool matched to the per-worker MIG-slice CPU-core allocation. 
+
+Metric glossary. Headers in Table 3: Revenue 
+
+is total advertiser revenue for the arm; Coverage 
+
+is the fraction of queries for which a sponsored ad is shown; Impression is Impression Yield (IY), the expected value per impression opportunity; 
+
+DefectML-FBS aggregates the Defect-ML classifier and Feedback-Based-Suppression (FBS) guardrails on the Ads Selection. 
+
+H MARISA-Int Feasibility Measurements 
+
+MARISA-Int is included only as a feasibility check (not a primary performance baseline). At billion-key scale it is too slow for a full 13K sweep, so we report a fixed 10-query subsample (seed 42) and omit K ≥ 500 after observing a single BW =1000 
+
+query at 10 ,997 s ( ≈3.05 h). Table 7 reports mean/p50/p90/p95 on the sub-sample. p99 is omitted at N =10 . The large mean– Table 6: Per-request trie-search latency (ms), full percentile breakdown. Each cell is the median across 10 runs of 13,000 queries each. Lower is better.                                                                                                                
+
+> MARISA-Opt (CPU) FlashTrie (GPU)
+> BW Mean p50 p90 p95 p99 Mean p50 p90 p95 p99 100 9.0 8.9 11.8 13.0 15.1 0.6 0.5 0.6 0.6 0.7 200 14.9 14.4 19.2 20.9 23.6 0.7 0.7 0.8 0.9 0.9 300 20.1 19.8 25.2 26.9 30.0 0.9 0.9 1.1 1.1 1.2 400 25.3 25.1 32.2 34.2 38.3 1.1 1.1 1.4 1.5 1.6 500 29.5 29.3 38.2 40.6 45.4 1.4 1.4 1.7 1.8 2.0 600 33.4 33.0 44.2 47.4 53.9 1.6 1.5 2.0 2.2 2.6 700 36.3 35.9 48.8 52.6 60.4 1.6 1.6 2.2 2.4 2.8 800 40.5 38.4 52.7 57.0 66.5 1.9 1.8 2.5 2.7 3.2 900 42.9 40.6 55.9 60.5 70.5 1.9 1.9 2.5 2.8 3.3 1000 46.3 43.8 60.6 65.5 76.7 1.9 1.8 2.5 2.8 3.3
+
+Table 7: MARISA-Int per-request latency on a fixed 10-query random subsample of the 13,000-request work-load (seed 42, identical query indices across BW ). 
+
+Latency (s) 
+
+BW Mean p50 p90 p95 
+
+100 394.5 37.6 1,049.7 1,809.4 200 764.6 492.0 2,392.3 2,597.4 300 1,498.9 947.7 4,333.6 5,134.4 400 2,028.9 1,329.3 4,789.9 6,391.6 median gap reflects high per-query variation in traversal depth and root branching. Latency grows roughly linearly with BW , con-sistent with MARISA-Int’s serial per-beam exe-cution model, and confirms it is unsuitable as a main comparator at this operating point (hence MARISA-Opt in Section 2.1). 
+
+I PPT Baseline Construction 
+
+For each decoding depth d ∈ [0 , T ), we col-lect the set of all token IDs that appear at posi-tion d in any keyword of the constraint library and store them as a sorted, deduplicated array on the GPU. A flat (valid tokens, valid offsets, valid counts) layout is used so that the depth-d
+
+alphabet is contiguous in device memory. At search time, for each beam at depth d, every top-K pro-posal token is tested against valid tokens [d] via a single lower bound binary search; tokens that pass are admitted into the next beam, tokens that fail are pruned. The cooperative kernel, beam scor-ing, log-prob thresholds, length normalisation, and top-B pruning are unchanged from FlashTrie, the only difference is the constraint structure. PPT admits a token xt,i at depth d iff xt,i appears at position d in some keyword; it does not require that the prefix x0: d extended by xt,i corresponds to a valid path in the constraint library. The candidate set produced by PPT is therefore a strict superset of the trie-valid set, and PPT performs strictly less work per step than FlashTrie. 
+
+J Full Ablations: Binary-Search and Linear-Search Variants 
+
+This appendix gives the full per-BW data for the two ablations summarised in Table 2 (PPT and the per-key linear probe), and then reports two additional, fully sequential GPU variants that were measured but failed to scale to the produc-tion benchmark. Together with the main-text PPT ablation (Section 4.6), these results decompose the FlashTrie speedup into three additive contri-butions: GPU residency and kernel fusion (PPT vs MARISA-Opt), the LOUDS-trie structure for path validity (FlashTrie vs PPT), and binary search at the inner per-key loop (FlashTrie vs the per-key linear probe). 
+
+Per-BW Sweep: PPT and Per-Key Linear Probe 
+
+Table 8 gives the complete per-BW sweep for the two ablations summarised in Table 2: all ten beam widths BW ∈ { 100 , 200 , . . . , 1000 } on the same 13K-request workload, with Mean and p95 latency in milliseconds and the speedup column equal to ablation p95 divided by FlashTrie p95 at the same 
+
+BW .
+
+Why the Inner Search Algorithm Matters: Linear-Search Variants 
+
+The PPT ablation attributes the remaining gap be-tween FlashTrie and a GPU baseline to the LOUDS-trie data structure. Within the trie kernel itself, however, the per-parent child lookup is performed by a binary search over the parent’s sorted child Table 8: Full per-BW ablation sweep (companion to Table 2). Lower is better.                                                      
+
+> PPT Linear-probe
+> BW Mean p95 Speedup Mean p95 Speedup
+> 100 0.57 0.79 1.23 ×110.2 134.1 209 ×
+> 200 1.16 1.61 1.85 ×119.6 144.2 166 ×
+> 300 1.90 2.69 2.40 ×123.9 149.1 133 ×
+> 400 2.73 3.97 2.71 ×126.8 152.8 104 ×
+> 500 3.54 5.20 2.84 ×128.6 155.7 85 ×
+> 600 5.57 8.22 3.69 ×135.5 169.3 76 ×
+> 700 6.98 10.30 4.37 ×141.1 178.8 76 ×
+> 800 8.22 12.15 4.45 ×145.6 186.3 68 ×
+> 900 9.73 14.36 5.21 ×151.2 194.3 71 ×
+> 1000 11.28 16.65 5.98 ×154.3 198.7 71 ×
+
+labels. To isolate the contribution of this algorith-mic choice, as distinct from GPU residency, kernel fusion, and the LOUDS layout, we replaced the binary-search inner loop with three successively weaker variants and measured each in turn. We report this ablation primarily as evidence that the seemingly small step from binary to linear search at the inner loop is responsible for a substantial fraction of FlashTrie’s wall-clock advantage, and as a cautionary data point for naive GPU ports of the textbook MARISA traversal. All three variants share FlashTrie’s cooperative kernel, beam scoring, log-prob thresholds, and length normalisation. They differ only in how each parent beam locates the children whose labels ap-pear in the top-K proposal set: • Two-pointer merge (vanilla MARISA port). 
+
+Faithful single-thread port of the CPU MARISA child-extension loop: one CTA per parent, one thread per CTA walks the par-ent’s sorted children and the sorted top-K in lockstep, O(degree + K) per parent. The re-maining 511 threads of the CTA idle. Across-parent parallelism is preserved (one CTA per parent, many CTAs per SM), matching the CPU pattern of multi-threading across par-ents. • Per-child parallel linear scan. Block-parallel baseline that distributes children across the CTA’s threads: thread t handles children t, t + blockDim , . . . and for each as-signed child performs an O(K) linear scan through the top-K array to test membership. Per-parent work O(degree · K/ blockDim ) in wall-clock, but every thread re-issues trie metadata loads ( select0 , rank1 , label de-code) for its assigned children with no shar-ing. • Per-key linear probe (FlashTrie inner loop with binary to linear). Identical paralleli-sation to FlashTrie – one thread per top-K
+
+key, striding blockDim – but each thread lin-early scans the parent’s sorted children for its assigned key (with sorted-array early exit) instead of binary searching. To make this competitive at all, the CTA cooperatively de-codes each parent’s child labels once into a shared-memory cache, after which all 512 threads scan the cache. Per-parent work 
+
+O(degree + K · degree /blockDim ) in arith-metic, with all global-memory trie loads amor-tised across the top-K loop. Both fully sequential variants fail to scale to the full benchmark at production beam widths. The two-pointer merge, although algorithmically the lowest in arithmetic complexity per parent (O(degree + K)), uses only 1/512 of each CTA’s threads; the resulting underutilisation makes the warm-up pass alone (20 iterations on a single batch) take several minutes at K = 100 , with a full 13K-query pass projected at well over an order of magni-tude longer than even the per-child parallel variant. The per-child parallel scan is similarly impractical: although every thread is busy, the redundant per-thread re-decoding of children labels (each thread re-issues select0 , rank1 , and label lookups for its slice) and the O(K) inner scan per child push per-batch latency into the multi-second range. A single 13K-query pass at BW = 100 failed to complete within seven hours, ruling out the variant for our sweep. Only the per-key linear probe with coopera-tive shared-memory caching admits a meaningful comparison: it shares FlashTrie’s parallelisation scheme exactly, differing only in whether the inner per-key search over the cached children is binary or linear. Even so, at BW =100 the per-key linear probe has a mean per-request latency of 110.2 ms against FlashTrie’s 0.55 ms ( ∼200 × slower; full per-BW sweep in Table 8), indicating that binary search at the inner loop contributes a two-orders-of-magnitude factor on top of the GPU residency, kernel fusion, and shared-memory caching that all three variants share. The first two variants illustrate a common failure mode of porting CPU succinct-trie code to the GPU. The CPU MARISA loop is fast because (i) modern x86 cores are individually fast and (ii) MARISA-Opt multi-threads across parents to exploit thread-level parallelism. Both properties evaporate on the GPU: an SM’s individual thread is far weaker than a CPU core, and the across-parents axis alone is not wide enough to amortise the trie metadata cost when each parent’s inner loop is sequential. The per-child parallel variant uses all threads but pays for it with redundant global-memory traffic that swamps the arithmetic savings. Only by holding the parallelisation scheme fixed and varying the inner-loop algorithm, the per-key linear probe ver-sus FlashTrie’s binary search, can the contribution of the search algorithm itself be measured cleanly, and that contribution is large. 
+
+K NQ + GENRE Workload Construction and Realistic-Threshold Analysis 
+
+The three components introduced in Section 4.7 are pinned for exact reproduction: NQ-Open vali-dation ( 3,600 questions , free-form input matching serving shape), the public GENRE-KILT check-point ( facebook/genre-kilt , BART-large with a 
+
+∼50 k token vocabulary, ungated), and the dedu-plicated KILT Wikipedia titles ( ∼6M tokenized titles , BART-tokenized so the model’s emitted to-ken IDs and the trie’s edge labels share one ID space, avoiding train/serve vocabulary mismatch). GENRE is autoregressive: a vanilla top-K beam roll-out produces a proposal grid where each po-sition’s top-K is conditioned on the previous-step argmax, so the grid is internally coherent and the trie does little admissibility filtering. To simulate the cross-position incoherence of production NAR grids, we use a two-stage pipeline. 
+
+Stage 1: AR top-K extraction. For each NQ-Open query we run GENRE over T =16 decod-ing positions, emitting at each position t the top-
+
+K=600 tokens with their log-softmax scores. The result is a per-query (T, K ) grid of token IDs and log-probs, the same data shape FlashTrie and MARISA-Opt consume on internal traffic. 
+
+Stage 2: head + noise-tail replace-ment. For a chosen head size r ∈{0, 9, 18 , 37 , 75 , 150 , 300 , 600 } we keep the top-r AR-emitted tokens at each position (the “coherent head”) and replace ranks [r, K ) with to-kens sampled from the position-stratified marginal distribution of the trie corpus (the empirical frequency of each token at position t across all                                
+
+> Table 9: Mean trie-search latency (ms) at BW =600 on NQ+GENRE vs. head size r(r=0 : NAR-style proxy, max trie work; r=600 : GENRE verbatim). Speedup = CPU / GPU mean. Lower latency, higher speedup are better.
+> r0918 150 300 600
+> MARISA-Opt (ms) 41.2 40.5 40.2 37.6 33.7 20.4
+> FlashTrie (ms) 5.7 5.2 3.6 2.8 2.7 2.4
+> Speedup (CPU/GPU) 7.3 7.8 11.1 13.3 12.5 8.4
+
+tokenized Wikipedia titles). Noise tokens inherit the AR model’s tail log-probs at the occupied ranks so the resulting grid is indistinguishable from a real model emission to a downstream beam scorer. The knob r interpolates between r=0 (pure NAR-style proxy, maximum trie work) and r=K
+
+(pure AR, minimum trie work). Alternative noise designs (uniform-vocab, uniform-position alphabet, and history-conditioned sampling) were rejected because they either under-stress the trie or reintroduce AR coherence. Position-stratified marginal sampling preserves per-position plausibility while remaining cross-position independent. We keep AR tail log-probs to preserve realistic score decay under θtok , θsent ,and length normalization. All experiments use the same Docker container as Section 3 (1 × A100 80 GB, 8 CPU cores pinned via numactl --cpunodebind=0 --membind=0 taskset -c 0-7 , 60 GB host RAM). The con-straint trie is built once over the tokenized KILT cor-pus and reused across all r. For the r-sweep, beam-score thresholds are set permissively ( θtok =−20 ,
+
+θsent =−200 , length-norm exponent 5.0) so that the trie’s admissibility check, not the scorer, drives all pruning. Results are reported at BW =600 , which sits inside the beam-width range of the internal sweep (Figure 3) and has the densest r-grid in the released artifacts. The latency measurement proto-col (Section 3) is reused verbatim. 
+
+GPU Overhead Floor 
+
+The GPU curve flattening in Table 9 is explained by a structural overhead floor (kernel launch, grid barriers, fixed top-B selection passes, and fixed-size H2D/D2H I/O). CPU has less fixed overhead, so its latency keeps scaling with reduced trie work while GPU saturates once work drops below this floor. Table 10: Per-request mean trie-search latency (ms) at 
+
+K=600 under realistic production thresholds on the NQ + GENRE public workload, across the head-size sweep r ∈ { 0, 9, 18 , 37 , 75 , 150 , 300 , 600 }. MARISA-Opt is the CPU baseline (8 worker threads, NUMA-local pinning); FlashTrie is the GPU implementation on a single A100 80 GB. The Speedup column reports CPU mean / GPU mean per row. Compared to the permissive-threshold sweep in Table 9, score-driven pruning ahead of the trie reduces CPU mean latency by ≈ 5× and GPU mean by ≈ 2–4×, while the relative CPU-to-GPU mean speedup remains in the same 5–13 × band. Lower is better for latency; higher is better for speedup.                         
+
+> rMARISA-Opt FlashTrie Speedup
+> 08.95 1.54 5.8×
+> 98.61 1.13 7.6×
+> 18 8.45 2.83 3.0×
+> 37 8.37 1.00 8.3×
+> 150 7.22 0.95 7.6×
+> 300 6.78 0.91 7.4×
+> 600 6.70 1.40 4.8×
+
+Realistic-Threshold Operating Point 
+
+Table 9 uses permissive thresholds to stress trie work. Here we evaluate realistic production thresh-olds (Section 4.8), where scorer-side pruning is stronger under the same 30 ms SLA. We keep all other NQ+GENRE settings fixed (3,600 queries, BW =600 , T =16 , length norm 5.0, identical warmup) and use the deployed threshold pair. Table 10 reports mean latency and CPU/GPU speedup across the r sweep. At realistic thresholds and worst-case r=0 ,MARISA-Opt drops from 41.19 ms (permissive) to 8.95 ms mean and FlashTrie from 5.66 ms to 1.54 ms, showing scorer-side pruning reduces ab-solute work for both systems. Relative advantage remains multi-×: 5.8 × at r=0 , typically 7.4–8.3 ×
+
+for r ∈ { 9, 37 , 150 , 300 } (Table 10). Across the r sweep, CPU latency still tracks workload coherence, while GPU latency stays in a narrow band because fixed cooperative-kernel overhead dominates once useful trie work is small. This preserves FlashTrie’s core value at production thresholds: lower and more stable latency under workload variance.
