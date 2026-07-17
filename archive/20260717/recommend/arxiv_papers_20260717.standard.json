@@ -1,0 +1,457 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-17T21:21:23.558184+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 10,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 5,
+    "quick_skim_target": 11,
+    "quick_selected": 5
+  },
+  "deep_dive": [
+    {
+      "id": "2607.10169v1",
+      "source": "arxiv",
+      "title": "Beyond Euclidean Clipping: Overcoming Exploration Collapse in LLM RL via Riemannian Isometric Policy Optimization",
+      "abstract": "Reinforcement learning (RL) has become a dominant paradigm for enhancing LLMs' reasoning capabilities. However, RL algorithms with PPO-Clip are inherently limited by exploration collapse. Subsequent works remain primarily heuristic and fail to identify the essential cause of PPO-Clip's failure. This work reveals the fundamental flaw of PPO-Clip: it implicitly measures policy discrepancy using Euclidean metric, which is theoretically inconsistent with the intrinsic geometry on the policy Riemannian manifold. This geometric mismatch results in overly conservative updates in low-probability regions while aggressive in high-probability regions, ultimately collapsing exploration. To correct this geometric flaw, we propose Riemannian Isometric Policy Optimization (RIPO), which guarantees isometric policy updates on the Riemannian manifold, effectively balancing exploration and exploitation. We further show that RIPO achieves a favorable bias-variance trade-off, which stabilizes optimization. Extensive experiments demonstrate that RIPO significantly surpasses existing LLM RL algorithms across seven competition-level benchmarks (up to 60% improvement over GRPO on AIME24).",
+      "authors": [
+        "Zhicheng Cai",
+        "Xinyuan Guo",
+        "Hanlin Wu",
+        "Mingxuan Wang",
+        "Wei-Ying Ma",
+        "Ya-Qin Zhang",
+        "Hao Zhou"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-11T07:19:59+00:00",
+      "link": "https://arxiv.org/pdf/2607.10169v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "overcomes exploration collapse in LLM RL via Riemannian geometry",
+      "llm_evidence_cn": "通过黎曼几何克服大语言模型强化学习中的探索崩溃",
+      "llm_evidence": "通过黎曼几何克服大语言模型强化学习中的探索崩溃",
+      "canonical_evidence": "通过黎曼几何克服大语言模型强化学习中的探索崩溃",
+      "llm_tldr_en": "Reveals that PPO-Clip's Euclidean metric causes exploration collapse in LLM RL, and proposes Riemannian Isometric Policy Optimization to correct this geometric flaw, significantly improving exploration.",
+      "llm_tldr_cn": "本文揭示了PPO-Clipping在大语言模型强化学习中的根本缺陷：其隐含使用的欧几里得度量与策略黎曼流形的内在几何不一致，导致探索崩溃。为纠正这一几何错误，作者提出了黎曼等距策略优化，从根本上解决了探索过度保守的问题。实验表明该方法在保持稳定性的同时显著提升了探索效率，为大语言模型后训练提供了更稳健的强化学习算法。",
+      "llm_tldr": "本文揭示了PPO-Clipping在大语言模型强化学习中的根本缺陷：其隐含使用的欧几里得度量与策略黎曼流形的内在几何不一致，导致探索崩溃。为纠正这一几何错误，作者提出了黎曼等距策略优化，从根本上解决了探索过度保守的问题。实验表明该方法在保持稳定性的同时显著提升了探索效率，为大语言模型后训练提供了更稳健的强化学习算法。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.10474v1",
+      "source": "arxiv",
+      "title": "Reinforcement Learning with Verifiable Physics: Post-training LLMs with Continuous Rewards",
+      "abstract": "Partial differential equations (PDEs) are foundational to modeling in science and engineering, but constructing reliable numerical solvers remains labor-intensive, demanding expert knowledge of discretization schemes, stability conditions, and boundary treatments. Recent work has begun to frame PDE solving as a code-generation task for large language models (LLMs), yet existing approaches operate primarily at inference time: relying on prompting, debugging, self-refinement, and test-time scaling rather than adapting the model itself. In parallel, reinforcement learning with verifiable rewards has emerged as a post-training paradigm for code and math reasoning, but its verifiers are typically binary: a compiler runs, or a test passes. Such signals discard the graded structure of scientific correctness, where two solvers may both execute and yet differ in solution accuracy by orders of magnitude. In this work, we introduce RLVP: Reinforcement Learning with Verifiable Physics, an RL post-training framework for multi-PDE solver code generation. RLVP addresses this verifiability gap with a hybrid verifier: hard program-validity checks ensure executability, while continuous physics rewards score function-space accuracy and PDE-residual consistency. A single policy is post-trained across diverse PDE families spanning hyperbolic, parabolic, elliptic, and incompressible-flow systems. RLVP improves over both pre-trained and supervised-only baselines on PDE benchmarks, and shows zero-shot improvement transfer to held-out PDEs. We show that a smaller LLM post-trained with RLVP can outperform prompting a frontier model on in-distribution PDE solver generation. The trained policy shows evidence of compositionality in numerical motifs: it recombines stencils, time-stepping schemes, and boundary-handling primitives learned from the PDEs used in training into generated solvers for unseen PDE problems.",
+      "authors": [
+        "Pengfei Cai",
+        "Utkarsh Utkarsh",
+        "Alan Edelman",
+        "Christopher Vincent Rackauckas",
+        "Rafael Gomez-Bombarelli"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CE"
+      ],
+      "published": "2026-07-11T20:53:04+00:00",
+      "link": "https://arxiv.org/pdf/2607.10474v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Post-training LLMs with continuous rewards from physics environments via RLVR",
+      "llm_evidence_cn": "通过可验证奖励的强化学习在物理环境中对LLM进行后训练",
+      "llm_evidence": "通过可验证奖励的强化学习在物理环境中对LLM进行后训练",
+      "canonical_evidence": "通过可验证奖励的强化学习在物理环境中对LLM进行后训练",
+      "llm_tldr_en": "Proposes to use reinforcement learning with verifiable rewards (RLVR) to post-train LLMs for PDE solving, using continuous rewards from a physics simulator, achieving improved code generation without inference-time scaling.",
+      "llm_tldr_cn": "该论文利用可验证奖励的强化学习（RLVR）对LLM进行后训练以解决偏微分方程。传统方法依赖推理时提示与调试，而该方法通过物理模拟器提供连续奖励直接微调模型。实验表明后训练LLM能生成更可靠的数值求解器代码，无需额外推理时计算，为科学计算领域的LLM后训练提供了新途径。",
+      "llm_tldr": "该论文利用可验证奖励的强化学习（RLVR）对LLM进行后训练以解决偏微分方程。传统方法依赖推理时提示与调试，而该方法通过物理模拟器提供连续奖励直接微调模型。实验表明后训练LLM能生成更可靠的数值求解器代码，无需额外推理时计算，为科学计算领域的LLM后训练提供了新途径。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.14485v1",
+      "source": "arxiv",
+      "title": "Step-Level Preference Learning for Generative Agents in Social Simulations",
+      "abstract": "Large language model (LLM)-based generative agents simulate human behavior through long-horizon decision-making processes that comprise intermediate steps such as planning, memory retrieval, reflection, and action selection. However, fine-grained human annotations of these intermediate steps remain scarce, and existing agents are not grounded in human preferences over such intermediate decisions. To address this gap, we introduce \\method, an interactive simulation interface that enables us to collect step-level human preference supervision over agent decision trajectories, leading to a dataset of 57K fine-grained annotations. We conduct step-level preference learning on open-weight language models using supervised finetuning and direct preference optimization on this data, consistently improving simulation fidelity, coordination, and interaction quality, and inducing more socially effective agent behavior. Our results show that step-level human supervision is an effective training signal for improving both local decision quality and long-horizon agent behavior.",
+      "authors": [
+        "Wenchang Gao",
+        "Pingyue Sheng",
+        "Lanlan Qiu",
+        "Yunfei Ma",
+        "Jian Zhao",
+        "Baicheng Chen",
+        "Kangda Wang",
+        "Yuyang Tian",
+        "Shunqiang Mao",
+        "Tianxing He"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-16T01:58:53+00:00",
+      "link": "https://arxiv.org/pdf/2607.14485v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "directly addresses step-level preference learning for LLM agents, matching reward modeling requirement",
+      "llm_evidence_cn": "直接针对生成式智能体的步骤级偏好学习，符合用户对奖励建模的需求",
+      "llm_evidence": "直接针对生成式智能体的步骤级偏好学习，符合用户对奖励建模的需求",
+      "canonical_evidence": "直接针对生成式智能体的步骤级偏好学习，符合用户对奖励建模的需求",
+      "llm_tldr_en": "Proposes step-level preference learning for generative agents using 57K human annotations, applying supervised finetuning and DPO to align agent decisions with human preferences.",
+      "llm_tldr_cn": "大语言模型驱动的生成式智能体在长期决策中缺乏中间步骤的人类偏好监督。本文构建交互式模拟界面收集57K细粒度步骤级偏好数据，并通过监督微调和直接偏好优化（DPO）进行偏好学习，使智能体行为更符合人类偏好。方法有效提升了模拟真实性和用户满意度。",
+      "llm_tldr": "大语言模型驱动的生成式智能体在长期决策中缺乏中间步骤的人类偏好监督。本文构建交互式模拟界面收集57K细粒度步骤级偏好数据，并通过监督微调和直接偏好优化（DPO）进行偏好学习，使智能体行为更符合人类偏好。方法有效提升了模拟真实性和用户满意度。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.14506v1",
+      "source": "arxiv",
+      "title": "Non-vacuous Generalization Bounds for Reinforcement Learning with Verifiable Rewards",
+      "abstract": "While reinforcement learning with verifiable rewards (RLVR) is widely used to improve the reasoning capabilities of large language models (LLMs), the generalizability of the resulting models remains poorly understood. In this work, we establish the first non-vacuous generalization bounds for parameter-efficient RLVR fine-tuning at the billion-parameter scale. Our approach adapts PAC-Bayes compression bounds to this setting, and addresses the inherent stochasticity of token generation by applying the Gumbel-max reparameterization trick. To operationalize these bounds, we propose the Progressive RLVR framework, which integrates RLVR with on-policy distillation, TinyLoRA, and model quantization. Progressive RLVR empirically retains 84-97% performance of standard LoRA fine-tuning while producing models that are 14,796x more compressible. We show that this framework yields non-vacuous generalization bounds in four domains: mathematical problem-solving, programming, general-knowledge reasoning, and Text-to-SQL. Our bounds exceed the accuracy of the base model by 9-51% and lie within 6-11% of the accuracy of the fine-tuned models.",
+      "authors": [
+        "Yuxuan Zhu",
+        "Rohan Alur",
+        "Daniel Kang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-16T02:42:24+00:00",
+      "link": "https://arxiv.org/pdf/2607.14506v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Provides non-vacuous generalization bounds for RLVR fine-tuning of LLMs",
+      "llm_evidence_cn": "为LLM的RLVR微调提供非平凡泛化界限",
+      "llm_evidence": "为LLM的RLVR微调提供非平凡泛化界限",
+      "canonical_evidence": "为LLM的RLVR微调提供非平凡泛化界限",
+      "llm_tldr_en": "Establishes first non-vacuous generalization bounds for parameter-efficient RLVR fine-tuning at billion-parameter scale using PAC-Bayes and Gumbel-max reparameterization, with 84-97% performance retention.",
+      "llm_tldr_cn": "该论文针对LLM在可验证奖励强化学习（RLVR）微调中的泛化问题，首次在十亿参数规模下建立了非平凡泛化界。方法采用PAC-Bayes压缩界结合Gumbel-max重参数化技巧，并提出Progressive RLVR框架整合在线蒸馏与模型量化。实验表明Progressive RLVR保留了84-97%的性能，为LLM后训练理论提供了关键支撑。",
+      "llm_tldr": "该论文针对LLM在可验证奖励强化学习（RLVR）微调中的泛化问题，首次在十亿参数规模下建立了非平凡泛化界。方法采用PAC-Bayes压缩界结合Gumbel-max重参数化技巧，并提出Progressive RLVR框架整合在线蒸馏与模型量化。实验表明Progressive RLVR保留了84-97%的性能，为LLM后训练理论提供了关键支撑。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "math formulation",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.14614v1",
+      "source": "arxiv",
+      "title": "Beyond Entropy: Correctness-Aware Advantage Shaping via Contrastive Policy Optimization",
+      "abstract": "Reinforcement learning with verifiable rewards (RLVR) commonly uses entropy for advantage shaping. However, entropy cannot distinguish useful uncertainty from detrimental confusion, limiting its effectiveness as a correctness signal. We propose Contrastive Policy Optimization (CPO), which uses token-level contrastive disagreement between reference-guided and vanilla generation distributions for correctness-aware advantage shaping. Both theoretical and empirical results show that this disagreement reliably indicates token-level correctness. We further show that On-policy Distillation is a special case of CPO, where the posterior distribution is instantiated by an external teacher model. CPO also resolves the zero-advantage problem. Experiments on in-domain and out-of-domain benchmarks demonstrate that CPO substantially outperforms entropy-based RLVR methods while maintaining strong generalization. Further analysis shows that correct and incorrect responses naturally support exploration and exploitation respectively, and balancing both leads to the best performance.",
+      "authors": [
+        "Weiwen Xu",
+        "Jia Liu",
+        "Hou Pong Chan",
+        "Long Li",
+        "Deng Cai",
+        "Min Chen",
+        "Hao Zhang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-07-16T06:25:19+00:00",
+      "link": "https://arxiv.org/pdf/2607.14614v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Contrastive Policy Optimization for correctness-aware advantage shaping in RLVR",
+      "llm_evidence_cn": "基于对比策略优化的RLVR正确感知优势塑造",
+      "llm_evidence": "基于对比策略优化的RLVR正确感知优势塑造",
+      "canonical_evidence": "基于对比策略优化的RLVR正确感知优势塑造",
+      "llm_tldr_en": "Proposes Contrastive Policy Optimization (CPO) that uses token-level contrastive disagreement for correctness-aware advantage shaping in RLVR, outperforms entropy-based methods and resolves zero-advantage problem.",
+      "llm_tldr_cn": "该论文针对强化学习可验证奖励（RLVR）中熵无法区分有用不确定性与有害混淆的问题，提出了对比策略优化（CPO）。CPO通过参考引导与普通生成分布之间的令牌级对比不一致性进行正确感知优势塑造。理论和实验均表明该方法可可靠指示令牌正确性，解决零优势问题，并将在线蒸馏作为特例。该方法为LLM后训练中的奖励塑造提供了新范式。",
+      "llm_tldr": "该论文针对强化学习可验证奖励（RLVR）中熵无法区分有用不确定性与有害混淆的问题，提出了对比策略优化（CPO）。CPO通过参考引导与普通生成分布之间的令牌级对比不一致性进行正确感知优势塑造。理论和实验均表明该方法可可靠指示令牌正确性，解决零优势问题，并将在线蒸馏作为特例。该方法为LLM后训练中的奖励塑造提供了新范式。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.09153v1",
+      "source": "arxiv",
+      "title": "KV-PRM: Efficient Process Reward Modeling via KV-Cache Transfer for Multi-Agent Test-Time Scaling",
+      "abstract": "Process Reward Models (PRMs) have been proven to be highly effective in guiding test-time scaling (TTS) methods, which significantly boost the capabilities of LLM-based multi-agent systems. However, existing PRMs are text-based: they re-encode the entire trajectory text from scratch. In long multi-agent rollouts, the scoring cost, growing quadratically with respect to sequence length L, creates a severe computational bottleneck, severely limiting PRMs' application in long-context scenarios. To resolve this, we introduce KV-PRM, a highly efficient process reward model that eliminates the heavy text re-encoding by directly reading the KV cache produced naturally during the LLM's generation phase. By processing a single \"verify token\" against the pre-existing KV cache, KV-PRM reduces the scoring cost from O(L^2) to O(L). We formally prove that the KV cache contains strictly greater information capacity than text, and is more efficient for downstream reward modeling. Empirically, across the MATH, GSM8K, and AIME benchmarks, KV-PRM matches or strictly outperforms text-PRMs under various TTS methods such as Beam Search, MCTS, and Weighted Voting, with up to a 5,000x reduction in scoring FLOPs, a 37x reduction in latency, and a 34x reduction in per-sequence memory footprint compared to text-based PRMs.",
+      "authors": [
+        "Peng Kuang",
+        "Haibo Jin",
+        "Xiaoyu Han",
+        "Yanli Wang",
+        "Xiaopeng Yuan",
+        "Ye Yu",
+        "Kaidi Xu",
+        "Haohan Wang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-10T07:16:43+00:00",
+      "link": "https://arxiv.org/pdf/2607.09153v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "directly proposes efficient process reward model for RLHF-like test-time scaling",
+      "llm_evidence_cn": "直接提出高效过程奖励模型用于类似RLHF的测试时扩展",
+      "llm_evidence": "直接提出高效过程奖励模型用于类似RLHF的测试时扩展",
+      "canonical_evidence": "直接提出高效过程奖励模型用于类似RLHF的测试时扩展",
+      "llm_tldr_en": "Introduces KV-PRM, a process reward model that reuses KV-cache from LLM generation to avoid re-encoding, enabling efficient reward modeling for long multi-agent trajectories.",
+      "llm_tldr_cn": "本文提出KV-PRM，一种高效的过程奖励模型，通过直接利用LLM生成阶段产生的KV缓存来避免重新编码整个轨迹，极大降低了长序列多智能体场景下的奖励计算成本，使过程奖励模型在测试时扩展中更实用。方法通过简单读取KV缓存实现验证，显著提升效率且保持准确性。",
+      "llm_tldr": "本文提出KV-PRM，一种高效的过程奖励模型，通过直接利用LLM生成阶段产生的KV缓存来避免重新编码整个轨迹，极大降低了长序列多智能体场景下的奖励计算成本，使过程奖励模型在测试时扩展中更实用。方法通过简单读取KV缓存实现验证，显著提升效率且保持准确性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.09999v1",
+      "source": "arxiv",
+      "title": "Silent Failures in Quantized LLM Reasoning: A Taxonomy-Based Analysis of Hollow Convergence and Failure Mode Shifts",
+      "abstract": "We show that post-training quantization can silently alter how large language models reason even when task accuracy is preserved. Using a six-category failure taxonomy validated by two independent human annotators (Cohen's $κ$ = 0.906), we classify 30,000 chain-of-thought outputs from five instruction-tuned LLMs (3B--14B parameters) across three quantization precisions (FP32, FP16, NF4) and four reasoning benchmarks. We find that while accuracy is robust across precisions (maximum 3.1 pp drop), Hollow Convergence (correct answers reached through incomplete or unverifiable reasoning) shows a significant size-dependent shift under NF4, dropping sharply for the two smallest models tested but remaining invariant for models at 12B parameters and above. This effect is also benchmark-specific: GSM8K is categorically immune while LogiQA and ARC-Challenge show the largest shifts. Furthermore, under NF4, Shortcut Collapse rises from 44% to 78% of wrong-answer failures in LLaMA 3.2-3B while Confidence Snowballing collapses from 15.8% to near zero, a qualitative shift invisible to accuracy metrics. Finally, we show Hollow Convergence cannot be reliably detected from surface-level text features (best F1 = 0.53), establishing it as a deployment-relevant failure mode that standard evaluation pipelines cannot catch.",
+      "authors": [
+        "Renuka Oladri",
+        "Mohan Vamsi Varadaraju Priya",
+        "Jerry Wu"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-07-10T21:55:05+00:00",
+      "link": "https://arxiv.org/pdf/2607.09999v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Taxonomy of reasoning failures in quantized LLMs relating to hallucination-like hollow convergence",
+      "llm_evidence_cn": "量化LLM推理失败分类，涉及类似幻觉的空心收敛",
+      "llm_evidence": "量化LLM推理失败分类，涉及类似幻觉的空心收敛",
+      "canonical_evidence": "量化LLM推理失败分类，涉及类似幻觉的空心收敛",
+      "llm_tldr_en": "This paper investigates how post-training quantization silently alters LLM reasoning, identifying hollow convergence as a failure mode where correct answers mask flawed reasoning, with size-dependent shifts.",
+      "llm_tldr_cn": "本文揭示了后训练量化会静默改变大语言模型的推理过程，即使任务准确率保持不变。通过六类失败分类法分析了30,000条思维链输出，发现量化精度下降时出现了空心收敛（正确答案但推理不完整或不可验证）这一故障模式，且该模式在小模型中显著减少，而大模型保持稳定。这警示量化可能导致推理质量退化而不被察觉。",
+      "llm_tldr": "本文揭示了后训练量化会静默改变大语言模型的推理过程，即使任务准确率保持不变。通过六类失败分类法分析了30,000条思维链输出，发现量化精度下降时出现了空心收敛（正确答案但推理不完整或不可验证）这一故障模式，且该模式在小模型中显著减少，而大模型保持稳定。这警示量化可能导致推理质量退化而不被察觉。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.10159v1",
+      "source": "arxiv",
+      "title": "UNIT: Unleash Large Language Models Potential for Graph Continual Learning",
+      "abstract": "In real-world multimodal web scenarios, graph-structured data often arrives in a streaming manner, making graph continual learning a crucial paradigm for continuously modeling such evolving structures. However, existing graph continual learning methods still face two fundamental challenges. 1) semantic-structural separation, where the graph-based methods excel at modeling topological relationships but neglect deep semantics. 2) imbalanced knowledge transfer, where existing models fail to effectively leverage general knowledge gained from early tasks to benefit subsequent new tasks. To address above issues, we propose a novel framework, \\textbf{UN}leash Large Language Models PotentIal for Graph ConTinual Learning (UNIT). By fine-tuning large language model only on the first task, we bridge the distributional gap between the pre-trained LLM corpus and the target task dataset to enhance the adaptability of LLMs for graph-structured tasks. Meanwhile, we propose an uncertain-aware anchor generation mechanism to effectively preserve representative knowledge across tasks, avoiding the neglect of universal knowledge learned from previous tasks. Additionally, we introduce structural confluence modeling to explicitly integrates graph topology information into semantic information, enhancing the collaborative capabilities between semantic understanding and structural modeling. Extensive experiments demonstrate that our proposed method achieves state-of-the-art performance in the graph continual learning task.",
+      "authors": [
+        "Tairan Huang",
+        "Yili Wang",
+        "Beibei Hu",
+        "Yiting Shi",
+        "Qiutong Li",
+        "Changlong He",
+        "Jianliang Gao"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-11T06:47:26+00:00",
+      "link": "https://arxiv.org/pdf/2607.10159v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "fine-tunes LLMs for graph continual learning, relates to post-training theme",
+      "llm_evidence_cn": "微调LLM用于图持续学习，与大模型后训练主题相关",
+      "llm_evidence": "微调LLM用于图持续学习，与大模型后训练主题相关",
+      "canonical_evidence": "微调LLM用于图持续学习，与大模型后训练主题相关",
+      "llm_tldr_en": "UNIT fine-tunes LLMs to address semantic-structural separation and imbalanced knowledge transfer in graph continual learning, unleashing LLM potential for evolving graph data.",
+      "llm_tldr_cn": "图持续学习中存在语义-结构分离和知识迁移不平衡问题。UNIT框架通过微调大型语言模型，利用其语义理解能力增强图结构学习，同时设计知识蒸馏策略平衡旧任务与新任务的知识迁移。实验结果表明，UNIT在多个图持续学习基准上取得最优性能，展示了LLM在后训练阶段应用于图数据的潜力，属于大语言模型后训练主题的探索。",
+      "llm_tldr": "图持续学习中存在语义-结构分离和知识迁移不平衡问题。UNIT框架通过微调大型语言模型，利用其语义理解能力增强图结构学习，同时设计知识蒸馏策略平衡旧任务与新任务的知识迁移。实验结果表明，UNIT在多个图持续学习基准上取得最优性能，展示了LLM在后训练阶段应用于图数据的潜力，属于大语言模型后训练主题的探索。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.14561v1",
+      "source": "arxiv",
+      "title": "MARS: Multi-hop Adaptive Retrieval and SPARQL Generation for KGQA",
+      "abstract": "Large language models (LLMs) have demonstrated strong reasoning performance, but their tendency to hallucinate limits their reliability in knowledge-intensive tasks requiring up-to-date and grounded information. Combining knowledge graphs (KGs) with LLMs facilitates the use of explicit symbolic knowledge that can be continuously updated without costly fine-tuning, while benefiting from rapidly advancing LLM reasoning. We propose MARS, a scalable knowledge graph question answering (KGQA) approach that requires no model fine-tuning. Rather than relying on open-ended agentic exploration, MARS performs a structured retrieval procedure that links question entities to the KG and iteratively retrieves relevant next-hop information. At each step, MARS decides whether to continue graph traversal or to generate the final SPARQL query, allowing the model to adapt the retrieval depth to the question while keeping the overall pipeline more predictable than fully agentic approaches. We evaluate MARS on three established KGQA benchmarks across several LLMs and settings, including multilingual evaluation, and provide insights through ablation studies and error analysis. Our approach achieves competitive performance relative to state-of-the-art methods while remaining efficient and scalable. The evaluation results, code and resources are publicly available: https://github.com/dice-group/mars-kgqa.",
+      "authors": [
+        "Nikit Srivastava",
+        "Daniel Vollmers",
+        "René Speck",
+        "Nikolaos Karalis",
+        "Hamada M. Zahera",
+        "Axel-Cyrille Ngonga Ngomo"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-16T04:40:05+00:00",
+      "link": "https://arxiv.org/pdf/2607.14561v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "hallucination suppression via KG grounding",
+      "llm_evidence_cn": "通过知识图谱增强减少幻觉",
+      "llm_evidence": "通过知识图谱增强减少幻觉",
+      "canonical_evidence": "通过知识图谱增强减少幻觉",
+      "llm_tldr_en": "MARS uses multi-hop KG retrieval to ground LLM reasoning, directly addressing hallucination in knowledge-intensive tasks.",
+      "llm_tldr_cn": "大语言模型在知识密集型任务中容易产生幻觉，MARS提出一种无需微调的多跳自适应检索和SPARQL生成方法，通过连接知识图谱进行结构化检索，减少对开放探索的依赖。实验表明该方法能有效提升问答准确率并抑制幻觉，展示了结合知识图谱缓解幻觉的实用路径。",
+      "llm_tldr": "大语言模型在知识密集型任务中容易产生幻觉，MARS提出一种无需微调的多跳自适应检索和SPARQL生成方法，通过连接知识图谱进行结构化检索，减少对开放探索的依赖。实验表明该方法能有效提升问答准确率并抑制幻觉，展示了结合知识图谱缓解幻觉的实用路径。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.14777v1",
+      "source": "arxiv",
+      "title": "SEED: Self-Evolving On-Policy Distillation for Agentic Reinforcement Learning",
+      "abstract": "Large language models are increasingly trained as interactive agents for long-horizon tasks involving multi-turn interaction, tool use, and environment feedback. Outcome-based reinforcement learning (RL) provides a practical optimization paradigm, but its sparse trajectory-level rewards offer limited guidance on intermediate decisions, leaving a supervision gap between episode-level outcomes and token-level policy learning. We propose SEED (SElf-Evolving On-Policy Distillation), a self-evolving framework that converts completed on-policy trajectories into training-time hindsight skills and distills their behavioral effect back into the policy model. SEED first fine-tunes the policy to analyze completed trajectories and generate natural-language skills that capture reusable workflows, decisive observations, or failure-avoidance rules. During RL, the current policy both collects trajectories and serves as the analyzer that extracts hindsight skills from them. Policy updates therefore improve subsequent decision making and skill analysis together, allowing hindsight supervision to evolve with the policy. SEED then re-scores the sampled actions under ordinary and skill-augmented contexts, converting the skill-induced probability shift into a dense token-level on-policy distillation signal. This signal is jointly optimized with outcome-based RL, keeping the auxiliary supervision aligned with the current trajectory distribution. Extensive experiments on text-based and vision-based agentic tasks show that SEED consistently improves performance and sample efficiency, exhibiting robust generalization to unseen scenarios. Our code is available at https://github.com/jinyangwu/SEED.",
+      "authors": [
+        "Jinyang Wu",
+        "Shuo Yang",
+        "Zhengxi Lu",
+        "Fan Zhang",
+        "Yuhao Shen",
+        "Lang Feng",
+        "Haoran Luo",
+        "Zheng Lian",
+        "Shuai Zhang",
+        "Zhengqi Wen",
+        "Jianhua Tao"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-16T09:57:18+00:00",
+      "link": "https://arxiv.org/pdf/2607.14777v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "on-policy distillation for agentic RL, addresses sparse reward similar to RLHF",
+      "llm_evidence_cn": "基于在线策略蒸馏的智能体强化学习，处理稀疏奖励问题类似RLHF",
+      "llm_evidence": "基于在线策略蒸馏的智能体强化学习，处理稀疏奖励问题类似RLHF",
+      "canonical_evidence": "基于在线策略蒸馏的智能体强化学习，处理稀疏奖励问题类似RLHF",
+      "llm_tldr_en": "SEED proposes self-evolving on-policy distillation to convert trajectories into hindsight skills, bridging the supervision gap in outcome-based RL for LLM agents.",
+      "llm_tldr_cn": "大型语言模型在长程任务中面临奖励稀疏问题，SEED提出一种自我演化的在线策略蒸馏框架，将完成的轨迹转化为训练时的后见技能并回注到策略模型中，有效弥合了片段级奖励与令牌级学习之间的监督鸿沟。",
+      "llm_tldr": "大型语言模型在长程任务中面临奖励稀疏问题，SEED提出一种自我演化的在线策略蒸馏框架，将完成的轨迹转化为训练时的后见技能并回注到策略模型中，有效弥合了片段级奖励与令牌级学习之间的监督鸿沟。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.15161v1",
+      "source": "arxiv",
+      "title": "On-Policy Delta Distillation",
+      "abstract": "On-policy distillation is an alternative post-training method in reinforcement learning that alleviates the constraints imposed by reward models by providing token-level supervision from a teacher model. Although on-policy distillation has been studied and applied across various settings, its fundamental design remains underexplored. In this paper, we introduce a new distillation reward, termed the delta signal, instead of directly imitating the teacher's output distribution. The delta signal is defined as the difference between the teacher model and its base model prior to instruction tuning for reasoning capability. It therefore captures the changes induced by reasoning tuning and provides a more direct signal for transferring reasoning capabilities. Using extensive empirical evidence, we show that the delta signal substantially improves on-policy distillation and refer to the new distillation method as On-Policy Delta Distillation (OPD$^2$). Experiments across mathematics, science, and code-reasoning benchmarks demonstrate that OPD$^2$ consistently outperforms conventional on-policy distillation, enabling reasoning LLMs to achieve strong performance with only a short post-training period. Code will be available at https://github.com/naver-ai/opd2",
+      "authors": [
+        "Byeongho Heo",
+        "Jaehui Hwang",
+        "Sangdoo Yun",
+        "Dongyoon Han"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-07-16T16:07:19+00:00",
+      "link": "https://arxiv.org/pdf/2607.15161v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "introduces delta signal distillation alleviating reward model constraints",
+      "llm_evidence_cn": "提出增量信号蒸馏，缓解奖励模型约束",
+      "llm_evidence": "提出增量信号蒸馏，缓解奖励模型约束",
+      "canonical_evidence": "提出增量信号蒸馏，缓解奖励模型约束",
+      "llm_tldr_en": "On-Policy Delta Distillation introduces a delta signal as distillation reward, capturing reasoning tuning changes to transfer reasoning capabilities, providing alternative to reward model in RLHF.",
+      "llm_tldr_cn": "针对奖励模型在强化学习从人类反馈中存在的约束，本文提出在线策略增量蒸馏方法，通过定义教师模型与基座模型在推理指令微调后的差异作为增量信号，替代直接模仿教师输出分布，更直接地传递推理能力。实验表明该方法有效缓解了奖励模型依赖，为后训练提供新范式。",
+      "llm_tldr": "针对奖励模型在强化学习从人类反馈中存在的约束，本文提出在线策略增量蒸馏方法，通过定义教师模型与基座模型在推理指令微调后的差异作为增量信号，替代直接模仿教师输出分布，更直接地传递推理能力。实验表明该方法有效缓解了奖励模型依赖，为后训练提供新范式。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    }
+  ]
+}
