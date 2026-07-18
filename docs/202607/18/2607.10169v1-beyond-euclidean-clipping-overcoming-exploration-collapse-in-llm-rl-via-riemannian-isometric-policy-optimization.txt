@@ -1,0 +1,507 @@
+Title: Beyond Euclidean Clipping: Overcoming Exploration Collapse in LLM RL via Riemannian Isometric Policy Optimization
+
+URL Source: https://arxiv.org/pdf/2607.10169v1
+
+Published Time: Tue, 14 Jul 2026 00:48:13 GMT
+
+Number of Pages: 11
+
+Markdown Content:
+# Beyond Euclidean Clipping: Overcoming Exploration Collapse in LLM RL via Riemannian Isometric Policy Optimization 
+
+Zhicheng Cai 1 2 3 Xinyuan Guo 1 3 Hanlin Wu 1 2 3 Mingxuan Wang 2 3 Wei-Ying Ma 1 3 Ya-Qin Zhang 1 3 
+
+Hao Zhou 1 3 * 
+
+# Abstract 
+
+Reinforcement learning (RL) has become a dom-inant paradigm for enhancing LLMs’ reasoning capabilities. However, RL algorithms with PPO-Clip are inherently limited by exploration collapse. Subsequent works remain primarily heuristic and fail to identify the essential cause of PPO-Clip’s failure. This work reveals the fundamental flaw of PPO-Clip: it implicitly measures policy dis-crepancy using Euclidean metric, which is theo-retically inconsistent with the intrinsic geometry on the policy Riemannian manifold. This geo-metric mismatch results in overly conservative up-dates in low-probability regions while aggressive in high-probability regions, ultimately collapsing exploration. To correct this geometric flaw, we propose Riemannian Isometric Policy Optimiza-tion (RIPO), which guarantees isometric policy updates on the Riemannian manifold, effectively balancing exploration and exploitation. We fur-ther show that RIPO achieves a favorable bias-variance trade-off, which stabilizes optimization. Extensive experiments demonstrate that RIPO sig-nificantly surpasses existing LLM RL algorithms across seven competition-level benchmarks (up to 60% improvement over GRPO on AIME24). 
+
+# 1. Introduction 
+
+Reinforcement learning (RL) has emerged as a central paradigm for enhancing the reasoning capabilities of large language models (LLMs) (Guo et al., 2025; Comanici et al., 2025; OpenAI, 2024). It has demonstrated remarkable suc-cess in domains requiring long-horizon decision-making, such as mathematical reasoning (Shao et al., 2024; Wang 
+
+> 1
+
+Institute for AI Industry Research (AIR), Tsinghua University 
+
+> 2
+
+ByteDance Seed 3SIA-Lab of Tsinghua AIR and ByteDance Seed. Correspondence to: Hao Zhou <zhouhao@air.tsinghua.edu.cn >.
+
+Proceedings of the 43 rd International Conference on Machine Learning , Seoul, South Korea. PMLR 306, 2026. Copyright 2026 by the author(s). 
+
+et al., 2024; Luo et al., 2025), and so on (OpenAI, 2025; Jin et al., 2025; Dou et al., 2024; Anthropic, 2024). Despite these advances, the PPO-Clip (Schulman et al., 2017) used in modern LLM RL algorithms (Guo et al., 2025) incurs a critical issue: exploration collapse (Yu et al., 2025). Specifically, PPO-Clip makes the policy rapidly concentrates on a narrow set of high-probability actions during training, thus rare but vital actions are unexplored, severely suppressing model performance. This is especially devastating in long-horizon reasoning tasks, where the state-action space is extremely vast, thus extensive exploration is indispensable to discover a feasible solution. Ultimately, exploration collapse hinders further scaling progress of RL, stifling the potential in increasingly challenging tasks. Subsequent works (Yang et al., 2025b; Zheng et al., 2025) provide symptomatic fixes without identifying the root cause of PPO-Clip’s failure. For example, DAPO (Yu et al., 2025) raises the clipping boundary to encourage exploration. While yielding empirical gains, they remain heuristic within the PPO-Clip framework, offering limited theoretical under-standing and leaving exploration collapse unresolved. In this work, we discover the fundamental flaw of PPO-Clip lies in the geometric mismatch between Euclidean metric and Riemannian manifold . Specifically, PPO-Clip implicitly measures policy discrepancy using a Euclidean metric on the importance ratio, treating equal ratio deviations as equal policy changes. However, the intrinsic discrepancy between policies is governed by the Kullback-Leibler (KL) diver-gence (Schulman et al., 2015), which induces a Riemannian geometry on the statistical manifold of policies. This ge-ometric mismatch leads to pathological update behavior: updates for low-probability actions consume almost no KL budget thus become overly conservative, while updates for high-probability actions are disproportionately aggressive. Consequently, rare but informative actions are systemati-cally under-updated, causing premature policy concentra-tion and eventual exploration collapse. To correct the mismatch, we propose Riemannian Isometric Policy Optimization (RIPO), a theoretically grounded RL algorithm that fundamentally reinterprets policy updates on 1arXiv:2607.10169v1 [cs.LG] 11 Jul 2026 Beyond Euclidean Clipping: Overcoming Exploration Collapse in LLM RL via Riemannian Isometric Policy Optimization 
+
+the Riemannian manifold. By dynamically adapting the clipping boundary to the local Riemannian geometry, RIPO permits larger updates for low-probability actions while constraining updates for high-probability actions. This iso-metric policy update balances exploration and exploitation, significantly improving the model performance, particularly in long-horizon tasks that require sustained exploration. In addition, such geometric isometry induces statistical ho-moscedasticity, leading to a favorable bias–variance trade-off and enabling more stable policy optimization. In summary, our contributions are threefold: • We identify a fundamental geometric mismatch of PPO-Clip , showing that its Euclidean clipping is incompati-ble with the intrinsic Riemannian manifold, leading to pathological updates and exploration collapse. • We propose Riemannian Isometric Policy Optimization 
+
+(RIPO), a theoretically grounded RL algorithm that enforces isometric updates on the Riemannian mani-fold, effectively balancing exploration and exploitation. We further show that RIPO induces a favorable bias– variance trade-off. • We conduct extensive experiments across various LLMs and competition-level benchmarks. RIPO sig-nificantly outperforms existing RL algorithms, achiev-ing up to 60% relative improvement over GRPO on AIME24, demonstrating its superiority and efficacy in enhancing reasoning performance. 
+
+# 2. Preliminary 
+
+2.1. Trust Region Policy Optimization 
+
+Trust Region Policy Optimization (TRPO) (Schulman et al., 2015) theoretically establishes that optimizing the surrogate objective under a KL-divergence constraint (the trust region )between the target policy πθ and the behavior policy πθold 
+
+guarantees monotonic policy improvement. Specifically, 
+
+max  
+
+> θ
+
+Es∼ρθold ,a ∼πθold 
+
+ πθ (a|s)
+
+πθold (a|s) ˆA(s, a )
+
+
+
+s.t. Es∼ρθold [DKL (πθold (·| s)|| πθ (·| s))] ≤ δ
+
+(1) where ˆA is the estimated advantage and δ is the trust-region radius. Despite its solid theoretical guarantees and appeal-ing empirical performance, such constrained optimization incurs significant computational overhead, making TRPO difficult to scale in practice. 
+
+2.2. Proximal Policy Optimization and Clip 
+
+To alleviate the computational burden and retain the intuition of TRPO, Proximal Policy Optimization (PPO) (Schulman et al., 2017) heuristically approximates the second-order optimization with a first-order clipped surrogate objective. For clarity, we omit the explicit dependence on (s, a ):
+
+JPPO (θ) = E
+
+h
+
+min 
+
+
+
+r(θ) ˆA, clip (r(θ), 1 − ϵ, 1 + ϵ) ˆA
+
+i 
+
+where rs,a (θ) = πθ (a|s)  
+
+> πθold (a|s)
+
+is the importance ratio, ϵ is the fixed clipping boundary, and ˆA is the advantage estimated with GAE (Schulman et al., 2016). By clipping the im-portance ratio, PPO constrains the policy updates within a proximal region, thus stabilizing training and improving policy performance. Due to the simplicity and effectiveness, clipping has become a central component in modern RL algorithms for large language models. 
+
+2.3. Group Relative Policy Optimization and Variants 
+
+Similar to PPO, Group Relative Policy Optimization (GRPO) (Guo et al., 2025; Shao et al., 2024) retains the PPO-Clip but eliminates the value model and estimates ad-vantage in a group-relative manner for computational and memory efficiency. In the LLM RL setting, given a query 
+
+q ∼ D , the behavior policy πθold samples a group of G indi-vidual responses {oi}Gi=1 with sparse rewards {Ri}Gi=1 . The GRPO objective is, 
+
+JGRPO (θ) = Eq∼D ,{oi}Gi=1 ∼πθold (·| q)
+
+"
+
+1
+
+G
+
+> G
+
+X
+
+> i=1
+
+1
+
+|oi|
+
+> |oi|
+
+X
+
+> t=1
+
+min 
+
+
+
+ri,t (θ) ˆAi,t , clip (ri,t (θ), 1 − ϵ, 1 + ϵ) ˆAi,t 
+
+ # (2) where ri,t (θ) = πθ (oi,t |q,o i<t )  
+
+> πθold (oi,t |q,o i<t )
+
+is the importance ratio, and 
+
+ˆAi,t = Ri−mean ({Ri}Gi=1 ) 
+
+> std ({Ri}Gi=1 )
+
+is the group-normalized advantage. A series of GRPO variants have been proposed to miti-gate two commonly observed issues in PPO-Clip: explo-ration collapse and gradient instability. DAPO (Yu et al., 2025) introduces decoupled Clip-Higher, setting the clip-ping range as (1 − ϵlow , 1 + ϵhigh ) and ϵhigh > ϵ low to en-courage exploration. DCPO (Yang et al., 2025b) adapts clipping thresholds dynamically. GSPO (Zheng et al., 2025) and GMPO (Zhao et al., 2025) clip on the sequential impor-tance ratio to reduce gradient variance. CISPO (Chen et al., 2025), GPPO (Su et al., 2025), and SAPO (Gao et al., 2025) propose to maintain the gradient of these clipped tokens. Although these variants yield empirical gains, they remain largely heuristic with limited theoretical understanding. Im-portantly, they do not identify and address the fundamental flaw of PPO-Clip, which we examine next. 2Beyond Euclidean Clipping: Overcoming Exploration Collapse in LLM RL via Riemannian Isometric Policy Optimization 
+
+# 3. The Geometric Flaw of PPO Clip 
+
+In this section, we first revisit the exploration collapse phe-nomenon of PPO-Clip. Then we theoretically illustrate that such issue originates from the geometric mismatch between the Euclidean metric used by PPO-Clip and the intrinsic geometry of the Riemannian manifold induced by KL diver-gence. 
+
+3.1. Exploration Collapse of PPO-Clip 
+
+The essence of PPO-Clip is to act as a first-order approxi-mation to the trust region by restricting the importance ratio 
+
+rs,a (θ) = πθ (a|s)  
+
+> πθold (a|s)
+
+to the interval (1 − ϵ, 1 + ϵ). How-ever, previous work (Yu et al., 2025) shows that PPO-Clip suppresses policy exploration, making it much easier to fur-ther increase the probability of already-preferred “exploita-tion tokens” than to promote low-likelihood “exploration tokens”, which ultimately leads to exploration collapse. Specifically, given ϵ = 0 .2 (the default value of most cases), consider action with relatively high probability of πθold = 0 .8,the maximum possible updated probability πθ (a|s) is 0.96 
+
+with an increase of 0.16 . While for low-probability action with πθold = 0 .01 , clipping limits the updated probability to only 0.012 , corresponding to a negligible increase of 0.002 .Consequently, even when low-probability while valuable actions are sampled, PPO-Clip fails to generate probability updates commensurate with the rarity. In contrast, high-frequent while low-value actions are more likely to receive large updates. As training proceeds, this asymmetry grad-ually reduces policy behavioral diversity, namely, the re-sponses of policy tend to be nearly identical. DAPO (Yu et al., 2025) proposes decoupled Clip-Higher to encourage exploration, setting the range as (1 − ϵlow , 1 + 
+
+ϵhigh ) and lifting ϵhigh from 0.2 to 0.28 . Consequently, the maximum update for low-probability action ( e.g. , 0.01 ) is lifted from 0.012 to 0.0128 . However, the increase is merely 
+
+0.0008 , which is still negligible. Even more critically, the maximum update for high-probability action ( e.g. , 0.8) is also lifted from 0.96 to 1, which further intensifies the re-duction in behavioral diversity. Therefore, DAPO fails to fundamentally analyze the flaw of PPO-Clip and resolve it. In summary, PPO-style Clip indiscriminately updates or truncates tokens, regardless of whether the corresponding action is already highly exploited or rarely explored. We next illustrate that such issue fundamentally originates from the geometric mismatch. 
+
+3.2. Geometric Mismatch in Policy Divergence The Euclidean Assumption of PPO-Clip. Equivalently, PPO-Clip constrains the ratio through |r(θ) − 1| < ϵ , which induces an implicit Euclidean distance measure: 
+
+dclip (πθold , π θ ) = ( πθ
+
+πθold 
+
+− 1) 2 = ( r(θ) − 1) 2 (3) for quantifying the change between two policies. Under this view, as long as two pairs of samples have the same ratio deviation , PPO-Clip regards them as having the same trust level , i.e. , the same discrepancy between the new and old policy distributions, and therefore subjects them to the same constraint . This implicitly assumes that policy change is uniform over the entire statistical manifold of policies. That is, the Euclidean deviation of the ratio dclip can uniformly characterize the divergence between policy distributions. However, this assumption is fundamentally incorrect from a geometric perspective. 
+
+Riemannian Geometry of Policy Discrepancy. As stated in TRPO (Schulman et al., 2015), the discrep-ancy between two policies is measured by the KL diver-gence DKL (πθold (·| s)|| πθ (·| s)) , which admits the following second-order Taylor expansion: 
+
+Φ( θ) = DKL (πθold (·| s)|| πθ (·| s)) 
+
+≈
+
+
+
+Φ( θ) + ∆ θ∇θ Φ( θ) + 12 ∆θ⊤∇2 
+
+> θ
+
+Φ( θ)∆ θ
+
+
+
+> θ=θold
+
+= 12 ∆θ⊤F (θ)|θ=θold ∆θ
+
+(4) where ∆θ = θ − θold , and F (θ) is the Fisher Information Matrix, delivering a Riemannian manifold. To relate pa-rameter updates to their effect on probability distributions, we map the above approximation from the parameter space 
+
+Θ = {θ} to the induced policy space of probability distribu-tions Π = {πθ (a|s) | θ ∈ Θ}. Formally, we have: 
+
+2DKL (πθold (·| s)|| πθ (·| s)) ≈ ∆θ⊤F (θ)|θ=θold ∆θ
+
+= ∆ θ⊤Ea
+
+∇θ log πθ (a|s)∇θ log πθ (a|s)⊤
+
+> θ=θold
+
+∆θ
+
+= ∆ θ⊤ X
+
+> a
+
+πθ (a|s) ∇θ πθ (a|s)
+
+πθ (a|s)
+
+∇θ πθ (a|s)⊤
+
+πθ (a|s) θ=θold 
+
+∆θ
+
+= X
+
+> a
+
+1
+
+πθold (a|s)
+
+ ∇θ πθ (a|s)⊤|θ=θold ∆θ2
+
+(5) Perform first-order Taylor expansion of πθ (a|s) around θold :
+
+πθ (a|s) ≈ πθold (a|s) + ∇θ π⊤ 
+
+> θ
+
+(a|s)|θ=θold ∆θ (6) Thus we obtain: 
+
+DKL (πθold (·| s)|| πθ (·| s)) ≈ 12
+
+X
+
+> a
+
+(πθ (a|s) − πθold (a|s)) 2
+
+πθold (a|s)= 12
+
+X
+
+> a
+
+πθold (a|s)( rs,a (θ) − 1) 2
+
+(7) 3Beyond Euclidean Clipping: Overcoming Exploration Collapse in LLM RL via Riemannian Isometric Policy Optimization 
+
+As a consequence, the geometric distance between two poli-cies on the Riemannian manifold can be derived as 
+
+dgeom (πθold , π θ ) ∝ πθold · (r(θ) − 1) 2 (8) Crucially, this geometric distance depends on the underlying probability simplex πθold : distances in high-probability re-gions expand, while distances in low-probability regions shrink. Thus the geometry of Riemannian manifold is non-uniform. In contrast, PPO-Clip implicitly adopts a Eu-clidean metric that ignores the dependence on πθold , treating 
+
+(r(θ) − 1) 2 as globally equivalent, leading to a systematic mismatch in measuring policy divergence. 
+
+Trust Region Perspective. We now revisit the illustrative example of Sec. 3.1 in light of the derived geometry. Note that PPO-Clip intends to approximate a trust region con-straint DKL ≤ δ. For high-probability action πθold (a|s) = 0 .8,consider r(θ) = 1 .2 which reaches the clipping boundary 
+
+|r(θ)−1| = 0 .2. Correspondingly, the maximum distance is 0.5 × 0.8 × 0.22 = 0 .016 , which can be regarded as a reasonable trust region. While for low-probability action 
+
+πθold (a|s) = 0 .01 , also consider |r(θ) − 1| = 0 .2. In this case, the induced distance is 0.5 × 0.01 × 0.22 = 0 .0002 ,which is orders of magnitude smaller than the available trust-region budget. Under PPO-Clip, both updates are treated identically due to their same ratio deviation. How-ever, in Riemannian geometry, the second update moves almost zero distance, leaving substantial trust region budget unused. Consequently, high-probability tokens are allowed to grow aggressively, whereas low-probability tokens face a severely restricted trust region. We conclude this section with following proposition. 
+
+Proposition 3.1. PPO-Clip incorrectly employs a Eu-clidean metric to measure the discrepancy between poli-cies, failing to align with the geometry of policy Rieman-nian manifold. This leads to overly conservative updates in low-probability regions while aggressive in high-probability regions, ultimately causing exploration collapse. 
+
+# 4. Riemannian Isometric Policy Optimization 
+
+In this section, we first propose a theoretically grounded clipping mechanism, Riemannian Isometric Clip. We then illustrate that it achieves a desirable bias–variance trade-off. Finally, we introduce the complete Riemannian Isometric Policy Optimization algorithm. 
+
+4.1. Riemannian Isometric Clip 
+
+In order to address the inherent issue of PPO-Clip, we pro-pose that updates for each state-action sample should move within the same geometric distance on the Riemannian man-ifold, rather than having the same Euclidean ratio deviation. That is, each update should consume within the same budget of trust region. To achieve this, we propose Riemannian Isometric Clip (RIC) that dynamically adjusts the clipping boundary depends on the corresponding local probability simplex πθold . Formally, we require that the geometric dis-tance for each update satisfies: 
+
+dgeom (πθold (a|s), π θ (a|s)) ≜ 12 πθold (a|s)( rs,a (θ) − 1) 2 ≤ δ
+
+(9) Solving for rs,a (θ), we obtain the theoretically grounded ratio constraint for each action: 
+
+|rs,a (θ) − 1| ≤ 
+
+s
+
+2δπθold (a|s)1 −
+
+s
+
+2δπθold (a|s) ≤ rs,a (θ) ≤ 1 + 
+
+s
+
+2δπθold (a|s)
+
+(10) This result provides a distribution-dependent dynamic clip-ping threshold, which can be practically implemented as: 
+
+|rs,a (θ)−1| ≤ ϵs,a (πθold ), ϵs,a (πθold ) = 
+
+s
+
+δπθold (a|s) (11) where the coefficient 2 is absorbed into the hyper-parameter 
+
+δ, which indicates the maximum geometric distance ( i.e. ,the radius of the trust region). Consequently, by considering the local probability simplex, RIC allows low-probability ac-tions to receive larger policy updates, while high-probability actions are assigned reduced updates, thus maintaining a balanced exploration-exploitation trade-off. 
+
+Revisit the Illustrative Example. We again revisit the example of Sec. 3.1 to intuitively demonstrate the effect of RIC. With δ = 0.02 , for a high-probability action 
+
+πθold (a|s) = 0 .8, the maximum updated probability is con-strained to 0.92 , which is noticeably less aggressive than 
+
+0.96 under PPO-Clip. In contrast, for a low-probability action πθold (a|s) = 0 .01 , RIC allows the probability to in-crease to 0.024 , a substantially larger update compared with 
+
+0.012 under PPO-Clip. Moreover, the consumed trust re-gions (geometric distances) of these two actions are con-stantly 0.01 under RIC, compared to highly different values of 0.016 and 0.0002 under PPO-Clip. Consequently, RIC enables exploration without amplifying already dominant actions through allocating isometric trust regions. 
+
+4.2. Geometric Isometry Implies Homoscedasticity 
+
+We next analyze Riemannian Isometric Clip from the per-spective of the critical bias–variance trade-off in off-policy RL algorithms (Schulman et al., 2015; Yang et al., 2025b), and reveal a deep connection between geometric isometry and statistical homoscedasticity. 4Beyond Euclidean Clipping: Overcoming Exploration Collapse in LLM RL via Riemannian Isometric Policy Optimization 
+
+For off-policy algorithms, the objective under target policy 
+
+πθ is estimated by samples x (i.e. , state-action pairs) from behavior policy πθold through importance sampling, namely, 
+
+Ex∼πθ [A(x)] = Ex∼πθold [r(x)A(x)] , r(x) = πθ (x)
+
+πθold (x)
+
+(12) which is unbiased but often suffers from severe variance. The variance is dominated by the second-moment term while the squared-mean term is typically negligible (Tokdar & Kass, 2010; Murphy, 2012): 
+
+Vx∼πθold [r(x)A(x)] ≈ Ex∼πθold 
+
+r(x)2A(x)2
+
+= X
+
+> x
+
+πθold (x) r(x)2A(x)2 (13) The variance explosion primarily originates from the long-tail distribution of πθold (x). Define the variance contribution of sample x is v(x) = πθold (x)r(x)2, when πθold (x) is small, 
+
+v(x) = πθ (x)2/π θold (x) becomes arbitrarily large, causing uncontrollable contribution to the variance. PPO-Clip implicitly mitigates this issue by truncating the importance ratio, r(x) ≤ 1+ ϵ, thus discarding samples with large ratios. For samples x′ around the clipped region, the variance contribution is v(x′) = πθold (x′)(1 + ϵ)2 → 0 as 
+
+πθold (x′) → 0, effectively reducing variance. However, PPO-Clip introduces severe bias by ignoring the contribution of these clipped samples to the objective. In contrast, RIC adopts a distribution-dependent clipping threshold r(x) ≤ 1 + pδ/π θold (x). Consequently, the vari-ance contribution v(x′) of each sample x′ around the clipped region satisfies, 
+
+v(x′) = πθold (x′) 1 + 
+
+s
+
+δπθold (x′)
+
+!2
+
+≈ O (δ) (14) yielding a density-independent and constant-order variance. As a result, RIC achieves a principled bias–variance trade-off : the variance is strictly smaller than standard importance sampling, while the bias is substantially smaller than PPO-Clip as more rare samples are considered. 
+
+Geometric Interpretation. This analysis reveals a fun-damental connection between geometry and statistics: by guaranteeing isometric updates on the policy Riemannian manifold, RIC equalizes the second-order contribution of each sample to the trust region, which in turn induces statis-tical homoscedasticity in importance sampling. In contrast, PPO-Clip implicitly assumes a Euclidean geometry, leading to heteroscedastic variance and overly conservative updates in low-probability regions. We conclude the proposed clipping mechanism as, 
+
+Proposition 4.1. Riemannian Isometric Clip guarantees equal geometric distance for each state-action update on the policy Riemannian manifold, where low-probability actions are allowed larger updates and high-probability actions re-ceive less aggressive updates. This geometrically principled clipping mechanism simultaneously mitigates exploration collapse and balances the bias–variance trade-off in policy optimization. 
+
+4.3. Riemannian Isometric Policy Optimization 
+
+Now we present the objective of Riemannian Isometric Pol-icy Optimization (RIPO 1): 
+
+JRIPO (θ) = Eq∼D ,{oi}Gi=1 ∼πθold (·| q)
+
+"
+
+1
+
+PGi=1 |oi|
+
+> G
+
+X
+
+> i=1
+> |oi|
+
+X
+
+> t=1
+
+min 
+
+
+
+ri,t (θ) ˆAi,t , clip (ri,t (θ), 1−ϵi,t (πθold ), 1+ ϵi,t (πθold )) ˆAi,t 
+
+#
+
+(15) where ϵi,t (πθold ) is the dynamic clipping boundary of RIC as proposed in Eqn. 11. RIPO is proposed for LLM RL tasks and adopts the group-relative advantage estimator of GRPO. In addition, RIPO adopts token-level policy gradient loss as DAPO (Yu et al., 2025) to balance the gradient influence of both long and short trajectories. 
+
+# 5. Experiments 
+
+To validate the effectiveness of RIPO, we conduct extensive experiments on four LLMs of different sizes and types, across seven challenging benchmarks, and comparing with six representative RL algorithms. 
+
+5.1. Experimental Setup Models and Baselines. We evaluate the RL algorithm’s performance on four large language models of different scales and architectures, i.e. , Llama3.2-3B-Instruct (Dubey et al., 2024), Qwen3-1.7B-Base, Qwen3-4B-Base, and Qwen3-8B-Base (Yang et al., 2025a). We compare the proposed RIPO to six representative RL algorithms with different clipping mechanisms, including GRPO (Shao et al., 2024) with PPO-Clip, DAPO (Yu et al., 2025) with Clip-Higher, GSPO (Zheng et al., 2025) with sequence-level clipping, GMPO (Zhao et al., 2025) with geometric-mean ratio clipping, and DCPO (Yang et al., 2025b) with dynamic-adaptive clipping, following their de-fault hyper-parameter settings. We set the δ of RIPO as 0.05 
+
+by default. As a common practice (Yang et al., 2025b; Ye et al., 2020), we employ dual clipping to the importance ratio of GRPO, DAPO, DCPO, and RIPO, with the lower 
+
+> 1RIPO, pronounced like “ripple”, highlighting how policy im-provements propagate smoothly across the Riemannian manifold.
+
+5Beyond Euclidean Clipping: Overcoming Exploration Collapse in LLM RL via Riemannian Isometric Policy Optimization                                                                                                                                                                                                                                          
+
+> Table 1. Comparison of different RL algorithms (evaluated by Avg@8) across various mathematical-reasoning benchmarks.
+> Method AIME24 AIME25 AMC23 HMMT25 BRUMO25 CMIMC25 SMT25 Average
+> Qwen3-1.7B-Base
+> Base 2.1 0.0 28.4 0.0 11.3 0.0 6.6 6.9 (-38.4%) GRPO 11.3 10.8 33.8 0.0 15.0 0.3 7.3 11.2 (+ 0.0%) DAPO 15.0 12.1 39.7 0.8 9.2 1.9 7.8 12.4 (+10.7%) GSPO 16.3 11.2 40.0 1.6 12.9 2.8 8.5 13.3 (+19.0%) GMPO 17.5 12.5 40.9 0.8 15.0 3.8 6.6 13.9 (+24.1%) DCPO 17.1 11.3 46.9 0.8 15.4 1.3 10.8 14.8 (+32.1%)
+> RIPO 18.3 12.9 46.1 1.3 15.4 3.2 10.4 15.4 (+37.2% )
+> Llama3.2-3B-Instruct
+> Base 5.4 0.0 17.8 0.0 1.3 0.0 0.0 3.5 (-45.3%) GRPO 16.3 1.3 24.5 0.4 1.7 0.0 0.7 6.4 (+ 0.0%) DAPO 20.1 1.7 25.3 0.8 2.5 0.3 0.9 7.4 (+15.6%) GSPO 17.5 1.7 25.7 0.4 3.8 0.6 0.9 7.2 (+12.5%) GMPO 16.7 1.3 27.7 0.4 2.8 0.9 1.7 7.4 (+15.6%) DCPO 16.7 2.1 24.7 0.4 2.5 0.6 1.4 6.9 (+ 7.8%)
+> RIPO 22.1 2.1 28.1 0.8 4.3 0.9 1.7 8.6 (+34.4%)
+> Qwen3-4B-Base
+> Base 10.0 8.3 50.0 0.0 18.3 1.3 8.9 13.8 (-46.3%) GRPO 30.4 20.8 63.4 7.5 25.8 12.4 19.8 25.7 (+ 0.0%) DAPO 31.7 21.3 69.4 9.2 26.3 10.0 21.7 27.1 (+ 5.4%) GSPO 32.1 21.3 70.3 9.2 26.7 10.0 18.2 26.8 (+ 4.3%) GMPO 32.5 26.7 68.8 11.3 26.3 10.6 22.5 28.4 (+10.5%) DCPO 31.7 24.2 71.3 8.8 25.0 15.0 19.8 27.8 (+ 8.2%)
+> RIPO 32.9 27.5 73.1 10.0 31.3 14.7 21.5 30.1 (+17.1%)
+> Qwen3-8B-Base
+> Base 3.8 3.3 43.4 1.3 15.0 3.1 10.8 11.5 (-59.6%) GRPO 31.7 20.8 66.6 12.9 33.3 12.5 21.9 28.5 (+ 0.0%) DAPO 33.7 22.1 70.9 7.9 33.3 18.1 28.3 30.6 (+ 7.4%) GSPO 37.5 19.6 70.1 15.0 36.3 13.8 32.5 32.1 (+12.6%) GMPO 41.7 30.0 76.9 11.7 35.8 17.8 33.0 35.3 (+23.9%) DCPO 36.3 27.5 72.2 15.4 42.8 16.3 31.6 34.5 (+21.1%)
+> RIPO 43.8 29.2 79.7 16.7 47.5 18.1 34.2 38.5 (+35.1%)
+
+and upper bounds set to 0.5 and 10 , respectively. We also remove the KL penalty term for all the methods following prior works (Yu et al., 2025; Yang et al., 2025b). Note that all these seven RL algorithms utilize the group-relative advantage estimator. 
+
+Training. We focus on evaluating the improvement in mathematical reasoning capability induced by RL algo-rithms, which is particularly challenging and widely re-garded as a strong indicator of general reasoning capability. We adopt DAPO-Math-17k (Yu et al., 2025) as the training set, which includes 17,917 questions. For each question, we generate 8 rollouts and set the maximum response length as 16,384 tokens for thorough reasoning. In each RL iteration, the behavior policy πθold totally generates 1024 rollouts with a train batch size of 128, and the current policy πθ is updated 8 times with a mini-batch size of 16. Mathematical prob-lems admit verifiable rewards, thus the rewards are set to 1 for correct responses and 0 for incorrect ones. We uniformly adopt the token-mean loss aggregation and optimize all mod-els 300 steps to convergence using AdamW (Loshchilov & Hutter, 2017) with a constant learning rate of 1 × 10 −6. All experiments are conducted on the VeRL (Sheng et al., 2025) framework using 8 ×A100 GPUs. 
+
+Evaluation. We comprehensively evaluate the effective-ness of these RL algorithms on seven competition-level mathematical reasoning benchmarks without contamina-tion, including American Mathematics Competitions 2023 (AMC23), American Invitational Mathematics Examination 2024&2025 (AIME24, AIME25), Harvard—MIT Mathe-matics Tournament 2025 (HMMT25), Brown University Math Olympiad 2025 (BRUMO25), Carnegie Mellon In-formatics and Mathematics Competition 2025 (CMIMC25), and Stanford Math Tournament 2025 (SMT25) (Balunovi ´cet al., 2025). We repeat the evaluation set for 8 times and report avg @8 metric for results stability. 6Beyond Euclidean Clipping: Overcoming Exploration Collapse in LLM RL via Riemannian Isometric Policy Optimization  
+
+> Figure 1. Training dynamics of Qwen3-8B-Base with various RL algorithms trained on DAPO-Math-17k.
+
+5.2. Main Results 
+
+Table 1 summarizes the main experimental results across seven competition-level mathematical reasoning bench-marks and four base models with different scales and archi-tectures. Overall, RIPO consistently achieves the best average per-formance across all models, demonstrating strong effective-ness and generalization. Specifically, RIPO substantially outperforms GRPO up to 37 .2% , 34 .4% , 17 .1% , and 35 .1% 
+
+on average for Qwen3-1.7B-Base, Llama3.2-3B-Instruct, Qwen3-4B-Base, and Qwen3-8B-Base, respectively, sig-nificantly improving the reasoning capability of different models. When compared to algorithms with improved clip-pings ( i.e. , DAPO, GSPO, GMPO, and DCPO), RIPO leads consistently on the majority of benchmarks, especially on harder datasets like AIME24 and BRUMO25. The perfor-mance improvement is particularly notable on larger models, indicating that RIPO scales effectively with model size. In summary, the experimental results demonstrate that RIPO delivers consistent and scalable improvements across di-verse models and benchmarks, validating its theoretical foundation and practical effectiveness. 
+
+5.3. Training Dynamics and Analysis 
+
+We visualize the training dynamics of Qwen3-8B-Base with the six RL algorithms in Fig. 1. As shown in Fig. 1(a), RIPO exhibits substantially faster per-formance improvement on AIME24 compared to other meth-ods. Notably, RIPO surpasses the performance of GRPO trained for 200 steps within only 40 steps, demonstrating 
+
+five times the token-efficiency . Moreover, the evaluation curve of RIPO increases smoothly with minimal oscillation and does not exhibit training collapse, indicating stable and efficient optimization. Fig. 1(b) reports the policy entropy during training. GRPO suffers from a rapid entropy collapse to near zero, reflect-ing deterministic policy outputs and severe exploration col-lapse. While DAPO exhibits uncontrolled entropy growth, indicating excessive exploration. In contrast, RIPO strikes a favorable balance between exploration and exploitation, its entropy decreases initially and then stabilizes within a moderate range, maintaining sustained exploration without destabilizing training. Fig. 1(c) presents the gradient norm dynamics. Other RL al-gorithms show pronounced oscillations with frequent spikes, reflecting unstable updates and high-variance gradients dur-ing optimization. By contrast, RIPO maintains an almost fluctuation-free gradient norm throughout training, consis-tent with previous analysis that RIPO stabilizes optimization by balancing bias and variance. Fig. 1(d) shows the proportion of clipped tokens. DCPO and GMPO rarely activate clipping, whereas GSPO and DAPO clip several orders of magnitude more tokens. In compari-son, RIPO achieves a balanced clipping ratio between these extremes, indicating an appropriate and well-calibrated trust region that harmonize update flexibility and stability. 
+
+5.4. Ablation Study 
+
+We conduct an ablation study on the choice of δ for RIPO using Qwen3-8B-Base. In addition to the default symmetric setting, we also consider a decoupled variant, where differ-ent budgets are assigned to the lower and upper clipping boundaries, denoted as δlow and δhigh , respectively. Table 2 summarizes the results on AIME24. RIPO exhibits stable performance across a broad range of δ values from 0.02 to 
+
+0.08 , demonstrating the robustness to hyper-parameter. In contrast, when δhigh is set substantially larger than δlow , per-formance degrades markedly, highlighting the importance of jointly constraining both directions of policy updates. Fig. 2 further illustrates the training dynamics. For symmetric settings, the reward improves steadily as entropy gradu-ally decreases and stabilizes at a moderate level, indicating well-behaved optimization. In contrast, highly asymmetric settings exhibit sudden reward degradation with entropy ex-plosion. This phenomenon arises because the asymmetric clipping makes action probabilities much easier to increase than to decrease, leading to excessive exploration and even-7Beyond Euclidean Clipping: Overcoming Exploration Collapse in LLM RL via Riemannian Isometric Policy Optimization                                                        
+
+> Table 2. Ablation study of different δfor RIPO on AIME24.
+> δlow 0.02 0.05 0.05 0.08 0.05 0.08 0.08
+> δhigh 0.02 0.04 0.05 0.08 0.02 0.02 0.04 Avg@8 40.8 41.7 43.8 42.1 28.8 27.5 27.9
+> Figure 2. Training dynamics of RIPO with different {δlow , δ high }.
+> Table 3. Comparison of RL algorithms with different clipping motivations on Qwen3-8B-Base. Benchmark GRPO GPPO Clip-Cov RIPO
+> AIME24 31.7 31.7 (+0.0) 36.3 (+4.6) 43.8 (+12.1)
+> AIME25 20.8 23.8 (+3.0) 22.9 (+2.1) 29.2 (+ 8.4)
+> AMC23 66.6 73.4 (+6.8) 66.6 (+0.0) 79.7 (+13.1)
+> HMMT25 12.9 14.2 (+1.3) 11.7 (-1.2) 16.7 (+ 3.8)
+> BRUMO25 33.3 38.3 (+5.0) 36.3 (+3.0) 47.5 (+14.2)
+> SMT25 21.9 25.0 (+3.1) 30.2 (+8.3) 34.2 (+14.2)
+
+tually causes training collapse. 
+
+5.5. Comparison with Other Clippings 
+
+We further compare RIPO with RL algorithms that employ clipping mechanisms with different underlying motivations and strategies. Specifically, we investigate GPPO (Su et al., 2025) which preserves the gradients of PPO-Clipped to-kens to mitigate information loss, and Clip-Cov (Cui et al., 2025b) which clips these high-covariance tokens to regu-late entropy and encourage exploration. We conduct ex-periments on the Qwen3-8B-Base model, following the previous experimental settings and using the default hyper-parameters for each method. Table 3 summarizes the quan-titative results. While GPPO and Clip-Cov show improve-ment over GRPO, RIPO significantly outperforms them across all benchmarks, highlighting the superior stability and effectiveness. 
+
+5.6. Transfer to PPO Objective 
+
+To demonstrate the generality of RIPO-Clip ( i.e. , RIC) be-yond GRPO-style objectives, we further apply it to PPO objective. Compared with the group-relative RL algorithms studied above, PPO differs in that it employs a learned value                       
+
+> Table 4. Comparison of different clipping mechanisms on PPO objective (evaluated on GSM8k dataset by Avg@1). Models PPO-Clip DAPO-Clip DCPO-Clip RIPO-Clip
+> 0.5B 58.0 (+0.0) 58.7 (+0.7) 58.4 (+0.4) 61.1 (+3.1)
+> 1.5B 79.2 (+0.0) 80.9 (+1.7) 79.6 (+0.4) 81.6 (+2.4)
+> 7B 91.7 (+0.0) 90.8 (-0.9) 91.4 (-0.3) 93.5 (+1.8)
+> 14B 93.2 (+0.0) 93.6 (+0.4) 93.9 (+0.7) 94.4 (+1.2)
+> Figure 3. Training dynamics of Qwen2.5-1.5B-Instruct with differ-ent clipping mechanisms on GSM8k.
+
+function and uses generalized advantage estimation (GAE) to compute advantages, as described in Sec. 2. We conduct experiments on the GSM8K math dataset (Cobbe et al., 2021), consisting of 7K train-ing problems and 1K held-out test problems. We evaluate Qwen2.5-Instruct models (Qwen et al., 2025) of different scales under the PPO objective, and compare RIC with other clipping mechanisms. The maximum response length is set as 8,192 tokens for thorough reasoning. In each RL iteration, the behavior policy πθold totally generates 256 rollouts with a train batch size of 512, and the current policy 
+
+πθ is updated 2 times with a mini-batch size of 256. For the value model of PPO, we adopt the same model as policy does with no warmups. We optimize all models 15 epochs (435 steps) to convergence using AdamW with a learning rate of 1e−6.Table 4 reports the results measured by Avg@1. Despite the difference in objective formulation and advantage es-timation, RIPO-Clip consistently outperforms other three clipping mechanisms, demonstrating that RIC is broadly applicable across policy optimization frameworks. Fig. 3 visualizes the training dynamics of Qwen2.5-1.5B-Instruct with different clips. PPO-Clip encounters severe exploration collapse where entropy rapidly decays to near zero. While PPO with RIPO-Clip maintains in certain en-tropy level, promoting consistent exploration. Additionally, the gradient norm of PPO with other clips exhibits sub-stantial fluctuations and sharp spikes. While RIPO-Clip demonstrates smoother gradients, signifying more stable optimization. 8Beyond Euclidean Clipping: Overcoming Exploration Collapse in LLM RL via Riemannian Isometric Policy Optimization  
+
+> Table 5. Pass@k performance comparison of different methods based on Qwen3-8B-Base evaluated on AIME-25 and HMMT-25
+
+Dataset Mehthod Avg@8 Pass@1 Pass@8 Pass@16 Pass@32 Pass@64 Pass@128 
+
+AIME-25 Base 3.3 5.0 12.3 16.7 16.7 16.7 16.7 GRPO 20.8 20.4 36.5 40.8 45.5 50.1 53.3 DAPO 22.1 20.6 33.4 35.7 37.4 39.1 40.0 DCPO 27.5 26.4 39.5 44.7 48.5 54.7 58.9 RIPO 29.2 30.4 43.2 47.0 50.8 55.6 60.0 HMMT-25 Base 1.3 0.6 3.5 5.2 6.3 6.7 6.7 GRPO 12.9 11.7 19.3 21.6 24.1 26.6 30.0 DAPO 7.9 7.7 16.7 20.3 23.4 25.7 26.7 DCPO 15.4 15.5 26.8 30.6 34.3 37.5 40.0 RIPO 16.7 16.7 28.3 32.6 37.3 41.4 45.3  
+
+> Table 6. Comparison of different RL algorithms (evaluated by Avg@8) on various coding and search tasks
+
+Task Type Model Codeforces CodeContest TACO APPS Average 
+
+Coding Base 20.2 25.8 10.4 25.8 20.6 ( −48 .1% )GRPO 46.8 44.8 19.7 47.6 39.7 ( + 0 .0% )RIPO 51.5 49.9 25.8 52.5 44.9 ( +13 .2% )
+
+Task Type Model TriviaQA PopQA HotpotQA WikiMultiHopQA Average 
+
+Search Base 19.5 7.2 9.3 17.7 13.4 ( −64 .5% )GRPO 60.9 34.5 25.1 30.4 37.7 ( + 0 .0% )RIPO 67.4 39.8 30.9 35.5 43.4 ( +15 .1% )
+
+5.7. RIPO Breaks through the Capacity Boundaries 
+
+We additionally conduct deep-dive Pass@k analysis (up to k=128) of Qwen3-8B-Base on AIME-25 and HMMT-25, the two most challenging benchmarks requiring complex reasoning, to study the capacity boundaries of LLMs trained with different RL algorithms. As Table 5 shows, the base model’s performance plateaus prematurely around k = 16 , suggesting a limited intrinsic capacity. In contrast, RIPO consistently outperforms other RL algorithms and scales continuously, achieving a peak of 60.0% on AIME-25 and 45.3% on HMMT-25 at k = 128 .These compelling results empirically demonstrate that RIPO effectively mitigates the severe exploration collapse issue in long-horizon reasoning tasks, successfully maintaining pol-icy diversity and breaking through the intrinsic boundaries of reasoning capacity imposed by the base model. 
+
+5.8. Generalization to Coding and Search Tasks 
+
+We further extend to long-horizon coding and multi-hop search tasks. For coding, we trained on Eurus-Code dataset (Cui et al., 2025a) and evaluated on four challeng-ing benchmarks, namely, Codeforces, CodeContest, TACO (Text-Assisted Coding with Objectives), and APPS (Auto-mated Programming Progress Standard). For search, we trained on Search-R1 dataset (Jin et al., 2025) and evaluated on TriviaQA, PopQA, HotpotQA, and WikiMultiHopQA. We conduct experiments on Qwen3-8B-Base following pre-vious stated training recipes. As Table 6 shows, RIPO consistently outperforms GRPO with significant gains across these benchmarks, validating the universal effectiveness of our method across different long-horizon reasoning tasks, illustrating the geometric mis-match we addressed is intrinsic and critical. 
+
+# 6. Conclusion 
+
+This paper theoretically identifies that the fundamental limi-tation of PPO-Clip stems from the mismatch between the Euclidean metric and the intrinsic geometry of the policy manifold. Grounded in this derivation, we introduce Rie-mannian Isometric Policy Optimization (RIPO), which guar-antees isometric policy updates on the manifold to balance exploration and exploitation. This geometric isometry also induces statistical homoscedasticity, enabling a favorable bias-variance trade-off. Extensive experiments on multiple competition-level benchmarks show that RIPO consistently and substantially outperforms representative RL baselines. Our work establishes a principled pathway for designing more effective and stable reinforcement learning algorithms for large language models. 9Beyond Euclidean Clipping: Overcoming Exploration Collapse in LLM RL via Riemannian Isometric Policy Optimization 
+
+# Acknowledgments 
+
+This work is supported by the Natural Science Founda-tion of China (Grant No. 62376133) and sponsored by Beijing Nova Program (20240484682) and the Wuxi Re-search Institute of Applied Technologies, Tsinghua Univer-sity (20242001120). 
+
+# Impact Statement 
+
+This paper introduces Riemannian Isometric Policy Opti-mization (RIPO), a theoretically grounded RL algorithm that resolves a fundamental flaw underlying clipping-based policy optimization. By enforcing geometry-isometric pol-icy updates, RIPO establishes a principled framework for stable and scalable RL. More broadly, this work delivers valuable theoretical insights for the design of RL algorithms and significantly enhances the reasoning capabilities of large language models on addressing more challenging tasks. 
+
+# References 
+
+Anthropic. Claude for coding. https://www. anthropic.com/claude , 2024. Balunovi ´c, M., Dekoninck, J., Petrov, I., Jovanovi ´c, N., and Vechev, M. Matharena: Evaluating llms on uncontam-inated math competitions. Proceedings of the Neural Information Processing Systems Track on Datasets and Benchmark , 2025. Chen, A., Li, A., Gong, B., Jiang, B., Fei, B., Yang, B., Shan, B., Yu, C., Wang, C., Zhu, C., et al. Minimax-m1: Scaling test-time compute efficiently with lightning attention. arXiv preprint arXiv:2506.13585 , 2025. Cobbe, K., Kosaraju, V., Bavarian, M., Chen, M., Jun, H., Kaiser, L., Plappert, M., Tworek, J., Hilton, J., Nakano, R., Hesse, C., and Schulman, J. Training verifiers to solve math word problems. arXiv preprint arXiv:2110.14168 ,2021. Comanici, G., Bieber, E., Schaekermann, M., Pasupat, I., Sachdeva, N., Dhillon, I., Blistein, M., Ram, O., Zhang, D., Rosen, E., et al. Gemini 2.5: Pushing the frontier with advanced reasoning, multimodality, long context, and next generation agentic capabilities. arXiv preprint arXiv:2507.06261 , 2025. Cui, G., Yuan, L., Wang, Z., Wang, H., Li, W., He, B., Fan, Y., Yu, T., Xu, Q., Chen, W., et al. Process re-inforcement through implicit rewards. arXiv preprint arXiv:2502.01456 , 2025a. Cui, G., Zhang, Y., Chen, J., Yuan, L., Wang, Z., Zuo, Y., Li, H., Fan, Y., Chen, H., Chen, W., et al. The entropy mech-anism of reinforcement learning for reasoning language models. arXiv preprint arXiv:2505.22617 , 2025b. Dou, S., Liu, Y., Jia, H., Xiong, L., Zhou, E., Shen, W., Shan, J., Huang, C., Wang, X., Fan, X., et al. Stepcoder: Im-prove code generation with reinforcement learning from compiler feedback. arXiv preprint arXiv:2402.01391 ,2024. Dubey, A., Jauhri, A., Pandey, A., Kadian, A., Al-Dahle, A., Letman, A., Mathur, A., Schelten, A., Yang, A., Fan, A., et al. The llama 3 herd of models. arXiv preprint arXiv:2407.21783 , 2024. Gao, C., Zheng, C., Chen, X.-H., Dang, K., Liu, S., Yu, B., Yang, A., Bai, S., Zhou, J., and Lin, J. Soft adaptive policy optimization. arXiv preprint arXiv:2511.20347 ,2025. Guo, D., Yang, D., Zhang, H., Song, J., Zhang, R., Xu, R., Zhu, Q., Ma, S., Wang, P., Bi, X., et al. Deepseek-r1: In-centivizing reasoning capability in llms via reinforcement learning. Nature , 2025. Jin, B., Zeng, H., Yue, Z., Yoon, J., Arik, S., Wang, D., Zamani, H., and Han, J. Search-r1: Training llms to reason and leverage search engines with reinforcement learning. Proceedings of the Conference on Language Modeling (COLM) , 2025. Loshchilov, I. and Hutter, F. Decoupled weight decay regu-larization. arXiv preprint arXiv:1711.05101 , 2017. Luo, H., Sun, Q., Xu, C., Zhao, P., Lou, J., Tao, C., Geng, X., Lin, Q., Chen, S., and Zhang, D. Wizardmath: Empow-ering mathematical reasoning for large language models via reinforced evol-instruct. International Conference on Learning Representations , 2025. Murphy, K. P. Machine learning: a probabilistic perspective .MIT press, 2012. OpenAI. Learning to reason with large language models. https://openai.com/research/ learning-to-reason-with-llms , 2024. OpenAI. Introducing deep research. https://openai. com/index/introducing-deep-research/ ,2025. Qwen, :, Yang, A., Yang, B., Zhang, B., Hui, B., Zheng, B., Yu, B., Li, C., Liu, D., Huang, F., Wei, H., Lin, H., Yang, J., Tu, J., Zhang, J., Yang, J., Yang, J., Zhou, J., Lin, J., Dang, K., Lu, K., Bao, K., Yang, K., Yu, L., Li, M., Xue, M., Zhang, P., Zhu, Q., Men, R., Lin, R., Li, T., Tang, T., Xia, T., Ren, X., Ren, X., Fan, Y., Su, Y., Zhang, Y., Wan, Y., Liu, Y., Cui, Z., Zhang, Z., and Qiu, Z. Qwen2.5 technical report, 2025. URL https: //arxiv.org/abs/2412.15115 .10 Beyond Euclidean Clipping: Overcoming Exploration Collapse in LLM RL via Riemannian Isometric Policy Optimization 
+
+Schulman, J., Levine, S., Abbeel, P., Jordan, M., and Moritz, P. Trust region policy optimization. In International conference on machine learning , pp. 1889–1897. PMLR, 2015. Schulman, J., Moritz, P., Levine, S., Jordan, M., and Abbeel, P. High-dimensional continuous control using general-ized advantage estimation. International Conference on Learning Representations , 2016. Schulman, J., Wolski, F., Dhariwal, P., Radford, A., and Klimov, O. Proximal policy optimization algorithms. 
+
+arXiv preprint arXiv:1707.06347 , 2017. Shao, Z., Wang, P., Zhu, Q., Xu, R., Song, J., Bi, X., Zhang, H., Zhang, M., Li, Y., Wu, Y., et al. Deepseekmath: Push-ing the limits of mathematical reasoning in open language models. arXiv preprint arXiv:2402.03300 , 2024. Sheng, G., Zhang, C., Ye, Z., Wu, X., Zhang, W., Zhang, R., Peng, Y., Lin, H., and Wu, C. Hybridflow: A flexible and efficient rlhf framework. In Proceedings of the Twentieth European Conference on Computer Systems , pp. 1279– 1297, 2025. Su, Z., Pan, L., Bai, X., Liu, D., Dong, G., Huang, J., Hu, W., Zhang, F., Gai, K., and Zhou, G. Klear-reasoner: Advanc-ing reasoning capability via gradient-preserving clipping policy optimization. arXiv preprint arXiv:2508.07629 ,2025. Tokdar, S. T. and Kass, R. E. Importance sampling: a review. Wiley Interdisciplinary Reviews: Computational Statistics , 2(1):54–60, 2010. Wang, P., Li, L., Shao, Z., Xu, R., Dai, D., Li, Y., Chen, D., Wu, Y., and Sui, Z. Math-shepherd: Verify and reinforce llms step-by-step without human annotations. In Proceed-ings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , pp. 9426–9439, 2024. Yang, A., Li, A., Yang, B., Zhang, B., Hui, B., Zheng, B., Yu, B., Gao, C., Huang, C., Lv, C., et al. Qwen3 technical report. arXiv preprint arXiv:2505.09388 , 2025a. Yang, S., Dou, C., Guo, P., Lu, K., Ju, Q., Deng, F., and Xin, R. Dcpo: Dynamic clipping policy optimization. arXiv preprint arXiv:2509.02333 , 2025b. Ye, D., Liu, Z., Sun, M., Shi, B., Zhao, P., Wu, H., Yu, H., Yang, S., Wu, X., Guo, Q., et al. Mastering complex control in moba games with deep reinforcement learn-ing. In Proceedings of the AAAI conference on artificial intelligence , volume 34, pp. 6672–6679, 2020. Yu, Q., Zhang, Z., Zhu, R., Yuan, Y., Zuo, X., Yue, Y., Dai, W., Fan, T., Liu, G., Liu, L., et al. Dapo: An open-source llm reinforcement learning system at scale. Proceedings of the Neural Information Processing Systems , 2025. Zhao, Y., Liu, Y., Liu, J., Chen, J., Wu, X., Hao, a., Lv, T., Huang, S., Cui, L., Ye, Q., et al. Geometric-mean policy optimization. arXiv preprint arXiv:2507.20673 , 2025. Zheng, C., Liu, S., Li, M., Chen, X.-H., Yu, B., Gao, C., Dang, K., Liu, Y., Men, R., Yang, A., et al. Group sequence policy optimization. arXiv preprint arXiv:2507.18071 , 2025. 11

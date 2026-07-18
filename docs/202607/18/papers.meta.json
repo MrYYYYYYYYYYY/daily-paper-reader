@@ -1,0 +1,39 @@
+{
+  "label": "2026-07-18",
+  "date": "2026-07-18",
+  "generated_at": "2026-07-18T21:17:38",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202607/18/2607.10169v1-beyond-euclidean-clipping-overcoming-exploration-collapse-in-llm-rl-via-riemannian-isometric-policy-optimization",
+      "section": "deep",
+      "title_en": "Beyond Euclidean Clipping: Overcoming Exploration Collapse in LLM RL via Riemannian Isometric Policy Optimization",
+      "authors": "Zhicheng Cai, Xinyuan Guo, Hanlin Wu, Mingxuan Wang, Wei-Ying Ma, Ya-Qin Zhang, Hao Zhou",
+      "date": "2026-07-11",
+      "pdf": "https://arxiv.org/pdf/2607.10169v1",
+      "score": "8.0",
+      "evidence": "改进LLM强化学习以用于RLHF",
+      "tldr": "强化学习用于提升大模型推理能力时，PPO-Clip算法因使用欧几里得度量衡量策略差异，与策略黎曼流形的内在几何不一致，导致低概率区更新保守、高概率区更新激进，引发探索崩溃。本文提出黎曼等距策略优化（RIPO），在流形上保证等距更新，平衡探索与利用，并实现更优的偏差-方差权衡。在7个竞赛级基准测试中，RIPO显著超越现有算法，在AIME24上最高提升60%。该工作从几何角度修正了PPO-Clip的根本缺陷，稳定了优化过程。",
+      "tags": "query:lpt",
+      "abstract_en": "Reinforcement learning (RL) has become a dominant paradigm for enhancing LLMs' reasoning capabilities. However, RL algorithms with PPO-Clip are inherently limited by exploration collapse. Subsequent works remain primarily heuristic and fail to identify the essential cause of PPO-Clip's failure. This work reveals the fundamental flaw of PPO-Clip: it implicitly measures policy discrepancy using Euclidean metric, which is theoretically inconsistent with the intrinsic geometry on the policy Riemannian manifold. This geometric mismatch results in overly conservative updates in low-probability regions while aggressive in high-probability regions, ultimately collapsing exploration. To correct this geometric flaw, we propose Riemannian Isometric Policy Optimization (RIPO), which guarantees isometric policy updates on the Riemannian manifold, effectively balancing exploration and exploitation. We further show that RIPO achieves a favorable bias-variance trade-off, which stabilizes optimization. Extensive experiments demonstrate that RIPO significantly surpasses existing LLM RL algorithms across seven competition-level benchmarks (up to 60% improvement over GRPO on AIME24).",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/18/2607.14811v1-is-external-database-protection-static-in-retrieval-augmented-generation-rethinking-privacy-preservation-under-dynamic-queries",
+      "section": "quick",
+      "title_en": "Is External Database Protection Static in Retrieval-Augmented Generation? Rethinking Privacy Preservation under Dynamic Queries",
+      "authors": "Gang Zhang, Mingyu Tian, Xukun Luan, Yuanchi Ma, Jinyan Liu",
+      "date": "2026-07-16",
+      "pdf": "https://arxiv.org/pdf/2607.14811v1",
+      "score": "7.0",
+      "evidence": "提出面向隐私保护的RAG的提示感知动态层次差分隐私框架，属于大语言模型后训练中的算法改进",
+      "tldr": "检索增强生成中，外部数据库检索可能泄露隐私，但现有保护方法基于文档级静态风险假设，忽略了查询对风险的动态影响。本文提出PA-HDP框架，通过提示感知风险分层和自适应敏感实体替换，在动态查询下提供差异化保护。实验表明，该方法显著减少隐私泄露，同时保持高检索质量，实现更好的隐私-效用平衡。",
+      "tags": "query:lpt",
+      "abstract_en": "Retrieval-augmented generation (RAG) enhances large language models via external document retrieval, but retrieved contexts may leak sensitive information. Current privacy protection methods typically rely on a document-level static risk assumption, treating all retrieved documents as having the same privacy leakage risk. However, this assumption overlooks a fundamental characteristic of RAG: the privacy risk of a document is highly dependent on the user's query, making privacy leakage inherently query-driven and dynamic. To address this challenge, we propose a Prompt-Aware Dynamic Hierarchical Differential Privacy framework (PA-HDP) for privacy-preserving RAG. PA-HDP first performs a prompt-aware risk hierarchy to dynamically assess privacy risks under different queries. It then applies adaptive sensitive entity replacement and exponential mechanism-based text selection to provide differentiated privacy protection while preserving semantic utility. By protecting only the content that is truly sensitive under a given query, PA-HDP minimizes unnecessary modifications to the retrieval corpus. Extensive experiments on benchmark datasets demonstrate that PA-HDP significantly reduces privacy leakage while maintaining high retrieval quality, achieving a better privacy-utility trade-off than prior methods.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

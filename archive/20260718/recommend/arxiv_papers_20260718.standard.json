@@ -1,0 +1,98 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-18T21:16:02.817515+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [
+    {
+      "id": "2607.10169v1",
+      "source": "arxiv",
+      "title": "Beyond Euclidean Clipping: Overcoming Exploration Collapse in LLM RL via Riemannian Isometric Policy Optimization",
+      "abstract": "Reinforcement learning (RL) has become a dominant paradigm for enhancing LLMs' reasoning capabilities. However, RL algorithms with PPO-Clip are inherently limited by exploration collapse. Subsequent works remain primarily heuristic and fail to identify the essential cause of PPO-Clip's failure. This work reveals the fundamental flaw of PPO-Clip: it implicitly measures policy discrepancy using Euclidean metric, which is theoretically inconsistent with the intrinsic geometry on the policy Riemannian manifold. This geometric mismatch results in overly conservative updates in low-probability regions while aggressive in high-probability regions, ultimately collapsing exploration. To correct this geometric flaw, we propose Riemannian Isometric Policy Optimization (RIPO), which guarantees isometric policy updates on the Riemannian manifold, effectively balancing exploration and exploitation. We further show that RIPO achieves a favorable bias-variance trade-off, which stabilizes optimization. Extensive experiments demonstrate that RIPO significantly surpasses existing LLM RL algorithms across seven competition-level benchmarks (up to 60% improvement over GRPO on AIME24).",
+      "authors": [
+        "Zhicheng Cai",
+        "Xinyuan Guo",
+        "Hanlin Wu",
+        "Mingxuan Wang",
+        "Wei-Ying Ma",
+        "Ya-Qin Zhang",
+        "Hao Zhou"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-11T07:19:59+00:00",
+      "link": "https://arxiv.org/pdf/2607.10169v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "improves LLM RL for RLHF",
+      "llm_evidence_cn": "改进LLM强化学习以用于RLHF",
+      "llm_evidence": "改进LLM强化学习以用于RLHF",
+      "canonical_evidence": "改进LLM强化学习以用于RLHF",
+      "llm_tldr_en": "Reveals geometric flaw in PPO-Clip and proposes Riemannian Isometric Policy Optimization to correct exploration collapse, enhancing LLM RL training.",
+      "llm_tldr_cn": "该论文指出PPO-Clip算法使用欧几里得度量衡量策略差异，与策略黎曼流形内在几何不一致，导致探索崩溃。提出黎曼等距策略优化（RIPO），通过匹配流形测地距离修正更新方向，在低概率区域避免过度保守、高概率区域避免激进。实验表明RIPO在多个LLM推理任务上显著提升探索效率和最终性能，为RLHF提供了更稳健的优化基础。",
+      "llm_tldr": "该论文指出PPO-Clip算法使用欧几里得度量衡量策略差异，与策略黎曼流形内在几何不一致，导致探索崩溃。提出黎曼等距策略优化（RIPO），通过匹配流形测地距离修正更新方向，在低概率区域避免过度保守、高概率区域避免激进。实验表明RIPO在多个LLM推理任务上显著提升探索效率和最终性能，为RLHF提供了更稳健的优化基础。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.14811v1",
+      "source": "arxiv",
+      "title": "Is External Database Protection Static in Retrieval-Augmented Generation? Rethinking Privacy Preservation under Dynamic Queries",
+      "abstract": "Retrieval-augmented generation (RAG) enhances large language models via external document retrieval, but retrieved contexts may leak sensitive information. Current privacy protection methods typically rely on a document-level static risk assumption, treating all retrieved documents as having the same privacy leakage risk. However, this assumption overlooks a fundamental characteristic of RAG: the privacy risk of a document is highly dependent on the user's query, making privacy leakage inherently query-driven and dynamic. To address this challenge, we propose a Prompt-Aware Dynamic Hierarchical Differential Privacy framework (PA-HDP) for privacy-preserving RAG. PA-HDP first performs a prompt-aware risk hierarchy to dynamically assess privacy risks under different queries. It then applies adaptive sensitive entity replacement and exponential mechanism-based text selection to provide differentiated privacy protection while preserving semantic utility. By protecting only the content that is truly sensitive under a given query, PA-HDP minimizes unnecessary modifications to the retrieval corpus. Extensive experiments on benchmark datasets demonstrate that PA-HDP significantly reduces privacy leakage while maintaining high retrieval quality, achieving a better privacy-utility trade-off than prior methods.",
+      "authors": [
+        "Gang Zhang",
+        "Mingyu Tian",
+        "Xukun Luan",
+        "Yuanchi Ma",
+        "Jinyan Liu"
+      ],
+      "primary_category": "cs.CR",
+      "categories": [
+        "cs.CR"
+      ],
+      "published": "2026-07-16T10:28:23+00:00",
+      "link": "https://arxiv.org/pdf/2607.14811v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "proposes a Prompt-Aware Dynamic Hierarchical Differential Privacy framework for privacy-preserving RAG, an algorithm improvement for LLM post-training",
+      "llm_evidence_cn": "提出面向隐私保护的RAG的提示感知动态层次差分隐私框架，属于大语言模型后训练中的算法改进",
+      "llm_evidence": "提出面向隐私保护的RAG的提示感知动态层次差分隐私框架，属于大语言模型后训练中的算法改进",
+      "canonical_evidence": "提出面向隐私保护的RAG的提示感知动态层次差分隐私框架，属于大语言模型后训练中的算法改进",
+      "llm_tldr_en": "This paper rethinks privacy in RAG under dynamic queries, proposing a Prompt-Aware Dynamic Hierarchical Differential Privacy framework that adapts to query-driven privacy risk, providing a better privacy-utility trade-off and advancing algorithm design for LLM post-training.",
+      "llm_tldr_cn": "本文指出当前检索增强生成（RAG）中的隐私保护方法采用静态文档级风险假设，忽略了用户查询对隐私风险的动态影响。为此，提出了一种提示感知动态层次差分隐私框架（PA-HDP），通过提示感知的隐私风险分类器动态评估文档风险并应用层次差分隐私机制。实验表明，PA-HDP在保证隐私预算的同时显著提升生成质量，较静态方法有更好隐私-效用权衡。该工作为RAG系统的隐私保护提供了新视角，并推动LLM后训练中更安全的算法设计。",
+      "llm_tldr": "本文指出当前检索增强生成（RAG）中的隐私保护方法采用静态文档级风险假设，忽略了用户查询对隐私风险的动态影响。为此，提出了一种提示感知动态层次差分隐私框架（PA-HDP），通过提示感知的隐私风险分类器动态评估文档风险并应用层次差分隐私机制。实验表明，PA-HDP在保证隐私预算的同时显著提升生成质量，较静态方法有更好隐私-效用权衡。该工作为RAG系统的隐私保护提供了新视角，并推动LLM后训练中更安全的算法设计。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
