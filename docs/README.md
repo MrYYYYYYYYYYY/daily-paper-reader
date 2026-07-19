@@ -6,26 +6,41 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-18
-- 运行时间：2026-07-18 21:17:32 UTC
+- 最新运行日期：2026-07-19
+- 运行时间：2026-07-19 21:25:46 UTC
 - 运行状态：成功
-- 本次总论文数：2
-- 精读区：1
-- 速读区：1
+- 本次总论文数：7
+- 精读区：3
+- 速读区：4
 
 ### 今日简报（AI）
-今日聚焦大模型强化学习探索崩溃与检索增强生成动态隐私两篇前沿研究。最值得关注的方向是黎曼等距策略优化解决LLM RL探索坍塌，以及动态查询下RAG隐私保护的再思考。建议优先精读前者的几何方法，再结合后者的实际场景评估敏感数据保护策略。
-- 详情：[/202607/18/README](/202607/18/README)
+今日精读聚焦LLM智能体模拟联盟形成与生物医学文献摘要系统评估，速读涵盖压缩、复合AI评估及数据科学数学。最值得关注：多智能体协作政治模拟及摘要方法基准对比；建议优先阅读精读中的两篇高分研究，前者探索AI社会模拟，后者为文献分析提供实用工具。
+- 详情：[/202607/19/README](/202607/19/README)
 
 ### 精读区论文标签
-1. [Beyond Euclidean Clipping: Overcoming Exploration Collapse in LLM RL via Riemannian Isometric Policy Optimization](/202607/18/2607.10169v1-beyond-euclidean-clipping-overcoming-exploration-collapse-in-llm-rl-via-riemannian-isometric-policy-optimization)  
+1. [Digital Pantheon: Simulating and Auditing Coalition Formation with LLM Agents](/202607/19/2607.15095v1-digital-pantheon-simulating-and-auditing-coalition-formation-with-llm-agents)  
    标签：评分：8.0/10、query:lpt
-   evidence：改进LLM强化学习以用于RLHF
+   evidence：使用DPO进行偏好优化，类似于RLHF中的奖励建模
+2. [Systematic evaluation and benchmarking of text summarization methods for biomedical literature: From word-frequency methods to language models](/202607/19/biorxiv-10-64898-2026-01-09-697335-v4-systematic-evaluation-and-benchmarking-of-text-summarization-methods-for-biomedical-literature-from-word-frequency-methods-to-language-models)  
+   标签：评分：8.0/10、query:lpt
+   evidence：对62种文本摘要方法的系统评估与基准测试，包含大语言模型
+3. [Survey and Evaluation of Applied Containerization Practices in Bioinformatics](/202607/19/biorxiv-10-64898-2026-07-17-739198-v1-survey-and-evaluation-of-applied-containerization-practices-in-bioinformatics)  
+   标签：评分：8.0/10、query:lpt
+   evidence：生物信息学容器化实践调查
 
 ### 速读区论文标签
-1. [Is External Database Protection Static in Retrieval-Augmented Generation? Rethinking Privacy Preservation under Dynamic Queries](/202607/18/2607.14811v1-is-external-database-protection-static-in-retrieval-augmented-generation-rethinking-privacy-preservation-under-dynamic-queries)  
+1. [Random Access to LZ-End: Faster and Deterministic](/202607/19/2607.14923v1-random-access-to-lz-end-faster-and-deterministic)  
    标签：评分：7.0/10、query:lpt
-   evidence：提出面向隐私保护的RAG的提示感知动态层次差分隐私框架，属于大语言模型后训练中的算法改进
+   evidence：LZ-End随机访问的确定性算法改进
+2. [CAFE: A Compound-AI Factorial Evaluation Framework](/202607/19/2607.10380v1-cafe-a-compound-ai-factorial-evaluation-framework)  
+   标签：评分：6.0/10、query:lpt
+   evidence：复合AI系统因子评估框架，方法创新
+3. [Mathematics of Data Science](/202607/19/2607.11938v1-mathematics-of-data-science)  
+   标签：评分：6.0/10、query:lpt
+   evidence：涵盖数据科学数学基础，包括优化理论
+4. [PathoBench: an open community-driven benchmark registry for pathogen bioinformatics tools](/202607/19/biorxiv-10-64898-2026-07-16-739016-v1-pathobench-an-open-community-driven-benchmark-registry-for-pathogen-bioinformatics-tools)  
+   标签：评分：6.0/10、query:lpt
+   evidence：病原体工具开放基准注册平台
 
 
 <div class="dpr-home-promo-card">

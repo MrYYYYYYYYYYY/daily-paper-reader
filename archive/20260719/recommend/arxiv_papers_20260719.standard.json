@@ -1,0 +1,288 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-19T21:17:03.786879+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 3,
+    "deep_cap": 6,
+    "deep_selected": 3,
+    "quick_candidates": 4,
+    "quick_skim_target": 11,
+    "quick_selected": 4
+  },
+  "deep_dive": [
+    {
+      "id": "2607.15095v1",
+      "source": "arxiv",
+      "title": "Digital Pantheon: Simulating and Auditing Coalition Formation with LLM Agents",
+      "abstract": "The formation of political coalitions is a complex negotiation driven by both concrete policy objectives and deep-seated ideological convictions. While Large Language Models (LLMs) open new avenues for computational political science, the neutrality and helpfulness biases instilled by Reinforcement Learning from Human Feedback (RLHF) prevent them from sustaining steadfast partisan behaviour. We present a multi-agent framework that reconciles factual grounding with ideological alignment by combining Supervised Fine-Tuning (SFT), Direct Preference Optimization (DPO), and Retrieval-Augmented Generation (RAG): DPO instils aggressive party-specific personas, while a per-party RAG pipeline keeps each agent bounded to its official manifesto. We operationalize the framework on the 2019 Flemish election, deploying the partisan agents in a hub-and-spoke negotiation arbitrated by a formateur. To make the emergent negotiation interpretable, we introduce a Multi-Layered Information Lineage Topology (MILT) that traces every clause in the final agreement back to its manifesto origin and classifies it into five provenance states, a Coalition Influence Score (CIS) that aggregates these traceable contributions to identify which party shaped the agreement, and a real-world grounding pass that benchmarks each simulated provision against the historically adopted coalition agreement. Across three independent simulations the framework yields a stable winner and ranking (N-VA ahead of CD\\&V and Open Vld), and manifesto-anchored lineage reliably predicts real-world materialization whereas hallucinated content does not. The result is a transparent, scalable testbed for the ex-ante exploration of party compatibility and formateur-mediated compromise.",
+      "authors": [
+        "Dylan Van Mulders",
+        "Matthias Bogaert",
+        "Dirk Van den Poel"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI",
+        "cs.MA"
+      ],
+      "published": "2026-07-16T15:08:29+00:00",
+      "link": "https://arxiv.org/pdf/2607.15095v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "uses DPO for preference optimization in LLM agents, akin to reward modeling in RLHF",
+      "llm_evidence_cn": "使用DPO进行偏好优化，类似于RLHF中的奖励建模",
+      "llm_evidence": "使用DPO进行偏好优化，类似于RLHF中的奖励建模",
+      "canonical_evidence": "使用DPO进行偏好优化，类似于RLHF中的奖励建模",
+      "llm_tldr_en": "Digital Pantheon uses DPO to instill partisan personas in LLM agents, demonstrating a reward modeling approach for RLHF-style preference learning.",
+      "llm_tldr_cn": "大型语言模型受RLHF中立性偏差影响难以维持坚定立场。本文提出多智能体框架，结合SFT、DPO和RAG：DPO注入党派个性，RAG约束于官方纲领。该方法展示了基于偏好的奖励建模在模拟政治联盟形成中的应用，验证了DPO在RLHF风格学习中的有效性。",
+      "llm_tldr": "大型语言模型受RLHF中立性偏差影响难以维持坚定立场。本文提出多智能体框架，结合SFT、DPO和RAG：DPO注入党派个性，RAG约束于官方纲领。该方法展示了基于偏好的奖励建模在模拟政治联盟形成中的应用，验证了DPO在RLHF风格学习中的有效性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-01-09-697335-v4",
+      "source": "biorxiv",
+      "title": "Systematic evaluation and benchmarking of text summarization methods for biomedical literature: From word-frequency methods to language models",
+      "abstract": "The rapid expansion of biomedical literature demands automated summarization tools that reliably condense research articles into concise, accurate summaries. We benchmarked 62 summarization methods, ranging from frequency-based and TextRank extractors to encoder-decoder models (EDMs) and large language models (LLMs), on 1,000 biomedical abstracts from 20 journals across ScienceDirect and Cell Press, using author-written highlights as reference summaries. Models were evaluated with a composite suite of lexical, semantic, and factual metrics, including ROUGE, BLEU, METEOR, embedding-based similarity, and factuality scores. General-purpose models (e.g., Mistral, GPT, Llama) achieved the highest overall performance across lexical and semantic dimensions, outperforming reasoning-oriented (e.g., DeepSeek, Magistral) and domain-specific (e.g., BioGPT, BioMistral) models. Notably, medium-sized models outperformed large-scale models, suggesting an optimal balance between model capacity and efficiency, while classical extractive methods lagged behind neural approaches. These findings provide a systematic reference for selecting biomedical summarization tools and highlight that broad pretraining outperforms narrow domain adaptation.",
+      "authors": [
+        "Baumgärtel, F.",
+        "Bono, E.",
+        "Fillinger, L.",
+        "Galou, L.",
+        "Keska-Izworska, K.",
+        "Walter, S.",
+        "Andorfer, P.",
+        "Kratochwill, K.",
+        "Perco, P.",
+        "Ley, M."
+      ],
+      "primary_category": "bioinformatics",
+      "categories": [
+        "bioinformatics"
+      ],
+      "published": "2026-07-16T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.01.09.697335v4.full.pdf",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "systematic evaluation and benchmarking of 62 summarization methods, includes LLMs",
+      "llm_evidence_cn": "对62种文本摘要方法的系统评估与基准测试，包含大语言模型",
+      "llm_evidence": "对62种文本摘要方法的系统评估与基准测试，包含大语言模型",
+      "canonical_evidence": "对62种文本摘要方法的系统评估与基准测试，包含大语言模型",
+      "llm_tldr_en": "Benchmarks 62 summarization methods from frequency-based to LLMs, evaluating with lexical, semantic, and factual metrics, providing a survey of capabilities.",
+      "llm_tldr_cn": "该论文对62种文本摘要方法进行了系统评估与基准测试，涵盖从词频方法到大语言模型。在1000篇生物医学摘要上，使用ROUGE、BLEU、METEOR、嵌入相似度和事实性分数等指标进行全面评价。通用模型（如Mistral、GPT、Llama）表现最优。该工作为摘要方法选择提供了全面的参考，并特别关注了事实性评估，与幻觉抑制相关。",
+      "llm_tldr": "该论文对62种文本摘要方法进行了系统评估与基准测试，涵盖从词频方法到大语言模型。在1000篇生物医学摘要上，使用ROUGE、BLEU、METEOR、嵌入相似度和事实性分数等指标进行全面评价。通用模型（如Mistral、GPT、Llama）表现最优。该工作为摘要方法选择提供了全面的参考，并特别关注了事实性评估，与幻觉抑制相关。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "servey",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-07-17-739198-v1",
+      "source": "biorxiv",
+      "title": "Survey and Evaluation of Applied Containerization Practices in Bioinformatics",
+      "abstract": "Containerization enables portable, reproducible, and scalable scientific computing. However, container development, documentation, and deployment practices can vary widely, even within a single domain. Understanding patterns of how containers are implemented in real-world settings can inform community guidelines, quality scoring rubrics, and systems to automate software review. Focusing on bioinformatics as an exemplar domain, we surveyed published software tools to find applied containerization examples. After identifying >250 tools to review, we annotated metadata regarding version control, asset provenance, and general container image health and tested the ability to build and pull the container images in a purpose-built evaluation platform (https://github.com/vpnagraj/socr8s). The majority of images tested did not build successfully in our environment. Of the tool characteristics we tracked, the strongest predictor of build success was version control activity. Tools with commits in the preceding two years were roughly twice as likely to build. Deeper assessment of failures identified a variety of issues, including missing assets and broken dependency chains. While many tools had published images accessible in open registries, 24% could neither be built nor pulled. Images tended to be large, with median size of 1.57GB for those that were able to be built. Where image specification files were available, we found that more advanced container orchestration and build techniques were uncommon. Our results highlight areas of improvement in how containerized tools are built and maintained in bioinformatics and scientific computing software in general.",
+      "authors": [
+        "Nagraj, V.",
+        "Turner, S. D.",
+        "Magee, N."
+      ],
+      "primary_category": "bioinformatics",
+      "categories": [
+        "bioinformatics"
+      ],
+      "published": "2026-07-18T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.07.17.739198v1.full.pdf",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "survey of containerization practices in bioinformatics",
+      "llm_evidence_cn": "生物信息学容器化实践调查",
+      "llm_evidence": "生物信息学容器化实践调查",
+      "canonical_evidence": "生物信息学容器化实践调查",
+      "llm_tldr_en": "A survey of containerization practices in bioinformatics, analyzing >250 tools to inform community guidelines and quality rubrics.",
+      "llm_tldr_cn": "该工作对生物信息学领域250余个软件工具的容器化实践进行了系统调查和评估，覆盖版本控制、资产来源、容器镜像健康度等方面。结果表明容器化实践差异大，缺乏统一标准。该调查为社区指南和软件自动审查系统的开发提供了数据支撑。",
+      "llm_tldr": "该工作对生物信息学领域250余个软件工具的容器化实践进行了系统调查和评估，覆盖版本控制、资产来源、容器镜像健康度等方面。结果表明容器化实践差异大，缺乏统一标准。该调查为社区指南和软件自动审查系统的开发提供了数据支撑。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "servey",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.14923v1",
+      "source": "arxiv",
+      "title": "Random Access to LZ-End: Faster and Deterministic",
+      "abstract": "The LZ-End parsing of a length-$n$ string is a variation of Lempel-Ziv compression introduced by Kreft and Navarro [DCC 2010], motivated by the lack of a linear-size structure with $O(\\log n)$ access time for the classical variant. While the original paper was only able to provide efficient extraction from the phrase boundaries, recently Kempa and Saha [SODA 2022] established that, for a string $S$ whose LZ-End parsing consists of $z$ phrases, there exists a random access data structure that uses $O(z)$ space and guarantees $O(\\log^{4}n \\cdot \\log\\log n)$ query time. However, their proof does not yield an efficient construction algorithm, and their data structure is inherently randomized.   We resolve both limitations by providing a deterministic, $O(z)$-space data structure that supports random access queries in polylogarithmic time and can be constructed in $O(z\\log^{2}(n/z))$ time directly from the LZ-End parsing. In addition to eliminating randomness and providing an efficient construction algorithm, the query time of our data structure is $O(\\log^{2}(n/z))$, significantly improving upon the query time of Kempa and Saha.   We also show that our techniques can be used to support the more general substring-extraction. Namely, we present a data structure with the same space and the same construction time that given two indices $i$ and $j$, outputs $S[i..j]$ in $O(j-i+\\log^2\\frac{n}{z})$ time.",
+      "authors": [
+        "Itai Boneh",
+        "Paweł Gawrychowski"
+      ],
+      "primary_category": "cs.DS",
+      "categories": [
+        "cs.DS"
+      ],
+      "published": "2026-07-16T12:40:38+00:00",
+      "link": "https://arxiv.org/pdf/2607.14923v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "deterministic algorithm improvement for LZ-End access",
+      "llm_evidence_cn": "LZ-End随机访问的确定性算法改进",
+      "llm_evidence": "LZ-End随机访问的确定性算法改进",
+      "canonical_evidence": "LZ-End随机访问的确定性算法改进",
+      "llm_tldr_en": "This paper presents a deterministic data structure for LZ-End compression that supports O(z) space and O(log^4 n log log n) access time, improving over prior randomized construction.",
+      "llm_tldr_cn": "该论文针对LZ-End压缩的随机访问问题，提出了确定性数据结构，在O(z)空间内支持O(log^4 n log log n)时间随机访问。相比之前仅提供存在性证明且为随机化的方法，该工作给出了高效构建算法，且是确定性的。该成果提升了压缩字符串随机访问的实用性和效率。",
+      "llm_tldr": "该论文针对LZ-End压缩的随机访问问题，提出了确定性数据结构，在O(z)空间内支持O(log^4 n log log n)时间随机访问。相比之前仅提供存在性证明且为随机化的方法，该工作给出了高效构建算法，且是确定性的。该成果提升了压缩字符串随机访问的实用性和效率。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.10380v1",
+      "source": "arxiv",
+      "title": "CAFE: A Compound-AI Factorial Evaluation Framework",
+      "abstract": "We introduce CAFE (Compound-AI Factorial Evaluation), an open-source platform that brings design of experiments to the evaluation of compound AI systems (CAIS). Such systems expose many interchangeable choices - e.g. which retriever, model, or prompt - and practitioners rarely know which of them most affects answer quality. With CAFE, a practitioner registers each swappable component of a pipeline as a factor to build a factorial design over the chosen factors, run the resulting configurations, and score the answers on a shared rubric using a configurable LLM judge together with human raters. From these ratings it attributes answer-quality variance to the components and their interactions with mixed-effects models and reports effect sizes, significance, the best configuration, cost and latency trade-offs, and judge-human reliability. Whereas existing tools mostly either search for a good configuration or score outputs in isolation, CAFE also explains which component drives quality and whether an observed difference is significant. We validate CAFE on a retrieval-augmented question-answering (QA) pipeline over the HotpotQA benchmark dataset, where it recovers planted factor effects and stays calibrated under a permutation null. CAFE is released as a Python package and as a Web application.",
+      "authors": [
+        "Fabian Lukassen",
+        "Christoph Weisser",
+        "Thomas Kneib",
+        "Alexander Silbersdorff"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-11T16:17:46+00:00",
+      "link": "https://arxiv.org/pdf/2607.10380v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "factorial evaluation framework for compound AI systems, novel methodology",
+      "llm_evidence_cn": "复合AI系统因子评估框架，方法创新",
+      "llm_evidence": "复合AI系统因子评估框架，方法创新",
+      "canonical_evidence": "复合AI系统因子评估框架，方法创新",
+      "llm_tldr_en": "CAFE introduces design of experiments to evaluate compound AI systems, attributing variance to components via factorial design and mixed-effects models.",
+      "llm_tldr_cn": "该论文提出CAFE框架，将实验设计引入复合AI系统评估。用户将可替换组件注册为因子，执行全因子设计后通过LLM评判和人工评分，利用混合效应模型归因质量方差。该框架创新性地量化了各组件及其交互对答案质量的影响，帮助实践者优化配置。",
+      "llm_tldr": "该论文提出CAFE框架，将实验设计引入复合AI系统评估。用户将可替换组件注册为因子，执行全因子设计后通过LLM评判和人工评分，利用混合效应模型归因质量方差。该框架创新性地量化了各组件及其交互对答案质量的影响，帮助实践者优化配置。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "innovation",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.11938v1",
+      "source": "arxiv",
+      "title": "Mathematics of Data Science",
+      "abstract": "This book is about the mathematical foundations of data science.   1. Introduction   2. Curses, Blessings, and Surprises in High Dimensions   3. Singular Value Decomposition and Principal Component Analysis   4. Linear Regression and Regularization   5. Graphs, Networks, and Clustering   6. Nonlinear Dimension Reduction and Diffusion Maps   7. Linear Dimension Reduction via Random Projections   8. Optimization for Data Science   9. Classification   10. A Mathematical Introduction  to Deep Learning   11. Large Sample Limit of Graph Laplacians   12. Community   13. Concentration of Measure and Gaussian Analysis   14. Matrix Concentration Inequalities   15. Compressive Sensing and Sparsity   16. Low-Rank Matrix Recovery",
+      "authors": [
+        "Afonso S. Bandeira",
+        "Amit Singer",
+        "Thomas Strohmer"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.IT",
+        "math.PR"
+      ],
+      "published": "2026-07-11T08:31:44+00:00",
+      "link": "https://arxiv.org/pdf/2607.11938v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "covers mathematical foundations relevant to data science and optimization",
+      "llm_evidence_cn": "涵盖数据科学数学基础，包括优化理论",
+      "llm_evidence": "涵盖数据科学数学基础，包括优化理论",
+      "canonical_evidence": "涵盖数据科学数学基础，包括优化理论",
+      "llm_tldr_en": "A comprehensive book on mathematical foundations of data science, covering topics like SVD, regression, optimization, and deep learning mathematics.",
+      "llm_tldr_cn": "这是一本系统介绍数据科学数学基础的书籍。全书涵盖高维诅咒、奇异值分解、线性回归、优化、分类、深度学习数学入门等内容。它提供了理解现代数据科学算法所需的数学工具，对数学公式化要求的研究者具有参考价值。",
+      "llm_tldr": "这是一本系统介绍数据科学数学基础的书籍。全书涵盖高维诅咒、奇异值分解、线性回归、优化、分类、深度学习数学入门等内容。它提供了理解现代数据科学算法所需的数学工具，对数学公式化要求的研究者具有参考价值。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "math formulation",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-07-16-739016-v1",
+      "source": "biorxiv",
+      "title": "PathoBench: an open community-driven benchmark registry for pathogen bioinformatics tools",
+      "abstract": "The proliferation of pathogen bioinformatics pipelines has outpaced the community ability to compare them on common ground. Self-reported performance numbers, ad-hoc evaluation datasets, and inconsistent metrics make pipeline selection difficult for clinical and public-health researchers. We present PathoBench, an open web platform that addresses this gap through three coordinated mechanisms: (i) a curated registry of 26 standard benchmark datasets across 10 human pathogens, each with persistent identifiers and direct download links; (ii) pathogen-specific evaluation metrics that submissions must report, allowing direct head-to-head comparison only on the same dataset; and (iii) a credibility framework combining mandatory dataset attestation, ORCID-linked attribution, public peer comments, and administrator verification. As a case study, four published Mycobacterium tuberculosis drug-resistance pipelines were evaluated against the WHO TB mutation catalogue, demonstrating the framework discriminating power. PathoBench is open for community contributions across all ten supported pathogens.",
+      "authors": [
+        "Dong, Y.",
+        "Li, N.",
+        "Chiribau, C. B.",
+        "Mitchell, M.",
+        "Liu, X.",
+        "Perkins, A."
+      ],
+      "primary_category": "bioinformatics",
+      "categories": [
+        "bioinformatics"
+      ],
+      "published": "2026-07-17T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.07.16.739016v1.full.pdf",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "open benchmark registry for pathogen tools",
+      "llm_evidence_cn": "病原体工具开放基准注册平台",
+      "llm_evidence": "病原体工具开放基准注册平台",
+      "canonical_evidence": "病原体工具开放基准注册平台",
+      "llm_tldr_en": "PathoBench provides an open community-driven benchmark registry with standardized datasets and evaluation metrics for pathogen bioinformatics tools.",
+      "llm_tldr_cn": "针对病原体生物信息学工具评估标准缺失的问题，PathoBench建立了一个开放社区驱动的基准注册平台，包含26个标准数据集和统一评价指标，支持头对头比较。该平台通过数据集持久标识和可信度框架提升了工具评估的可复现性和公平性。",
+      "llm_tldr": "针对病原体生物信息学工具评估标准缺失的问题，PathoBench建立了一个开放社区驱动的基准注册平台，包含26个标准数据集和统一评价指标，支持头对头比较。该平台通过数据集持久标识和可信度框架提升了工具评估的可复现性和公平性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "servey",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
