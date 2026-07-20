@@ -1,0 +1,749 @@
+Title: Continuous Query for Top-K Maximal Sum Intervals over Streaming Data
+
+URL Source: https://arxiv.org/pdf/2607.11035v1
+
+Published Time: Tue, 14 Jul 2026 01:37:44 GMT
+
+Number of Pages: 14
+
+Markdown Content:
+# Continuous Query for Top-𝐾 Maximal Sum Intervals over Streaming Data 
+
+# Zhongshuai Zhang 
+
+Beijing Institute of Technology zhang_zhongshuai@126.com 
+
+# Xiaochun Yang 
+
+Northeastern University yangxc@mail.neu.edu.cn 
+
+# Baihua Zheng 
+
+Singapore Management University bhzheng@smu.edu.sg 
+
+# Rui Zhu 
+
+Shenyang Aerospace University zhurui@sau.edu.cn 
+
+# Haomin Li 
+
+Northeastern University lihm@mails.neu.edu.cn 
+
+# Bin Wang 
+
+Northeastern University binwang@mail.neu.edu.cn 
+
+## ABSTRACT 
+
+The continuous identification of top-𝑘 maximal sum intervals us-ing a sliding window over a data stream is a critical operation for applications in IoT and beyond. A maximal sum interval is a non-overlapping, contiguous subsequence with the maximal sum in a sequence of signed values. Existing algorithms are ill-suited for streaming contexts: they either exhaustively enumerate all intervals even for small 𝑘 values, or depend on indexes that require frequent and costly restructuring. We propose a novel partition -based strat-egy. Our core insight is a partitioning scheme that guarantees that any maximal sum interval is fully contained within a single par-tition, enabling independent and parallel processing. This design provides two key advantages: it enables safe pruning of partitions that cannot contribute to top-𝑘 results, drastically narrowing the search space, and it enables efficient, incremental maintenance of the maximal sum intervals in each partition. We develop algo-rithms for partition construction, incremental partition updates, and partition-based top-𝑘 maximal sum interval search. Extensive experiments on real and synthetic datasets demonstrate that our approach significantly improves efficiency. 
+
+PVLDB Reference Format: 
+
+Zhongshuai Zhang, Xiaochun Yang, Baihua Zheng, Rui Zhu, Haomin Li, and Bin Wang. Continuous Query for Top-𝐾 Maximal Sum Intervals over Streaming Data. PVLDB, 19(9): 2289 - 2302, 2026. doi:10.14778/3819518.3819551 
+
+PVLDB Artifact Availability: 
+
+The source code, data, and/or other artifacts have been made available at https://github.com/zhangzhongshuai/C-KMaxI-code. 
+
+## 1 INTRODUCTION 
+
+The Top-𝑘 Maximal Sum Intervals (KMaxI) problem [ 6, 26 ], a clas-sic problem studied for over 25 years, aims to find the 𝑘 non-overlapping, contiguous subsequences with the highest sums in a sequence of real numbers. These intervals are ranked such that the 𝑖 -th interval has the maximum possible sum from the elements                      
+
+> This paper has been accepted by VLDB 2026. This work is licensed under the Creative Commons BY-NC-ND 4.0 International License. Visit https://creativecommons.org/licenses/by-nc-nd/4.0/ to view a copy of this license. For any use beyond those covered by this license, obtain permission by emailing info@vldb.org. Copyright is held by the owner/author(s). Publication rights licensed to the VLDB Endowment. Proceedings of the VLDB Endowment, Vol. 19, No. 9 ISSN 2150-8097. doi:10.14778/3819518.3819551 Generation
+> Consumption
+> Surplus/ Deficit *
+> ...
+> ...
+> ...
+> 69.5
+> 67.7
+> 1.8
+> 75.2
+> 72.8
+> 2.4
+> 63.4
+> 66.6
+> -3.2
+> 76.5
+> 72.7
+> 3.8
+> 69.4
+> 73.4
+> -4.0
+> 84.6
+> 80.7
+> 3.9
+> 62.1
+> 68.6
+> -6.5
+> 73.7
+> 67.9
+> 5.8
+> 64.8
+> 70.1
+> -5.3
+> 72.6
+> 67.9
+> 4.7
+> Sample ID 12345678910 ...
+> UNIT: kWh W1W2
+> 70.4
+> 69.2
+> 1.2
+> 11
+> *Surplus/ Deficit = Generation -Consumption
+> []
+> The 2 nd -ranked interval in W1:I[1,4]
+
+Figure 1: A running example on power generation, consump-tion, and storage of a microgrid. 
+
+disjoint from all higher-ranked (1st to ( 𝑖 − 1)-th) intervals. Iden-tifying such high-impact contiguous segments is fundamental in time-series analysis, supporting applications such as burst detec-tion, anomaly identification, and trend discovery in sequential data. This paper extends KMaxI to the challenging streaming context. In many modern applications, signals arrive continuously and must be analyzed in real time, making it necessary to support efficient interval discovery over sliding windows. To address this need, we introduce the Continuous KMaxI query (C-KMaxI), which provides real-time insights over a sliding window. Sliding windows can be time- or count-based [ 5 , 9, 13 – 16 , 20 , 23 , 25 , 29 ]. In this work, we focus on the count-based model. Formally, a C-KMaxI query, de-noted as 𝑞 (𝑛, 𝑠, 𝑘 ), continuously monitors the 𝑛 most recent signed numeric values in the query window 𝑊 . Each time 𝑊 advances by 𝑠 positions, the query returns the top-𝑘 maximal sum intervals within the updated window. The techniques developed in this work can also be applied to time-based sliding windows. 
+
+Motivations and Challenges . The C-KMaxI extends interval-based analysis to streaming environments by continuously identi-fying high-impact contiguous periods within the sliding window. Such intervals capture sustained periods of strong cumulative signal values and are essential for detecting bursts, trends, or anomalous behaviors. In many real-world applications, identifying multiple disjoint high-impact periods is more informative than detecting a single peak interval, as systems often need to prioritize several candidate periods for downstream analysis or operational planning. The C-KMaxI query is motivated by its importance in real-time analytics across diverse domains. For example, it can be used to iden-tify significant genomic regions in high-throughput bio-informatics sequencing [ 18 , 19 , 26 , 28 ], detect trending patterns in web scrap-ing [ 24 ] and information retrieval systems [ 21 ], and extract infor-mative temporal features for online AI models [ 17 ]. In these applica-tions, the data naturally form signed sequences, where values may be positive or negative, representing gains and losses, increases and arXiv:2607.11035v1 [cs.DB] 13 Jul 2026 decreases, or surplus and deficit signals. While KMaxI handles real-valued sequences, many practical signals are signed. Supporting signed sequences therefore enables systems to identify sustained positive trends despite temporary fluctuations. A compelling application of C-KMaxI query arises in the Internet of Things (IoT), particularly in real-time monitoring and energy management for microgrids, which have received significant atten-tion in recent years [ 11 , 34 ]. Figure 1 illustrates a running example. Here, a C-KMaxI query continuously analyzes a signed microgrid signal to identify time periods with the largest cumulative energy surplus. Specifically, the input stream can be modeled as a sur-plus/deficit sequence, where each value represents the difference between power generation and consumption. Positive values indi-cate energy surplus, while negative values indicate energy deficit. The returned top-𝑘 non-overlapping maximal sum intervals there-fore correspond to the 𝑘 most significant, disjoint periods with the highest cumulative surplus. These intervals correspond to sus-tained periods of excess generation, enabling operators to identify when surplus energy should be stored, redistributed, or sold to the grid. While we illustrate the query using a microgrid monitoring scenario, the proposed C-KMaxI framework is broadly applicable to many streaming analytics tasks that require identifying sustained high-impact periods from continuously evolving signals. As new measurements arrive, the query result evolves with the sliding window. Here, 𝐼 [𝑖, 𝑗 ] denotes the contiguous interval from objects 𝑜 𝑖 to 𝑜 𝑗 and its associated sum is the total value over that interval. For example, the top intervals may change from 𝐼 [8, 8]
+
+with sum 5.8 and 𝐼 [1, 4] with sum 4.8 in window 𝑊 1, to 𝐼 [8, 11 ] with sum 6.4 and 𝐼 [6, 6] with sum 3.9 in window 𝑊 2. This dynamic up-date capability enables continuous monitoring of emerging surplus periods as the data stream evolves. Despite its practical importance, efficiently computing C-KMaxI queries over data streams presents two formidable challenges. First, the combination of high-velocity data streams and the inherent computational complexity of the KMaxI problem makes it difficult to deliver low-latency results, especially for large window sizes. Second, the set of top-𝑘 intervals is highly volatile. As the window slides, intervals may split, merge, or be completely replaced. For instance, as shown in Figure 1, when the window advances to 𝑊 2,the result interval 𝐼 [8, 8] merges with adjacent intervals to form a new result interval 𝐼 [8, 11 ]. This volatility renders static algorithms inefficient, as they cannot update results incrementally and must instead perform costly re-computations from scratch. 
+
+State-Of-The-Art Efforts . Existing research on the KMaxI prob-lem is primarily designed for static data environments and falls into two categories. Scan-based approaches, such as Ruzzo-Tompa [ 26 ], identify all maximal intervals through a sequential scan but re-quire a subsequent sorting step to select the top-𝑘 results, which becomes inefficient especially when 𝑘 is much smaller than the total count. Index-based approaches, like the Tournament-Tree [ 6 ], construct auxiliary structures that allow direct retrieval of the top-𝑘 
+
+intervals without exhaustive comparisons. While effective in static scenarios, these approaches are not suitable for data streams. For example, adapting the Tournament-Tree would necessitate frequent and costly index reconstructions with every window slide, result-ing in prohibitive computational overhead. Consequently, existing algorithms cannot efficiently support the C-KMaxI query. 
+
+Table 1: Notations                                                                     
+
+> Symbols Description
+> 𝑜 𝑖 the 𝑖 -th real number object
+> 𝐼 [𝑖, 𝑗 ],𝑆 [𝑖, 𝑗 ]the interval from 𝑜 𝑖 to 𝑜 𝑗 , the sum of objects in 𝐼 [𝑖, 𝑗 ]
+> 𝑀𝑎𝑥𝐼 [𝑖, 𝑗 ]maximal sum interval from 𝑜 𝑖 to 𝑜 𝑗
+> 𝑞 (𝑛, 𝑠, 𝑘 )
+> the query, modeled as a sliding window 𝑊 monitoring most recent 𝑛 objects, returning the top-𝑘 maximal intervals over a data stream S, with 𝑠 being object update number for each slide
+> 𝑀 [𝑖 ],𝑀 [·] the largest sum of an interval starting at position 𝑖 ,𝑀 [·] is the collective term for 𝑀 𝑖
+> 𝑙 𝑗 ,𝑟 𝑗 ,𝐿𝑀 𝑗 the leftmost index in partition 𝑃 𝑗 , the rightmost index in 𝑃 𝑗 , the index of the largest 𝑀 in 𝑃 𝑗
+> pTMS
+> 𝑀 [𝑢, 𝑣 ]
+> a Potential Target 𝑀 -Subsequence that has 𝑀 [𝑢 ]/ 𝑀 [𝑣 ]as its strict maximum/minimum 𝑀 value.
+
+Our Solution . To overcome these limitations, we propose a novel partition-based framework for efficient C-KMaxI processing. The key idea is to partition the query window into a set of disjoint partitions such that every maximal sum interval is fully contained within a single partition. This property enables two important ad-vantages. First, since the top-𝑘 results must come from at most 𝑘 
+
+partitions, many partitions can be safely pruned, drastically reduc-ing the search space. Second, changes in maximal sum intervals are closely tied to the evolution of partitions as the window slides, which can be categorized into four distinct patterns, namely un-altered, shrinking, extended, and emergent. We develop efficient update strategies for each pattern, maximizing the reuse of previ-ously identified maximal sum intervals. Based on this insight, our solution proceeds in three stages. First, we construct the partitions and identify the top-1 maximal sum in-terval within each partition using a dynamic programming strategy. Next, we perform a partition-based 𝑘 -maximal sum interval search algorithm that examines promising partitions (at most 𝑘 partitions) to identify the top-𝑘 results. Finally, we design an incremental main-tenance mechanism that updates partitions and their correspond-ing maximal intervals as the query window evolves. By carefully categorizing partition evolution patterns and reusing previously computed results whenever possible, our approach significantly reduces the computational overhead of C-KMaxI evaluation. 
+
+## 2 PROBLEM DEFINITION 
+
+A maximal sum interval (or maximal interval , denoted as 𝑀𝑎𝑥𝐼 [𝑖, 𝑗 ]), is a contiguous subsequence (𝑜 𝑖 , · · · , 𝑜 𝑗 ) in a sequence of real numbers (𝑜 1, 𝑜 2, · · · , 𝑜 𝑛 ) whose sum 𝑆 [𝑖, 𝑗 ] is global maximal, i.e., 
+
+𝑆 [𝑖, 𝑗 ] = max 1≤𝑖 ≤ 𝑗 ≤𝑛 𝑆 [𝑖, 𝑗 ], with 𝑆 [𝑖, 𝑗 ] > 0. This paper considers the set of globally ranked, positive, and non-overlapping maximal intervals, following the iterative definition in [ 26 ]. Specifically, the interval with the largest sum in the entire sequence is ranked first; the 𝑖 -th interval is the maximal interval computed from elements disjoint from all higher-ranked intervals. To avoid ambiguity under ties, we treat intervals containing non-empty zero-sum prefixes or suffixes as invalid. Otherwise, such intervals could create mul-tiple overlapping intervals with identical sums when adjacent to positive-sum segments. Therefore, if a sequence has fewer than 𝑘 
+
+valid maximal intervals, C-KMaxI may return fewer than 𝑘 results. Consider the sequence in query window 𝑊 1 in Figure 2. The interval 𝐼 [10 , 10 ] (sum=12) is a global maximum sum interval since no other subsequence has a larger sum. Subsequences like 𝐼 [3, 3]Figure 2: An example of 𝑞 (𝑛 = 13 , 𝑠 = 4, 𝑘 = 2).
+
+and 𝐼 [11 , 13 ] are invalid due to non-positive sums. While 𝐼 [1, 2] and 
+
+𝐼 [2, 2] both have sum 6, 𝐼 [1, 2] is invalid as it contains a zero-sum prefix. In addition, each lower rank interval must be disjoint from all higher-ranked ones, e.g., 𝐼 [4, 10 ] has a sum larger than 𝐼 [4, 8] but is inadmissible, as it overlaps with the 1st-ranked interval 𝐼 [10 , 10 ].We now formally define C-KMaxI , the continuous query for top-𝑘 maximal sum intervals over streaming data. 
+
+Definition 1. C-KMaxI. Given a stream S of signed values (here-after referred to as objects), a C-KMaxI query, denoted as 𝑞 (𝑛, 𝑠, 𝑘 ),maintains a sliding window 𝑊 of the most recent 𝑛 objects from S.Each time the window slides by 𝑠 positions ( 𝑠 objects expire and 𝑠 
+
+new objects arrive), the query returns the top-𝑘 maximal intervals 
+
+{𝑀𝑎𝑥𝐼 1, 𝑀𝑎𝑥𝐼 2, . . . , 𝑀𝑎𝑥𝐼 𝑘 } in the updated window 𝑊 .
+
+Figure 2 illustrates an example C-KMaxI query 𝑞 (13 , 4, 2). In window 𝑊 1, four maximal intervals exist: 𝑀𝑎𝑥𝐼 [2, 2], 𝑀𝑎𝑥𝐼 [4, 8],
+
+𝑀𝑎𝑥𝐼 [10 , 10 ], and 𝑀𝑎𝑥𝐼 [12 , 12 ]. The top-2 results are 𝑀𝑎𝑥𝐼 1 [10 , 10 ]
+
+(sum = 12 ) and 𝑀𝑎𝑥𝐼 2 [4, 8] (sum= 10 ). After the window slides to 𝑊 2,the intervals update to 𝑀𝑎𝑥𝐼 ′ [6, 6], 𝑀𝑎𝑥𝐼 ′ [8, 8], 𝑀𝑎𝑥𝐼 ′ [10 , 10 ], and 
+
+𝑀𝑎𝑥𝐼 ′ [12 , 17 ]. The top-2 results become 𝑀𝑎𝑥𝐼 ′ 
+
+> 1
+
+[12 , 17 ] (sum= 13 )and 𝑀𝑎𝑥𝐼 ′ 
+
+> 2
+
+[10 , 10 ] (sum= 12 ). Streams with signed values naturally arise in many real-world applications. Examples include surplus signals in energy systems (supply −demand), financial price changes, sensor deltas, and resid-ual signals obtained after subtracting a baseline. Residual signals, in particular, convert strictly positive or negative measurements into signed streams (e.g., by subtracting the mean or expected value). In all these scenarios, a C-KMaxI query identifies the top-𝑘 intervals with the largest cumulative deviations. 
+
+## 3 PARTITIONING 
+
+This section formalizes our partitioning strategy for optimizing C-KMaxI queries. The core idea of this approach is a guarantee that any maximal interval lies entirely within a single partition, which enables independent processing of partitions. This property yields two key advantages: safe pruning of partitions that cannot contain result intervals, and efficient incremental maintenance via partition evolution patterns. We begin by formally defining partitions and subsequently demonstrate how these characteristics are realized. 
+
+Definition 2. Partition. A partition P = {𝑃 1, 𝑃 2, . . . , 𝑃 𝑝 } of a query window 𝑊 = (𝑜 1, 𝑜 2, . . . , 𝑜 𝑛 ) is a division of 𝑊 into contiguous, non-overlapping segments that collectively cover 𝑊 . Each partition 
+
+𝑃 𝑖 = {𝑜 𝑙 𝑖 , 𝑜 𝑙 𝑖 +1, . . . , 𝑜 𝑟 𝑖 } = [𝑙 𝑖 , 𝑟 𝑖 ] with 1 ≤ 𝑙 𝑖 ≤ 𝑟 𝑖 ≤ 𝑛 has a right boundary at position 𝑟 𝑖 , which is defined as the position that maxi-mizes the cumulative sum from the start of the partition 𝑃 𝑖 ; that is, 
+
+𝑆 [𝑙 𝑖 , 𝑟 𝑖 ] ≥ 𝑆 [𝑙 𝑖 , 𝑡 ] for all 𝑡 ∈ [ 𝑙 𝑖 , 𝑛 ].
+
+Figure 3: An example of partitions. 
+
+Figure 3 shows the partitioning of 𝑊 1 = (𝑜 1, · · · , 𝑜 19 ) into five partitions, 𝑃 1, . . . , 𝑃 5. Consider partition 𝑃 1 = (𝑜 1, 𝑜 2, 𝑜 3, 𝑜 4) = [1, 4].Its right boundary is at position 4 (i.e., 𝑟 1 = 4). This means that for a subsequence starting from position 1, the cumulative sum is maximized at position 4; any interval [1, 𝑗 ] with 𝑗 ≠ 4 yields a smaller cumulative sum. This property extends to any subsequence starting from 𝑠 ∈ [ 1, 4], as formally established in Lemma 1. This follows directly from the functional definition of the partition’s right boundary. We omit the formal proof in the interest of brevity. 
+
+Lemma 1. Right-bound Alignment. Let partition 𝑃 𝑖 = (𝑜 𝑙 𝑖 , 𝑜 𝑙 𝑖 +1,
+
+. . . , 𝑜 𝑟 𝑖 ) = 𝑃 [𝑙 𝑖 , 𝑟 𝑖 ] be a partition of size greater than 1 of window 
+
+𝑊 = (𝑜 1, 𝑜 2, · · · , 𝑜 𝑛 ), where 𝑟 𝑖 is its right boundary as defined in Definition 2. Then, for every start index 𝑗 ∈ [ 𝑙 𝑖 , 𝑟 𝑖 ], the cumulative sum starting from 𝑗 also attains its maximum at the same right boundary 𝑟 𝑖 . Formally, ∀𝑗 ∈ [ 𝑙 𝑖 , 𝑟 𝑖 ], 𝑆 [ 𝑗, 𝑟 𝑖 ] = max 𝑡 ∈ [ 𝑗,𝑛 ] 𝑆 [ 𝑗, 𝑡 ].
+
+Beyond the right-bound alignment property, our partitioning scheme exhibits a more profound property: any maximal interval is entirely contained within a single partition. This guarantee is formally encapsulated by Theorem 1. 
+
+Theorem 1. No maximal interval overlaps with any two adjacent partitions. 
+
+Proof. We proceed by contradiction. Assume the theorem is false, i.e., meaning there exists a maximal interval 𝑀𝑎𝑥𝐼 [𝑎, 𝑏 ] that overlaps with two adjacent partitions 𝑃 𝑖 = [𝑙 𝑖 , 𝑟 𝑖 ] and 𝑃 𝑖 +1 =
+
+[𝑙 𝑖 +1, 𝑟 𝑖 +1] where 𝑟 𝑖 = 𝑙 𝑖 +1 − 1, 𝑙 𝑖 ≤ 𝑎 ≤ 𝑟 𝑖 , and 𝑏 ≥ 𝑙 𝑖 +1. By the definition of a maximal interval, we have 𝑆 [𝑎, 𝑏 ] > 𝑆 [𝑎, 𝑟 𝑖 ]. On the other hand, the right-bound alignment property of a partition guar-antees that 𝑆 [𝑎, 𝑏 ] ≤ 𝑆 [𝑎, 𝑟 𝑖 ]. These two constraints introduce a contradiction, implying that our initial assumption is false, thereby proving the theorem. □
+
+For 𝑊 1 in Figure 3, there are in total seven maximal intervals: 
+
+{𝑀𝑎𝑥𝐼 [1, 1], 𝑀𝑎𝑥𝐼 [3, 4], 𝑀𝑎𝑥𝐼 [6, 9], 𝑀𝑎𝑥𝐼 [11 , 11 ], 𝑀𝑎𝑥𝐼 [13 , 13 ],
+
+𝑀𝑎𝑥𝐼 [15 , 15 ], 𝑀𝑎𝑥𝐼 [17 , 18 ]}. As guaranteed by Theorem 1, each maximal interval is contained entirely within a single partition (e.g. 
+
+𝑀𝑎𝑥𝐼 [1, 1] and 𝑀𝑎𝑥𝐼 [3, 4] lie in partition 𝑃 1). A key benefit of our partitioning strategy is its support for ef-ficient query processing by focusing on local maximal intervals. Since Theorem 1 guarantees that any maximal interval is entirely contained within a single partition, partitions can be processed in-dependently. This containment enables a crucial pruning heuristic: we first identify the top-1 maximal interval within each partition. If this local champion for a given partition 𝑃 𝑖 does not qualify for the global top-𝑘 list, then no other intervals within 𝑃 𝑖 can be query results. Therefore, the partition 𝑃 𝑖 can be safely pruned. Consider the query in Figure 3 that searches for top-3 maxi-mal intervals within 𝑊 1. The top-1 maximal intervals with each Figure 4: Constructing partitions. 
+
+partition are 𝑀𝑎𝑥𝐼 [3, 4] (sum 20 ) in 𝑃 1, 𝑀𝑎𝑥𝐼 [11 , 11 ] (sum 16 ) in 
+
+𝑃 2, 𝑀𝑎𝑥𝐼 [13 , 13 ] (sum 21 ) in 𝑃 3, and 𝑀𝑎𝑥𝐼 [17 , 18 ] (sum 17 ) in 𝑃 4.
+
+𝑃 5, only containing a non-positive object, can be skipped as it does not contain any maximal intervals. Among these candidates, 
+
+𝑀𝑎𝑥𝐼 [11 , 11 ] from 𝑃 2 is not among the top-3. Consequently, no other interval in 𝑃 2, such as 𝑀𝑎𝑥𝐼 [6, 9], can be a query result, and the entire partition can be pruned. 
+
+## 4 THE INITIALIZATION CONSTRUCTION 
+
+In this section, we first introduce the partition construction algo-rithm and then propose a search algorithm to locate 𝑘 -maximal intervals based on partitions. 
+
+## 4.1 The Partition Construction 
+
+We propose a dynamic programming-based partition construction algorithm. Moreover, while constructing the partitions, it provides direct access to the top-1 maximal interval within each partition, without requiring extra computation. Given a query window 𝑊 = (𝑜 1, · · · , 𝑜 𝑛 ), we define two ar-rays 𝑀 [1 · · · 𝑛 ] and 𝐸 [1 · · · 𝑛 ]. Here, 𝑀 [𝑖 ] stores the largest cumu-lative sum of any contiguous interval starting at position 𝑖 , and 
+
+𝐸 [𝑖 ] records the ending position of the corresponding interval, i.e., 
+
+𝑆 [𝑖, 𝐸 [𝑖 ]] = 𝑀 [𝑖 ]. Formally, 𝑀 [𝑖 ] = 𝑆 [𝑖, 𝐸 [𝑖 ]] = max    
+
+> 1≤𝑖 ≤𝑗 ≤𝑛
+
+∑︁  
+
+> 𝑗 𝜇 =𝑖
+
+𝑜 𝜇 .Both arrays can be computed in reverse order using the following recurrence relation: 
+
+(𝑀 [𝑖 ], 𝐸 [𝑖 ]) =
+
+
+
+(𝑜 𝑖 + 𝑀 [𝑖 + 1], 𝐸 [𝑖 + 1]) , if 𝑀 [𝑖 + 1] > 0,
+
+(𝑜 𝑖 , 𝑖 ), if 𝑀 [𝑖 + 1] ≤ 0
+
+(1) with the base case 𝑀 [𝑛 ] = 𝑜 𝑛 and 𝐸 [𝑛 ] = 𝑛 . Intuitively, if 𝑀 [𝑖 +1] ≤ 
+
+0, the single-object interval 𝐼 [𝑖, 𝑖 ] (i.e, just 𝑜 𝑖 ) yields the maximal sum starting at 𝑖 , as including any subsequent interval would only decrease the sum. Crucially, any position 𝑖 where 𝑀 [𝑖 ] ≤ 0 is identified as a cutting point , as formalized in Definition 3. A non-positive 𝑀 [𝑖 ] indicates that no interval 𝐼 [ 𝑗, ·] starting at position 
+
+𝑗 < 𝑖 can achieve a larger sum by extending to include any interval starting at position 𝑖 . Consequently, these positions naturally form the boundaries of our partitions. 
+
+Definition 3. Cutting Points. A cutting point is a position 𝑖 
+
+in the query window 𝑊 for which the value 𝑀 [𝑖 ] ≤ 0. The object 𝑜 𝑖 
+
+located at a cutting point is the physical marker for that boundary. 
+
+A partition is determined by two consecutive cutting points, inclusive of its left cutting point and exclusive of the right one. The window boundaries (i.e., positions 1 and 𝑛 of a query window of size 
+
+𝑛 ) serve as implicit partition boundaries if they are not themselves 
+
+Algorithm 1: Partition Construction                                                                                                                                    
+
+> Input: The object array 𝑜 [1,· · · , 𝑛 ]
+> Output: 𝑀 values; partitions P; indices of the largest 𝑀 in each partition
+> L M , and set of cutting points C.
+> 1Initialize array 𝑀 [1,· · · , 𝑛 ], partition set P, the largest 𝑀 index set L M ,the cutting point index set C, the right cutting point index 𝑟𝑐 ;
+> 2𝑀 [𝑛 ] ← 𝑜 [𝑛 ],𝑟𝑐 ←𝑛 +1,𝐿𝑀 ←𝑛 ;
+> 3for 𝑖 ←𝑛 −1to 1do
+> 4if 𝑀 [𝑖 +1] ≤ 0then // scan a cutting point
+> 5C.add (𝑖 +1); 𝑀 [𝑖 ] ← 𝑜 [𝑖 ];
+> 6if 𝑃 [𝑖 +1, 𝑟𝑐 −1]is a non-degenerate partition then
+> 7P.add (𝑃 [𝑖 +1, 𝑟𝑐 −1]), L M .add (𝐿𝑀 );
+> 8𝑟𝑐 ←𝑖 +1,𝐿𝑀 ←𝑖 ;
+> 9else // enter a non-degenerate partition
+> 10 𝑀 [𝑖 ] ← 𝑜 [𝑖 ] + 𝑀 [𝑖 +1];
+> 11 if 𝑀 [𝑖 ]>𝑀 [𝐿𝑀 ]then
+> 12 𝐿𝑀 ←𝑖 ;
+> 13 if 𝑃 [1, 𝑟𝑐 −1]is a non-degenerate partition then
+> 14 P.add (𝑃 [1, 𝑟𝑐 −1]), L M .add (𝐿𝑀 );
+> 15 return 𝑀 ,P,L M ,C;
+
+cutting points. As illustrated in Figure 4, the cutting points 𝑜 5, 𝑜 12 ,
+
+𝑜 14 , and 𝑜 19 divide the entire sequence 𝑊 1 into five partitions. The partition construction process is detailed in Algorithm 1. After initializing the key data structures (Lines 1-2), the algorithm performs a reverse scan of the window 𝑊 to compute 𝑀 [𝑖 ] values and identify cutting points (Lines 3-12). It maintains a pointer, 
+
+𝑟𝑐 , to track the position of previous cutting point. When a new cutting point is found at position 𝑖 + 1 (Lines 4-5), objects within the segment [𝑖 + 1, 𝑟𝑐 − 1] are finalized as a new partition (Lines 6-7). In addition, 𝑟𝑐 is updated to 𝑖 + 1 (Line 8). Here, we want to highlight that not all partitions are retained in our algorithm; a degenerate partition containing only a single non-positive object is discarded, as it contain zero positive-sum maximal intervals. Only non-degenerate partitions are returned to serve C-KMaxI query. The algorithm also maintains a list LM that stores, for each non-degenerate partition, the indices of the largest 𝑀 [𝑖 ] value (Lines 11-12). Formally, for a non-degenerate partition 𝑃 𝑖 = [𝑙 𝑖 , 𝑟 𝑖 ],
+
+𝐿𝑀 𝑖 = arg max 𝑗 ∈ [ 𝑙 𝑖 ,𝑟 𝑖 ] 𝑀 [ 𝑗 ]. Accordingly, the interval 𝐼 [𝐿𝑀 𝑖 , 𝑟 𝑖 ] is the top-1 maximal interval in 𝑃 𝑖 and meanwhile also a valid maximal interval in 𝑊 , as formally established in Lemma 2. The proof is provided in our technical report [ 36 ] due to space constraints. List 
+
+LM provides direct access to the top-1 maximal interval in each partition, facilitating the processing of C-KMaxI as detailed later. 
+
+Lemma 2. For a non-degenerate partition 𝑃 𝑗 that ends at position 
+
+𝑟 𝑗 , the interval 𝐼 [𝐿𝑀 𝑗 , 𝑟 𝑗 ] is the maximal interval with the largest sum within 𝑃 𝑗 and also a maximal interval globally. 
+
+In addition, the algorithm uses a list C to store the indices of all cutting points. These cutting points help determine how partitions evolve after the query window slides, as detailed in Section 5.1. Finally, we emphasize that the partitions generated by this process adhere strictly to the definition given in Definition 2. Specifically, as established by Lemma 3, the right boundary of each partition 
+
+𝑃 = [𝑙 𝑖 , 𝑟 𝑖 ] is correctly positioned at 𝑟 𝑖 , i.e., ∀𝑗 ∈ [ 𝑙 𝑖 , 𝑟 𝑖 ], 𝐸 [ 𝑗 ] = 𝑟 𝑖 .The proof is omitted, as it can be derived directly from the definition of cutting points. This property is precisely why Algorithm 1 does not need to maintain 𝐸 [·] array explicitly. Lemma 3. In a non-degenerate partition 𝑃 𝑖 = [𝑙 𝑖 , 𝑟 𝑖 ] constructed by Algorithm 1, 𝑟 𝑖 is 𝑃 𝑖 ’s right boundary, i.e., ∀𝑗 ∈ [ 𝑙 𝑖 , 𝑟 𝑖 ], 𝐸 [ 𝑗 ] = 𝑟 𝑖 .
+
+The example in Figure 4 demonstrates this process. The right boundary 𝑟𝑐 is initialized to 20 , making position 19 the initial right boundary of the initial scanned partition. Since 𝑀 [19 ] < 0, the segment [19 , 20 ) is identified as a degenerate partition (contain-ing only 𝑜 19 ) and is discarded. The algorithm then processes a non-degenerate partition. Upon scanning the next cutting point at position 14, a non-degenerate partition 𝑃 4 = [14 , 19 ) is recorded. 
+
+𝐿𝑀 4 = 17 , as 𝑀 [17 ] is the maximum in this partition. Partitions 𝑃 3
+
+and 𝑃 2 are identified similarly. Finally, the leftmost partition 𝑃 1 =
+
+[1, 4] is verified as non-degenerate and recorded, with 𝐿𝑀 1 = 3.
+
+## 4.2 Partition-based 𝑘 -Maximal Interval Search 
+
+In a streaming context, the query window evolves continuously. A naive method would compute all maximal intervals for each new window, which is computationally expensive. Our key observation is that the top-𝑘 results in any window can originate from at most 
+
+𝑘 partitions. This follows from the fact that each maximal interval lies entirely within a single partition. Since the top-𝑘 maximal intervals must be mutually disjoint, these 𝑘 intervals can belong to at most 𝑘 partitions. This property enables effective pruning of the search space by restricting attention to a limited subset of promising partitions. We therefore rely on the top-1 maximal interval within each partition, identified during partition construction, to determine the 𝑘 most promising partitions. Algorithm 2 presents the “Partition-based 𝑘 -Maximal Interval Search” algorithm. It maintains a size-𝑘 AVL tree that stores the sums of the current top-𝑘 maximal intervals discovered so far. Initially, the sums of top-1 intervals of all partitions are inserted into the AVL tree (Lines 1-2). Those partitions 𝑃 𝑗 whose top-1 in-tervals (e.g., the interval 𝐼 [𝐿𝑀 𝑗 , 𝑟 𝑗 ]) remain within this tree are considered promising. The algorithm then processes these promis-ing partitions (up to 𝑘 ) in descending order of their top-1 interval’s sum (Lines 3-6). For each such partition 𝑃 𝑗 , an evaluation is invoked to locate the remaining valid maximal intervals within the partition that are disjoint from the top-1 interval 𝐼 [𝐿𝑀 𝑗 , 𝑟 𝑗 ] (Line 4). The de-tails of this evaluation procedure are described in the next section. The maximal intervals discovered in 𝑃 𝑗 are stored in a set 𝐶𝑀 𝑗 . The sums of these newly discovered maximal intervals are inserted into the AVL tree (Lines 5-6), which continuously maintains the sums of current top-𝑘 maximal intervals found so far. The algorithm terminates once all partitions whose top-1 interval sums remain among the current top-𝑘 candidates have been evaluated. Finally, the union of all such 𝐶𝑀 𝑗 forms the final candidate maximal inter-val set CM , which will be used for subsequent window updates, and the maximal intervals whose sums remain in the final AVL tree form the final top-𝑘 results (Line 7). The results returned by Algorithm 2 are guaranteed to be the top-𝑘 maximal intervals, as stated in Lemma 4. We omit the proof for brevity and provide it in Lemma 4 of our technical report [36]. 
+
+Lemma 4. Within a query window 𝑊 𝑖 , the 𝑘 intervals returned by Algorithm 2 correspond to the top-𝑘 maximal intervals in the window. 
+
+4.2.1 Identifying maximal intervals in a partition. Algorithm 2 in-vokes an evaluation procedure to identify all remaining maximal 
+
+Algorithm 2: Partition-based 𝑘 -Maximal Interval Search                                                                          
+
+> Input: Partitions P={𝑃 1, 𝑃 2· · · , 𝑃 𝑝 }with their respective top-1 𝑀 values
+> (𝑀 [𝐿𝑀 1], 𝑀 [𝐿𝑀 2],· · · , 𝑀 [𝐿𝑀 𝑝 ] ) , the candidate maximal interval set C M ={𝐶𝑀 1, 𝐶𝑀 2,· · · , 𝐶𝑀 𝑝 }, required 𝑘
+> Output: The top-𝑘 maximal intervals, the candidate maximal interval set.
+> 1Initialize an AVL tree 𝑎𝑣𝑙 with the size of 𝑘 ;
+> 2insert all 𝑀 [𝐿𝑀 𝑗 ]for 𝑗 ∈ [ 1, 𝑝 ]into 𝑎𝑣𝑙 ;
+> 3while find 𝑀 [𝐿𝑀 𝑖 ]in 𝑎𝑣𝑙 in descending order do
+> 4incrementally update C M 𝑖 ;// Algorithm 5
+> 5foreach maximal interval 𝑀𝑎𝑥𝐼 [𝑢, 𝑣 ]in 𝐶𝑀 𝑖 do
+> 6insert the sum of 𝑀𝑎𝑥𝐼 [𝑢, 𝑣 ]into 𝑎𝑣𝑙 ;
+> 7return maximal intervals whose sums are in 𝑎𝑣𝑙 ,C M ;1
+
+order 
+
+P1
+
+... 
+
+Pj Pp                        
+
+> 3245678910 11 12 13
+> 3355-7-73333-16 -16 17 17 1-7-32-341-7-32-34
+> [lj,LM j-1]
+
+data 
+
+... ... 55 -16 -16 17 17 ... ... ...               
+
+> 17 1839210 385749M
+> M[1,2]
+> 647
+> 14
+> 77-5-555
+> 15 16
+> M[3,4] M[5,7] M[8,10] M[11,13] M[14,15]
+> I[8,14] I[1,6] MaxIs:
+> MDMSs:
+
+Figure 5: An example of maximal intervals in range [𝑙 𝑗 , 𝐿𝑀 𝑗 −
+
+1] in 𝑃 𝑗 where 𝑙 𝑗 = 1 and 𝐿𝑀 𝑗 = 16 .
+
+intervals within each promising partition 𝑃 𝑗 ; specifically, those maximal intervals disjoint from the top-1 interval 𝐼 [𝐿𝑀 𝑗 , 𝑟 𝑗 ]. To support this procedure, we first derive a necessary but not sufficient condition that any maximal interval must satisfy, as formalized in Lemma 5. Again, we omit the proof due to space constraints; the full proof is provided in Lemma 5 of our technical report [36]. 
+
+Lemma 5. Let 𝑀𝑎𝑥𝐼 [𝑢, 𝑣 − 1] be a maximal interval in the sub-range [𝑙 𝑗 , 𝐿𝑀 𝑗 − 1] of partition 𝑃 𝑗 = [𝑙 𝑗 , 𝑟 𝑗 ]. Then, 𝑀 [𝑢 ] > 𝑀 [𝑖 ] for all 𝑖 ∈ ( 𝑢, 𝑣 ], and 𝑀 [𝑣 ] < 𝑀 [𝑖 ] for all 𝑖 ∈ [ 𝑢, 𝑣 ). Thus, 𝑢 is a strict local maximum and 𝑣 is a strict local minimum of the 𝑀 [·] values. 
+
+Lemma 5 states that 𝐼 [𝑢, 𝑣 − 1] can be a maximal interval only if the corresponding 𝑀 -subsequence 𝑀 [𝑢, 𝑣 ] has 𝑀 [𝑢 ] as its strict maximum and 𝑀 [𝑣 ] as its strict minimum. Any 𝑀 -subsequence sat-isfying this condition is defined as a Potential Target 𝑀 -Subsequence 
+
+(pTMS for short). All other 𝑀 -subsequences can therefore be safely filtered out. However, not every pTMS corresponds to a maximal interval. For instance, in Figure 5, 𝑀 [5, 7] is a pTMS, yet 𝐼 [5, 6]
+
+is not a maximal interval. Thus, while pTMS provides a filtered candidate set, additional refinement is needed. We therefore seek a Target 𝑀 -Subsequence (TMS for short), i.e., an 
+
+𝑀 [𝑢, 𝑣 ] whose corresponding interval 𝐼 [𝑢, 𝑣 −1] is indeed a maximal interval. The key observation underlying this refinement is the mergeability property of pTMS. Two pTMS, 𝑀 [𝑢 1, 𝑣 1] and 𝑀 [𝑢 2, 𝑣 2]
+
+(with 𝑣 1 < 𝑢 2) are mergeable if their concatenation 𝑀 [𝑢 1, 𝑣 2] also constitutes a pTMS. Based on this notion, we establish a key result (Lemma 6): a pTMS is a true TMS if and only if it is non-mergeable with any other pTMS in the sequence. Again, we omit the proof for brevity and provide it in Lemma 6 of our technical report [36]. 
+
+Definition 4. Mergeability of two pTMS. Let 𝑀 [𝑢 1, 𝑣 1] and 
+
+𝑀 [𝑢 2, 𝑣 2] be two pTMS in a partition 𝑃 𝑗 = [𝑙 𝑗 , 𝑟 𝑗 ] such that 𝑙 𝑗 ≤
+
+𝑢 1 < 𝑣 1 < 𝑢 2 < 𝑣 2 < 𝐿𝑀 𝑗 . They are mergeable iff the concatenated Algorithm 3: Identify Maximal Intervals                                                                                                                                        
+
+> Input: Array 𝑀 [𝑙 𝑎 . . . 𝐿𝑀 𝑎 −1]
+> Output: Maximal intervals
+> 1Initialize an empty double linked list 𝐿 with a dummy head;
+> 2while traverse the array 𝑀 from 𝑀 [𝑙 𝑎 ]to 𝑀 [𝐿𝑀 𝑎 −1]do
+> 3scan a Maximal Monotonically Decreasing 𝑀 SubSequence 𝑀 [𝑖, 𝑗 ];
+> 4𝑏 ← | 𝐿 | − 1;𝐿.𝑎𝑝𝑝𝑒𝑛𝑑 (𝑀 [𝑖, 𝑗 ] ) ;
+> 5while 𝑏 ≥0do // traverse 𝐿 for mergeability checks
+> 6𝑀 [𝑢, 𝑣 ] ← 𝐿 [𝑏 ];
+> 7if 𝑀 [𝑢 ]>𝑀 [𝑖 ] ∧ 𝑀 [𝑣 ]>𝑀 [𝑗 ]// mergeable then
+> 8𝐿 [𝑏 ] ← 𝑀 [𝑢, 𝑗 ];𝐿 [𝑏 ].𝑛𝑒𝑥𝑡 ←𝑁𝑈 𝐿𝐿 ;
+> 9𝑏 ←𝑏 −1;𝑀 [𝑖, 𝑗 ] ← 𝑀 [𝑢, 𝑗 ];
+> 10 else if 𝑀 [𝑢 ] ≤ 𝑀 [𝑖 ] ∧ 𝑀 [𝑣 ]>𝑀 [𝑗 ]then
+> 11 𝐿.𝑀 [𝑖, 𝑗 ].𝑝𝑟𝑒𝑣 ←𝐿 [𝑏 ].𝑝𝑟𝑒𝑣 ;𝑏 ←𝑏 −1;
+> 12 else // 𝑀 [𝑣 ] ≤ 𝑀 [𝑗 ]
+> 13 𝐿.𝑀 [𝑖, 𝑗 ].𝑝𝑟𝑒𝑣 ←𝐿 [𝑏 ]; break; // stop traversing 𝐿
+> 14 return elements of 𝐿 ;
+
+sequence 𝑀 [𝑢 1, 𝑣 2] itself constitutes a valid pTMS (i.e., 𝑀 [𝑢 1] is the strict maximum and 𝑀 [𝑣 2] is the strict minimum over the extended range [𝑢 1, 𝑣 2]). Otherwise, the two pTMS are non-mergeable. 
+
+Lemma 6. A pTMS within [𝑙 𝑗 , 𝐿𝑀 𝑗 − 1] is a TMS iff it is non-mergeable with any other pTMS in [𝑙 𝑗 , 𝐿𝑀 𝑗 − 1].
+
+Guided by Lemma 6, our task can be reduced to identifying non-mergeable pTMS. Directly determining non-mergeability of a pTMS 
+
+𝑀 [𝑢 1, 𝑣 1] during a scan of a 𝑀 sequence requires examining all future 𝑀 values, leading to repeated scans. To avoid this inefficiency, we introduce Maximal Monotonically Decreasing 𝑀 -SubSequence 
+
+(MDMS for short), the longest contiguous subsequences where 
+
+𝑀 values directly decrease (e.g., 𝑀 [1, 2] and 𝑀 [3, 4] in Figure 5). MDMS plays a crucial role in our evaluation procedure because it has three useful properties: i) each MDMS is itself a pTMS; ii) all MDMS can be identified in a single scan of the sequence, and iii) MDMS can be iteratively merged according to Definition 4 to eventually produce the desired TMS. Based on these observations, we present the procedure to identify maximal intervals in a given 𝑀 sequence, as outlined in Algorithm 3. The algorithm scans the 𝑀 sequence in each partition 𝑃 𝑎 from 𝑙 𝑎 to 
+
+𝐿𝑀 𝑎 − 1, identifying MDMS on the fly (Lines 2-13). During the scan, we maintain an ordered list 𝐿 that stores current pTMS candidates. Whenever a new MDMS 𝑀 [𝑖, 𝑗 ] is identified, it is appended to the tail of 𝐿 (Lines 3-4). We perform mergeability checks to examine whether it can merge with existing pTMS in 𝐿 , examining them sequentially from the tail (the element in 𝐿 immediately preceding 
+
+𝑀 [𝑖, 𝑗 ]) toward the head (Lines 5-13). If a merge is possible, the two subsequences are merged to form a longer pTMS; the new and longer pTMS becomes the new tail so all pTMS contained within the merged range are removed from 𝐿 . We then continue checking whether the newly formed pTMS can be further merged with earlier elements in 𝐿 . Once this local mergeability checks complete, the tail pTMS (originating from the identified MDMS) is guaranteed to be non-mergeable with any other pTMS in 𝐿 . The algorithm then proceeds to identify the next MDMS and repeats the mergeability checks. After all MDMS are processed, the final list 𝐿 contains the desired TMSs, each corresponding to a maximal interval. Figure 6 shows this process when MDMS 𝑀 [5, 7] is scanned (Step 2○). The list 𝐿 contains 𝑀 [1, 2] and 𝑀 [3, 4]. The algorithm checks 
+
+Figure 6: Build a skip-pointer when the algorithm scans 
+
+𝑀 [8, 10 ].
+
+its mergeability with these candidates from tail to head sequentially. While 𝑀 [5, 7] cannot merge with 𝑀 [3, 4], it is mergeable with 
+
+𝑀 [1, 2], forming the new, longer pTMS 𝑀 [1, 7]. This new pTMS now fully encompasses the range of 𝑀 [3, 4], making it obsolete. Consequently, the list is updated to 𝑀 [1, 7].A naive implementation of mergeability checks that examines each new MDMS against every pTMS in 𝐿 is inefficient, as it per-forms many unnecessary checks. We optimize it with a skip-pointer 
+
+mechanism, based on two key insights: let 𝑀 [𝑢, 𝑣 ] and 𝑀 [𝑖, 𝑗 ] be two pTMSs in 𝐿 with 𝑣 < 𝑖 , 1) if 𝑀 [𝑣 ] ≤ 𝑀 [ 𝑗 ], 𝑀 [𝑖, 𝑗 ] cannot merge with 𝑀 [𝑢, 𝑣 ] and any earlier pTMS in 𝐿 , as the merged sequence would violate the requirement that its last element be the strict minimum 𝑀 value; 2) if 𝑀 [𝑢 ] ≤ 𝑀 [𝑖 ], 𝑀 [𝑢, 𝑣 ] cannot merge with 
+
+𝑀 [𝑖, 𝑗 ] or any subsequent pTMSs in 𝐿 , since the merged sequence would violate the requirement that the first element of a pTMS must have the strict maximum 𝑀 value over the merged range. Consequently, the mergeability of a pTMS (a new MDMS 𝑀 [𝑖, 𝑗 ]
+
+or one formed by a previous merge) and an existing pTMS 𝑀 [𝑢, 𝑣 ]
+
+in 𝐿 is determined by evaluating the extended range 𝑀 [𝑢, 𝑗 ]. This leads to three cases based on whether 𝑀 [𝑢 ] is the strict maximum and 𝑀 [ 𝑗 ] is the strict minimum in the extended range 𝑀 [𝑢, 𝑗 ].
+
+• Case i): both conditions hold (Lines 7-9). This sequence is merged into a new pTMS 𝑀 [𝑢, 𝑗 ]. All pTMS contained within this new range are removed from 𝐿 , and the algorithm continues checking the new pTMS against the remaining elements in 𝐿 .
+
+• Case ii): only 𝑀 [ 𝑗 ] is minimal (Lines 10-11). 𝑀 [𝑢, 𝑣 ] can not merge with 𝑀 [𝑖, 𝑗 ] and future pTMS located after 𝑀 [𝑖, 𝑗 ]. How-ever, 𝑀 [𝑖, 𝑗 ] or future pTMSs 𝑀 [𝑖 ′, 𝑗 ′] with 𝑖 ′ > 𝑗 may be able to merge with pTMS 𝑀 [𝑢 ′, 𝑣 ′] located before 𝑀 [𝑢, 𝑣 ] in 𝐿 if 
+
+𝑀 [𝑢 ′] has the strict maximum 𝑀 value while 𝑀 [ 𝑗 ] or 𝑀 [ 𝑗 ′]
+
+has the strict minimum 𝑀 value in the range [𝑢 ′, 𝑗 ] or [𝑢 ′, 𝑗 ′].Consequently, only 𝑀 [𝑢, 𝑣 ] can be bypassed in this mergeability evaluation procedure, and prev pointer of 𝑀 [𝑖, 𝑗 ] is set to that of 𝑀 [𝑢, 𝑣 ], and the algorithm continues checking 𝑀 [𝑖, 𝑗 ] against the preceding element in 𝐿 .
+
+• Case iii): 𝑀 [ 𝑗 ] is not minimal (Lines 12-13). 𝑀 [𝑖, 𝑗 ] cannot merge with 𝑀 [𝑢, 𝑣 ] or any pTMS located before 𝑀 [𝑢, 𝑣 ] in 𝐿 . Con-sequently, we can safely terminate the mergeability checks of 
+
+𝑀 [𝑖, 𝑗 ]. In addition, prev pointer of 𝑀 [𝑖, 𝑗 ] is set to 𝑀 [𝑢, 𝑣 ].In summary, we implement both insights in above mergeability check procedure, and we re-purpose the prev pointer in the ordered list 𝐿 . For any pTMS 𝑀 [𝑖, 𝑗 ] in 𝐿 , its prev pointer does not simply point to the immediate predecessor in 𝐿 . Instead, it points to the nearest preceding pTMS 𝑀 [𝑢, 𝑣 ] in 𝐿 such that 𝑀 [𝑣 ] ≤ 𝑀 [ 𝑗 ], or to the dummy head element if no such preceding pTMS exists. This pointer effectively creates a “skip list” that allows the algorithm to bypass directly all intervening pTMS that are guaranteed to be unmergeable due to the fact that their initial 𝑀 value is not the strict maximum and their last 𝑀 value is not the strict minimum. For example, as shown in Figure 6, when the scanning MDMS 
+
+𝑀 [8, 10 ] against a list containing 𝑀 [1, 7], its prev pointer links to the dummy head. This instantly tells that 𝑀 [1, 7] cannot merge with any subsequent pTMS, due to the existence of 𝑀 [8, 10 ]. When MDMS 𝑀 [11 , 13 ] is formed, we only need to check whether it is mergeable with 𝑀 [8, 10 ], bypassing the check against 𝑀 [1, 7].
+
+Complexity analysis . Algorithm 1 scans the 𝑛 objects in the query window to construct |P | partitions (where |P | < 𝑛 ). This costs O( 𝑛 )
+
+time and O( 𝑛 ) space. Algorithm 2 first spends O(|P | · 𝑙𝑜𝑔 𝑘 ) time to find top-𝑘 promising partitions. It then traverses the AVL tree, which costs O( 𝑘 · 𝑙𝑜𝑔 𝑘 ) time. During this process, Algorithm 3 is called to identify maximal intervals within each partition. As-suming partitions are distributed uniformly, each partition 𝑃 𝑖 con-tains 𝑛  
+
+> | P |
+
+objects and |𝐶𝑀 𝑖 | maximal intervals. Algorithm 3 is lin-ear, so identifying them costs O( 𝑛  
+
+> | P |
+
+) time. They participate in comparison, requiring O(| 𝐶𝑀 𝑖 | · 𝑙𝑜𝑔 𝑘 ) time. The total time com-plexity is O  𝑛 + | 𝑝 | · 𝑙𝑜𝑔 𝑘 + 𝑘 · 𝑙𝑜𝑔 𝑘 + 𝑘 · ( 𝑛  
+
+> | P |
+
++ | 𝐶𝑀 𝑖 | · 𝑙𝑜𝑔 𝑘 )
+
+= O  (1 + 𝑘  
+
+> | P |
+
+) · 𝑛 + (| 𝑃 | + 𝑘 + | 𝐶𝑀 |) · 𝑙𝑜𝑔 𝑘 .For space complexity, Algorithm 1 maintains 𝑛 𝑀 values, |P | 
+
+partitions including their boundaries, LM set, and cutting points. Algorithm 2 maintains an AVL tree of size 𝑘 and the candidate set 
+
+CM . Algorithm 3 processes a partition requiring space bounded by O( 𝑛  
+
+> | P |
+
+); when it completes a partition, the space can be released. Thus, the total space is bounded by O( 𝑛 + |P | + 𝑘 + |CM| + 𝑛  
+
+> | P |
+
+).
+
+## 5 THE INCREMENTAL MAINTENANCE 
+
+Our partitioning strategy is designed not only to support C-KMaxI search within a single window but also to incrementally update the 
+
+LM and CM sets 1, which are essential for identifying promising partitions and searching for results in the new window. In the following, we first explain how to update the partitions and then detail the maintenance of the LM and CM sets corresponding to the updated window. 
+
+## 5.1 Update Partitions 
+
+Sliding the window can significantly alter partitions. As shown in Figure 7, when 𝑊 1 slides to 𝑊 2, partitions evolve: 𝑃 2 shrinks, 𝑃 4
+
+extends, and 𝑃 ′ 
+
+> 4
+
+emerges. These changes result from updated cutting points, which shift from { 𝑜 5, 𝑜 12 , 𝑜 14 , 𝑜 19 } to { 𝑜 12 , 𝑜 14 , 𝑜 22 }. A naive approach would track these changes by recomputing all affected 𝑀 
+
+values via a full window scan. However, this is highly inefficient, as many objects’ 𝑀 values remain unchanged and many updated partitions do not contribute to query results. To eliminate these unnecessary computations, we propose a maintenance strategy that updates only a subset of the 𝑀 values.        
+
+> 1𝐿𝑀 𝑗 ∈ L M and C M 𝑖 ∈ C M record the position of the top-1 interval and the remaining maximal intervals, if identified, in partition 𝑃 𝑗 , respectively.
+
+Figure 7: An example of window sliding from 𝑊 1 to 𝑊 2.
+
+Each time the window 𝑊 advances, the first 𝑠 objects expire and 𝑠 new objects arrive. We first calculate the 𝑀 values for the new objects, in reverse order, from 𝑀 [𝑛 + 𝑠 ] to 𝑀 [𝑛 + 1], using Equation (1) . If Δ = 𝑀 [𝑛 + 1] ≤ 0, the update is complete, as this non-positive value blocks further propagation to preceding 𝑀 
+
+values. Otherwise, we propagate the update backward through the existing partitions. This backward propagation process traverses the partitions in reverse order, starting from the last partition 𝑃 𝑝 
+
+in 𝑊 1. For each partition 𝑃 𝑖 = [𝑙 𝑖 , 𝑟 𝑖 ], if Δ𝑖 = 𝑀 [𝑟 𝑖 + 1] > 0, we add Δ𝑖 to all 𝑀 values within 𝑃 𝑖 . We then proceed to partition 
+
+𝑃 𝑖 −1. The propagation terminates at the first partition 𝑃 𝑗 where 
+
+Δ𝑗 = 𝑀 [𝑟 𝑗 + 1] ≤ 0, as this cutting point prevents the cumulative impact from propagating further. Note that all partitions, including degenerate partitions (which can be easily recovered from cutting points), participate in this process. Figure 7 illustrates this process. When 𝑊 1 advances to 𝑊 2 by 
+
+𝑠 = 6 objects, we first calculate the 𝑀 values for the new objects, i.e., 𝑀 [20 , 25 ]. Since Δ = 𝑀 [20 ] = 6 > 0, we propagate the update backward through the partitions: 1) Partition 𝑃 5: the 𝑀 value is increased by Δ = 6. 2) Partition 𝑃 4: As Δ4 = 𝑀 [19 ] = 1 > 0, prop-agation continues and 𝑀 values are increased by Δ4. 3) Partition 
+
+𝑃 3: Since Δ3 = 𝑀 [14 ] = −5, the propagation terminates, leaving 𝑀 
+
+values for objects in partitions 𝑃 3, 𝑃 2, and 𝑃 1 unchanged. We want to highlight that when propagating the update back-ward through the existing partitions, Δ value reduces monotonically, as stated in Lemma 7. The proof is skipped, as it can be derived by the fact that Δ𝑖 = Δ𝑖 +1 + 𝑀 [𝑟 𝑖 + 1] and 𝑀 [𝑟 𝑖 + 1] = 𝑀 [𝑙 𝑖 +1] < 0
+
+(position 𝑙 𝑖 +1 is a cutting point). In addition, a non-cutting point in the original window will not become a cutting point in the updated window, as the 𝑀 values of objects in a partition 𝑃 𝑖 change only when the corresponding Δ𝑖 > 0. A non-cutting point has a positive 
+
+𝑀 value, and this value can only increase (or remain unchanged) during backward propagation. Consequently, it cannot become a cutting point, as stated in Lemma 8. 
+
+Lemma 7. Let 𝑃 𝑖 and 𝑃 𝑖 +1 be consecutive partitions whose 𝑀 values are updated by backward propagation with changes Δ𝑖 and Δ𝑖 +1
+
+respectively. Then, Δ𝑖 < Δ𝑖 +1.
+
+Lemma 8. When the window advances from 𝑊 to 𝑊 ′, let C and 
+
+C′ indicate the sets of cutting points in 𝑊 and 𝑊 ′ respectively, and let E and A denote the sets of expired and newly arrived objects. A non-cutting point in 𝑊 will certainly not become a cutting point in 
+
+C′. Moreover, C′ is a subset of (C \ E) ∪ A .Algorithm 4: Partition Update                                     
+
+> Input: Cutting points C, expired objects E, newly arrived objects A,𝑀
+> array, L M list
+> Output: Updated cutting points C′, and updated L M ′list
+> 1C′← C \ E ;
+> 2𝑀 𝑛𝑒𝑤 ,C𝑛𝑒𝑤 ←DP-BuildNewCPs (A) ; // call Algorithm 1
+> 3C′← C ′∪ C 𝑛𝑒𝑤 \BackwardPropagation ( C ′, 𝑀, 𝑀 𝑛𝑒𝑤 );
+> 4L M ′←UpdateLM (C′,C,L M ,𝑀 ,𝑀 𝑛𝑒𝑤 );
+> 5return C′,L M ′;
+
+After the 𝑀 values are updated, cutting points can be identified to form partitions for the new window. In our example shown in Figure 7, given cutting points 𝑜 12 , 𝑜 14 , and 𝑜 22 , four partitions are formed: 𝑃 ′ 
+
+> 1
+
+= [7, 11 ], 𝑃 ′ 
+
+> 2
+
+= [12 , 13 ], 𝑃 ′ 
+
+> 3
+
+= [14 , 21 ], and 𝑃 ′ 
+
+> 4
+
+= [22 , 25 ].We observe that partition evolution can be described using four fundamental patterns, illustrated in Figure 7: ( i) Shrinking, where a partition loses objects from its head without incorporate new ones (e.g., 𝑃 ′
+
+> 1
+
+); ( ii ) Unaltered, where a partition remains unaltered (e.g., 
+
+𝑃 ′
+
+> 2
+
+); ( iii ) Extended, where a partition extends by shifting its right boundary forward (e.g., 𝑃 ′
+
+> 3
+
+); or ( iv ) Emergent, where a new partition forms entirely from newly arrived objects (e.g., 𝑃 ′
+
+> 4
+
+). If a shrinking partition exists, it must be the first partition in the new window. For presentation clarity, we assume that all partition changes conform to one of these four patterns. This categorization is well supported by the property that a non-cutting point cannot become a cutting point after a window slides (Lemma 8). However, in an extreme case, the first partition in the new window may both lose initial objects (due to object expiry) and extend its range, although this occurs only if backward propagation reaches the first cutting point, which is not common in practice. Importantly, our approach fully supports this corner case. It can be interpreted as a combination of a Shrinking followed by an Extension, thus does not affect the correctness of the algorithm or the returned top-𝑘 intervals. Algorithm 4 updates partitions as follows. It removes expired cutting points (Line 1), processes new objects via Algorithm 1 to find new cutting points (Line 2), and runs BackwardPropagation 
+
+function propagates their cumulative impact backward to remove cutting points whose updated 𝑀 values become positive (Line 3). Finally, function UpdateLM updates 𝐿𝑀 ′, the index of top-1 𝑀 value in each partition 𝑃 ′ in the new window (Line 4). Let 𝑃 ′ = [𝑙 ′, 𝑟 ′]
+
+be an updated partition in the new window. We detail its 𝐿𝑀 ′
+
+update operation below, dependent on the evolution pattern of 𝑃 ′.i) Shrinking (from partition 𝑃 𝑖 ): If 𝑙 ′ ≤ 𝐿𝑀 𝑖 , 𝐿𝑀 ′ = 𝐿𝑀 𝑖 ; otherwise, we scan 𝑀 values of objects in 𝑃 ′ to locate 𝐿𝑀 ′. ii) Unaltered (same as partition 𝑃 𝑖 in previous window): 𝐿𝑀 ′ = 𝐿𝑀 𝑖 . iii) Extended: assume 𝑃 ′ covers 𝑃 𝑖 , · · · , 𝑃 𝑗 (𝑗 ≥ 𝑖 ) in the original window, and possibly including new objects A′ ⊆ A . Due to the nature of backward propagation, the position 𝐿𝑀 𝑖 within any partition 𝑃 𝑖 in 
+
+𝑊 continues to have the largest 𝑀 value among all objects in that partition, even after their 𝑀 values are updated. Consequently, 𝐿𝑀 ′
+
+must lie among the positions { 𝐿𝑀 𝑖 , · · · , 𝐿𝑀 𝑗 }, and, when A′ ≠ ∅,among the newly arrived objects { 𝑛 + 1, · · · , 𝑛 + |A ′ | }, where 𝑛 
+
+indicates the right boundary of the previous window 𝑊 . We identify 
+
+𝐿𝑀 ′ by scanning the 𝑀 values at these positions. iv) Emergent: we scan 𝑀 values of objects in 𝑃 ′ to locate 𝐿𝑀 ′.
+
+Implementation Optimization. In the above description, we as-sume that the backward propagation stops only after encountering 
+
+Algorithm 5: Incremental Maximal Interval Maintenance                                                                                                                                                                        
+
+> Input: Partition 𝑃 ′=[𝑙 ′, 𝑟 ′]in new window with 𝐿𝑀 ′indicating the top-1
+> 𝑀 value, original partitions P={𝑃 1,· · · ,𝑃 𝑝 }, original L M list, reusable maximal intervals C M ={𝐶𝑀 1,· · · ,𝐶𝑀 𝑝 }
+> Output: Maximal intervals 𝐶𝑀 ′in partition 𝑃 ′
+> 1if ∃𝑃 𝑗 ∈ P ,Unaltered (𝑃 ′,𝑃 𝑗 )∧MaxIReusable (𝑃 𝑗 )then
+> 2𝐶𝑀 ′←𝐶𝑀 𝑗 ;
+> 3else if ∃𝑃 𝑗 ∈ P ,Shrinking (𝑃 ′,𝑃 𝑗 )∧MaxIReusable (𝑃 𝑗 )then
+> 4𝐶𝑀 ′←𝐶𝑀 𝑗 \ { expired 𝑀𝑎𝑥𝐼 [𝑎, 𝑏 ]with 𝑏 <𝑙 ′} ;
+> 5if ∃𝑀𝑎𝑥𝐼 [𝑎, 𝑏 ] ∈ 𝐶𝑀 ′such that 𝑙 ′∈ ( 𝑎, 𝑏 ]then
+> 6𝐶𝑀 ′.remove (𝑀𝑎𝑥𝐼 [𝑎, 𝑏 ] ) ;
+> 7𝐶𝑀 ′.add (reidentify 𝑀𝑎𝑥𝐼 within [𝑙 ′, 𝑏 ]via Algorithm 3);
+> 8else if ∃𝑃 𝑖 ,· · · , 𝑃 𝑗 ∈ P ,Extended (𝑃 ′,𝑃 𝑖 ,· · · ,𝑃 𝑗 )then
+> 9if ∃𝑎 ∈ [ 𝑖, 𝑗 ],𝐿𝑀 𝑎 =𝐿𝑀 ′∧MaxIReusable (𝑃 𝑖 ,· · · ,𝑃 𝑎 )then
+> // Case 1
+> 10 𝐶𝑀 ′← ∪ 𝑎 𝑡 =𝑖 𝐶𝑀 𝑡 ∪𝑀𝑎𝑥𝐼 [𝐿𝑀 ′, 𝑟 ′] \ { 𝑀𝑎𝑥𝐼 in [𝐿𝑀 ′, 𝑟 ′]};
+> 11 else if 𝐿𝑀 ′>𝑛 ∧MaxIReusable (𝑃 𝑖 ,· · · ,𝑃 𝑗 )then // Case 2
+> 12 𝐶𝑀 ′←𝑀𝑎𝑥𝐼 [𝐿𝑀 ′, 𝑟 ′]∪ reidentify 𝑀𝑎𝑥𝐼 within [𝑙 ′, 𝐿𝑀 ′−1]
+> via Algorithm 3;
+> 13 else // emergent partition or partitions without reusable MaxI
+> 14 𝐶𝑀 ′←Identify Maximal Interval via Algorithm 3;
+> 15 return 𝐶𝑀 ′;
+
+a cutting point say 𝑐 𝑖 with non-positive 𝑀 value. This is mainly for ease of explanation. In practice, however, it is not necessary to update the 𝑀 values for all objects located after 𝑐 𝑖 . In our implemen-tation, we adopt a lazy update strategy. We update the 𝑀 values only for new objects and for existing cutting points associated with previous window. The 𝑀 values of objects within a partition are updated only when necessary (e.g., when determining 𝐿𝑀 ′ for a shrinking partition). A binary flag associated with each partition records whether the 𝑀 values of its objects are updated. When a window slides, the flags of all the partitions are initialized to 0. 
+
+Complexity analysis. Removing expired cutting points requires 
+
+𝑂 (|E|) time. Constructing new cutting points from the newly ar-rived objects costs 𝑂 (|A|) time. Backward impact propagation only updates cutting points’ 𝑀 values rather than all, which requires 
+
+𝑂 (|C|) . The total time complexity is 𝑂 (|E| + |A| + |C|) . We need auxiliary space to record the cutting points and the 𝑀 values of new objects, so the total space complexity is 𝑂 (|C| + |C 𝑛𝑒𝑤 | + |A|) .
+
+## 5.2 Maintain Maximal Intervals Incrementally 
+
+After updating the partitions and LM , we answer C-KMaxI using the partition-based 𝑘 -maximal interval search (Algorithm 2). Re-call that LM only provides access to the top-1 maximal interval in each partition. During AVL-tree traversal, however, we must still retrieve other maximal intervals (beyond the top-1) from each promising partition whose top-1 enters the current top-𝑘 . A naive strategy computes all maximal intervals in these partitions using Algorithm 3, but this is inefficient because it ignores maximal in-tervals already obtained in the previous window (maintained in set CM ). Depending on how partitions evolve, many intervals in 
+
+CM remain valid and can be reused. To avoid redundant computa-tion, we incrementally maintain maximal intervals by exploiting partition evolution patterns and reusing prior results. Algorithm 5 summarizes this procedure: it first determines the current parti-tion’s evolution pattern and the availability of reusable maximal intervals, then applies the corresponding maintenance strategy. Specifically, for new partitions or partitions without reusable maximal intervals (Lines 13-14), maximal intervals must be com-puted from scratch using Algorithm 3. When reusable maximal intervals exist (determined by function MaxIReusable ), unaltered partitions can directly reuse all previously computed maximal in-tervals (Lines 1-2). For shrinking and extended partitions, the cor-responding maintenance strategies are detailed below. 
+
+Shrinking Partitions . Let partition 𝑃 ′ = [𝑙 ′, 𝑟 ] be a shrinking par-tition derived from partition 𝑃 = [𝑙, 𝑟 ], where 𝑙 ′ > 𝑙 . The maximal intervals containing only expired objects are removed. If position 
+
+𝑙 ′ − 1 falls within an existing maximal interval 𝑀𝑎𝑥𝐼 [𝑎, 𝑏 ], we need to perform the following updates. First, 𝑀𝑎𝑥𝐼 [𝑎, 𝑏 ] shrinks to 
+
+𝐼 [𝑙 ′, 𝑏 ]. It is guaranteed that pTMS 𝑀 [𝑙 ′, 𝑏 + 1] corresponding to in-terval 𝐼 [𝑙 ′, 𝑏 ] will not merge with any other pTMS in this partition. This is because in the maximal interval 𝑀𝑎𝑥𝐼 [𝑎, 𝑏 ], 𝑀 [𝑎 ] has the strict maximal 𝑀 value, and therefore 𝑀 [𝑎 ] > 𝑀 [𝑙 ′]. The fact that 
+
+𝑀𝑎𝑥𝐼 [𝑎, 𝑏 ] is a maximal interval in 𝑃 = [𝑙, 𝑟 ] and 𝑀 [𝑎 ] > 𝑀 [𝑙 ′]
+
+guarantees that 𝑀 [𝑙 ′, 𝑏 + 1] cannot merge with any other pTMS in this partition. Next, we invoke Algorithm 3 to identify maximal intervals, if any, in the range of [𝑙 ′, 𝑏 ].In summary, in a shrinking partition, maximal intervals contain-ing only expired objects are removed, the maximal interval con-taining both expired and valid objects, if it exists, requires further evaluation, and all other maximal intervals remain unchanged. For example, in Figure 7, partition 𝑃 2 in 𝑊 1 shrinks to 𝑃 ′ 
+
+> 1
+
+in 𝑊 2. Objects 
+
+𝑜 5 and 𝑜 6 in 𝑃 2 expire, affecting only maximal interval 𝑀𝑎𝑥𝐼 [6, 9],which shrinks to interval 𝐼 [7, 9]. We then locate two maximal inter-vals 𝐼 [7, 7] and 𝐼 [9, 9] in this reduced range via Algorithm 3. The other maximal interval, 𝑀𝑎𝑥𝐼 [11 , 11 ], remains unchanged. 
+
+Extended Partitions . Let partition 𝑃 ′ = [𝑙 𝑖 , 𝑟 ′] be an extended par-tition originating from 𝑃 𝑖 = [𝑙 𝑖 , 𝑟 𝑖 ] (𝑟 ′ > 𝑟 𝑖 ), covering the sequence of partitions 𝑃 𝑖 , · · · , 𝑃 𝑗 for some 𝑗 ≥ 𝑖 , and possibly including new objects A′ ⊆ A . Let 𝐿𝑀 ′ denote the new position in 𝑃 ′ with the largest 𝑀 value. The maintenance operations depend on whether 
+
+𝐿𝑀 ′ > 𝑛 , where 𝑛 denotes the ending position of the previous window 𝑊 , as described below. Case 1): 𝐿𝑀 ′ ≤ 𝑛 . This means that the position with the top-1 𝑀 
+
+value lies in an existing partition, say 𝑃 𝑎 (i.e., 𝐿𝑀 ′ = 𝐿𝑀 𝑎 ). Accord-ingly, 𝑀𝑎𝑥𝐼 [𝐿𝑀 ′, 𝑟 ′] is the top-1 maximal interval in the extended partition 𝑃 ′, and all maximal intervals in this range become invalid and are removed. However, maximal intervals that end before posi-tion 𝐿𝑀 ′ remain unchanged. In other words, if 𝐶𝑀 s corresponding to 𝑃 𝑖 , · · · , 𝑃 𝑎 are available, we can immediately identify 𝐶𝑀 ′ by re-using all maximal intervals ending before 𝐿𝑀 𝑎 . Otherwise, we only need to compute 𝐶𝑀 s of those partitions among 𝑃 𝑖 , · · · , 𝑃 𝑎 
+
+whose 𝐶𝑀 s are unavailable. We did not explicitly highlight this in our pseudo-code due to space constraints and for code simplicity. Consider the extended partition 𝑃 ′ 
+
+> 3
+
+= [14 , 21 ] in Figure 7 as an example. 𝑃 ′ 
+
+> 3
+
+(with 𝐿𝑀 ′ = 17 ) originates from 𝑃 4, covers partitions 
+
+𝑃 4 and 𝑃 5, and includes new objects A′ = {𝑜 20 , 𝑜 21 }. Accordingly, 
+
+𝑀𝑎𝑥𝐼 [17 , 21 ] becomes the new top-1 maximal interval, and the previous maximal interval 𝑀𝑎𝑥𝐼 [17 , 18 ] is removed. All maximal intervals ending before position 17 (i.e., 𝑀𝑎𝑥𝐼 [15 , 15 ]) remain valid. Case 2): 𝐿𝑀 ′ > 𝑛 . This means the position with the top-1 𝑀 value is located among new objects. 𝐼 [𝐿𝑀 ′, 𝑟 ′] becomes the top-1 maxi-mal interval in the extended partition 𝑃 ′, we need to relocate the maximal intervals in the range of [𝑙 𝑖 , 𝐿𝑀 ′ − 1] via Algorithm 3. 
+
+Table 2: Parameter Setting                            
+
+> Parameters Value Ranges Default
+> 𝑛 0.1% ,0.5% ,1% ,5% ,10% (× | 𝐷 | ) 1% × | 𝐷 |
+> 𝑠 0.01% ,0.1% ,0.5% ,1% ,10% (× 𝑛 )0.1% ×𝑛 𝑘 5,10 ,50 ,100 ,1000 50
+
+Complexity analysis. Let |P | partitions with a uniform distri-bution exist in the window with 𝑛 objects. In Algorithm 5, only when the worst case (case 2 in extended partitions) occurs, maximal intervals in the partition need to be re-identified. In this case, the algorithm degenerates to the scenario where Algorithm 3 processes one partition, which requires O( 𝑛  
+
+> | P |
+
+) time and O( 𝑛  
+
+> | P |
+
+) space. 
+
+## 6 EXPERIMENTS 6.1 Experiment Setting 
+
+Datasets. Three real datasets, Stock , Power , and Genome , and two synthetic datasets, Uniform and Normal , are used. 1) Stock .Bitcoin records from Alpha Vantage [ 1] (Nov. 4, 2013–Mar. 31, 2025), converted into a 5-minute price-delta stream (close price − open price) with 9M records; top-𝑘 maximal intervals indicate the largest cumulative price increases. 2) Power . UK’s half-hourly power data (Nov. 2008–Dec. 2022), compiled by Kaggle from the Elexon Portal and National Grid [ 2]. Generation minus consumption forms a sur-plus stream with 0.24 M records; top-𝑘 maximal intervals indicate the largest cumulative surplus. 3) Genome . The Haemophilus in-fluenzae genome from NCBI [ 3 ]; following prior work [ 26 ], CpG dinucleotides score 20 and all others score −1, yielding 1.8M records. 4) Uniform and 5) Normal . Synthetic streams of 10 M real num-bers each, drawn from uniform and normal distributions. 
+
+Parameter Setting. We vary three key parameters: window size 𝑛 ,slide size 𝑠 , and result size 𝑘 . For each dataset, we vary one parame-ter at a time using the values in Table 2, while fixing the others at their defaults. Since suitable values depend on application needs, no single configuration is universally optimal. Following streaming and sliding-window evaluations [ 8, 23 , 27 , 30 – 33 , 35 , 37 , 38 ], we choose parameter ranges that (i) cover multiple orders of magni-tude, (ii) are normalized across datasets for comparability, and (iii) stress scalability under different workloads. Using percentages pre-vents parameter choices from being tied to a particular dataset scale and enables consistent comparison across datasets with different cardinalities. The default (𝑛, 𝑠, 𝑘 ) configuration represents a repre-sentative mid-range streaming workload with substantial window overlap and a moderate number of requested disjoint intervals. 
+
+Performance Metrics. Following prior evaluations [ 8 , 23 , 27 , 30 –33 , 35 , 37 , 38 ], we use five metrics: 1) Overall running time : total query and update time. 2) Data throughput : updates processed per second. 3) Candidate set size : average number of candidate maximal intervals. 4) Memory usage : peak memory across algorithms and datasets. 5) Impact of number of partitions : average running time per window under different partition counts. 
+
+Competitors. We compare our partition-based algorithm with RT [ 26 ], Tournament [ 6], and their incremental streaming variants, Streaming RT and Streaming Tournament; implementation details appear in Appendixes A and B of our technical report [ 36 ]. All algorithms are implemented in C++ and evaluated on a Windows 
+
+11 PC with an Intel Core i 5-13500 H CPU and 32 GB memory. Figure 8: Running time comparison under different data scales. 
+
+Figure 9: Performance comparison for datasets of 1M records. 
+
+## 6.2 Algorithm Comparisons 
+
+Running time comparison . We assess the running time of all algorithms under varying data scales, ranging from 20% to 100% 
+
+of each dataset. For example, using 20% of Stock means that 20% of the original records are selected to form a new dataset contain-ing approximately 9M ×0.2 = 1.8M records. The running time required to process C-KMaxI while simultaneously updating par-titions for the entire dataset is reported in Figure 8. The results demonstrate that the partition-based approach consistently out-performs all competing algorithms across all datasets, achieving substantial performance gains. For example, on the Stock dataset, it achieves speedups of 8× and 10 × over Streaming RT and Streaming Tournament, respectively. Additionally, it outperforms the original RT and Tournament by more than an order of magnitude. Similar advantages are observed across the remaining datasets, where the partition-based algorithm exhibits consistent and often significant superiority. The superior performance of our method can be primarily attrib-uted to the proposed partitioning strategy. Compared with competi-tors, our method has three advantages. First, unlike Streaming RT, it identifies partitions likely to contain query results and confines maximal interval identification and comparison to them, substan-tially reducing the solution space. Second, unlike Streaming Tour-nament, our method avoids index structures and their restructuring overhead. Third, its partition-based incremental maintenance accu-rately identifies affected ranges and maximizes reuse of previously computed maximal intervals. In contrast, although both Streaming RT and Streaming Tournament support incremental maintenance, Streaming RT incurs a larger affected range due to the absence of partitions, while Streaming Tournament frequently requires expen-sive structural adjustments. Furthermore, without streaming incre-mental maintenance, original RT and Tournament must re-identify all maximal intervals in each window, yielding lower efficiency. We also observe that the performance gap varies considerably across datasets. For example, on the Stock dataset, the partition-based approach outperforms Streaming Tournament by approxi-mately an order of magnitude on average, whereas its advantage increases to nearly two orders of magnitude on the Power and 
+
+Genome datasets. To further examine the sensitivity of the algorithms to data distri-bution, we analyze the running time required by each algorithm to process one million objects across multiple datasets. The results are presented in Figure 9(a). We observe that, for each algorithm, the time needed to process one million updates varies across datasets. This variation arises because maximal intervals, the targets of inter-est, are inherently sensitive to the underlying data distribution. As subsequences of signed values, both their length and their counts are influenced by distributional characteristics. However, it is evident that our approach exhibits the least sensi-tivity to data distribution. This robustness stems from the partition-ing strategy: although the length and number of maximal intervals may fluctuate significantly across datasets, our method processes only a small subset of the data, specifically up to 𝑘 partitions most likely to contain query results. This effectively mitigates dataset-specific variations and reduces the impact of distributional differ-ences. Consequently, we conclude that our approach demonstrates notably greater stability compared to all competing algorithms. 
+
+Data throughput comparison . Figure 10 presents data through-put of all algorithms under varying parameter settings across dif-ferent datasets, showing that our approach consistently outper-forms all competitors by a significant margin. As shown in Fig-ures 10(a)-(e), as 𝑛 increases, the throughput of both our approach and Streaming Tournament improves, while the throughput of the other algorithms remains relatively stable. Note, due to the small size of the Power dataset, its 𝑛 value starts at 0.5% rather than 0.1%. A larger 𝑛 indicates that the query window contains more objects and thus more maximal intervals. However, our approach continues to process only the partitions likely to contain query results, while Streaming Tournament directly searches for the top-𝑘 results based on the index. Consequently, the number of updates processed per unit time increases for both methods. Conversely, Figures 10(k)-(o) show that as 𝑘 increases, the data throughput of the partition-based algorithm experiences a slight decrease, while that of Streaming Tournament decreases sharply. Meanwhile, the throughput of other algorithms remains relatively stable. This behavior arises because the partition-based algorithm Figure 10: Data throughput comparison under different datasets. Table 3: The average size of the candidate set (UNIT: 𝑐𝑜𝑢𝑛𝑡 )                    
+
+> Solutions Stock Power Genome Uniform Normal
+> Partition-based 930 16 194 1270 1252 Streaming RT 1927 17 207 2961 3032 RT 1927 17 207 2961 3032
+
+must process more partitions as 𝑘 grows, whereas Streaming Tour-nament performs more queries. Both RT and Streaming RT retain all maximal intervals, and Tournament incurs substantial overhead due to frequent index restructuring. As a result, their performance is less sensitive to 𝑘 . Importantly, even when 𝑘 is large, the partition-based algorithm still maintains a clear performance advantage. Figures 10(f)-(j) illustrate that all algorithms exhibit increased throughput as 𝑠 becomes larger. When 𝑠 is small, there is consid-erable overlap between windows, causing many objects to be re-computed repeatedly. As 𝑠 increases, the overhead from redundant computations is reduced, leading to an overall improvement. 
+
+Candidate set size . Table 3 reports the average number of max-imal intervals maintained in the candidate set (i.e., CM in our algorithm). The two Tournament-Tree-based-approaches do not rely on a candidate set and are therefore excluded from this statistic. Both Streaming RT and RT maintain all maximal intervals, so their values in the table reflect the average number of maximal intervals per window. In contrast, our approach significantly reduces the number of intervals in the candidate set. This improvement arises because we incrementally maintain maximal intervals only within the partitions likely to contain query results. The Power dataset is the only exception: our method reduces candidate set only from 17 to 16, because this dataset inherently produces very few maximal intervals, leaving limited room for enhancement. Table 4 presents the average per-window statistics for candidate count and usage. Count denotes the number of maximal intervals identified, while usage counts how many times these intervals are used, including comparisons for top-𝑘 selection and candidate-set maintenance. The results show that our approach achieves substan-tial improvements in both metrics. This advantage stems from our partitioning strategy: during maximal interval identification, top-
+
+𝑘 comparison, and incremental maintenance, the strategy avoids exhaustively processing all maximal intervals and instead focuses only on partitions likely to contain query results. 
+
+Memory usage comparison. Figure 9(b) illustrates the maximum memory usage of all the algorithms during their execution across various datasets. Among these, the partition-based approach con-sumes the least memory, as the partitioning strategy minimizes the number of partitions processed. Both Streaming RT and RT require comparing all maximal intervals to select the top-𝑘 , ne-cessitating the use of more memory to identify and maintain all maximal intervals. While Streaming Tournament and Tournament do not maintain a candidate set, they still incur higher memory costs compared to the other algorithms due to the construction of the Tournament tree. Furthermore, the memory usage of the partition-based approach is notably lower than that of the other algorithms, particularly on the Power dataset. A detailed exami-nation of this dataset reveals that most maximal intervals exist in the form of the maximal interval with the largest sum within its respective partition. These intervals can be directly obtained during partition construction, eliminating the need to invoke the maximal interval identification algorithm (Algorithm 3), which results in a substantial reduction in memory usage. 
+
+Impact of number of partitions. Our partitioning scheme is data-driven: for a fixed window, the cutting points and thus the Table 4: Average count/usage statistics of candidates per win-dow (UNIT: 𝑐𝑜𝑢𝑛𝑡 for count, and 𝑡𝑖𝑚𝑒𝑠 for usage)                   
+
+> Dataset Partition-based Streaming RT RT
+> Stock 49.29 / 370.82 1244.15 / 1927.74 39401.89 / 1927.74
+> Power 0.51 / 0.97 92.15 /17.13 431.62 / 17.13
+> Genome 1.67 / 6.30 6.90 / 207.73 724.41 / 207.73
+> Uniform 50.74 / 569.54 1228.59 / 2961.59 49977.34 / 2961.59
+> Normal 51.83 / 620.57 1137.16 / 3032.76 49972.99 / 3032.76
+
+Table 5: Average running time per sliding window under different numbers of partitions on Stock dataset.                                
+
+> Groups by | P | 1-100 101 -200 201 -300 301 -400 401 -500 501 -600
+> Groups’ Frequency 42 .95% 30 .74% 17 .92% 6.41% 1.68% 0.30%
+> Time /| 𝑊 |(×10 −5s) 5.45 4.83 4.34 3.89 3.35 2.91 Baselines Streaming RT Streaming TT RT TT Time /| 𝑊 |(×10 −5s) 43.56 56.64 137.36 283.38
+
+number of partitions |P | are uniquely determined by the distribu-tion of signed values within the window. Consequently, |P | is not controlled by any algorithmic parameter, but varies naturally with the data. To evaluate how the partition count affects performance in practice, we conduct a window stratification study under the default parameters. Specifically, we process the entire stream and record for every sliding window, then group windows into ranges according to partition counts |P | (e.g., 1-100, 101-200, etc). For each group, we report both its frequency and the average running time per window. Table 5 reports the results on the Stock stream, together with the average running time per window required by other baselines. Note, Streaming TT and TT represent Streaming Tournament Tree and Tournament Tree, respectively. Please refer to our technical report [36] for results on other datasets. The results reveal a clear monotonic trend: windows with larger 
+
+|P | have lower average running time. This behavior reflects the key advantage of the partition-based framework. A larger number of partitions provides finer-grained localization and more effective pruning, allowing the top-𝑘 search to focus on fewer relevant re-gions and thereby reducing overall computation. As a result, the reduction in search space outweighs the relatively small overhead of maintaining additional partitions. Across all partition ranges, our method consistently outperforms these baselines by a substantial margin. Importantly, even for windows with small |P | , the running time remains stable and highly competitive, indicating that our method does not degrade under coarse partitioning. 
+
+## 7 RELATED WORK 
+
+To the best of our knowledge, no existing algorithm efficiently addresses the C-KMaxI problem over streaming data. Prior studies mainly address maximal interval discovery in static sequences or consider different interval optimization objectives. 
+
+Maximal interval discovery in static sequences. Finding maxi-mal sum intervals is a classic problem derived from the maximum subarray problem [ 4]. Existing solutions mainly fall into two cat-egories. Scan-based approaches, such as the Ruzzo-Tompa (RT) algorithm [ 26 ], identify all maximal intervals in linear time. How-ever, RT always enumerates the full set of maximal intervals, even when only the top-𝑘 results are needed, and the intervals are not ranked during enumeration, requiring an additional selection step. Index-based approaches, such as the Tournament-Tree method [ 6], build a tree-structured index that enables direct retrieval of the highest-ranked interval. After each interval is retrieved, its ele-ments are marked as holes to prevent reuse in subsequent results. While effective for static data, these approaches assume a fixed input sequence and are not designed for continuous updates. 
+
+Streaming Interval Extraction. Several studies investigate ex-tracting interval-shaped patterns from data streams under differ-ent formulations. For example, [ 22 ] proposes an online frame-work (oPIEC) for detecting probabilistic maximal intervals in noisy streams. This approach operates on probability and locates the threshold-based intervals that may overlap. In contrast, C-KMaxI operates on signed streams and returns globally ranked disjoint maximal intervals, making the problem fundamentally different. 
+
+Other Variants . Some work [ 7, 10 , 12 ] also studies selecting 𝑘 
+
+disjoint subsequences that maximize the total sum. This objective differs fundamentally from C-KMaxI. For instance, given the se-quence (10 , −9, 10 , −11 , 1) and 𝑘 = 2, these variants would select intervals 𝐼 [1, 1] and 𝐼 [3, 3] (total sum = 20 ), whereas C-KMaxI selects 𝑀𝑎𝑥𝐼 [1, 3] and 𝑀𝑎𝑥𝐼 [5, 5]). 
+
+Limitations of existing approaches. Although static KMaxI algorithms could in principle be adapted to streaming settings through incremental maintenance, such adaptations remain costly. Scan-based methods must maintain and repeatedly compare all maximal intervals within the sliding window to derive the top-𝑘 re-sults, leading to large candidate sets and high update overhead. For index-based methods require continuous structural updates to main-tain correctness under window slides, including node insertions, deletions, and restoration of previously excluded elements. These operations introduce significant maintenance costs in high-velocity streams. In contrast, our method avoids both full enumeration and global indexing. By exploiting the partition containment guarantee, we prune partitions that cannot contribute to the top-𝑘 results and restrict interval identification and maintenance to a small number of promising partitions, enabling efficient and robust incremental processing over data streams. 
+
+## 8 CONCLUSION 
+
+This paper introduces an innovative partitioning strategy designed to support C-KMaxI over streaming data. The proposed strategy demonstrates significant efficiency in candidate identification, can-didate set maintenance, and query result retrieval. Its adaptability enables effective support for C-KMaxI using a compact candidate set. Our comprehensive experiments across diverse datasets vali-date the superior performance and relative stability of the proposed algorithms. In the near future, we would like to study parallel algo-rithms for C-KMaxI over streaming data, leveraging the inherent property that partitions can be processed independently. 
+
+## ACKNOWLEDGMENTS 
+
+The work was partially supported by the National Key Research and Development Program of China (No. 2024YFF0617702); the National Natural Science Foundation of China (Nos. U22A2025, 62232007, and U23A20309); the 111 Project (No. B16009); the Ant Group Research Program (No. 2025021900003). REFERENCES 
+
+[1] 2025. Alpha Vantage . https://www.alphavantage.co/ Accessed: October 15, 2025. [2] 2025. Electrical Grid Half Hourly (UK) . https://www.kaggle.com/datasets/ thedevastator/gb-electrical-grid-half-hourly-data-2008-present Accessed: Octo-ber 15, 2025. [3] 2025. Haemophilus influenzae whole genome . https://www.ncbi.nlm.nih.gov/ Traces/wgs/JAMLFG01 Accessed: October 15, 2025. [4] 2025. Maximum subarray problem . https://en.wikipedia.org/wiki/Maximum_ subarray_problem Accessed: October 6, 2025. [5] Miklós Ajtai, T. S. Jayram, Ravi Kumar, and D. Sivakumar. 2002. Approximate counting of inversions in a data stream. In Proceedings on 34th Annual ACM Symposium on Theory of Computing, May 19-21, 2002, Montréal, Québec, Canada ,John H. Reif (Ed.). ACM, 370–379. https://doi.org/10.1145/509907.509964 [6] Sung Eun Bae and Tadao Takaoka. 2007. Algorithms for k-Disjoint Maximum Subarrays. Int. J. Found. Comput. Sci. 18, 2 (2007), 319–339. https://doi.org/10. 1142/S012905410700470X [7] Fredrik Bengtsson and Jingsen Chen. 2006. Computing Maximum-Scoring Seg-ments in Almost Linear Time. In Computing and Combinatorics, 12th Annual International Conference, COCOON 2006, Taipei, Taiwan, August 15-18, 2006, Pro-ceedings (Lecture Notes in Computer Science) , Danny Z. Chen and D. T. Lee (Eds.), Vol. 4112. Springer, 255–264. https://doi.org/10.1007/11809678_28 [8] Christian Böhm, Beng Chin Ooi, Claudia Plant, and Ying Yan. 2007. Efficiently Processing Continuous k-NN Queries on Data Streams. In Proceedings of the 23rd International Conference on Data Engineering, ICDE 2007, The Marmara Hotel, Istanbul, Turkey, April 15-20, 2007 , Rada Chirkova, Asuman Dogac, M. Tamer Özsu, and Timos K. Sellis (Eds.). IEEE Computer Society, 156–165. https://doi. org/10.1109/ICDE.2007.367861 [9] Ben Chen, Zhijin Lv, Xiaohui Yu, and Yang Liu. 2017. Sliding Window Top-K Monitoring over Distributed Data Streams. Data Sci. Eng. 2, 4 (2017), 289–300. https://doi.org/10.1007/S41019-017-0053-1 [10] Miklós Csürös. 2004. Maximum-Scoring Segment Sets. IEEE ACM Trans. Comput. Biol. Bioinform. 1, 4 (2004), 139–150. https://doi.org/10.1109/TCBB.2004.43 [11] Eros D. Escobar, Daniel Betancur, and Idi A. Isaac. 2024. Optimal Power and Battery Storage Dispatch Architecture for Microgrids: Implementation in a Campus Microgrid. Smart Grids and Sustainable Energy 9, 2 (2024), 27. https://doi.org/10.1007/s40866-024-00210-8 [12] Pawel Gawrychowski and Patrick K. Nicholson. 2015. Encodings of Range Maximum-Sum Segment Queries and Applications. In Combinatorial Pattern Matching - 26th Annual Symposium, CPM 2015, Ischia Island, Italy, June 29 - July 1, 2015, Proceedings (Lecture Notes in Computer Science) , Ferdinando Cicalese, Ely Porat, and Ugo Vaccaro (Eds.), Vol. 9133. Springer, 196–206. https://doi.org/10. 1007/978-3-319-19929-0_17 [13] Bugra Gedik, Kun-Lung Wu, Philip S. Yu, and Ling Liu. 2007. A Load Shedding Framework and Optimizations for M-way Windowed Stream Joins. In Proceedings of the 23rd International Conference on Data Engineering, ICDE 2007, The Marmara Hotel, Istanbul, Turkey, April 15-20, 2007 , Rada Chirkova, Asuman Dogac, M. Tamer Özsu, and Timos K. Sellis (Eds.). IEEE Computer Society, 536–545. https://doi. org/10.1109/ICDE.2007.367899 [14] Xiaohui Gu, Philip S. Yu, and Haixun Wang. 2007. Adaptive Load Diffusion for Multiway Windowed Stream Joins. In Proceedings of the 23rd International Conference on Data Engineering, ICDE 2007, The Marmara Hotel, Istanbul, Turkey, April 15-20, 2007 , Rada Chirkova, Asuman Dogac, M. Tamer Özsu, and Timos K. Sellis (Eds.). IEEE Computer Society, 146–155. https://doi.org/10.1109/ICDE. 2007.367860 [15] Parisa Haghani, Sebastian Michel, and Karl Aberer. 2009. Evaluating top-k queries over incomplete data streams. In Proceedings of the 18th ACM Conference on In-formation and Knowledge Management, CIKM 2009, Hong Kong, China, November 2-6, 2009 , David Wai-Lok Cheung, Il-Yeol Song, Wesley W. Chu, Xiaohua Hu, and Jimmy Lin (Eds.). ACM, 877–886. https://doi.org/10.1145/1645953.1646064 [16] Cheqing Jin, Ke Yi, Lei Chen, Jeffrey Xu Yu, and Xuemin Lin. 2010. Sliding-window top-k queries on uncertain streams. VLDB J. 19, 3 (2010), 411–435. https://doi.org/10.1007/S00778-009-0171-0 [17] Yuan Jin, Yunliang Lai, Azadeh Noori Hoshyar, Nisreen Innab, Meshal Shutaywi, Wejdan Deebani, and A Swathi. 2025. An ideally designed deep trust network model for heart disease prediction based on seagull optimization and Ruzzo Tompa algorithm. Scientific Reports 15, 1 (2025), 6035. [18] S Karlin and S F Altschul. 1993. Applications and statistics for multiple high-scoring segments in molecular sequences. Proceedings of the National Academy of Sciences 90, 12 (1993), 5873–5877. https://doi.org/10.1073/pnas.90.12.5873 arXiv:https://www.pnas.org/doi/pdf/10.1073/pnas.90.12.5873 [19] Samuel Karlin and Volker Brendel. 1992. Chance and Statisti-cal Significance in Protein and DNA Sequence Analysis. Science 
+
+257, 5066 (1992), 39–49. https://doi.org/10.1126/science.1621093 arXiv:https://www.science.org/doi/pdf/10.1126/science.1621093 [20] Tianyi Li, Yu Gu, Xiangmin Zhou, Qian Ma, and Ge Yu. 2017. An Effective and Efficient Truth Discovery Framework over Data Streams. In Proceedings of the 20th International Conference on Extending Database Technology, EDBT 2017, Venice, Italy, March 21-24, 2017 , Volker Markl, Salvatore Orlando, Bern-hard Mitschang, Periklis Andritsos, Kai-Uwe Sattler, and Sebastian Breß (Eds.). OpenProceedings.org, 180–191. https://doi.org/10.5441/002/EDBT.2017.17 [21] Shangsong Liang, Zhaochun Ren, Wouter Weerkamp, Edgar Meij, and Maarten de Rijke. 2014. Time-Aware Rank Aggregation for Microblog Search. In Proceedings of the 23rd ACM International Conference on Conference on Information and Knowl-edge Management (Shanghai, China) (CIKM ’14) . Association for Computing Ma-chinery, New York, NY, USA, 989–998. https://doi.org/10.1145/2661829.2661905 [22] Periklis Mantenoglou, Alexander Artikis, and Georgios Paliouras. 2023. Online event recognition over noisy data streams. Int. J. Approx. Reason. 161 (2023), 108993. https://doi.org/10.1016/J.IJAR.2023.108993 [23] Kyriakos Mouratidis, Spiridon Bakiras, and Dimitris Papadias. 2006. Continuous monitoring of top-k queries over sliding windows. In Proceedings of the ACM SIGMOD International Conference on Management of Data, Chicago, Illinois, USA, June 27-29, 2006 , Surajit Chaudhuri, Vagelis Hristidis, and Neoklis Polyzotis (Eds.). ACM, 635–646. https://doi.org/10.1145/1142473.1142544 [24] Jeff Pasternack and Dan Roth. 2009. Extracting article text from the web with maximum subsequence segmentation. In Proceedings of the 18th International Conference on World Wide Web (Madrid, Spain) (WWW ’09) . Association for Computing Machinery, New York, NY, USA, 971–980. [25] Víctor Rampérez, Shima Zahmatkesh, and Emanuele Della Valle. 2021. Scaling the monitoring of approximate top-k queries in streaming windows. In 2021 IEEE International Conference on Big Data (Big Data), Orlando, FL, USA, December 15-18, 2021 , Yixin Chen, Heiko Ludwig, Yicheng Tu, Usama M. Fayyad, Xingquan Zhu, Xiaohua Hu, Suren Byna, Xiong Liu, Jianping Zhang, Shirui Pan, Vagelis Papalexakis, Jianwu Wang, Alfredo Cuzzocrea, and Carlos Ordonez (Eds.). IEEE, 181–189. https://doi.org/10.1109/BIGDATA52589.2021.9672041 [26] Walter L. Ruzzo and Martin Tompa. 1999. A Linear Time Algorithm for Finding All Maximal Scoring Subsequences. In Proceedings of the Seventh International Conference on Intelligent Systems for Molecular Biology, August 6-10, 1999, Hei-delberg, Germany , Thomas Lengauer, Reinhard Schneider, Peer Bork, Douglas L. Brutlag, Janice I. Glasgow, Hans-Werner Mewes, and Ralf Zimmer (Eds.). AAAI, 234–241. http://www.aaai.org/Library/ISMB/1999/ismb99-027.php [27] Avani Shastri, Di Yang, Elke A. Rundensteiner, and Matthew O. Ward. 2011. MTopS: scalable processing of continuous top-k multi-query workloads. In 
+
+Proceedings of the 20th ACM Conference on Information and Knowledge Man-agement, CIKM 2011, Glasgow, United Kingdom, October 24-28, 2011 , Craig Macdonald, Iadh Ounis, and Ian Ruthven (Eds.). ACM, 1107–1116. https: //doi.org/10.1145/2063576.2063736 [28] John L Spouge, Leonardo Mariño-Ramírez, and Sergey L Sheetlin. 2012. The ruzzo-tompa algorithm can find the maximal paths in weighted, directed graphs on a one-dimensional lattice. In 2012 IEEE 2nd International Conference on Com-putational Advances in Bio and medical Sciences (ICCABS) . IEEE, 1–6. [29] Julien Subercaze, Christophe Gravier, Syed Gillani, Abderrahmen Kammoun, and Frédérique Laforest. 2017. Upsortable: Programming TopK Queries Over Data Streams. Proc. VLDB Endow. 10, 12 (2017), 1873–1876. https://doi.org/10. 14778/3137765.3137797 [30] Yufei Tao and Dimitris Papadias. 2006. Maintaining Sliding Window Skylines on Data Streams. IEEE Trans. Knowl. Data Eng. 18, 2 (2006), 377–391. https: //doi.org/10.1109/TKDE.2006.48 [31] Luan V. Tran, Liyue Fan, and Cyrus Shahabi. 2016. Distance-based Outlier Detection in Data Streams. Proc. VLDB Endow. 9, 12 (2016), 1089–1100. https: //doi.org/10.14778/2994509.2994526 [32] Luan V. Tran, Minyoung Mun, and Cyrus Shahabi. 2020. Real-Time Distance-Based Outlier Detection in Data Streams. Proc. VLDB Endow. 14, 2 (2020), 141–153. https://doi.org/10.14778/3425879.3425885 [33] Di Yang, Avani Shastri, Elke A. Rundensteiner, and Matthew O. Ward. 2011. An optimal strategy for monitoring top-k queries in streaming windows. In EDBT 2011, 14th International Conference on Extending Database Technology, Uppsala, Sweden, March 21-24, 2011, Proceedings , Anastasia Ailamaki, Sihem Amer-Yahia, Jignesh M. Patel, Tore Risch, Pierre Senellart, and Julia Stoyanovich (Eds.). ACM, 57–68. https://doi.org/10.1145/1951365.1951375 [34] Meng Yang, Rui Xie, Yongjun Zhang, and Yue Chen. 2025. Robust Microgrid Dispatch With Real-Time Energy Sharing and Endogenous Uncertainty. IEEE Transactions on Smart Grid 16, 4 (2025), 3085–3098. https://doi.org/10.1109/TSG. 2025.3569095 [35] Susik Yoon, Jae-Gil Lee, and Byung Suk Lee. 2019. NETS: Extremely Fast Outlier Detection from a Data Stream via Set-Based Processing. Proc. VLDB Endow. 12, 11 (2019), 1303–1315. https://doi.org/10.14778/3342263.3342269 [36] Zhongshuai Zhang, Xiaochun Yang, Baihua Zheng, Rui Zhu, Haomin Li, and Bin Wang. 2026. Continuous Query for Top-K Maximal Sum Intervals over Streaming Data (Long Version). https://github.com/zhangzhongshuai/C-KMaxI/blob/main/Continuous_Query_for_Top-K_Maximal_Sum_Intervals_ over_Streaming_Data_Long_Version.pdf [37] Rui Zhu, Bin Wang, Xiaochun Yang, and Baihua Zheng. 2023. Closest Pairs Search Over Data Stream. Proc. ACM Manag. Data 1, 3 (2023), 205:1–205:26. https://doi.org/10.1145/3617326 [38] Rui Zhu, Bin Wang, Xiaochun Yang, Baihua Zheng, and Guoren Wang. 2017. SAP: Improving Continuous Top-K Queries Over Streaming Data. IEEE Trans. Knowl. Data Eng. 29, 6 (2017), 1310–1328. https://doi.org/10.1109/TKDE.2017.2662236
