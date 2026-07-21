@@ -1,0 +1,358 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-21T20:58:34.631443+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 7,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 3,
+    "quick_skim_target": 11,
+    "quick_selected": 3
+  },
+  "deep_dive": [
+    {
+      "id": "2607.16097v1",
+      "source": "arxiv",
+      "title": "Understanding Reasoning from Pretraining to Post-Training",
+      "abstract": "Reinforcement learning (RL) has become central to improving large language models (LLMs) on complex reasoning tasks, yet RL post-training is largely studied in isolation from the pretraining that precedes it. As a result, two basic questions remain open: (1) how do pretraining choices (model size, data) shape the returns to RL compute, and (2) what does RL actually do to the model? These questions are difficult to study in the standard LLM setting: pretraining corpora are vast and uncontrolled, making it hard to attribute behaviors to pretraining versus RL, and systematic compute sweeps across both stages are prohibitively expensive. To address these challenges, we use chess as a controlled testbed for studying reasoning across the full pretraining-to-post-training pipeline. We follow the standard LLM training pipeline by pretraining language models from 5M to 1B parameters on human chess games, supervised fine-tuning on synthetic reasoning traces, and running RL on chess puzzles with verifiable rewards. Using this framework, we find that the post-RL performance at given RL compute level is well-predicted from the pretraining loss, and slope of the RL reward curves improves approximately linearly with the pretraining tokens. Beyond scaling, we find that RL does not simply sharpen the SFT policy: on easy puzzles it amplifies correct moves the SFT policy already preferred, while on hard puzzles it surfaces correct moves that were nearly absent under SFT. We further test whether our findings transfer beyond chess by training a 1B language model on math-domain text, where the same predictive pattern emerges: longer-pretrained checkpoints reach higher post-RL performance and improve faster under RL. In sum, we provide a quantitative account of the pretraining-to-RL interface and a controlled testbed for studying the science of reasoning across the full pretraining-to-post-training pipeline.",
+      "authors": [
+        "Jingyan Shen",
+        "Ang Li",
+        "Salman Rahman",
+        "Yifan Sun",
+        "Micah Goldblum",
+        "Matus Telgarsky",
+        "Pavel Izmailov"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-07-17T16:31:58+00:00",
+      "link": "https://arxiv.org/pdf/2607.16097v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Directly studies RL post-training for LLM reasoning, central to composite theme",
+      "llm_evidence_cn": "直接研究LLM的RL后训练推理，是复合主题的核心",
+      "llm_evidence": "直接研究LLM的RL后训练推理，是复合主题的核心",
+      "canonical_evidence": "直接研究LLM的RL后训练推理，是复合主题的核心",
+      "llm_tldr_en": "This paper uses chess as a controlled testbed to study how pretraining choices affect the returns to RL post-training, and what RL actually does to the model, providing insights for understanding reasoning in LLMs.",
+      "llm_tldr_cn": "该论文针对LLM后训练中强化学习与预训练研究相互孤立的问题，提出了以国际象棋为受控环境的分析框架。通过系统性地扫描预训练和后训练两个阶段的计算资源分配，揭示了预训练规模、数据组成如何影响RL微调的收益，以及RL如何改变模型内部的推理表征。实验表明，预训练参数量的增加会显著提升RL微调的效果，而RL主要增强了模型在搜索空间中的路径探索能力。这项工作为优化LLM后训练策略提供了理论基础。",
+      "llm_tldr": "该论文针对LLM后训练中强化学习与预训练研究相互孤立的问题，提出了以国际象棋为受控环境的分析框架。通过系统性地扫描预训练和后训练两个阶段的计算资源分配，揭示了预训练规模、数据组成如何影响RL微调的收益，以及RL如何改变模型内部的推理表征。实验表明，预训练参数量的增加会显著提升RL微调的效果，而RL主要增强了模型在搜索空间中的路径探索能力。这项工作为优化LLM后训练策略提供了理论基础。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.16643v1",
+      "source": "arxiv",
+      "title": "Diversity-Oriented Fine-Tuning for Uncertainty-Based Hallucination Detection",
+      "abstract": "Existing hallucination detection methods are typically conducted at the inference stage, without making any modifications to the model itself. In this paper, we are interested in exploring fine-tuning strategies that enhance the detectability of hallucinations in the resulting model. Focusing on semantic-entropy-based detection, we observe that many erroneous outputs remain undetected because the model produces nearly identical incorrect answers across multiple runs. To address this, we propose diversity-oriented fine-tuning to encourage more varied generations. We introduce two specific strategies: one based on Supervised Fine-Tuning (SFT) and the other on Direct Preference Optimization (DPO). Extensive experiments are conducted to evaluate our approach and analyze the behavior of the models before and after fine-tuning. We find that after adopting our fine-tuning methods, the models become less likely to produce low semantic entropy responses for hallucinated answers, thereby improving the effectiveness of hallucination detection, eventually yielding results better than or comparable with state of the art methods. The code will be publicly released.",
+      "authors": [
+        "Qiuyuan Li",
+        "Hongliang Dai",
+        "Piji Li"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CV"
+      ],
+      "published": "2026-07-18T05:11:35+00:00",
+      "link": "https://arxiv.org/pdf/2607.16643v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "hallucination detection via diversity-oriented fine-tuning",
+      "llm_evidence_cn": "通过多样性微调进行幻觉检测",
+      "llm_evidence": "通过多样性微调进行幻觉检测",
+      "canonical_evidence": "通过多样性微调进行幻觉检测",
+      "llm_tldr_en": "Proposes diversity-oriented fine-tuning strategies (SFT and DPO) to improve uncertainty-based hallucination detection by encouraging more varied generations, enhancing detectability.",
+      "llm_tldr_cn": "现有幻觉检测多在推理阶段进行，模型本身未优化；本文提出基于多样性的微调策略（SFT和DPO），促使模型产生更多样化的输出，从而提高基于语义熵的幻觉检测能力；实验表明该方法能有效提升检测率，为模型内建幻觉可检测性提供了新思路。",
+      "llm_tldr": "现有幻觉检测多在推理阶段进行，模型本身未优化；本文提出基于多样性的微调策略（SFT和DPO），促使模型产生更多样化的输出，从而提高基于语义熵的幻觉检测能力；实验表明该方法能有效提升检测率，为模型内建幻觉可检测性提供了新思路。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.16431v1",
+      "source": "arxiv",
+      "title": "RIMS: Preference Optimization via Smoothed Multi-pair Aggregation for Small-Scale LLM Retrieval-Augmented Generation",
+      "abstract": "Small-scale language models (SLMs) are attractive for retrieval-augmented generation (RAG) in resource-constrained settings, but their limited capacity makes them highly sensitive to noisy or spurious retrieved evidence. Existing preference-based methods such as RoseRAG select only the hardest single preference pair via hard argmin/argmax, discarding the remaining signal; others treat multiple pairs as independent binary comparisons, resulting in low data utilization. We propose RIMS, a three-stage preference optimization framework comprising (1) synthetic chain-of-thought preference data generation via rejection sampling using the target SLM itself without relying on proprietary models, (2) a differentiable soft aggregation mechanism that replaces hard selection with a smooth operator, preserving gradient signal from all preference pairs while retaining the discriminative structure of margin-aware selection, and (3) preference optimization with the smoothed objective applied to multiple alignment algorithms. We theoretically show that the smoothed approximation admits a controllable error bound and that smooth aggregation yields provably tighter gradient alignment to the oracle objective than hard selection. Experiments on four multi-hop question answering benchmarks show that our approach outperforms state-of-the-art baselines across multiple SLM backbones, achieving consistent gains in Exact Match and F1 under noisy retrieval conditions. Our implementation is available at https://github.com/tptrix29/RIMS.",
+      "authors": [
+        "Pei Tian",
+        "Zihan Dong",
+        "Tianci Liu",
+        "Linjun Zhang",
+        "Haoyu Wang"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-17T18:24:19+00:00",
+      "link": "https://arxiv.org/pdf/2607.16431v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "preference optimization for small-scale LLM RAG, addresses noisy evidence",
+      "llm_evidence_cn": "针对小规模LLM检索增强生成的偏好优化，处理噪声证据",
+      "llm_evidence": "针对小规模LLM检索增强生成的偏好优化，处理噪声证据",
+      "canonical_evidence": "针对小规模LLM检索增强生成的偏好优化，处理噪声证据",
+      "llm_tldr_en": "Proposes RIMS, a three-stage preference optimization framework for small-scale LLM RAG that uses smoothed multi-pair aggregation and synthetic CoT data to mitigate noise sensitivity.",
+      "llm_tldr_cn": "小规模语言模型在检索增强生成中易受噪声证据影响。现有偏好优化方法或仅用最困难单对样本，或低效处理多对。RIMS框架通过可微分多对聚合与合成思维链数据生成，利用拒绝采样实现高效偏好学习。实验表明该方法能显著提升对噪声的鲁棒性，在资源受限场景下实现更可靠的RAG性能。",
+      "llm_tldr": "小规模语言模型在检索增强生成中易受噪声证据影响。现有偏好优化方法或仅用最困难单对样本，或低效处理多对。RIMS框架通过可微分多对聚合与合成思维链数据生成，利用拒绝采样实现高效偏好学习。实验表明该方法能显著提升对噪声的鲁棒性，在资源受限场景下实现更可靠的RAG性能。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.17038v1",
+      "source": "arxiv",
+      "title": "Reward-Driven LLM Agent Workflows: Synthesizing POMDP Routing and Self-Correction for Autonomous Decision-Making",
+      "abstract": "This paper addresses key technical challenges in current large language model (LLM) agent applications, including long-horizon planning, sparse reward attribution, and dynamic environmental interaction, by designing and optimizing an intelligent agent workflow. The proposed architecture is based on the synthesis of core AI paradigms: Visual, Language, Generative, Graph, Multimodal, Reinforcement, and Agent Intelligence. Unlike conventional baseline models that rely on static prompting and lack robust perception-action loops, our approach introduces a Partially Observable Markov Decision Process (POMDP) routing mechanism. This mechanism is augmented with an internal, self-correcting reward model that evaluates decision trajectories before execution. By integrating multimodal inputs and advanced reinforcement learning principles (such as proximal policy optimization and value function approximation), the agent maintains long-term structural memory and dynamically adapts its reasoning pathways to mitigate error accumulation. Empirical experiments on the ALFWorld embodied simulation environment and the WebShop online navigation benchmark demonstrate a 24.5% absolute improvement in task success rate and trajectory efficiency over mainstream baselines like the standard ReAct framework. Comprehensive ablation studies confirm the significant contribution of the reward-driven critique module in suppressing hallucination rates. This research bridges theoretical foundations of reinforcement learning and graph-based memory with autonomous agent workflows. Ultimately, the resulting architecture offers a practical, scalable reference framework for developing artificial intelligence technologies in complex, multi-step autonomous systems. Code is available at https://github.com/01Amez/RLAW_Implementation.",
+      "authors": [
+        "Amez Amanj Ali",
+        "Kuo-Kun Tseng"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-19T02:51:41+00:00",
+      "link": "https://arxiv.org/pdf/2607.17038v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "internal self-correcting reward model for LLM agent workflows",
+      "llm_evidence_cn": "用于LLM智能体工作流的内部自纠正奖励模型",
+      "llm_evidence": "用于LLM智能体工作流的内部自纠正奖励模型",
+      "canonical_evidence": "用于LLM智能体工作流的内部自纠正奖励模型",
+      "llm_tldr_en": "Proposes a reward-driven LLM agent workflow with POMDP routing and self-correcting reward model for autonomous decision-making.",
+      "llm_tldr_cn": "本文针对LLM智能体的长程规划、稀疏奖励归因等问题，提出智能体工作流架构，融合POMDP路由机制和内部自纠正奖励模型。该奖励模型在运行时评估决策并自我修正，显著提升了自主决策的鲁棒性和长期奖励累积。实验验证了该框架在复杂环境下的有效性，为奖励驱动型LLM智能体提供了新思路。",
+      "llm_tldr": "本文针对LLM智能体的长程规划、稀疏奖励归因等问题，提出智能体工作流架构，融合POMDP路由机制和内部自纠正奖励模型。该奖励模型在运行时评估决策并自我修正，显著提升了自主决策的鲁棒性和长期奖励累积。实验验证了该框架在复杂环境下的有效性，为奖励驱动型LLM智能体提供了新思路。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.17247v1",
+      "source": "arxiv",
+      "title": "Distilled Reinforcement Learning for LLM Post-training",
+      "abstract": "Large language model (LLM) post-training is essential for improving reasoning, adaptation, and alignment. Existing methods mainly follow two paradigms: reinforcement learning (RL) and on-policy distillation (OPD). However, RL relies on coarse-grained outcome supervision, resulting in difficult credit assignment and limited capability to acquire new knowledge. OPD, meanwhile, unconditionally matches teacher logits through KL divergence, which creates a dilemma: similar teachers provide little new knowledge, while substantially different teachers often yield ineffective guidance, largely restricting OPD to within-family distillation. We propose Distilled Reinforcement Learning (Distilled RL), which integrates teacher supervision into the RL objective to provide fine-grained guidance, selectively transfer new knowledge and avoid unconditional imitation. Distilled RL contains three components: reverse importance sampling with clipping, negative sample reset, and sequence-level geometric normalization. Through a concise and interpretable case study, we demonstrate that Distilled RL can effectively transfer previously unavailable knowledge from a teacher model to a student model. Extensive experiments across both within-family and cross-family distillation settings show that Distilled RL substantially outperforms standard RL and OPD in terms of both pass@1 and pass@k. Our code is available at https://github.com/597358816/Distilled-RL.",
+      "authors": [
+        "Chen Wang",
+        "Zhaochun Li",
+        "Jionghao Bai",
+        "Yining Zhang",
+        "Hexuan Deng",
+        "Ge Lan",
+        "Yue Wang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-19T13:32:54+00:00",
+      "link": "https://arxiv.org/pdf/2607.17247v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "distilled reinforcement learning for LLM post-training algorithm improvement",
+      "llm_evidence_cn": "用于LLM后训练的蒸馏强化学习算法改进",
+      "llm_evidence": "用于LLM后训练的蒸馏强化学习算法改进",
+      "canonical_evidence": "用于LLM后训练的蒸馏强化学习算法改进",
+      "llm_tldr_en": "Proposes Distilled RL, integrating teacher supervision into RL objective for fine-grained credit assignment in LLM post-training.",
+      "llm_tldr_cn": "现有LLM后训练方法中，强化学习依赖粗粒度结果监督，信用分配困难；在线蒸馏无条件匹配教师logits，知识获取受限。本文提出蒸馏强化学习（Distilled RL），将教师监督融入RL目标，提供细粒度指导，同时保留RL探索能力。实验表明，Distilled RL在多个推理和对齐任务上优于纯RL和在线蒸馏方法，为LLM后训练提供了更有效的算法框架。",
+      "llm_tldr": "现有LLM后训练方法中，强化学习依赖粗粒度结果监督，信用分配困难；在线蒸馏无条件匹配教师logits，知识获取受限。本文提出蒸馏强化学习（Distilled RL），将教师监督融入RL目标，提供细粒度指导，同时保留RL探索能力。实验表明，Distilled RL在多个推理和对齐任务上优于纯RL和在线蒸馏方法，为LLM后训练提供了更有效的算法框架。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.17935v1",
+      "source": "arxiv",
+      "title": "DeLIVeR: Decomposed Learning for Information-grounded Veracity Recognition via Reinforced Knowledge Graph Exploration",
+      "abstract": "Automated fact-checking remains a challenge for Large Language Models (LLMs) due to \"query brittleness\" in traditional retrieval systems. We propose DeLIVeR (Decomposed Learning for Information-grounded Veracity Recognition), a framework that treats evidence retrieval as a reinforced strategic exploration task. DeLIVeR utilizes a Planner LLM to decompose complex claims into targeted question sets, which are used to traverse structured Knowledge Graphs (KGs) for high-precision evidence. We optimize the Planner's policy using Group Relative Policy Optimization (GRPO) with a reward system prioritizing structural diversity and verdict accuracy. Our evaluation on LIAR, FEVER, and PolitiFact shows that DeLIVeR significantly outperforms state-of-the-art baselines. Using Qwen2.5-7B, our framework achieved peak F1-scores of 83.73, 84.57, and 79.70 respectively, representing a 10-15% improvement over HippoRAG2. By shifting to a reinforced question-planning strategy, DeLIVeR effectively bridges multi-hop reasoning gaps and provides an auditable, transparent path for verifiable misinformation detection.",
+      "authors": [
+        "Cong Hoan Nguyen",
+        "Thomas Hoang",
+        "Hieu Minh Duong",
+        "Long Nguyen"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-07-20T13:32:42+00:00",
+      "link": "https://arxiv.org/pdf/2607.17935v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "fact-checking to suppress hallucinations; uses GRPO reward optimization",
+      "llm_evidence_cn": "事实验证抑制幻觉；使用GRPO奖励优化",
+      "llm_evidence": "事实验证抑制幻觉；使用GRPO奖励优化",
+      "canonical_evidence": "事实验证抑制幻觉；使用GRPO奖励优化",
+      "llm_tldr_en": "DeLIVeR employs a Planner LLM to decompose claims and query knowledge graphs, optimized via GRPO with a reward system, achieving strong fact-checking performance on LIAR, FEVER, PolitiFact, directly addressing hallucination suppression.",
+      "llm_tldr_cn": "大语言模型在自动事实验证中面临查询脆弱性问题。本文提出DeLIVeR框架，利用规划器将复杂声明分解为问题集，通过强化知识图谱探索获取证据，并使用组相对策略优化（GRPO）和基于结构多样性与准确性的奖励系统来优化策略。在LIAR、FEVER和PolitiFact上的评估表明，该方法有效提升了事实验证准确性，为抑制模型幻觉提供了新途径。",
+      "llm_tldr": "大语言模型在自动事实验证中面临查询脆弱性问题。本文提出DeLIVeR框架，利用规划器将复杂声明分解为问题集，通过强化知识图谱探索获取证据，并使用组相对策略优化（GRPO）和基于结构多样性与准确性的奖励系统来优化策略。在LIAR、FEVER和PolitiFact上的评估表明，该方法有效提升了事实验证准确性，为抑制模型幻觉提供了新途径。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.17946v1",
+      "source": "arxiv",
+      "title": "A Geometric Perspective on Stabilizing Value Conflict Resolution",
+      "abstract": "Large Language Models (LLMs) often struggle to navigate value conflicts when trained with the compressed scalar rewards of Reinforcement Learning from Human Feedback (RLHF). To address this challenge, we investigate how chain-of-thought (CoT) reasoning can help improve performance in this domain. Geometrically, we show that CoT correlates with further smoothing the model's loss landscape in its sharpest direction, helping resolve the optimization instability of traditional scalar rewards. We also demonstrate via relevant downstream benchmarks that value conflict-focused CoT may generalize to different kinds of moral reasoning, demonstrating that this CoT has the potential to be an effective mechanism for better moral reasoning. To capitalize on this potential, we create a new value conflict-focused CoT design that further smooths the sharpest direction of the loss landscape and increases moral reasoning performance. This finding shows that explicitly modifying and improving the design of reasoning dynamics offers a promising avenue for improving model performance on user requests with complex value conflicts, advancing pluralistic alignment in LLMs.",
+      "authors": [
+        "Saket Reddy",
+        "Andy Liu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-20T13:46:47+00:00",
+      "link": "https://arxiv.org/pdf/2607.17946v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "addresses RLHF value conflict resolution with geometric perspective",
+      "llm_evidence_cn": "用几何视角解决RLHF中的价值冲突",
+      "llm_evidence": "用几何视角解决RLHF中的价值冲突",
+      "canonical_evidence": "用几何视角解决RLHF中的价值冲突",
+      "llm_tldr_en": "This paper uses a geometric perspective and chain-of-thought reasoning to stabilize value conflict resolution in RLHF for LLMs, smoothing the loss landscape and improving moral reasoning.",
+      "llm_tldr_cn": "大型语言模型在RLHF训练中常因压缩标量奖励而难以处理价值冲突。本文从几何角度出发，提出使用链式思维推理来平滑损失景观的最陡方向，从而稳定优化。实验表明，该方法在下游基准测试中提升了道德推理能力，且具有泛化潜力。",
+      "llm_tldr": "大型语言模型在RLHF训练中常因压缩标量奖励而难以处理价值冲突。本文从几何角度出发，提出使用链式思维推理来平滑损失景观的最陡方向，从而稳定优化。实验表明，该方法在下游基准测试中提升了道德推理能力，且具有泛化潜力。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.16872v1",
+      "source": "arxiv",
+      "title": "Trace-Based On-Policy Distillation for Masked Diffusion Language Models",
+      "abstract": "Diffusion large language models (dLLMs) are a promising alternative to autoregressive generation. However, reasoning-oriented post-training for dLLMs remains challenging. Supervised fine-tuning (SFT) for dLLMs requires dense but often off-policy masked states, while reinforcement learning (RL) relies on sparse rewards or value modeling. This paper proposes \\textbf{trace-based on-policy distillation (TOPD)}, a teacher-supervised framework that transfers reasoning ability to a target dLLM without reward estimation. The key idea is to supervise a dLLM on its own denoising trajectory, focusing on the trace-aligned token decisions that form the final response. Specifically, TOPD samples on-policy diffusion trajectories from the target dLLM, obtains teacher token distributions from a teacher model on the corresponding partially denoised states, and updates the target dLLM with a token-level Reverse Kullback-Leibler (Reverse-KL) objective. This design preserves dense teacher supervision while aligning training with the model's own denoising states. On mathematical reasoning benchmarks, TOPD enables SDAR-4B-Chat to match the MATH500 accuracy of its RL-trained counterpart TraDo-4B-Instruct, with gains of +5.7 under static evaluation and +4.5 under dynamic evaluation. Compared with the RL-trained counterpart, TOPD achieves this with 4$\\times$ fewer rollout rounds, corresponding to an estimated 96.0$\\times$ to-accuracy model-compute speedup.",
+      "authors": [
+        "Haolin Ren",
+        "Ziyang Huang",
+        "Chenhao Yuan",
+        "Jun Zhao",
+        "Kang Liu"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-07-18T16:25:17+00:00",
+      "link": "https://arxiv.org/pdf/2607.16872v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "trace-based on-policy distillation for post-training diffusion LLMs",
+      "llm_evidence_cn": "针对扩散语言模型后训练的追踪式在线蒸馏方法",
+      "llm_evidence": "针对扩散语言模型后训练的追踪式在线蒸馏方法",
+      "canonical_evidence": "针对扩散语言模型后训练的追踪式在线蒸馏方法",
+      "llm_tldr_en": "Proposes TOPD, a teacher-supervised on-policy distillation framework for post-training masked diffusion LMs, transferring reasoning ability without reward estimation.",
+      "llm_tldr_cn": "当前扩散语言模型的后训练面临挑战：监督微调需要密集但离线的掩码状态，强化学习依赖稀疏奖励。本文提出TOPD，一种基于教师监督的在线蒸馏框架，通过在目标模型的去噪轨迹上进行追踪对齐来转移推理能力，无需奖励估计。实验表明该方法有效提升了推理性能，为扩散模型后训练提供了新范式。",
+      "llm_tldr": "当前扩散语言模型的后训练面临挑战：监督微调需要密集但离线的掩码状态，强化学习依赖稀疏奖励。本文提出TOPD，一种基于教师监督的在线蒸馏框架，通过在目标模型的去噪轨迹上进行追踪对齐来转移推理能力，无需奖励估计。实验表明该方法有效提升了推理性能，为扩散模型后训练提供了新范式。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.18155v1",
+      "source": "arxiv",
+      "title": "Testing Retrieval-Augmented Generation Systems with Chunk Coverage",
+      "abstract": "Retrieval-Augmented Generation (RAG)-based systems\\footnote{For brevity, RAG-based systems are referred to as RAG systems throughout this paper.} are increasingly deployed in high-stakes settings where correct behaviour depends not only on the language model but also on the retrieval component that selects external documents at inference time. While existing RAG evaluation metrics assess retrieval and generation quality on a per-query basis, typically relying on query-level test oracles such as reference answers or relevance annotations, they provide limited insight into whether a test suite adequately exercises the retrieval behaviour of the system as a whole. In this paper, we introduce Chunk Coverage (CC), an oracle-independent test adequacy criterion for testing the retrieval component of RAG systems. CC measures the fraction of corpus chunks that are retrieved at least once across a test suite, providing a structural view of which parts of the retrieval space have been exercised. We further show how CC can be used to guide test selection and generation by prioritising queries that expand coverage of previously unexercised retrieval regions. We evaluate CC on clinical and financial RAG system scenarios. CC-guided testing reaches 50% of attainable coverage 1.7x faster than random selection and 4.2x faster than redundancy-biased strategies. Moreover, CC improves fault detection effectiveness (APFD) by 10% to 25% over random, indicating earlier discovery of distinct retrieval faults. These results show that CC captures retrieval diversity relevant to effective testing without requiring test oracles.",
+      "authors": [
+        "Jinhan Kim",
+        "Samuele Pasini",
+        "Paolo Tonella"
+      ],
+      "primary_category": "cs.SE",
+      "categories": [
+        "cs.SE"
+      ],
+      "published": "2026-07-20T16:53:05+00:00",
+      "link": "https://arxiv.org/pdf/2607.18155v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Proposes test adequacy criterion for RAG systems, relevant to hallucination evaluation",
+      "llm_evidence_cn": "提出RAG系统测试充分性标准，与幻觉评估相关",
+      "llm_evidence": "提出RAG系统测试充分性标准，与幻觉评估相关",
+      "canonical_evidence": "提出RAG系统测试充分性标准，与幻觉评估相关",
+      "llm_tldr_en": "Introduces Chunk Coverage, an oracle-independent criterion for evaluating RAG systems by measuring retrieval coverage of test suites.",
+      "llm_tldr_cn": "本文针对检索增强生成系统提出块覆盖率指标，一种独立于测试预言的标准，用于评估测试套件对检索行为的覆盖程度。与传统逐查询评测不同，该指标关注系统整体检索行为的充分性，有助于发现检索相关缺陷，间接支持幻觉抑制。",
+      "llm_tldr": "本文针对检索增强生成系统提出块覆盖率指标，一种独立于测试预言的标准，用于评估测试套件对检索行为的覆盖程度。与传统逐查询评测不同，该指标关注系统整体检索行为的充分性，有助于发现检索相关缺陷，间接支持幻觉抑制。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
