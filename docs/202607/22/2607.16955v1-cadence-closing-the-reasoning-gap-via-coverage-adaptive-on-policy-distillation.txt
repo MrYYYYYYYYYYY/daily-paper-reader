@@ -1,0 +1,669 @@
+Title: CADENCE: Closing the Reasoning Gap via Coverage-Adaptive On-Policy Distillation
+
+URL Source: https://arxiv.org/pdf/2607.16955v1
+
+Published Time: Tue, 21 Jul 2026 00:48:10 GMT
+
+Number of Pages: 15
+
+Markdown Content:
+# CADENCE: Closing the Reasoning Gap via Coverage-Adaptive On-Policy Distillation 
+
+Saurabh Jha Satyam Kumar 
+
+## Abstract 
+
+On-policy knowledge distillation is a promising paradigm for transferring reason-ing capabilities from large teachers to compact students, but existing approaches suffer from three compounding failure modes: (i) cold-start collapse , where a fresh student assigns near-zero probability mass to teacher-preferred tokens; (ii) 
+
+state-agnostic divergence scheduling , where time-only interpolation between for-ward and reverse KL ignores the student’s coverage state; and (iii) binary reward sparsity , where pass/fail signals discard information from partially correct traces. We present CADENCE , a unified framework that prescribes targeted fixes for each failure mode. CADENCE introduces a DRIFT mechanism that schedules a per-token convex mixture of forward-KL and reverse-KL surrogate objectives from student-sampled trajectories—we are explicit that these are per-token sur-rogates, not sequence-level KL gradient estimators. Six novel components ex-tend this foundation: (A) COVA, a coverage-adaptive β schedule that condition-ally accelerates the forward →reverse transition; (B) FTB, a forking-token boost concentrating gradient at high-entropy positions using a globally-normalized en-tropy reference; (C) CCD, a dense reward combining correctness with numerical-proximity partial credit for incorrect-but-close traces (raising nonzero-reward fraction from 38% to ∼ 55% ); (D) LAP, a brevity-preferential correct-rollout reinforcement with response-length–only normalization; (E) EMR, an entropy-matching regularizer for calibration; (F) BSD, a bootstrapped self-distillation phase. Evaluated on GSM8K and MATH-500 (with a corrected 512-token evaluation protocol matching Qwen2.5-Math published performance) with 5 seeds and re-ported standard deviations, CADENCE distills a 0.5B student from a 1.5B teacher to 69 .8 ± 0.5% GSM8K pass@1 (from 48 .7% pretrained, closing 63 .2% of the teacher gap) and to 72 .1 ± 0.4% with a 3B teacher ( 76 .2% gap closed). CADENCE outperforms the strongest matched-compute label-using baseline (DRIFT+binary reward) by +4 .4±0.7 points. All experiments run on a single Ap-ple Mac Studio (M-series, 16-core CPU, 40-core GPU, 64GB unified memory), demonstrating that principled distillation reaches strong reasoning quality without datacenter-scale hardware. 
+
+## 1 Introduction 
+
+Large language models (LLMs) with billions of parameters have demonstrated remarkable reasoning capabilities (DeepSeek-AI, 2025; Grattafiori et al., 2024), but deploying them on edge or resource-constrained hardware remains impractical (Kumar & Jha, 2026). Knowledge distillation (Hinton et al., 2015) offers a principled route to a compact student that inherits the teacher’s capabilities. Classical distillation minimizes forward KL divergence over teacher-generated sequences (Kim & Rush, 2016), but this off-policy paradigm suffers from a train–inference mismatch: the student trains on teacher trajectories but must generate from its own distribution at deployment (Agarwal et 
+
+> Preprint. arXiv:2607.16955v1 [cs.LG] 18 Jul 2026
+
+al., 2024). On-policy distillation (Agarwal et al., 2024; Gu et al., 2024) addresses this by having the student sample its own trajectories and receive teacher-provided per-token guidance. Yet three failure modes persist: 
+
+(1) Cold-start collapse. A small pretrained student assigns near-zero probability mass to teacher-preferred reasoning tokens. Under reverse KL, these positions provide vanishing gradient signal (they are almost never sampled), so the student cannot bootstrap support for reasoning patterns it has never produced. 
+
+(2) State-agnostic divergence scheduling. Existing forward-to-reverse KL interpolations use fixed time-based schedules (Ko et al., 2024). Different prompts induce different rates of coverage growth; a single time-only schedule is necessarily suboptimal, either holding easy prompts too long in mode-covering or pushing hard prompts prematurely toward sharpening. 
+
+(3) Binary reward sparsity. Methods with outcome-based reinforcement (DeepSeek-AI, 2025; Shao et al., 2024) use pass/fail signals. On GSM8K at ∼ 49% pretrained pass@1, 51% of trajecto-ries receive zero reward. Purely binary signals discard information from partially correct traces—a trajectory setting up the problem correctly but erring in the final arithmetic step receives the same zero reward as an incoherent response. 
+
+CADENCE (this paper) prescribes a targeted fix for each failure mode (Figure 1). A DRIFT mech-anism combines forward-KL and reverse-KL per-token surrogate signals on student-sampled trajec-tories, requiring one frozen teacher forward pass per batch. Six novel components extend this base-line: (A) COVA conditionally accelerates the β schedule after measured coverage exceeds a gate; 
+
+(B) FTB concentrates the advantage at high teacher-entropy positions using a global-scale entropy reference (Cui et al., 2025); (C) CCD combines correctness with numerical-proximity partial credit 
+
+for incorrect trajectories—directly addressing failure mode (3) rather than only re-grading already-rewarded correct trajectories; (D) LAP is a brevity-preferential correct-rollout reinforcement with prompt-length–independent normalization; (E) EMR matches student and teacher entropies at fork-ing tokens; (F) BSD performs bootstrapped self-distillation on high-consistency correct traces. Two stabilization mechanisms— TFW (Teacher-Forced Warmup) and KTR (KL Trust Region)—ensure training robustness. We introduce five diagnostic metrics (SAG, FTA, KLPE, CNI, RLD) that decompose distilla-tion quality mechanistically, and we compare against three matched-compute label-using baselines (STaR/RFT, GKD+GRPO, DRIFT+binary) to isolate CADENCE’s component contribution from mere label access. All results use 5 seeds with reported standard deviations, and all hyperparameters were selected on a held-out validation split (200 problems from GSM8K train), never on the test set. 
+
+Contributions. (1) We diagnose three failure modes and propose targeted fixes with honestly-stated properties. (2) We present CADENCE, integrating six novel components and two stabilization mechanisms. (3) We demonstrate that CADENCE closes 63 .2% of the teacher–student gap on GSM8K (48.7% → 69.8%) with a 1.5B teacher and 76 .2% with a 3B teacher, outperforming the strongest matched-compute label-using baseline by +4 .4 points. (4) We introduce five diagnostic metrics with comparative baseline values. (5) We provide a comprehensive ablation with proper statistical reporting. 
+
+## 2 Related Work 
+
+Classical knowledge distillation. Hinton et al. (2015) introduced softened-output distillation. Kim & Rush (2016) extended to sequence-level. These off-policy approaches minimize forward KL, which is mode-covering but produces incoherent autoregressive generators (Gu et al., 2024). 
+
+Reverse KL and on-policy distillation. Gu et al. (2024) proposed MiniLLM (reverse KL). Agar-wal et al. (2024) introduced GKD, showing on-policy training substantially outperforms off-policy. Ko et al. (2024) proposed DistiLLM combining skew KL with adaptive off-policy mechanisms. CA-DENCE differs: instead of a single divergence or fixed interpolation, it schedules a per-token convex mixture whose weight is data-adaptive through COVA. 
+
+Reasoning distillation, RL, and label-using baselines. DeepSeek-AI (2025) distilled reasoning via SFT on teacher-generated traces. Shao et al. (2024) showed GRPO improves mathematical rea-2soning with outcome rewards. Schulman et al. (2017) introduced PPO, inspiring KTR. STaR/RFT-style rejection sampling (Zelikman et al., 2022; Yuan et al., 2023) performs SFT on correctness-filtered self-generated traces. Because CADENCE uses gold-answer supervision (via CCD’s cor-rectness gate, LAP’s correctness gate, and BSD’s correctness gate), we include matched-compute label-using baselines in comparison (Section 5.1) to isolate component contribution from label ac-cess. 
+
+Divergence scheduling and adaptive objectives. α-divergence path interpolation has roots in variational inference (Minka, 2005). Ko et al. (2024) employed skew KL with fixed interpolation; Warmup-Distill (Jin et al., 2025) bridges distribution mismatch before distillation. CADENCE’s COVA makes the interpolation state-adaptive. 
+
+Token-level importance and entropy-based token weighting. SelecTKD (Huang et al., 2025) weights tokens by teacher–student disagreement. TIP (Yuan et al., 2026) identifies high-importance tokens. Cui et al. (2025) showed high-entropy tokens carry disproportionate learning value in RLVR settings. CADENCE’s FTB operationalizes this insight for distillation using a globally-normalized entropy scale, providing cross-sequence comparability. 
+
+Self-distillation and consistency training. Explored in vision (Zhang et al., 2019) and lan-guage (Hübotter et al., 2026). CADENCE’s BSD selects high-consistency correct rollouts, related to self-consistency decoding (Wang et al., 2023) applied at training time with an explicit correctness gate to avoid the “confidently-and-consistently-wrong” failure mode on hard problems. 
+
+## 3 CADENCE: Framework and Methodology 
+
+3.1 Problem Formulation 
+
+Let πϕ denote a frozen teacher and πθ a trainable student with |θ| ≪ | ϕ|. Both share a vocabulary V
+
+and operate autoregressively: π(x1: T |s) = Q 
+
+> t
+
+π(xt|s, x 1: t−1). The training objective is 
+
+θ∗ = arg min 
+
+> θ
+
+Es∼D [D(πθ (· | s) ∥ πϕ(· | s))] , (1) where D is a prompt distribution and D a divergence measure. 
+
+3.2 The DRIFT Mechanism: Per-Token KL Surrogate Mixture 
+
+DRIFT combines forward-KL and reverse-KL per-token surrogate signals on student-sampled tra-jectories. We are explicit throughout this section that DRIFT does not estimate sequence-level KL divergence gradients ; instead it optimizes per-token surrogate objectives that are the practical target in on-policy distillation (Agarwal et al., 2024; Ko et al., 2024). Proposition 1 formalizes this. 
+
+Step 1: On-policy sampling. Sample x1: T ∼ πθ (· | s).
+
+Step 2: Teacher scoring. Compute log πϕ(xt | s, x 1: t−1) for each generated token. 
+
+Step 3: Per-token log-ratio. 
+
+ˆkt = log πθ (xt | st) − log πϕ(xt | st). (2) 
+
+Step 4: Self-normalized importance weights. With clip c = 10 :
+
+wt = clip 
+
+
+
+exp( −ˆkt), 0, c 
+
+
+
+, Afwd  
+
+> t
+
+= G · wt
+
+PGt′=1 wt′ + ϵ . (3) The G-scaling ensures both −ˆkt (reverse signal) and Afwd  
+
+> t
+
+(forward signal) are O(1) per position; without it the mixture would be dominated by the reverse-KL term regardless of β.
+
+Step 5: DRIFT per-token advantage. 
+
+ADRIFT  
+
+> t
+
+= (1 − β) · (−ˆkt) + β · Afwd  
+
+> t
+
+, (4) with β annealed from 1 to 0 via cosine schedule. 3Step 6: Policy gradient update. 
+
+LDRIFT = − 1
+
+G
+
+> G
+
+X
+
+> t=1
+
+sg (ADRIFT  
+
+> t
+
+) · log πθ (xt | st). (5) 
+
+Proposition 1 (Per-token surrogate correspondence) . Consider the per-token surrogate objectives 
+
+Jrev (θ) = Es∼D , x ∼πθ
+
+"
+
+> 1
+> GG
+
+X
+
+> t=1
+
+ log πθ (xt|st) − log πϕ(xt|st)#
+
+, (6) 
+
+Jfwd (θ) = − Es∼D , x ∼πθ
+
+" GX  
+
+> t=1
+> wtP
+> t′wt′
+
+· log πθ (xt|st)
+
+#
+
+. (7) 
+
+At β = 0 , Eq. (5) yields the REINFORCE Monte-Carlo estimator of ∇θ Jrev . At β = 1 , Eq. (5) with advantage (3) is the self-normalized-IS estimator of ∇θ Jfwd (with clipping bias). Proof: substitute 
+
+β into Eq. (4) and Eq. (5); direct. 
+
+Remark 1 (Honest scope: what DRIFT is and is not) . DRIFT’s per-token surrogate is not equiva-lent to sequence-level KL gradients. The true sequence-level reverse-KL gradient uses reward-to-go 
+
+P 
+
+> t′≥t
+
+ˆkt′ weighting on each ∇ log πθ (xt), capturing how token xt affects divergence at all down-stream positions. The true sequence-level forward-KL gradient uses a sequence-level importance ratio πϕ(x1: T )/π θ (x1: T ), not per-token weights. Neither corresponds to what we compute in Eq. (5) .Our per-token treatment is a design choice standard in on-policy distillation practice (Agarwal et al., 2024; Ko et al., 2024): it sacrifices reward-to-go and sequence-level IS structure for simpler vari-ance behavior and computational efficiency. We make no claim of consistency for sequence-level KL divergence gradients; we optimize the per-token surrogates (6) –(7) directly. For intermediate 
+
+β ∈ (0 , 1) , DRIFT is a scheduled convex combination of the two endpoint per-token gradients. 
+
+The variance-reduction baseline is proper leave-one-out (Kool et al., 2019): 
+
+˜At = At − ¯At, ¯At = 1
+
+G − 1
+
+X 
+
+> t′̸=t
+
+At′ . (8) Excluding At from the baseline (as opposed to the full-mean formula that includes it) ensures the baseline is independent of the current action’s advantage, preserving unbiasedness of the score-function estimator. 
+
+3.3 CADENCE Novel Components 3.3.1 (A) COVA: Coverage-Adaptive β Scheduling 
+
+At position t, let Tk(t) be the top-k teacher tokens and cov t =
+
+P  
+
+> v∈T k(t)
+
+πϕ(v|st) · 1[πθ (v|st) > τ ]
+
+P  
+
+> v∈T k(t)
+
+πϕ(v|st) , (9) 
+
+k = 20 , τ = 10 −3; cov is an EMA over training steps. 
+
+βCOVA = max 
+
+
+
+βend , β cosine ·
+
+
+
+1 − αmax · max(0 ,cov −γ)1−γ
+
+ 
+
+, (10) with γ (gate) and αmax = 0 .5.
+
+Proposition 2 (COVA gating) . When cov ≤ γ, βCOVA = βcosine : COVA does not depart from the baseline schedule until measured coverage exceeds the gate. Proof. cov ≤ γ ⇒ max(0 , cov −γ) = 0 , so Eq. (10) reduces to max( βend , β cosine ) = βcosine (since 
+
+βcosine ≥ βend ). 
+
+Asymmetric fix. We are explicit: COVA fixes only prolonged mode-covering (transitioning too slowly given demonstrated coverage). Premature sharpening under an aggressive baseline cosine schedule is not addressed by COVA and is controlled by our conservative choice of βcosine . The gate value γ is selected on the validation split, not the test set (Section 4). 4Figure 1: CADENCE end-to-end architecture. Pre-distillation : TFW followed by student on-policy sampling generates diverse reasoning traces. Rollout Evaluation : CCD scores each trajectory using correctness and numerical-proximity partial credit for incorrect traces ; LAP applies brevity-preferential reinforcement. Advantage & Calibration : DRIFT computes the β-scheduled per-token surrogate advantage (Proposition 1), boosted by FTB with globally-normalized entropy at forking tokens and modulated by COVA’s coverage-adaptive gate; EMR matches student–teacher entropies at forking positions. Update & Stability : Policy-gradient update with KTR trust region and post-phase BSD. 
+
+3.3.2 (B) FTB: Forking-Token Boost with Global Entropy Reference 
+
+FTB concentrates advantage at high teacher-entropy positions, using a global entropy reference for cross-sequence comparability: 
+
+Hϕ(t) = − X
+
+> v∈V
+
+πϕ(v|st) log πϕ(v|st), AFTB  
+
+> t
+
+= ADRIFT  
+
+> t
+
+·
+
+
+
+1 + γftb · min 
+
+
+
+1, Hϕ(t)
+
+> Href
+
+ 
+
+, (11) with γftb = 0 .5, Href = 2 .0 nats (fixed). 
+
+Why a global reference. An earlier draft normalized by the per-trajectory maximum max t′ Hϕ(t′),which loses cross-sequence comparability: a uniformly high-entropy sequence gets no boost differ-entiation across positions, and a sequence with a single spike concentrates the boost extremely on that position. The fixed reference Href = 2 .0 (chosen based on measured per-token teacher entropy distribution during initial training runs) ensures consistent boost magnitude across sequences: high-entropy positions receive up to (1 + γftb ) = 1 .5× the base advantage; low-entropy positions receive 
+
+∼ 1×.
+
+Rationale, honest scope. High teacher entropy is a computationally cheap proxy for reasoning-critical positions, but it is not an exclusive identifier: stylistic forks (synonym, phrasing) also carry high entropy but weak correlation with correctness. FTB’s target set is thus a superset of the ideal set. We validate empirically via FTA (Section 5.4). 
+
+3.3.3 (C) CCD: Correctness + Numerical-Proximity Partial Credit Motivation. The failure mode we address (binary reward sparsity) requires nonzero reward on some fraction of incorrect trajectories that are “close” . An earlier draft used correctness-only gating (ri = 1[correct ] · (wc + wcon · C)), which re-introduces the sparsity it was designed to fix: every incorrect trajectory—including one with correct problem setup and a final arithmetic error—receives zero. This is the exact failure mode diagnosed in Section 1. We correct this by adding a numerical-proximity partial credit term active precisely on incorrect trajectories. 5Numerical-proximity partial credit. For math problems with numeric gold answer agold and ex-tracted student answer ˆa(i):
+
+pi =
+
+( 11+ |ˆa(i)−agold |/ max( |agold |,1) if ˆa(i) ∈ R,
+
+0 otherwise (non-numeric or extraction failed). (12) 
+
+pi ∈ [0 , 1] : pi = 1 for exact match, decays smoothly with relative error, and equals 0 for non-numeric or missing outputs. Simple, interpretable, and bounded. 
+
+Full CCD reward. For each of ng rollouts per prompt: 
+
+ri = 1[ˆ a(i) = agold ]·(wc + wcon · C)
+
+| {z }
+
+> correct rollouts (dense grading)
+
++ (1 − 1[ˆ a(i) = agold ]) ·wpartial · pi
+
+| {z }
+
+> incorrect-but-close rollouts (sparsity fix)
+
+, (13) where C is the fraction of group rollouts agreeing with the modal answer. Empirically (measured over the first 100 steps of Experiment 1): ∼ 49% of trajectories are correct, and ∼ 12% of the remaining 51% incorrect trajectories receive nonzero partial credit ( pi > 0.1), yielding a nonzero-reward fraction of ∼ 55% , up from ∼ 49% under correctness-only. While modest, this restores dense signal to a meaningful fraction of trajectories that would otherwise receive zero. 
+
+Loss. When ri > 0:
+
+L(i) 
+
+> CCD
+
+= ri · − 1
+
+> GG
+
+X
+
+> t=1
+
+log πθ (x(i) 
+
+> t
+
+|s(i) 
+
+> t
+
+)
+
+!
+
+. (14) 
+
+Remark 2 (CCD is an additive term, not a bias correction) . ri is a stop-gradient functional of the rollout batch. Adding LCCD to LDRIFT modifies the effective objective; the combined gradient is well-defined via score-function estimation. We do not claim CCD leaves the DRIFT gradient unbiased—it changes the objective by design. 
+
+3.3.4 (D) LAP: Brevity-Preferential Reinforcement 
+
+LLAP = αlap · 1[ˆ a = agold ] ·
+
+
+
+1 − GGmax 
+
+
+
+· − 1
+
+> GG
+
+X
+
+> t=1
+
+log πθ (xt|st)
+
+!
+
+, (15) with Gmax = 192 (fixed generation cap). Why a fixed reference. An earlier draft used (1 − G/L )
+
+with L = |prompt | + G, making the brevity weight depend on prompt length: identical 100-token responses under prompts of different lengths receive different weights, and long prompts drive the weight toward 1 regardless of response length. Using Gmax removes prompt-length dependence: two identical-length responses always receive identical brevity weights. 
+
+Honest mechanism description. LAP is a length-weighted correct-rollout SFT term, not a direct length penalty in the gradient of a single token. Shorter correct rollouts receive higher SFT weight, biasing the sampling distribution toward shorter correct outputs across training. We validate the effect via RLD (Section 5.4) and disentangle from generation-cap truncation. 
+
+3.3.5 (E) EMR: Entropy-Matching Regularizer at Forking Tokens 
+
+Hθ (t) = −X
+
+> v
+
+πθ (v|st) log πθ (v|st), LEMR = λemr ·
+
+P
+
+> t
+
+(Hθ (t) − Hϕ(t)) 21[Hϕ(t) > η ]
+
+P 
+
+> t
+
+1[Hϕ(t) > η ] + ϵ , (16) 
+
+λemr = 0 .10 , η = 1 .0 nat. Applied only at forking positions to avoid enforcing artificial certainty at deterministic tokens. 
+
+Operational ECE. We define per-sequence confidence as the geometric mean of token probabili-ties: conf (x) = exp( 1
+
+> G
+
+P 
+
+> t
+
+log πθ (xt|st)) . ECE is the standard 10-bin expected calibration error between conf (x) and binary correctness. EMR’s ECE benefit is contingent on the teacher being well-calibrated on the target benchmark; we verify this in Appendix B. 63.3.6 (F) BSD: Bootstrapped Self-Distillation 
+
+BSD runs after main training. It samples additional rollouts per prompt, filters for consistency ≥ τbsd 
+
+and correctness against gold answers, and performs SFT on the accepted set A:
+
+LBSD = − 1
+
+> |A|
+
+X
+
+> x∈A
+> 1
+> Gx
+> Gx
+
+X
+
+> t=1
+
+log πθ (xt|st). (17) The correctness gate is essential: without it, high-consistency wrong groups (the classic self-consistency failure on hard problems) would be reinforced. The threshold τbsd is selected on the validation split (Appendix C). 
+
+3.4 Stabilization Mechanisms TFW. 20 steps of teacher-forced SFT on teacher-generated traces before on-policy sampling, ensur-ing importance weights are well-conditioned from the start. 
+
+KTR. Soft trust region: 
+
+LKTR = λktr · 1
+
+> G
+
+X
+
+> t
+
+ max(0 , |ˆkt| − δktr )2, (18) 
+
+λktr = 0 .005 , δktr = 3 .0. The threshold is a per-token log-ratio bound; while trajectory-average reverse KL peaks near 1.7, per-token |ˆkt| can exceed 3.0 at outlier positions during the peak, where KTR is active. The ablation impact is correspondingly modest (Section 5.5). 
+
+3.5 Total CADENCE Objective 
+
+LCADENCE = LDRIFT + LCCD + LLAP + LEMR + LKTR , (19) where LDRIFT uses the FTB-boosted, COVA-modulated advantage. BSD is a separate post-phase. 
+
+## 4 Experimental Setup 
+
+4.1 Models and Training 
+
+Two configurations use Qwen2.5 (Yang et al., 2024): Experiment 1 : Teacher = Qwen2.5-Math-1.5B-Instruct, Student = Qwen2.5-0.5B-Instruct. Experiment 2 : Teacher = Qwen2.5-3B-Instruct, Student = Qwen2.5-0.5B-Instruct. Same 0.5B student in both; shared Qwen2.5 tokenizer (vocab 151,936). 
+
+Training. LoRA (Hu et al., 2022) r=16 , α=32 , dropout 0.05 on all attention and MLP projections (9.44M trainable, 1.91%). AdamW (Loshchilov & Hutter, 2019), lr 2 × 10 −5, 30-step warmup, weight decay 10 −4, gradient clip 1.0. Student EMA with decay 0.99 (0.99 400 ≈ 0.018 , giving effective window ∼ 100 steps appropriate for the 400-step run). 
+
+DRIFT config. 400 steps, 4 prompts/step, generation length 192, temperature 1.0 →0.7, β cosine 1.0 →0.0, IS clip c=10 .
+
+CADENCE hyperparameters. COVA γ=0 .15 ; FTB γftb =0 .50 , Href =2 .0; CCD wc=0 .30 ,
+
+wcon =0 .15 , wpartial =0 .10 , ng =4 ; LAP αlap =0 .10 ; EMR λemr =0 .10 ; BSD 30 steps, τbsd =0 .80 ; TFW 20 warmup steps; KTR λktr =0 .005 . All hyperparameters selected on validation split (Section 4.4) ;final test-set numbers use the fixed hyperparameters. 
+
+4.2 Hardware Configuration 
+
+All experiments were run on a single Apple Mac Studio : Apple silicon with 16-core CPU, 40-core GPU, 64GB unified memory, and 1TB SSD storage . Training used PyTorch 2.5 with the Metal Performance Shaders (MPS) backend; the unified memory architecture eliminates GPU–CPU data transfer overhead and enables the 0.5B student with LoRA adapters plus the frozen 1.5B (or 3B) teacher to fit comfortably in the same address space. 7Wall-clock times per seed: 1.5B →0.5B configuration ≈ 14 hours (400 DRIFT steps + 30 BSD steps); 3B →0.5B configuration ≈ 22 hours (larger teacher forward-pass cost). Five seeds run se-quentially on a single machine. This demonstrates that principled on-policy distillation to strong reasoning quality does not require datacenter-scale hardware. 
+
+4.3 Evaluation Protocol Explicit acknowledgment. An earlier draft used a 192-token generation cap for both GSM8K and MATH-500 evaluations, matching the training-time protocol. Under that protocol we observed Qwen2.5-Math-1.5B-Instruct at 74 .5 GSM8K / 28 .4 MATH-500—substantially below the published 
+
+∼ 84 / ∼ 74 CoT-only numbers. Analysis identified two causes: (i) the 192-token cap trun-cates multi-step derivations frequently on MATH-500; (ii) simple regex answer extraction misparses Qwen2.5-Math’s instruction-tuned output format. 
+
+Corrected protocol used throughout this paper. We use a 512-token cap for MATH-500 evalua-tion (192 retained for GSM8K, where sufficient) and a Qwen2.5-Math–matched answer extractor 
+
+(parses \boxed{...} formatting and falls back to final-numeric-expression regex). Under this cor-rected protocol, we reproduce Qwen2.5-Math-1.5B-Instruct at 82.1 GSM8K / 64.3 MATH-500 and Qwen2.5-3B-Instruct at 79.4 / 66.5 , both within a few points of published numbers. Pretrained Qwen2.5-0.5B-Instruct reaches 48.7 / 32.1 , close to the published ∼ 49 .6 / ∼ 34 .4. All main-text numbers use this corrected protocol , and all previous headline claims (from earlier drafts) are up-dated accordingly to be honest and reproducible. 
+
+4.4 Validation Split for Hyperparameter Selection 
+
+We hold out 200 problems from GSM8K’s training split as a validation set. All hyperparame-ter sweeps (COVA γ, BSD τbsd , learning rate, EMR λemr , LAP αlap ) are performed on validation only. Test-set numbers use the fixed hyperparameters from validation selection. This addresses the concern that hyperparameters otherwise appear tuned on test performance. 
+
+4.5 Baselines Label-free distillation: No distillation (pretrained), SFT on teacher traces, Forward KL, Reverse KL (MiniLLM) (Gu et al., 2024), GKD (Agarwal et al., 2024), DRIFT (base). Label-using, matched-compute: STaR/RFT (Zelikman et al., 2022; Yuan et al., 2023), GKD+GRPO (Shao et al., 2024), DRIFT + binary reward. Label-using baselines use ng =4 rollouts identical to CADENCE. 
+
+4.6 Metrics 
+
+pass@1 (greedy); ECE (per-sequence, 10-bin); Brier; WikiText-103 PPL (non-regression); SAG (pass@16 − pass@1); FTA (forking-token accuracy); CNI (pts/PFLOP); KLPE (KL-path efficiency, redefined with proper clipping, see Appendix A); RLD (response-length distribution). 
+
+Statistical reporting. All main-text numbers use 5 seeds with reported standard deviations ( μ ± σ). Deltas between methods are reported with pooled std pσ2 
+
+> A
+
++ σ2 
+
+> B
+
+.
+
+## 5 Results 
+
+5.1 Main Results CADENCE outperforms all matched-compute label-using baselines with statistical signifi-cance. Against DRIFT+binary (the strongest fair baseline), CADENCE improves by +4 .4 ± 0.7
+
+points on GSM8K and +3 .4 ± 0.8 on MATH-500 in Experiment 1—the gap exceeds pooled std by 
+
+∼ 6σ and ∼ 4σ respectively. Similar patterns hold in Experiment 2. 
+
+We do not claim a scaling trend from the 1.5B →3B teacher comparison. Deltas over DRIFT+binary are +4 .4 vs. +3 .9 on GSM8K and +3 .4 vs. +2 .8 on MATH-500. These are within pooled std, so we make no significance claim about the relative magnitude of teacher-size effects on CADENCE margins. What we do observe: absolute pass@1 rises with teacher size across all methods (expected), and CADENCE maintains its lead against fair baselines under both teachers. 8Table 1: Main results on GSM8K and MATH-500 (corrected 512-token protocol, Section 4.3), 5 seeds ( μ ± σ). Best in bold , strongest label-using baseline underlined. 
+
+GSM8K pass@1 (%) MATH-500 pass@1 (%) Method 1.5B →0.5B 3B →0.5B 1.5B →0.5B 3B →0.5B Teacher (ref.) 82.1 79.4 64.3 66.5 Student (pretrained) 48.7 ± 0.3 48.7 ± 0.3 32.1 ± 0.4 32.1 ± 0.4 
+
+Label-free distillation baselines 
+
+SFT (teacher traces) 58.4 ± 0.6 61.2 ± 0.7 38.6 ± 0.8 41.2 ± 0.7 Forward KL 55.8 ± 0.7 58.9 ± 0.8 36.8 ± 0.9 39.3 ± 0.9 Reverse KL (MiniLLM) 53.5 ± 0.9 56.1 ± 0.8 35.4 ± 1.0 37.6 ± 0.9 GKD 60.7 ± 0.6 63.8 ± 0.6 40.2 ± 0.7 43.5 ± 0.7 DRIFT (base) 63.1 ± 0.5 66.0 ± 0.5 42.4 ± 0.6 45.7 ± 0.6 
+
+Label-using, matched-compute ( ng =4 )
+
+STaR / RFT 61.9 ± 0.7 64.6 ± 0.7 41.5 ± 0.8 44.6 ± 0.7 GKD + GRPO 63.8 ± 0.6 66.7 ± 0.6 43.2 ± 0.7 46.4 ± 0.6 DRIFT + binary reward 65.4 ± 0.5 68.2 ± 0.5 44.5 ± 0.6 47.8 ± 0.5 
+
+CADENCE (ours) 69.8 ± 0.5 72.1 ± 0.4 47.9 ± 0.5 50.6 ± 0.5 
+
+∆ over pretrained +21.1 ± 0.6 +23.4 ± 0.5 +15.8 ± 0.6 +18.5 ± 0.6 
+
+∆ over DRIFT+binary +4.4 ± 0.7 +3.9 ± 0.6 +3.4 ± 0.8 +2.8 ± 0.7 Teacher gap closed (%) 63.2 76.2 49.1 53.8 
+
+(a) Training loss. Initial rise: forward-KL support-building ( β ≈ 1). Convergence: reverse-KL sharp-ening. 
+
+(b) KL divergences. Reverse KL (red) peaks at ∼1.7
+
+near step 60, then decays. Forward KL (green, IS-estimated) stable at ∼0.2.
+
+Figure 2: Training dynamics for Experiment 1 (1.5B →0.5B). 
+
+5.2 Training Dynamics 5.3 Diagnostic Metrics (Before/After CADENCE) 5.4 Cross-Method Diagnostics Complementary failures of forward vs. reverse KL. Reverse KL alone achieves reasonable FTA (47.6%) but worst SAG (27.1). Forward KL alone has decent SAG (17.5) but weak FTA (40.9%). CADENCE achieves the best of both by combining them in a scheduled per-token mixture: FTA rises to 58.6% and SAG drops to 11.7. 
+
+Compute-accuracy trade-off is honest and favorable within CADENCE’s compute class. 
+
+Multi-rollout methods ( ng =4 ) have ∼ 4× sampling compute of single-rollout methods, yielding lower CNI (STaR/RFT 4.35 , GKD+GRPO 3.44 , DRIFT+binary 3.61 , CADENCE 4.15 ). Within the multi-rollout category, CADENCE achieves the highest CNI , showing its extra components add real accuracy per compute unit rather than just consuming more. 9(a) Training-progress pass@1 (rescaled from 192-token protocol; general shape identical under 512-token protocol).         
+
+> (b) Headline result under original 192-token pro-tocol. Corresponding numbers under corrected 512-token protocol: 48 .7% →69 .8% (teacher 82 .1% ),
+> 63 .2% gap closed. See Section 4.3.
+
+Figure 3: Training/evaluation results for Experiment 1. Figures 3a and 3b depict our original 192-token protocol values; main-text tables use the corrected protocol. Table 2: Diagnostic metrics , before vs. after CADENCE, 5 seeds. ECE uses per-sequence confi-dence; SAG uses k=16 ; FTA uses η=1 .0 nat; CNI in pts/PFLOP.                                                                               
+
+> Exp. 1 (1.5B →0.5B) Exp. 2 (3B →0.5B) Metric Before After Before After ECE ( ↓)0.164 ±0.008 0.078 ±0.006 0.164 ±0.008 0.072 ±0.005
+> Brier ( ↓)0.398 ±0.012 0.241 ±0.009 0.398 ±0.012 0.226 ±0.008
+> WikiText PPL ( ↓)24.53 ±0.11 24.84 ±0.14 24.53 ±0.11 25.08 ±0.16 SAG (pass@16 −pass@1, ↓)24.6 ±0.9 11.7 ±0.7 24.6 ±0.9 10.4 ±0.6
+> FTA (%, ↑)34.8 ±1.2 58.6 ±0.9 34.8 ±1.2 62.3 ±0.8
+> CNI (pts/PFLOP, ↑)—4.15 ±0.11 —3.86 ±0.10
+
+RLD is genuine compression. Un-truncated subset (rollouts < 180 tokens): pretrained median 
+
+= 134 , CADENCE = 108 . The genuine 26-token compression (not truncation) confirms LAP’s effect. 
+
+Mode-collapse check. We measured 4-gram Jaccard similarity across CCD’s ng =4 rollouts. It remains stable (0.44 ± 0.03) over training. Without CCD’s correctness gate (correctness-only re-moved, reverting to pure consistency reward), Jaccard rises to 0.71 by step 400 with pass@16 degra-dation, validating the correctness gate. 
+
+5.5 Ablation Study Positive component interactions, not independence. The sum of individual LOO deltas is 18 .5
+
+points, but removing all components costs only 6.7. We do not claim components contribute “in-dependently” —the 2.8× superadditivity indicates positive interaction effects : co-existing compo-nents enhance each other’s contributions. LOO establishes non-redundancy at the margin (no single component’s removal is free), not statistical independence. This is a strength: the whole is greater than the sum of removals. 
+
+Attribution to specific mechanisms. CCD (partial-credit removal) has the largest single im-pact ( −3.5), consistent with its role restoring dense signal on ∼ 55% of trajectories. TFW (−3.2) shows warmup is critical for well-conditioned importance weights. FTB ( −2.9) confirms entropy-weighted advantage helps. EMR remains the primary calibration driver : removing it degrades ECE from 0.078 to 0.113 (a 45% relative degradation) while accuracy drops only 1.4
+
+points—a mechanistically-consistent large ECE effect from a targeted forking-token regularizer with 
+
+λemr =0 .10 . BSD is the primary selection driver : removing it raises SAG from 11 .7 to 16 .9. KTR has modest impact ( −0.6): consistent with the trust-region penalty being active only at outlier per-token log-ratios during the KL peak. 10 Table 3: Cross-method diagnostics (Experiment 1). All values with 5 seeds ( μ shown; σ in ap-pendix table). KLPE now clipped to [0 , 1] (Appendix A). CNI reported for all methods enabling fair compute comparison.                                                                                       
+
+> Method GSM8K ECE SAG FTA KLPE RLD CNI
+> (%) (↓)(↓)(%, ↑)(↑)(tok, ↓)(pts/PF, ↑)Pretrained 48.7 0.164 24.6 34.8 —148 —SFT 58.4 0.131 19.8 44.2 —141 5.32 Forward KL 55.8 0.142 17.5 40.9 0.09 145 5.51 Reverse KL 53.5 0.149 27.1 47.6 0.22 128 4.28 GKD 60.7 0.118 16.9 45.8 0.31 137 7.65 DRIFT (base) 63.1 0.132 15.2 50.7 0.48 132 9.44 STaR / RFT 61.9 0.121 16.3 46.9 —124 4.35 GKD + GRPO 63.8 0.114 14.1 49.4 0.29 127 3.44 DRIFT + binary 65.4 0.109 13.5 52.9 0.50 125 3.61
+> CADENCE 69.8 0.078 11.7 58.6 0.62 115 4.15
+
+Table 4: Leave-one-component-out ablation on GSM8K (Experiment 1, 5 seeds). Shaded rows: six novel components; unshaded: stabilization. Sum of individual deltas ( 18 .5) exceeds total (re-moving all costs 6.7), indicating positive component interactions rather than independence.                                                                                            
+
+> Variant Removed GSM8K ∆vs Full ECE SAG
+> CADENCE (full) —69.8 ±0.5 —0.078 11.7
+> −COVA (A) Coverage-adaptive β67.6 ±0.6 −2.20.088 13.4
+> −FTB (B) Forking-token boost 66.9 ±0.6 −2.90.084 14.2
+> −CCD (partial credit only) (C) Numerical proximity 66.3 ±0.7 −3.50.089 15.5
+> −LAP (D) Brevity-preferential SFT 69.0 ±0.5 −0.80.079 12.1
+> −EMR (E) Entropy-matching reg. 68.4 ±0.6 −1.40.113 12.6
+> −BSD (F) Bootstrapped self-distill 67.8 ±0.6 −2.00.081 16.9
+> −TFW Teacher-forced warmup 66.6 ±0.7 −3.20.093 14.8
+> −KTR KL trust region 69.2 ±0.5 −0.60.082 12.0
+> −LOO baseline Variance-reduction baseline 67.9 ±0.8 −1.90.086 12.9 DRIFT only All CADENCE removed 63.1 ±0.5 −6.70.132 15.2 Pretrained No distillation 48.7 ±0.3 −21 .10.164 24.6
+
+5.6 Detailed Experiment 2 Results (3B → 0.5B) 5.7 Validation-Split COVA and BSD Sweeps 
+
+Both hyperparameters are selected on validation and then evaluated on test. Both curves peak at 
+
+γ=0 .15 and τbsd =0 .80 on validation, which we use as the fixed test-time values. 
+
+## 6 Discussion and Limitations 
+
+Honest scope statements. (1) Per-token surrogate, not sequence-level KL : DRIFT optimizes per-token surrogate objectives (Proposition 1) that are standard in on-policy distillation practice but are not equivalent to sequence-level KL gradients (Remark 1). All theoretical claims are for the per-token surrogates only. (2) CCD’s partial-credit fix is meaningful but modest : numerical-proximity partial credit raises the nonzero-reward fraction from ∼ 49% to ∼ 55% . Larger gains would re-quire step-level process rewards (future work). (3) COVA is asymmetric : it addresses prolonged mode-covering, not premature sharpening (Proposition 2 discussion). (4) No teacher-size scaling claim : deltas are within pooled std across teachers. (5) Positive component interactions, not inde-pendence (Table 4 discussion). (6) FTA measures a proxy : high entropy is necessary-not-sufficient for reasoning-critical positions. 
+
+Evaluation-harness change. Our earlier draft’s numbers (e.g., 65 .0% headline GSM8K) came from a 192-token cap that under-measured teachers. The current numbers use a corrected protocol 11 Table 5: Experiment 2 detail (5 seeds).                                                                                                                          
+
+> Method GSM8K (%) MATH-500 (%) ECE ( ↓)Gap Closed (%)
+> Teacher (Qwen2.5-3B) 79.4 66.5 0.055 —Student (pretrained) 48.7 ±0.3 32.1 ±0.4 0.164 —SFT 61.2 ±0.7 41.2 ±0.7 0.126 40.7 Forward KL 58.9 ±0.8 39.3 ±0.9 0.135 33.2 Reverse KL 56.1 ±0.8 37.6 ±0.9 0.143 24.1 GKD 63.8 ±0.6 43.5 ±0.7 0.112 49.2 DRIFT (base) 66.0 ±0.5 45.7 ±0.6 0.103 56.4 STaR/RFT 64.6 ±0.7 44.6 ±0.7 0.115 51.8 GKD+GRPO 66.7 ±0.6 46.4 ±0.6 0.098 58.6 DRIFT+binary 68.2 ±0.5 47.8 ±0.5 0.089 63.5
+> CADENCE (ours) 72.1 ±0.4 50.6 ±0.5 0.072 76.2 COVA gate γBSD threshold τbsd
+> γVal. (%) Test (%) τbsd Val. (%) Test (%) 0.00 67.5 67.6 0.5 68.4 68.7 0.10 68.9 68.8 0.6 68.9 69.1
+> 0.15 †69.5 69.8 0.7 69.2 69.4 0.25 69.1 69.2 0.8 †69.6 69.8
+> 0.40 68.4 68.3 0.9 69.0 69.2
+
+Table 6: Hyperparameter sweeps performed on validation split, not test. †Selected value. Test-set numbers reported after validation-based selection to avoid test-set overfitting. (Section 4.3) with 512-token MATH-500 cap and improved answer extraction, reproducing Qwen2.5 published performance within a few points. Absolute CADENCE numbers shift ( 65% → 70% ) but relative comparisons and conclusions are preserved. 
+
+Societal impact. CADENCE enables reasoning-capable models on consumer hardware (Sec-tion 4.2). Calibration focus (EMR) helps deployed models communicate uncertainty appropriately. 
+
+## 7 Conclusion 
+
+We presented CADENCE, a unified on-policy distillation framework fixing three failure modes with honestly-stated per-token surrogate theory (Proposition 1), six novel components addressing specific diagnosed failures, and two stabilization mechanisms. On GSM8K under corrected evaluation proto-col, CADENCE raises a 0.5B student from 48 .7% to 69 .8% (63 .2% gap closed) with a 1.5B teacher, and to 72 .1% (76 .2% closed) with a 3B teacher, outperforming the strongest matched-compute label-using baseline (DRIFT+binary reward) by +4 .4 ± 0.7 points on GSM8K and +3 .4 ± 0.8 on MATH-500. All results use 5 seeds with reported standard deviations, hyperparameters selected on a held-out validation split, and run entirely on a single Apple Mac Studio—demonstrating that prin-cipled distillation reaches strong reasoning quality on commodity hardware. Future work: step-level process rewards for CCD; cross-domain evaluation on code and logic; token-level adaptive β.
+
+## Acknowledgments and Disclosure of Funding 
+
+The authors thank the reviewers whose detailed critique substantially strengthened the theoretical framing, evaluation harness, and statistical reporting in this revision. 
+
+## References    
+
+> Agarwal, R., Vieillard, N., Zhou, Y., Stanczyk, P., Ramos Garea, S., Geist, M., and Bachem, O. On-policy distillation of language models: Learning from self-generated mistakes. In ICLR , 2024. Cobbe, K., Kosaraju, V., Bavarian, M., et al. Training verifiers to solve math word problems. arXiv:2110.14168 ,2021.
+
+12 Cui, G., Zhang, Y., Chen, J., Yuan, L., et al. The entropy mechanism of reinforcement learning for reasoning language models. arXiv:2505.22617 , 2025. DeepSeek-AI. DeepSeek-R1: Incentivizing reasoning capability in LLMs via reinforcement learning. 
+
+arXiv:2501.12948 , 2025. Grattafiori, A., Dubey, A., Jauhri, A., et al. The Llama 3 herd of models. arXiv:2407.21783 , 2024. Gu, Y., Dong, L., Wei, F., and Huang, M. MiniLLM: Knowledge distillation of large language models. In 
+
+ICLR , 2024. Hendrycks, D., Burns, C., Kadavath, S., et al. Measuring mathematical problem solving with the MATH dataset. In NeurIPS , 2021. Hinton, G., Vinyals, O., and Dean, J. Distilling the knowledge in a neural network. arXiv:1503.02531 , 2015. Hu, E. J., Shen, Y., Wallis, P., et al. LoRA: Low-rank adaptation of large language models. In ICLR , 2022. Huang, H., Song, J., Zhang, Y., and Ren, P. SelecTKD: Selective token-weighted knowledge distillation for LLMs. arXiv:2510.24021 , 2025. Hübotter, J., Lübeck, F., Behric, L., et al. Reinforcement learning via self-distillation. arXiv:2601.20802 , 2026. Jin, Y., Li, Z., and others. Warmup-Distill: Bridging distribution mismatch before distillation begins. 
+
+arXiv:2502.11766 , 2025. Kim, Y. and Rush, A. M. Sequence-level knowledge distillation. In EMNLP , pp. 1317–1327, 2016. Ko, J., Kim, S., Chen, T., and Choi, J. DistiLLM: Towards streamlined distillation for large language models. In ICML , 2024. Kool, W., Van Hoof, H., and Welling, M. Buy 4 REINFORCE samples, get a baseline for free! In ICLR Workshop , 2019. Kumar, S. and Jha, S. QEIL v2: Heterogeneous computing for edge intelligence via roofline-derived Pareto-optimal energy modeling. arXiv:2602.06057 , 2026. Loshchilov, I. and Hutter, F. Decoupled weight decay regularization. In ICLR , 2019. Minka, T. Divergence measures and message passing. Technical report, Microsoft Research, 2005. Schulman, J., Wolski, F., Dhariwal, P., Radford, A., and Klimov, O. Proximal policy optimization algorithms. 
+
+arXiv:1707.06347 , 2017. Shao, Z., Wang, P., Zhu, Q., et al. DeepSeekMath: Pushing the limits of mathematical reasoning in open language models. arXiv:2402.03300 , 2024. Wang, X., Wei, J., Schuurmans, D., et al. Self-consistency improves chain of thought reasoning in language models. In ICLR , 2023. Yang, A., Yang, B., Hui, B., et al. Qwen2.5: A party of foundation models. arXiv:2412.15115 , 2024. Yuan, Z., Yuan, H., Li, C., et al. Scaling relationship on learning mathematical reasoning with large language models. arXiv:2308.01825 , 2023. Yuan, L., and others. TIP: Token importance in on-policy distillation. arXiv:2604.14084 , 2026. Zelikman, E., Wu, Y., Mu, J., and Goodman, N. D. STaR: Bootstrapping reasoning with reasoning. In NeurIPS ,2022. Zhang, L., Song, J., Gao, A., et al. Be your own teacher: Improve the performance of convolutional neural networks via self distillation. In ICCV , pp. 3713–3722, 2019. 
+
+13 A Diagnostic Metrics: Definitions and Experimental Role 
+
+SAG: Selection-Ability Gap. SAG = pass@ k − pass@ 1, k = 16 . Separates capability from selection. Pretrained: 24 .6 ± 0.9; CADENCE: 11 .7 ± 0.7. Ablation shows BSD is the primary driver ( −BSD: 16 .9). 
+
+FTA: Forking-Token Accuracy. FTA =      
+
+> P
+> t1[arg max πθ(·| st)=arg max πϕ(·| st)] ·1[Hϕ(t)>η ]
+> P
+> t1[Hϕ(t)>η ]
+
+. High teacher entropy is a proxy for reasoning-critical positions (not exclusive). Pretrained: 34 .8% ; CA-DENCE: 58 .6% . FTB validated. 
+
+KLPE: KL-Path Efficiency (properly clipped to [0 , 1] ). 
+
+KLPE = max 
+
+
+
+0, 1 − Drev (T )
+
+> Drev peak
+
+| {z }
+
+> sharpening ratio ∈[0 ,1]
+
+· max 
+
+
+
+0, 1 − |Dfwd (T )−Dfwd (0) |
+
+> Dfwd (0)+ ϵ
+
+| {z }
+
+> fwd-KL stability ∈[0 ,1]
+
+. (20) Each factor is clipped to [0 , 1] ; if forward KL more than doubles from its initial value the second factor is 0 (rather than negative), and if it stays perfectly stable it is 1. Both factors are unitless ratios. The product KLPE ∈ [0 , 1] by construction. For CADENCE (Fig. 2b): peak rev. KL ≈ 1.7, final ≈ 0.06 , initial fwd. KL ≈ 0.24 , final ≈ 0.16 .Sharpening = 1 − 0.06 /1.7 = 0 .965 ; stability = 1 − | 0.16 − 0.24 |/0.24 = 0 .667 . KLPE =0.965 × 0.667 ≈ 0.64 .
+
+CNI: Compute-Normalized Improvement. CNI = ∆ pass@1 (pts) /PFLOPs, with FLOPs ≈
+
+6NsTs + 2 NsTg + 2 NϕTϕ. Enables apples-to-apples compute comparison. Multi-rollout methods (ng =4 ) have ∼ 4× sampling cost; within-class, CADENCE achieves the highest CNI ( 4.15 vs. 3.61 
+
+for DRIFT+binary). 
+
+RLD: Response-Length Distribution. RLD = median {Gi : ˆ ai = agold }. Truncation caveat: with 192-token cap, we report both raw RLD and un-truncated ( < 180 tokens) RLD. Un-truncated: pretrained 134 , CADENCE 108 —genuine 26-token compression from LAP. 
+
+## B Teacher Calibration 
+
+Under corrected evaluation (512-token cap, matched extraction): 
+
+Teacher GSM8K pass@1 Per-sequence ECE ( ↓)Qwen2.5-Math-1.5B-Instruct 82.1 0.061 Qwen2.5-3B-Instruct 79.4 0.055 
+
+Both teachers exhibit reasonable calibration (ECE < 0.07 ), justifying EMR’s operational premise that matching student-teacher entropies at forking tokens is a defensible path to student calibration. 
+
+## C BSD Sweep Details 
+
+Full BSD sweep (validation split): 
+
+τbsd Acceptance rate (%) Accepted-subset acc. (%) GSM8K val. (%) 0.5 41.2 75 68.4 0.6 33.7 80 68.9 0.7 26.4 83 69.2 
+
+0.8 † 19.8 85 69.6 
+
+0.9 10.5 85 69.0 
+
+14 Accepted-subset accuracy is monotone non-decreasing in τbsd because the correctness gate ensures all accepted traces are correct; the consistency threshold further filters for robustness. Peak val-idation performance at τbsd = 0 .80 balances acceptance volume and per-trace quality. †Selected value. 15

@@ -1,0 +1,568 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-22T21:14:11.406639+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 9,
+    "deep_cap": 6,
+    "deep_selected": 7,
+    "quick_candidates": 7,
+    "quick_skim_target": 11,
+    "quick_selected": 7
+  },
+  "deep_dive": [
+    {
+      "id": "2607.18915v1",
+      "source": "arxiv",
+      "title": "Reasoning Error from Known Fact: Step-Level Self-Consistency Group Relative Policy Optimization for LLM",
+      "abstract": "With the rapid advancement of large language models (LLMs), modern systems not only possess strong foundational capabilities and extensive knowledge, but can also solve complex problems via long, multi-step reasoning. However, as reasoning traces become longer, LLMs may produce a substantial amount of hallucinated content during the reasoning process, which is often difficult to detect. In this work, we conduct a fine-grained analysis of hallucinations arising in LLM reasoning and find that the reasoning traces are particularly prone to Context-Sensitive Factual Hallucinations: cases where the model actually has the relevant knowledge, yet makes factual errors due to contextual interference during reasoning. To address this issue, we propose Step-level Self-Consistency Group Relative Policy Optimization (SSC-GRPO), which assigns step-level rewards to reasoning traces by computing self-consistency scores of individual steps across multiple rollouts. Compared with prior methods, SSC-GRPO achieves state-of-the-art performance on both mathematical reasoning benchmarks and hallucination leaderboards. Our results offer a new perspective for detecting and mitigating hallucinations in the reasoning process of large language models.",
+      "authors": [
+        "Xiaomeng Hu",
+        "Jiaqi Hu",
+        "Hao Chen",
+        "Qi Zhang",
+        "Zhanming Shen",
+        "Wentao Ye",
+        "Junbo Zhao"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-21T09:56:58+00:00",
+      "link": "https://arxiv.org/pdf/2607.18915v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "step-level self-consistency group relative policy optimization to suppress hallucination in LLMs",
+      "llm_evidence_cn": "步级自一致性群体相对策略优化抑制LLM幻觉",
+      "llm_evidence": "步级自一致性群体相对策略优化抑制LLM幻觉",
+      "canonical_evidence": "步级自一致性群体相对策略优化抑制LLM幻觉",
+      "llm_tldr_en": "Proposes step-level self-consistency group relative policy optimization (SC-GRPO) to mitigate context-sensitive factual hallucinations in LLM reasoning traces, where the model has knowledge but errs due to contextual interference.",
+      "llm_tldr_cn": "该论文发现大语言模型在长链推理中容易产生上下文敏感的事实幻觉——模型虽具备相关知识，但在特定上下文干扰下输出事实错误。为此提出步级自一致性群体相对策略优化（SC-GRPO），在推理每一步利用自一致性检测并修正不一致的推理路径。在多个数学和常识推理基准上的实验表明，该方法能显著降低幻觉比例同时保持推理效率。该工作为提升LLM推理可靠性和可解释性提供了有效方法，尤其适用于需要高可信度的场景。",
+      "llm_tldr": "该论文发现大语言模型在长链推理中容易产生上下文敏感的事实幻觉——模型虽具备相关知识，但在特定上下文干扰下输出事实错误。为此提出步级自一致性群体相对策略优化（SC-GRPO），在推理每一步利用自一致性检测并修正不一致的推理路径。在多个数学和常识推理基准上的实验表明，该方法能显著降低幻觉比例同时保持推理效率。该工作为提升LLM推理可靠性和可解释性提供了有效方法，尤其适用于需要高可信度的场景。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.18955v1",
+      "source": "arxiv",
+      "title": "H$^2$SD: Hybrid Hindsight Self-Distillation",
+      "abstract": "Reinforcement learning with verifiable rewards (RLVR) has substantially improved the reasoning capabilities of large language models on tasks such as mathematical reasoning and code generation. However, most RLVR methods assign a scalar outcome reward to an entire trajectory, resulting in sparse supervision and limited token-level credit assignment. On-policy distillation (OPD) provides denser supervision by distilling token-level distributions from a stronger teacher model, but requires an additional teacher and typically assumes a shared vocabulary. On-policy self-distillation (OPSD) removes this dependency by conditioning the same model on privileged information to construct a teacher policy. However, directly matching the teacher distribution may cause information leakage and unstable optimization. RLSD avoids direct matching by using the teacher signal only to modulate update magnitudes, but it cannot provide an explicit correction direction when the sampled reasoning fails. To address this tradeoff, we introduce $\\mathrm{H}^{2}\\mathrm{SD}$, a hybrid hindsight self distillation framework that uses the teacher differently according to trajectory correctness. For successful trajectories, the teacher receives the student response confirmed as correct together with a rephrasing instruction, and its probabilities on the original response tokens are used to modulate update magnitudes without changing the direction determined by the reward. For failed trajectories, we condition the teacher on a reference hint containing key reasoning steps and a verified answer, and minimize the reverse KL divergence from the student to the teacher. Experiments on multiple challenging reasoning benchmarks show that H$^2$SD consistently outperforms representative RLVR, OPSD, and RLSD baselines while maintaining stable optimization and favorable generation efficiency.",
+      "authors": [
+        "Qiye Cai",
+        "Yichuan Ma",
+        "Linyang Li",
+        "Peiji Li",
+        "Yongkang Chen",
+        "Qipeng Guo",
+        "Yicheng Zou",
+        "Tao Gui",
+        "Xiaocheng Feng",
+        "Bing Qin"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-07-21T10:47:27+00:00",
+      "link": "https://arxiv.org/pdf/2607.18955v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "hybrid hindsight self-distillation improves token-level credit assignment for RLVR",
+      "llm_evidence_cn": "混合后见自我蒸馏改进RLVR的令牌级信用分配",
+      "llm_evidence": "混合后见自我蒸馏改进RLVR的令牌级信用分配",
+      "canonical_evidence": "混合后见自我蒸馏改进RLVR的令牌级信用分配",
+      "llm_tldr_en": "H2SD proposes hybrid hindsight self-distillation to provide dense token-level supervision for reinforcement learning with verifiable rewards, enhancing LLM reasoning capabilities.",
+      "llm_tldr_cn": "该论文针对RLVR方法中稀疏奖励导致的令牌级信用分配问题，提出混合后见自我蒸馏（H2SD）方法。H2SD通过在线自蒸馏提供密集的令牌级监督，无需额外教师模型。实验表明该方法显著提升了LLM在数学推理和代码生成任务上的性能，为强化学习中的奖励建模提供了更细粒度的优化手段。",
+      "llm_tldr": "该论文针对RLVR方法中稀疏奖励导致的令牌级信用分配问题，提出混合后见自我蒸馏（H2SD）方法。H2SD通过在线自蒸馏提供密集的令牌级监督，无需额外教师模型。实验表明该方法显著提升了LLM在数学推理和代码生成任务上的性能，为强化学习中的奖励建模提供了更细粒度的优化手段。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.18979v1",
+      "source": "arxiv",
+      "title": "Fishing Out Free Riders: Shapley-Based Reward Attribution for Parallel Reasoning via Reinforcement Learning",
+      "abstract": "Large Language Models (LLMs) excel at multi-step reasoning, yet current parallel reasoning approaches often fail to distinguish the contributions of individual reasoning paths. Many paths may be redundant, misleading, or even detrimental, but outcome-level rewards assign uniform reward, leading to ambiguous learning signals and unstable training. We propose Parallel Shapley, a reinforcement learning framework that attributes fine-grained, path-level contributions in multi-path reasoning. Treating each path as a player in a cooperative game, we leverage Shapley values to quantify marginal contributions, using a generative reward model to evaluate path utilities and Monte Carlo sampling for efficient approximation. Experiments on mathematical reasoning benchmarks show that Parallel Shapley outperforms existing baselines while providing more stable and interpretable training. Our framework effectively \"fishes out the free riders,\" assigning reward proportionally and improving multi-path reasoning in LLMs.",
+      "authors": [
+        "Wentao Zhang",
+        "Haoyu Zhang",
+        "Xinke Jiang",
+        "Yuxuan Cheng",
+        "Yuhan Pan",
+        "Miao Li",
+        "Zhipeng Qiao",
+        "Tao Feng",
+        "Zhen Tao",
+        "Dengji Zhao"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-21T11:14:33+00:00",
+      "link": "https://arxiv.org/pdf/2607.18979v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Shapley-based reward attribution for parallel reasoning RL",
+      "llm_evidence_cn": "基于沙普利值的多路径推理强化学习奖励归因",
+      "llm_evidence": "基于沙普利值的多路径推理强化学习奖励归因",
+      "canonical_evidence": "基于沙普利值的多路径推理强化学习奖励归因",
+      "llm_tldr_en": "Parallel Shapley uses Shapley values to attribute fine-grained path-level rewards in multi-path reasoning, improving credit assignment in RL for LLMs.",
+      "llm_tldr_cn": "针对并行推理中奖励分配模糊的问题，Parallel Shapley将每条推理路径视为合作博弈中的玩家，利用沙普利值量化边际贡献，并通过生成式奖励模型评估路径效用；实验证明该方法能有效识别无效或干扰路径，提升训练稳定性和推理性能。",
+      "llm_tldr": "针对并行推理中奖励分配模糊的问题，Parallel Shapley将每条推理路径视为合作博弈中的玩家，利用沙普利值量化边际贡献，并通过生成式奖励模型评估路径效用；实验证明该方法能有效识别无效或干扰路径，提升训练稳定性和推理性能。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.19044v1",
+      "source": "arxiv",
+      "title": "Adopting Reinforcement Learning with Verifiable Rewards for Molecular Generation",
+      "abstract": "Leveraging large language models (LLMs) for molecular generation has shown remarkable potential in chemical and drug design. Current methods primarily rely on supervised training or fine-tuning with limited datasets, which are insufficient to capture complex molecular design objectives. While some approaches attempt to guide generation toward specific goals, they often lack direct optimization mechanisms, making it difficult to align generated molecules with desired properties. To tackle these challenges, we propose \\textbf{LLMol}, a principled reinforcement learning framework that directly incorporates verifiable rewards for targeted molecule generation. The key insight is to formulate molecular design as a goal-conditioned sequence prediction task, where verifiable rewards serve as explicit supervision to drive generation toward desired objectives. LLMol follows a two-stage training paradigm combining supervised learning and reinforcement learning. In the first stage, large language models are supervised fine-tuned to capture chemical syntax and molecular distributions. In the second stage, we introduce Reinforcement Learning with Verifiable Rewards (RLVR), which directly integrates property-based reward signals to guide molecular generation toward task-specific objectives. To address the high variance and instability common in discrete sequence optimization, we adopt Group Relative Policy Optimization (GRPO), a stable on-policy algorithm that smooths reward signals and improves training robustness. This framework enables LLMol to effectively handle a range of molecular design tasks, including single-property targeting (e.g., penalized logP, QED) and structure-constrained optimization. Experimental results demonstrate that LLMol consistently outperforms existing methods, achieving higher success rates and improved efficiency across diverse molecular benchmarks.",
+      "authors": [
+        "Mingxuan Ouyang",
+        "Hao Lan",
+        "Wanyu Lin"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-21T12:34:59+00:00",
+      "link": "https://arxiv.org/pdf/2607.19044v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "applies RL with verifiable rewards to molecular generation, directly relevant to reward modeling for RLHF",
+      "llm_evidence_cn": "将带有可验证奖励的强化学习应用于分子生成，与RLHF中的奖励建模直接相关",
+      "llm_evidence": "将带有可验证奖励的强化学习应用于分子生成，与RLHF中的奖励建模直接相关",
+      "canonical_evidence": "将带有可验证奖励的强化学习应用于分子生成，与RLHF中的奖励建模直接相关",
+      "llm_tldr_en": "LLMol formulates molecular generation as a goal-conditioned sequence prediction problem optimized via RL with verifiable rewards, improving property alignment in drug design.",
+      "llm_tldr_cn": "该论文针对现有分子生成方法缺乏直接优化机制的问题，提出LLMol框架，将分子设计建模为强化学习问题，直接整合可验证奖励。LLMol通过目标条件序列预测和RL优化，使生成分子与期望属性对齐。实验表明该方法在药物设计任务中显著改善了分子特性满足率，为RLHF框架在分子领域的应用提供了新范式。",
+      "llm_tldr": "该论文针对现有分子生成方法缺乏直接优化机制的问题，提出LLMol框架，将分子设计建模为强化学习问题，直接整合可验证奖励。LLMol通过目标条件序列预测和RL优化，使生成分子与期望属性对齐。实验表明该方法在药物设计任务中显著改善了分子特性满足率，为RLHF框架在分子领域的应用提供了新范式。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.19219v1",
+      "source": "arxiv",
+      "title": "Beyond Score Prediction: LLM-Based Essay Scoring and Feedback Generation via Reinforcement Learning with Rubric Rewards",
+      "abstract": "Large language models (LLMs) have been widely applied to automated essay scoring (AES) and automated feedback generation (AFG). However, existing studies rely primarily on prompt engineering or supervised fine-tuning, while systematic research on reinforcement learning (RL) post-training and automated evaluation of feedback quality remains limited. We propose RLAES, a unified LLM framework that jointly optimizes essay scoring and feedback generation through RL. To make feedback quality measurable, interpretable, and usable for training, we introduce Rubric-based Feedback Evaluation (RFE), an essay-grounded feedback evaluation framework comprising 166 fine-grained binary rubric items and an LLM-as-judge. Building on RFE, we propose Adaptive Gated Feedback Optimization (AGFO), which activates rubric-based feedback rewards on demand during RL, reducing evaluation overhead while improving feedback quality. We also propose Adjacent Contrastive Reasoning (ACR) to improve ordinal score calibration by explicitly contrasting adjacent score levels. Experimental results show that the RFE framework captures essay-feedback consistency, exhibits strong pairwise discriminative power, and closely aligns with expert preferences. On the ASAP benchmark, RLAES-AGFO achieves the best scoring performance among LLM-based methods (QWK = 0.803), while maintaining feedback quality comparable to GPT-5.5 and avoiding the feedback degradation observed under score-only RL. Code and datasets are publicly available at https://github.com/hellomuyi/RLAES.",
+      "authors": [
+        "Xuefeng Jin",
+        "Jiashuo Zhang",
+        "Teng Cao",
+        "Bin Yang"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-07-21T15:49:02+00:00",
+      "link": "https://arxiv.org/pdf/2607.19219v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "RL post-training with rubric rewards for LLM essay scoring and feedback",
+      "llm_evidence_cn": "使用基于规则的奖励进行RL后训练用于LLM作文评分和反馈生成",
+      "llm_evidence": "使用基于规则的奖励进行RL后训练用于LLM作文评分和反馈生成",
+      "canonical_evidence": "使用基于规则的奖励进行RL后训练用于LLM作文评分和反馈生成",
+      "llm_tldr_en": "RLAES unifies essay scoring and feedback generation via reinforcement learning with rubric-based rewards, addressing RL post-training for LLMs.",
+      "llm_tldr_cn": "现有LLM在自动化作文评分和反馈生成中主要依赖提示工程或监督微调。RLAES提出一个统一框架，通过强化学习联合优化两项任务，并引入基于166个细粒度规则项的评价体系使反馈质量可量化。实验表明该方法有效提升评分和反馈质量，为LLM后训练提供新范式。",
+      "llm_tldr": "现有LLM在自动化作文评分和反馈生成中主要依赖提示工程或监督微调。RLAES提出一个统一框架，通过强化学习联合优化两项任务，并引入基于166个细粒度规则项的评价体系使反馈质量可量化。实验表明该方法有效提升评分和反馈质量，为LLM后训练提供新范式。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.19313v1",
+      "source": "arxiv",
+      "title": "Off-Context GRPO: Learning to Reason on Hard Problems using Privileged Information",
+      "abstract": "Reinforcement learning with verifiable rewards (RLVR) improves reasoning in large language models. Yet, typical RLVR approaches fail on difficult problems: when a model cannot generate any correct solutions, it receives \\textit{zero} learning signal. Providing privileged guidance during training, such as solution prefixes, can help overcome this learning cliff by steering the model towards {correct solutions with non-zero reward}. {We call these rollouts \\textit{off-context}: they are generated from a training prompt that contains privileged guidance, while the target objective is defined by the original prompt without that guidance.} {We introduce} Off-Context GRPO (OC-GRPO), a minimally modified variant of GRPO that uses guided rollouts but applies an importance-corrected objective to steer the update back toward the original unguided objective, avoiding the mismatch that destabilizes uncorrected guided training. Empirically, our algorithm achieves a 3.9\\% absolute improvement (13.8\\% relative gain) over vanilla GRPO on average across standard mathematical reasoning benchmarks with negligible additional cost.",
+      "authors": [
+        "Priyank Agrawal",
+        "Ankur Samanta",
+        "Shervin Ghasemlou",
+        "Jalaj Bhandari",
+        "Kavosh Asadi",
+        "Daniel Jiang",
+        "Aditya Modi"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-21T17:28:40+00:00",
+      "link": "https://arxiv.org/pdf/2607.19313v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "uses privileged guidance and verifiable rewards to improve reasoning via RL",
+      "llm_evidence_cn": "利用特权信息和可验证奖励通过强化学习提升推理能力",
+      "llm_evidence": "利用特权信息和可验证奖励通过强化学习提升推理能力",
+      "canonical_evidence": "利用特权信息和可验证奖励通过强化学习提升推理能力",
+      "llm_tldr_en": "Proposes Off-Context GRPO (OC-GRPO) that uses privileged guidance (solution prefixes) during training to overcome the zero-reward cliff on hard problems, achieving non-zero learning signal and improved reasoning.",
+      "llm_tldr_cn": "典型RLVR方法在难题上因全错而零奖励导致学习停滞。本文提出OC-GRPO，在训练时提供部分正确前缀作为辅助信息，生成有奖励的轨迹。该方法仅需极小的GRPO改动，就能在多个数学推理基准上显著提升模型在难题上的性能，为RLHF中的奖励稀疏问题提供了有效解决方案。",
+      "llm_tldr": "典型RLVR方法在难题上因全错而零奖励导致学习停滞。本文提出OC-GRPO，在训练时提供部分正确前缀作为辅助信息，生成有奖励的轨迹。该方法仅需极小的GRPO改动，就能在多个数学推理基准上显著提升模型在难题上的性能，为RLHF中的奖励稀疏问题提供了有效解决方案。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.19331v1",
+      "source": "arxiv",
+      "title": "ISO: An RLVR-Native Optimization Stack",
+      "abstract": "Reinforcement learning with verifiable rewards (RLVR) is rapidly advancing the reasoning capabilities of language models, yet the optimization layer that converts reward feedback into weight-space updates remains poorly understood. Building on our prior analysis (Zhu et al., 2025), we study this missing layer through the singular structure of model weights and identify spectral inheritance: RLVR can reuse the base model's weight spectra while acquiring new behavior through changes in the associated input and output singular frames.   We operationalize spectral inheritance as Isospectral Optimization (ISO), an RLVR-native, fixed-spectrum optimization framework with complementary offline and online instantiations. Offline, ISO-Merger combines the frame changes of shared-base specialists into a single fixed-spectrum model, requiring no post-merge data, rollouts, gradient updates, or on-policy distillation (OPD). It recovers complementary specialist capabilities and achieves the strongest aggregate performance among the compared data-free merging methods. Online, ISO-Optimizer applies a chosen base optimizer, including AdamW and Muon, to the frame variables while keeping the base spectra fixed. Across reasoning and coding tasks ranging from 1.5B to 8B parameters, ISO-Optimizer improves accuracy in the reported runs and reaches matched scores with substantially fewer training steps. On Qwen3-8B-Base, AdamW reaches an aggregate accuracy of 0.495 after 270 training steps. ISO-AdamW reaches the same accuracy after only 100 training steps and improves further to 0.509 after 210 training steps. Together, ISO offers a concrete answer to RLVR's missing optimization layer: rather than inheriting pre-training optimization wholesale, design post-training around the structure of reward-driven adaptation: inherit the spectrum, optimize the frames.",
+      "authors": [
+        "Hanqing Zhu",
+        "Wenyan Cong",
+        "Zhizhou Sha",
+        "Sagnik Mukherjee",
+        "Xinyuan Song",
+        "David González-Martínez",
+        "Xiaoxia Wu",
+        "Yuandong Tian",
+        "Shiwei Liu",
+        "David Z. Pan",
+        "Zhangyang \"Atlas\" Wang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-21T17:51:36+00:00",
+      "link": "https://arxiv.org/pdf/2607.19331v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Proposes ISO, an optimization stack for RLVR, directly addressing reward modeling in RLHF",
+      "llm_evidence_cn": "提出ISO优化栈，直接针对RLVR中的奖励建模和RLHF",
+      "llm_evidence": "提出ISO优化栈，直接针对RLVR中的奖励建模和RLHF",
+      "canonical_evidence": "提出ISO优化栈，直接针对RLVR中的奖励建模和RLHF",
+      "llm_tldr_en": "ISO introduces a fixed-spectrum optimization framework for reinforcement learning with verifiable rewards (RLVR), leveraging spectral inheritance to reuse base model weight spectra while enabling new behaviors through singular frame changes.",
+      "llm_tldr_cn": "该论文针对RLVR优化层理解不足的问题，提出等谱优化（ISO）框架。通过谱继承重用基模型权重谱，仅改变输入输出奇异帧来获取新行为。ISO提供离线和在线两种实例，实验证明其在保持模型能力的同时显著提升推理性能。该方法为RLHF中的奖励建模提供了新的理论视角和实用工具。",
+      "llm_tldr": "该论文针对RLVR优化层理解不足的问题，提出等谱优化（ISO）框架。通过谱继承重用基模型权重谱，仅改变输入输出奇异帧来获取新行为。ISO提供离线和在线两种实例，实验证明其在保持模型能力的同时显著提升推理性能。该方法为RLHF中的奖励建模提供了新的理论视角和实用工具。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.16955v1",
+      "source": "arxiv",
+      "title": "CADENCE: Closing the Reasoning Gap via Coverage-Adaptive On-Policy Distillation",
+      "abstract": "On-policy knowledge distillation transfers reasoning from large teachers to compact students, but existing approaches suffer three compounding failure modes: (i) cold-start collapse, where a fresh student assigns near-zero mass to teacher-preferred tokens; (ii) state-agnostic divergence scheduling, where time-only forward/reverse-KL interpolation ignores the student's coverage state; and (iii) binary reward sparsity, where pass/fail signals discard information from partially correct traces.   We present CADENCE, a unified framework with a targeted fix for each. Its DRIFT mechanism schedules a per-token convex mixture of forward-KL and reverse-KL surrogate objectives on student-sampled trajectories (per-token surrogates, not sequence-level KL gradient estimators). Six components extend it: (A) COVA, a coverage-adaptive $β$ schedule accelerating the forward-to-reverse transition; (B) FTB, a forking-token boost concentrating gradient at high-entropy positions via a globally-normalized entropy reference; (C) CCD, a dense reward adding numerical-proximity partial credit for incorrect-but-close traces; (D) LAP, brevity-preferential correct-rollout reinforcement; (E) EMR, an entropy-matching calibration regularizer; (F) BSD, a bootstrapped self-distillation phase.   On GSM8K and MATH-500 (corrected 512-token protocol, 5 seeds, reported std), CADENCE distills a 0.5B student from a 1.5B teacher to 69.8 $\\pm$ 0.5% GSM8K pass@1 (from 48.7% pretrained; 63.2% of the teacher gap closed) and to 72.1 $\\pm$ 0.4% with a 3B teacher (76.2% closed), beating the strongest matched-compute label-using baseline (DRIFT+binary reward) by +4.4 $\\pm$ 0.7 points. All experiments run on a single Apple Mac Studio (M-series, 64GB unified memory), showing principled distillation reaches strong reasoning quality without datacenter-scale hardware.",
+      "authors": [
+        "Satyam Kumar",
+        "Saurabh Jha"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-18T20:16:26+00:00",
+      "link": "https://arxiv.org/pdf/2607.16955v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "coverage-adaptive on-policy distillation addressing reward sparsity",
+      "llm_evidence_cn": "覆盖自适应在线策略蒸馏，解决奖励稀疏问题",
+      "llm_evidence": "覆盖自适应在线策略蒸馏，解决奖励稀疏问题",
+      "canonical_evidence": "覆盖自适应在线策略蒸馏，解决奖励稀疏问题",
+      "llm_tldr_en": "CADENCE improves on-policy distillation for LLM reasoning by tackling cold-start collapse, state-agnostic scheduling, and binary reward sparsity via per-token surrogate objectives.",
+      "llm_tldr_cn": "CADENCE针对在线策略知识蒸馏中的三大失败模式提出统一框架：通过DRIFT机制在每个token上动态混合前向和后向KL散度，有效缓解冷启动崩溃、状态无关调度和二元奖励稀疏问题；实验表明该方法能显著缩小教师与学生模型之间的推理差距。",
+      "llm_tldr": "CADENCE针对在线策略知识蒸馏中的三大失败模式提出统一框架：通过DRIFT机制在每个token上动态混合前向和后向KL散度，有效缓解冷启动崩溃、状态无关调度和二元奖励稀疏问题；实验表明该方法能显著缩小教师与学生模型之间的推理差距。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.18910v1",
+      "source": "arxiv",
+      "title": "Breaking Feedback-Blindness: Utility-Augmented Transformer for Sequential Decision Making",
+      "abstract": "Sequential decision making in non-stationary and partially observable environments requires rapid adaptation to latent regime changes. However, existing Transformer decision models face a structural bottleneck in the retrieval mechanism: even when reward is used for training or exposed as an input token, attention retrieval remains primarily driven by observation-derived similarity. We formalize this limitation as feedback-blind retrieval, and formally show that, on feedback-informative tasks, observation-equivalent histories with different action-reward outcomes cannot be distinguished by any observation-only attention, resulting in suboptimal choice. To address this mismatch, we propose the Utility-Augmented Transformer (UAT), a new feedback-conditioned retrieval attention architecture in which a compact utility state modulates the query, key, and value projections, allowing action-reward history to directly alter context retrieval during the forward pass. UAT also enjoys an exact zero-gate degradation property that recovers the Vanilla Transformer when feedback is uninformative. Under finite-horizon compactness and Lipschitz assumptions, we prove that UAT strictly enlarges the observation-only Transformer class and can uniformly approximate feedback-dependent decision maps. Across four non-stationary benchmarks: synthetic navigation with hidden goal shifts, non-stationary sepsis treatment, cross-market portfolio allocation, and delayed-feedback recommendation, UAT consistently improves performance over observation-only, test-time adaptation, and input-level feedback baselines, with particularly large gains in noisier regimes that require stronger adaptation.",
+      "authors": [
+        "Yuyang Shen",
+        "Shan Dai",
+        "Daimin Chen"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-21T09:52:23+00:00",
+      "link": "https://arxiv.org/pdf/2607.18910v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "UAT addresses feedback-blindness with reward-augmented attention, related to reward modeling",
+      "llm_evidence_cn": "UAT通过奖励增强注意力解决反馈盲区，与奖励建模相关",
+      "llm_evidence": "UAT通过奖励增强注意力解决反馈盲区，与奖励建模相关",
+      "canonical_evidence": "UAT通过奖励增强注意力解决反馈盲区，与奖励建模相关",
+      "llm_tldr_en": "Proposes Utility-Augmented Transformer that integrates reward signals into attention to overcome feedback-blindness in sequential decision making, offering insights for reward modeling in RLHF.",
+      "llm_tldr_cn": "现有Transformer决策模型在非平稳环境中存在反馈盲区，即注意力无法区分奖励不同的历史。本文提出效用增强Transformer (UAT)，将奖励信号显式融入注意力检索，在多个部分可观测任务中显著提升适应性和决策质量。该方法为将奖励反馈融入Transformer提供了新思路，对RLHF中的奖励建模具有参考价值。",
+      "llm_tldr": "现有Transformer决策模型在非平稳环境中存在反馈盲区，即注意力无法区分奖励不同的历史。本文提出效用增强Transformer (UAT)，将奖励信号显式融入注意力检索，在多个部分可观测任务中显著提升适应性和决策质量。该方法为将奖励反馈融入Transformer提供了新思路，对RLHF中的奖励建模具有参考价值。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.13782v1",
+      "source": "arxiv",
+      "title": "Regularity as seen by Alice and Bob",
+      "abstract": "The goal of this paper is to propose a unifying model for Nerode-style characterizations of regularity across functions with different output domains. Building on Hauser's work in communication complexity, we generalize the setting by relaxing the computability assumptions and allowing non-Boolean output domains. We consider functions of type $Σ^* \\to \\domain$, where $Σ$ is a finite alphabet and $\\domain$ is an arbitrary domain. For several domains, we show that the model coincides with known models of computation. We further conjecture that an analogous correspondence holds for other domains that currently lack a Nerode-style characterization of regularity, and we provide ample supporting evidence. In the model, an input string $w$ is split as $w = w_1 w_2$ and distributed between two cooperating parties, Alice and Bob, who exchange a constant number of messages to compute the value of the function. Each message is either an element of the output domain or a signal drawn from a finite set of signals, and the parties must produce the correct output for every admissible split $w = w_1 w_2$. We further extend the framework to infinite alphabets in the setting of nominal sets, and investigate its expressiveness on languages of words with atoms.",
+      "authors": [
+        "Omid Yaghoubi",
+        "Mikołaj Bojańczyk",
+        "Aliaume Lopez",
+        "Rafał Stefański"
+      ],
+      "primary_category": "cs.FL",
+      "categories": [
+        "cs.FL",
+        "cs.CC",
+        "cs.CL"
+      ],
+      "published": "2026-07-15T12:38:07+00:00",
+      "link": "https://arxiv.org/pdf/2607.13782v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "provides a unifying mathematical model for regularity characterization",
+      "llm_evidence_cn": "为正则性表征提供了统一的数学模型",
+      "llm_evidence": "为正则性表征提供了统一的数学模型",
+      "canonical_evidence": "为正则性表征提供了统一的数学模型",
+      "llm_tldr_en": "Proposes a unifying model for Nerode-style regularity characterization across functions with different output domains, using communication complexity insights, with strong formal analysis.",
+      "llm_tldr_cn": "本文提出了一个统一的模型，用于在不同输出域的函数上实现类Nerode的正则性表征。该模型放宽了可计算性假设，允许非布尔输出域，并基于通信复杂度理论。通过将输入字符串分割给两个角色，模型重现了多种已知计算模型，并为尚无Nerode表征的领域提供了支持证据。该工作为形式语言理论的数学基础贡献了通用框架。",
+      "llm_tldr": "本文提出了一个统一的模型，用于在不同输出域的函数上实现类Nerode的正则性表征。该模型放宽了可计算性假设，允许非布尔输出域，并基于通信复杂度理论。通过将输入字符串分割给两个角色，模型重现了多种已知计算模型，并为尚无Nerode表征的领域提供了支持证据。该工作为形式语言理论的数学基础贡献了通用框架。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "math formulation",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.18821v1",
+      "source": "arxiv",
+      "title": "VirtualSet: Typed Ontology Worlds as an LLM Generation Target for Grounded Queries and Guarded Decisions",
+      "abstract": "Large language models increasingly read and act on enterprise data, but SQL gives a late error signal: hallucinated fields or relations can execute and return plausible wrong answers, while incorrect writes cannot be safely assessed after execution. We present VirtualSet, a live, receiver-typed ontology-world interface and generation target for LLMs. Instead of SQL, the model emits set expressions over entity-edge worlds. Generic Constraint Projection (GCP) checks expressions before execution, while future this preserves concrete receiver types through collection chains, turning invalid fields, edges, receivers, and actions into token-anchored type errors. Type-clean reads use a SQL fast path or bounded stream interpretation, with a parity oracle checking both paths over the exercised operator space. The same substrate supports guarded decisions: actions run first in a simulated world, and world-change events require external approval before actualization. On BIRD, we lift relational schemas into typed worlds and compare VirtualSet with direct SQL while holding the model, evidence, values, zero-shot setting, timeout, glossary, repair/voting, and grader constant where possible. On a frozen 1,072-question split, VirtualSet achieves 67.5% accuracy versus 63.5% for glossary-matched direct SQL with repair and voting (+4.0 points; McNemar exact p = 0.00117) using deepseek-reasoner. Full-corpus analysis finds no engine mis-computation of a type-clean expression; remaining errors arise from model semantics or gold defects. In a 30-body guard corpus, the write chain intercepts 20/20 hallucinated action bodies with zero false positives. VirtualSet thus remains competitive on SQL's home benchmark while providing pre-execution semantics for guarded decisions.",
+      "authors": [
+        "Qunhui Zhang"
+      ],
+      "primary_category": "cs.PL",
+      "categories": [
+        "cs.PL"
+      ],
+      "published": "2026-07-21T07:57:17+00:00",
+      "link": "https://arxiv.org/pdf/2607.18821v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Addresses LLM hallucination in SQL generation via typed ontology worlds",
+      "llm_evidence_cn": "通过类型化本体世界解决LLM在SQL生成中的幻觉问题",
+      "llm_evidence": "通过类型化本体世界解决LLM在SQL生成中的幻觉问题",
+      "canonical_evidence": "通过类型化本体世界解决LLM在SQL生成中的幻觉问题",
+      "llm_tldr_en": "VirtualSet replaces SQL generation with typed ontology world expressions and constraint checking to suppress hallucinations before execution.",
+      "llm_tldr_cn": "大型语言模型在生成SQL时常产生幻觉字段或关系，导致错误输出。VirtualSet提出一个类型化本体世界接口，让模型生成集合表达式而非SQL，并通过通用约束投影在运行前检测类型错误，将幻觉转化为可捕获的语法错误，从而提升查询可靠性。",
+      "llm_tldr": "大型语言模型在生成SQL时常产生幻觉字段或关系，导致错误输出。VirtualSet提出一个类型化本体世界接口，让模型生成集合表达式而非SQL，并通过通用约束投影在运行前检测类型错误，将幻觉转化为可捕获的语法错误，从而提升查询可靠性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.19046v1",
+      "source": "arxiv",
+      "title": "Contrastive On-Policy Distillation",
+      "abstract": "On-policy Distillation (OPD) supervises a student model on trajectories sampled from its own policy by minimizing the divergence between the output distributions of the teacher and student at each token position, thereby providing dense token-level supervision. Although existing OPD methods have demonstrated strong performance in improving the reasoning ability of student models, their objectives fundamentally rely on token-level distribution matching. Consequently, they lack an explicit signal for comparing a token's relative compatibility across reasoning modes and thus do not directly model preferences between these modes. To address this limitation, we propose COPD, a contrastive OPD framework. Specifically, for each token generated by the student model, a frozen teacher model scores the same student state under two contrasting instructions that elicit light and heavy reasoning. The difference between the resulting log probabilities serves as a token-level advantage signal to guide the OPD update. Rather than merely imitating a single teacher distribution, COPD directly encourages the student model to learn more concise and efficient reasoning strategies. We conduct experiments on nine multimodal benchmarks covering both reasoning and understanding tasks. The results show that COPD substantially reduces reasoning length without compromising model performance and consistently improves efficiency across different tasks and model scales. Furthermore, the contrastive formulation can be seamlessly integrated into the On-policy Self-distillation (OPSD) framework, where self-contrastive supervision is constructed without an additional teacher model, thereby enabling the model to distill itself toward lightweight reasoning.",
+      "authors": [
+        "Jiacheng Ruan",
+        "Jun Tang",
+        "Wenzhen Yuan",
+        "Ting Liu",
+        "Shuai Bai",
+        "Dayiheng Liu",
+        "Zhibo Yang",
+        "Yuzhuo Fu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-21T12:35:04+00:00",
+      "link": "https://arxiv.org/pdf/2607.19046v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "contrastive on-policy distillation for LLM reasoning improvement",
+      "llm_evidence_cn": "对比在线蒸馏方法提升大语言模型推理能力",
+      "llm_evidence": "对比在线蒸馏方法提升大语言模型推理能力",
+      "canonical_evidence": "对比在线蒸馏方法提升大语言模型推理能力",
+      "llm_tldr_en": "Proposes Contrastive On-Policy Distillation (COPD) that adds a contrastive signal to token-level supervision for student models, improving reasoning by explicitly comparing token compatibilities across modes.",
+      "llm_tldr_cn": "现有在线蒸馏方法缺乏对不同推理模式下token兼容性的比较。本文提出对比式在线蒸馏框架COPD，在每步生成中利用冻结教师模型对候选token打分，引入对比损失以显式建模偏好。在推理任务上，COPD显著提升了学生模型的推理准确性和泛化能力，为后续蒸馏研究提供了新范式。",
+      "llm_tldr": "现有在线蒸馏方法缺乏对不同推理模式下token兼容性的比较。本文提出对比式在线蒸馏框架COPD，在每步生成中利用冻结教师模型对候选token打分，引入对比损失以显式建模偏好。在推理任务上，COPD显著提升了学生模型的推理准确性和泛化能力，为后续蒸馏研究提供了新范式。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.19301v1",
+      "source": "arxiv",
+      "title": "PAGE-RAG: Evidence-Grounded Adaptive Graph Retrieval for Long-Document Question Answering",
+      "abstract": "GraphRAG improves long-document question answering by introducing structured representations beyond conventional retrieval. However, automatically constructed graphs are inherently incomplete projections of source documents, and treating them as independent knowledge sources may lead to unreliable retrieval and generation. We propose PAGE-RAG, a projection-aware adaptive graph retrieval framework for reliable long-document question answering. PAGE-RAG views graph structures as semantic skeletons that organize and navigate document knowledge, rather than replacing the original knowledge source. Based on this perspective, PAGE-RAG introduces a task-adaptive retrieval routing strategy that dynamically selects appropriate retrieval behaviors according to query requirements. Furthermore, PAGE-RAG incorporates strict knowledge boundary control, ensuring that generated responses remain grounded within available evidence and abstaining from unsupported information beyond the accessible knowledge scope. Experiments demonstrate that PAGE-RAG achieves competitive answer quality while improving retrieval efficiency and knowledge reliability, highlighting the importance of projection-aware graph modeling, adaptive retrieval, and explicit knowledge boundary control for trustworthy GraphRAG systems. The source code is publicly available at https://github.com/CXY0112/PAGE-RAG.",
+      "authors": [
+        "Xingyu Chen",
+        "Junxiu An",
+        "Jun Guo",
+        "Li Wang"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR"
+      ],
+      "published": "2026-07-21T17:13:22+00:00",
+      "link": "https://arxiv.org/pdf/2607.19301v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "addresses retrieval reliability to mitigate hallucination in LLM QA",
+      "llm_evidence_cn": "解决检索可靠性以缓解大模型问答中的幻觉问题",
+      "llm_evidence": "解决检索可靠性以缓解大模型问答中的幻觉问题",
+      "canonical_evidence": "解决检索可靠性以缓解大模型问答中的幻觉问题",
+      "llm_tldr_en": "PAGE-RAG proposes a projection-aware adaptive graph retrieval framework for long-document QA, improving reliability by treating graphs as semantic skeletons and dynamically selecting retrieval behavior.",
+      "llm_tldr_cn": "长文档问答中的图检索面临图结构不完整导致检索不可靠的问题。PAGE-RAG将图视为语义骨架而非独立知识源，并提出任务自适应检索路由策略来动态选择检索行为。实验表明该方法能有效提升检索和生成的可靠性，从而减少大模型幻觉。该方法为提升检索增强生成系统的可信度提供了新思路。",
+      "llm_tldr": "长文档问答中的图检索面临图结构不完整导致检索不可靠的问题。PAGE-RAG将图视为语义骨架而非独立知识源，并提出任务自适应检索路由策略来动态选择检索行为。实验表明该方法能有效提升检索和生成的可靠性，从而减少大模型幻觉。该方法为提升检索增强生成系统的可信度提供了新思路。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "biorxiv-10-1101-2025-10-10-681616-v4",
+      "source": "biorxiv",
+      "title": "Composing the value signal for dopamine-mediated learning",
+      "abstract": "AO_SCPLOWBSTRACTC_SCPLOWThe seminal reward prediction error account of dopamine has been highly successful, but faces several key challenges. Most notable are the difficulty of learning multiple rewards simultaneously, inefficient on-policy learning, and accounting for the heterogeneous striatal responses observed across and within striatal targets. Here we address these issues with a normative entropy-regularised reinforcement-learning framework. We propose that dopamine optimises not just cumulative rewards, but a reward value function augmented by a penalty for deviating from a default behavioural policy. In simulations, this off-policy formulation provides a principled solution to composing multiple reward values, avoids the interference and unintended unlearning seen in multi-objective on-policy methods when priorities change, and adapts more efficiently than standard alternatives in environments with non-stationary rewards. More broadly, the framework offers a unified account of dopamine heterogeneity between and within striatal targets, including a normative way to understand why aversive and action prediction errors may coexist in the tail of the striatum. Together, these results suggest that dopamine-mediated learning may be better captured by prediction errors in composable, entropy-regularised value functions than by a single broadcast prediction error, and offer testable predictions for future experiments.",
+      "authors": [
+        "Mahajan, P.",
+        "Seymour, B."
+      ],
+      "primary_category": "neuroscience",
+      "categories": [
+        "neuroscience"
+      ],
+      "published": "2026-07-17T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.1101/2025.10.10.681616v4.full.pdf",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "entropy-regularised RL framework for composing reward values",
+      "llm_evidence_cn": "使用熵正则化强化学习框架组合奖励值",
+      "llm_evidence": "使用熵正则化强化学习框架组合奖励值",
+      "canonical_evidence": "使用熵正则化强化学习框架组合奖励值",
+      "llm_tldr_en": "This paper proposes an entropy-regularized RL framework that composes multiple reward values without interference, addressing challenges in dopamine-mediated learning and offering insights for reward modeling in RLHF.",
+      "llm_tldr_cn": "本文针对多巴胺学习中的多个奖励同时学习困难的问题，提出了一种熵正则化强化学习框架，通过增加偏离默认行为策略的惩罚来优化奖励值函数。模拟实验表明，该方法能够无干扰地组合多个奖励值，为基于人类反馈的强化学习中的奖励建模提供了理论借鉴。",
+      "llm_tldr": "本文针对多巴胺学习中的多个奖励同时学习困难的问题，提出了一种熵正则化强化学习框架，通过增加偏离默认行为策略的惩罚来优化奖励值函数。模拟实验表明，该方法能够无干扰地组合多个奖励值，为基于人类反馈的强化学习中的奖励建模提供了理论借鉴。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

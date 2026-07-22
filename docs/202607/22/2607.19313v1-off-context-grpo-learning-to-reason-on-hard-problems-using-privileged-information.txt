@@ -1,0 +1,1930 @@
+Title: Off-Context GRPO: Learning to Reason on Hard Problems using Privileged Information
+
+URL Source: https://arxiv.org/pdf/2607.19313v1
+
+Published Time: Wed, 22 Jul 2026 01:20:38 GMT
+
+Number of Pages: 24
+
+Markdown Content:
+# Off-Context GRPO: Learning to Reason on Hard Problems using Privileged Information 
+
+Priyank Agrawal 1,2,∗, Ankur Samanta 1,2, Shervin Ghasemlou 1, Boris Vidolov 1, Jalaj Bhandari 1,
+
+Kavosh Asadi 1,†, Daniel Jiang 1,†, Aditya Modi 1,†
+
+> 1
+
+Meta AI, 2Columbia University 
+
+> ∗
+
+Work done at Meta , †Joint last author 
+
+Reinforcement learning with verifiable rewards (RLVR) improves reasoning in large language models. Yet, typical RLVR approaches fail on difficult problems: when a model cannot generate any correct solutions, it receives zero learning signal. Providing privileged guidance during training, such as solution prefixes, can help overcome this learning cliff by steering the model towards correct solutions with non-zero reward. We call these rollouts off-context : they are generated from a training prompt that contains privileged guidance, while the target objective is defined by the original prompt without that guidance. We introduce Off-Context GRPO (OC-GRPO), a minimally modified variant of GRPO that uses guided rollouts but applies an importance-corrected objective to steer the update back toward the original unguided objective, avoiding the mismatch that destabilizes uncorrected guided training. Empirically, our algorithm achieves a 3.9% absolute improvement (13.8% relative gain) over vanilla GRPO on average across standard mathematical reasoning benchmarks with negligible additional cost.  
+
+> Date:
+
+July 22, 2026  
+
+> Correspondence:
+
+Priyank Agrawal at pa2608@columbia.edu  
+
+> Code:
+
+https://github.com/AgPriyank/OC-GRPO 
+
+## 1 Introduction 
+
+Reinforcement learning with verifiable rewards (RLVR) has emerged as a powerful approach for improving reasoning in large language models (Guo et al., 2025a; Yu et al., 2025; Jaech et al., 2024). The dominant algorithm for RLVR is Group Relative Policy Optimization (GRPO) (Shao et al., 2024) which itself is based on the seminal PPO algorithm (Schulman et al., 2017). In GRPO, for each problem, we first sample a group of responses from an LLM, use a verifier to score each response, and then compute in-group advantages by normalizing rewards within the group. These advantage estimates are then used to update the LLM policy via a PPO-like clipped importance-sampling surrogate. The gradient signal in this GRPO update comes entirely from within-group reward variance, i.e., GRPO learns only when some rollouts in a group succeed and others fail, reinforcing the successful ones relative to the failures. This requirement exposes a fundamental failure mode on hard problems. When every rollout in a group fails, rewards are uniformly zero, within-group variance collapses, and the gradient is identically zero, no matter how long training continues. We refer to this as the learning cliff (Guo et al., 2025b; Zhang et al., 2025d; Qu et al., 2026; Yan et al., 2025). Escaping this cliff requires at least some successes within each rollout group. One workaround is to use oracle/expert solutions directly as training targets, via supervised fine-tuning or off-policy RL (Yan et al., 2025; Song et al., 2024; Agarwal et al., 2024; Huang et al., 2025; Zhang et al., 2025a,e). This breaks the cliff by construction but at a cost: it distorts the base model’s native reasoning style and requires heavy stabilization machinery such as reward shaping, entropy control, and hybrid SFT–RL objectives. A second class of methods takes a more surgical approach, using oracle information not as a training target but as context , injecting privileged guidance into the prompt to make correct continuations reachable, while the model still samples its own rollouts. Examples include solution-prefix conditioning (Qu et al., 2026; Zhang et al., 2025e; Li et al., 2025), output-space prefix injection (Setlur et al., 2026; Amani et al., 2025), and tiered in-prompt hints (Zhang et al., 2025d). This preserves GRPO’s on-policy structure while 1arXiv:2607.19313v1 [cs.LG] 21 Jul 2026 (a) Standard GRPO                                      
+
+> Problem x
+> y1r= 0
+> y2r= 0
+> y3r= 0
+> y4r= 0
+> (b) Guided rollouts
+> Problem x
+> Guidance g
+> y1r= 1
+> y2r= 1
+> y3r= 0
+> y4r= 0
+> (c) OC-GRPO correction: ρoc
+> i(θ) = πθ(yi|x)
+> πθold (yi|g(x))
+> bAiρoc
+> i(θ)ρoc
+> i(θ)bAi
+> y1
+> y2
+> y3
+> y4
+> +0 .87
+> +0 .87
+> −0.87
+> −0.87
+> 0.7
+> 0.9
+> 1.1
+> 1.2
+> −0.87 0+0 .87
+> Figure 1 Off-Context GRPO. (a)
+
+On hard problems, unguided samples all receive reward 0, so the group-relative advantages vanish. (b) Guidance is supplied with the problem and produces successful rollouts, while the update still targets the unguided objective at x. (c) OC -GRPO keeps the guided rollouts and reweights their advantages with the importance weight shown in the panel. Successes made likely by guidance receive smaller positive contributions; failures receive larger negative contributions. 
+
+breaking the cliff. However, all of these methods share a subtle but consequential flaw we call the off-context 
+
+problem: rollouts are sampled under a guided prompt the model never sees at deployment, yet gradients are computed as if the sampling and evaluation distributions matched. The result is either a misaligned objective or biased gradients that can destabilize training. In this work, we propose OC -GRPO : Off-context GRPO , a minimal modification to GRPO (Figure 1). OC -GRPO re-weights per-token advantages by the importance ratio between the unguided and guided policies, a standard technique used for correction for off-distribution sampling (Precup et al., 2001; Degris et al., 2012). The resulting estimator is unbiased for the original unguided objective, and its variance scales with the length of the guidance prefix rather than the rollout, yielding a clear principle: use the shortest guidance that breaks the cliff. The framework is mechanism-agnostic, applying to any form of privileged signal since what matters is the context mismatch, not its form. Beyond fixing the objective, the importance ratio encodes a meaningful inductive bias about how much credit each trajectory generated under the guided context deserves. As illustrated in Figure 1, the correction dampens the credit assigned to correct trajectories, and the dampening is stronger for solution trajectories that rely more heavily on the guidance, limiting the influence of successes the model could not have produced on its own. We formalize this intuition in Section 5. Our contributions are as follows. 
+
+• We formalize privileged guidance in RLVR as off-context sampling and show that existing methods implicitly optimize a different objective than the one evaluated at deployment. 
+
+• We propose OC -GRPO , a minimal modification to GRPO that corrects for the off-context mismatch via importance sampling, with provable unbiasedness and variance controlled by guidance length. 
+
+• We prove that the importance correction induces a behavior-aware credit assignment (Theorem 2): a guided success retains credit only to the extent that the model could have produced it without the guid-ance, while a failure that persists despite the guidance draws an amplified penalty. The update therefore reinforces genuine problem solving rather than hint-following, without any additional reward shaping. 
+
+• We empirically validate the proposed method on multiple models and benchmarks. On Qwen2.5-7B-Instruct, OC -GRPO delivers a 13.8% relative gain over GRPO on math reasoning. At 3B and 1.5B scale, guided-target baselines degrade below vanilla GRPO while OC -GRPO retains consistent gains, evidence that back-generalization is capacity-dependent and the off-context correction matters most at smaller scales. 22 Preliminaries: RLVR and GRPO 
+
+RLVR trains a policy on problems with automatically checkable answers (Guo et al., 2025a). A training distribution D supplies problems x ∈ X , and the policy samples a response y = ( y1, . . . , y T ) autoregressively from πθ (· | x), where T denotes the response length. We use the base model πref as the KL reference. A response may contain a reasoning trace, but the verifier scores only the extracted final answer: we write a(y)
+
+for the answer extracted from y and a⋆(x) for the correct answer to x. The verifier returns the binary reward 
+
+r(x, y ) = 1{a(y) = a⋆(x)}. The RLVR objective is the expected verifier reward: 
+
+J(θ) = Ex∼D Ey∼πθ (·| x)
+
+r(x, y ). (1) GRPO converts these binary rewards into relative advantages within a rollout group (Shao et al., 2024). For each problem x, the behavior policy πθold generates G responses {yi}Gi=1 . We write Ti for the length of 
+
+yi. Let μr and σr be the mean and standard deviation of the group rewards {r(x, y i)}Gi=1 . GRPO assigns 
+
+bAi = ( r(x, y i) − μr )/σ r . When σr = 0 , the group contains no preference information, and the usual convention sets all advantages to zero. The policy is updated by optimizing the clipped, KL-regularized surrogate averaged over training problems: 
+
+LGRPO (θ) = Ex∼D 
+
+ 1
+
+G
+
+> G
+
+X
+
+> i=1
+
+1
+
+TiTiX
+
+> t=1
+
+
+
+min 
+
+
+
+ρi,t (θ) bAi, clip  ρi,t (θ), 1−ϵ, 1+ ϵ bAi
+
+
+
+− β KL i,t (θ)
+
+ . (2) The per-token PPO ratio (Schulman et al., 2017) compares the current policy with the behavior policy that produced the rollout, and the KL term penalizes drift from the reference model: 
+
+ρi,t (θ) := πθ (yi,t | x, y i,<t )
+
+πθold (yi,t | x, y i,<t ) , KL i,t (θ) := DKL 
+
+ πθ (· | x, y i,<t ) πref (· | x, y i,<t ) . (3) 
+
+## 3 Overcoming Learning Cliffs with Privileged Guidance 
+
+Challenging reasoning benchmarks often contain problems that receive almost no verifier reward under the behavior policy πθold . We call a problem x hard if its expected verifier reward under the behavioral policy 
+
+p(x) := Ey∼πθold (·| x)[r(x, y )] (4) is close to zero. Hard problems are common in practice, and they expose a fundamental failure mode of GRPO: if every sampled response is incorrect, rewards are uniformly zero and σr = 0 , so the group-relative advantages bAi vanish. This means the gradient of (2) is identically zero, and nothing is learned from x. We refer to this as the learning cliff in RLVR. (no guidance) 20% 40% 60% 80% 100%    
+
+> Guidance Levels
+> 0%
+> 20%
+> 40%
+> 60%
+> 80%
+> 100%
+> Fraction of problems unlocked/solved
+> 0% 9.1% 22.4%
+> 35.8%
+> 53.8%
+> 79.0%
+> Solved
+> Unsolved
+> Figure 2
+
+Solution prefixes increase empirical ex-pected verifier reward under πθold on hard MATH problems from 0.091 (none) to 0.790 (full pre-fix) (Hendrycks et al., 2021). 
+
+A direct way to address the learning cliff is to use privileged guidance : auxiliary training-time context, unavailable at inference, that raises expected verifier reward on a hard problem x. Let g be a guidance strategy that maps each problem to a rollout prompt. It leaves non-hard problems unchanged, g(x) = x, and can add a solution prefix or problem-specific hint on hard problems (Appendix H). The expected reward under the guided prompt is 
+
+q(x) := Ey∼πθold (·| g(x)) [r(x, y )] , (5) Useful guidance satisfies q(x) > p (x) (see Theorem 2). Figure 2 gives an illustration of this effect for increasing solution prefixes. 3One way that recent methods have used privileged guidance is to sample rollouts under g(x) and run GRPO as if g(x) were the true task (Zhang et al., 2025d,e; Qu et al., 2026; Setlur et al., 2026; Amani et al., 2025). These guided-target methods effectively optimize 
+
+Jguide (θ) := Ex∼D Ey∼πθ (·| g(x)) 
+
+r(x, y ), (6) which scores the original problem x but trains the policy under the behavior prompt g(x). The corresponding per-token ratio in (3) is 
+
+ρguide  
+
+> i,t
+
+(θ) := πθ (yi,t | g(x), y i,<t )
+
+πθold (yi,t | g(x), y i,<t ) , (7) conditioning on g(x) throughout rather than the original x for hard problems. The objective Jguide is therefore different from the target J because it trains the policy on responses conditioned on g(x), while J evaluates responses conditioned on x. When guidance carries significant information, these two can differ substantially. We refer to this mismatch as the off-context problem. Despite optimizing a misaligned objective, guided-target updates can still improve J in practice. This transfer rests on back-generalization , a hypothesis coined by Setlur et al. (2026) and shared by related guided-target methods (Qu et al., 2026): the rollout distributions induced by g(x) and x overlap, so a policy update that improves continuations under the guided prompt also improves them under the nearby unguided prompt. Back-generalization is empirical and not guaranteed in practice: Appendix F gives a toy example where optimizing Jguide selects a policy that is useless under the original prompt, and our experiments in Section 6.3 suggest the transfer is capacity-dependent, with guided-target baselines degrading below vanilla GRPO at smaller model scales. 
+
+## 4 Off-Context GRPO 
+
+OC -GRPO addresses the off-context problem via a minimal modification to the GRPO update rule. Recall from Section 3 that existing methods effectively optimize Jguide (θ) by sampling rollouts under the guided prompt 
+
+g(x) instead of the original prompt x. Importance sampling provides a principled correction: 
+
+Ex∼D , y ∼πθold (·| g(x)) 
+
+ πθ (y | x)
+
+πθold (y | g(x)) f (y)
+
+
+
+= Ex∼D , y ∼πθ (·| x)[f (y)] .
+
+This makes the reweighted guided expectation exactly equivalent to the target expectation. When g(x) = x
+
+(i.e., no guidance is applied), the per-token importance ratio reduces to the standard GRPO ratio in (3) , and the update is identical to standard GRPO. In our setting, the sampling distribution is πθold (· | g(x)) , the guided context that produced the rollout, and the target distribution is πθ (· | x), the unguided prompt that defines J(θ) in (1) . The appropriate per-token importance ratio for guided rollouts is therefore 
+
+ρoc 
+
+> i,t
+
+(θ) := πθ (yi,t | x, y i,<t )
+
+πθold (yi,t | g(x), y i,<t ) . (8) 
+
+Remark 1. One alternative is to mask the guidance tokens from the loss (Setlur et al., 2026). This restricts which tokens receive gradient, but does not change what they condition on. The per-token ratio remains 
+
+πθ (yi,t | g(x), y i,<t ) / π θold (yi,t | g(x), y i,<t ), with g(x) in both numerator and denominator, so the update still targets Jguide (θ) rather than J(θ). We verify this failure mode empirically in Section 6. 
+
+Table 1 summarizes the contemporary landscape of approaches along three axes: guided sampling (for overcoming learning cliff), off-context correction, and effective objective. Table 1 highlights that OC -GRPO is the unique combination that achieves all three desiderata. Replacing ρi,t (θ) in (2) with ρoc 
+
+> i,t
+
+(θ) from (8) gives the OC -GRPO surrogate: 
+
+LOC -GRPO (θ) = Ex∼D 
+
+ 1
+
+G
+
+> G
+
+X
+
+> i=1
+
+1
+
+TiTiX
+
+> t=1
+
+(
+
+min 
+
+
+
+ρoc 
+
+> i,t
+
+(θ) bAi, clip 
+
+
+
+ρoc 
+
+> i,t
+
+(θ), 1−ϵ, 1+ ϵ
+
+ bAi
+
+
+
+− β KL i,t (θ)
+
+) . (9) 4Method Guided Sampling Off-Context Correction Effective Objective is J(θ)
+
+Vanilla GRPO ✗ ✗ ✓
+
+Guided, on-context 
+
+> Qu et al. (2026); Zhang et al. (2025e) Setlur et al. (2026); Amani et al. (2025)
+
+✓ ✗ ✗
+
+Guided, no correction ✓ ✗ ✗ 
+
+> OC-GRPO (ours)
+
+✓ ✓ ✓ 
+
+> Table 1
+
+Comparison of GRPO-based methods along three axes: whether guided sampling is used to address the learning cliff, whether the off-context shift is corrected in the update rule, and whether the resulting effective objective is aligned to the target objective. OC -GRPO is the only method that combines guided sampling with off-context correction, recovering J(θ) as the optimization target. Appendix F gives a toy example where guided-target optimization selects the opposite policy from J(θ); Appendix D demonstrates the instability of uncorrected guided training. 
+
+## 5 Theoretical Understanding 
+
+We now show that the importance correction in (8) has a more intuitive interpretation than simply to correct the off-context distribution mismatch. In fact, it induces a provably well-behaved, behavior-aware credit assignment mechanism, automatically adjusting the gradient contributions based on how much the guidance influenced each trajectory. For simplicity, the analysis in this subsection is response-level, where we treat a sampled completion y = ( y1, . . . , y T ) as the unit that receives verifier reward and group-relative advantage. Let Y+ = {y : r(x, y ) = 1 } and Y− = {y : r(x, y ) = 0 } refer to the responses partitioned based on their correctness. Recall from (4) and (5) that, for a hard problem x,
+
+p(x) = Ey∼πθold (·| x)[r(x, y )] ≈ 0, q(x) = Ey∼πθold (·| g(x)) [r(x, y )] ,
+
+for the expected verifier rewards under the original and guided prompts respectively. For this response-level calculation, set θ = θold . We use the centered advantage 
+
+bA(x, y ) := r(x, y ) − q(x) = 
+
+(
+
+1 − q(x), y ∈ Y +,
+
+−q(x), y ∈ Y −,
+
+without within-group standard-deviation normalization. Define the response-level correction multiplier and aggregate correction factors 
+
+ρoc resp (y) := πθold (y | x)
+
+πθold (y | g(x)) , λ+(x, g ) := E
+
+h
+
+ρoc resp (y) y ∈ Y +i
+
+, λ−(x, g ) := E
+
+h
+
+ρoc resp (y) y ∈ Y −i
+
+.
+
+The quantities λ+(x, g ) and λ−(x, g ) are conditional averages of the response-level correction multiplier over successful and failed guided rollouts, respectively. Pointwise, ρoc resp (y) > 1 means the original prompt assigns higher probability to the same response y than the guided prompt does; ρoc resp (y) < 1 means the guided prompt assigns higher probability to y; and ρoc resp (y) = 1 means the two probabilities match. We also use the “ideal” 
+
+response-level surrogate, without clipping or token-level averaging, 
+
+Lresp OC -GRPO (θ) := Ex∼D 
+
+"
+
+Ey∼πθold (·| g(x)) 
+
+ πθ (y | x)
+
+πθold (y | g(x)) bA(x, y )
+
+#
+
+.
+
+At θ = θold , the prefactor in the inner expectation is ρoc resp (y). We first isolate the aggregate effect of the correction on successful and failed guided rollouts. The proofs of Lemma 1 and Theorem 2 are deferred to Appendix A. 5Lemma 1 (Aggregate correction factors) . Consider a hard problem x with 0 < p (x) < q (x) < 1, and assume πθold (y | g(x)) > 0 whenever πθold (y | x) > 0. Then, with all expectations taken over guided rollouts 
+
+y ∼ πθold (· | g(x)) ,
+
+λ+(x, g ) = p(x)
+
+q(x) < 1, λ−(x, g ) = 1 − p(x)1 − q(x) > 1.
+
+Lemma 1 gives a direct credit-assignment interpretation, formalized in Theorem 2 below. 
+
+Theorem 2 (OC -GRPO Credit Assignment) . Under the conditions of Lemma 1, the following hold: 
+
+(i) Systematic credit redistribution. The response-level correction suppresses expected credit on successful guided rollouts, 
+
+E
+
+h
+
+ρoc resp (y) bA(x, y ) y ∈ Y +i
+
+< E
+
+h bA(x, y ) y ∈ Y +i
+
+,
+
+and increases the expected penalty magnitude on failed guided rollouts, 
+
+E
+
+h
+
+ρoc resp (y) bA(x, y ) y ∈ Y −i
+
+> E
+
+h bA(x, y ) y ∈ Y −i
+
+.
+
+(ii) Gradient decomposition. Define sx(y) : = ∇θ log πθ (y | x) θ=θold 
+
+. The gradient of the response-level surrogate satisfies the following decomposition: 
+
+∇θ Lresp OC -GRPO (θ) θ=θold 
+
+= Ex∼D 
+
+"
+
+λ+(x, g )(1 − q(x)) 
+
+| {z }
+
+> success weight
+
+·q(x) · Ey∼πθold (·| x)
+
+sx(y) y ∈ Y +
+
+− λ−(x, g )q(x)
+
+| {z }
+
+> failure weight
+
+·(1 − q(x)) · Ey∼πθold (·| x)
+
+sx(y) y ∈ Y − #
+
+.
+
+(10) 
+
+For hard prompts with p(x) ≈ 0, standard unguided GRPO has little reward variation, while (10) still produces a failure-side update whenever q(x) > 0 and the failure-conditioned score average is nonzero. 
+
+Part (ii) shows where the correction from part (i) enters the gradient. The success branch is scaled by 
+
+λ+(x, g ) = p(x)/q (x), while the failure branch is scaled by λ−(x, g ) = (1 − p(x)) /(1 − q(x)) . The importance ratio therefore acts as a behavior-aware credit assignment mechanism, where the correction multiplier encodes the guidance’s influence on each trajectory and automatically adjusts gradient contributions accordingly without any additional design choices. Since πθ is conditioned only on x throughout (never on g(x)), the privileged information g plays no role at inference time, and the training and deployment objectives remain exactly aligned. The following example illustrates this response-level mechanism for light and large hints. 
+
+Example 1 (Response-level credit assignment) . In practice, the correction credits trajectories that solve a hard problem without leaning too heavily on the guidance. Consider the shared problem x, “Prove |a·b| ≤ ∥ a∥ ∥ b∥,” together with three guidance strategies g1, g 2, g 3.
+
+• Light hint, successful rollout. The guidance says “consider ∥a − b∥2 ≥ 0”, and the response y expands 
+
+(a − b)·(a − b), rearranges, and reaches the conclusion. The model essentially solves the problem on its own, so the guidance barely shifts the likelihood of y. The correction multiplier is close to one, retaining full credit. 
+
+• Light hint, failed rollout. The guidance gives a similarly light hint, but the model goes off-track without using it. Because this failing trajectory does not rely on the guidance, the same ratio is again close to one, so the full penalty is preserved. 
+
+• Large hint, successful rollout. The guidance gives away the solution, “ ∥a−b∥2 ≥ 0 ⇒ a·b ≤ 12 (∥a∥2+∥b∥2) ⇒
+
+AM–GM ⇒ result”, which the response reproduces verbatim. Here the guidance is almost entirely responsible for y, so the correction multiplier is much smaller than one, heavily damping the credit even though the trajectory is correct. 
+
+6The correction preserves the learning signal when the model succeeds or fails on its own merits, and suppresses it when a success is inherited from the guidance. 
+
+In Appendix E.2, we also analyze the variance of the correction ratio as a function of the guidance length. 
+
+## 6 Empirical Results 
+
+We evaluate OC -GRPO on math reasoning benchmarks to assess whether importance-corrected updates can reliably learn from privileged guidance. We describe the experimental setup below and present results in Section 6.3. 
+
+6.1 Implementing OC -GRPO 
+
+OC -GRPO requires three components: (i) identifying which problems need guidance and at what level, (ii) constructing the augmented training dataset, and (iii) running the importance-corrected update. 
+
+Identifying hard problems. We consider the MATH dataset (Hendrycks et al., 2021), which includes full reference solutions. A problem x is hard if πref is unable to solve it in 64 attempts. We start from all the hard problems in MATH Levels 3, 4, and 5. 
+
+Using cascaded guidance. Given a hard problem x ∈ D with reference solution z⋆(x) = ( z⋆ 
+
+> 1
+
+, . . . , z ⋆T ⋆ ), we define L = 5 guidance levels by taking solution prefixes at fixed length fractions. Let hℓ(x) denote the prefix text and gℓ(x) denote the corresponding rollout prompt: 
+
+hℓ(x) := z⋆ 
+
+> 1: ⌈αℓ·T⋆⌉
+
+(x), gℓ(x) := ( x, h ℓ(x)) , αℓ ∈ { 0.2, 0.4, 0.6, 0.8, 1.0}. (11) Levels are strictly nested: hℓ(x) contains all the information in hℓ−1(x) plus an additional chunk of the reference solution. Alternative guidance families (self-hints, frontier hints) are studied in Appendix H, and the same methodology and theoretical results apply to those settings. 
+
+Fixed guidance via OC -GRPO -Fixed . OC -GRPO -Fixed constructs an augmented training dataset Daug before 
+
+RLVR training begins, by identifying the minimum guidance level needed for each hard problem to yield at least one correct rollout under the base model πref . For each x ∈ D , we start from ℓ = 1 , sample 8 rollouts from πref (· | gℓ(x)) ; if any succeeds, record ℓ⋆(x) = ℓ and stop; otherwise adjust to ℓ + 1 . The augmented dataset is then 
+
+Daug = D ∪ gℓ⋆(x)(x) : x ∈ D .
+
+The guidance level ℓ⋆(x) is selected once using the base model and fixed throughout training. The policy never re-selects guidance as it evolves. 
+
+Adaptive guidance via OC -GRPO -Adaptive . A natural alternative is to adjust guidance adaptively during training, using the current policy πθt to re-evaluate which problems need guidance at each step. We refer to this as OC -GRPO -Adaptive and defer the full algorithm to Appendix C. Adaptive adjustment can in principle provide more targeted guidance as the policy improves, but incurs additional inference cost at every training step. We report results for both variants, with OC -GRPO -Fixed as our recommended default: it is simpler, faster, and easier to reproduce, while remaining empirically competitive. 
+
+6.2 Experimental Setup 
+
+We construct a hard dataset D from the MATH training split (Levels 3–5), retaining problems on which all 64 rollouts under πref fail; this yields 595 hard problems on which vanilla GRPO receives near-zero learning signal. We train Qwen2.5-7B-Instruct (Qwen, 2024) with LoRA adapters via veRL (Sheng et al., 2024) for 4 epochs (16 rollouts/prompt, 3 seeds). We evaluate Pass@1 and Pass@16 1 on AIME (1983–2026), Gaokao2023, and OmniMath. Full details of the setup are in Appendix G.                 
+
+> 1Pass@ kis the probability that at least one of ksampled responses solves the problem. We compute it with the standard unbiased estimator (Chen et al., 2021): given n≥ksamples per problem of which care correct, pass @k=E1− n−ck
+> / nk
+>  ; we use n= 16 .
+
+7Method Training AIME (1983–2026) Gaokao2023 OmniMath Average P@1 P@16 P@1 P@16 P@1 P@16 P@1 P@16 P@1 P@16 Baselines 
+
+Base 0.7 4.7 16.8 37.5 44.2 64.7 19.5 44.8 26.8 49.0 Vanilla GRPO (Shao et al., 2024) (ref.) 
+
+1.0 ±0.2 7.0 ±0.6 17.5 ±0.6 38.8 ±1.2 44.0 ±3.2 64.2 ±2.5 22.0 ±0.8 45.9 ±1.2 27.8 49.6 
+
+> Before-Training Guidance
+
+PrefixRL* (Setlur et al., 2026) 
+
+4.0 ±1.4 
+
+> (+300.0%)
+
+11.8 ±0.8 
+
+> (+68.6%)
+
+18.6 ±0.7 
+
+> (+6.3%)
+
+40.8 ±0.6 
+
+> (+5.1%)
+
+43.9 ±1.8 
+
+> (-0.2%)
+
+65.2 ±1.7 
+
+> (+1.5%)
+
+22.6 ±0.8 
+
+> (+2.9%)
+
+44.9 ±0.1 
+
+> (-2.1%)
+
+28.4 
+
+> (+1.9%)
+
+50.3 
+
+> (+1.3%)
+
+POPE* (Qu et al., 2026) 6.8 ±0.4 
+
+> (+580.0%)
+
+13.2 ±0.5 
+
+> (+88.6%)
+
+18.7 ±0.2 
+
+> (+6.5%)
+> 41.9
+
+±1.0 
+
+> (+8.0%)
+
+48.9 ±2.1 
+
+> (+11.2%)
+
+67.2 ±1.6 
+
+> (+4.6%)
+
+23.2 ±0.8 
+
+> (+5.6%)
+
+45.0 ±0.4 
+
+> (-1.8%)
+
+30.3 
+
+> (+8.7%)
+> 51.4
+> (+3.5%)
+
+OC-GRPO-Fixed 6.2 ±1.4 
+
+> (+520.0%)
+> 14.8
+
+±0.3 
+
+> (+111.4%)
+
+19.1 ±0.2 
+
+> (+9.2%)
+
+41.7 ±0.2 
+
+> (+7.4%)
+> 51.6
+
+±2.3 
+
+> (+17.3%)
+> 68.2
+
+±1.0 
+
+> (+6.2%)
+> 24.3
+
+±0.7 
+
+> (+10.8%)
+
+44.3 ±1.0 
+
+> (-3.5%)
+> 31.7
+> (+13.8%)
+> 51.4
+> (+3.6%)
+> During-Training Guidance
+
+BREAD* (Zhang et al., 2025e) 
+
+5.7 ±0.3 
+
+> (+470.0%)
+
+13.8 ±1.2 
+
+> (+97.1%)
+> 19.3
+
+±0.3 
+
+> (+10.0%)
+
+41.6 ±0.8 
+
+> (+7.1%)
+
+46.0 ±1.2 
+
+> (+4.5%)
+
+65.1 ±0.5 
+
+> (+1.3%)
+
+23.3 ±0.0 
+
+> (+6.1%)
+
+45.5 ±0.4 
+
+> (-0.8%)
+
+29.5 
+
+> (+6.1%)
+
+50.7 
+
+> (+2.2%)
+
+OC-GRPO-Adaptive 2.5 ±0.7 
+
+> (+150.0%)
+
+10.0 ±0.3 
+
+> (+42.9%)
+
+18.0 ±0.5 
+
+> (+2.5%)
+
+39.8 ±0.8 
+
+> (+2.6%)
+
+50.5 ±0.1 
+
+> (+14.8%)
+
+67.5 ±0.8 
+
+> (+5.1%)
+
+23.9 ±0.3 
+
+> (+8.8%)
+
+45.6 ±0.8 
+
+> (-0.5%)
+
+30.8 
+
+> (+10.7%)
+
+51.0 
+
+> (+2.7%)
+
+Table 2 Main results on Qwen2.5-7B-Instruct. Each non-base cell reports the seed-averaged (3 seeds) mean ±std on the first line and, on the second line, the relative improvement over Vanilla GRPO, which serves as the reference (ref.) for all comparisons. The Training columns report Pass@1 and Pass@16 on the 595 hard training problems; Average is computed over AIME (1983–2026) (Veeraboina, 2023; Balunović et al., 2025), Gaokao2023 (Zhang et al., 2023), and OmniMath (Gao et al., 2024). In each column, the method with the best mean is bolded; bolding considers the mean alone, with no adjustment for seed variance, and methods with equal means are both bolded. 
+
+Baselines. We compare OC -GRPO -Fixed and OC -GRPO -Adaptive against four baselines 2. Each method’s optimization objective is given explicitly to clarify the comparison. Vanilla GRPO optimizes the unguided objective J(θ) = Ex∼D Ey∼πθ (·| x)[r(x, y )] but receives near- zero signal because every x has pass @64 = 0 
+
+under πref . POPE* (Qu et al., 2026) (offline) and BREAD* (Zhang et al., 2025e) (online) sample from 
+
+g(x) and score under g(x) in both numerator and denominator, optimizing a misaligned guided objective 
+
+Jguide (θ) := Ex∼D Ey∼πθ (·| g(x)) [r(x, y )] , rather than J(θ). Appendix F gives a toy example where the two objectives prefer opposite policies. PrefixRL* (Setlur et al., 2026) injects solution prefixes in the output space rather than the prompt, with gradients masked on the prefix tokens. Although the mechanism differs, the optimized objective is similar to those in Qu et al. (2026); Zhang et al. (2025e): the policy is trained to complete from a forced prefix endpoint, and at inference time the prefix is absent. See Appendix G for full empirical implementation details. 
+
+6.3 Results 
+
+Table 2 reports the main results on Qwen2.5-7B-Instruct. OC -GRPO -Fixed achieves the best average Pass@1 of 
+
+31 .7, a 13 .8% relative gain over vanilla GRPO and 1.4 absolute points ahead of the strongest guided baseline POPE* ( +8 .7% ). OC -GRPO -Adaptive is competitive ( +10 .7% ) but trails its fixed counterpart with additional inference cost per training step. Across individual benchmarks, OC -GRPO -Fixed leads on Gaokao2023 and OmniMath while remaining competitive on AIME. Tables 3 and 4 report results at 3B and 1.5B scale with identical hyperparameters. Two patterns emerge consistently. First, OC -GRPO remains the strongest method at every scale, with OC -GRPO -Fixed achieving 
+
++7 .2% at 3B and +10 .2% at 1.5B over vanilla GRPO. Second, guided baselines that optimize a misaligned objective (Qu et al., 2026; Zhang et al., 2025e; Setlur et al., 2026) degrade below vanilla GRPO at smaller scales: PrefixRL* drops 7.2% at 1.5B and BREAD* drops 3.4% at 3B while OC -GRPO retains consistent gains. This suggests that back-generalization is capacity-dependent: larger models may absorb the objective mismatch, but smaller models cannot, making the importance correction increasingly critical at reduced scale. 
+
+> 2
+
+We implement each baseline in our setting with the same Daug across all methods. We mark these baselines with a * suffix. 
+
+8Method Training AIME (1983–2026) Gaokao2023 OmniMath Average P@1 P@16 P@1 P@16 P@1 P@16 P@1 P@16 P@1 P@16 Baselines 
+
+Base 0.3 5.0 9.2 29.2 38.2 64.4 18.5 44.2 22.0 45.9 Vanilla GRPO (ref.) 1.0 6.2 10.2 30.8 41.6 63.6 18.6 43.5 23.5 46.0 
+
+Before-Training Guidance 
+
+PrefixRL* 4.5 11.6 10.1 
+
+> (-1.0%)
+
+32.1 
+
+> (+4.2%)
+
+41.3 
+
+> (-0.6%)
+
+64.4 
+
+> (+1.2%)
+
+18.8 
+
+> (+1.1%)
+
+41.7 
+
+> (-4.1%)
+
+23.4 
+
+> (-0.3%)
+
+46.1 
+
+> (+0.2%)
+
+POPE* 6.1 14.3 9.8 
+
+> (-4.0%)
+
+30.2 
+
+> (-2.0%)
+
+43.4 
+
+> (+4.4%)
+
+62.3 
+
+> (-2.0%)
+
+18.9 
+
+> (+1.6%)
+
+41.3 
+
+> (-5.1%)
+
+24.0 
+
+> (+2.4%)
+
+44.6 
+
+> (-3.0%)
+
+OC-GRPO-Fixed 1.3 9.4 11.0 
+
+> (+7.9%)
+
+30.6 
+
+> (-0.7%)
+
+45.7 
+
+> (+10.0%)
+
+64.7 
+
+> (+1.6%)
+
+18.8 
+
+> (+1.1%)
+
+42.0 
+
+> (-3.4%)
+
+25.2 
+
+> (+7.2%)
+
+45.8 
+
+> (-0.4%)
+
+During-Training Guidance 
+
+BREAD* 4.7 13.3 9.1 
+
+> (-10.9%)
+
+31.3 
+
+> (+1.6%)
+
+40.0 
+
+> (-3.8%)
+
+62.1 
+
+> (-2.4%)
+
+18.9 
+
+> (+1.6%)
+
+42.6 
+
+> (-2.1%)
+
+22.7 
+
+> (-3.4%)
+
+45.3 
+
+> (-1.4%)
+
+OC-GRPO-Adaptive 1.7 6.1 10.7 
+
+> (+5.0%)
+
+29.3 
+
+> (-4.9%)
+
+43.4 
+
+> (+4.4%)
+
+65.2 
+
+> (+2.4%)
+
+19.2 
+
+> (+3.2%)
+
+42.3 
+
+> (-2.8%)
+
+24.4 
+
+> (+4.1%)
+
+45.6 
+
+> (-0.8%)
+
+Table 3 Results with Qwen2.5-3B-Instruct (single seed). The empirical setting is identical to Table 2. 
+
+Method Training AIME (1983–2026) Gaokao2023 OmniMath Average P@1 P@16 P@1 P@16 P@1 P@16 P@1 P@16 P@1 P@16 Baselines 
+
+Base 1.2 7.3 3.8 18.7 34.8 56.9 13.0 37.6 17.2 37.7 Vanilla GRPO (ref.) 1.8 7.4 4.6 21.2 33.5 59.0 14.7 36.9 17.6 39.0 
+
+Before-Training Guidance 
+
+PrefixRL* 2.0 11.3 3.9 
+
+> (-15.2%)
+
+20.7 
+
+> (-2.4%)
+
+31.2 
+
+> (-7.0%)
+
+57.7 
+
+> (-2.2%)
+
+14.0 
+
+> (-4.8%)
+
+37.7 
+
+> (+2.2%)
+
+16.4 
+
+> (-7.2%)
+
+38.7 
+
+> (-0.9%)
+
+POPE* 2.9 10.9 4.1 
+
+> (-10.9%)
+
+21.1 
+
+> (-0.5%)
+
+33.8 
+
+> (+0.8%)
+
+59.7 
+
+> (+1.3%)
+
+15.8 
+
+> (+7.5%)
+
+38.1 
+
+> (+3.3%)
+
+17.9 
+
+> (+1.7%)
+
+39.6 
+
+> (+1.5%)
+
+OC-GRPO-Fixed 2.5 10.4 4.2 
+
+> (-8.7%)
+
+19.5 
+
+> (-8.1%)
+
+37.7 
+
+> (+12.4%)
+
+59.7 
+
+> (+1.3%)
+
+16.3 
+
+> (+10.9%)
+
+36.4 
+
+> (-1.4%)
+
+19.4 
+
+> (+10.2%)
+
+38.5 
+
+> (-1.4%)
+
+During-Training Guidance 
+
+BREAD* 2.4 11.8 4.6 
+
+> (+0.0%)
+
+19.3 
+
+> (-9.0%)
+
+33.2 
+
+> (-0.8%)
+
+60.0 
+
+> (+1.8%)
+
+14.6 
+
+> (-0.7%)
+
+38.2 
+
+> (+3.5%)
+
+17.5 
+
+> (-0.7%)
+
+39.2 
+
+> (+0.4%)
+
+OC-GRPO-Adaptive 0.5 8.4 4.8 
+
+> (+4.3%)
+
+21.3 
+
+> (+0.5%)
+
+35.8 
+
+> (+7.0%)
+
+62.9 
+
+> (+6.6%)
+
+16.1 
+
+> (+9.5%)
+
+38.2 
+
+> (+3.5%)
+
+18.9 
+
+> (+7.2%)
+
+40.8 
+
+> (+4.6%)
+
+Table 4 Results with Qwen2.5-1.5B-Instruct (single seed). The empirical setting is identical to Table 2. 
+
+97 Conclusion 
+
+We identified the off-context problem in guided RLVR, where existing methods use privileged guidance to restore learning signal on hard problems but inadvertently optimize a different objective from the one used at deployment. OC -GRPO corrects for this via a minimal per-token importance reweighting, so training can sample from guided prompts while still estimating the unguided objective. The same correction also gives behavior-aware credit assignment: it discounts trajectories that leaned heavily on guidance and preserves the penalty for failures that remain under guidance. Gains over guided baselines are consistent across model scales and grow at smaller sizes, where the objective mismatch is hardest to absorb. A natural extension is multi-turn or agentic RLVR, where privileged context can take the form of tool-call results, intermediate environment states, or oracle subgoals accessible during training but absent at deployment. The off-context problem appears whenever the training-time context differs from the deployment-time context, and the per-token importance correction in OC -GRPO generalizes directly. The broader lesson is that privileged information can guide exploration, but the update still has to account for the distribution it came from. 10 References 
+
+Rishabh Agarwal, Nino Vieillard, Yongchao Zhou, Piotr Stanczyk, Sabela Ramos Garea, Matthieu Geist, and Olivier Bachem. On-policy distillation of language models: Learning from self-generated mistakes. In The twelfth international conference on learning representations , 2024. Mohammad Hossein Amani, Aryo Lotfi, Nicolas Mario Baldwin, Samy Bengio, Mehrdad Farajtabar, Emmanuel Abbe, and Robert West. Rl for reasoning by adaptively revealing rationales. arXiv preprint arXiv:2506.18110 , 2025. Marcin Andrychowicz, Filip Wolski, Alex Ray, Jonas Schneider, Rachel Fong, Peter Welinder, Bob McGrew, Josh Tobin, OpenAI Pieter Abbeel, and Wojciech Zaremba. Hindsight experience replay. Advances in neural information processing systems , 30, 2017. Mislav Balunović, Jasper Dekoninck, Ivo Petrov, Nikola Jovanović, and Martin Vechev. Matharena: Evaluating llms on uncontaminated math competitions, February 2025. https://matharena.ai/ .Mark Chen, Jerry Tworek, Heewoo Jun, Qiming Yuan, Henrique Ponde de Oliveira Pinto, Jared Kaplan, Harri Edwards, Yuri Burda, Nicholas Joseph, Greg Brockman, et al. Evaluating large language models trained on code. arXiv preprint arXiv:2107.03374 , 2021. Xiaoyin Chen, Jiarui Lu, Minsu Kim, Dinghuai Zhang, Jian Tang, Alexandre Piché, Nicolas Gontier, Yoshua Bengio, and Ehsan Kamalloo. Self-evolving curriculum for llm reasoning. arXiv preprint arXiv:2505.14970 , 2025. Thomas Degris, Martha White, and Richard S Sutton. Off-policy actor-critic. arXiv preprint arXiv:1205.4839 , 2012. Liang Ding. Agenther: Hindsight experience replay for llm agent trajectory relabeling. arXiv preprint arXiv:2603.21357 ,2026. Bofei Gao, Feifan Song, Zhe Yang, Zefan Cai, Yibo Miao, Qingxiu Dong, Lei Li, Chenghao Ma, Liang Chen, Runxin Xu, Zhengyang Tang, Benyou Wang, Daoguang Zan, Shanghaoran Quan, Ge Zhang, Lei Sha, Yichang Zhang, Xuancheng Ren, Tianyu Liu, and Baobao Chang. Omni-math: A universal olympiad level mathematic benchmark for large language models. arXiv preprint arXiv:2410.07985 , 2024. Daya Guo, Dejian Yang, Haowei Zhang, Junxiao Song, Peiyi Wang, Qihao Zhu, Runxin Xu, Ruoyu Zhang, Shirong Ma, Xiao Bi, et al. Deepseek-r1: Incentivizing reasoning capability in llms via reinforcement learning. arXiv preprint arXiv:2501.12948 , 2025a. Yongxin Guo, Wenbo Deng, Zhenglin Cheng, and Xiaoying Tang. Ggrpo-a: Guided group relative policy optimization with adaptive guidance. arXiv preprint arXiv:2508.13023 , 2025b. Dan Hendrycks, Collin Burns, Saurav Kadavath, Akul Arora, Steven Basart, Eric Tang, Dawn Song, and Jacob Steinhardt. Measuring mathematical problem solving with the math dataset. NeurIPS , 2021. Edward J Hu, yelong shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, and Weizhu Chen. LoRA: Low-rank adaptation of large language models. In International Conference on Learning Representations ,2022. Michael Y Hu, Benjamin Van Durme, Jacob Andreas, and Harsh Jhamtani. Sample-efficient online learning in lm agents via hindsight trajectory rewriting. arXiv preprint arXiv:2510.10304 , 2025. Zeyu Huang, Tianhao Cheng, Zihan Qiu, Zili Wang, Yinghui Xu, Edoardo M Ponti, and Ivan Titov. Blending supervised and reinforcement fine-tuning with prefix sampling. arXiv preprint arXiv:2507.01679 , 2025. Jonas Hübotter, Frederike Lübeck, Lejs Behric, Anton Baumann, Marco Bagatella, Daniel Marta, Ido Hakimi, Idan Shenfeld, Thomas Kleine Buening, Carlos Guestrin, et al. Reinforcement learning via self-distillation. arXiv preprint arXiv:2601.20802 , 2026. Aaron Jaech, Adam Kalai, Adam Lerer, Adam Richardson, Ahmed El-Kishky, Aiden Low, Alec Helyar, Aleksander Madry, Alex Beutel, Alex Carney, et al. Openai o1 system card. arXiv preprint arXiv:2412.16720 , 2024. Guochao Jiang, Wenfeng Feng, Guofeng Quan, Chuzhan Hao, Yuewei Zhang, Guohua Liu, and Hao Wang. Vcrl: Variance-based curriculum reinforcement learning for large language models. arXiv preprint arXiv:2509.19803 , 2025. Woosuk Kwon, Zhuohan Li, Siyuan Zhuang, Ying Sheng, Lianmin Zheng, Cody Hao Yu, Joseph E. Gonzalez, Hao Zhang, and Ion Stoica. Efficient memory management for large language model serving with pagedattention. In 
+
+Proceedings of the ACM SIGOPS 29th Symposium on Operating Systems Principles , 2023. 
+
+11 Renda Li, Hailang Huang, Fei Wei, Feng Xiong, Yong Wang, and Xiangxiang Chu. Adacurl: Adaptive curriculum reinforcement learning with invalid sample mitigation and historical revisiting. In Proceedings of the AAAI Conference on Artificial Intelligence , volume 40, pages 23123–23131, 2026. Ziheng Li, Zexu Sun, Jinman Zhao, Erxue Min, Yongcheng Zeng, Hui Wu, Hengyi Cai, Shuaiqiang Wang, Dawei Yin, Xu Chen, et al. Staying in the sweet spot: Responsive reasoning evolution via capability-adaptive hint scaffolding. 
+
+arXiv preprint arXiv:2509.06923 , 2025. Doina Precup, Richard S Sutton, and Sanjoy Dasgupta. Off-policy temporal-difference learning with function approximation. In ICML , pages 417–424, 2001. Yuxiao Qu, Amrith Setlur, Virginia Smith, Ruslan Salakhutdinov, and Aviral Kumar. Pope: Learning to reason on hard problems via privileged on-policy exploration. arXiv preprint arXiv:2601.18779 , 2026. Qwen. Qwen2.5: A party of foundation models, September 2024. https://qwenlm.github.io/blog/qwen2.5/ .John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, and Oleg Klimov. Proximal policy optimization algorithms. arXiv preprint arXiv:1707.06347 , 2017. Amrith Setlur, Zijian Wang, Andrew Cohen, Paria Rashidinejad, and Sang Michael Xie. Reuse your flops: Scaling rl on hard problems by conditioning on very off-policy prefixes. arXiv preprint arXiv:2601.18795 , 2026. Zhihong Shao, Peiyi Wang, Qihao Zhu, Runxin Xu, Junxiao Song, Xiao Bi, Haowei Zhang, Mingchuan Zhang, YK Li, Yang Wu, et al. Deepseekmath: Pushing the limits of mathematical reasoning in open language models. arXiv preprint arXiv:2402.03300 , 2024. Guangming Sheng, Chi Zhang, Zilingfeng Ye, Xibin Wu, Wang Zhang, Ru Zhang, Yanghua Peng, Haibin Lin, and Chuan Wu. Hybridflow: A flexible and efficient rlhf framework. arXiv preprint arXiv: 2409.19256 , 2024. Avi Singh, John D Co-Reyes, Rishabh Agarwal, Ankesh Anand, Piyush Patil, Xavier Garcia, Peter J Liu, James Harrison, Jaehoon Lee, Kelvin Xu, et al. Beyond human data: Scaling self-training for problem-solving with language models. arXiv preprint arXiv:2312.06585 , 2023. Yifan Song, Da Yin, Xiang Yue, Jie Huang, Sujian Li, and Bill Yuchen Lin. Trial and error: Exploration-based trajectory optimization of llm agents. In Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , pages 7584–7600, 2024. Alex Stein, Furong Huang, and Tom Goldstein. Gates: Self-distillation under privileged context with consensus gating. 
+
+arXiv preprint arXiv:2602.20574 , 2026. Hemish Veeraboina. AIME problem set 1983–2024. https://www.kaggle.com/datasets/hemishveeraboina/ aime-problem-set-1983-2024 , 2023. Zhenting Wang, Guofeng Cui, Yu-Jhe Li, Kun Wan, and Wentian Zhao. Dump: Automated distribution-level curriculum learning for rl-based llm post-training. arXiv preprint arXiv:2504.09710 , 2025. Jianhao Yan, Yafu Li, Zican Hu, Zhi Wang, Ganqu Cui, Xiaoye Qu, Yu Cheng, and Yue Zhang. Learning to reason under off-policy guidance. arXiv preprint arXiv:2504.14945 , 2025. Zhicheng Yang, Zhijiang Guo, Yinya Huang, Yongxin Wang, Dongchun Xie, Hanhui Li, Yiwei Wang, Xiaodan Liang, and Jing Tang. Depth-breadth synergy in rlvr: Unlocking llm reasoning gains with adaptive exploration. arXiv preprint arXiv:2508.13755 , 2025. Qiying Yu, Zheng Zhang, Ruofei Zhu, Yufeng Yuan, Xiaochen Zuo, Yu Yue, Weinan Dai, Tiantian Fan, Gaohong Liu, Lingjun Liu, et al. Dapo: An open-source llm reinforcement learning system at scale. arXiv preprint arXiv:2503.14476 ,2025. Eric Zelikman, Yuhuai Wu, Jesse Mu, and Noah Goodman. Star: Bootstrapping reasoning with reasoning. Advances in Neural Information Processing Systems , 35:15476–15488, 2022. Runzhe Zhan, Yafu Li, Zhi Wang, Xiaoye Qu, Dongrui Liu, Jing Shao, Derek F Wong, and Yu Cheng. Exgrpo: Learning to reason from experience. arXiv preprint arXiv:2510.02245 , 2025. Kaiyi Zhang, Ang Lv, Jinpeng Li, Yongbo Wang, Feng Wang, Haoyuan Hu, and Rui Yan. Stephint: Multi-level stepwise hints enhance reinforcement learning to reason. arXiv preprint arXiv:2507.02841 , 2025a. Shijie Zhang, Guohao Sun, Kevin Zhang, Xiang Guo, and Rujun Guo. Clpo: Curriculum learning meets policy optimization for llm reasoning. arXiv preprint arXiv:2509.25004 , 2025b. 
+
+12 Wenhao Zhang, Yuexiang Xie, Yuchang Sun, Yanxi Chen, Guoyin Wang, Yaliang Li, Bolin Ding, and Jingren Zhou. On-policy rl meets off-policy experts: Harmonizing supervised fine-tuning and reinforcement learning via dynamic weighting. arXiv preprint arXiv:2508.11408 , 2025c. Xiaotian Zhang, Chunyang Li, Yi Zong, Zhengyu Ying, Liang He, and Xipeng Qiu. Evaluating the performance of large language models on gaokao benchmark. arXiv preprint arXiv:2305.12474 , 2023. Xichen Zhang, Sitong Wu, Yinghao Zhu, Haoru Tan, Shaozuo Yu, Ziyi He, and Jiaya Jia. Scaf-grpo: Scaffolded group relative policy optimization for enhancing llm reasoning. arXiv preprint arXiv:2510.19807 , 2025d. Xuechen Zhang, Zijian Huang, Yingcong Li, Chenshun Ni, Jiasi Chen, and Samet Oymak. Bread: Branched rollouts from expert anchors bridge sft & rl for reasoning. arXiv preprint arXiv:2506.17211 , 2025e. Siyan Zhao, Zhihui Xie, Mengchen Liu, Jing Huang, Guan Pang, Feiyu Chen, and Aditya Grover. Self-distilled reasoner: On-policy self-distillation for large language models. arXiv preprint arXiv:2601.18734 , 2026. 
+
+13 Limitations. OC-GRPO is evaluated at academic scale, Qwen2.5 models up to 7B with LoRA adapters on a small A100 cluster, and behavior at frontier scale may differ. Our experiments target mathematical reasoning with verifiable answer rewards, and the gains may not transfer uniformly to other RLVR settings such as code generation, agentic tool-use, or multimodal reasoning. Finally, while the off-context framework is mechanism-agnostic and we explore hint-style variants in Appendix H, our main results rely on ground-truth solution prefixes as the privileged signal; behavior under partial, noisy, or adversarial guidance is left for future work. 
+
+## A Missing Proofs 
+
+A.1 Proof of Lemma 1 
+
+Proof. Write P (y) = πθold (y | x) and Q(y) = πθold (y | g(x)) . The support assumption lets us restrict sums to responses with positive guided probability without dropping any response with positive original-prompt probability. Let Y+ 
+
+> g
+
+= {y ∈ Y + : Q(y) > 0}. Then 
+
+λ+(x, g ) = E
+
+h
+
+ρoc resp (y) y ∈ Y +i
+
+= X
+
+> y∈Y +
+> g
+
+Q(y)
+
+P 
+
+> z∈Y +
+
+Q(z)
+
+P (y)
+
+Q(y)=
+
+P 
+
+> y∈Y +
+> g
+
+P (y)
+
+P 
+
+> z∈Y +
+
+Q(z) =
+
+P 
+
+> y∈Y +
+
+P (y)
+
+P 
+
+> z∈Y +
+
+Q(z)= Pr y∼πθold (·| x)(r(x, y ) = 1) Pr y∼πθold (·| g(x)) (r(x, y ) = 1) = p(x)
+
+q(x) .
+
+Since p(x) < q (x), this ratio is less than one. The same calculation on Y− gives 
+
+λ−(x, g ) = 
+
+P 
+
+> y∈Y −
+
+P (y)
+
+P 
+
+> y∈Y −
+
+Q(y) = 1 − p(x)1 − q(x) > 1,
+
+where the strict inequality again follows from p(x) < q (x).
+
+A.2 Proof of Theorem 2 
+
+Proof. We prove the two parts in order. By Lemma 1, λ+(x, g ) < 1 < λ −(x, g ). On Y+, the centered advantage is constant and equal to 1 − q(x), so E[ bA(x, y ) | y ∈ Y +] = 1 − q(x) > 0. Hence 
+
+E
+
+h
+
+ρoc resp (y) bA(x, y ) y ∈ Y +i
+
+= (1 − q(x)) E
+
+h
+
+ρoc resp (y) y ∈ Y +i
+
+= λ+(x, g )E
+
+h bA(x, y ) y ∈ Y +i
+
+< E
+
+h bA(x, y ) y ∈ Y +i
+
+.
+
+On Y−, the same calculation uses bA(x, y ) = −q(x) and λ−(x, g ) > 1, which gives 
+
+E
+
+h
+
+ρoc resp (y) bA(x, y ) y ∈ Y −i
+
+= λ−(x, g ) E
+
+h bA(x, y ) y ∈ Y −i
+
+> E
+
+h bA(x, y ) y ∈ Y −i
+
+.
+
+For the second part, fix x and write P (y) = πθold (y | x) and Q(y) = πθold (y | g(x)) . Differentiating Lresp OC -GRPO 
+
+and evaluating at θ = θold gives 
+
+∇θ Lresp OC -GRPO (θ) θ=θold 
+
+= Ex∼D 
+
+
+
+Ey∼Q
+
+h
+
+ρoc resp (y) bA(x, y )sx(y)
+
+i
+
+.
+
+14 Because bA(x, y ) = 1 − q(x) on Y+ and bA(x, y ) = −q(x) on Y−, the law of total expectation gives 
+
+Ey∼Q
+
+h
+
+ρoc resp (y) bA(x, y )sx(y)
+
+i
+
+= q(x)(1 − q(x)) Ey∼Q
+
+h
+
+ρoc resp (y)sx(y) y ∈ Y +i
+
+− q(x)(1 − q(x)) Ey∼Q
+
+h
+
+ρoc resp (y)sx(y) y ∈ Y −i
+
+.
+
+For any S ∈ {Y +, Y−}, the correction changes the conditional law from Q to P :
+
+Ey∼Q
+
+h
+
+ρoc resp (y)sx(y) y ∈ S
+
+i
+
+= X
+
+> y∈S
+
+Q(y)
+
+P 
+
+> z∈S
+
+Q(z)
+
+P (y)
+
+Q(y) sx(y)=
+
+P 
+
+> z∈S
+
+P (z)
+
+P 
+
+> z∈S
+
+Q(z) Ey∼P
+
+sx(y) y ∈ S .
+
+Taking S = Y+ gives the factor p(x)/q (x) = λ+(x, g ), and taking S = Y− gives the factor (1 −p(x)) /(1 −q(x)) = 
+
+λ−(x, g ). Substitution gives (10). 
+
+## B Extended Related Works 
+
+B.1 Self-Distillation in RLVR 
+
+A complementary line of work uses the model itself, conditioned on richer information, as a self-teacher.  
+
+> OPSD
+
+(Zhao et al., 2026) instantiates a single LLM as both privileged teacher (conditioned on ground-truth answers) and unprivileged student (conditioned only on the problem), training via per-token KL/JSD divergence on student rollouts. SDPO (Hübotter et al., 2026) extends this to rich-feedback settings such as code execution traces, treating the feedback-conditioned policy as a self-teacher. GATES (Stein et al., 2026) applies a similar idea with consensus gating to filter unreliable supervision in document-grounded question answering. Conceptual ancestors include STaR (Zelikman et al., 2022), which bootstraps rationales conditioned on the correct answer, and on-policy distillation (Agarwal et al., 2024). OPSD and SDPO share with OC-GRPO the use of training-time-only privileged context, but the methods differ in three essential ways. First, they are distillation methods, not RL methods : training minimizes a divergence to the teacher’s logit distribution rather than a verifier reward, and correctness is never directly consulted during the update. Second, the two paradigms inject privileged context at different points in the pipeline : OPSD and SDPO sample rollouts from the unguided student and use privileged information only to shape the teacher’s per-token distribution, whereas OC-GRPO uses the privileged context to drive the rollout distribution itself and reserves the unguided context for the importance correction. SDPO is flexible in the kinds of feedback the self-teacher can consume; neither method, however, specifically targets the learning-cliff regime, and without further algorithmic modifications both rely in this regime on teacher signal computed over student-sampled traces that are typically incorrect, whereas OC-GRPO’s guided rollouts more frequently produce reward-bearing trajectories. Third, OC-GRPO is provably unbiased for the original unguided RLVR objective J(θ), while OPSD and SDPO optimize a distillation divergence that is structurally distinct from 
+
+J(θ). The two paradigms are complementary rather than competing, distillation provides dense token-level supervision when the teacher distribution is reliable, RL provides reward-anchored supervision when it is not. 
+
+B.2 Hybrid SFT and RL  
+
+> CHORD
+
+(Zhang et al., 2025c) reframes SFT as a dynamically weighted auxiliary objective inside on-policy RL, with a global coefficient and a token-wise weighting function balancing imitation against exploration.  
+
+> Prefix-RFT
+
+(Huang et al., 2025) blends supervised demonstrations with RFT by sampling prefixes from offline traces as starting points for on-policy continuation, scheduled via a cosine decay over prefix length.  
+
+> ReST-EM
+
+(Singh et al., 2023) iterates between rejection-sampling rollouts and SFT on filtered successes, viewing the procedure as expectation-maximization. These approaches harmonize the two losses; OC-GRPO instead harmonizes the two distributions: guided rollouts provide the exploration that SFT-RL hybrids would obtain through expert demonstrations, while importance correction plays the role that the SFT loss plays in those methods, namely keeping training aligned with the original deployment objective. 15 B.3 Self-Curriculum and Adaptive Difficulty 
+
+A separate body of work treats problem difficulty as a curriculum variable controlled across training. Methods in this family, including SEC (Chen et al., 2025), VCRL (Jiang et al., 2025), CLPO (Zhang et al., 2025b),  
+
+> AdaCuRL
+
+(Li et al., 2026), DUMP (Wang et al., 2025), and DARS (Yang et al., 2025), adjust which problems the policy trains on or how much rollout budget each receives, often using rollout reward variance, advantage magnitude, or learning progress as control signals. We list these works for completeness; OC-GRPO is not a curriculum method and operates in a different regime. Curriculum approaches assume that the policy can learn from at least some problems on its own and select among them; we target the regime where every remaining hard problem has pass@ k ≈ 0 without guidance, so privileged guidance is the lever that makes such problems trainable in the first place, before any curriculum question arises. 
+
+B.4 Sparse-Reward RL: Experience Reuse and Hindsight Relabeling  
+
+> Hindsight experience replay (HER)
+
+(Andrychowicz et al., 2017) is the canonical sparse-reward technique: failed trajectories are relabeled with the goals they actually achieved, converting zero-reward experience into useful learning signal. Recent work lifts this idea to language settings: AgentHER (Ding, 2026) relabels failed multi-step agent trajectories with hindsight goals via a four-stage pipeline, and Hu et al. (2025) extend experience replay to LM agents through hindsight trajectory rewriting. ExGRPO (Zhan et al., 2025) maintains a replay buffer of partially correct rollouts organized by correctness, prioritizes valuable experiences via correctness and entropy signals, and blends replayed and on-policy data through a mixed-policy objective. HER and OC-GRPO are mirror images: HER changes the goal post-hoc to match the trajectory, while OC-GRPO changes the prompt pre-hoc to make the trajectory reachable, then importance-corrects the gradient back to the original goal. ExGRPO and replay methods are orthogonal to OC-GRPO, they reuse trajectories the policy did sample, rather than altering the sampling distribution to obtain new ones. 
+
+## C OC -GRPO -Adaptive : Adaptive Guidance Adjustment 
+
+OC -GRPO -Adaptive (adaptive augmentation). At each training step t, given a batch B ⊂ D :1. Try unguided first. For each x ∈ B , sample N rollouts from πθt (· | x). If at least one is correct, keep the unguided group for this problem. 2. Adjust guidance if all rollouts fail. If all N unguided rollouts fail, form the guided prompt g1(x) and sample 
+
+N new rollouts from πθt (· | g1(x)) . Continue adjusting through levels ℓ = 2 , 3, 4, 5 until at least one rollout is correct, and use that group for the update. 3. Proceed with the policy update. The batch now contains a mix of unguided groups (for easier problems at the current policy) and guided groups (for problems that are currently too hard). 
+
+OC -GRPO -Adaptive differs from OC -GRPO -Fixed in how the guidance level is selected: the fixed variant fixes 
+
+ℓ⋆(x) once using the base model πref , while the adaptive variant re-selects guidance at every training step with respect to the current policy πθt . Theorem 2 applies whenever the behavior context used to sample the update group is fixed before that group is sampled. Adaptive adjustment selects a behavior prompt 
+
+b ∈ { x, g ℓ(x)}, where ℓ is the guidance level that first produces a correct rollout. In the implementation we use the realized behavior prompt in the importance ratio denominator, which corresponds to plugging in the selected behavior law πθt (· | b). OC -GRPO -Adaptive pays an inference cost at every training step: when the unguided rollouts fail, the model must re-sample N rollouts for each guidance level, potentially up to L
+
+times per problem. In contrast, OC -GRPO -Fixed pays this cost once with πref before training, and Daug can be reused across runs. Empirically, OC -GRPO -Fixed is competitive with or stronger than OC -GRPO -Adaptive 
+
+(Table 2), so we recommend the fixed variant as the default. 16 D Collapse of Off-Context GRPO without IS Correction 
+
+As discussed in the main text, naively using guided rollouts yi ∼ πθold (· | g(x)) while updating as if they came from the original prompt x gives a biased gradient estimator. We call this the “Masked no-IC” update. Useful guidance changes the rollout distribution, and no-IC credits guided trajectories as though they were unguided samples from the target objective. During training, this repeated mismatch can accumulate, inflating the gradient norm early in training and eventually causing reward collapse, as shown in Figure 3. 0 1 2 3 4          
+
+> Epoch
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> Mean Reward
+> Collapse
+> (a) Training Reward
+> No Importance Correction
+> OC-GRPO
+> 01234
+> Epoch
+> 10 2
+> 10 1
+> 10 0
+> 10 1
+> Gradient Norm
+> Collapse
+> (b) Gradient Norm
+> No Importance Correction
+> OC-GRPO
+> 01234
+> Epoch
+> 10 0
+> 10 1
+> |Log Probability Gap|
+> Collapse
+> (c) Log Probability Gap
+> No Importance Correction
+> OC-GRPO
+
+Anatomy of Collapse 
+
+Figure 3 Importance correction prevents collapse. Without the importance ratio correction, guided rollouts are scored as if they came from the unguided context, producing growing objective mismatch. This leads to reward collapse, gradient norm spikes, and a widening log-probability gap. OC -GRPO keeps the update aligned with the unguided objective. 
+
+The source of the bias is the off-context mismatch itself. If guidance makes a correct response much more likely under g(x) than under x, then no-IC assigns too much credit to the unguided policy for a trajectory produced by the guided rollout distribution. Masking the guidance tokens does not fix this, since the generated response still came from the guided rollout distribution. OC -GRPO removes this mismatch by weighting each trajectory by the ratio between the original-prompt probability and the guided-prompt probability, so the corrected estimator targets J(θ) by Theorem 3. 
+
+## E Additional Theoretical Results 
+
+E.1 Response-Level Unbiasedness 
+
+The exact unbiasedness statement is a response-level change of measure. It is separate from the credit-assignment identities in Theorem 2. 
+
+Theorem 3 (Response-level unbiasedness of the importance correction) . Fix a problem x and assume the support condition πθold (y | g(x)) > 0 whenever πθ (y | x)r(x, y ) > 0. For a guided rollout y ∼ πθold (· | g(x)) ,
+
+17 define the response-level estimator 
+
+bGoc (θ; x, y ) := πθ (y | x)
+
+πθold (y | g(x)) r(x, y )∇θ log πθ (y | x).
+
+Then 
+
+Ey∼πθold (·| g(x)) 
+
+ bGoc (θ; x, y ) = Ey∼πθ (·| x)
+
+r(x, y )∇θ log πθ (y | x) = ∇θ J(θ; x).
+
+Proof. By direct substitution, 
+
+Ey∼πθold (·| g(x)) 
+
+ bGoc (θ; x, y ) = X
+
+> y
+
+πθold (y | g(x)) πθ (y | x)
+
+πθold (y | g(x)) r(x, y )∇θ log πθ (y | x)= X
+
+> y
+
+πθ (y | x)r(x, y )∇θ log πθ (y | x)= ∇θ
+
+X
+
+> y
+
+πθ (y | x)r(x, y ) = ∇θ J(θ; x).
+
+The support condition makes the ratio well-defined on every reward-bearing response that can contribute to the target expectation. 
+
+E.2 Bounded Off-Context Correction Term 
+
+A practical concern with importance sampling is variance inflation, since large IS weights can destabilize training. The OC -GRPO -specific component of the importance ratio is bounded with controlled variance. Decompose the per-token importance ratio as 
+
+ρoc 
+
+> i,t
+
+(θ) = πθ (yi,t | x, y i,<t )
+
+πθold (yi,t | x, y i,<t )
+
+| {z } 
+
+> ρi,t (θ)(on-policy drift)
+
+· πθold (yi,t | x, y i,<t )
+
+πθold (yi,t | g(x), y i,<t )
+
+| {z } 
+
+> γi,t (off-context correction)
+
+. (12) The factor ρi,t (θ) is the standard GRPO drift ratio, controlled by clipping in [1 −ϵ, 1 +ϵ]. The OC -GRPO -specific factor is γi,t , the context correction. We use the following regularity assumption. 
+
+Assumption 1 (Per-guidance-token regularity) . There exists η > 0 such that for every guidance token index 
+
+k ∈ { 1, . . . , n } (g = u1: n), the inequality 
+
+log πθold (yi,t | x, u 1: k−1, y i,<t )
+
+πθold (yi,t | x, u 1: k, y i,<t ) ≤ η
+
+holds almost surely over the realized token yi,t ∼ Qi,t and the rollout history yi,<t .
+
+Assumption 1 states that adding any single guidance token shifts the old policy’s next-token log-probability by at most η in either direction. For a well-calibrated language model on natural-language input, this is small: each additional context token refines but does not radically reshape the next-token distribution. 
+
+Theorem 4 (Bounded off-context correction term) . Under Assumption 1, for every (i, t ), every history yi,<t ,and every realized token yi,t :
+
+1. (Deterministic bound) e−nη ≤ γi,t ≤ enη .2. (Rényi-2 variance bound) EQi,t [γ2 
+
+> i,t
+
+| yi,<t ] = eD2(Pi,t ∥ Qi,t ) ≤ e2nη , hence Var Qi,t [γi,t | yi,<t ] ≤ e2nη − 1,where n is the number of tokens in the guidance text added by g(x), Qi,t = πθold (· | g(x), y i,<t ), and 
+
+Pi,t = πθold (· | x, y i,<t ).
+
+The key observation is that the variance bound scales with the guidance length n, not the rollout length T .This also motivates the design principle use the shortest guidance prefix that restores learning signal . Our main method OC -GRPO -Fixed builds on this principle. 18 Proof. (i) By a telescoping decomposition, 
+
+log γi,t =
+
+> n
+
+X
+
+> k=1
+
+log πθold (yi,t | x, u 1: k−1, y i,<t )
+
+πθold (yi,t | x, u 1: k, y i,<t ) .
+
+By Assumption 1 each summand is in [−η, η ], so | log γi,t | ≤ nη . Exponentiating gives e−nη ≤ γi,t ≤ enη . 
+
+> (ii)
+
+Recall that for P ≪ Q, the exponentiated Rényi-2 divergence is eD2(P ∥Q) = P 
+
+> v
+
+P (v)2/Q (v) = 1+ χ2(P ∥Q).With Pi,t = πθold (· | x, y i,<t ) and Qi,t = πθold (· | g(x), y i,<t ), the second moment under Qi,t is 
+
+EQi,t [γ2 
+
+> i,t
+
+| yi,<t ] = X
+
+> v
+
+Qi,t (v) Pi,t (v)/Q i,t (v)2 = X
+
+> v
+
+Pi,t (v)2/Q i,t (v) = eD2(Pi,t ∥Qi,t ).
+
+By the deterministic bound from (i), γi,t ≤ enη almost surely under Qi,t , hence EQi,t [γ2
+
+> i,t
+
+] ≤ e2nη . Finally, since 
+
+γi,t = Pi,t /Q i,t is a likelihood ratio under Qi,t , EQi,t [γi,t ] = 1 , so Var Qi,t [γi,t ] = EQi,t [γ2
+
+> i,t
+
+] − 1 ≤ e2nη − 1.
+
+## F Toy Example: Guided-Target Misalignment 
+
+Consider a single problem x with guided version g(x), and suppose the policy chooses between two reasoning modes, shortcut and robust , with shortcut chosen with probability θ ∈ [0 , 1] . The verifier always evaluates the original problem x. The conditioning on x or g(x) below only specifies which prompt generated the response. Assume 
+
+Pr[ r = 1 | x, shortcut ] = 0 , Pr[ r = 1 | g(x), shortcut ] = 1 ,
+
+Pr[ r = 1 | x, robust ] = β, Pr[ r = 1 | g(x), robust ] = β, 
+
+for some β ∈ (0 , 1) . The target objective J(θ) is the expected verifier reward when the response is generated from the original prompt x, while the guided objective Jguide (θ) is the expected verifier reward when the response is generated from the guided prompt g(x). Since the policy selects shortcut with probability θ and 
+
+robust with probability 1 − θ, we have: 
+
+J(θ) = θ · 0 + (1 − θ)β = (1 − θ)β, Jguide (θ) = θ · 1 + (1 − θ)β = θ + (1 − θ)β. 
+
+Therefore arg max θ J(θ) = 0 and arg max θ Jguide (θ) = 1 . The two objectives prefer extreme opposite policies. Furthermore, Jguide (θ) − J(θ) = θ ≥ 0, so the guided objective is uniformly larger but rewards a deployment-useless behavior. 
+
+## G Experimental Details 
+
+Dataset construction. We construct our training set from the MATH dataset (Hendrycks et al., 2021), restricting to problems at difficulty Levels 3–5 (intermediate through advanced), which yields 5,586 problems from the training split. We identify problems on which the base model πref receives no learning signal under standard GRPO. For each problem x, we generate M = 64 independent rollouts from the model under training using nucleus sampling , and retain only those problems for which every rollout fails. This filter yields 595 
+
+hard problems for the 7B model. Similarly, for the 3B and 1.5B models, we repeat this filtering process to identify model-specific hard problems. For fixed guidance methods (including our OC -GRPO -Fixed ), we construct an augmented training set Daug as described in Section 6. For adaptive guidance methods (including 
+
+OC -GRPO -Adaptive ), no dataset augmentation is performed. 
+
+RL training configuration. All models are trained with Group Relative Policy Optimization (GRPO) (Shao et al., 2024) and algorithms derived from GRPO implemented in veRL (Sheng et al., 2024), using vLLM (Kwon et al., 2023) for rollout generation. We fine-tuned with LoRA (Hu et al., 2022) adapters (rank 64 , α = 128 ,dropout 0.05 ) applied to all linear layers. The base model weights are frozen; only LoRA parameters are updated. We use AdamW with learning rate 1 × 10 −5, weight decay 0.01 , and gradient clipping at norm 19 1.0. Training runs for 4 epochs on the training set. The batch size is 32 prompts with N = 16 rollouts per prompt, PPO mini-batch size 32 , and 1 PPO epoch per GRPO iteration. We apply the clipped surrogate objective with clip ratio ϵ = 0 .2, remove the KL penalty ( β = 0 ) following recent RLVR practice (Zhang et al., 2025d; Qu et al., 2026; Yu et al., 2025), and use no entropy bonus. Losses are aggregated at the token level. Importance correction is applied at the token level. Training rollouts use temperature 0.7, top-p = 0 .95 . We use a binary verifiable reward: 1 if the model’s extracted answer (from \boxed{} ) matches the ground-truth answer under symbolic equivalence, and 0 otherwise. 
+
+Fair comparison across methods. For any given model, all methods in our experiments are epoch-matched :each is trained for 4 epochs over the same training datasets: Daug (for the fixed-guidance methods) and D
+
+(for the adaptive-guidance methods). 
+
+Infrastructure. Adaptive-guidance runs use 4× NVIDIA A100 40GB GPUs with FSDP (CPU parameter and optimizer offloading) and tensor parallelism 2 for vLLM rollouts. Fixed-guidance and vanilla runs use 2×
+
+A100 GPUs with tensor parallelism 1. vLLM GPU memory utilization is set to 0.5–0.6.
+
+Seeds. All 7B model configurations are trained with 3 random seeds ( 0, 123 , 456 ), and results are reported as mean ± standard deviation across seeds. 
+
+Baseline methods. We compare our methods, OC -GRPO -Fixed and OC -GRPO -Adaptive , against four baselines: vanilla GRPO, POPE (Qu et al., 2026), PrefixRL (Setlur et al., 2026), and BREAD (Zhang et al., 2025e). Note that all the guided baselines have some version of filtering for hard problems as well. For a fair and uniform comparison we implement all of them under the same training dataset setting as ours. We re-implement the core algorithmic idea of each method within our veRL training loop, using the same base model, LoRA configuration, optimizer settings, and evaluation protocol as our own methods, so that differences in final performance reflect algorithmic choices rather than infrastructure differences. 
+
+Metrics. For each checkpoint and benchmark, we generate 16 trajectories per problem and report pass@ 1
+
+as the primary metric, with pass@ 16 reported alongside to assess the breadth of the solution distribution. Pass@ k is computed using the unbiased estimator formula. 
+
+Model selection. Checkpoints are evaluated at each epoch boundary. For each seed, we select the fourth epoch checkpoint and report that checkpoint’s results across all benchmarks. We selected 4 checkpoints for training as we observed the training gains on held out validation taper beyond the fourth checkpoint. 
+
+## H Cascading Hints 
+
+In this section we consider 5 levels of hints, in contrast with solution prefixes. Algorithm 1 describes the implementation of cascading hints style guidance. Appendix I.2 contains the prompt templates for generating hints. Unlike solution prefixes, guidance with the hints is a two step process: (a) generation of the hint; (b) constructing a guided prompt using hints. 
+
+## I All Prompt Templates 
+
+I.1 Solution Prefix as Guidance 
+
+In place of LLM-generated hints, the prefix cascade exposes increasing portions of the reference solution itself as the privileged scaffold. Let y⋆(x) denote the reference solution after stripping non-text artifacts (e.g., Asymptote diagram blocks). We define a prefix operator πα(y⋆) that returns the first α fraction of y⋆ by character count, snapped to the nearest preceding word boundary, and we instantiate the cascade at fractions 
+
+α ∈ { 0.2, 0.4, 0.6, 0.8, 1.0}. At α < 1.0 the prefix is a strict initial segment of the reference solution that the model is asked to complete ; at α = 1 .0 the prefix is the full reference solution and the model is asked to verify 
+
+20 Method Training AIME (1983–2026) Gaokao2023 OlympiadBench Minerva OmniMath P@1 P@16 P@1 P@16 P@1 P@16 P@1 P@16 P@1 P@16 P@1 P@16 Baselines 
+
+Base 0.4 4.7 16.1 37.5 42.0 64.7 28.1 48.2 26.0 45.2 20.8 44.8 Vanilla GRPO 0.7 ±0.2 
+
+> ref.
+
+7.2 ±2.0 
+
+> ref.
+
+16.8 ±0.3 
+
+> ref.
+
+38.5 ±1.0 
+
+> ref.
+
+46.1 ±0.7 
+
+> ref.
+
+65.9 ±0.5 
+
+> ref.
+
+29.6 ±0.1 
+
+> ref.
+
+48.7 ±0.1 
+
+> ref.
+
+26.5 ±0.1 
+
+> ref.
+
+45.0 ±1.1 
+
+> ref.
+
+22.6 ±0.2 
+
+> ref.
+
+45.8 ±0.6 
+
+> ref.
+> Fixed Hints
+
+OC -GRPO -Fixed (Hints) 2.7 ±1.2 
+
+> (+276.8%)
+> 11.7
+
+±2.6 
+
+> (+62.0%)
+
+16.6 ±2.6 
+
+> (-1.3%)
+> 40.5
+
+±1.2 
+
+> (+5.1%)
+
+46.5 ±6.0 
+
+> (+0.9%)
+
+67.0 ±2.4 
+
+> (+1.7%)
+
+28.4 ±2.4 
+
+> (-4.3%)
+
+48.3 ±0.7 
+
+> (-0.7%)
+
+26.7 ±2.2 
+
+> (+0.6%)
+
+45.5 ±0.7 
+
+> (+1.1%)
+
+22.0 ±2.2 
+
+> (-2.8%)
+
+44.6 ±0.3 
+
+> (-2.5%)
+> Adaptive Hints
+
+OC -GRPO -Adaptive (Hints) 1.4 ±0.2 
+
+> (+91.3%)
+
+7.8 ±0.5 
+
+> (+8.5%)
+> 17.9
+
+±0.2 
+
+> (+6.4%)
+
+39.8 ±0.2 
+
+> (+3.4%)
+> 49.9
+
+±0.1 
+
+> (+8.3%)
+> 67.6
+
+±0.7 
+
+> (+2.6%)
+> 30.0
+
+±0.3 
+
+> (+1.1%)
+
+48.7 ±0.3 
+
+> (+0.1%)
+> 27.7
+
+±0.5 
+
+> (+4.4%)
+> 46.2
+
+±1.1 
+
+> (+2.7%)
+> 23.2
+
+±0.2 
+
+> (+2.7%)
+> 46.2
+
+±0.9 
+
+> (+0.9%)
+
+OC -GRPO (Self-Correction) 0.7 ±0.1 
+
+> (-2.4%)
+
+6.9 ±0.4 
+
+> (-4.7%)
+
+17.3 ±0.2 
+
+> (+3.1%)
+
+40.3 ±0.9 
+
+> (+4.5%)
+
+46.4 ±2.1 
+
+> (+0.6%)
+
+66.5 ±1.0 
+
+> (+0.9%)
+
+29.8 ±0.4 
+
+> (+0.7%)
+
+49.2 ±1.0 
+
+> (+1.0%)
+
+27.0 ±0.9 
+
+> (+1.9%)
+
+45.2 ±0.8 
+
+> (+0.5%)
+
+22.7 ±0.6 
+
+> (+0.4%)
+
+45.9 ±0.2 
+
+> (+0.4%)
+
+OC -GRPO -Adaptive (Frontier Hints) 0.8 ±0.3 
+
+> (+6.8%)
+
+6.2 ±1.6 
+
+> (-14.7%)
+
+17.4 ±0.5 
+
+> (+3.4%)
+
+40.1 ±1.5 
+
+> (+4.0%)
+
+48.5 ±1.4 
+
+> (+5.2%)
+
+67.2 ±0.2 
+
+> (+2.0%)
+
+29.9 ±0.4 
+
+> (+0.8%)
+> 49.4
+
+±0.4 
+
+> (+1.4%)
+
+27.5 ±0.5 
+
+> (+3.6%)
+
+45.5 ±0.6 
+
+> (+1.1%)
+
+23.0 ±0.6 
+
+> (+1.6%)
+
+45.7 ±0.4 
+
+> (-0.1%)
+
+Table 5 Hint ablation on Qwen2.5-7B-Instruct using the best checkpoint per seed selected by validation Pass@1. Each non-base cell reports seed-averaged mean ±std on the first line and relative improvement over Vanilla GRPO on the second line. Within the Adaptive Hints section, the best method per metric is shown in italics. Overall best run(s) for each metric are bolded. 
+
+Algorithm 1: Cascading self-guidance rollout construction (per training step) 
+
+Input: Batch B = {x(d)}Dd=1 ⊂ D hard ; snapshot policy πθold ; verifier v; group size N ; max hint level L.
+
+Output: Final rollout groups {G(d)final }Dd=1 and behavior contexts {b(d)}Dd=1 .
+
+foreach x ∈ B do 
+
+G ← ∅ ;
+
+for i ← 1 to N do 
+
+sample yi ∼ πθold (· | x);
+
+G ← G ∪ { yi};compute rewards {ri}Ni=1 ← v(x, G );
+
+if PNi=1 ri > 0 then ▷ At least one success under the original prompt 
+
+Gfinal ← G; b ← x.
+
+else ▷ Learning cliff: all N rollouts fail 
+
+(Gfinal , b ) ← RegenerateWithSelfGuidance (x, G, π θold , v, N, L );store (G(d)final , b (d)) ← (Gfinal , b );
+
+return {(G(d)final , b (d))}Dd=1 ;
+
+and reproduce it. Unlike the hint cascade, no LLM call is required to produce a prefix—the operator πα is a pure string operation on the ground-truth solution, so the cascade is deterministic and free. The cascade is applied identically in the adaptive and fixed settings. In both cases, prefix-augmented prompts are used only to generate trajectories; the policy gradient is taken with respect to the original unprefixed prompt under an IS correction (Section 4). Prefixes are then injected into a solve prompt for trajectory generation. The key design is that the model is always asked to produce a full solution and a final boxed answer, while the prefix length varies by level. Prefix-conditioned solve prompt (used for guided rollout generation) 
+
+( p a r t i a l p r e f i x l e v e l s ) Problem : { q u e s t i o n } P a r t i a l r e f e r e n c e s o l u t i o n : { p r e f i x } Complete t h e r e s t o f t h e s o l u t i o n s t e p by s t e p and output t h e f i n a l answer w i t h i n \ boxed { } . You can u s e t h e p a r t i a l r e f e r e n c e s o l u t i o n t h a t f o l l o w s t h e q u e s t i o n t o h e l p you s o l v e t h e problem . system prompt f o r p a r t i a l p r e f i x l e v e l s : You a r e a math problem s o l v e r . When g i v e n ap a r t i a l r e f e r e n c e s o l u t i o n , u s e i t t o g u i d e your r e a s o n i n g , but w r i t e your s o l u t i o n i n d e p e n d e n t l y . Do not r e p e a t , copy , o r p a r a p h r a s e t h e r e f e r e n c e t e x t . Show your own 
+
+21 Algorithm 2: RegenerateWithSelfGuidance : adjusting hint levels until success  
+
+> Input:
+
+Problem x; failed unguided group G = {yi}Ni=1 ; snapshot policy πθold ; verifier v; group size N ; max hint level L. 
+
+> Output:
+
+A final group Gfinal and its behavior context b ∈ { gℓ(x)}Lℓ=1 ∪ { x}. 
+
+> for
+
+ℓ ← 1 to L do 
+
+generate hint hℓ ← HintGen ℓ(x, G ) ▷ L1–L4 use failures; L2–L5 may use y⋆(x) form guided prompt 
+
+gℓ(x) ← (x, h ℓ);
+
+G′ ← ∅ ; 
+
+> for
+
+i ← 1 to N do 
+
+sample y′ 
+
+> i
+
+∼ πθold (· | gℓ(x)) ;
+
+G′ ← G′ ∪ { y′
+
+> i
+
+};compute rewards {r′
+
+> i
+
+}Ni=1 ← v(x, G ′); 
+
+> if
+
+PNi=1 r′ 
+
+> i
+
+> 0 then ▷ Stop as soon as any guided rollout succeeds  
+
+> return
+
+(G′, g ℓ(x)) ; 
+
+> return
+
+(G, x ) ▷ Fallback: no success at any hint level ;
+
+s t e p - by - s t e p work and a r r i v e a t t h e answer through your own r e a s o n i n g . ( f u l l s o l u t i o n l e v e l ) Problem : { q u e s t i o n } R e f e r e n c e s o l u t i o n : { s o l u t i o n } Rephrase t h e s o l u t i o n above i n your own words . Show your s t e p - by - s t e p work and output t h e f i n a l answer w i t h i n \ boxed { } . 
+
+The two framings are kept distinct on purpose. For partial prefixes ( α < 1) the anti-repetition system prompt discourages the model from merely echoing the given segment and pushes it to produce its own continuation, so that the trajectory contains genuine model-generated reasoning over which the policy gradient can be computed. For the full solution ( α = 1 ) we drop the anti-repetition prompt and ask explicitly for a paraphrase, the goal at this level is to provide a guaranteed-correct trajectory whose answer-extraction reward is 1,anchoring the IS-corrected gradient even on problems the base policy never solves on its own. 
+
+I.2 Cascading Hint Templates and Hinted Solve Prompts 
+
+We employ a hierarchy of hint generators with increasing privileged information. Let y⋆(x) denote the reference solution and let y denote a failed model trajectory. We generate hints at levels: (i) feedback on the failed attempt, (ii) conceptual comparison to the reference, (iii) high-level strategy, (iv) detailed guidance, and (v) full-solution paraphrase. Cascading hint generation templates (L1–L5) 
+
+L1 ( b l i n d ; u s e s f a i l u r e o n l y ) : You a r e an e x p e r t math t u t o r . A s t u d e n t attempted t h i s problem but g o t i t wrong . Problem : { problem } Student ’ s f a i l e d attempt : { t r a j e c t o r y } Analyze t h e s t u d e n t ’ s work and t h i n k about t h e c o n c e p t s i n t h e problem . P r o v i d e ag u i d a n c e o r h i n t t h a t r e d i r e c t s t h e s t u d e n t towards t h e c o r r e c t approach . Hint : L2 ( c o n c e p t u a l ; u s e s r e f e r e n c e + f a i l u r e ) : You a r e an e x p e r t math t u t o r . A s t u d e n t attempted t h i s problem but g o t i t wrong . 
+
+22 Problem : { problem } R e f e r e n c e s o l u t i o n : { s o l u t i o n } Student ’ s f a i l e d attempt : { t r a j e c t o r y } Compare t h e s t u d e n t ’ s approach with t h e c o r r e c t s o l u t i o n and t h i n k about t h e key c o n c e p t s t h a t t h e s t u d e n t m i s s e d and p r o v i d e g u i d a n c e o r h i n t t h a t r e d i r e c t s t h e s t u d e n t t o t h e c o r r e c t s o l u t i o n . Do not r e v e a l f u l l s o l u t i o n . Hint : L3 ( s t r a t e g i c ; u s e s r e f e r e n c e ) : You a r e an e x p e r t math t u t o r . A s t u d e n t i s s t r u g g l i n g with t h i s problem . Problem : { problem } R e f e r e n c e s o l u t i o n : { s o l u t i o n } P r o v i d e a STEP-BY-STEP STRATEGY f o r s o l v i n g t h i s problem a s a numbered l i s t . H i g h l i g h t t h e key approach needed . Do not r e v e a l f i n a l answer . Hint : L4 ( d e t a i l e d ; u s e s r e f e r e n c e ) : You a r e an e x p e r t math t u t o r . A s t u d e n t i s s t r u g g l i n g with t h i s problem . Problem : { problem } R e f e r e n c e s o l u t i o n : { s o l u t i o n } P r o v i d e DETAILED GUIDANCE t o h e l p t h e s t u d e n t s o l v e t h i s problem . I n c l u d e : - The c o r r e c t approach with key i n t e r m e d i a t e c a l c u l a t i o n s - S p e c i f i c v a l u e s and e x p r e s s i o n s t h e s t u d e n t n e e d s - The c r i t i c a l s t e p s t h a t l e a d t o t h e answer You may r e v e a l most o f t h e s o l u t i o n path , but do NOT s t a t e t h e f i n a l boxed answer . Hint : L5 ( p a r a p h r a s e ; u s e s r e f e r e n c e ) : Rephrase t h e r e f e r e n c e s o l u t i o n i n your own words . Show your s t e p - by - s t e p work and output t h e f i n a l answer w i t h i n \ boxed { } . 
+
+Hints are then injected into a solve prompt for a re-attempt. The key design is that the model is always asked to produce a full solution and a final boxed answer, while the hint varies by level. Hint-conditioned solve prompt (used for re-attempt generation) 
+
+( L1 - - L4 ) Problem : { q u e s t i o n } Hint : { h i n t } Let ’ s t h i n k s t e p by s t e p and output t h e f i n a l answer w i t h i n \ boxed { } . You can u s e t h e h i n t t h a t f o l l o w s t h e q u e s t i o n t o h e l p you s o l v e t h e problem . 
+
+23 system prompt f o r L1 - - L4 : You a r e a math problem s o l v e r . When g i v e n a h i n t , u s e i t t o g u i d e your r e a s o n i n g , but w r i t e your s o l u t i o n i n d e p e n d e n t l y . Do not r e p e a t , copy , o r p a r a p h r a s e t h e h i n t t e x t . Show your own s t e p - by - s t e p work and a r r i v e a t t h e answer through your own r e a s o n i n g . ( L5 ) Problem : { q u e s t i o n } F u l l s o l u t i o n : { s o l u t i o n } Rephrase t h e s o l u t i o n above i n your own words . Show your s t e p - by - s t e p work and output t h e f i n a l answer w i t h i n \ boxed { } . 
+
+24

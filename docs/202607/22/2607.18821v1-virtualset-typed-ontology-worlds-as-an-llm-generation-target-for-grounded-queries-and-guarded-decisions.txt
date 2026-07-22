@@ -1,0 +1,472 @@
+Title: VirtualSet: Typed Ontology Worlds as an LLM Generation Target for Grounded Queries and Guarded Decisions
+
+URL Source: https://arxiv.org/pdf/2607.18821v1
+
+Published Time: Wed, 22 Jul 2026 00:39:42 GMT
+
+Number of Pages: 21
+
+Markdown Content:
+# VirtualSet: Typed Ontology Worlds as an LLM Generation Target for Grounded Queries and Guarded Decisions 
+
+Qunhui Zhang a
+
+> aSchool of Software, Shanghai Jiao Tong University, Shanghai 200240, China
+
+Abstract 
+
+Large language models increasingly read enterprise data and act on it. SQL gives a late error signal: a hallucinated field or relation may still parse, execute, and return a plausibly wrong answer, while a wrong write cannot be graded by execution because the effect is already real. We present VirtualSet, the data interface of a typed ontology world platform, as a live, receiver-typed generation target for LLMs. Instead of SQL strings, the model emits set expressions over an entity-edge world. GCP inference checks these dynamic-language emissions before execution, and future this preserves the concrete receiver type through fluent collection chains, so invalid fields, edges, receivers, and actions become token-anchored type errors rather than database effects. Type-clean reads execute by a SQL fast path or by bounded stream execu-tion; a parity oracle pins the two paths over the exercised operator-composition space. The same expression substrate carries decisions: actions execute first in the simulated world under the same guard, and world-change events are actualized only through external approval. On BIRD, SQL’s home turf, we lift relational schemas into typed worlds and compare VirtualSet against direct SQL with the construct model, evidence, value dictionary, zero-shot condition, timeout envelope, official glossary source, repair/voting machinery, and execution grader held constant where the target permits. On a 1,072-question evaluation split frozen before the reported runs, VirtualSet answers 67.5% versus 63.5% for glossary-matched direct SQL equipped with repair and voting (+4.0 points; McNemar exact p = 0 .00117 ) with deepseek-reasoner. A full-corpus failure analysis finds no engine mis-computation of a type-clean   
+
+> Email address: will_zhang@sjtu.edu.cn (Qunhui Zhang) arXiv:2607.18821v1 [cs.PL] 21 Jul 2026
+
+expression; residual errors are model semantics or gold defects. On the write chain, a 30-body guard sanity corpus intercepts 20/20 hallucinated action bodies with zero false positives. The result is not a text-to-SQL leaderboard claim; it shows that a typed target remains competitive and statistically ahead on SQL’s home benchmark while providing the pre-execution semantics needed for decisions. 
+
+Keywords: ontology platform, typed query language, LLM code generation, text-to-SQL alternative, sound query compilation, type-guarded actions 
+
+1. Introduction 
+
+Large language models are increasingly placed between users and struc-tured enterprise data. The same interaction pattern now extends beyond question answering: a model reads the operational world, forms a decision, and may trigger an action. The two directions fail differently. On the read side, a hallucinated field, relation, or join can still parse and execute as SQL, returning a plausible number with no warning label. On the write side, the problem is stricter: a wrong UPDATE cannot be evaluated by executing it, because the execution is already the harm. Execution-based grading, the foundation of text-to-SQL benchmarks, is unavailable exactly where the stakes are highest. 
+
+> read
+> LLM emits SQL SELECT
+> plausibly wrong number
+> caught after by execution comparison
+> write
+> LLM emits SQL UPDATE
+> production DB already mutated
+> no after-the-fact benchmark signal
+> write guarantees must act before the effect
+> detectably after
+> irreversible
+> Figure 1: The two failure modes. Read errors can be detected after execution by comparing answers; write errors must be prevented before execution because the effect itself is the damage.
+
+This paper studies a different LLM-facing target. We present VirtualSet ,the data interface of the Entitir ontology world platform, in which the model 2emits a typed, navigation-oriented expression rather than a SQL string. A query such as orders.filter(o->o.customer().city=="Paris").count() 
+
+is checked against the live entity-edge world before execution. A hallucinated field, edge, receiver, or action becomes a token-anchored type error with the legal receiver closure attached, so the model can repair the expression before any database effect occurs. The core design point is that VirtualSet is both live and receiver-typed .Static generated clients are typed but become stale when tenant schemas evolve after build time. Dynamic dictionary or reflection access is live but untyped. VirtualSet occupies the harder cell: tenant ontologies are loaded and extended at runtime, while Generic Constraint Projection (GCP) still projects the current chain prefix against the live receiver type and rejects symbols outside that receiver’s closure. The future-this rule preserves the concrete entity dimension through inherited collection operators, so after 
+
+employees.filter(...) the chain is still an employee collection with em-ployee fields, edges, and actions, not a generic stream that must be accessed through strings. The LLM context is deliberately layered. A shared System Outline declares the VirtualSet algebra, including grouping and aggregate operators; a live 
+
+World Outline declares one ontology world’s collections, fields, typed edges, and actions. A shared Global Recipe and a per-world World Recipe provide non-authoritative guidance for expression form, evidence use, and local conventions. The request adds the question, evidence, and values. GCP checks a completed expression against the live World Outline, not against a recipe: guidance can help select a legal expression but cannot make a hallucinated member legal. SQL is therefore an execution strategy for translatable reads, not the stage after an ontology world or the language of decisions. The empirical question is deliberately scoped. We do not claim state-of-the-art text-to-SQL accuracy, nor do we claim that types solve semantic misunderstanding. Instead, we ask whether a typed, navigation-oriented world target remains competitive against direct SQL generation when the model, question, evidence, value dictionary, zero-shot condition, timeout envelope, official glossary source, repair/voting machinery, and execution grader are controlled as far as the target permits. BIRD is SQL’s home turf: relational schemas, SQL-shaped questions, and gold SQL. We mechanically lift BIRD databases into typed worlds and compare the full VirtualSet target system against glossary-matched direct SQL with SQL-side repair and denotation voting. On the 1,072-question evaluation split, VirtualSet answers 724 ques-3tions (67.5%) versus 681 (63.5%) for direct SQL, a +4.0 point paired margin with McNemar exact p = 0 .00117 .The result matters because the read chain is only the measurable half of the system. Reads can be graded after execution; writes cannot. The same expres-sion substrate therefore also carries actions. At the persistence boundary, Vir-tualSet writes reduce to three standard actions: collection.create(...) ,
+
+entity.update(...) , and entity.delete() . They are opt-in schema ca-pabilities (enabled by ˜create , update , and delete ). Higher-level domain actions are Outline code that composes these primitives under the current receiver binding. The action body is type-checked before it executes, then runs in the simulated ontology world through the stream interpreter. World mutations emit typed events that external listeners approve or veto before any real-world actualization. In a 30-body guard sanity corpus, the pre-execution guard intercepts 20/20 hallucinated action bodies with 0/10 false positives. This is not an action benchmark; it is evidence for the guard at the reported scale, paired with a deployed event-gated architecture. The paper makes three contributions. 
+
+• A live, receiver-typed VirtualSet abstraction over runtime ontology worlds, with lazy set expressions, future-this chain preservation, and dual execution by SQL pushdown or bounded stream interpretation. 
+
+• A controlled BIRD comparison against glossary-matched direct SQL generation with repair and voting, plus an execution-substrate audit that finds no engine mis-computation of a type-clean expression in the exercised corpus. 
+
+• A guarded write chain in which persistent effects are factored through three primitive VirtualSet writes, while domain actions are typed Outline bodies checked before execution, run first in a simulated world, and reach external systems only through event-gated actualization. 
+
+2. Motivating Example 
+
+Consider a finance director asking: How many employees who became eligible for retirement this year are still holding company laptops they have not returned? What is the replacement value at risk? 4System Outline 
+
+VirtualSet algebra 
+
+Global Recipe 
+
+shared guidance 
+
+World Outline 
+
+entities, edges, actions 
+
+World Recipe 
+
+local conventions 
+
+> LLM context: outlines (authority) + recipes (guidance)
+> question + evidence + values
+
+L5 AIP loop 
+
+complete VirtualSet expression 
+
+L4 Outline / VirtualSet expression 
+
+one typed substrate for reads + actions 
+
+L3 GCP 
+
+checks against live World Outline 
+
+L2 GCP2SQL 
+
+translatable reads 
+
+L2 GCP2Stream 
+
+complex read tail 
+
+L2 GCP2Stream 
+
+receiver-bound action 
+
+> GCP2Stream
+
+L1 simulated ontology world 
+
+entities + typed edges + repository 
+
+L0 actualization gate 
+
+typed event; approve / veto 
+
+real-world effect 
+
+only after approval 
+
+> error + receiver closure
+> parity
+
+Figure 2: VirtualSet ontology-world architecture. A shared System Outline and live World Outline are type authority; Global and World Recipes are non-authoritative guidance. The LLM emits one L4 expression that L3 GCP checks against the World Outline. Type-clean reads use SQL where translatable or bounded stream interpretation otherwise; actions use the same stream substrate inside the simulated world and reach external systems only through an event-gated approval boundary. 
+
+5The answer drives a budget decision. If the true count is 89 and the exposure is 750K, but the agent silently reports 47 and 382K, the budget is wrong by half and the discrepancy may not surface until audit. A direct query generator may emit a plausible graph or SQL query that uses returned = false even though the schema contains returnDate , or that treats eligibility as age > 65 when the rule is inclusive. These are different errors. The invented field is structural and should be blocked before execution; the boundary rule is semantic and must come from domain evidence or metadata. With VirtualSet, the model emits an expression over the typed world: 
+
+employees .filter(e -> e.age >= 65) .filter(e -> e.assignedLaptop().returnDate == null) 
+
+If the model first writes e.retirementEligible , GCP rejects it as a member absent from the Employee receiver and returns the legal closure, including age , status , hireDate , and assignedLaptop . If it then writes 
+
+e.devices() , the receiver-level closure again rejects the hop and names the declared edge. The third expression is type-clean and can execute. The type system does not infer the inclusive retirement boundary; in the benchmark that knowledge is supplied as evidence to both arms, and in native worlds it is represented as schema-attached metadata. The key separation is that structure is enforced by the target, while semantics remain a grounding problem. The next instruction may be: Initiate laptop recovery for those employees and release the provi-sion. At that point the question has become a decision. A wrong read can be compared against a gold answer after execution; a wrong write cannot. VirtualSet handles the instruction as the same kind of typed expression, ending in an action: 
+
+employees .filter(e -> e.age >= 65) .filter(e -> e.assignedLaptop().returnDate == null) .initiate_recovery() 
+
+6The action body is checked before execution, the mutation occurs first only in the simulated world, and external listeners decide whether the real world executes. The LLM’s causal reach ends at the world boundary. 
+
+3. Substrate and Abstraction 
+
+VirtualSet is implemented on Outline, an expression-oriented dynamic language whose type inference substrate is described in a companion technical report [ 1]. This paper uses three substrate properties without re-proving them. 
+
+OEM structural matching. Outline Equational Matching is the struc-tural subtyping relation over outlines: one type satisfies another by member shape, not nominal class identity. For VirtualSet, this lets entity collections inherit the shared collection algebra while adding entity-specific fields and edges. 
+
+GCP projection. Generic Constraint Projection accumulates constraints on unresolved generic values and projects them against actual receiver types. For a chain prefix, the runtime surface is can_chain(prefix) : the closure of fields, edges, actions, and collection operators legal on the current receiver. A hallucinated member becomes a failed inference obligation rather than a database event. 
+
+Future this . Generic collection operators must not erase the entity dimension. If filter returned a generic VirtualSet<a> , then employees. filter(...).assignedLaptop() would lose access to the employee edge. Future this preserves the concrete receiver type through inherited operators, keeping the chain receiver-typed at every step. The VirtualSet base type is a parametric outline shared by every entity collection: 
+
+outline VirtualSet<a> = { filter: (a -> Bool) -> this, map: <b> (a -> b) -> VirtualSet<b>, group_by: <k> (a -> k) -> Grouped<k, a>, order_by: <k> (a -> k) -> this, take: Int -> this, count: () -> Int, sum: (a -> Decimal) -> Decimal, first: () -> a, 
+
+7to_list: () -> [a] }; 
+
+Entity outlines extend this algebra with fields and typed edges: 
+
+outline Employee = VirtualSet { age: Int, status: String, hireDate: Date, assignedLaptop: Laptop }; 
+
+VirtualSet expressions are lazy. Chain operators accumulate a symbolic tree; terminal operators such as count , sum , first , and to_list commit the chain to execution. Laziness is load-bearing for three reasons. The loop can check and repair a chain before I/O; the SQL compiler can lower the accumulated tree into one set-oriented statement where possible; and the runtime can choose between SQL pushdown and stream interpretation at terminal time. Metadata is attached to schema declarations but is not part of type validity. Native worlds may add synonyms, descriptions, and hints to collections, fields, edges, and actions. These help the model choose the right member or convention, while GCP still decides legality from the receiver type. In the BIRD evaluation, lifted worlds use BIRD’s official column glossaries but no hand-authored native hints, and the final SQL comparator receives the same official glossary source rendered in SQL-native form. 
+
+4. Dual-Mode Execution 
+
+A type-clean read chain executes by one of two paths. GCP2SQL compiles the translatable majority into set-oriented SQL. GCP2Stream interprets the complex tail in bounded in-memory execution over world entities. The same stream interpreter is the primary engine for action bodies, because action execution needs per-entity binding, effect hooks, and event emission. The SQL path has three translation tiers. First, simple predicates, projec-tions, sort keys, and aggregates translate directly. A predicate such as e -> e.age >= 65 becomes a SQL WHERE fragment, while sum(e -> e.salary) 
+
+becomes a terminal aggregate. Second, consecutive filters fuse into one con-junctive WHERE . The compiler does not reorder filters or implement a relational 8type-clean VirtualSet expression  
+
+> accepted by GCP guard
+> mode decision
+> translate while possible; first non-translatable operator switches to stream
+> GCP2SQL
+> single set-oriented SQL read majority
+> GCP2Stream
+> bounded interpretation complex reads + actions
+> parity oracle
+> reference semantics vs compiled SQL
+> result
+> or explicit overflow
+> translatable prefix not fully translatable
+> surface parity
+
+Figure 3: Dual-mode execution. GCP2SQL is the economical path for translatable read chains; GCP2Stream is the bounded interpreter for the complex read tail and for action bodies. The parity oracle empirically pins the two read implementations over the exercised operator-composition space. 
+
+optimizer; it emits set-oriented SQL and leaves index and plan choices to the database. Third, schema-aware edge navigation translates through the recorded foreign-key mapping into membership or correlated subqueries. The example chain can compile to a single statement of the following shape: 
+
+SELECT COUNT(*) FROM employee WHERE age >= 65 AND assigned_laptop_id IN ( SELECT id FROM laptop WHERE return_date IS NULL )
+
+The stream path begins when a lambda exceeds the SQL translation tiers, for example because it contains a user-defined function, captured host variable, or nested per-entity computation. The runtime materializes the SQL-translatable prefix within a configured safety limit and evaluates the remaining operators row by row. If no explicit row limit is present, a pre-flight count checks the candidate-set size. When the set exceeds the default 10,000-row safety limit, the interpreter raises a structured STREAMING_OVERFLOW and materializes nothing. There is no silent truncation state. The paper’s execution claim is empirical and scoped. For type-clean chains within the translatable tiers, GCP2SQL and GCP2Stream produce identical result multisets over the operator-composition space exercised by the evaluation corpora. A parity oracle re-executes compositions against 9in-memory reference semantics and compiled SQL. During development it found and pinned primitive-semantics divergences, including null-excluding aggregates, extrema over text-like domains, and null propagation in arithmetic. Two divergence classes remain outside the claim scope: locale-sensitive string collation and three-valued predicate truthiness for non-boolean predicate expressions. The BIRD failure sweep later confirms the same property at corpus scale: no residual failure is an engine mis-computation of a type-clean expression. 
+
+5. Generation and Repair Loop 
+
+The LLM-facing loop is intentionally simple. The prompt assembles the shared System Outline and Global Recipe, the live World Outline and World Recipe, then the per-request question, evidence, and value samples. The two Outline layers are type authority; recipes are guidance only. The model emits a complete VirtualSet expression in one round. GCP checks the whole expression against the live World Outline. Any error-severity finding triggers bounded regeneration seeded with the token-anchored error and the receiver’s legal-member closure. The repair budget is two regenerations. The accepted type-clean expression executes once through GCP2SQL or GCP2Stream. Lazy voting is used only when the first result is suspicious: empty, errored, type-rejected, or repaired. Up to two further samples are drawn, and agreement of two executed denotations accepts. Finally, a result-blind verifier re-derives the query intent from the question and compares it to the emitted expression, gating one seeded retry and surfacing confidence to the caller. The verifier does not see the executed number, because plausible numbers are exactly the failure class the system is designed to avoid. This loop is not claimed as orchestration novelty. Its value is that the target supplies an objective pre-execution error signal. On the 1,072-question evaluation split in the instrumented chat machinery audit, 904 questions (84.3%) produced a type-clean executable expression on the first generation, 41 used one repair round, and 127 used the two-round budget. More than 99% of questions surfaced an executable expression overall. The paired advantage in that audit did not come from the repair/voting tail: on the clean-first-generation subset, VirtualSet scored 623/890 versus 572/890 for SQL; on the repair/voting tail, the two arms were essentially tied at 88/182 versus 89/182. Repair and voting prevent typed-target forfeits; they do not by themselves explain the paired margin in the instrumented checkpoint. 10 Prompt world code + question evidence + values     
+
+> Generate complete VirtualSet expression
+> GCP type check
+> Repair regenerate token error + candidates
+> r≤2
+> lazy accept?
+> Draw more samples vote by denotation
+> K= 3
+> Execute GCP2SQL or GCP2Stream
+> confidence check
+> Seeded retry
+> n= 1
+> Answer or guarded action
+> clean
+> error
+> 83%
+> suspicious
+> ok
+> low
+> zero-shot both arms
+> 904 first-shot clean 41 one repair 127 two repairs
+> one accepted candidate is executed
+
+Figure 4: The shipped LLM-facing generation loop. The control flow is deliberately simple: the substrate supplies the guard, bounded repair handles type failures, and lazy voting is used only when the first result is suspicious. The measured repair counts are from the deepseek-chat machinery audit on the 1,072-question evaluation split. 
+
+6. Evaluation Design 
+
+The evaluation answers one question: with the construct model, natural-language question, BIRD evidence, value dictionary, zero-shot condition, timeout envelope, official glossary source, repair/voting machinery, and exe-cution grader held constant where possible, does the VirtualSet target system outperform direct SQL generation? 
+
+BIRD dev 
+
+1,534 questions / 11 databases 
+
+462 development 
+
+freeze prompt, recipe repair/vote budgets 
+
+1,072 evaluation 
+
+only split used for BIRD claims 
+
+VirtualSet arm 
+
+typed expression GCP guard + loop 
+
+Direct-SQL arm 
+
+SQLite statement repair + voting 
+
+held constant 
+
+model, evidence, glossary, value dictionary, timeout, EX@1 grader, zero-shot 
+
+> comparison: typed-world target system vs direct SQL
+
+Figure 5: Evaluation protocol. Configuration is frozen on the 462-question development slice; all BIRD claims are measured on the 1,072-question evaluation split with model, evidence, value dictionary, grading, timeout, and zero-shot condition held constant. 
+
+BIRD dev contains 1,534 questions over 11 relational databases, each paired with an external-knowledge evidence string [ 2]. We partition it into a 462-question development slice and a 1,072-question evaluation split. Final prompt composition, repair budget, voting policy, convention recipes, and 11 few-shot exclusion were frozen on the development slice. The paper discloses two qualifications. First, the evaluation split was not virgin to the project: earlier superseded development campaigns had touched overlapping BIRD questions, but no per-question artifact survives into the final system. Second, three generic engine or lift fixes were diagnosed during an earlier chat-pair evaluation campaign and the affected databases were rerun whole. The claim-of-record reasoner VirtualSet run was executed once after those fixes with no post-run modification. BIRD schemas are mechanically lifted into typed ontology worlds. Pri-mary keys are pinned to source values; declared foreign keys become typed edges, including non-primary-key target references with value remapping; conventional undeclared foreign keys are inferred from naming; multi-FK columns retain raw names so many edges to the same target remain navigable; and raw _ref fields preserve SQL’s ability to filter dangling keys. This lift is an evaluation-enabling contribution because several BIRD databases contain missing or misleading schema declarations. The substrate prompt separates its authority and guidance layers. The System Outline is shared across worlds; the lifted World Outline is database-specific and includes the official glossary metadata and value samples. The Global and World Recipes are shared and database-specific guidance respec-tively; they are frozen on the development split and ablated, but do not participate in GCP legality. The SQL arm receives the matched official glossary source and value dictionary. Thus a recipe cannot be mistaken for a hidden type channel. Both arms use execution accuracy: denotation multiset comparison against the gold SQL result. STRICT counts every question against gold as-is and is the headline paired-test metric. WELL-POSED removes only DB-decidable clear gold defects under a shared mask applied before arm outcomes are considered; it is diagnostic rather than the statistical headline. McNemar’s exact test is computed on STRICT paired per-question outcomes. The final SQL comparator is not a strawman single-shot SQL baseline. It receives the textual schema plus the same official BIRD glossary source rendered as compact SQL-native table.column descriptions, the same value dictionary, the same evidence, and SQL-side machinery available without a type substrate: three generations, two repair rounds from SQLite execution feedback, and denotation voting. The remaining difference is the target’s error signal. VirtualSet repairs from pre-execution typed diagnostics; SQL repairs only from post-execution database feedback. 12 7. Results 
+
+Table 1 reports the claim-of-record BIRD result. VirtualSet answers 724/1,072 questions (67.5%) and glossary-matched direct SQL with repair/voting answers 681/1,072 (63.5%). The paired STRICT discordants are 106 VirtualSet-only correct versus 63 SQL-only correct, giving McNemar exact two-sided 
+
+p = 0 .00117 . Per database, VirtualSet has seven wins, zero ties, and four losses.          
+
+> STRICT margin, points
+> financial +20.8
+> student_club +12.7
+> debit_card_specializing +12.2
+> formula_1 +6.8
+> card_games +4.4
+> codebase_community +3.7
+> european_football_2 +3.3
+> thrombosis_prediction -0.9
+> superhero -1.2
+> toxicology -5.8
+> california_schools -7.5
+> aggregate
+> +43 questions / +4.0 pt 7 wins, 0 ties, 4 losses McNemar p= 0 .00117
+
+Figure 6: Per-database BIRD STRICT margins for the deepseek-reasoner glossary-on comparison. The SQL arm receives the official BIRD glossary rendered as compact SQL-native table/column descriptions and uses SQL-side repair/voting. The aggregate margin is +43 questions (+4.0 points). Bar length is proportional to percentage-point margin. 
+
+The WELL-POSED diagnostic tier removes 82 clear gold defects under a shared mask. The reasoner comparison remains +4.0 points: 691/990 (69.8%) for VirtualSet versus 651/990 (65.8%) for direct SQL. Thus the STRICT result is not being propped up by mechanically clear benchmark defects. An earlier deepseek-chat checkpoint on the same evaluation split gives the same direction: 711/1,072 (66.3%) for VirtualSet versus 661/1,072 (61.7%) for direct SQL, with McNemar exact p = 9 .6 × 10 −4. This is a checkpoint replication, not a vendor-level replication, because both construct models are from the same vendor family. The execution-substrate audit separates model accuracy from engine reliability. A full failure sweep across all 11 databases compares the generated expression, pushed-down SQL, and gold SQL, with database ground-truth probes for every engine suspect. It finds zero cases where the engine mis-computed a type-clean expression. Residual failures are model semantic 13 Table 1: BIRD evaluation split, deepseek-reasoner, STRICT execution accuracy. The SQL arm receives the official BIRD glossary source and SQL-side repair/voting. 
+
+Database n VirtualSet SQL Margin financial 72 52 37 +15 student_club 110 87 73 +14 debit_card_specializing 41 28 23 +5 formula_1 117 82 74 +8 card_games 136 86 80 +6 codebase_community 136 96 91 +5 european_football_2 91 62 59 +3 thrombosis_prediction 116 51 52 -1 superhero 83 73 74 -1 toxicology 103 69 75 -6 california_schools 67 38 43 -5 Total 1072 724 (67.5%) 681 (63.5%) +43 (+4.0 pt) errors, such as wrong aggregation grain, wrong table or edge choice, and projection shape, or gold defects. The result is therefore not that the type system solves semantics; it is that the substrate does not silently corrupt a type-clean expression in the exercised corpus. Prompt-side levers were tested and excluded from the headline where they did not generalize. Per-database convention recipes stayed below the per-world noise floor except for one durable correction, and few-shot exemplars were fragile and did not generalize across databases. Both final arms are zero-shot. Spider dev provides a robustness check rather than the headline: VirtualSet scores 840/1,034 (81.2%) against 792/1,034 (76.6%) for direct SQL under the same reasoner model, a +4.6 point directionally consistent result on a different benchmark family [3]. 
+
+8. Guarded Decisions and Deployment 
+
+VirtualSet exposes three standard persistent write operations. For inser-tion, collection.create(...) creates a new entity in a typed collection. For an existing entity, entity.update(...) changes fields and entity.delete() 
+
+removes the entity. These actions are opt-in in the entity schema: ˜create is collection-level, while update and delete are entity-level. All other write-like 14 operations are domain actions: Outline code declared on an entity outline, using the three primitives above plus the ordinary VirtualSet read/navigation operators. Before execution, a domain action body is inferred by GCP with the receiver bound to its declared entity type. A body that touches a non-existent field, hops a non-existent relation, chains past a terminal operator, invokes an action on the wrong receiver type, or calls a write primitive with an ill-typed payload is rejected before any mutation.   
+
+> instruction
+> “initiate recovery”
+> 1. type guard
+> action body checked before execution
+> 2. simulated world
+> GCP2Stream per entity world mutation only
+> 3. actualization gate
+> external listener approve / veto
+> real world
+> executes only after approval
+> 20/20 hallucinated bodies intercepted
+> LLM causal reach ends in simulation
+> EntitirEvent policy / human / service
+> veto: no external effect
+> clean event approve
+
+Figure 7: The guarded write chain. Action bodies use the same type-checked expression language as reads, execute first in the simulated world through the stream runtime, and reach external systems only through an event-gated listener. 
+
+The guard sanity corpus contains 30 action bodies on an HR-onboarding-style world: six entity types, four declared domain actions, and the standard write primitives. Twenty hallucinated bodies cover four classes (field, relation, chain, receiver; five each), and ten legitimate bodies come from production onboarding flows such as status updates and salary-record creation. The deterministic check yields TP=20, FN=0, FP=0, TN=10, with 2.4 s mean and 2.2 s median per check excluding LLM round trips. We report this at its actual scale. The negatives are author-constructed against a taxonomy rather than sampled from a model in the wild, and the legitimate set is production-realistic rather than adversarially near-miss. The deployed architecture adds two boundaries after the guard. First, the action executes in the simulated ontology world through GCP2Stream. The mutation is real inside the world repository and nowhere else. Second, every world mutation publishes a typed event consumed by external listeners, such as policy engines, approval queues, or downstream services. These listeners decide whether the real-world system executes the simulated decision. From the world’s perspective, they are all actualization gates the LLM cannot reach around. This section claims pre-execution interception at the measured corpus scale and reports the event-gated architecture as deployed. It does not claim 15 an action benchmark, end-to-end decision accuracy, or listener-policy quality. The gate’s decision is intentionally outside the LLM-facing target. 
+
+9. Related Work 
+
+Text-to-SQL systems treat the problem as translation to SQL. Classic and recent work adds grammar-aware decoding, decomposed prompting, schema linking, retrieval, candidate selection, repair, and self-consistency [ 4, 5, 6, 7, 8]. This paper is orthogonal: the manipulated variable is the target. The pipeline machinery used by SQL generators could also drive a VirtualSet generator; the question here is what becomes possible when the emitted object has pre-execution receiver-level semantics. Type-guarded emission systems such as TypeChat validate LLM-emitted structured objects against schemas. Constrained decoding systems such as LMQL and Outlines constrain token generation against precomputable languages [ 9, 10 ]. VirtualSet’s legal vocabulary is not fixed by a grammar alone: after each chain hop, the legal members depend on the current receiver type loaded from the runtime ontology. The natural checkpoint is therefore member access and whole-expression checking before execution, not token-level grammar acceptance alone. Typed code-generation clients and ORMs are the strongest static peer. Over a fixed schema, GraphQL clients, Prisma-like ORMs, and LINQ-style APIs track receiver-level type flow, and this paper claims no advantage there. The target regime is dynamic enterprise ontology worlds: tenant schemas are loaded, versioned, and extended while the system runs. Regenerating and redeploying clients on every tenant schema change is operationally different from maintaining inference over the live world. Semantic layers such as LookML, Malloy, Cube, and dbt define curated interfaces over relational data. They share the conviction that a query surface should follow semantic structure rather than raw relational algebra. VirtualSet differs by checking arbitrary composed expressions, including lambda-valued operators and action bodies, against receiver-level type flow; by supporting writes through guarded actions; and by reporting a controlled model-held-constant comparison against direct SQL. Commercial ontology platforms with action layers, especially Palantir AIP, are close architectural peers. AIP demonstrates the industrial relevance of typed ontology objects and governed actions. The contribution here is not the architecture’s existence at industrial scale, but a published substrate with 16 defined inference semantics, a reproducible held-out comparison against direct SQL, and a measured pre-execution action guard. 
+
+10. Limitations 
+
+Five limitations bound the claim. First, the construct-model replication uses two DeepSeek models, so it does not eliminate vendor-family effects. A non-DeepSeek paired run is the most valuable remaining robustness check. Second, BIRD is one headline benchmark, and the worlds are mechanically lifted from relational schemas rather than designed natively as ontologies. Spider provides a same-direction corpus, not a native-world measurement. Third, the guard is identifier-level, not semantic. Wrong aggregation grain, edge choice, or projection remains the dominant residual model failure class. Fourth, the write-chain evidence is corpus-scale, not benchmark-scale. Fifth, BIRD contains gold defects; STRICT is therefore the common-denominator headline, with WELL-POSED reported only as a diagnostic tier. 
+
+11. Conclusion 
+
+VirtualSet is a live, receiver-typed world interface for LLM data access and guarded decisions. On SQL’s own benchmark family, the typed-world target system remains competitive and statistically ahead of glossary-matched direct SQL with repair and voting under the controlled BIRD comparison reported here. The +4.0 point read-side margin is modest and should not be read as a text-to-SQL leaderboard claim. Its importance is that the same target also supplies a pre-execution error signal, which SQL text lacks. The durable point is the read/write asymmetry. A wrong read can be audited after execution; a wrong write cannot, because execution is the harm. A generation target for decisions must therefore carry semantics before execution. VirtualSet makes a question, its answer, and the decision that follows one typed expression: measured where reads can be graded, guarded where writes would be harm. 
+
+References 
+
+[1] Anonymous, Generic constraint projection: Structural type inference for a dynamic ontology language, Tech. rep., Companion technical report, under submission; provided to referees as supplementary material (2026). 17 [2] J. Li, B. Hui, G. Qu, J. Yang, B. Li, B. Li, B. Wang, B. Qin, R. Geng, N. Huo, X. Zhou, C. Ma, G. Li, K. C. Chang, F. Huang, R. Cheng, Y. Li, Can LLM already serve as a database interface? a BIg bench for large-scale database grounded text-to-SQLs, in: Advances in Neural Information Processing Systems (NeurIPS), Datasets and Benchmarks Track, 2023. [3] T. Yu, R. Zhang, K. Yang, M. Yasunaga, D. Wang, Z. Li, J. Ma, I. Li, Q. Yao, S. Roman, Z. Zhang, D. Radev, Spider: A large-scale human-labeled dataset for complex and cross-domain semantic parsing and text-to-SQL task, in: Proceedings of EMNLP, 2018. [4] T. Scholak, N. Schucher, D. Bahdanau, PICARD: Parsing incremen-tally for constrained auto-regressive decoding from language models, in: Proceedings of EMNLP, 2021. [5] M. Pourreza, D. Rafiei, DIN-SQL: Decomposed in-context learning of text-to-SQL with self-correction, in: Advances in Neural Information Processing Systems (NeurIPS), 2023. [6] D. Gao, H. Wang, Y. Li, X. Sun, Y. Qian, B. Ding, J. Zhou, Text-to-SQL empowered by large language models: A benchmark evaluation, Proceedings of the VLDB Endowment 17 (5) (2024) 1132–1145. [7] B. Wang, C. Ren, J. Yang, X. Liang, J. Bai, L. Chai, Z. Yan, Q.-W. Zhang, D. Yin, X. Sun, Z. Li, MAC-SQL: A multi-agent collaborative framework for text-to-SQL, in: Proceedings of COLING, 2025. [8] Y. Gao, Y. Liu, X. Li, X. Shi, Y. Zhu, Y. Wang, S. Li, W. Li, Y. Hong, Z. Luo, J. Gao, L. Mou, Y. Li, XiYan-SQL: A multi-generator ensemble framework for text-to-SQL, arXiv preprint arXiv:2411.08599 (2024). [9] L. Beurer-Kellner, M. Fischer, M. Vechev, Prompting is programming: A query language for large language models, in: Proceedings of PLDI, 2023. [10] B. T. Willard, R. Louf, Efficient guided generation for large language models, arXiv preprint arXiv:2307.09702 (2023). 18 Appendix A. Appendix: Supplementary Figures 
+
+Appendix A.1. GCP Projection  
+
+> Genericable ⟨a⟩
+> four monotone constraints
+> declaredToBe annotation
+> extendToBe values seen
+> hasToBe call-site demand
+> definedToBe structural access
+> projection
+> actual receiver + OEM check
+> concrete outline e.g. Employee
+> e.retirementEligible
+> FIELD_NOT_FOUND
+> satisfies
+> not in closure
+
+Figure A.8: GCP constraint projection. 
+
+Four constraint dimensions accumulate on an unresolved generic; projec-tion against the actual receiver succeeds when OEM satisfaction holds and rejects structural accesses outside the receiver closure. 
+
+Appendix A.2. Future this 
+
+without future this with future this 
+
+employees 
+
+VirtualSet<Employee> 
+
+.filter(...) 
+
+VirtualSet<a> 
+
+.assignedLaptop() 
+
+unknown member 
+
+employees 
+
+VirtualSet<Employee> 
+
+.filter(...) 
+
+this = VirtualSet<Employee> 
+
+.assignedLaptop() 
+
+entity edge visible 
+
+> chain operators can be inherited without losing entity-specific fields and edges
+
+Figure A.9: Future this .
+
+A generic stream operator that returns the base type erases the entity dimension; future this preserves the receiver’s concrete VirtualSet type across the chain. 
+
+Appendix A.3. Motivating Repair Trace 
+
+Token-anchored GCP errors expose the missing symbol and the receiver closure, allowing the LLM to repair the expression before any database execution. 19 question retiring employees with laptops? 
+
+attempt 1 
+
+retirementEligible 
+
+> FIELD_NOT_FOUND members include age
+
+attempt 2 
+
+devices() 
+
+> FIELD_NOT_FOUND edge is assignedLaptop
+
+attempt 3 age + assignedLaptop returnDate null 
+
+type-clean one SQL statement count = 89   
+
+> repair from closure repair from closure execute
+
+Figure A.10: Generation-and-repair trace. 
+
+Appendix A.4. Lazy VirtualSet Execution 
+
+employees 
+
+LazySetValue 
+
+.filter(age>=65) 
+
+accumulate WHERE 
+
+.filter(laptop) 
+
+accumulate edge predicate 
+
+.count() 
+
+terminal operator 
+
+execute once 
+
+SELECT COUNT(*)...  
+
+> no DB touch no DB touch symbolic tree
+
+Figure A.11: Lazy VirtualSet execution. 
+
+Non-terminal chain operators extend a symbolic QuerySpec ; a terminal operator commits the accumulated chain to one SQL statement when the chain remains translatable. 
+
+Appendix A.5. Repair Load and Baseline Symmetry 
+
+repair load over 1,072 questions 
+
+first generation: 904 / 84.3% 41 127 
+
+where the paired margin lives 
+
+clean first generation 890 cases; VirtualSet 623 vs SQL 572; margin +51 
+
+repair / voting tail 182 cases; VirtualSet 88 vs SQL 89; margin -1 
+
+repair/voting prevents forfeits; it does not create the paired advantage 
+
+Figure A.12: Repair load and baseline-asymmetry decomposition for the deepseek-chat machinery audit. 
+
+Most questions are type-clean on the first generation; the paired advan-tage lives in the clean-first-shot subset, while repair/voting keeps rejected expressions from becoming forfeits. 
+
+Appendix A.6. Model Checkpoint Replication 
+
+The corrected glossary-on SQL audit is reported separately in Fig. 6. Bar length is proportional to percentage-point margin. 20 margin points chat / reasoner 
+
+formula_1 +8.5 / +12.8 
+
+student_club +10.0 / +12.7 
+
+debit_card_specializing +22.0 / +12.2 
+
+financial +4.2 / +6.9 
+
+card_games +0.7 / +5.9 
+
+european_football_2 +7.7 / +5.5 
+
+thrombosis_prediction +1.7 / +5.2 
+
+codebase_community +1.5 / +2.9 
+
+toxicology +4.9 / +2.9 
+
+superhero +2.4 / +2.4 
+
+california_schools -3.0 / +1.5 
+
+plain-SQL reference 
+
+chat: +4.7, p = 9 .6 × 10 −4
+
+reasoner: +6.3, p = 2 .7 × 10 −7
+
+California flips positive 
+
+Figure A.13: Per-database margin replication across construct models for the original plain-SQL reference comparison. 
+
+21

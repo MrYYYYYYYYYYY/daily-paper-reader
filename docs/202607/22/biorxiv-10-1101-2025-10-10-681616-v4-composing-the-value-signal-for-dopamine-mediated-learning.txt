@@ -1,0 +1,1639 @@
+Title: Composing the value signal for dopamine-mediated learning
+
+URL Source: https://www.biorxiv.org/content/10.1101/2025.10.10.681616v4.full.pdf
+
+Number of Pages: 19
+
+Markdown Content:
+# Composing the value signal for dopamine-mediated learning 
+
+A P REPRINT 
+
+Pranav Mahajan 
+
+Oxford Centre for Integrative Neuroimaging, Nuffield Department of Clinical Neurosciences, University of Oxford 
+
+pranav.mahajan@ndcn.ox.ac.uk 
+
+Ben Seymour 
+
+Oxford Centre for Integrative Neuroimaging, Nuffield Department of Clinical Neurosciences, & Institute of Biomedical Engineering, University of Oxford 
+
+ben.seymour@ndcn.ox.ac.uk 
+
+July 17, 2026 
+
+## ABSTRACT 
+
+The seminal reward prediction error account of dopamine has been highly successful, but faces 1
+
+several key challenges. Most notable are the difficulty of learning multiple rewards simultaneously, 2
+
+inefficient on-policy learning, and accounting for the heterogeneous striatal responses observed 3
+
+across and within striatal targets. Here we address these issues with a normative entropy-regularised 4
+
+reinforcement-learning framework. We propose that dopamine optimises not just cumulative rewards, 5
+
+but a reward value function augmented by a penalty for deviating from a default behavioural policy. 6
+
+In simulations, this off-policy formulation provides a principled solution to composing multiple 7
+
+reward values, avoids the interference and unintended unlearning seen in multi-objective on-policy 8
+
+methods when priorities change, and adapts more efficiently than standard alternatives in environments 9
+
+with non-stationary rewards. More broadly, the framework offers a unified account of dopamine 10 
+
+heterogeneity between and within striatal targets, including a normative way to understand why 11 
+
+aversive and action prediction errors may coexist in the tail of the striatum. Together, these results 12 
+
+suggest that dopamine-mediated learning may be better captured by prediction errors in composable, 13 
+
+entropy-regularised value functions than by a single broadcast prediction error, and offer testable 14 
+
+predictions for future experiments. 15 
+
+## 1 Introduction 16 
+
+Almost three decades ago, Schultz et al. [1] proposed that midbrain dopamine (DA) neuron phasic activity encodes 17 
+
+temporal difference errors (TDEs). This fundamental idea, leveraging the temporal difference (TD) learning algorithm 18 
+
+[2], suggested the brain could assign credit in terms of expected future reward using temporally successive predictions. 19 
+
+Numerous experiments have since substantiated this relationship within the TD reinforcement learning (TDRL) 20 
+
+framework [ 3, 4, 5 , 6, 7 ]. A core motivation was that engineered systems employ similar algorithms to optimise actions 21 
+
+in complex environments, mirroring challenges faced by animals [ 1]. However, three key challenges currently impede 22 
+
+TDRL research from fully realising this core motivation. 23 
+
+The first challenge arises because typical experiments and computational models, utilising single-attribute rewards 24 
+
+(e.g., juice) and monolithic value functions, inadequately capture the multi-objective nature of challenges animals face 25 
+
+in real life. Animals must constantly satisfy distinct, often conflicting objectives under changing priorities, a kind 26 
+
+of non-stationary reward landscape. This necessitates either multiple value functions [ 8, 9] or alternative efficient 27 
+
+representations like the successor representation [ 10, 11 , 12], as standard RL approaches struggle with instant revaluation 28 
+
+under non-stationary rewards [ 8 , 9 , 13 ]. This need for fast adaptation to multiple objectives (often encoded by different 29 
+
+rewarding attributes), under shifting priorities, is ubiquitous in homeostasis [ 14, 15 , 16 ] and extends to human cognitive 30 
+
+tasks [ 17 ]. Neural evidence further suggests dopaminergic circuits projecting to different targets may encode multiple 31 
+
+value functions corresponding to various reward modalities (e.g., food, juice, water [ 18 , 19 , 20 , 21 , 22 ]), valence [ 23], 32 
+
+substance type [ 24 ], or even abstract features and contexts [ 25 , 26, 27 ], yet this multiplicity is not captured by standard 33 
+
+TDRL. 34 
+
+> .CC-BY 4.0 International license available under a was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint (which this version posted July 17, 2026. ;https://doi.org/10.1101/2025.10.10.681616 doi: bioRxiv preprint
+
+Composing the value signal for dopamine-mediated learning A P REPRINT 
+
+The second challenge concerns the TD-learning rule used by Schultz et al. [1] , which learns values under the current 35 
+
+behavioural policy (on-policy algorithms), rather than under an optimal policy (off-policy algorithms). The result is that 36 
+
+the learned values estimate future returns assuming continued use of the current, often suboptimal, policy. While a core 37 
+
+motivation was to learn optimal actions [ 1 ], on-policy algorithms characteristically learn suboptimal values under an 38 
+
+often-exploring, suboptimal policy. This compromise, well-noted in traditional single-objective RL [ 28 ] and usually 39 
+
+dealt with by heuristically tuning exploratory noise, becomes particularly problematic in multi-objective RL, where the 40 
+
+behavioural policy can change drastically with shifts in needs or non-stationarity [8]. 41 
+
+The third challenge stems from widespread dopamine heterogeneity, which calls into question the physiological basis of 42 
+
+a single, broadcasted scalar reward prediction error (RPE). While a final scalar variable is computationally necessary 43 
+
+to guide choice, the notion of a monolithic RPE signal is increasingly at odds with observations of diverse dopamine 44 
+
+responses, both between and within striatal subregions. Extending the classical model [ 1] to multiple objectives [ 9]45 
+
+only partially explains this diversity (e.g., between different DA targets). For instance, within-target heterogeneity in 46 
+
+regions like the tail of the striatum (TS) remains difficult to reconcile, as evidence points to a mix of threat and action 47 
+
+prediction errors [23, 29, 30, 31, 32] that do not neatly integrate into the standard TDRL framework. 48 
+
+While distinct, the first two challenges—the need for multi-objective learning and the pitfalls of on-policy methods— 49 
+
+converge on a single, fundamental question of optimal composition of multiple values. The brain clearly possesses 50 
+
+mechanisms for learning multiple values, but how can they be reliably combined to produce a coherent and optimal 51 
+
+policy? Ideally, this “recipe” for combining values should satisfy two key properties: optimality and compositionality. 52 
+
+Optimality, the bedrock of modern reinforcement learning [ 33], simply means choosing the best possible action [ 34 ]. 53 
+
+Compositionality, conversely, is the formal principle of constructing solutions to complex problems from a set of 54 
+
+modular components, for instance by allowing a multi-attribute task to be represented by a basis set of value functions 55 
+
+tuned to individual reward dimensions. Crucially, this structure allows policies for novel priority landscapes to be 56 
+
+constructed by flexibly recombining these components, obviating the need to learn each new configuration de novo. 57 
+
+As noted previously [ 7], the choice of learning algorithm is not a mere technicality but a foundational choice dictating 58 
+
+the system’s computational objectives. Recent proposals often overlook this, foregoing either optimality [ 9] or 59 
+
+composability [ 8]. On-policy methods (e.g., SARSA), for instance, suffer from learning interference, especially under 60 
+
+shifting contextual priorities. When the current context prioritises one reward, the agent’s policy becomes biased; 61 
+
+because learning is tied to this policy, the valuation of alternative rewards is not learned in isolation but is corrupted 62 
+
+by being evaluated through the lens of the current trajectory. In contrast, off-policy methods (e.g., Q-learning) fail 63 
+
+because of the non-linearity of the Bellman optimality ( max ) operator, which is not additive. This creates an unrealistic 64 
+
+assumption: the agent is treated as perfectly rational during valuation (identifying the single best future action) yet as 65 
+
+boundedly rational during action selection (making stochastic choices). This inconsistency between ideal valuation and 66 
+
+bounded action selection corrupts the composition of different reward values. 67 
+
+To resolve this, we adopt a normative framework from control engineering [ 35 , 36 , 34 , 37 ], broadly termed linear RL 68 
+
+[38 ]. We propose that the dopamine system’s objective is not merely to optimise cumulative reward, but to optimise 69 
+
+returns augmented by a penalty for deviating from a default policy. This single modification provides a principled 70 
+
+solution to the optimal composition problem [ 39 ]. By enforcing a consistent assumption of bounded rationality 71 
+
+throughout both valuation and action selection, it resolves the paradoxical logic of standard algorithms, allowing 72 
+
+multiple values to be robustly combined. 73 
+
+Remarkably, the same principle that ensures optimal composition provides a natural framework for understanding 74 
+
+dopamine heterogeneity. The framework’s parallel architecture for outcome-specific prediction errors explains between-75 
+
+target dopamine heterogeneity [ 9, 40 ] and supports efficient learning across multiple rewards. We substantiate these 76 
+
+claims in our Results, which use a didactic example and simulations to demonstrate these normative advantages 77 
+
+across multi-objective tasks. Lastly, we discuss how this compositional logic can be extended to explain within-target 78 
+
+heterogeneity, formally reconciling threat and action prediction errors in the TS. 79 
+
+## 2 Results 80 
+
+2.1 Theory sketch 81 
+
+At Marr’s computational level [ 41 ], we formalise dopamine’s objective as maximising future returns augmented by a 82 
+
+penalty for deviating from a default policy. The agent thus optimises a relative-entropy–regularised return, 83 
+
+Gt =
+
+> ∞
+
+X
+
+> k=0
+
+γkrt+k+1 − τ D KL 
+
+ π(·| st+k)∥πd(·| st+k) ,
+
+2
+
+> .CC-BY 4.0 International license available under a was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint (which this version posted July 17, 2026. ;https://doi.org/10.1101/2025.10.10.681616 doi: bioRxiv preprint
+
+Composing the value signal for dopamine-mediated learning A P REPRINT 
+
+where DKL is the KL divergence between the current behavioural policy π and a default policy πd. If πd is uniform, this 84 
+
+encourages random exploration (maximum-entropy RL); if πd slowly tracks the learned policy π, it promotes choice 85 
+
+perseveration or soft-habit formation by penalising deviations from recently taken actions [ 42 , 38, 43, 44 ]. Lastly, we 86 
+
+note that entropy-regularised RL is mathematically equivalent to planning/control as probabilistic inference [45]. 87 
+
+At the algorithmic level, this objective is solved using soft Q-learning [ 46 ], an off-policy temporal difference (TD) 88 
+
+method, adapted here for the general relative-entropy objective. Q-values are updated as per, 89 
+
+Q(st, a t) ← Q(st, a t) + αδ t,
+
+where α is the learning rate, and δt is the temporal-difference error at timestep t, defined as: 90 
+
+δt = rt+1 + γV Q(st+1 ) − Q(st, a t),
+
+where the soft state-value is given by VQ(s) = τ log Ea∼πd exp( Qπ (s, a )/τ ) (see Methods, Eq. 7). VQ(s) replaces 91 
+
+the biologically intractable max a Q(s, a ) of the standard Bellman optimality operator with a smoother, compositional 92 
+
+form. Importantly, since the valuation of the next state is dependent on the default policy, separate from the current 93 
+
+behavioural policy, soft Q-learning is an off-policy algorithms. 94 
+
+Notably, for this one-step algorithm, the KL-divergence from the objective does not appear in δt because the action 95 
+
+at has already been taken [ 47 , 46 , 48 ], however it appears in eligibility trace-based extensions [ 49, 48 ]. Actions are 96 
+
+chosen using a Boltzmann policy that is optimal under this regularised objective (Methods, Eq. 6). 97 
+
+Figure 1: Neural architecture for optimally composable multi-objective reinforcement learning. (A) Conventional temporal-difference (TD) model [ 1]: dopamine neurons compute a scalar reward-prediction error (RPE) that updates a single state-value function in the striatum. Extensions with parallel outcome channels yield vectors of values and RPEs [ 9]. (B) Proposed model: parallel soft Q-learning modules learn distinct state–action values within a linearly solvable MDP framework [ 36 ]. Their outputs are optimally composed ( f ) to guide behaviour that maximises a weighted combination of rewards. This architecture supports parallel dopaminergic targets, requiring access to a default policy 
+
+πd for computing soft state-values VQ.Multiple soft Q-functions Qi(s, a ) are learned in parallel for distinct reward attributes ri and then combined through a 98 
+
+weighted softmax or summation operation 99 
+
+rc(s, a ) = f (r1, r 2, . . . , r n; w),
+
+where the weights w reflect current priorities, such as homeostatic needs [ 14 , 9], inferred beliefs [ 25 , 26 ], or survival 100 
+
+imperatives. When f is weighted softmax, the compositionality of optimal control laws in linear MDPs [ 39 ] guarantees 101 
+
+3
+
+> .CC-BY 4.0 International license available under a was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint (which this version posted July 17, 2026. ;https://doi.org/10.1101/2025.10.10.681616 doi: bioRxiv preprint
+
+Composing the value signal for dopamine-mediated learning A P REPRINT 
+
+that composing these independently learned values using the same function f yields a policy that is optimal for the 102 
+
+composite reward rc.103 
+
+At Marr’s implementation level, our model predicts parallel soft Q-learning mechanisms to account for heterogeneity in 104 
+
+dopaminergic responses between distinct neural targets (Fig. 1). Separate value channels for distinct reward attributes 105 
+
+support efficient multi-attribute learning while preventing positive outcomes from overriding threat or punishment 106 
+
+values [50, 51, 52]. 107 
+
+We first illustrate the principles of optimal value composition with a didactic simulation, building on Todorov [39] ,108 
+
+while situating and comparing with contemporary biological multi-objective RL models, then proceed to more concrete 109 
+
+experiments. 110 
+
+2.2 Optimal composition of multiple value functions for reliable optimisation 111 
+
+A central challenge in multi-objective reinforcement learning (RL) is to reliably combine multiple value functions 112 
+
+into a single, coherent policy. Recent proposals typically linearly decompose a composite reward rc into attributes 113 
+
+(r1, r 2, . . . ), learn independent value functions Qi(s, a ) for separate reward components ri, and combine them linearly 114 
+
+to form a composite value Qcomp = P 
+
+> i
+
+wiQi [53 , 8, 9]. However, depending on the specific value learning algorithm, 115 
+
+this can lead to a critical trade-off: either the individual values Qi are optimal for their respective rewards ri but their 116 
+
+composition Qcomp is not optimal for rc, or the composition is well-defined but the individual values Qi themselves are 117 
+
+sub-optimal. 118 
+
+To illustrate the first issue—individually optimal values that compose sub-optimally—we consider the off-policy, 119 
+
+multi-objective Q-learning devised by Russell and Zimdars [53] and utilised by Dulberg et al. [8] . This method learns 120 
+
+optimal Qi for each ri using standard Q-learning and then additively combines them. In a two-step MDP with two 121 
+
+reward functions r1, r 2 (Fig. 2A), if we equally weight rewards ( w1 = w2 = 0 .5) to get rc, the (undiscounted) optimal 122 
+
+Q-values for rc in the starting state S0 are Q∗ 
+
+> c
+
+(S0, a = L) = 3 .5 and Q∗ 
+
+> c
+
+(S0, a = R) = 4 .5. However, the additively 123 
+
+composed Q-values are Qcomp (S0, a = L) = Qcomp (S0, a = R) = 5 . Consequently, an agent using Qcomp with a 124 
+
+softmax policy chooses actions L and R with equal probability, irrespective of the temperature τ , deviating from the 125 
+
+optimal behaviour for rc (Fig. 2B). This sub-optimality arises from the non-linearity of the max operator in the Bellman 126 
+
+optimality equation. 127 
+
+In contrast, our approach using soft Q-learning within the linear MDP framework allows for a reliable composition. 128 
+
+Here, rewards rc,τ , a composite reward function composed from individual rewards r1 and r2, and Q-values Qcomp,τ 129 
+
+are functions of τ , which controls the influence of a default policy πd (here, uniform). As shown in Fig. 2C, the 130 
+
+resulting composed policy reliably optimises the target reward composition, achieving Qcomp,τ = Q∗ 
+
+> c,τ
+
+(Theorem 1, 131 
+
+Methods Section 4.3). This demonstrates optimal value composition [39]. 132 
+
+On the other hand, works that employ on-policy algorithms, i.e., TD(0) [ 1 ], its multi-objective extension [ 9], and 133 
+
+extensions to control (SARSA), are known to not reliably learn optimal policies, especially from sub-optimal trajectories 134 
+
+(see supplementary Fig. S2). 135 
+
+The limitations of on-policy learning become particularly acute in multi-objective scenarios with dynamically shifting 136 
+
+priorities. This is because policies optimal to one value component are bound to be sub-optimal for other value 137 
+
+components, but values for all components are learnt under a common behavioural policy. Here, we highlight a critical 138 
+
+form of interference in multi-objective (MO) on-policy algorithms such as MO SARSA (or vanilla Reward Bases 139 
+
+[9]): as priorities shift (Fig. 2D), the ensuing changes in the global behaviour policy directly impact the valuation 140 
+
+of individual components (supplementary Fig. S1 illustrates different policies under different priorities). Because 141 
+
+on-policy value updates depend on the current policy π, actions taken to optimise one reward modality can lead to 142 
+
+unintended revaluation and even unlearning of values for other modalities (Fig. 2E). The unstable value estimates 143 
+
+demonstrate how an on-policy agent struggles to adapt: its learned value for ‘Juice 1’ is also inadvertently altered while 144 
+
+it pursues ‘Juice 2’, preventing a truly flexible switch when the rules change. In contrast, our off-policy multi-objective 145 
+
+(MO) soft Q-learning framework effectively mitigates this interference, as the valuation of the next state is dependent 146 
+
+on the default policy separate from the current behavioural policy. This ensures stable learning of all value components 147 
+
+(Fig. 2F). 148 
+
+4
+
+> .CC-BY 4.0 International license available under a was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint (which this version posted July 17, 2026. ;https://doi.org/10.1101/2025.10.10.681616 doi: bioRxiv preprint
+
+Composing the value signal for dopamine-mediated learning A P REPRINT 
+
+Figure 2: Demonstration of the reliable and optimal composition of values in linear MDP. (A) Two-step MDP with two (diverging) reward functions, say Juice 1 ( r1) and Juice 2 ( r2). (B) Action selection probabilities under sub-optimal additive composition of Q-values in MDPs ( Qcomp ) deviate from optimal behaviour mandated by Q∗ 
+
+> c
+
+optimising rc. (C) Action selection probabilities under optimal softmax composition in Linear MDPs ( Qcomp ) match optimal behaviour mandated by Q∗ 
+
+> c
+
+optimising rc. Weights set to w1 = w2 = 0 .5 (equal priority for both rewards) and action probabilities plotted for a range of τ . (D) Changing reward weight w1, denoting the change in priorities and w2 = 1 − w1. (E) Action values of multi-objective (MO) SARSA show unstable and unreliable learning over episodes. (F) Action values of MO Soft Q-learning show reliable and stable learning over episodes. Note that the focus is on value learning over episodes is stable or has interference; action values from (E) and (F) cannot be compared as the objective functions are different. 
+
+2.3 Efficient learning and off-policy fast adaptation 149 
+
+Efficient adaptation to non-stationary rewards is a hallmark of intelligence. While full model-based RL offers a solution, 150 
+
+it is computationally costly. Part model-free solutions rely on either (i) composing independent value functions for 151 
+
+different (pre-defined) reward types, as discussed above [ 8, 9], or (ii) learning efficient representations such as the 152 
+
+successor representation (SR) [10], which allow rapid revaluation of policies when reward functions change. 153 
+
+Crucially, in the case of on-policy model-free algorithms, Millidge et al. [9] show that a combination of TD(0) learning 154 
+
+rules for each of the reward types is akin to a compressed SR with rewards tuned only to relevant dimensions. An 155 
+
+equivalent relationship in off-policy algorithms is lacking. The default representation (DR), an off-policy counterpart to 156 
+
+the SR derived from linear MDPs [38, 36, 34], overcomes the on-policy limitations of the SR. 157 
+
+5
+
+> .CC-BY 4.0 International license available under a was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint (which this version posted July 17, 2026. ;https://doi.org/10.1101/2025.10.10.681616 doi: bioRxiv preprint
+
+Composing the value signal for dopamine-mediated learning A P REPRINT 
+
+Theoretical result: Relationship to the default representation (DR). MO Soft Q-learning learns values equivalent 158 
+
+to those learned by a compressed DR tuned to only relevant (predefined) reward dimensions (Methods, Section 4.5). 159 
+
+It further provides two benefits: First, MO Soft Q-learning scales linearly with state space size (assuming a fixed, 160 
+
+smaller number of reward dimensions), whereas the full DR scales quadratically. Second, unlike the SR, the DR lacks 161 
+
+an efficient TD learning algorithm and typically requires matrix inversions for its computation. MO Soft Q-learning 162 
+
+provides a TD-based mechanism to learn DR-like values. 163 
+
+Simulation result: MO Soft Q-learning enables superior adaptation to shifting priorities. We empirically tested 164 
+
+these advantages in a four-room grid world where an agent pursued one of three goals, with priorities shifting every 165 
+
+1000 episodes (Fig. 3A; see Methods for more details). 166 
+
+MO Soft Q-learning outperformed SR and other MO TD algorithms in total rewards accrued (Fig. 3B), demonstrating 167 
+
+superior adaptation. The policy-dependence of SR was particularly detrimental during priority shifts requiring substantial 168 
+
+re-planning [ 54]. For instance, when needing to switch back to a previously learned goal after extensive training on 169 
+
+another, the SR agent took orders of magnitude more steps than MO Soft Q-learning or even MO SARSA (Fig. 3C). 170 
+
+MO Soft Q-learning, by maintaining relatively stable, independent values for each reward, could immediately leverage 171 
+
+the appropriate value function. The adaptation rates over episodes further illustrate these differences (Fig. 3D). 172 
+
+Figure 3: Demonstration of efficient learning and fast adaption to changing priorities in a four-room environment. (A) Four-room environment with changing priorities between three rewards every 1000 episodes, and the agent starts in the same starting position. Rewards for goals: +5 points, step cost: -0.01. The episode terminates only on reaching one of the rewarding goals. Meta-parameter τ = 0 .5 to allow all algorithms to converge to an efficient path. (B) Multi-objective (MO) Soft Q-learning algorithm performs the best amongst comparisons in terms of total rewards accrued, highlighting its fast adaptation capabilities. (C) Steps to the goal on episodes 3000, 4000 and 5000 are plotted for different algorithms to test replanning to a previously experienced reward. SR performs the worst at replanning, requiring substantial policy re-evaluation, while MO Soft Q-learning performs the best. (D) Performance over episodes shows different rates of adaptation for different algorithms upon a change of priorities. Lastly, we observe that off-policy algorithms continue to propagate optimal Q-values for all components, while 173 
+
+collecting data under different policies (priorities), unlike on-policy algorithms (supplementary Fig. S4). However, 174 
+
+MO Q-learning requires commensurate temperature annealing to get the most benefits, whereas MO soft Q-learning 175 
+
+manages this trade-off without explicit annealing. 176 
+
+In summary, dopaminergic circuits may cache outcome-specific value functions that can be flexibly combined according 177 
+
+to changing physiological or contextual priorities. These functions can be mapped to different DA targets, responsible 178 
+
+for different reward bases (for example, see Millidge et al. [9]). 179 
+
+6
+
+> .CC-BY 4.0 International license available under a was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint (which this version posted July 17, 2026. ;https://doi.org/10.1101/2025.10.10.681616 doi: bioRxiv preprint
+
+Composing the value signal for dopamine-mediated learning A P REPRINT 
+
+## 3 Discussion 180 
+
+In this work, we address the fundamental challenge of reliably optimising multiple objectives in reinforcement 181 
+
+learning and propose a model that outperforms existing multi-objective methods. This invites a reconsideration of 182 
+
+the dopaminergic system’s computational objective, shifting from the classical view of cumulative discounted reward 183 
+
+maximisation [ 1] towards optimising returns augmented by a KL penalty for deviations of the behavioural policy from a 184 
+
+default policy. This reframing not only yields distinct functional advantages but also generates novel testable predictions 185 
+
+in efficient and stable learning. In doing so, we also then discuss how the same framework can be instantiated to address 186 
+
+conflicting views of TS-projecting dopamine in threat prediction errors (TPEs) and action prediction errors (APEs) 187 
+
+within the temporal difference reinforcement learning framework. 188 
+
+This approach was designed to directly address several limitations of the standard model, specifically the challenge of 189 
+
+flexibly pursuing multiple, often conflicting, rewards without the learning process becoming unstable or inefficient—a 190 
+
+known issue for classic on-policy methods. Our model’s core innovation is to augment the classic reward prediction 191 
+
+error with a regularisation term that imposes a ‘cost’ for deviating from a default policy. 192 
+
+At an algorithmic level, this work addresses how to ensure (often individually optimal) value functions cooperate 193 
+
+effectively to drive reliable behaviour, despite competing for control. This contrasts with “delegation” approaches 194 
+
+[55, 56, 57 ], where only one value function controls actions at any timestep, thus avoiding this problem. Regarding 195 
+
+our optimal composition results, previous multi-objective TD(0) or SARSA approaches that scale on-policy prediction 196 
+
+errors with weights (e.g., state-dependent RPE modulation [ 9, 58 ] or feature-specific weight updates [ 26 , 40]) may 197 
+
+slightly ameliorate unreliable learning or policy interference, but do not resolve it (supplementary Fig. S3). This 198 
+
+excludes trivial conditions where only one value component is active, preventing interference. A better alternative for 199 
+
+these models might be to use importance sampling, which would ensure off-policy learning. 200 
+
+Off-policy learning is a prominent theme in this work, as it demonstrably improves performance over on-policy 201 
+
+multi-objective RL algorithms and the successor representation, while also relating directly to its off-policy counterpart 202 
+
+[38]. The brain may implement off-policy learning for several reasons: First, it prevents interference and unlearning 203 
+
+between multiple values amidst changing priorities. Second, it facilitates learning amidst motor noise and competition 204 
+
+from distributed control systems, like the motor cortex and cerebellum [ 59 , 60 ]. Third, on-policy algorithms, such as 205 
+
+the successor representation, exhibit strong policy dependence where goal information contaminates the state map, 206 
+
+hindering flexible transfer [ 54 , 61 ], a problem solved by off-policy alternatives [ 38 ]. Fourth, the ability of episodic 207 
+
+memories to utilise cached values [ 62 , 63 ] or stale behavioural data for performance improvements points towards an 208 
+
+underlying off-policy mechanism, akin to its necessity in deep Q-learning’s episodic replay buffers [ 64]. However, 209 
+
+finding strong neural and behavioural evidence for interference and unintended unlearning between two or more value 210 
+
+systems (for different rewards) under changing priorities in a two-step task similar to Fig. 2D-F, would falsify our 211 
+
+hypothesis of phasic dopamine performing off-policy multi-objective RL and find evidence for on-policy multi-objective 212 
+
+RL (e.g. [9]). Rapid change in priorities could be potentially implemented as a task rule that needs to be inferred. 213 
+
+Our framework synthesises several threads of the evolving dopamine story, which has progressively expanded from a 214 
+
+simple scalar reward signal [ 1] to a multifaceted control signal. Our results (Fig. 3C) also highlight the behavioural 215 
+
+inefficiencies of the SR model in replanning after overtraining [ 54]. Indeed, SR models of dopamine often need to treat 216 
+
+reward as a feature to explain RPEs as a form of state prediction error [ 12], as Lee et al. [40] shows they otherwise fail 217 
+
+to consistently respond to rewards. This highlights the benefit of outcome-specific models such as ours [and that of 9], 218 
+
+which efficiently achieve values comparable to an SR/DR model [10, 38] when tuned to a subset of reward types. 219 
+
+In terms of limitations; first, though broadly applicable to decision-making under changing priorities, when applied 220 
+
+to homeostatic priorities, it cannot explain physiological state-dependent modulation of prediction errors [ 65]. This 221 
+
+is a limitation common to all multi-objective RL approaches (e.g., those by Dulberg et al. [8] , vanilla version of 222 
+
+Millidge et al. [9] and ours), which learn equally from all reward types, at all times. Second, despite its advantages, 223 
+
+soft maximum composition optimises an objective different from a simple weighted sum of utilities. While this is 224 
+
+not necessarily an issue for modelling homeostasis, where value representation is debated [ 15 , 66 , 8], and may even 225 
+
+account for inhibitory effects of irrelevant drives [ 15 , 67], we find it can fit poorly to human behaviour when participants 226 
+
+explicitly maximise weighted sums of utilities or show generalisation in task structure rather than in values [ 17 ] (see 227 
+
+supplementary Fig. S5). Third, while there are compelling reasons for the brain to implement off-policy learning 228 
+
+[59, 60 , 32 ], some early work [ 68 , 69 ] suggested phasic dopamine implements on-policy algorithms like SARSA. 229 
+
+However, those experiments involved overtrained monkeys where no learning occurred, making observed TD error 230 
+
+signals potentially epiphenomenal. Our framework could partly explain these differences in action values as the KL 231 
+
+divergence from the overtrained default policy (APEs). Furthermore, the observed use of cached values in computing 232 
+
+TDEs [62, 63] better aligns with off-policy rather than on-policy TD learning. 233 
+
+7
+
+> .CC-BY 4.0 International license available under a was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint (which this version posted July 17, 2026. ;https://doi.org/10.1101/2025.10.10.681616 doi: bioRxiv preprint
+
+Composing the value signal for dopamine-mediated learning A P REPRINT Proposed Model 
+
+(APE) 
+
+Proposed Model 
+
+(APE -like KL term) 
+
+E F G
+
+Greenstreet et al. (2025) 
+
+C       
+
+> ෠𝑄 𝑁 ෠𝑄 𝑇
+> 𝛿 𝑇
+> 𝛿 𝑁
+> 𝜌
+> s
+> ෠𝑉 𝑄
+> 𝑁 ෠𝑉 𝑄
+> 𝑇
+> ሶ
+> 𝑉 𝑄
+> 𝑁 ሶ𝑉 𝑄
+> 𝑇
+> 𝜋 𝑑
+> 𝜋
+> KL 𝛿 𝐴𝑃𝐸
+> Cortex
+> (state and
+> threat belief)
+> TS
+> (Aversive value and
+> default policy)
+> Thalamic
+> aversive signal
+> GPi
+> (behavioural policy)
+> SNl
+> (Phasic dopamine:
+> aversive and action
+> prediction errors)
+> ෠𝑄 𝑇𝑆
+> b
+> ෠𝑄
+> ෠𝑄 𝑅
+> Striatum
+> (Other values)
+> ෠𝑉 𝑄
+> 𝑇 𝑆
+> 𝛿 𝑇𝑆
+> a
+> −෠𝑉 𝑄
+> 𝑇 𝑆
+> −𝛿 𝑇𝑆
+> 𝛿 𝐴𝑃𝐸
+
+Mapping to dopaminergic signals 
+
+in the TS             
+
+> Equivalent to Threat Prediction
+> (Akiti et al., 2022 )
+> Aversive Prediction Error with an
+> Action Prediction Error -like KL term
+> Action Prediction Error (APE)
+> Equivalent to Greenstreet et al., (2025)
+> ሶ
+> 𝑉 𝑄
+> 𝑇𝑆 −𝛿 𝑇𝑆 =−(𝜌 𝑡 +1+ሶ𝑉 𝑄
+> 𝑇𝑆 𝑠 𝑡 )+𝜏 𝐾𝐿 𝑡
+> Absolute Aversive
+> Prediction Error
+> ~ Action
+> Prediction Error
+
+A B            
+
+> wR
+> Note, −෠𝑉 𝑄
+> 𝑇 𝑆
+> and −𝛿 𝑇𝑆
+> are ≥0
+> and 𝜌 ≤0.
+> 𝐷𝑖𝑓𝑓𝑒𝑟𝑒𝑛𝑡𝑖𝑎𝑡𝑜𝑟 𝐸𝑥𝑐𝑖𝑡𝑎𝑡𝑜𝑟𝑦 𝑖𝑛𝑝𝑢𝑡 𝐼𝑛ℎ𝑖𝑏𝑖𝑡𝑜𝑟𝑦 𝑖𝑛𝑝𝑢𝑡 𝐶𝑜𝑚𝑝𝑜𝑠𝑖𝑡𝑖𝑜𝑛
+
+D
+
+Figure 4: Discussion-level summary of a TS-focused instantiation of the framework [ 70 ]. (A) A colour-coded wiring diagram of the proposed TS model. ˆQNπ and ˆQTπ are Q-value functions for the ‘Not-threatened’ and ‘Threatened’ contexts, respectively, while ˆV NQ and ˆV TQ are the corresponding soft Bellman value functions. ˙V NQ (st) = γ ˆV NQ (st+1 ) −
+
+ˆV NQ (st) and ˙V TQ = γ ˆV TQ (st+1 ) − ˆV TQ (st) are temporal derivatives of the soft Bellman value function. ρ is the aversive feedback signal ρ = min( r, 0) where r ∈ (−∞ , +∞), shared between the value functions in both contexts, contributing to the aversive TD errors δNt and δTt . The default policy is updated based on the chosen action using action prediction errors [ 32 , 42 ], scaled by the learning rate αd, and then normalised. The aversive values are updated by scaling the aversive TD errors by the learning rate α and eligibility traces et(s, a ) [49 , 48 ]. The TS Q-values are composed using weights derived from a belief state b, and can be further integrated with other reward-based value functions according to their respective weights wR. (B) The mapping of model signals to the dopaminergic signals observed in experimental evidence, and to previous models that attempt to explain them [ 30 , 32]. TD-error equation suggests why an aversive prediction error and an action prediction error-like KL term may co-exist in the TD errors, alongside previously proposed threat prediction (TP) values and APEs. (Caption continued on next page.) 
+
+8
+
+.CC-BY 4.0 International license available under a was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint (which this version posted July 17, 2026. ;https://doi.org/10.1101/2025.10.10.681616 doi: bioRxiv preprint Composing the value signal for dopamine-mediated learning A P REPRINT 
+
+Figure 4: (Continued from previous page.) (C) In the TS-focused model instantiation, Threat Prediction qualitatively reproduces the TS activity observed after the start of a retreat but not during approach [ 30 ]. (D) The same result is plotted along a continuous timeline before averaging, alongside the data from Menegas et al. [29] . ∆F/F represents the TS activity. The proposed model demonstrates higher TP signals at the start of a retreat (denoted by a dotted line). (E) Greenstreet et al. [32] observe that TS activity decreases across trials as mice acquire soft habits, which they qualitatively model using action prediction errors (APEs) that drive “value-free” habits [ 42 ]. (F) In the TS-focused model instantiation, the APEs used to update the default policy in our model (also in a value-free manner) replicate the APE curves from Greenstreet et al. [32] . (G) The KL term in our proposed model initially shows an increase and then an APE-like decrease after a few early trials. All figures are retrieved and minimally adapted from Menegas et al. [29] with permission from Springer Nature and from Akiti et al. [30] under CC-BY-NC-ND 4.0 license with permission from Elsevier. Figures adapted from Greenstreet et al. [32] under a CC-BY 4.0 license (figures were cropped and combined). Finally, while this paper focuses on the reliable composition of distinct reward attributes, the same linear MDP 234 
+
+framework may also accommodate within-target dopaminergic heterogeneity. As a discussion-level illustration of this 235 
+
+broader scope, Fig. 4 summarises a TS-focused instantiation in which threat prediction errors and action prediction 236 
+
+errors can coexist within a single entropy-regularised TD-error framework [ 29 , 30, 32 ]. The detailed model, simulations, 237 
+
+and experimental predictions are developed in related work [ 70 ]; here, the example is included only to show how the 238 
+
+same computational objective can extend beyond between-target value composition. The TS-focused variant extends 239 
+
+soft Q-learning with eligibility traces, resulting in: (1) a more biologically plausible computation of the TD error using 240 
+
+the temporal derivative of the soft Bellman value function; (2) the introduction of a KL term in the TD error, which 241 
+
+shows features similar to action prediction errors (APEs); and (3) the use of APEs [ 32, 42 , 38 ] to update the default 242 
+
+policy. We explore these TS-specific implications and their normative benefits for cautious exploration and stable 243 
+
+learning under uncertainty in related work. 244 
+
+In offering a novel normative framework for multi-objective reinforcement learning, this paper re-conceptualises the 245 
+
+computational role of striatal dopamine. Our findings demonstrate how the brain might achieve efficient and stable 246 
+
+learning under changing priorities, while suggesting how the same framework may extend to cautious behaviour and 247 
+
+within-target dopamine heterogeneity. 248 
+
+## 4 Methods 249 
+
+4.1 Reinforcement learning in MDPs 250 
+
+Let the environment be a Markov Decision Process, where at time t = 0 , 1, 2, ... , the agent is in state st ∈ S and takes 251 
+
+action at ∈ A and receives the next state st+1 ∈ S and the reward rt+1 = r(st, a t) ∈ R . The dynamics of MDP are 252 
+
+given by the conditional probability p(s′, r |s, a ) .
+
+= Pr( st = s′, r t = r|st−1 = s, a t−1 = a).253 
+
+The discounted return at time t is given by Gt = P∞ 
+
+> k=0
+
+γkrt+k+1 , where γ ∈ [0 , 1] . Policy π(a|s) is a mapping 254 
+
+from states to the probabilities of choosing each possible action. The value function of a state s under the policy π is 255 
+
+formalized as Vπ
+
+.
+
+= Eπ [Gt|st = s], ∀s ∈ S . Similarly, the action-value function is Qπ (s, a ) .
+
+= Eπ [Gt|st = s, a t = a].256 
+
+The Bellman equation of a value function Vπ is: 257 
+
+Vπ (s) .
+
+= Ea∼π(·| s)E(s′,r )∼p(s′,r |s,a )[r + γV π (s′)] , ∀s ∈ S (1) The Bellman optimality equation is: 258 
+
+V ∗(s) = max  
+
+> a
+
+E(s′,r )∼p(s′,r |s,a )[r + γV ∗(s′)] (2) 
+
+4.2 Entropy-regularised reinforcement learning in Linear MDPs 259 
+
+Entropy-regularised RL [ 36 , 34 , 71 ] augments the reward function with a term that penalises deviating from some default 260 
+
+policy πd, essentially making “soft” assumptions about the future policy (in the form of a stochastic action distribution). 261 
+
+When πd is an uniform policy, this reduces to max entropy reinforcement learning [ 47, 46 ]. The expected reward on 262 
+
+taking action at in state st is given by Eat∼π [r(st, a t) − τ D KL (π(·| st)∥πd(·| st))] , which can be further compactly 263 
+
+written as Eat∼π [rt+1 − τ KL( st)] . Here, τ is the scalar temperature parameter, and KL( st) is the Kullback-Leibler 264 
+
+divergence between the current policy π and a default policy πd in state st. Thus, the entropy-augmented return is 265 
+
+Gt = P∞ 
+
+> k=0
+
+γk(rt+k+1 − τ KL( st+k)) .266 
+
+The value function definitions under a policy π at any timestep t based on the entropy-augmented returns are as follows, 267 
+
+9
+
+> .CC-BY 4.0 International license available under a was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint (which this version posted July 17, 2026. ;https://doi.org/10.1101/2025.10.10.681616 doi: bioRxiv preprint
+
+Composing the value signal for dopamine-mediated learning A P REPRINT 
+
+Vπ (s) .
+
+= Eπ [Gt|st = s] = Eπ
+
+" ∞X
+
+> k=0
+
+γk(rt+k+1 − τ KL( st+k)) st = s
+
+#
+
+(3) 
+
+Qπ (s, a ) .
+
+= Eπ [Gt|st = s, a t = a] = Eπ
+
+"
+
+rt+1 +
+
+> ∞
+
+X
+
+> k=1
+
+γk(rt+k+1 − τ KL( st+k)) st = s, a t = a
+
+#
+
+(4) Note that this Q-function does not include the first KL penalty term ( KL( st)), as it does not depend on action action at268 
+
+which has already been chosen [47, 46, 48]. This gives the following relationship which holds for all policies π.269 
+
+Vπ (s) = Ea∼π [Qπ (s, a )] − τ KL( s) (5) The greedy (stochastic) policy in entropy-regularised RL is the Boltzmann policy ( πB
+
+> Q
+
+): 270 
+
+πB
+
+> Q
+
+(·| s) = [ GQ]( s) = πd(a|s) exp( Q(s, a )/τ )
+
+P 
+
+> A
+
+exp( Qπ (s, a ′)/τ )πd(a′|s) (6) Under the Boltzmann policy, the Bellman equation is equivalent to the "soft" Bellman equation, performing a soft 271 
+
+maximum operation over Q-values: 272 
+
+VQ(s) = τ log Ea∼πd exp( Qπ (s, a )/τ )= τ log X
+
+> A
+
+exp( Qπ (s, a )/τ )πd(a|s) (7) Note, this log-sum-exp performs a soft maximum because, max {x1, ..., x n} ≤ softmax( x1, ..., x n) ≤273 
+
+max {x1, ..., x n} + log( n).274 
+
+4.3 Multi-objective reinforcement learning and optimal composition in Linear MDPs 275 
+
+Having discussed reinforcement learning (RL) in MDPs and Linear MDPs with single-attribute rewards, we now focus 276 
+
+on multi-objective RL, which concerns multiple rewarding attributes r = [ r1, r 2, . . . , r n]. Note, taking an action at 277 
+
+timestep t results in rewards ri,t +1 , for the i-th reward dimension, but we will omit the time subscript from here for 278 
+
+convenience. The objective is to maximise a cumulative discounted return of a reward function composed of these 279 
+
+attributes: 280 
+
+rc(s, a ) = f (r1, r 2, . . . , r n; w),
+
+where w is a set of non-negative parameters that weight each attribute, satisfying P wi = 1 . We address the problem 281 
+
+of optimal compositions : determining how the reward function should be composed of multiple attributes to motivate 282 
+
+meaningful behaviour and how to compose value functions to ensure the resulting policy acts optimally with respect to 283 
+
+the composed reward function. 284 
+
+As shown in Results section 2.2, a simple linear composition of Q-values, such as w1Q∗
+
+> 1
+
+(s, a ) + w2Q∗
+
+> 2
+
+(s, a ) + · · · +285 
+
+wnQ∗
+
+> n
+
+(s, a ), may not maximise the composed reward function 286 
+
+rc(s, a ) = w1r1(s, a ) + w2r2(s, a ) + · · · + wnrn(s, a )
+
+due to the non-linearity introduced by the max operation in the Bellman optimality equation in MDPs: 287 
+
+Q∗(s, a ) = E(s′,r )∼p(s′,r |s,a )[r + γV ∗(s′)] = E(s′,r )∼p(s′,r |s,a )[r + γ max  
+
+> a′
+
+Q∗(s′, a ′)] . (8) However, in linear MDPs [ 35 , 36 , 39, 34 ], which replace the max operation over Q-values by a soft-maximum VQ with 288 
+
+respect to the default policy (see equation 7), optimal (softmax) and near-optimal (additive) compositions are possible. 289 
+
+The Bellman optimality equation for Q-values in linear MDPs is as follows: 290 
+
+10 
+
+> .CC-BY 4.0 International license available under a was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint (which this version posted July 17, 2026. ;https://doi.org/10.1101/2025.10.10.681616 doi: bioRxiv preprint
+
+Composing the value signal for dopamine-mediated learning A P REPRINT 
+
+Q∗(s, a ) = E(s′,r )∼p(s′,r |s,a )[r + γV ∗(s′)] = E(s′,r )∼p(s′,r |s,a )[r + γEa∼πB 
+
+> Q
+
+[Q(s′, a ′)] − τ D KL [πB
+
+> Q
+
+∥πd]( s′)] = E(s′,r )∼p(s′,r |s,a )[r + γV Q(s′)] .
+
+(9) 
+
+Theorem 1 (Optimal Softmax Composition) [39, 71] 291 
+
+Let Q∗ 
+
+> i,τ
+
+(s, a ) be the optimal entropy-regularized Q-functions for individual rewards ri(s, a ). Then the reward function 292 
+
+for the composed task is given by: 293 
+
+rc(s, a ) = τ log 
+
+> n
+
+X
+
+> i=1
+
+wi exp 
+
+ ri(s, a )
+
+τ
+
+!
+
+, (10) 
+
+The optimal Q-function Q∗ 
+
+> c,τ
+
+(s, a ) for the composed task is equal to the composition of Q-values Qcomp,τ (s, a ) given 294 
+
+by: 295 
+
+Q∗ 
+
+> c,τ
+
+(s, a ) = Qcomp,τ (s, a ) = τ log 
+
+> n
+
+X
+
+> i=1
+
+wi exp 
+
+ Q∗ 
+
+> i,τ
+
+(s, a )
+
+τ
+
+!
+
+(11) The theorem for additive composition in Linear MDPs is provided in the Supplementary Methods 2. 296 
+
+4.4 Off-policy model-free learning algorithms in Linear MDPs 297 
+
+Soft Q-learning (One-Step) 298 
+
+We adopt soft Q-learning and extend it from the maximum entropy formulation to a relative entropy formulation. The 299 
+
+Q-value update equation is: 300 
+
+Q(st, a t) ← Q(st, a t) + αδ t, (12) where α is the learning rate, and δt is the reward prediction error at timestep t, defined as: 301 
+
+δt = rt+1 + γV Q(st+1 ) − Q(st, a t), (13) where VQ is given by equation 7. For multi-step extensions involving eligibility traces please refer to Mahajan and 302 
+
+Seymour [49], Schulman et al. [48]. 303 
+
+4.5 Relationship to the default representation (DR) 304 
+
+The optimal values V ∗(s) are calculated using the default representation as follows [ 38 , 36 , 34 ] (in a model-based 305 
+
+fashion): 306 
+
+exp (V∗/τ ) = MP exp (r/τ ) (14) where, V∗ is the vector of optimal values at nonterminal states, r is the vector of rewards at terminal states, P is 307 
+
+the one-step transition probabilities TN T from non-terminal states to terminal states under the default policy πd
+
+> 308
+
+and M is the DR matrix defined as M = ( diag (exp (−rN )/τ ) − TN N )−1, where rN is vector of rewards at non-309 
+
+terminal states and TN N is the one-step transition probabilities between non-terminal states under the default policy πd.310 
+
+Further, [ 38 ] extend and define a more general version of the DR matrix D over all states (not just terminal states), as 311 
+
+D = ( diag (exp (−rA)/τ ) − T)−1, where rA is vector of rewards over all states and T are transition probabilities over 312 
+
+all states under the default policy πd. Here, M is a sub-block of D and TN T and TN N are sub-blocks of matrix T. We 313 
+
+observe that in both cases, it requires storing and/or learning the one-step transitions T under the default policy over all 314 
+
+states, resulting in a S × S memory cost, where S is the size of the state space. Therefore, the memory cost of the DR 315 
+
+scales quadratically with the size of the state space. 316 
+
+We propose our model (composition of multiple soft Q-learning rules) is intuitively akin to a compressed DR tuned to 317 
+
+only relevant reward dimensions and converges to the same. To show this, we decompose the reward vector at terminal 318 
+
+11 
+
+> .CC-BY 4.0 International license available under a was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint (which this version posted July 17, 2026. ;https://doi.org/10.1101/2025.10.10.681616 doi: bioRxiv preprint
+
+Composing the value signal for dopamine-mediated learning A P REPRINT 
+
+states, by assuming it to be composed using the optimal softmax composition [ 39 ], r = τ log  P ni=1 wi exp   ri
+
+> τ
+
+ .319 
+
+Therefore, the vector of optimal values using the DR will be: 320 
+
+exp (V∗/τ ) = MP 
+
+> N
+
+X
+
+> i=1
+
+wi exp 
+
+ ri
+
+τ
+
+!
+
+=
+
+> N
+
+X
+
+> i=1
+
+wi
+
+
+
+MP exp 
+
+ ri
+
+τ
+
+ 
+
+=
+
+> N
+
+X
+
+> i=1
+
+wiexp (V∗ 
+
+> i
+
+/τ )
+
+(15) Here, the vector of optimal values for each reward decomposition can be computed using soft Q-learning and consumes 321 
+
+memory cost of S (state-space size). Therefore, for N reward decompositions, our method consumes a memory cost of 322 
+
+S × N . We believe the necessary reward decompositions would often be much lesser than the total number of states, 323 
+
+N << S . Therefore, our method scales linearly with the size of the state space, whilst achieving the same optimal 324 
+
+values as the DR for a predefined reward basis. 325 
+
+4.6 Simulation parameters 326 
+
+Simulations in Fig. 2D,E and supplementary Fig. S2, S3 use learning rate α = 0 .1, discount rate γ = 1 , temperature 327 
+
+τ = 1 (unless explicitly varied) and are averaged over 100 runs. Simulations on efficient learning (Fig. 3) use α = 0 .1,328 
+
+γ = 0 .99 , τ = 0 .5 for all algorithms, and results are averaged over 30 runs. 329 
+
+## Acknowledgments 330 
+
+An earlier extended abstract of this work was presented at RLDM 2025, and the authors thank the two anonymous 331 
+
+reviewers at RLDM 2025, Thomas Akam and Chris Summerfield for their helpful suggestions on how to make this 332 
+
+work more impactful. Authors thank the funders: Wellcome Trust (214251/Z/18/Z, 203139/Z/16/Z and 203139/A/16/Z), 333 
+
+IITP (MSIT 2019-0-01371) and JSPS (22H04998). This research was also partly supported by the NIHR Oxford Health 334 
+
+Biomedical Research Centre (NIHR203316). The views expressed are those of the author(s) and not necessarily those 335 
+
+of the NIHR or the Department of Health and Social Care. For the purpose of open access, the authors have applied a 336 
+
+CC BY public copyright licence to any Author Accepted Manuscript version arising from this submission. 337 
+
+## Code and Data availability 338 
+
+Code for all simulations is available at https://github.com/PranavMahajan25/OptCompMultValues.git. No data was 339 
+
+collected during this study. 340 
+
+## References 341 
+
+[1] Wolfram Schultz, Peter Dayan, and P Read Montague. A neural substrate of prediction and reward. Science , 275 342 
+
+(5306):1593–1599, 1997. 343 
+
+[2] Richard S Sutton. Learning to predict by the methods of temporal differences. Machine learning , 3(1):9–44, 1988. 344 
+
+[3] Yael Niv and Geoffrey Schoenbaum. Dialogues on prediction errors. Trends in cognitive sciences , 12(7):265–272, 345 
+
+2008. 346 
+
+[4] Paul W Glimcher. Understanding dopamine and reinforcement learning: the dopamine reward prediction error 347 
+
+hypothesis. Proceedings of the National Academy of Sciences , 108(supplement_3):15647–15654, 2011. 348 
+
+[5] Neir Eshel, Michael Bukwich, Vinod Rao, Vivian Hemmelder, Ju Tian, and Naoshige Uchida. Arithmetic and 349 
+
+local circuitry underlying dopamine prediction errors. Nature , 525(7568):243–246, 2015. 350 
+
+[6] Mitsuko Watabe-Uchida, Neir Eshel, and Naoshige Uchida. Neural circuitry of reward prediction error. Annual 351 
+
+review of neuroscience , 40(1):373–394, 2017. 352 
+
+[7] Zhewei Zhang, Kauê M Costa, Angela J Langdon, and Geoffrey Schoenbaum. The devilish details affecting tdrl 353 
+
+models in dopamine research. Trends in Cognitive Sciences , 2025. 354 
+
+12 
+
+> .CC-BY 4.0 International license available under a was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint (which this version posted July 17, 2026. ;https://doi.org/10.1101/2025.10.10.681616 doi: bioRxiv preprint
+
+Composing the value signal for dopamine-mediated learning A P REPRINT 
+
+[8] Zack Dulberg, Rachit Dubey, Isabel M Berwian, and Jonathan D Cohen. Having multiple selves helps learning 355 
+
+agents explore and adapt in complex changing worlds. Proceedings of the National Academy of Sciences , 120(28): 356 
+
+e2221180120, 2023. 357 
+
+[9] Beren Millidge, Yuhang Song, Armin Lak, Mark E Walton, and Rafal Bogacz. Reward bases: A simple mechanism 358 
+
+for adaptive acquisition of multiple reward types. PLOS Computational Biology , 20(11):e1012580, 2024. 359 
+
+[10] Peter Dayan. Improving generalization for temporal difference learning: The successor representation. Neural 360 
+
+computation , 5(4):613–624, 1993. 361 
+
+[11] Samuel J Gershman. The successor representation: its computational logic and neural substrates. Journal of 362 
+
+Neuroscience , 38(33):7193–7200, 2018. 363 
+
+[12] Matthew PH Gardner, Geoffrey Schoenbaum, and Samuel J Gershman. Rethinking dopamine as generalized 364 
+
+prediction error. Proceedings of the Royal Society B , 285(1891):20181645, 2018. 365 
+
+[13] Sindhu Padakandla, Prabuchandran KJ, and Shalabh Bhatnagar. Reinforcement learning algorithm for non-366 
+
+stationary environments. Applied Intelligence , 50(11):3590–3606, 2020. 367 
+
+[14] Mike JF Robinson and Kent C Berridge. Instant transformation of learned repulsion into motivational “wanting”. 368 
+
+Current Biology , 23(4):282–289, 2013. 369 
+
+[15] Mehdi Keramati and Boris Gutkin. Homeostatic reinforcement learning for integrating reward collection and 370 
+
+physiological stability. Elife , 3:e04811, 2014. 371 
+
+[16] Ethan B Richman, Nicole Ticea, William E Allen, Karl Deisseroth, and Liqun Luo. Neural landscape diffusion 372 
+
+resolves conflicts between needs across time. Nature , 623(7987):571–579, 2023. 373 
+
+[17] Momchil S Tomov, Eric Schulz, and Samuel J Gershman. Multi-task reinforcement learning in humans. Nature 374 
+
+Human Behaviour , 5(6):764–773, 2021. 375 
+
+[18] Wolfram Schultz. Multiple reward signals in the brain. Nature reviews neuroscience , 1(3):199–207, 2000. 376 
+
+[19] Regina M Carelli, Stephanie G Ijames, and Alison J Crumling. Evidence that separate neural circuits in the 377 
+
+nucleus accumbens encode cocaine versus “natural”(water and food) reward. Journal of Neuroscience , 20(11): 378 
+
+4255–4266, 2000. 379 
+
+[20] Kazuki Enomoto, Naoyuki Matsumoto, Sadamu Nakai, Takemasa Satoh, Tatsuo K Sato, Yasumasa Ueda, Hitoshi 380 
+
+Inokawa, Masahiko Haruno, and Minoru Kimura. Dopamine neurons learn to encode the long-term value of 381 
+
+multiple future rewards. Proceedings of the National Academy of Sciences , 108(37):15462–15467, 2011. 382 
+
+[21] Armin Lak, William R Stauffer, and Wolfram Schultz. Dopamine prediction error responses integrate subjective 383 
+
+value from different reward dimensions. Proceedings of the National Academy of Sciences , 111(6):2343–2348, 384 
+
+2014. 385 
+
+[22] Yuji K Takahashi, Hannah M Batchelor, Bing Liu, Akash Khanna, Marisela Morales, and Geoffrey Schoenbaum. 386 
+
+Dopamine neurons respond to errors in the prediction of sensory features of expected rewards. Neuron , 95(6): 387 
+
+1395–1405, 2017. 388 
+
+[23] Mitsuko Watabe-Uchida and Naoshige Uchida. Multiple dopamine systems: weal and woe of dopamine. In Cold 389 
+
+Spring Harbor Symposia on Quantitative Biology , volume 83, pages 83–95. Cold Spring Harbor Laboratory Press, 390 
+
+2018. 391 
+
+[24] Jing-Yu Chang, Patricia H Janak, and Donald J Woodward. Comparison of mesocorticolimbic neuronal responses 392 
+
+during cocaine and heroin self-administration in freely moving rats. Journal of Neuroscience , 18(8):3098–3115, 393 
+
+1998. 394 
+
+[25] Benedicte M Babayan, Naoshige Uchida, and Samuel J Gershman. Belief state representation in the dopamine 395 
+
+system. Nature communications , 9(1):1891, 2018. 396 
+
+[26] Samuel J Gershman and Naoshige Uchida. Believing in dopamine. Nature Reviews Neuroscience , 20(11):703–714, 397 
+
+2019. 398 
+
+[27] Yuji K Takahashi, Thomas A Stalnaker, Lauren E Mueller, Sevan K Harootonian, Angela J Langdon, and Geoffrey 399 
+
+Schoenbaum. Dopaminergic prediction errors in the ventral tegmental area reflect a multithreaded predictive 400 
+
+model. Nature Neuroscience , 26(5):830–839, 2023. 401 
+
+[28] Richard S Sutton and Andrew G Barto. Reinforcement learning: An introduction . MIT press, 2018. 402 
+
+[29] William Menegas, Korleki Akiti, Ryunosuke Amo, Naoshige Uchida, and Mitsuko Watabe-Uchida. Dopamine 403 
+
+neurons projecting to the posterior striatum reinforce avoidance of threatening stimuli. Nature neuroscience , 21 404 
+
+(10):1421–1430, 2018. 405 
+
+13 
+
+> .CC-BY 4.0 International license available under a was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint (which this version posted July 17, 2026. ;https://doi.org/10.1101/2025.10.10.681616 doi: bioRxiv preprint
+
+Composing the value signal for dopamine-mediated learning A P REPRINT 
+
+[30] Korleki Akiti, Iku Tsutsui-Kimura, Yudi Xie, Alexander Mathis, Jeffrey E Markowitz, Rockwell Anyoha, 406 
+
+Sandeep Robert Datta, Mackenzie Weygandt Mathis, Naoshige Uchida, and Mitsuko Watabe-Uchida. Striatal 407 
+
+dopamine explains novelty-induced behavioral dynamics and individual variability in threat prediction. Neuron ,408 
+
+110(22):3789–3804, 2022. 409 
+
+[31] Isobel Green, Ryunosuke Amo, and Mitsuko Watabe-Uchida. Shifting attention to orient or avoid: a unifying 410 
+
+account of the tail of the striatum and its dopaminergic inputs. Current Opinion in Behavioral Sciences , 59: 411 
+
+101441, 2024. 412 
+
+[32] Francesca Greenstreet, Hernando Martinez Vergara, Yvonne Johansson, Sthitapranjya Pati, Laura Schwarz, 413 
+
+Stephen C Lenzi, Jesse P Geerts, Matthew Wisdom, Alina Gubanova, Lars B Rollik, et al. Dopaminergic action 414 
+
+prediction errors serve as a value-free teaching signal. Nature , pages 1–10, 2025. 415 
+
+[33] Richard Bellman. On the theory of dynamic programming. Proceedings of the national Academy of Sciences , 38 416 
+
+(8):716–719, 1952. 417 
+
+[34] Emanuel Todorov. Efficient computation of optimal actions. Proceedings of the national academy of sciences ,418 
+
+106(28):11478–11483, 2009. 419 
+
+[35] Hilbert J Kappen. Linear theory for control of nonlinear stochastic systems. Physical review letters , 95(20): 420 
+
+200201, 2005. 421 
+
+[36] Emanuel Todorov. Linearly-solvable markov decision problems. Advances in neural information processing 422 
+
+systems , 19, 2006. 423 
+
+[37] Krishnamurthy Dvijotham and Emanuel Todorov. A unifying framework for linearly solvable control. arXiv 424 
+
+preprint arXiv:1202.3715 , 2012. 425 
+
+[38] Payam Piray and Nathaniel D Daw. Linear reinforcement learning in planning, grid fields, and cognitive control. 426 
+
+Nature communications , 12(1):4942, 2021. 427 
+
+[39] Emanuel Todorov. Compositionality of optimal control laws. Advances in neural information processing systems ,428 
+
+22, 2009. 429 
+
+[40] Rachel S Lee, Yotam Sagiv, Ben Engelhard, Ilana B Witten, and Nathaniel D Daw. A feature-specific prediction 430 
+
+error model explains dopaminergic heterogeneity. Nature Neuroscience , pages 1–13, 2024. 431 
+
+[41] David Marr. Vision: A computational investigation into the human representation and processing of visual 432 
+
+information . MIT press, 2010. 433 
+
+[42] Kevin J Miller, Amitai Shenhav, and Elliot A Ludvig. Habits without values. Psychological review , 126(2):292, 434 
+
+2019. 435 
+
+[43] Samuel J Gershman. Origin of perseveration in the trade-off between reward and complexity. Cognition , 204: 436 
+
+104394, 2020. 437 
+
+[44] E Thorndike. Biological lectures from the marine laboratory at woods’ holl, usa, for 1899. Nature , 62:411, 1900. 438 
+
+[45] Sergey Levine. Reinforcement learning and control as probabilistic inference: Tutorial and review. arXiv preprint 439 
+
+arXiv:1805.00909 , 2018. 440 
+
+[46] Tuomas Haarnoja, Haoran Tang, Pieter Abbeel, and Sergey Levine. Reinforcement learning with deep energy-441 
+
+based policies. In International conference on machine learning , pages 1352–1361. PMLR, 2017. 442 
+
+[47] Brian D Ziebart. Modeling purposeful adaptive behavior with the principle of maximum causal entropy . Carnegie 443 
+
+Mellon University, 2010. 444 
+
+[48] John Schulman, Xi Chen, and Pieter Abbeel. Equivalence between policy gradients and soft q-learning. arXiv 445 
+
+preprint arXiv:1704.06440 , 2017. 446 
+
+[49] Pranav Mahajan and Ben Seymour. Soft q(λ) : A multi-step off-policy method for entropy regularised reinforce-447 
+
+ment learning using eligibility traces. arXiv preprint arXiv:2604.13780 , 2026. 448 
+
+[50] Stefan Elfwing and Ben Seymour. Parallel reward and punishment control in humans and robots: Safe reinforce-449 
+
+ment learning using the maxpain algorithm. In 2017 Joint IEEE International Conference on Development and 450 
+
+Learning and Epigenetic Robotics (ICDL-EpiRob) , pages 140–147. IEEE, 2017. 451 
+
+[51] Pranav Mahajan, Shuangyi Tong, Sang Wan Lee, and Ben Seymour. Balancing safety and efficiency in human 452 
+
+decision making. bioRxiv , pages 2024–01, 2024. 453 
+
+[52] Zack Dulberg and Jonathan D Cohen. On the duality of pain and pleasure processing: Why two dimensions of 454 
+
+valence may be better than one. bioRxiv , pages 2025–01, 2025. 455 
+
+14 
+
+> .CC-BY 4.0 International license available under a was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint (which this version posted July 17, 2026. ;https://doi.org/10.1101/2025.10.10.681616 doi: bioRxiv preprint
+
+Composing the value signal for dopamine-mediated learning A P REPRINT 
+
+[53] Stuart J Russell and Andrew Zimdars. Q-decomposition for reinforcement learning agents. In Proceedings of the 456 
+
+20th international conference on machine learning (ICML-03) , pages 656–663, 2003. 457 
+
+[54] Evan M Russek, Ida Momennejad, Matthew M Botvinick, Samuel J Gershman, and Nathaniel D Daw. Predictive 458 
+
+representations can link model-based reinforcement learning to model-free mechanisms. PLoS computational 459 
+
+biology , 13(9):e1005768, 2017. 460 
+
+[55] Peter Dayan and Geoffrey E Hinton. Feudal reinforcement learning. Advances in neural information processing 461 
+
+systems , 5, 1992. 462 
+
+[56] Thomas G Dietterich. Hierarchical reinforcement learning with the maxq value function decomposition. Journal 463 
+
+of artificial intelligence research , 13:227–303, 2000. 464 
+
+[57] Ronald Parr and Stuart Russell. Reinforcement learning with hierarchies of machines. Advances in neural 465 
+
+information processing systems , 10, 1997. 466 
+
+[58] Maaike MH van Swieten and Rafal Bogacz. Modeling the effects of motivation on choice and learning in the 467 
+
+basal ganglia. PLoS Computational Biology , 16(5):e1007465, 2020. 468 
+
+[59] Jack Lindsey and Ashok Litwin-Kumar. Action-modulated midbrain dopamine activity arises from distributed 469 
+
+control policies. arXiv preprint arXiv:2207.00636 , 2022. 470 
+
+[60] Jack Lindsey, Jeffrey E Markowitz, Winthrop F Gillis, Sandeep Robert Datta, and Ashok Litwin-Kumar. Dynamics 471 
+
+of striatal action selection and reinforcement learning. bioRxiv , 2024. 472 
+
+[61] Lucas Lehnert, Stefanie Tellex, and Michael L Littman. Advantages and limitations of using successor features 473 
+
+for transfer in reinforcement learning. arXiv preprint arXiv:1708.00102 , 2017. 474 
+
+[62] Brian F Sadacca, Joshua L Jones, and Geoffrey Schoenbaum. Midbrain dopamine neurons compute inferred and 475 
+
+cached value prediction errors in a common framework. elife , 5:e13665, 2016. 476 
+
+[63] Timothy A Krausz, Alison E Comrie, Ari E Kahn, Loren M Frank, Nathaniel D Daw, and Joshua D Berke. 477 
+
+Dual credit assignment processes underlie dopamine signals in a complex spatial environment. Neuron , 111(21): 478 
+
+3465–3478, 2023. 479 
+
+[64] Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Andrei A Rusu, Joel Veness, Marc G Bellemare, Alex 480 
+
+Graves, Martin Riedmiller, Andreas K Fidjeland, Georg Ostrovski, et al. Human-level control through deep 481 
+
+reinforcement learning. nature , 518(7540):529–533, 2015. 482 
+
+[65] Jackson J Cone, Samantha M Fortin, Jenna A McHenry, Garret D Stuber, James E McCutcheon, and Mitchell F 483 
+
+Roitman. Physiological state gates acquisition and expression of mesolimbic reward prediction signals. Proceed-484 
+
+ings of the National Academy of Sciences , 113(7):1943–1948, 2016. 485 
+
+[66] Peter Dayan. “liking” as an early and editable draft of long-run affective value. PLoS Biology , 20(1):e3001476, 486 
+
+2022. 487 
+
+[67] A Dickinson and B Balleine. The role of learning in motivation in gallistel cr (ed.), steven’s handbook of 488 
+
+experimental psychology: Learning, motivation and emotion (vol. 3, pp. 497–534), 2002. 489 
+
+[68] Genela Morris, Alon Nevet, David Arkadir, Eilon Vaadia, and Hagai Bergman. Midbrain dopamine neurons 490 
+
+encode decisions for future action. Nature neuroscience , 9(8):1057–1063, 2006. 491 
+
+[69] Yael Niv, Nathaniel D Daw, and Peter Dayan. Choice values. Nature neuroscience , 9(8):987–988, 2006. 492 
+
+[70] Pranav Mahajan and Ben Seymour. Entropy regularised reinforcement learning reconciles aversive and action 493 
+
+prediction errors in the tail of the striatum. bioRxiv , pages 2026–07, 2026. 494 
+
+[71] Benjamin Van Niekerk, Steven James, Adam Earle, and Benjamin Rosman. Composing value functions in 495 
+
+reinforcement learning. In International conference on machine learning , pages 6401–6409. PMLR, 2019. 496 
+
+[72] Tuomas Haarnoja, Vitchyr Pong, Aurick Zhou, Murtaza Dalal, Pieter Abbeel, and Sergey Levine. Composable 497 
+
+deep reinforcement learning for robotic manipulation. In 2018 IEEE international conference on robotics and 498 
+
+automation (ICRA) , pages 6244–6251. IEEE, 2018. 499 
+
+15 
+
+> .CC-BY 4.0 International license available under a was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint (which this version posted July 17, 2026. ;https://doi.org/10.1101/2025.10.10.681616 doi: bioRxiv preprint
+
+Composing the value signal for dopamine-mediated learning A P REPRINT 
+
+## Supplementary Figures 500 
+
+Figure S1: MO Q-learning comparison: (A) Two-step MDP with two (diverging) reward functions. (B) Action selection probabilities under additive composition in Linear MDPs. (C) Multi-objective (MO) soft Q-learning leads to better performance than MO Q-learning in this task. MO SARSA comparison: (D) Reward weight w1, denoting change in priorities. (E) Distinct behavioural policies under different priorities. 16 
+
+> .CC-BY 4.0 International license available under a was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint (which this version posted July 17, 2026. ;https://doi.org/10.1101/2025.10.10.681616 doi: bioRxiv preprint
+
+Composing the value signal for dopamine-mediated learning A P REPRINT 
+
+Figure S2: Demonstration of the off-policy learning of optimal values in linear MDP under sub-optimal trajectories (A & B) and under optimal control at different τ (C & D). 
+
+Figure S3: MO SARSA with state-dependent TD-errors, uses ˜δi = wiδi. Neither variant completely avoids the interference and unintended unlearning effect caused by the on-policy nature of MO SARSA. 17 
+
+> .CC-BY 4.0 International license available under a was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint (which this version posted July 17, 2026. ;https://doi.org/10.1101/2025.10.10.681616 doi: bioRxiv preprint
+
+Composing the value signal for dopamine-mediated learning A P REPRINT 
+
+Figure S4: Differences in value propagation between multi-objective (MO) off-policy and on-policy algorithms, while exploring under different policies. Off-policy algorithms propagate optimal values throughout the environment, whereas on-policy algorithms do not. 
+
+Figure S5: Soft maximum composition may not match human behaviour when they are explicitly asked to optimise the weighted sum of rewards across different modalities [ 17 ]. Figures adapted from Tomov et al. [17] with permission from Springer Nature. 18 
+
+> .CC-BY 4.0 International license available under a was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint (which this version posted July 17, 2026. ;https://doi.org/10.1101/2025.10.10.681616 doi: bioRxiv preprint
+
+Composing the value signal for dopamine-mediated learning A P REPRINT 
+
+## Supplementary Methods 501 
+
+SM 1: How does the Boltzmann policy achieve the soft Bellman optimal policy in Linear MDPs? 502 
+
+We here aim to provide an intuitive explanation for known results. Consider the KL divergence between any policy π503 
+
+and the Boltzmann policy πB 
+
+> Q
+
+under some Q-values. 504 
+
+DKL (π(·| s)∥πB
+
+> Q
+
+(·| s)) = Ea∼π [log π(a|s) − log πB
+
+> Q
+
+(a|s)] = Ea∼π [log π(a|s) − log πd(a|s) − Q(s, a )/τ + log Ea∼πd [Q(s, a )/τ ]] = DKL [π∥πd]( s) − Ea∼π [Q(s, a )/τ ] + log Ea∼πd [Q(s, a )/τ ]
+
+(16) We can rearrange this equation and multiply by τ to get Vπ (as per equation 5) on the left-hand side. 505 
+
+Ea∼π [Q(s, a )] − τ D KL [π∥πd]( s) = τ log Ea∼πd [Q(s, a )/τ ] − τ D KL [π∥πB
+
+> Q
+
+]( s) (17) Here, we can see that the left-hand side of the equation (i.e. Vπ (s)) ) is maximised with respect to π, during generalised 506 
+
+policy iteration (GPI), when the KL term on the right-hand side is minimized (as the other term does not depend 507 
+
+on π), and DKL [π∥πB
+
+> Q
+
+]( s) is minimized at π = πB
+
+> Q
+
+. After each GPI, as DKL [π∥πB
+
+> Q
+
+]( s) approaches zero at π = πB
+
+> Q
+
+,508 
+
+we observe that left-hand side of the equation is the "soft" Bellman value function VQ(s). This shows that for fixed 509 
+
+Q-values, the Boltzmann policy is the stochastic greedy policy that maximises value. Under optimal Q-values, this 510 
+
+greedy policy can lead to the Bellman optimal policy in linear MDPs. 511 
+
+During the generalised policy evaluation (GPE), these optimal Q-values can be learnt using any reinforcement learning 512 
+
+algorithm with convergence guarantees. Repeating these generalised policy updates (GPE+GPI) will lead to the optimal 513 
+
+policy π∗ will be given by the Boltzmann policy πB 
+
+> Q∗
+
+. This concludes our intuitive explanation. 514 
+
+SM 2: Theorem for additive composition in Linear MDPs 515 
+
+Theorem 2 (Additive Composition) [72, 71] 516 
+
+Let Q∗ 
+
+> 1,τ
+
+(s, a ) and Q∗ 
+
+> 2,τ
+
+(s, a ) be the optimal entropy-regularized Q-functions for two tasks with rewards r1(s, a ) and 517 
+
+r2(s, a ).518 
+
+Then the reward function for the composed task aimed to ensure both objectives are given by the average of the 519 
+
+individual reward functions: 520 
+
+rc(s, a ) = r1(s, a ) + r2(s, a )2 .
+
+Let the composition of Q-values Qcomp,τ (s, a ) be: 521 
+
+Qcomp,τ (s, a ) = Q∗ 
+
+> 1,τ
+
+(s, a ) + Q∗ 
+
+> 2,τ
+
+(s, a )2 .
+
+The optimal Q-function Q∗ 
+
+> c,τ
+
+(s, a ) for the composed task is bounded by: 522 
+
+Qcomp,τ (s, a ) ≥ Q∗ 
+
+> c,τ
+
+(s, a ) ≥ Qcomp,τ (s, a ) − C∗ 
+
+> τ
+
+(s, a ),
+
+where C∗ 
+
+> τ
+
+is a fixed point of 523 
+
+C∗ 
+
+> τ
+
+= τ Es′∼ρ(s,a )
+
+h
+
+D 12 (π∗ 
+
+> 1
+
+(s)∥π∗ 
+
+> 2
+
+(s)) + max  
+
+> a′
+
+C(s′, a ′)
+
+i
+
+,
+
+where π∗ 
+
+> i
+
+(s) is the optimal Boltzmann policy for task i, and D 12 (·∥· ) is the Rényi divergence of order 12 .524 
+
+19
