@@ -1,0 +1,300 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-23T20:18:34.213617+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 2,
+    "deep_cap": 6,
+    "deep_selected": 2,
+    "quick_candidates": 5,
+    "quick_skim_target": 11,
+    "quick_selected": 5
+  },
+  "deep_dive": [
+    {
+      "id": "2607.19824v1",
+      "source": "arxiv",
+      "title": "Rewarding Better Thinking for LLM Preference Alignment",
+      "abstract": "LLM preference alignment aims to optimize models toward human preferences across diverse user instructions. Reinforcement learning has become a major post-training approach for this goal, but existing proxy rewards are often outcome-level, mainly evaluating the final response while providing limited guidance for the reasoning trajectory. This can make credit assignment coarse when multiple responses receive similar final scores, leaving trajectory-level preferences under-specified. To address this limitation, we propose Thinking Checklist Reward (TCR), a process-oriented reward for RL-based preference alignment. TCR converts preference pairs into sample-specific thinking checklists and uses them to evaluate whether the generated reasoning trace addresses the preference-implied considerations. To reduce overlap with outcome-level supervision, TCR further introduces an exponential moving average (EMA) residual formulation to isolate a complementary thinking surplus beyond what is predictable from the outcome reward. Experiments on five models from three model families show that TCR consistently improves alignment performance across diverse benchmarks, with ablations further validating the importance of EMA-based residual formulation and sample-specific checklist supervision.",
+      "authors": [
+        "Xubo Liu",
+        "Wenya Guo",
+        "Ruxue Yan",
+        "Xinying Qian",
+        "Ying Zhang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-07-22T06:57:55+00:00",
+      "link": "https://arxiv.org/pdf/2607.19824v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "process-oriented reward for RL-based preference alignment",
+      "llm_evidence_cn": "基于强化学习的偏好对齐的过程导向奖励",
+      "llm_evidence": "基于强化学习的偏好对齐的过程导向奖励",
+      "canonical_evidence": "基于强化学习的偏好对齐的过程导向奖励",
+      "llm_tldr_en": "TCR proposes a process-oriented reward for RL-based preference alignment, converting preference pairs into checklists to evaluate reasoning traces, achieving better alignment than outcome-level rewards.",
+      "llm_tldr_cn": "针对RLHF中结果级奖励难以区分不同推理轨迹的问题，本文提出思考检查清单奖励（TCR），通过将偏好对转化为检查清单，对推理过程进行逐项评估。实验证明TCR能有效引导模型产生更优推理，在多个基准上取得更好性能，为偏好对齐提供了过程导向的新视角。",
+      "llm_tldr": "针对RLHF中结果级奖励难以区分不同推理轨迹的问题，本文提出思考检查清单奖励（TCR），通过将偏好对转化为检查清单，对推理过程进行逐项评估。实验证明TCR能有效引导模型产生更优推理，在多个基准上取得更好性能，为偏好对齐提供了过程导向的新视角。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.20083v1",
+      "source": "arxiv",
+      "title": "Co-Evolving LLM Evaluators and Policies via DynamicRubric",
+      "abstract": "Post-training with evaluator feedback on policy-induced samples serves as a major mechanism for improving large language models. As policies improve, these sampled responses become close in quality. These close candidates create a bottleneck for policy optimization: collapsed relative evaluator score gaps yield weak or misleading policy supervision. We theoretically characterize why these gaps matter through a probability allocation view, showing that the directional gain of shifting probability mass from one response to another is exactly the evaluator score gap between them. This identifies relative score gaps as the policy optimization signals that guide updates. Motivated by this view, we propose DynamicRubric, a response-set-conditioned evaluator--policy co-evolution framework that generates weighted binary rubric items for each candidate set and aggregates the resulting judgments into response-level scores. In our experiments with 8B backbones, DynamicRubric improves evaluator performance and provides stronger policy supervision than baselines using a 70B reward model or a 235B static rubric generator. DynamicRubric-optimized policies also show gains on verifiable reasoning and coding tasks. A DynamicRubric-optimized model is fully deployed in WeChat Search's AI answering scenario, where it serves all online traffic across tens of millions of requests per day and improves key online metrics. These results suggest a principle for evaluator-guided post-training: evaluators should evolve with the policies they supervise.",
+      "authors": [
+        "Beining Wang",
+        "Weihang Su",
+        "Hongtao Tian",
+        "Hao Kong",
+        "Tao Yang",
+        "Ting Yao",
+        "Qingyi Pan",
+        "Yueyue Wu",
+        "Qingyao Ai",
+        "Min Zhang",
+        "Yiqun Liu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-22T12:35:40+00:00",
+      "link": "https://arxiv.org/pdf/2607.20083v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Directly addresses reward modeling for LLM post-training via DynamicRubric evaluator-policy co-evolution.",
+      "llm_evidence_cn": "直接针对LLM后训练中的奖励建模，提出DynamicRubric评估器-策略共同进化方法。",
+      "llm_evidence": "直接针对LLM后训练中的奖励建模，提出DynamicRubric评估器-策略共同进化方法。",
+      "canonical_evidence": "直接针对LLM后训练中的奖励建模，提出DynamicRubric评估器-策略共同进化方法。",
+      "llm_tldr_en": "DynamicRubric co-evolves LLM evaluators and policies to maintain useful score gaps for policy optimization in post-training.",
+      "llm_tldr_cn": "LLM后训练中，评估器对政策样本的打分差距随着政策提升而缩小，导致优化信号减弱。本文理论分析指出评估器分数差距正是指导更新的优化信号，并提出DynamicRubric框架，使评估器根据响应集动态调整，从而保持有效分数差距。实验表明该方法能持续提升政策性能。贡献是揭示了分数差距的关键作用并提供了实用解决方案。",
+      "llm_tldr": "LLM后训练中，评估器对政策样本的打分差距随着政策提升而缩小，导致优化信号减弱。本文理论分析指出评估器分数差距正是指导更新的优化信号，并提出DynamicRubric框架，使评估器根据响应集动态调整，从而保持有效分数差距。实验表明该方法能持续提升政策性能。贡献是揭示了分数差距的关键作用并提供了实用解决方案。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.16492v1",
+      "source": "arxiv",
+      "title": "WeedExpert-R1: Incentivizing Botanical Reasoning in MLLMs with Reinforcement Learning for Precision Weed Grounding",
+      "abstract": "Precision weed control requires species-level identification and instance-level localization. However, conventional object detectors use a closed vocabulary, limiting their deployment across regions, and cannot explain their predictions in complex agricultural scenes. Multimodal large language models (MLLMs) offer visual grounding and reasoning capabilities, but insufficient botanical knowledge can cause hallucinations in fine-grained weed identification. This study introduces WeedExpert-R1, a multimodal model that learns visually grounded botanical reasoning through verifiable rewards. A domain-specific Chain-of-Thought synthesis pipeline combines a human-curated botanical trait dictionary with an Auditor-Synthesizer LLM workflow to generate reasoning data for supervised fine-tuning. Group Relative Policy Optimization is then applied with rewards for format, accuracy, instance count, and response length. Across 37 weed species from six datasets, WeedExpert-R1-4B achieved 75.82 percent exact-set precision at an IoU threshold of 0.5, 89.30 percent precision, and 87.81 percent recall. It outperformed proprietary models, including GPT-5.4 and Gemini-3.1-Pro, and larger open-source models, including Qwen3-VL-30B-Instruct and Gemma-4-31B-it. Results on unseen species further demonstrate its open-vocabulary capability and potential for deployment across diverse regions and crops without retraining.",
+      "authors": [
+        "Zonglin Yang",
+        "Wei-Zhen Liang",
+        "Nevin Lawrence",
+        "Xin Qiao",
+        "Benjamin Riggan",
+        "Chi-En Chiang",
+        "Fuchen Li"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-17T20:33:10+00:00",
+      "link": "https://arxiv.org/pdf/2607.16492v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Addresses hallucination in MLLMs via verifiable rewards, directly related to hallucination suppression",
+      "llm_evidence_cn": "通过可验证奖励减少多模态模型幻觉，直接关联幻觉抑制需求",
+      "llm_evidence": "通过可验证奖励减少多模态模型幻觉，直接关联幻觉抑制需求",
+      "canonical_evidence": "通过可验证奖励减少多模态模型幻觉，直接关联幻觉抑制需求",
+      "llm_tldr_en": "WeedExpert-R1 uses reinforcement learning with domain-specific chain-of-thought and verifiable rewards to suppress hallucinations in fine-grained weed identification by multimodal LLMs.",
+      "llm_tldr_cn": "多模态大模型在细粒度杂草识别中因植物学知识不足易产生幻觉。WeedExpert-R1通过领域思维链合成和可验证奖励的强化学习，使模型学习基于视觉的植物学推理。实验证明该方法准确识别杂草并减少幻觉，为多模态模型在精细农业中的应用提供了新范式。",
+      "llm_tldr": "多模态大模型在细粒度杂草识别中因植物学知识不足易产生幻觉。WeedExpert-R1通过领域思维链合成和可验证奖励的强化学习，使模型学习基于视觉的植物学推理。实验证明该方法准确识别杂草并减少幻觉，为多模态模型在精细农业中的应用提供了新范式。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.18796v1",
+      "source": "arxiv",
+      "title": "TSGR: Taobao Search Generative Retrieval",
+      "abstract": "Generative retrieval (GR) has demonstrated strong promise for industrial e-commerce search by training a single autoregressive model to directly generate the Semantic IDs (SIDs) of target items. However, existing GR systems are primarily optimized for semantic matching and remain insensitive to item business value: SID construction is value-unaware, and candidates are ranked without access to item side-info. Consequently, high-value items are often missed or deprioritized at the retrieval stage, limiting downstream business impact. This limitation is particularly critical in industrial settings such as Taobao Search, where business objectives are central to system design. To address this, we propose $\\textbf{T}$aobao $\\textbf{S}$earch $\\textbf{G}$enerative $\\textbf{R}$etrieval ($\\textbf{TSGR}$), a unified generative retrieval framework that incorporates value awareness into both item representation and candidate ranking. 1) For item representation, TSGR introduces $\\textbf{Query-aware Parallel SID (QP-SID)}$, which encodes query-conditioned value orderings into the SID construction by building parallel codebooks derived from query-item statistics, so that higher-value and query-relevant items are assigned better token indices. 2) For candidate ranking, we introduce a $\\textbf{Value-aware Ranking Module (VRM)}$ that is built upon and jointly optimized with the GR, enabling a single model to seamlessly serve as both retriever and pre-ranker without a dedicated pre-ranking stage. A progressive training pipeline further aligns the model with semantic relevance, user preferences, and business objectives. Offline experiments show that TSGR achieves an 9.16% improvement in HR@1000, and online A/B tests further validate its effectiveness, yielding gains of +0.43% in IPV, +1.12% in Transaction Count, and +1.64% in GMV.",
+      "authors": [
+        "Tianyu Zhan",
+        "Gui Ling",
+        "Tong Xiong",
+        "Kunhai Lin",
+        "Yang Wang",
+        "Kaixuan Zhang",
+        "Zhihong Chen",
+        "Yuliang Yan",
+        "Dan Ou",
+        "Shengyu Zhang",
+        "Haihong Tang",
+        "Bo Zheng"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR"
+      ],
+      "published": "2026-07-21T07:17:43+00:00",
+      "link": "https://arxiv.org/pdf/2607.18796v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Proposes TSGR for generative retrieval, improving algorithm to incorporate business value.",
+      "llm_evidence_cn": "提出TSGR生成式检索算法，融入业务价值提升检索效果。",
+      "llm_evidence": "提出TSGR生成式检索算法，融入业务价值提升检索效果。",
+      "canonical_evidence": "提出TSGR生成式检索算法，融入业务价值提升检索效果。",
+      "llm_tldr_en": "TSGR improves generative retrieval by incorporating business value into semantic ID construction and ranking, enhancing retrieval of high-value items.",
+      "llm_tldr_cn": "现有的生成式检索方法只关注语义匹配，忽视了商品业务价值。本文提出淘宝搜索生成式检索(TSGR)，在语义ID构建和排序中融入业务信息，从而提升高价值商品的检索率。实验证明该方法在工业场景中有效提升了业务指标。",
+      "llm_tldr": "现有的生成式检索方法只关注语义匹配，忽视了商品业务价值。本文提出淘宝搜索生成式检索(TSGR)，在语义ID构建和排序中融入业务信息，从而提升高价值商品的检索率。实验证明该方法在工业场景中有效提升了业务指标。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.16955v1",
+      "source": "arxiv",
+      "title": "CADENCE: Closing the Reasoning Gap via Coverage-Adaptive On-Policy Distillation",
+      "abstract": "On-policy knowledge distillation transfers reasoning from large teachers to compact students, but existing approaches suffer three compounding failure modes: (i) cold-start collapse, where a fresh student assigns near-zero mass to teacher-preferred tokens; (ii) state-agnostic divergence scheduling, where time-only forward/reverse-KL interpolation ignores the student's coverage state; and (iii) binary reward sparsity, where pass/fail signals discard information from partially correct traces.   We present CADENCE, a unified framework with a targeted fix for each. Its DRIFT mechanism schedules a per-token convex mixture of forward-KL and reverse-KL surrogate objectives on student-sampled trajectories (per-token surrogates, not sequence-level KL gradient estimators). Six components extend it: (A) COVA, a coverage-adaptive $β$ schedule accelerating the forward-to-reverse transition; (B) FTB, a forking-token boost concentrating gradient at high-entropy positions via a globally-normalized entropy reference; (C) CCD, a dense reward adding numerical-proximity partial credit for incorrect-but-close traces; (D) LAP, brevity-preferential correct-rollout reinforcement; (E) EMR, an entropy-matching calibration regularizer; (F) BSD, a bootstrapped self-distillation phase.   On GSM8K and MATH-500 (corrected 512-token protocol, 5 seeds, reported std), CADENCE distills a 0.5B student from a 1.5B teacher to 69.8 $\\pm$ 0.5% GSM8K pass@1 (from 48.7% pretrained; 63.2% of the teacher gap closed) and to 72.1 $\\pm$ 0.4% with a 3B teacher (76.2% closed), beating the strongest matched-compute label-using baseline (DRIFT+binary reward) by +4.4 $\\pm$ 0.7 points. All experiments run on a single Apple Mac Studio (M-series, 64GB unified memory), showing principled distillation reaches strong reasoning quality without datacenter-scale hardware.",
+      "authors": [
+        "Satyam Kumar",
+        "Saurabh Jha"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-18T20:16:26+00:00",
+      "link": "https://arxiv.org/pdf/2607.16955v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "on-policy distillation addressing cold-start and reward sparsity",
+      "llm_evidence_cn": "面向冷启动和奖励稀疏的政策蒸馏方法改进",
+      "llm_evidence": "面向冷启动和奖励稀疏的政策蒸馏方法改进",
+      "canonical_evidence": "面向冷启动和奖励稀疏的政策蒸馏方法改进",
+      "llm_tldr_en": "CADENCE proposes a coverage-adaptive on-policy distillation framework with DRIFT mechanism to improve reasoning transfer from large teachers to compact students.",
+      "llm_tldr_cn": "针对策略蒸馏中冷启动、状态无关调度和奖励稀疏问题，提出CADENCE框架，通过覆盖率自适应调度、逐token前向-反向KL混合及覆盖奖励机制，显著提升小模型推理能力，实验证明在多项推理基准上优于现有方法。",
+      "llm_tldr": "针对策略蒸馏中冷启动、状态无关调度和奖励稀疏问题，提出CADENCE框架，通过覆盖率自适应调度、逐token前向-反向KL混合及覆盖奖励机制，显著提升小模型推理能力，实验证明在多项推理基准上优于现有方法。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.20152v1",
+      "source": "arxiv",
+      "title": "Active Inference as a Convex Markov Decision Process",
+      "abstract": "Active Inference (AIF) frames adaptive behavior as the minimization of expected free energy (EFE), combining epistemic and pragmatic objectives within a single variational principle. We frame AIF as policy optimization and show that, for closed-loop control policies, EFE minimization can be formulated as a convex Markov decision process (MDP). In this formulation, the pragmatic terms are linear in the predictive state marginals and therefore equivalent to reward maximization in a latent MDP, while the epistemic value introduces a nonlinear component that distinguishes EFE minimization from standard reinforcement learning. This perspective further reveals the epistemic drive of active inference as a policy-dependent (performative) reward. We analyze finite-horizon, discounted, and average-reward formulations of EFE and derive a mirror descent (MD) algorithm that locally linearizes the objective around the current state marginals, yielding a policy-dependent reward that is compatible with actor-critic methods and dynamic programming. Finally, we argue that coupling world-model learning with policy optimization gives active inference the structure of performative reinforcement learning, providing a route toward grounding active inference within modern reinforcement learning and optimization theory, including convergence analysis and principled policy improvement guarantees.",
+      "authors": [
+        "Nikola Milosevic",
+        "Nicolás Hinrichs",
+        "Nico Scherf"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "stat.ML"
+      ],
+      "published": "2026-07-22T13:52:40+00:00",
+      "link": "https://arxiv.org/pdf/2607.20152v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Formulates active inference as a convex MDP with mathematical rigor, relevant to math formulation of reinforcement learning",
+      "llm_evidence_cn": "用凸MDP严格形式化主动推理，与数学形式化需求相关",
+      "llm_evidence": "用凸MDP严格形式化主动推理，与数学形式化需求相关",
+      "canonical_evidence": "用凸MDP严格形式化主动推理，与数学形式化需求相关",
+      "llm_tldr_en": "This paper reformulates active inference as a convex Markov decision process, revealing its equivalence to reward maximization in a latent MDP and its unique epistemic drive.",
+      "llm_tldr_cn": "主动推理将适应性行为定义为最小化预期自由能。本文将其重新形式化为凸马尔可夫决策过程，揭示其认知驱动可视为策略依赖奖励。理论分析表明主动推理在有限期折扣设置下可转化为凸优化问题，为理解智能行为提供了数学框架。",
+      "llm_tldr": "主动推理将适应性行为定义为最小化预期自由能。本文将其重新形式化为凸马尔可夫决策过程，揭示其认知驱动可视为策略依赖奖励。理论分析表明主动推理在有限期折扣设置下可转化为凸优化问题，为理解智能行为提供了数学框架。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "math formulation",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.17063v1",
+      "source": "arxiv",
+      "title": "When LLMs Over-Answer: Measuring and Mitigating Quality Issues in LLM-Based Hardware Description Language Question Answering",
+      "abstract": "The rapid advancement of large language models (LLMs) has led practitioners to increasingly rely on them for answering questions about hardware description languages (HDLs). Because HDL is ultimately synthesized into physical hardware, an imprecise or redundant answer can propagate into timing violations or non-synthesizable logic that surface only late in the design flow, making the quality of HDL answers especially consequential. However, the quality of LLM-generated responses, particularly in comparison with answers provided by human experts, remains unclear. To investigate this question, we collect 6,246 HDL Q&A posts with accepted answers from Stack Overflow and curate them into a dataset, organized into a taxonomy of four main categories (Conceptual, Debugging, Generation, and Optimization) and ten subcategories. Using this dataset, we design a user study conducted with 19 HDL engineers with one to three years of experience. Our findings reveal a pervasive over answering tendency: LLMs supply correct content but bury it under redundant alternatives (65.7%) and verbose padding (69.1%), while nearly half of answers (49.0%) fail to fully align with expert answers yet participants still preferred LLM responses for readability (58.3%). Motivated by these findings, we propose a multi-agent framework for improving LLM-based HDL question answering. We evaluate answer quality using an LLM-as-Judge and two structural metrics: the number of core answers, which reflects redundancy since LLMs often provide multiple alternative solutions, and the length of non-core content, which reflects verbosity. Evaluated on the four mainstream LLMs, our framework increases the average core-answer quality score from 3.71 to 4.67 (+0.96) and the non-core content quality from 3.72 to 4.23 (+0.51), on a five-point scale.",
+      "authors": [
+        "Ziteng Hu",
+        "Jiachi Chen",
+        "Wenhao Lv",
+        "Huan Zhang",
+        "Yingjie Xia"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-19T04:12:38+00:00",
+      "link": "https://arxiv.org/pdf/2607.17063v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Addresses over-answering and quality mitigation in LLMs, akin to hallucination suppression",
+      "llm_evidence_cn": "解决LLM过度回答和质量缓解问题，类似于幻觉抑制",
+      "llm_evidence": "解决LLM过度回答和质量缓解问题，类似于幻觉抑制",
+      "canonical_evidence": "解决LLM过度回答和质量缓解问题，类似于幻觉抑制",
+      "llm_tldr_en": "The paper investigates quality issues in LLM-based HDL QA, finding that models often over-answer with imprecise or redundant details; it curates a dataset and provides insights for mitigation.",
+      "llm_tldr_cn": "该论文研究了基于大语言模型的硬件描述语言问答中的质量问题，发现模型常常过度回答，提供不精确或冗余的细节。作者收集了6246个Stack Overflow问答对并分析了回答质量，提出了缓解策略，有助于提升LLM在专业领域的回答可靠性。",
+      "llm_tldr": "该论文研究了基于大语言模型的硬件描述语言问答中的质量问题，发现模型常常过度回答，提供不精确或冗余的细节。作者收集了6246个Stack Overflow问答对并分析了回答质量，提出了缓解策略，有助于提升LLM在专业领域的回答可靠性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
