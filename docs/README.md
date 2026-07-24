@@ -6,45 +6,41 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-23
-- 运行时间：2026-07-23 20:23:39 UTC
+- 最新运行日期：2026-07-24
+- 运行时间：2026-07-24 20:33:56 UTC
 - 运行状态：成功
 - 本次总论文数：7
-- 精读区：2
-- 速读区：5
+- 精读区：4
+- 速读区：3
 
 ### 今日简报（AI）
-今日推荐数据共7篇，精读聚焦于通过动态规则协同进化评估器与策略、以及奖励更优思考以对齐LLM偏好的两篇高分论文。
-
-最值得关注的方向：LLM偏好对齐中“奖励思考过程”的策略，以及评估器与策略的动态协同进化机制。
-
-建议普通读者优先精读这两篇9.0分论文，理解其核心思想后，再根据自身需求选择性速读其余三篇7.0分论文以拓展应用场景。
-- 详情：[/202607/23/README](/202607/23/README)
+今日精读2篇高分论文，分别聚焦大语言模型自解释忠实性与多模态幻觉细粒度诊断。最值得关注的方向是提升模型解释可靠性及多模态幻觉检测技术。建议优先精读这两篇9分论文，深入理解其方法框架与应用场景。
+- 详情：[/202607/24/README](/202607/24/README)
 
 ### 精读区论文标签
-1. [Rewarding Better Thinking for LLM Preference Alignment](/202607/23/2607.19824v1-rewarding-better-thinking-for-llm-preference-alignment)  
+1. [Training Large Language Models for Self-Explanation Faithfulness](/202607/24/2607.21090v1-training-large-language-models-for-self-explanation-faithfulness)  
    标签：评分：9.0/10、query:lpt
-   evidence：基于强化学习的偏好对齐的过程导向奖励
-2. [Co-Evolving LLM Evaluators and Policies via DynamicRubric](/202607/23/2607.20083v1-co-evolving-llm-evaluators-and-policies-via-dynamicrubric)  
+   evidence：直接优化自解释忠实性的强化学习方法，用于抑制幻觉
+2. [HalluScope: Fine-grained Hallucination Diagnosis for Multimodal Large Language Models](/202607/24/2607.21105v1-halluscope-fine-grained-hallucination-diagnosis-for-multimodal-large-language-models)  
    标签：评分：9.0/10、query:lpt
-   evidence：直接针对LLM后训练中的奖励建模，提出DynamicRubric评估器-策略共同进化方法。
+   evidence：直接针对多模态大语言模型的幻觉抑制问题
+3. [A Safeguarded Projected-Gradient Framework for Complementarity-Constrained Least-Squares Problems](/202607/24/2607.20786v1-a-safeguarded-projected-gradient-framework-for-complementarity-constrained-least-squares-problems)  
+   标签：评分：8.0/10、query:lpt
+   evidence：针对互补约束最小二乘问题的安全投影梯度框架及其收敛性分析
+4. [GRADRAG: Cross-Component Prompt Adaptation for Coordinated Multi-Agent RAG](/202607/24/2607.21324v1-gradrag-cross-component-prompt-adaptation-for-coordinated-multi-agent-rag)  
+   标签：评分：8.0/10、query:lpt
+   evidence：通过跨组件提示适应提升RAG质量并减少幻觉
 
 ### 速读区论文标签
-1. [WeedExpert-R1: Incentivizing Botanical Reasoning in MLLMs with Reinforcement Learning for Precision Weed Grounding](/202607/23/2607.16492v1-weedexpert-r1-incentivizing-botanical-reasoning-in-mllms-with-reinforcement-learning-for-precision-weed-grounding)  
+1. [The Matryoshka Hypencoder](/202607/24/2607.17457v1-the-matryoshka-hypencoder)  
    标签：评分：7.0/10、query:lpt
-   evidence：通过可验证奖励减少多模态模型幻觉，直接关联幻觉抑制需求
-2. [CADENCE: Closing the Reasoning Gap via Coverage-Adaptive On-Policy Distillation](/202607/23/2607.16955v1-cadence-closing-the-reasoning-gap-via-coverage-adaptive-on-policy-distillation)  
+   evidence：通过套娃式多尺寸表示改进了Hypencoder检索算法
+2. [PATS: Policy-Aware Training Scaffolding for Agentic Reinforcement Learning](/202607/24/2607.21419v1-pats-policy-aware-training-scaffolding-for-agentic-reinforcement-learning)  
    标签：评分：7.0/10、query:lpt
-   evidence：面向冷启动和奖励稀疏的政策蒸馏方法改进
-3. [When LLMs Over-Answer: Measuring and Mitigating Quality Issues in LLM-Based Hardware Description Language Question Answering](/202607/23/2607.17063v1-when-llms-over-answer-measuring-and-mitigating-quality-issues-in-llm-based-hardware-description-language-question-answering)  
-   标签：评分：7.0/10、query:lpt
-   evidence：解决LLM过度回答和质量缓解问题，类似于幻觉抑制
-4. [TSGR: Taobao Search Generative Retrieval](/202607/23/2607.18796v1-tsgr-taobao-search-generative-retrieval)  
+   evidence：提出了面向LLM智能体强化学习的以策略为中心的训练支架，是一种算法改进
+3. [Transitive reasoning as linear classification](/202607/24/biorxiv-10-64898-2026-06-24-734346-v2-transitive-reasoning-as-linear-classification)  
    标签：评分：6.0/10、query:lpt
-   evidence：提出TSGR生成式检索算法，融入业务价值提升检索效果。
-5. [Active Inference as a Convex Markov Decision Process](/202607/23/2607.20152v1-active-inference-as-a-convex-markov-decision-process)  
-   标签：评分：6.0/10、query:lpt
-   evidence：用凸MDP严格形式化主动推理，与数学形式化需求相关
+   evidence：将传递推理形式化为线性分类，使用最小二乘估计
 
 
 <div class="dpr-home-promo-card">

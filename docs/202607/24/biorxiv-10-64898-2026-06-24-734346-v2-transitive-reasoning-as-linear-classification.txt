@@ -1,0 +1,1290 @@
+Title: Transitive reasoning as linear classification
+
+URL Source: https://www.biorxiv.org/content/10.64898/2026.06.24.734346v2.full.pdf
+
+Number of Pages: 29
+
+Markdown Content:
+1
+
+## Transitive reasoning as linear classification 1
+
+2
+
+Abbreviated title: Transitive inference is linear 3
+
+4
+
+Vincent P. Ferrera 1,2,3,8 , Samuel Lippl 1,2 , Kenneth Kay 3, Fabian Munoz 1,2 , Yuhao Jin 4, Greg 5
+
+Jensen 5, Herbert S. Terrace 6,7 
+
+6
+
+7
+
+1. Department of Neuroscience, Columbia University, NY, NY, 10027 8
+
+2. Zuckerman Mind Brain Behavior Institute, Columbia University, NY, NY, 10027 9
+
+3. Flatiron Institute, NY, NY, 10010 10 
+
+4. Department of Biology, Columbia University, NY, NY, 10027 11 
+
+5. Reed College, Portland, OR, 97202 12 
+
+6. Department of Psychology, Columbia University, NY, NY, 10027 13 
+
+7. Department of Psychiatry, Columbia University, NY, NY, 10032 14 
+
+8. Kavli Institute for Brain Sciences, Columbia University, NY, NY, 10027 15 
+
+16 
+
+Keywords: inference, least squares estimation, symbolic distance effect, transitive generalization, 17 
+
+decision-making, transverse patterning, perceptron 18 
+
+19 
+
+20 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted July 21, 2026. ;https://doi.org/10.64898/2026.06.24.734346 doi: bioRxiv preprint
+
+2
+
+## Abstract 21 
+
+Transitive inference (TI) is the ability to reason about transitive relationships in an 22 
+
+ordered set of items (e.g., if A>B and B>C, then A>C). TI is widely held to depend on a linear 23 
+
+representation of the serial (rank) order of those items. By what computational mechanism is 24 
+
+such an ordering constructed during learning, and how is it used to make choices that obey 25 
+
+transitivity? Here we take a minimalist approach, applying least-squares estimation (LSE) to a 26 
+
+serial learning task commonly used to test TI in humans and animals. In this formulation, LSE 27 
+
+computes a linear classifier that maps task conditions onto behavioral outcomes. This algorithm 28 
+
+makes no explicit assumptions about transitivity or serial order, yet it reproduces key empirical 29 
+
+features of TI; namely, the ability to generalize beyond the training set, and a symbolic distance 30 
+
+effect (SDE) in performance accuracy. Applying the classifier to individual items produces an 31 
+
+internally ordered representation of rank from which both generalization and the SDE naturally 32 
+
+emerge. The approach also yields a decision mechanism, in the form of a differencing operation, 33 
+
+for selecting the correct item from any pair. These findings reframe TI as a linear classification 34 
+
+problem, challenging conventional assumptions about the cognitive mechanisms required for 35 
+
+transitive reasoning. 36 
+
+37 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted July 21, 2026. ;https://doi.org/10.64898/2026.06.24.734346 doi: bioRxiv preprint
+
+3
+
+## Introduction 38 
+
+Computational models of cognitive tasks are often built around complex, neurally 39 
+
+inspired algorithms that seek to capture the richness and dynamics of underlying cognitive 40 
+
+processes. Such models are validated by their ability to reproduce behavioral and neural 41 
+
+responses observed in living subjects. To understand what these models reveal about cognition, 42 
+
+however, it is equally important to understand the computational complexity of the task itself. 43 
+
+Can simple, ostensibly non-neural algorithms illuminate how cognitive tasks are solved? Here we 44 
+
+show that serial learning with transitive inference can be solved by a standard least-squares 45 
+
+linear estimation (LSE) algorithm that reduces TI to linear classification. In contrast to neural 46 
+
+network and reinforcement learning approaches, which involve many free parameters, the LSE 47 
+
+algorithm has no residual degrees of freedom. Yet it exhibits emergent hallmarks of TI 48 
+
+performance, including generalization to out-of-training-set comparisons and the oft-reproduced 49 
+
+symbolic distance effect in performance accuracy. 50 
+
+Transitive inference (TI) is a classic paradigm widely used to study reasoning in humans 51 
+
+and animals. An early example is the problem: “Edith has fairer hair than Suzanne, and Edith 52 
+
+has darker hair than Lili. Does Suzanne have darker hair than Lili?” (Piaget, 1928). Such 53 
+
+problems can be presented to animals in non-verbal form, and every vertebrate species that has 54 
+
+been tested has shown some ability to make transitive inferences (Jensen 2017). The ability to 55 
+
+perform TI has been put forth as evidence of logical reasoning in animals (McGonigle and 56 
+
+Chalmers 1977). 57 
+
+TI is a component of serial, relational learning and extends to ordered sets much larger 58 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted July 21, 2026. ;https://doi.org/10.64898/2026.06.24.734346 doi: bioRxiv preprint
+
+4
+
+than 3 items (Treichler et al., 2003, 2007). A key aspect of TI is that training on a small set of 59 
+
+premises about ordinal relationships allows subjects to make inferences about many untrained 60 
+
+relations. Thus, if a ranked set of 7 items is written as A>B>C>D>E>F>G, then learning the 61 
+
+order of the six adjacent pairs (A>B, B>C, ..., F>G) allows one to infer the correct order of 62 
+
+the 15 non-adjacent pairs (e.g. B>D). As the set of premises increases linearly, the number of 63 
+
+possible inferences grows exponentially. 64 
+
+Over the past few decades, many computational models of TI have been proposed 65 
+
+(Wynne 1995; Wu & Levy 2001; De Lillo et al., 2001; Vasconcelos 2008; Kumaran & 66 
+
+McClelland 2013; Rombouts et al., 2015; Jensen et al., 2015; Kumaran et al., 2016; Lazareva et 67 
+
+al., 2020; Ciranka et al., 2022; Kay et al., 2024; Miconi & Kay 2023; Nelli et al., 2023; 68 
+
+DiAntonio et al., 2024). Jensen et al. (2019) conducted an extensive analysis of reinforcement 69 
+
+learning algorithms applied to TI tasks, finding that the most successful algorithms exploit 70 
+
+transitivity to explicitly construct an ordered representation, thereby enabling generalization 71 
+
+and symbolic distance effects. 72 
+
+A recent study (Lippl et al., 2024) used mathematical first principles to derive minimal 73 
+
+conditions for performing TI and showed that linear stimulus-response mappings necessarily 74 
+
+generalize transitively. This analysis raised the possibility of a radically simplified framework for 75 
+
+analyzing TI using linear classification. The present study explores that possibility with the aim 76 
+
+of clarifying the mathematical basis of transitive inference. 77 
+
+In living subjects, TI is often tested using a limited set of trial conditions, each repeated 78 
+
+roughly 10–20 times to obtain reliable estimates of performance metrics such as accuracy and 79 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted July 21, 2026. ;https://doi.org/10.64898/2026.06.24.734346 doi: bioRxiv preprint
+
+5
+
+response time. Such repetitive testing is typical of laboratory paradigms with finite sets of 80 
+
+stimuli, responses, outcomes, and contexts, and may allow subjects to develop an implicit sense 81 
+
+of the overall task structure—including not just the task rules but also systematic relationships 82 
+
+between stimuli, responses, and outcomes. TI, like many behavioral paradigms used to probe 83 
+
+high-level cognition in animals, can be formalized as a set of stimulus-response-outcome 84 
+
+mappings. These mappings can be expressed mathematically as a system of linear equations, 85 
+
+admitting a solution—that is, a linear classifier—via least-squares estimation (LSE). The 86 
+
+present study applies this framework to a standard TI task and demonstrates that essential 87 
+
+features of TI behavior emerge naturally from linear classification. Although TI may appear 88 
+
+computationally complex and fundamentally nonlinear, this work establishes that it can be 89 
+
+solved by a simple linear mapping and explores some consequences of this observation. 90 
+
+91 
+
+## Methods 92 
+
+Transitive inference transfer task. 93 
+
+In a typical laboratory TI task ( Fig. 1 ), a set of 7 images is randomly selected from a 94 
+
+large image database. A different set of images is used for each session, and none of these 95 
+
+images have been previously presented to the subject. To create an ordered list, the 96 
+
+experimenter assigns each stimulus a unique rank, usually indicated by a letter from A to G 97 
+
+(Fig. 1A ). Stimulus rank is never revealed to the subject, nor is there any information about 98 
+
+serial order in the spatial or temporal presentation of stimuli. 99 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted July 21, 2026. ;https://doi.org/10.64898/2026.06.24.734346 doi: bioRxiv preprint
+
+6
+
+The task is presented to the subject as a series of trials. During each trial ( Fig. 1B) two 100 
+
+stimuli are displayed equidistant from the center of the screen in opposite locations. The 101 
+
+subject’s task is to select the 102 
+
+stimulus with the higher 103 
+
+rank (lower ordinal) by 104 
+
+touching it, moving a mouse 105 
+
+cursor, or making an eye 106 
+
+movement. Ranks are 107 
+
+initially unknown, so initial 108 
+
+performance is at chance. 109 
+
+Performance improves over 110 
+
+the course of a few hundred 111 
+
+trials through trial-and-error 112 
+
+learning of the correct response to each stimulus pair. 113 
+
+The task is designed to show transfer of ordinal knowledge from an initial training phase 114 
+
+to a subsequent testing phase. In the training phase, stimuli are presented in pairs ( Fig. 1B ). 115 
+
+Each pair comprises stimuli whose ordinal positions are adjacent in the list (A/B, B/C, C/D, 116 
+
+etc., Fig. 1C ). For a 7-item list, there are 6 adjacent stimulus pairs; with positional 117 
+
+counterbalancing, this yields 12 unique trials. 118 
+
+In the testing phase of the experiment, all possible pairwise combinations of the 7 stimuli 119 
+
+are presented ( Fig. 1D ), one pair per trial. As in the training phase, the correct response is to 120 
+
+Figure 1. Transitive Inference Transfer Task. This task tests subjects’ ability to learn the implied serial order of a set of images from pairwise presentations. A. Set of 7 random images is arranged in an ordered list (A>B>C>D>E>F>G). A novel set of images is used for each behavioral session. B. A pair of choice trials presenting the pair D/E, with spatial position counterbalanced. C. Adjacent pairs used for the training phase of the session. D. All pairs used for the testing phase. 
+
+# A > B > C > D > E > F > G 
+
+Test All Pairs Train Adjacent Pairs D E E D
+
+ABC Dleft/ right A B C D E F GA AB                                                             
+
+> BBA BC
+> CCB CD
+> DDC DE
+> EED EF FFE FG
+> GGF
+> left/ right ABCDEFGAAB AC AD AE AF AG
+> BBA BC BD BE BF BG
+> CCA CB CD CE CF CG
+> DDA DB DC DE DF DG
+> EEA EB EC ED EF EG
+> FFA FB FC FD FE FG
+> GGA GB GC GD GE GF
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted July 21, 2026. ;https://doi.org/10.64898/2026.06.24.734346 doi: bioRxiv preprint
+
+7
+
+choose the higher-ranking stimulus. This tests the subjects’ ability to transfer knowledge of list 121 
+
+order, acquired during adjacent-pair training, to untrained non-adjacent pairs. For a 7-item list, 122 
+
+there are 21 possible pairs (6 adjacent, 15 non-adjacent), yielding 42 unique trials with 123 
+
+positional counterbalancing. Transfer is defined as correct choice on first presentation of a non-124 
+
+adjacent pair, having been trained only on adjacent pairs. As TI lists grow longer, the number 125 
+
+of adjacent pairs increases linearly while the number of non-adjacent pairs grows exponentially; 126 
+
+thus, learning a small set of adjacent premise pairs allows one to infer a much larger set of 127 
+
+ordinal relationships. 128 
+
+129 
+
+Simulations 130 
+
+Simulations were run in Matlab 2023b. Code available on request. 131 
+
+132 
+
+## Results 133 
+
+Intuition for theoretical framework 134 
+
+To develop an intuition for how linear classification can solve TI, we begin with a simple 135 
+
+example in which a set of n = 4 stimuli is mapped onto a linear ranking ( Fig. 2 ). Each stimulus 136 
+
+is characterized by three numbers ( p = { p1, p 2, p 3}), which can be plotted in a 3D space ( Fig. 137 
+
+2A ). These numbers can be thought of as stimulus features. For example, they could 138 
+
+represent the color, shape, and size of the stimuli. These properties are assigned at random, and 139 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted July 21, 2026. ;https://doi.org/10.64898/2026.06.24.734346 doi: bioRxiv preprint
+
+8
+
+the stimuli are not necessarily ordered in the feature space. However, a vector, x, that maps 140 
+
+each stimulus to its rank order, can be found by linear estimation ( Fig. 2B ). This vector 141 
+
+assigns a weight to each stimulus feature, p. When the feature vectors are multiplied by the 142 
+
+mapping vector ( 𝒑 ∗ 𝒙 ), the result is a one-dimensional rank ordering of the original stimuli 143 
+
+(Fig. 2C ). The resulting order obeys transitivity even when the original feature-space 144 
+
+representation does not. Once ranked, stimuli can be compared across any pair based on relative 145 
+
+rank, including non-adjacent pairs not used to generate the ranking. This approach is fully 146 
+
+general: given any ranked ordering of the n items, there exists a mapping vector (classifier) x147 
+
+that converts the item characteristics, p, into that ranked ordering, provided each item’s 148 
+
+characteristics, p, consist of at least n-1 values and that each item’s characteristics are distinct 149 
+
+(or, more precisely, linearly independent) from those of other items. While Fig. 2 presents one 150 
+
+particular mapping (with the red diamond as the best item and the purple triangle as the 151 
+
+worst), other mapping vectors x could instead be used to obtain any other ranking. The key 152 
+
+point is that, given a set of stimuli with measured attributes, a set of weights can always be 153 
+
+found that achieves a desired ranking and that set of weights is a linear classifier. 154 
+
+Figure 2. Mapping a set of items with random features onto a linear ranking. A) Items with random features plotted in 3D feature space. B) Mapping vector ( x). C) Ordering achieved by applying the mapping, x, to each item. 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted July 21, 2026. ;https://doi.org/10.64898/2026.06.24.734346 doi: bioRxiv preprint
+
+9
+
+155 
+
+Standard TI Task with Transfer 156 
+
+A typical 7-item transitive inference task can be described as a system of linear 157 
+
+equations. To formalize this, a set of n = 7 unique stimuli is generated (the analysis generalizes 158 
+
+to larger sets). Although laboratory tasks often use pictorial images, a simpler stimulus 159 
+
+representation suffices here. Each stimulus is tokenized as a row vector of p = 7 elements, where 160 
+
+each element is assigned a random value between 0 and 1; p is referred to as the description 161 
+
+length . The stimulus vector can be thought of as a unique “bar code” for each stimulus. 162 
+
+Each of the seven stimuli is randomly assigned a unique rank, indicated by the letters A 163 
+
+through G, creating an ordered list ( Fig. 1A ). The task is presented to participants as a series 164 
+
+of discrete trials. During each trial ( Fig. 1B ), two stimuli are presented. The correct response is 165 
+
+to choose the stimulus with the higher rank (e.g., choose A from the pair A/B). 166 
+
+The training set comprises the six adjacent stimulus pairs (A/B, B/C, C/D, D/E, E/F, 167 
+
+F/G, Fig. 1C ). Each pair is presented in both spatial configurations—once with the higher-168 
+
+ranked stimulus on the left and once on the right. The testing set ( Fig. 1D ) comprises all pairs, 169 
+
+adjacent and non-adjacent, presented in both spatial configurations. Spatial counterbalancing 170 
+
+ensures the decision is non-trivial: because there are two possible response locations for each 171 
+
+stimulus pair, the subject cannot respond correctly without identifying the relative ranks of the 172 
+
+presented stimuli. 173 
+
+All of the task elements described above are incorporated into a “task design matrix,” or 174 
+
+embedding ,W, that represents the training set as a ( 2(𝑛 − 1) × 2𝑝 ) matrix (Fig. 3A ). Each 175 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted July 21, 2026. ;https://doi.org/10.64898/2026.06.24.734346 doi: bioRxiv preprint
+
+10 
+
+matrix row represents a trial condition by concatenating the individual vectors of the two 176 
+
+stimuli presented during that trial. The columns of W are the stimulus features. Thus, the 177 
+
+first row is [ A1…Ap, B1…Bp]. The second row is [ B1…Bp, A1…Ap]. The third row is [ B1…Bp,178 
+
+C1…Cp], and so forth. 179 
+
+The trial outcomes are encoded in a 2𝑝 𝑥 2 matrix, y, where the columns represent the 180 
+
+two choices (left and right); 1 and -1 are values that encode the correct and incorrect responses 181 
+
+(Fig. 3C ). This representation assigns a distinct value to each choice option. However, the 182 
+
+second column of y is redundant, being the negation of the first. The outcome representation 183 
+
+can thus be simplified to a single column vector where +1 represents correct leftward choices 184 
+
+and -1 represents correct rightward choices. This simplification does not affect any of the 185 
+
+following results. 186 
+
+The solution to the task is the matrix, x, ( Fig. 3B ) that maps W onto y. This linear 187 
+
+classifier can be found by least-squares estimation (LSE): 188 
+
+Figure 3. Setup for solving 7-item TI task with LSE. A) Task representation (embedding) W. Trial conditions are represented across rows, stimulus features across columns. Each row contains a stimulus pair in a particular spatial configuration. B) Mapping vector ( x). C) Outcome matrix ( y). 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted July 21, 2026. ;https://doi.org/10.64898/2026.06.24.734346 doi: bioRxiv preprint
+
+11 
+
+Eqn 2. 𝑥 = 𝑝𝑠𝑒𝑢𝑑𝑜𝑖𝑛𝑣𝑒𝑟𝑠𝑒 (𝑊 ! ∗ 𝑊) ∗ 𝑊 ! ∗ 𝑦 189 
+
+using the Moore-Penrose inverse (Moore 1920, Penrose 1955). The solution, x, is two-fold anti-190 
+
+symmetric; x1…2p,1 = -x1…2p,2 and x1…p,i = -x p+1…2p,i , i = 1,2. Hence, we can ignore the second column 191 
+
+of x (x1…2p,2 ) and set x = x1…2p,1 in the following. The remaining column of x can be divided into 192 
+
+two halves (elements 1 thru p, and p+1 thru 2 p) and plotted as in Fig. 4A . The solution has 193 
+
+𝑝 − (𝑛 − 1) = 0 residual degrees of freedom. Performance plateaus when the description length 194 
+
+𝑝 = (𝑛 − 1). Increasing the description length further increases the length of the classifier, x,195 
+
+but does not improve or impair performance. Indeed, the bar codes could be replaced with 196 
+
+photographic images such as those used in laboratory TI studies, which typically have 197 
+
+description lengths in the thousands (proportional to the number of pixels), and performance 198 
+
+would remain unchanged. 199 
+
+To understand how the solution to Eqn. 2 relates to transitive inference, we first note 200 
+
+that x creates an ordered representation of stimulus rank, i.e. the “mental line” that features in 201 
+
+nearly every theoretical treatment of TI. To create the mental line, consider the inner product 202 
+
+Figure 4. LSE solution to 7-item TI task. A) Elements of the mapping vector or “classifier” ( x). B)Implied rank ( Stimulus vector * x) for left (red) and right (blue) items. C) Array of margins for all pairs. Numbers are symbolic distances. 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted July 21, 2026. ;https://doi.org/10.64898/2026.06.24.734346 doi: bioRxiv preprint
+
+12 
+
+or margin, M, of any given stimulus, U, with the mapping, x:203 
+
+Eqn. 3. M = [ U1…Up] * [ x1… x p]204 
+
+Where [ U1…Up] is the vector that represents the given stimulus. These inner products decrease 205 
+
+in magnitude ( Fig. 4B, red symbols ) with decreasing stimulus rank, demonstrating that 206 
+
+weighting the individual stimuli by the linear classifier creates a strictly ordered ranking. This 207 
+
+ranking can be used to make choices that obey transitivity. 208 
+
+209 
+
+Decision Mechanism 210 
+
+The LSE solution incorporates a mechanism for choosing the correct stimulus from each 211 
+
+pair. First, note that the classifier, x, is anti-symmetric ( Fig. 4A) such that the lower half of x212 
+
+is the negative of the upper half. This points to a differencing mechanism in which the margin 213 
+
+(inner product), M, for any generic stimulus pair, U/V , is equal to: 214 
+
+Eqn. 4. M = [ U1…Up] * [ x1… x p] – [ V1…Vp] * [x1… x p]215 
+
+The decision rule is that when the sign of M is positive, the stimulus on the left is chosen; when 216 
+
+M is negative, the stimulus on the right is chosen. Due to the anti-symmetry of the classifier, 217 
+
+the subtraction happens automatically by taking the inner product of the trial vector 218 
+
+(constructed by concatenating the stimulus vectors U and V) and the classifier, x. The sign of 219 
+
+the inner product determines the choice. This decision mechanism is embedded in the LSE 220 
+
+solution and does not require any additional computations. 221 
+
+222 
+
+Transitive generalization 223 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted July 21, 2026. ;https://doi.org/10.64898/2026.06.24.734346 doi: bioRxiv preprint
+
+13 
+
+The linear classifier derived from Eqn 2 when the design matrix contains only adjacent 224 
+
+pairs generalizes to non-adjacent pairs that were not included in computing the LSE solution. 225 
+
+To demonstrate generalization, the classifier, x, is applied to each non-adjacent pair to produce 226 
+
+a scalar margin ( Mi,j ). E.g. for the pair B/D with B on the left, the margin is the inner product: 227 
+
+Eqn. 5. M2,4 = [ B1…Bp, D1…Dp] * x228 
+
+As per the decision mechanism described above, if Mi,j is positive, then the stimulus on the left 229 
+
+is chosen. If Mi,j is negative, the stimulus on the right is chosen. The complete set of margins 230 
+
+for all pairs of stimuli is shown in Fig. 4C . The colors indicate that the sign of the margin is 231 
+
+correct for each non-adjacent pair (blue = positive = choose the stimulus on the left; red = 232 
+
+negative = choose the stimulus on the right). Hence, solving 𝑾 ∗ 𝒙 = 𝒚 for adjacent pairs 233 
+
+produces a classifier, x, that generalizes such that taking the inner product of any non-adjacent 234 
+
+pair with x produces a scalar margin whose sign indicates the correct choice. 235 
+
+236 
+
+Symbolic Distance Effect 237 
+
+The linear classifier produces a symbolic distance effect when applied to all stimulus 238 
+
+pairs. Symbolic distance is defined as the difference in ordinal rank between the two stimuli in 239 
+
+a pair. The margin for a pair is simply the sum of the margins of the individual items. It can 240 
+
+be seen from Fig. 4B that 𝐴 !"#$ + 𝐶 %&' ($, which has a symbolic distance of 2, is greater than 241 
+
+𝐴 !"#$ + 𝐵 %&' ($, which has a symbolic distance of 1. In Fig. 4C , the number inside each square is 242 
+
+the symbolic distance for the corresponding pair of stimuli. The color saturation of the square 243 
+
+represents the margin’s magnitude, bluer for left choices, and redder for right choices. It can be 244 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted July 21, 2026. ;https://doi.org/10.64898/2026.06.24.734346 doi: bioRxiv preprint
+
+14 
+
+seen that the magnitudes of the margins increase as symbolic distance increases. 245 
+
+246 
+
+Independence of Trial Order 247 
+
+The LSE solution does not depend on how the rows of the design matrix are ordered. In 248 
+
+the example shown above, the rows of the design matrix W have a particular order (the first 249 
+
+row is always A/B, the second B/A, the third B/C, and so forth). The results do not depend 250 
+
+on this ordering of rows. The solution depends only on the elements of the stimulus vectors. 251 
+
+The rows can be randomly shuffled and LSE will still find a solution that generalizes and shows 252 
+
+a symbolic distance effect. In fact, the lines in Fig 4A represent a solution when the design 253 
+
+matrix ( W) was ordered as in Fig. 2A , while the filled dots represent the solution when the 254 
+
+rows of the same task design matrix were randomly shuffled. 255 
+
+The main results, i.e. generalization from adjacent-only pairs to all pairs, and the 256 
+
+symbolic distance effect, do not depend on the outcomes being symmetric (+1 for correct and -1 257 
+
+for incorrect choices). The set of possible outcomes can be any pair of values, e.g. [1 0], as long 258 
+
+as the values are distinct. 259 
+
+260 
+
+Linear separability 261 
+
+The task design matrix, W, can be partitioned row-wise into two trial sets that are 262 
+
+linearly separable. Formally, two subsets, D₁ and D₂, are linearly separable if there exists a 263 
+
+weight vector x and a scalar bias b such that: 264 
+
+𝒘 "
+
+> !
+
+𝒙 + 𝑏 > 0 ∀ 𝒘 " in 𝐃 #265 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted July 21, 2026. ;https://doi.org/10.64898/2026.06.24.734346 doi: bioRxiv preprint
+
+15 
+
+𝒘 $
+
+> !
+
+𝒙 + 𝑏 < 0 ∀ 𝒘 $ in 𝐃 %266 
+
+267 
+
+The rows of the design matrix W used during adjacent-pair training can be divided 268 
+
+according to the subject's choices. Let W+ contain the row vectors associated with leftward 269 
+
+choices (mapped to positive outcomes), and W- contain the row vectors corresponding to 270 
+
+rightward choices (mapped to negative outcomes). Spatial counterbalancing of the task design 271 
+
+ensures that these submatrices are perfectly separable through the origin (b = 0), satisfying: 272 
+
+𝒘 "
+
+> !
+
+𝒙 > 0 ∀ 𝒘 " ∈ 𝑾 &273 
+
+𝒘 $
+
+> !
+
+𝒙 < 0 ∀ 𝒘 $ ∈ 𝑾 '274 
+
+The linear classifier, x, corresponds exactly to the mapping derived in Equation 2 . This 275 
+
+mathematical separability 276 
+
+demonstrates that Transitive 277 
+
+Inference (TI) tasks can be 278 
+
+solved by linear classification 279 
+
+architectures, such as single-280 
+
+layer perceptrons and support 281 
+
+vector machines, making the 282 
+
+problem universally amenable 283 
+
+to any linear classifier. 284 
+
+285 
+
+Dependence on spatial counterbalancing 286 
+
+Figure 5. LSE solution to 9-item minimal TI task. A) Design matrix. B) Outcome vector. C) Elements of the mapping vector ( x). D) Implied rank ( Stimulus vector * x). E) Array of margins for all pairs. 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted July 21, 2026. ;https://doi.org/10.64898/2026.06.24.734346 doi: bioRxiv preprint
+
+16 
+
+The design matrix in Fig. 3A is spatially counterbalanced and thus encodes complete 287 
+
+information about both stimulus location and identity. Spatial information can be reduced by 288 
+
+presenting each pair in only one spatial configuration ( Fig. 5A ). To ensure that the decision is 289 
+
+non-trivial, the location of the correct stimulus varies randomly ( Fig. 5B ) so that the subject 290 
+
+cannot use a default response such as always choosing the stimulus on the right. This approach 291 
+
+has been used with monkeys (Jensen et al., 2021) to test their ability to perform TI with 292 
+
+minimal training. 293 
+
+By removing spatial counterbalancing, the task design becomes indeterminate. There is 294 
+
+insufficient information to jointly specify both the relative ranks of the stimuli and the location 295 
+
+of the correct response. This would require 2 ∗ (𝑛 − 1) bits of information whereas the outcome 296 
+
+matrix, y, only provides 𝑛 − 1 bits. Consequently, no exact solution exists for this minimal task 297 
+
+variant. Nevertheless, LSE can still find solutions ( Fig 5C ), however the implied ranks are not 298 
+
+strictly ordered ( Fig. 5D ) and generalization to all pairs is poor ( Fig. 5E ). 299 
+
+300 
+
+Effects of noise 301 
+
+In living participants, random variability in stimulus processing, response execution, or 302 
+
+the stimulus-to-response mapping, due to lapses in attention, memory, or decision-making, is to 303 
+
+be expected. The effects of such internal noise can be simulated by adding a random error term, 304 
+
+e, to Eqn 1, as follows: 305 
+
+Eqn 6. 𝑾 ∗ 𝒙 + 𝒆 = 𝒚 306 
+
+where e is a matrix comprising random Gaussian deviates with covariance = Q. In this case, 307 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted July 21, 2026. ;https://doi.org/10.64898/2026.06.24.734346 doi: bioRxiv preprint
+
+17 
+
+the Gauss-Markov solution is: 308 
+
+Eqn 7. 𝑥 = 𝑝𝑠𝑒𝑢𝑑𝑜𝑖𝑛𝑣𝑒𝑟𝑠𝑒 (𝑊 ! ∗ 𝑄 '# ∗ 𝑊) ∗ 𝑊 ! ∗ 𝑄 '# ∗ 𝑦 309 
+
+Fig. 6 presents results from two simulations with noise standard deviation = 0.2, 310 
+
+differing only in stimulus vector initialization. In the top row, the classifier, x, ( Fig. 6A )311 
+
+happens to have approximate 312 
+
+mirror symmetry like that 313 
+
+shown in Fig. 4 . This leads to 314 
+
+a linear representation of 315 
+
+implied rank ( Fig. 6B ), low 316 
+
+error (MSE = 0.004, where 317 
+
+mean squared error is ( W * x -318 
+
+y)2), and appropriate 319 
+
+generalization with a symbolic distance effect ( Fig. 6C ). 320 
+
+In the bottom row, the derived classifier ( Fig. 6D ) lacks symmetry, leading to a large 321 
+
+error (MSE = 11.3,), poor reconstruction of implied rank ( Fig. 6E ) and poor performance on 322 
+
+all-pairs testing ( Fig. 6F ). These results suggest that the differencing mechanism embodied in 323 
+
+Eqn. 4, which depends on the mirror symmetry of x, is critical for successful performance of TI 324 
+
+by the LSE algorithm. 325 
+
+326 
+
+Transverse patterning 327 
+
+Conventional TI has an open-ended topology. The two terminal items have different 328 
+
+Figure 6. LSE solution to 7-item TI task with added noise. 
+
+A,D ) Elements of the mapping vector ( x). B,E ) Implied rank (Stimulus vector * x). C,F ) Array of margins for all pairs. 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted July 21, 2026. ;https://doi.org/10.64898/2026.06.24.734346 doi: bioRxiv preprint
+
+18 
+
+outcome contingencies compared to the internal list items. For example, internal item C is the 329 
+
+correct choice when paired with D, but incorrect when paired with B, yielding a 50% hit rate. 330 
+
+By contrast, the first list item (A) is always correct (100% hit rate), and the last item (G) is 331 
+
+always incorrect (0% hit rate). This open-loop structure gives rise to a “terminal item effect” 332 
+
+(also called an “end-anchor 333 
+
+effect”), in which human and 334 
+
+animal subjects show markedly 335 
+
+higher accuracy on pairs that 336 
+
+include a terminal item (Trabasso 337 
+
+& Riley 1975). 338 
+
+The loop can be closed 339 
+
+simply by adding a comparison 340 
+
+between the two terminal items. 341 
+
+For a 7-item list, adding the pair G>A transforms the linear topology into a circle—this is 342 
+
+called “transverse patterning” (Alvarado & Rudy 1995; Astur & Sutherland 1998). This single 343 
+
+addition fundamentally changes the problem: there is no longer a linear classifier capable of 344 
+
+mapping the trials onto their outcomes, and symbolic distance becomes ambiguous because it 345 
+
+depends on the direction in which the list is traversed. 346 
+
+To confirm the absence of a linear LSE solution for transverse patterns, we constructed 347 
+
+a conventional TI list ( Fig. 7A ) and computed the linear classifier using the adjacent pairs 348 
+
+(Fig. 7B ). We show that this classifier creates a ranked representation ( Fig. 7C ), generalizes 349 
+
+Figure 7. Transitive vs. transverse patterning. A. Linear (open) sequence with probability of correct choice for each item (red). B. Linear classifer. C. Rank derived from linear classifier. D. Output for all pairs. Numbers are symbolic distances. E. Closed loop formed by adding G>A with probability of correct choice (red). F. Classifier. G. 
+
+Rank. H. Output for all pairs. 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted July 21, 2026. ;https://doi.org/10.64898/2026.06.24.734346 doi: bioRxiv preprint
+
+19 
+
+to non-adjacent pairs, and shows a symbolic distance effect ( Fig. 7D ). Then, without changing 350 
+
+the stimulus encoding or any other relationships, we simply added the comparison G>A to close 351 
+
+the loop ( Fig. 7E ). This change disrupted performance not only for pairs containing A or G, 352 
+
+but for all internal pairs as well, because the classifier ( Fig. 7F ) no longer produced a well-353 
+
+ordered representation ( Fig. 7G ). Consequently, generalization was poor or absent, and no 354 
+
+symbolic distance effect was observed ( Fig. 7H ). 355 
+
+356 
+
+Perceptron simulation 357 
+
+When provided with the task 358 
+
+design and outcome matrices, the 359 
+
+LSE solution can be computed in a 360 
+
+single step. Living subjects, by 361 
+
+contrast, experience one trial at a 362 
+
+time and must therefore learn the 363 
+
+task incrementally. A well-known 364 
+
+approach for solving linear 365 
+
+classification problems incrementally 366 
+
+is the Perceptron (McCulloch & 367 
+
+Pitts 1943; Rosenblatt 1957). In this implementation ( Fig.8A ), each input node ( 𝑥 &) represents 368 
+
+a pair of adjacent items. Input values are initialized randomly. The weighted sum of the inputs 369 
+
+is compared to the desired outcome (b), and the resulting error is used to update the weights 370 
+
+Figure 8. Perceptron implementation. A. Perceptron architecture. B. Linear classifier weights for Perceptron and Least Squares solution. C. Output after training on an 11-item list. D. Training and testing performance. 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted July 21, 2026. ;https://doi.org/10.64898/2026.06.24.734346 doi: bioRxiv preprint
+
+20 
+
+after each trial. 371 
+
+With training on adjacent pairs, the perceptron weights tend to converge to the LSE 372 
+
+classifier ( Fig. 8B ). The perceptron solution generalizes to all pairs and produces a symbolic 373 
+
+distance effect ( Fig. 8C ). During adjacent-pair training, performance—measured as the inner 374 
+
+product (margin) between the input pair and the classifier—rapidly asymptotes ( Fig. 8D ). 375 
+
+Upon transfer to non-adjacent pairs, margins increase markedly and scale with symbolic 376 
+
+distance. This “catastrophic improvement” in performance at transfer is also observed in the 377 
+
+behavior of living subjects (Munoz et al., 2025). 378 
+
+379 
+
+## Discussion 380 
+
+In this study, a transitive inference problem was formulated as a task that could be 381 
+
+solved by least-squares linear estimation (LSE), which finds a linear classifier mapping the task 382 
+
+representation onto the outcome space. The approach makes no explicit assumptions about 383 
+
+transitivity or list order, and requires no iterative training to update weights. Nevertheless, the 384 
+
+LSE solution reproduces key features of TI behavior observed in living subjects. (1) A classifier 385 
+
+trained on adjacent pairs correctly generalizes to non-adjacent pairs. (2) The magnitude of the 386 
+
+decision variable (margin) scales with the symbolic distance between stimuli, yielding a 387 
+
+symbolic distance effect. (3) The solution implies a differencing mechanism, also identified in 388 
+
+neural network models of TI (Kay et al. 2024). Lippl et al. (2024) formally derive how this 389 
+
+mechanism arises from linear stimulus-response mappings. (4) The solution produces a linear 390 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted July 21, 2026. ;https://doi.org/10.64898/2026.06.24.734346 doi: bioRxiv preprint
+
+21 
+
+representation of rank, i.e. a “mental line,” (Bryant and Trabasso 1971) that is consistent with 391 
+
+several computational models of TI. 392 
+
+The way LSE solves TI becomes clear when we examine the inner product of each 393 
+
+stimulus with the linear classifier ( Fig. 4B ). The magnitude of these inner products tracks the 394 
+
+ranking of the stimuli. This ranking allows the solution to generalize and exhibit a symbolic 395 
+
+distance effect. The implied ranking is reminiscent of models that solve TI by implementing 396 
+
+transitivity explicitly (e.g., Jensen et al., 2015; Jensen et al., 2019). The explicit application of 397 
+
+the transitive rule yields an ordered representation. In the LSE solution, the transitive rule is 398 
+
+not explicit; rather, transitivity implicit in the task design constrains the linear classifier so that 399 
+
+an ordered representation emerges from solving Eqn. 1 and then applying the resulting linear 400 
+
+classifier to each stimulus. 401 
+
+The approach described here depends on well-known conditions for solving systems of 402 
+
+linear equations, i.e. the outcomes must be a linear combination of the task conditions. It is not 403 
+
+necessary that the task matrix, W, be square or have a true inverse. As long as the description 404 
+
+length of each stimulus is greater than the number of stimuli, the pseudoinverse can find a 405 
+
+reasonably good solution and is robust to noise. It is also a condition that the stimulus vectors 406 
+
+are not colinear, i.e. the stimulus representations must be distinct and not merely linearly 407 
+
+combinations of one another. These constraints place conditions on the neural representation of 408 
+
+stimuli that form ordered lists that obey transitivity. It may be the case that TI learning 409 
+
+involves the creation of stimulus representations that are linearly classifiable. 410 
+
+The current approach is not intended as a literal model of how the brain performs TI. 411 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted July 21, 2026. ;https://doi.org/10.64898/2026.06.24.734346 doi: bioRxiv preprint
+
+22 
+
+However, biologically plausible mechanisms for matrix operations such as the pseudoinverse 412 
+
+have been proposed (Tapson & van Schaik 2013). More broadly, the LSE approach reveals 413 
+
+information that is latent in the task structure and accessible via linear classification and thus 414 
+
+amenable to a broad class of models including perceptrons and support vector machines. 415 
+
+Transitivity is not assumed a priori but emerges from constraints implicit in the task. These 416 
+
+results suggest that generalization from adjacent to non-adjacent pairs, and the symbolic 417 
+
+distance effect, may be properties of the task structure itself rather than of any particular 418 
+
+computational architecture. This view is consistent with recent findings that generic 419 
+
+architectures with minimal constraints can perform TI (Kay et al. 2024; Lippl et al. 2024). 420 
+
+Subjects who have learned a TI task likely acquire an implicit representation of that structure, 421 
+
+and the present results suggest this representation may suffice to account for many serial 422 
+
+learning phenomena. 423 
+
+The LSE solution is not incremental: it does not process individual pairs sequentially or 424 
+
+update the solution trial by trial; the system of equations is solved simultaneously. However, 425 
+
+LSE can be implemented recursively rather than in batch mode. In fact, LSE is effectively 426 
+
+implemented by a Perceptron (McCulloch & Pitts 1943; Rosenblatt 1957) with a linear 427 
+
+activation function (Beilina 2020). Linear perceptrons can also solve TI ( Fig. 8 and DiAntonio 428 
+
+et al., 2024), exhibiting generalization and a symbolic distance effect. As long as the task design 429 
+
+is linearly separable, it should be solvable by any linear classification method. 430 
+
+We speculate that the approach described herein can be generalized to any task that can 431 
+
+be expressed as a system of linear equations W*x = y, where W contains the task conditions 432 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted July 21, 2026. ;https://doi.org/10.64898/2026.06.24.734346 doi: bioRxiv preprint
+
+23 
+
+and y represents behavioral outcomes. The utility of this approach is that it distinguishes 433 
+
+aspects of behavioral performance that might be expected from the general mathematical 434 
+
+structure of the task from those that may reflect the particular computational mechanisms 435 
+
+implemented by a task-solver. 436 
+
+Cognitive tasks are generally designed to probe specific cognitive functions, but the 437 
+
+correspondence between task and function is seldom exact, and validation is necessary. Some 438 
+
+cognitive functions are defined entirely by performance on specific tasks; others involve 439 
+
+cognitive structures inferred from performance patterns. Computational modeling is an 440 
+
+important validation step, but models often presuppose a particular solution strategy. Subjects, 441 
+
+by contrast, may be given minimal instruction and are free to adopt any strategy—effective or 442 
+
+otherwise. They may arrive at an understanding of the task, or discover strategies, that 443 
+
+experimenters never anticipated. For this reason, it is valuable to consider the full range of 444 
+
+computational approaches to solving a task, including those that may not initially appear 445 
+
+biologically plausible. 446 
+
+447 
+
+## Data availability 448 
+
+Simulation code available on request 449 
+
+450 
+
+## Competing interests 451 
+
+The authors declare they have no competing interests. 452 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted July 21, 2026. ;https://doi.org/10.64898/2026.06.24.734346 doi: bioRxiv preprint
+
+24 
+
+453 
+
+## Acknowledgements 454 
+
+Supported by NIH R01-MH111703 (VPF and HST) 455 
+
+456 
+
+## Author Contributions 457 
+
+The concept for this manuscript was developed by VPF, SL, and KK. The manuscript was 458 
+
+written by VPF, SL, KK, FM, YJ, GJ, and HST. 459 
+
+460 
+
+(which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted July 21, 2026. ;https://doi.org/10.64898/2026.06.24.734346 doi: bioRxiv preprint 25 
+
+## References 461 
+
+1. Alvarado MC, Rudy JW. Some properties of con fi gural learning: an investigation of the 462 
+
+transverse-patterning problem. J Exp Psychol Anim Behav Process. 1992 Apr;18(2):145-463 
+
+53. doi: 10.1037//0097-7403.18.2.145. PMID: 1583444. 464 
+
+2. Astur, R. S., & Sutherland, R. J. (1998). Cognitive fl exibility in a transverse patterning 465 
+
+task. Behavioural Processes, 44(3), 291-301. DOI:10.3758/BF03330606. 466 
+
+3. Beilina L (2020) Numerical analysis of least squares and perceptron learning for 467 
+
+classi fi cation problems. Open Journal of Discrete Applied Mathematics Vol. 3 (2020), 468 
+
+Issue 2, pp. 30 – 49. DOI: 10.30538/psrp-odam2020.0035 469 
+
+4. Bryant PE, Trabasso T. Transitive inferences and memory in young children. Nature. 470 
+
+1971 Aug 13;232(5311):456-8. doi: 10.1038/232456a0. PMID: 4937205. 471 
+
+5. Burt C (1911) Experimental tests of higher mental processes and their relation to 472 
+
+general intelligence. J. Experimental Pedagogy 1, 93-112. 473 
+
+6. Ciranka, S., Linde-Domingo, J., Padezhki, I. et al. Asymmetric reinforcement learning 474 
+
+facilitates human inference of transitive relations. Nat Hum Behav 6, 555–564 (2022). 475 
+
+https://doi.org/10.1038/s41562-021-01263-w 476 
+
+7. Di Antonio, G., Raglio, S. & Mattia, M. A geometrical solution underlies general neural 477 
+
+principle for serial ordering. Nat Commun 15, 8238 (2024). 478 
+
+https://doi.org/10.1038/s41467-024-52240-6 479 
+
+8. De Lillo, C., Floreano, D. & Antinucci, F. Transitive choices by a simple, fully 480 
+
+connected, backpropagation neural network: implications for the comparative study of 481 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted July 21, 2026. ;https://doi.org/10.64898/2026.06.24.734346 doi: bioRxiv preprint
+
+26 
+
+transitive inference. Anim.Cogn. 4, 61–68 (2001). https://doi.org/10.1007/s100710100092 482 
+
+9. Jensen, G (2017) Serial learning. APA handbook of comparative psychology: Perception, 483 
+
+learning, and cognition, Vol. 2, 385-409. American Psychological Association. 484 
+
+10. Jensen G, Muñoz F, Alkan Y, Ferrera VP, Terrace HS. Implicit Value Updating Explains 485 
+
+Transitive Inference Performance: The Betasort Model. PLoS Comput Biol. 2015 Sep 486 
+
+25;11(9):e1004523. doi: 10.1371/journal.pcbi.1004523. PMID: 26407227; PMCID: 487 
+
+PMC4583549. 488 
+
+11. Jensen G, Munoz F, Meaney A, Terrace HS, Ferrera VP (2021) Transitive inference after 489 
+
+minimal training in rhesus macaques (Macaca mulatta). Journal of Experimental 490 
+
+Psychology: Animal Learning and Cognition, Vol 47(4), Oct 2021, 464-475 491 
+
+12. Jensen G, Terrace HS, Ferrera VP. Discovering Implied Serial Order Through Model-492 
+
+Free and Model-Based Learning. Front Neurosci. 2019 Aug 20;13:878. doi: 493 
+
+10.3389/fnins.2019.00878. PMID: 31481871; PMCID: PMC6710392. 494 
+
+13. Kumaran, D., Banino, A., Blundell, C., Hassabis, D., and Dayan, P. (2016). 495 
+
+Computations underlying social hierarchy learning: distinct neural mechanisms for 496 
+
+updating and representing self-relevant information. Neuron 92, 1135–1147. doi: 497 
+
+10.1016/j.neuron.2016.10.052 498 
+
+14. Kumaran, D., and McClelland, J. L. (2012). Generalization through the recurrent 499 
+
+interaction of episodic memories: a model of the hippocampal system. Psychol. Rev. 119, 500 
+
+573–616. doi: 10.1037/a0028681 501 
+
+15. Kay K, Biderman N, Khajeh R, Beiran M, Cueva CJ, Shohamy D, et al. (2024) 502 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted July 21, 2026. ;https://doi.org/10.64898/2026.06.24.734346 doi: bioRxiv preprint
+
+27 
+
+Emergent neural dynamics and geometry for generalization in a transitive inference task. 503 
+
+PLoS Comput Biol 20(4): e1011954. https://doi.org/10.1371/journal.pcbi.1011954 504 
+
+16. Lazareva OF, Paxton Gazes R, Elkins Z, Hampton R. Associative models fail to 505 
+
+characterize transitive inference performance in rhesus monkeys (Macaca mulatta). Learn 506 
+
+Behav. 2020 Mar;48(1):135-148. doi: 10.3758/s13420-020-00417-6. PMID: 32040696; 507 
+
+PMCID: PMC7853493. 508 
+
+17. Lippl S, Kay K, Jensen G, Ferrera VP, Abbott LF. A mathematical theory of relational 509 
+
+generalization in transitive inference. Proc Natl Acad Sci U S A. 2024 Jul 510 
+
+9;121(28):e2314511121. doi: 10.1073/pnas.2314511121. PMID: 37662223; PMCID: 511 
+
+PMC10473627. 512 
+
+18. McCulloch, W; Pitts, W (1943). "A Logical Calculus of Ideas Immanent in Nervous 513 
+
+Activity". Bulletin of Mathematical Biophysics. 5 (4): 115–133. doi:10.1007/BF02478259. 514 
+
+19. McGonigle, B. O., & Chalmers, M. (1977). Are monkeys logical? Nature, 267(5613), 694– 515 
+
+696. https://doi.org/10.1038/267694a0 516 
+
+20. Miconi T, Kay K. Neural mechanisms of relational learning and fast knowledge 517 
+
+reassembly in plastic neural networks. Nat Neurosci. 2025 Feb;28(2):406-414. doi: 518 
+
+10.1038/s41593-024-01852-8. Epub 2025 Jan 15. PMID: 39814949. 519 
+
+21. Moore, E. H. (1920). On the reciprocal of the general algebraic matrix. Bulletin of the 520 
+
+American Mathematical Society, 26, 394–395. [1, 2, 3] 521 
+
+22. Munoz F, Jensen G, Shinn M, Alkan Y, Murray JD, Terrace HS, Ferrera VP. Learning 522 
+
+Decouples Accuracy and Reaction Time for Rapid Decisions in a Transitive Inference 523 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted July 21, 2026. ;https://doi.org/10.64898/2026.06.24.734346 doi: bioRxiv preprint
+
+28 
+
+Task. J Cogn Neurosci. 2025 Dec 30:1-18. doi: 10.1162/JOCN.a.2425. Epub ahead of 524 
+
+print. PMID: 41468119; PMCID: PMC12854202. 525 
+
+23. Nelli S, Braun L, Dumbalska T, Saxe A, Summer fi eld C. Neural knowledge assembly in 526 
+
+humans and neural networks. Neuron. 2023 May 3;111(9):1504-1516.e9. doi: 527 
+
+10.1016/j.neuron.2023.02.014. Epub 2023 Mar 9. PMID: 36898375; PMCID: 528 
+
+PMC10618408. 529 
+
+24. Penrose, R. (1955). A generalized inverse for matrices. Mathematical Proceedings of the 530 
+
+Cambridge Philosophical Society , 51(3), 406-413. 531 
+
+25. Piaget, J. (1928). Judgment and reasoning in the child. Harcourt, 532 
+
+Brace. https://doi.org/10.4324/9780203207260 533 
+
+26. Rombouts JO, Bohte SM, Roelfsema PR (2015) How Attention Can Create Synaptic 534 
+
+Tags for the Learning of Working Memories in Sequential Tasks. PLoS Comput Biol 535 
+
+11(3): e1004060. doi:10.1371/journal.pcbi.1004060 536 
+
+27. Rosenblatt, Frank (1957). The Perceptron—a perceiving and recognizing automaton. 537 
+
+Report 85-460-1. Cornell Aeronautical Laboratory. 538 
+
+28. Tapson J, van Schaik A (2013) Learning the pseudoinverse solution to network weights. 539 
+
+Neural Networks. 45, 94-100. http://dx.doi.org/10.1016/j.neunet.2013.02.008 540 
+
+29. Trabasso T, Riley CA. (1975). The construction and use of representations involving 541 
+
+linear order. In Solso RL. Information processing and cognition: The Loyola Symposium, 542 
+
+381–410. New York: Halstead Press. ISBN: 9780470812303 543 
+
+30. Treichler, F. R., Raghanti, M. A., & Van Tilburg, D. N. (2003). Linking of serially 544 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted July 21, 2026. ;https://doi.org/10.64898/2026.06.24.734346 doi: bioRxiv preprint
+
+29 
+
+ordered lists by macaque monkeys (Macaca mulatta): List position in fl uences. Journal of 545 
+
+Experimental Psychology: Animal Behavior Processes, 29(3), 211– 546 
+
+221. https://doi.org/10.1037/0097-7403.29.3.211 547 
+
+31. Treichler, F. R., Raghanti, M. A., & Van Tilburg, D. N. (2007). Serial list linking by 548 
+
+macaque monkeys (Macaca mulatta): List property limitations. Journal of Comparative 549 
+
+Psychology, 121(3), 250–259. https://doi.org/10.1037/0735-7036.121.3.250 550 
+
+32. Vasconcelos M (2008) Transitive inference in non-human animals: an empirical and 551 
+
+theoretical analysis. Behav. Processes, 78(3):313–34, 2008. doi: 552 
+
+10.1016/j.beproc.2008.02.017. 553 
+
+33. Wu X., Levy W.B. (2001) Simulating symbolic distance e ff ects in the transitive inference 554 
+
+problem. Neurocomputing: An International Journal, 38-40, 1603-1610. 555 
+
+https://doi.org/10.1016/S0925-2312(01)00512-4 556 
+
+34. Wynne CDL (1995) Reinforcement accounts for transitive inference performance. 557 
+
+Animal Learning and Behavior 23(2), 207-217. 558

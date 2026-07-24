@@ -1,0 +1,1471 @@
+Title: A Safeguarded Projected-Gradient Framework for Complementarity-Constrained Least-Squares Problems
+
+URL Source: https://arxiv.org/pdf/2607.20786v1
+
+Published Time: Fri, 24 Jul 2026 00:20:05 GMT
+
+Number of Pages: 22
+
+Markdown Content:
+# A Safeguarded Projected-Gradient Framework for Complementarity-Constrained Least-Squares Problems 
+
+Lianghai Xiao ∗ Wei Zhang † Jiayi Zhong ‡
+
+Abstract 
+
+Generalized absolute value equations (GAVEs) and linear complementarity problems (LCPs) arise in many equilibrium and optimization models and can both be formulated as least-squares problems over the complementarity set. Building on this shared formulation, we propose a safeguarded projected-gradient framework for both classes with problem-dependent algebraic refinements. We analyze its convergence properties and, under stronger conditions, establish finite recovery of the unique solution. Numerical experiments on GAVE and LCP benchmarks illustrate the practical behavior of the framework, including its high final accuracy in the tested settings and its problem-dependent computational tradeoffs. 
+
+## 1 Introduction 
+
+Complementarity systems arise in equilibrium models, constrained optimization, and piecewise-linear equations [8,10,12]. Their defining disjunction—at most one member of each complementary pair can be positive—provides useful structure but also makes the feasible set nonconvex. We consider the complementarity-constrained least-squares problem min  
+
+> (u,v )∈C
+
+Φ( u, v ) := 12 ∥P u + Qv − c∥2, (1) where P, Q ∈ Rm×n, c ∈ Rm, and 
+
+C := {(u, v ) ∈ Rn × Rn : u ≥ 0, v ≥ 0, u ⊙ v = 0 } ,
+
+where ⊙ denotes the Hadamard product and inequalities are interpreted componentwise. The zero-level set of (1) consists precisely of the complementary solutions of the linear system 
+
+P u + Qv = c, u ≥ 0, v ≥ 0, u ⊙ v = 0 .
+
+The following two instances motivate our development. 
+
+Example 1 (GAVE) . Consider the generalized absolute value equation 
+
+Ax − B|x| = b, x ∈ Rn, (2) where A, B ∈ Rm×n and b ∈ Rm. It is represented by (1) with 
+
+u = x+, v = x−, P = A − B, Q = −A − B, c = b. 
+
+A zero-residual feasible point therefore yields a solution x = x+ − x− of (2). 
+
+> ∗
+
+College of Information Science and Technology, Jinan University. Email: xiaolh@jnu.edu.cn .
+
+> †
+
+Corresponding Author, School of Mathematics, South China University of Technology. Email: zw2020@scut.edu. cn .‡College of Information Science and Technology, Jinan University. Email: zjyeexo@stu2024.jnu.edu.cn .
+
+1arXiv:2607.20786v1 [math.OC] 22 Jul 2026 Example 2 (LCP) . Consider the linear complementarity problem 
+
+z ≥ 0, w = M z − b ≥ 0, z ⊙ w = 0 ,
+
+where M ∈ Rn×n and b ∈ Rn. It can be written as an instance of (1) by setting 
+
+u = z, v = w, P = M, Q = −I, c = b. 
+
+1.1 Related work 
+
+GAVEs and LCPs are closely related classes of piecewise-linear systems. The connection between absolute value equations and complementarity problems is developed in [19], while the theory and classical algorithms for LCPs are treated systematically in [8]; see also the recent AVE survey [12]. Despite their close relationship, the numerical literatures on GAVEs and LCPs often emphasize different algorithmic tools. For AVEs and GAVEs, a major line of research applies generalized, semismooth, or smoothing Newton methods to the piecewise-linear equation [6, 7, 18]. Picard iterations and matrix-splitting schemes instead use fixed-point or relaxed linear solves [22, 25]. Optimization reformulations have also led to successive linearization, complementarity smoothing, and gradient-type methods [1, 17, 24]. These approaches are effective under suitable regularity, contractivity, or unique-solvability conditions. Many of them are formulated for square systems, whereas alternating-projection and randomized-sketching methods explicitly accommodate rectangular GAVEs [2, 23]. LCP algorithms include pivoting methods, projected stationary iterations, and equation-based methods; comprehensive accounts are given in [8, 10]. Projected Gauss–Seidel and projected SOR exploit matrix structure and are classical choices for structured LCPs [8, 9]. Another influen-tial approach uses the minimum or Fischer–Burmeister function to replace complementarity by a nonsmooth equation and then applies semismooth or smoothing Newton steps [11, 14, 21]. Their convergence guarantees depend on the structure of the LCP matrix, the regularity of the equation reformulation, and the globalization strategy. Projection methods provide a closer link between the two literatures. Alcantara et al. reformu-lated a general GAVE as a nonconvex feasibility problem and applied alternating projections [2]. Alcantara and Lee subsequently developed a union-convex analysis for several projection methods, proving convergence to the solution set for P-matrix LCPs and introducing pattern-based accel-eration schemes [3]. These results highlight the usefulness of the union-convex structure. Their methods are built from projections associated with particular feasibility reformulations, and their analysis is formulated in terms of the corresponding sets and fixed-point mappings. Motivated by these developments, we consider a framework that treats GAVEs and LCPs di-rectly through their common complementarity structure while separating the basic iteration from problem-specific refinement. We formulate both problems as linear least-squares problems over the complementarity set and solve them within a common projected-gradient framework. Problem-specific algebraic solves are incorporated as safeguarded refinements, preserving the common con-vergence analysis while exploiting the structure of each problem class. 
+
+1.2 Contributions 
+
+The main contributions are as follows. 
+
+• We develop a safeguarded projected-gradient framework for GAVEs and LCPs that combines a common first-order iteration with problem-specific algebraic refinements while retaining a unified convergence analysis. 2• We establish verifiable conditions for stationary exactness, under which every projected sta-tionary point has zero residual and is therefore a global solution. The results cover both GAVEs and P-matrix LCPs, including biactive points. 
+
+• Building on stationary exactness, we derive global convergence guarantees for the generated sequence. These include convergence to the zero-residual solution set and, in the unique-solution settings, convergence of the entire sequence. We further establish eventual pattern compatibility and finite solution recovery through the full-step refinements. Numerical experiments on GAVEs and LCPs illustrate the practical behavior of the framework, including high final accuracy in the tested settings and performance that depends on the problem structure and comparison method. 
+
+1.3 Organization 
+
+The remainder of this paper is organized as follows. Section 2 introduces the complementarity pro-jection, stationarity measure, and active-face notation. Section 3 presents the safeguarded projected-gradient framework. The global analysis and the problem-specific exactness and recovery results are given in Section 4. Section 5 describes the implementation and numerical experiments. Section 6 concludes the paper. 
+
+## 2 Preliminaries 
+
+Throughout the paper, ∥ · ∥ denotes the Euclidean norm for vectors and the spectral norm for matrices. For W ∈ Rm×n, σmin (W ) denotes the smallest of its min {m, n } singular values, and Range( W ) denotes its column space. For a nonempty set Ω, define dist( y, Ω) := inf z∈Ω ∥y − z∥. For an index set I, W:,I denotes the submatrix formed by the columns indexed by I, while WII denotes the corresponding principal submatrix when W is square. For x ∈ Rn, write supp( x) := {i : xi̸ = 0 }.For t ∈ R, let t+ := max {t, 0} and t− := max {− t, 0}. Vector operations and inequalities are understood componentwise; in particular, x = x+ − x− and |x| = x+ + x−. For y = ( u, v ) ∈ C ,define I+0 (y) := {i : ui > 0, v i = 0 },
+
+I0+ (y) := {i : ui = 0 , v i > 0},
+
+I00 (y) := {i : ui = vi = 0 }.
+
+Indices in I00 (y) are called biactive .
+
+Definition 1. The point y is strictly complementary if the biactive set I00 (y) = ∅.Let P := {GAVE , LCP } denote the set of problem types. For a point y = ( u, v ) ∈ C , define the GAVE pattern by 
+
+ϑGAVE  
+
+> i
+
+(y) := sgn( ui − vi), i = 1 , . . . , n, 
+
+and the LCP pattern by 
+
+ϑLCP  
+
+> i
+
+(y) := 
+
+
+
+1, ui > 0,
+
+−1, vi > 0,
+
+0, ui = vi = 0 ,i = 1 , . . . , n. 
+
+For a strictly complementary point y, define its active face by 
+
+F(y) := {(eu, ev) ∈ C : evi = 0 for i ∈ I +0 (y), eui = 0 for i ∈ I 0+ (y)} .
+
+3Define its active matrix by H(y) := [ h1(y) · · · hn(y)] , where hi(y) := 
+
+(
+
+P:i, i ∈ I +0 (y),Q:i, i ∈ I 0+ (y). Write 
+
+r(y) := P u + Qv − c and S := {y ∈ C : r(y) = 0 }. When S̸ = ∅, we have S = argmin 
+
+> y∈C
+
+Φ( y), and min y∈C Φ( y) = 0 . For a ≤ b, let D[a,b ] := {diag( d) : d ∈ [a, b ]n}. For x ∈ Rn, define 
+
+di(x) := 
+
+(
+
+1, xi ≥ 0,
+
+−1, xi < 0, and D(x) := diag( d(x)) . (3) For any diagonal matrix D of appropriate dimension, write CD := A − BD . For an LCP matrix 
+
+M and I ⊆ { 1, . . . , n }, define RI := M:,I −I:,Ic
+
+ . For x ∈ Rn, define the set of sign matrices compatible with x by 
+
+D(x) := {diag( d) : di = sgn( xi) if xi̸ = 0 , di ∈ {− 1, 1} if xi = 0 } .
+
+For ( z, w ) ∈ C , define the set of compatible LCP partitions by 
+
+J(z, w ) := {J ⊆ { 1, . . . , n } : supp( z) ⊆ J ⊆ { 1, . . . , n } \ supp( w)} .
+
+Thus a biactive index may be assigned to either branch in a compatible sign matrix or partition. A matrix M ∈ Rn×n is a P-matrix if all its principal minors are positive. Equivalently, every nonzero 
+
+p ∈ Rn has an index i such that pi(M p )i > 0; see, for example, [8]. Let Π C denote the Euclidean projection onto C. Although C is nonconvex, it is the Cartesian product of n unions of two nonnegative coordinate axes. Hence, its Euclidean projection is therefore available in closed form. 
+
+Proposition 1. For (ξ, η ) ∈ Rn × Rn, a projection onto C is obtained coordinatewise by setting 
+
+(ui, v i) = 
+
+((ξ+ 
+
+> i
+
+, 0) , ξ+ 
+
+> i
+
+≥ η+ 
+
+> i
+
+,
+
+(0 , η + 
+
+> i
+
+), η+ 
+
+> i
+
+> ξ + 
+
+> i
+
+, i = 1 , . . . , n. (4) 
+
+Then (u, v ) ∈ ΠC (ξ, η ).Proof. For each i, the closest points on the two nonnegative axes are ( ξ+ 
+
+> i
+
+, 0) and (0 , η + 
+
+> i
+
+). Their squared distances differ by 
+
+ (ξi − ξ+ 
+
+> i
+
+)2 + η2
+
+> i
+
+ −  ξ2 
+
+> i
+
++ ( ηi − η+ 
+
+> i
+
+)2 = ( η+ 
+
+> i
+
+)2 − (ξ+ 
+
+> i
+
+)2.
+
+Thus the first candidate is no farther precisely when ξ+ 
+
+> i
+
+≥ η+ 
+
+> i
+
+, proving (4). 
+
+Definition 2. For α > 0, a point y ∈ C is α-projected stationary if 
+
+y ∈ ΠC
+
+ y − α∇Φ( y). (5) 
+
+Definition 3. For Ω ⊆ C , problem (1) is said to satisfy stationary exactness on Ω if 
+
+[
+
+> α> 0
+
+y ∈ Ω : y ∈ ΠC
+
+ y − α∇Φ( y) ⊆ S .
+
+Problem (1) is called stationary exact if this inclusion holds with Ω = C.For a selected projection ˆ y ∈ ΠC (y − α∇Φ( y)), define the projected-gradient residual by 
+
+Gα(y; ˆ y) := 1
+
+α (y − ˆy). (6) The dependence on ˆ y accounts for the possible nonuniqueness of the projection. 43 Algorithmic Framework 
+
+Our method consists of a projected-gradient step and an optional problem-specific refinement. The projected-gradient step defines the baseline candidate, while the refinement exploits the current sign or active-set pattern to accelerate solution recovery. The refined candidate is accepted only if it is feasible and does not increase the objective relative to the projected-gradient candidate. Let y := [ u⊤, v ⊤]⊤ ∈ R2n and H := [ P, Q ]. Problem (1) can be written as min  
+
+> y∈C
+
+Φ( y) := 12 ∥Hy − c∥2. (7) Its gradient is ∇Φ( y) = H⊤(Hy − c), which is Lipschitz continuous with constant L = ∥H⊤H∥2 =
+
+∥H∥22. Starting from yk ∈ C , we compute ¯yk+1 ∈ ΠC
+
+
+
+yk − αk∇Φ( yk)
+
+
+
+. (8) For later use, we specialize the iteration notation to the two model classes. For a GAVE, write 
+
+yk = ( x+,k , x −,k ), xk := x+,k − x−,k , ¯yk+1 = (¯ x+,k +1 , ¯x−,k +1 ), ¯xk+1 := ¯ x+,k +1 − ¯x−,k +1 .
+
+The refinement matrix associated with ¯ xk+1 is D(¯ xk+1 ) from (3). For an LCP, write yk = ( zk, w k)and ¯ yk+1 = (¯ zk+1 , ¯wk+1 ). For either problem type, set 
+
+ϑpk := ϑp(yk), ¯ϑpk+1 := ϑp(¯ yk+1 ).
+
+For p = LCP, the zero entries of ϑp(z, w ) are precisely the biactive indices. For the projected candidate, set ¯J k+1  
+
+> z
+
+:= {i : ( ¯ϑpk+1 )i ≥ 0}, ¯J k+1  
+
+> w
+
+:= {i : ( ¯ϑpk+1 )i = −1}.
+
+This convention assigns every biactive index to the z-branch, so that ( ¯J k+1  
+
+> z
+
+, ¯J k+1  
+
+> w
+
+) is a partition of 
+
+{1, . . . , n }. The projected-gradient candidate serves as the reference point in the acceptance test, while the refinement exploits the current problem-specific pattern. A refinement is attempted only when a prescribed trigger T pk holds. Initialize νp 
+
+> 0
+
+:= 0 and set 
+
+νpk+1 := 
+
+(
+
+νpk + 1 , ¯ϑpk+1 = ϑpk,
+
+0, otherwise .
+
+For prescribed q ≥ 1 and τ ≥ 0, define 
+
+T pk ⇐⇒ ρ(¯ yk+1 ) ≤ τ or νpk+1 ≥ q, (9) where ρ(y) := ∥Hy − c∥/ max {1, ∥c∥} . When T pk holds, let byk+1 be a problem-dependent refinement of ¯ yk+1 and accept it according to 
+
+yk+1 =
+
+(byk+1 , byk+1 ∈ C and Φ( byk+1 ) ≤ Φ(¯ yk+1 ),
+
+¯yk+1 , otherwise . (10) If no refinement is performed, we simply set yk+1 = ¯ yk+1 . Thus, irrespective of how the refinement candidate is constructed, Φ( yk+1 ) ≤ Φ(¯ yk+1 ). (11) Algorithm 1 summarizes the framework. The construction of byk+1 is deliberately left open here; concrete GAVE and LCP refinements are specified in Section 5. 5Algorithm 1 Projected-gradient method with safeguarded refinement 
+
+Require: Problem type p ∈ P and initial point y0 ∈ C . 
+
+> 1:
+
+for k = 0 , 1, 2, . . . do  
+
+> 2:
+
+Select a stepsize αk > 0.  
+
+> 3:
+
+Compute ¯ yk+1 from (8).  
+
+> 4:
+
+if the prescribed trigger T pk holds then  
+
+> 5:
+
+Compute a problem-dependent refinement candidate byk+1 . 
+
+> 6:
+
+else  
+
+> 7:
+
+Set byk+1 = ¯ yk+1 . 
+
+> 8:
+
+end if  
+
+> 9:
+
+Determine yk+1 according to (10).  
+
+> 10:
+
+end for 
+
+## 4 Convergence Analysis 
+
+We first establish properties shared by every refinement satisfying (10). The argument proceeds in three steps. The projection inequality yields sufficient descent; telescoping this decrease gives van-ishing projected-gradient residuals and stationarity of every accumulation point; the same estimate gives a worst-case complexity bound. We then specialize the stationarity conditions to GAVEs and LCPs. The active-face normal equation yields facewise least-squares optimality, while explicit rank or range conditions give zero-residual solution-set convergence. Problem-specific generalized nor-mal equations then establish stationary exactness at biactive points under a uniform full-row-rank condition on A − BD or the P-matrix property. Under the stronger square-GAVE condition or the P-matrix assumption, uniqueness upgrades solution-set convergence to convergence of the entire sequence, and the projected candidates eventually have compatible sign or active-set patterns. The next assumption is the stepsize condition used in the analysis. 
+
+Assumption 1. There exist constants α and α such that 0 < α ≤ αk ≤ α < 1/L , for all k.The first result transfers the decrease of the projected-gradient candidate to the safeguarded it-erate. In particular, sufficient descent is a consequence of Assumption 1, rather than an independent algorithmic assumption. 
+
+Lemma 1. Suppose that Assumption 1 holds. Then the final iterate satisfies 
+
+Φ( yk+1 ) ≤ Φ( yk) −
+
+ 12α − L
+
+2
+
+
+
+∥¯yk+1 − yk∥2. (12) 
+
+Proof. Since yk ∈ C and ¯ yk+1 is a Euclidean projection, 
+
+∥¯yk+1 − (yk − αk∇Φ( yk)) ∥2 ≤ ∥ yk − (yk − αk∇Φ( yk)) ∥2.
+
+Expanding this inequality gives 
+
+⟨∇ Φ( yk), ¯yk+1 − yk⟩ ≤ − 12αk
+
+∥¯yk+1 − yk∥2.
+
+Combining this inequality with the descent lemma for the L-Lipschitz gradient proves Φ(¯ yk+1 ) ≤ Φ( yk) −
+
+ 12αk
+
+− L
+
+2
+
+
+
+∥¯yk+1 − yk∥2. (13) 6Under Assumption 1, 12αk
+
+− L
+
+2 ≥ 12α − L
+
+2 > 0.
+
+Combining this bound with (13) and (11) proves (12). The descent estimate makes the projected displacements square summable. Their normalized versions are precisely the stationarity measure introduced in (6). 
+
+Theorem 1. Suppose that Assumption 1 holds. Then 
+
+> ∞
+
+X
+
+> k=0
+
+∥¯yk+1 − yk∥2 < ∞, ∥Gαk (yk; ¯ yk+1 )∥ → 0. (14) 
+
+Moreover, every accumulation point y∗ of {yk} is α∗-projected stationary for some α∗ ∈ [α, α ].Proof. By Lemma 1, {Φ( yk)} is nonincreasing and, because Φ is nonnegative, convergent. Summing (12) gives  12α − L
+
+2
+
+ KX
+
+> k=0
+
+∥¯yk+1 − yk∥2 ≤ Φ( y0) − Φ( yK+1 ) ≤ Φ( y0).
+
+Letting K → ∞ proves the first part of (14). Hence ∥¯yk+1 − yk∥ → 0, and the lower stepsize bound yields ∥Gαk (yk; ¯ yk+1 )∥ → 0. Let ykj → y∗. After passing to a further subsequence, αkj → α∗ for some α∗ ∈ [α, α ]. By (14) we have ¯ ykj +1 → y∗, while (8) gives ¯ykj +1 ∈ ΠC
+
+ ykj − αkj ∇Φ( ykj ).
+
+The projection mapping onto a closed set has a closed graph. Passing to the limit gives (5). Summing the same one-step inequality also quantifies the number of iterations needed to produce an approximately projected stationary point. 
+
+Theorem 2. Suppose that Assumption 1 holds. For any ϵ > 0, define Tϵ := min k ≥ 0 : 
+
+∥Gαk (yk; ¯ yk+1 )∥ ≤ ϵ , with the convention min ∅ := + ∞. Then Tϵ is finite and 
+
+Tϵ ≤ Φ( y0) − inf y∈C Φ( y)
+
+  12α − L
+
+> 2
+
+ α2ϵ2 . (15) 
+
+Consequently, an iterate with projected-gradient residual at most ϵ is generated in O(ϵ−2) iterations. Proof. Using (6) in (12) and αk ≥ α yields 
+
+ 12α − L
+
+2
+
+
+
+α2∥Gαk (yk; ¯ yk+1 )∥2 ≤ Φ( yk) − Φ( yk+1 ).
+
+If Tϵ = + ∞, then the residual norm is greater than ϵ at every iteration. Summing the one-step estimate over k = 0 , . . . , N would then give 
+
+ 12α − L
+
+2
+
+
+
+α2(N + 1) ϵ2 < Φ( y0) − inf  
+
+> y∈C
+
+Φ( y)7for every N , which is impossible. Hence Tϵ is finite. If Tϵ = 0, then (15) is immediate. Otherwise, its definition gives 
+
+∥Gαk (yk; ¯ yk+1 )∥ > ϵ, k = 0 , . . . , T ϵ − 1.
+
+Summing the one-step estimate over these indices yields 
+
+ 12α − L
+
+2
+
+
+
+α2Tϵϵ2 < Φ( y0) − Φ( yTϵ ) ≤ Φ( y0) − inf  
+
+> y∈C
+
+Φ( y),
+
+which proves (15) and the stated O(ϵ−2) bound. 
+
+4.1 Projected Stationarity and Global Recovery 
+
+Projected stationarity need not imply zero residual on the nonconvex set C. We first derive normal equations and least-squares optimality on the active face, and then obtain zero-residual convergence under strict complementarity and pointwise rank or range conditions. We then exploit the algebraic structures of GAVEs and LCPs to cover biactive points. Under the subsequent problem-wide conditions, we also show that the projected candidates eventually have compatible sign or active-set patterns. This viewpoint is related to component identification for union-convex problems [3] and active-set stabilization in MPCCs [20]. 
+
+Proposition 2. Let y∗ = ( u∗, v ∗) be an α-projected stationary point of (7) . Then 
+
+P ⊤ 
+
+> :i
+
+r(y∗) = 0 , i ∈ I +0 (y∗), (16) 
+
+Q⊤ 
+
+> :i
+
+r(y∗) = 0 , i ∈ I 0+ (y∗), (17) 
+
+P ⊤ 
+
+> :i
+
+r(y∗) ≥ 0, Q⊤ 
+
+> :i
+
+r(y∗) ≥ 0, i ∈ I 00 (y∗). (18) 
+
+If I00 (y∗) = ∅, then 
+
+H(y∗)⊤r(y∗) = 0 . (19) 
+
+and 
+
+y∗ ∈ argmin 
+
+> y∈F (y∗)
+
+Φ( y).
+
+Proof. Write ∇Φ( y∗) = [ P ⊤r(y∗); Q⊤r(y∗)]. If i ∈ I +0 (y∗), then the ith projected pair in (5) equals ( u∗ 
+
+> i
+
+, 0) with u∗ 
+
+> i
+
+> 0. The closest point on the first nonnegative axis has first component 
+
+ u∗ 
+
+> i
+
+− αP ⊤ 
+
+> :i
+
+r(y∗)+. It can equal u∗ 
+
+> i
+
+only if P ⊤ 
+
+> :i
+
+r(y∗) = 0, so (16) is proved. The proof of (17) is identical. If i ∈ I 00 (y∗), the projection of ( −αP ⊤ 
+
+> :i
+
+r(y∗), −αQ ⊤ 
+
+> :i
+
+r(y∗)) is (0 , 0). The projection rule (4) therefore proves (18). Under strict complementarity, the unique active column at each coordinate gives (19). This active-face viewpoint is the analogue of the branch-NLP decomposition used in MPCC analysis; see [20, Section 4]. Here the quadratic structure yields the stronger facewise optimality conclusion directly. Indeed, for any ey = ( eu, ev) ∈ F (y∗), set s∗ := u∗ + v∗ and es := eu + ev.Then 
+
+r(ey) = r(y∗) + H(y∗)( es − s∗),
+
+and hence Φ( ey) − Φ( y∗) = 
+
+D
+
+H(y∗)⊤r(y∗), es − s∗E
+
++ 12 ∥H (y∗)( es − s∗)∥2 ≥ 0by (19). The next two corollaries specialize the active-face normal equation and give conditions under which a projected stationary point has zero residual. 8Corollary 1. Let y∗ = ( x+,∗, x −,∗) be a strictly complementary α-projected stationary point of the GAVE, and denote x∗ := x+,∗ − x−,∗ and D∗ := D(x∗). Then 
+
+C⊤
+
+> D∗
+
+ Ax ∗ − B|x∗| − b = 0 . (20) 
+
+Moreover, x∗ solves the GAVE whenever 
+
+rank( CD∗ ) = m or b ∈ Range( CD∗ ). (21) 
+
+Proof. For the GAVE formulation, D∗ is nonsingular by definition. Strict complementarity selects a unique active column at every coordinate and gives H(y∗) = CD∗ D∗ and r(y∗) = Ax ∗ − B|x∗| − b.By Proposition 2, H(y∗)⊤r(y∗) = 0. Substituting the preceding identity gives ( D∗)⊤C⊤ 
+
+> D∗
+
+r(y∗) = 0. Since D∗ is nonsingular, this is equivalent to (20). If rank( CD∗ ) = m, then C⊤ 
+
+> D∗
+
+is injective, and (20) yields r(y∗) = 0. If instead b ∈ Range( CD∗ ), strict complementarity gives |x∗| = D∗x∗ and hence r(y∗) = CD∗ x∗−b ∈ Range( CD∗ ). Equation (20) also implies r(y∗) ∈ Range( CD∗ )⊥. Thus r(y∗) = 0 under either condition in (21), and x∗ solves the GAVE. 
+
+Corollary 2. Let (z∗, w ∗) be a strictly complementary α-projected stationary point of the LCP, and denote I := I+0 (z∗, w ∗). Then 
+
+R⊤I (M z ∗ − w∗ − b) = 0 . (22) 
+
+If 
+
+det( MII )̸ = 0 , (23) 
+
+then (z∗, w ∗) solves the LCP. Proof. Here P = M , Q = −I, and c = b. Strict complementarity gives I0+ (z∗, w ∗) = Ic and 
+
+H(z∗, w ∗) = RI . Proposition 2 therefore gives 
+
+R⊤I r(z∗, w ∗) = 0 , r(z∗, w ∗) = M z ∗ − w∗ − b, 
+
+which is (22). After ordering rows and columns according to ( I, Ic), the active matrix has the block triangular form 
+
+RI ∼
+
+ MII 0
+
+MIcI −I
+
+
+
+.
+
+Thus (23) makes RI nonsingular, so R⊤I is nonsingular as well. Consequently, (22) implies M z ∗ −
+
+w∗ − b = 0. Since ( z∗, w ∗) ∈ C , nonnegativity and complementarity already hold; therefore ( z∗, w ∗)solves the LCP. The preceding corollaries give conditions under which an individual strictly complementary projected stationary point has zero residual. The following theorem uses these pointwise conditions to establish solution-set convergence for the general model. 
+
+Theorem 3. Suppose that Assumption 1 holds, {yk} is bounded, and every accumulation point 
+
+y∗ satisfies I00 (y∗) = ∅ and either rank( H(y∗)) = m or c ∈ Range( H(y∗)) . Then S̸ = ∅, every accumulation point belongs to S, and dist( yk, S) → 0. If S = {y†}, then yk → y†.Proof. Let y∗ be any accumulation point. By Lemma 1, the closedness of C, and the continuity of Φ, we have y∗ ∈ C and Φ( y∗) ≤ Φ( y0). Theorem 1 shows that y∗ is α∗-projected stationary for some 
+
+α∗ ∈ [α, α ]. Proposition 2 and I00 (y∗) = ∅ give H(y∗)⊤r(y∗) = 0. If rank( H(y∗)) = m, then H(y∗)⊤
+
+is injective and hence r(y∗) = 0. Alternatively, if c ∈ Range( H(y∗)), strict complementarity gives 9P u ∗ + Qv ∗ = H(y∗)( u∗ + v∗), so r(y∗) ∈ Range( H(y∗)). The active-face normal equation also gives 
+
+r(y∗) ∈ Range( H(y∗)) ⊥, and therefore r(y∗) = 0. Thus y∗ ∈ S in either case. Since {yk} is bounded, it has an accumulation point y∗ ∈ S . Monotonicity gives the existence of lim k Φ( yk), while continuity along a subsequence converging to y∗ shows that this limit is Φ( y∗) = 0. Suppose that dist( yk, S)̸ → 0. Then there exist ε > 0 and a subsequence {ykj } such that dist( ykj , S) ≥ ε ∀j. By boundedness, a further subsequence converges to some accumulation point ¯ y ∈ S . Since the distance function is continuous, dist( ykjℓ , S) → dist(¯ y, S) = 0 , which is a contradiction. Hence dist( yk, S) → 0. If S = {y†} but yk̸ → y†, then some subsequence satisfies ∥ykj − y†∥ ≥ ε for an ε > 0. A further convergent subsequence must converge to an accumulation point in S, necessarily y†, which is again a contradiction. Therefore yk → y†.If the zero-residual solution set S is empty, then the assumptions of Theorem 3 cannot all hold. The least-squares problem nevertheless has a global minimizer because C is a finite union of polyhedral cones. Proposition 2 shows that a projected stationary point minimizes Φ over its active face, but not necessarily over all of C. Convergence to a global least-squares solution in this inconsistent setting would require an additional condition, such as an appropriate projected Polyak–Lojasiewicz inequality. We do not pursue this case here. The next two theorems impose problem-wide matrix conditions that establish stationary exact-ness without strict complementarity, including at biactive projected stationary points. 
+
+Theorem 4. For the GAVE problem, the following statements hold. For all conclusions concerning the sequence generated by Algorithm 1, suppose that Assumption 1 holds. (i) Suppose that m ≤ n and 
+
+inf 
+
+> D∈D [−1,1]
+
+σmin (A − BD ) > 0. (24) 
+
+Then the GAVE formulation satisfies stationary exactness. If {yk} is bounded, then 
+
+Φ( yk) → 0, dist( yk, S) → 0,
+
+and every accumulation point corresponds to a global GAVE solution. (ii) Suppose that m = n and 
+
+δ := σmin (A) − ∥ B∥2 > 0. (25) 
+
+Then the GAVE has a unique solution x†. Set y† := (( x†)+, (x†)−). Every projected stationary point y = ( x+, x −) satisfies x+ − x− = x†. Moreover, the sequence generated by Algorithm 1 satisfies 
+
+yk → y†, Φ( yk) → 0. (26) 
+
+(iii) In addition to the assumptions of part (ii), suppose that (9) is used with p = GAVE and τ > 0.When invoked at ¯xk+1 , the refinement computes 
+
+CD(¯ xk+1 ) ex = b (27) 
+
+and tests ey = ( ex+, ex−) according to (10) . Then there exists K ∈ N such that 
+
+D(¯ xk+1 ) ∈ D(x†), ∀k ≥ K. (28) 
+
+Consequently, the algorithm reaches y† after finitely many iterations. 
+
+10 Proof. For part (i), let y = ( x+, x −) be any α-projected stationary point, set x := x+ − x− and 
+
+r := Ax − B|x| − b, and write ai := A⊤ 
+
+> :i
+
+r and βi := B⊤ 
+
+> :i
+
+r. The coordinatewise conditions in Proposition 2 give ai − βi = 0 when xi > 0 and ai + βi = 0 when xi < 0. If xi = 0, they give 
+
+ai − βi ≥ 0, −ai − βi ≥ 0,
+
+and hence βi ≤ −| ai|. We may therefore choose di ∈ [−1, 1] such that ai − diβi = 0: take di = 1 when xi > 0, di = −1 when xi < 0, di = ai/β i when xi = 0 and βi < 0, and di = 0 otherwise. With D := diag( d), this gives ( A − BD )⊤r = 0 with D ∈ D [−1,1] . Condition (24) makes ( A − BD )⊤
+
+injective, so r = 0. Under the algorithmic assumptions, Theorem 1 shows that every accumulation point is pro-jected stationary and hence belongs to S. Boundedness supplies at least one accumulation point. Monotonicity and continuity therefore give Φ( yk) → 0, and the standard bounded-subsequence contradiction gives dist( yk, S) → 0. For part (ii), every D ∈ D [−1,1] satisfies 
+
+σmin (A − BD ) ≥ σmin (A) − ∥ BD ∥2 ≥ σmin (A) − ∥ B∥2 = δ > 0.
+
+Thus (24) holds and part (i) applies. Moreover, 
+
+∥A−1B∥2 ≤ ∥B∥2
+
+σmin (A) < 1.
+
+Thus x 7 → A−1(B|x| + b) is a contraction, whose unique fixed point x† is the unique GAVE solution. For every y = ( u, v ) ∈ C , the vector x = u − v satisfies |x| = u + v and ∥x∥ = ∥y∥. Consequently, 
+
+p2Φ( y) = ∥Ax − B|x| − b∥≥ ∥ Ax ∥ − ∥ B|x|∥ − ∥ b∥≥  σmin (A) − ∥ B∥2
+
+∥x∥ − ∥ b∥
+
+= δ∥y∥ − ∥ b∥.
+
+Thus Φ is coercive on C. By Lemma 1, the generated sequence {yk} lies in a bounded level set. Part (i) and uniqueness show that every accumulation point equals y†, which proves (26). For part (iii), part (ii) gives yk → y† and ∇Φ( y†) = 0. The bounded stepsizes and (8) imply 
+
+ζk := yk − αk∇Φ( yk) → y†. Since y† ∈ C and ¯ yk+1 ∈ ΠC (ζk), 
+
+∥¯yk+1 − ζk∥ ≤ ∥ y† − ζk∥, ∥¯yk+1 − y†∥ ≤ 2∥ζk − y†∥ → 0.
+
+Consequently, ρ(¯ yk+1 ) → 0. For each i with x†
+
+> i
+
+̸ = 0, convergence of ¯ xk+1 fixes its sign after finitely many iterations; no restriction is needed when x† 
+
+> i
+
+= 0. This proves (28). Since τ > 0, the residual alternative in (9) eventually invokes the refinement. For every D ∈ D(x†), we have Dx † = |x†| and hence CDx† = b. By (25), CD is nonsingular, so (27) yields ex = x†. Thus ey = y† and Φ( ey) = 0, and the safeguard accepts the candidate. The GAVE result relies on the uniform rank condition imposed on A−BD . Its LCP counterpart below uses the P-matrix property to obtain stationary exactness, convergence of the entire sequence, and recovery after finitely many iterations. 
+
+Theorem 5. Consider the LCP problem. The following statements hold. For all conclusions concerning the sequence generated by Algorithm 1, suppose that Assumption 1 holds. 
+
+11 (i) Suppose that M is a P-matrix. Then the LCP formulation satisfies stationary exactness. The LCP has a unique solution (z†, w †), and the sequence generated by Algorithm 1 satisfies 
+
+(zk, w k) → (z†, w †), Φ( zk, w k) → 0. (29) 
+
+(ii) In addition to the assumptions of part (i), suppose that (9) is used with p = LCP and τ > 0.When invoked at ¯yk+1 , the refinement computes 
+
+h
+
+−M:, ¯J k+1  
+
+> z
+
+I:, ¯J k+1 
+
+> w
+
+i " ez ¯J k+1 
+
+> z
+
+ew ¯J k+1 
+
+> w
+
+#
+
+= −b, ez( ¯J k+1   
+
+> z)c
+
+= 0 , ew( ¯J k+1   
+
+> w)c
+
+= 0 , (30) 
+
+and tests (ez, ew) according to (10) . Then there exists K ∈ N such that 
+
+¯J k+1  
+
+> z
+
+∈ J(z†, w †), ∀k ≥ K. (31) 
+
+Consequently, the algorithm reaches (z†, w †) after finitely many iterations. Proof. For part (i), let ( z, w ) be any projected stationary point, and set r := M z − w − b. For every i, define ai := M ⊤ 
+
+> :i
+
+r. The coordinatewise conditions in Proposition 2 give ai = 0 when zi > 0, 
+
+ri = 0 when wi > 0, and ai ≥ 0, ri ≤ 0 at a biactive index. Hence one can choose di ∈ [0 , 1] so that 
+
+diai + (1 − di)ri = 0. Take di = 1 when zi > 0, di = 0 when wi > 0, and di = −ri/(ai − ri) at a biactive index when ai − ri > 0; otherwise take di = 0. With Θ := diag( d) and JΘ := I − Θ + M Θ, we obtain 
+
+J⊤ 
+
+> Θ
+
+r = 0 . (32) To show that JΘ is nonsingular, suppose that JΘp = 0 and set v := Θ p. If v = 0, then 0 = JΘp = ( I − Θ) p, and hence p = Θ p + ( I − Θ) p = 0. Thus p̸ = 0 implies v̸ = 0. Moreover, 
+
+JΘp = 0 gives M v = −(I − Θ) p, and consequently 
+
+vi(M v )i = −di(1 − di)p2 
+
+> i
+
+≤ 0, ∀i. 
+
+This contradicts the P-matrix characterization that every nonzero v has an index i satisfying 
+
+vi(M v )i > 0. Thus JΘ is nonsingular, and (32) gives r = 0. The classical P-matrix characteri-zation of LCPs then gives a unique solution ( z†, w †); see, for example, [3]. For boundedness, let E be the finite set of diagonal matrices with diagonal entries in {0, 1}. The preceding nonsingularity argument gives μ := min E∈E σmin (I − E + M E ) > 0. For every ( z, w ) ∈ C ,taking x = z − w and the binary matrix E selected by the sign of x gives 
+
+M z − w = ( I − E + M E )x, ∥x∥ = ∥(z, w )∥.
+
+Therefore p2Φ( z, w ) = ∥M z − w − b∥≥ ∥ M z − w∥ − ∥ b∥
+
+= ∥(I − E + M E )x∥ − ∥ b∥≥ μ∥x∥ − ∥ b∥
+
+= μ∥(z, w )∥ − ∥ b∥.
+
+The generated sequence lies in a bounded level set. Every accumulation point is projected stationary and hence equals the unique LCP solution, proving (29). 12 For part (ii), set y† 
+
+> L
+
+:= ( z†, w †). Global convergence, ∇Φ( y†
+
+> L
+
+) = 0, and the bounded stepsizes give ζk := yk − αk∇Φ( yk) → y†
+
+> L
+
+. Since y† 
+
+> L
+
+∈ C and ¯ yk+1 ∈ ΠC (ζk), 
+
+∥¯yk+1 − y†
+
+> L
+
+∥ ≤ 2∥ζk − y†
+
+> L
+
+∥ → 0.
+
+Consequently, ρ(¯ yk+1 ) → 0. Hence every index in supp( z†) belongs to ¯J k+1  
+
+> z
+
+eventually, whereas every index in supp( w†) is eventually excluded. This proves (31). Since τ > 0, the residual alternative in (9) eventually invokes the refinement. Fix any J ∈ J(z†, w †). Then z†J c = 0 and w†J = 0, so the LCP solution satisfies the full-step system associated with ( J , J c). Its coefficient matrix is nonsingular because MJ J is a principal submatrix of the P-matrix M . Consequently, (30) yields ( ez, ew) = ( z†, w †). This candidate is feasible and has zero objective value, so it is accepted by (10). 
+
+## 5 Numerical Experiments 
+
+We evaluate the proposed method, denoted by PGDN, on GAVEs and LCPs. Since the two model classes use different variables and residuals, comparisons are made within each class. 
+
+5.1 Implementation details 
+
+The theoretical framework uses the sufficient condition αk < 1/L , whereas the implementation enforces descent directly through a projected Armijo line search and may accept larger stepsizes. The projected-gradient step uses alternating Barzilai–Borwein trial stepsizes [4], globalized by a projected Armijo line search.The trial value is truncated to [ αmin , α max ] and then reduced by the factor β until the projected candidate satisfies the Armijo condition Φ(¯ yk+1 ) ≤ Φ( yk) − σαk
+
+∥¯yk+1 − yk∥2.
+
+Thus, the implementation does not compute the Lipschitz constant L and does not explicitly enforce the theoretical upper bound 1 /L . The default values are α0 = 1, αmin = 10 −12 , αmax = 10 12 ,
+
+β = 0 .5, and σ = 10 −4, unless stated otherwise. The refinement is triggered when either the normalized equation residual is at most newtonTol or the relevant sign/active pattern has been unchanged for signStableIts consecutive iterations. The defaults are newtonTol = 10 −3, signStableIts = 5, and at most maxNewton = 3 inner refinements. Damped candidates are tested in the order γ ∈ { 1, 0.5, 0.25 , 0.1} and retained only if the normalized residual is at most newtonEta = 0 .8 times the best current residual. The final refined point is used only when it improves the projected-gradient candidate, which realizes the safeguard (10). For a GAVE iterate x, the refinement uses the sign matrix D(x) from (3) and solves  A −
+
+BD (x)ex = b. A direct linear solve is used for square systems and a minimum-norm least-squares solution for rectangular systems. Each damped point has the form x + γ(ex − x) and is tested using the true GAVE residual. After acceptance, the complementarity variables are recovered from its positive and negative parts. For the direct LCP solver, let Iw = {i : wi > 0} and Iz = {1, . . . , n } \ I w. Thus a biac-tive index is assigned to the z-branch. The refinement fixes zIw = 0 and wIz = 0 and solves 
+
+−M:,Iz I:,Iw
+
+  ezIz
+
+ewIw
+
+
+
+= −b. The resulting system is square. A candidate is discarded if an active component is below the prescribed feasibility tolerance; the remaining damped candidates are tested using ∥w − M z + b∥/ max {1, ∥b∥} .13 Both solvers stop when the normalized equation residual reaches tolRes . They also stop when the infinity norm of the projected-gradient displacement is at most tolStep and no refinement was accepted; in this case the termination flag records whether the residual tolerance was met. Consequently, the practical solver may stop at a prescribed tolerance before the refinement systems in Theorems 4 and 5 return an exact solution. 
+
+5.2 Experimental settings 
+
+All methods were implemented in MATLAB R2024b and run on a 64-bit workstation with an Intel Core i9-12900 CPU at 2.40 GHz and 64 GB of RAM. CPU times were measured in this common environment. Because the methods have different per-iteration costs, iteration counts are compared only within the same model class. For GAVE instances, we use the relative equation residual and, when a planted solution is available, the relative solution error: relRes := ∥Ax − B|x| − b∥2
+
+max {1, ∥b∥2} , distX := ∥x − x∗∥2
+
+max {1, ∥x∗∥2} .
+
+For direct LCP instances, we report CPU time, the natural residual, and the feasibility-and-complementarity residual defined below. PGDN is shown in red in all figures. 
+
+5.3 Ablation study 
+
+We isolate the effects of the BB stepsize and algebraic refinement by comparing four variants: 
+
+• PGD. Projected gradient descent with a fixed stepsize and without algebraic refinement. 
+
+• PGD-BB. Projected gradient descent equipped with the Barzilai–Borwein (BB) stepsize. 
+
+• PGD-Newton. Projected gradient descent with the safeguarded algebraic refinement and a fixed stepsize. 
+
+• PGDN. The full proposed method. All variants use the same projected line search and differ only in the two components indicated above. For the fixed-step variants, we use αfix := 0.99 2( σmax (A)+ ∥B∥2)2 . We set the iteration limit to 4, 000 and use tolRes = 10 −12 and tolStep = 10 −10 .
+
+We generate synthetic GAVEs Ax − B|x| = b. The matrices A and B have linearly spaced pre-scribed singular values; their singular-vector factors are obtained by QR factorizations of Gaussian matrices. The baseline parameters are 
+
+σmin (A) = 2 , κ(A) = 2 , ∥B∥2 = 1 , κ(B) = 10 . (33) For each instance, we sample x∗ and set b = Ax ∗ − B|x∗|, so that the instance is consistent. All variants use the same random initial point in each trial. We test m ∈ { 512 , 1024 , 2048 , 4096 }, and 
+
+n ∈ { 64 , 128 , 256 , 512 }, with n ≤ m. For each pair ( m, n ), ten independent trials are performed. Figure 1 shows the expected tradeoff. The theoretically safe fixed stepsize makes PGD stable but substantially slower than its BB variant. The refinement reduces both fixed-step and BB iterations and drives the final residual and solution error close to machine precision. PGDN uses a modest amount of additional linear algebra relative to PGD-BB, but it requires the fewest outer iterations overall and is faster than both fixed-step variants. Thus the BB rule accelerates the projected-gradient iterations, while the algebraic refinement provides high final accuracy. 14 0 0.5 1 1.5 2                   
+
+> dimension (m*n) 10 6
+> 00.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8
+> Median CPU time (s)
+> CPU time (s)
+> 00.5 11.5 2
+> dimension (m*n) 10 6
+> 050 100 150 200 250
+> Median iterations
+> iterations
+> 00.5 11.5 2
+> dimension (m*n) 10 6
+> 10 -16
+> 10 -15
+> 10 -14
+> 10 -13
+> 10 -12
+> 10 -11
+> 10 -10
+> 10 -9
+> Median relative residual
+> relative residual
+> 00.5 11.5 2
+> dimension (m*n) 10 6
+> 10 -16
+> 10 -15
+> 10 -14
+> 10 -13
+> 10 -12
+> 10 -11
+> 10 -10
+> 10 -9
+> Median relative error to xTrue
+> relative error to xTrue
+> PGD PGD-BB PGD-Newton PGDN
+
+Figure 1: Ablation results for the fixed-stepsize, BB, and safeguarded refinement components. Each curve reports the median over independent trials for the tested matrix dimensions. 
+
+5.4 Sensitivity analysis 
+
+We next vary the condition numbers, the relative strength of the absolute-value term, and the dimension. We set tolRes = 10 −12 , tolStep = 10 −10 , and x0 = 0, and report medians over five independent trials. For square instances with n ∈ { 128 , 256 , 512 }, we vary one parameter at a time from the baseline (33) κ(A), κ (B) ∈ { 2, 5, 10 , 20 , 50 , 100 } and ∥B∥2/σ min (A) ∈ { 0.1, 0.25 , 0.5, 0.75 , 1.0}. Figures 2 and 3 report median CPU time and relative residual, respectively. 0 20 40 60 80 100                     
+
+> (A)
+> 00.02 0.04 0.06 0.08 0.1
+> CPU time (s) (A)
+> 020 40 60 80 100
+> (B)
+> 00.01 0.02 0.03 0.04 0.05 0.06 0.07
+> CPU time (s) (B)
+> 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+> ||B|| 2/min (A)
+> 00.01 0.02 0.03 0.04 0.05 0.06 0.07
+> CPU time (s) ||B|| 2/min (A)
+> n = 128 n = 256 n = 512
+
+Figure 2: Median CPU time of PGDN under variations in the condition numbers, the ratio 
+
+∥B∥2/σ min (A), and the problem dimension. 0 20 40 60 80 100                        
+
+> (A)
+> 0.4 0.6 0.8 11.2 1.4 1.6 1.8
+> Median relative residual
+> 10 -14 (A)
+> 020 40 60 80 100
+> (B)
+> 46810 12 14 16
+> Median relative residual
+> 10 -15 (B)
+> 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+> ||B|| 2/min (A)
+> 46810 12 14 16
+> Median relative residual
+> 10 -15 ||B|| 2/min (A)
+> n = 128 n = 256 n = 512
+
+Figure 3: Median relative residual of PGDN under variations in the condition numbers, the ratio 
+
+∥B∥2/σ min (A), and the problem dimension. Across the tested ranges, Figure 2 shows moderate variation in median CPU time, while Figure 3 shows that the final residual remains at a comparable level. The tested instances therefore indicate limited sensitivity to these three factors. 15 5.5 Comparisons with existing GAVE methods 
+
+We compare PGDN with RABK [23], PIM [22], MAP [2], GNM [13, 18], and TAVE [1]. Unless otherwise stated, all methods start from x0 = 0, use a maximum of 4000 iterations, and target a relative residual of 10 −12 .
+
+Square controlled-spectrum systems. Following the setting in [23, Section 6.2], we fix σmin (A) = 2 and ∥B∥2 = 1 and use ( κ(A), κ (B)) ∈ { (2 , 1) , (3 , 10) , (10 , 10) , (30 , 100) }. We test m = n ∈{64 , 128 , 256 , 512 , 1024 }, with three trials per size and spectral pair. GNM and PGDN consistently attain residuals near floating-point precision. PIM and MAP generally stop near the requested tolerance. RABK often reaches 4000 iterations before meeting the target, and its residual deteriorates as dimension or conditioning increases. TAVE is accurate but becomes much more expensive at n = 1024. GNM or PIM is faster than PGDN in several settings, so the results support high accuracy and competitive performance in selected settings, not uniform superiority. 
+
+Tall controlled-spectrum systems. The rectangular experiment fixes n = 64 and uses m ∈{64 , 128 , 256 , 512 , 1024 , 2048 }, with five trials per spectral pair. The comparison contains RABK, MAP, and PGDN because their available implementations directly support tall matrices. GNM requires a square system. PIM is defined through an inverse solve with A; using MATLAB’s rect-angular backslash would replace that step by a least-squares solve and would no longer implement the stated PIM iteration. The available SLA implementation [17] constructs and solves a dense LP at every iteration and has no enforceable time limit; it already required more than one minute at ( m, n ) = (128 , 64). The available TAVE implementation likewise performs an LP initialization before its internal time check. SLA and TAVE are therefore excluded rather than being assigned misleading nominal timeouts. PGDN attains median residuals between approximately 4 × 10 −16 and 10 −15 . MAP is also accurate, typically between 10 −15 and 10 −13 . RABK reaches its iteration limit and becomes less accurate for larger or more ill-conditioned instances. At ( κ(A), κ (B)) = (30 , 100) and ( m, n ) = (2048 , 64), the median CPU times are 0.0098, 0.0176, and 0.0888 seconds for PGDN, MAP, and RABK, respectively; their median residuals are 5 .70 × 10 −16 , 4 .15 × 10 −14 , and 1 .76 × 10 −2.
+
+Large-scale sparse AVE systems. Following the sparse generation strategy in [6, Section 3], we use MATLAB’s sprand with prescribed singular values to generate A ∈ Rn×n with requested density 0 .003. We sample x⋆ and x0 componentwise from U (−100 , 100) and set b = Ax ⋆ − | x⋆|. The singular values are sampled from [4 , 160], with both endpoints inserted, so σmin (A) = 4, κ2(A) = 40, and ∥A−1∥2 = 1 /4 < 1/3. We use n ∈ { 1000 , 2500 , 5000 , 10000 } and three fixed-seed trials per dimension. The comparison includes RABK [23], PIM [22], Exact-SSN [18], Inexact-SSN [6], and PGDN. Exact-SSN is the GNM iteration specialized to B = I. PIM reuses a sparse LU factorization, Exact-SSN uses sparse direct solves, and Inexact-SSN uses warm-started LSQR with the residual-relative tolerance in [6]. The success criterion is ∥Ax − | x| − b∥2 ≤ 10 −8. MAP and TAVE are omitted because their available implementations do not preserve the intended large-scale sparse computational model. PIM, Exact-SSN, Inexact-SSN, and PGDN solve every instance. RABK reaches its 4000-update limit on every instance and does not meet the tolerance. At n = 10000, Inexact-SSN is fastest, followed by PIM; PGDN and Exact-SSN are more expensive because their accepted steps involve sparse direct factorizations. PGDN nevertheless retains a median residual near 10 −10 in the absolute 16 10 2 10 3
+
+Dimension n 
+
+10 -3 
+
+10 -2 
+
+10 -1 
+
+10 0
+
+10 1
+
+10 2
+
+> CPU time (s)
+
+(A)=2, (B)=1: CPU 
+
+10 2 10 3
+
+Dimension n 
+
+10 -15 
+
+10 -10 
+
+10 -5 
+
+10 0
+
+> Relative residual
+
+Residual 
+
+RABK PIM MAP GNM TAVE PGDN (a) κ(A) = 2, κ(B) = 1. 10 2 10 3
+
+Dimension n 
+
+10 -4 
+
+10 -2 
+
+10 0
+
+10 2
+
+> CPU time (s)
+
+(A)=3, (B)=10: CPU 
+
+10 2 10 3
+
+Dimension n 
+
+10 -15 
+
+10 -10 
+
+10 -5 
+
+10 0
+
+> Relative residual
+
+Residual 
+
+RABK PIM MAP GNM TAVE PGDN (b) κ(A) = 3, κ(B) = 10. 10 2 10 3
+
+Dimension n 
+
+10 -4 
+
+10 -2 
+
+10 0
+
+10 2
+
+> CPU time (s)
+
+(A)=10, (B)=10: CPU 
+
+10 2 10 3
+
+Dimension n 
+
+10 -15 
+
+10 -10 
+
+10 -5 
+
+10 0
+
+> Relative residual
+
+Residual 
+
+RABK PIM MAP GNM TAVE PGDN 
+
+(c) κ(A) = 10, κ(B) = 10. 10 2 10 3
+
+Dimension n 
+
+10 -4 
+
+10 -2 
+
+10 0
+
+10 2
+
+> CPU time (s)
+
+(A)=30, (B)=100: CPU 
+
+10 2 10 3
+
+Dimension n 
+
+10 -15 
+
+10 -10 
+
+10 -5 
+
+10 0
+
+> Relative residual
+
+Residual 
+
+RABK PIM MAP GNM TAVE PGDN (d) κ(A) = 30, κ(B) = 100. 
+
+Figure 4: Square controlled-spectrum GAVE comparisons. 10 2 10 3
+
+Number of rows m 
+
+10 -3 
+
+10 -2 
+
+10 -1 
+
+> CPU time (s)
+
+(A)=2, (B)=1: CPU 
+
+10 2 10 3
+
+Number of rows m 
+
+10 -16 
+
+10 -14 
+
+10 -12 
+
+10 -10 
+
+> Relative residual
+
+Residual 
+
+RABK MAP PGDN 
+
+(a) κ(A) = 2, κ(B) = 1. 10 2 10 3
+
+Number of rows m 
+
+10 -3 
+
+10 -2 
+
+10 -1 
+
+> CPU time (s)
+
+(A)=3, (B)=10: CPU 
+
+10 2 10 3
+
+Number of rows m 
+
+10 -16 
+
+10 -14 
+
+10 -12 
+
+10 -10 
+
+10 -8 
+
+10 -6 
+
+> Relative residual
+
+Residual 
+
+RABK MAP PGDN (b) κ(A) = 3, κ(B) = 10. 10 2 10 3
+
+Number of rows m 
+
+10 -3 
+
+10 -2 
+
+10 -1 
+
+> CPU time (s)
+
+(A)=10, (B)=10: CPU 
+
+10 2 10 3
+
+Number of rows m 
+
+10 -15 
+
+10 -10 
+
+10 -5 
+
+10 0
+
+> Relative residual
+
+Residual 
+
+RABK MAP PGDN 
+
+(c) κ(A) = 10, κ(B) = 10. 10 2 10 3
+
+Number of rows m 
+
+10 -3 
+
+10 -2 
+
+10 -1 
+
+> CPU time (s)
+
+(A)=30, (B)=100: CPU 
+
+10 2 10 3
+
+Number of rows m 
+
+10 -15 
+
+10 -10 
+
+10 -5 
+
+10 0
+
+> Relative residual
+
+Residual 
+
+RABK MAP PGDN (d) κ(A) = 30, κ(B) = 100. 
+
+Figure 5: Tall controlled-spectrum GAVE comparisons with fixed n = 64. 17 Large-scale sparse AVE instances (density 0.003, cond 2(A)=40)    
+
+> 10 310 4
+> Dimension n
+> 10 -2
+> 10 -1
+> 10 0
+> 10 1
+> Median CPU time (s)
+> RABK PIM Exact-SSN Inexact-SSN PGDN
+> 10 310 4
+> Dimension n
+> 10 -10
+> 10 -5
+> 10 0
+> 10 5
+> Median absolute residual
+> 10 -8 tolerance
+
+Figure 6: Median CPU time and absolute residual on large-scale sparse AVEs. scale and near floating-point precision in the relative scale. These results support accuracy and robustness for PGDN on this controlled sparse family, but not superiority over specialized sparse iterations. 
+
+5.6 Comparisons with existing LCP methods 
+
+We next solve three LCP benchmarks directly in the form 
+
+z ≥ 0, w = M z − b ≥ 0, z⊤w = 0 ,
+
+used by the problem generator. These tests assess the projection and active-set refinement without first converting the LCP to a GAVE. Following [3, Section 7.2], we use the following three LCP problems: 
+
+• LCP1 [21, Example 2]: M is tridiagonal with Mii = 4 for all i and Mij = −1 when |i − j| = 1, while the benchmark right-hand side is the all-ones vector. 
+
+• LCP2 [15, Example 7.1]: M is upper triangular with Mii = 1 for all i and Mij = 2 for all 
+
+i < j , and the benchmark right-hand side is again the all-ones vector. 
+
+• LCP3 [15, Example 7.3]: the benchmark right-hand side is sampled componentwise from the uniform distribution on ( −500 , 500), and M = A⊤ 
+
+> 1
+
+A1 + A2 + diag( η), where the entries of A1 and A2 are independently sampled from the uniform distribution on ( −5, 5), A2 is skew-symmetric, and each entry of η is independently sampled from (0 , 0.3). We compare PGDN with projected Gauss–Seidel (PGS) and projected SOR (PSOR) [8, 9], a smoothed Fischer–Burmeister Newton method [16], and PG-BT [5]. The latter applies projected gradient with the backtracking test of [5] to our complementarity-constrained least-squares formu-lation, without active-set refinement. We also include AMAP+, APS+, and EGA from [3], using the authors’ implementation in lcp safp solver-main . For the affine matrix [ M, −I], AMAP+ uses the metric Q = ( M M ⊤ + I)−1, whereas APS+ uses Q = I; both employ extrapolation and component identification. The generated data are initially divided by s := ∥M ∥1/√n. For LCP2, both normalized quan-tities are subsequently multiplied by s, thereby recovering the original unscaled benchmark. This positive common scaling leaves the solution set in z unchanged, while the complementary slack is scaled by the same factor. We use n ∈ { 64 , 128 , 256 , 512 }. LCP1 and LCP2 are determinis-tic, whereas the reported LCP3 values are medians over ten independent instances. The stopping 18 64 128 256 512 
+
+Dimension n 
+
+10 -3 
+
+10 -2 
+
+10 -1 
+
+> CPU time (s)
+
+LCP1: CPU time 
+
+64 128 256 512 
+
+Dimension n 
+
+10 -16 
+
+10 -14 
+
+10 -12 
+
+10 -10 
+
+10 -8 
+
+10 -6 
+
+10 -4 
+
+> LCP residual
+
+LCP1: residual 
+
+64 128 256 512 
+
+Dimension n 
+
+10 0
+
+10 1
+
+10 2
+
+10 3
+
+10 4
+
+> Iterations
+
+LCP1: iterations 
+
+PGDN PG-BT PGS PSOR FB-Newton AMAP+ APS+ EGA (a) LCP1. 64 128 256 512 
+
+Dimension n 
+
+10 -4 
+
+10 -3 
+
+10 -2 
+
+10 -1 
+
+10 0
+
+10 1
+
+> CPU time (s)
+
+LCP2: CPU time 
+
+64 128 256 512 
+
+Dimension n 
+
+10 -15 
+
+10 -10 
+
+10 -5 
+
+10 0
+
+> LCP residual
+
+LCP2: residual 
+
+64 128 256 512 
+
+Dimension n 
+
+10 0
+
+10 1
+
+10 2
+
+10 3
+
+10 4
+
+> Iterations
+
+LCP2: iterations 
+
+PGDN PG-BT PGS PSOR FB-Newton AMAP+ APS+ EGA 
+
+(b) LCP2. 64 128 256 512 
+
+Dimension n 
+
+10 -4 
+
+10 -3 
+
+10 -2 
+
+10 -1 
+
+10 0
+
+10 1
+
+> CPU time (s)
+
+LCP3: CPU time 
+
+64 128 256 512 
+
+Dimension n 
+
+10 -16 
+
+10 -14 
+
+10 -12 
+
+10 -10 
+
+10 -8 
+
+10 -6 
+
+10 -4 
+
+10 -2 
+
+> LCP residual
+
+LCP3: residual 
+
+64 128 256 512 
+
+Dimension n 
+
+10 1
+
+10 2
+
+10 3
+
+10 4
+
+> Iterations
+
+LCP3: iterations 
+
+PGDN PG-BT PGS PSOR FB-Newton AMAP+ APS+ EGA 
+
+(c) LCP3. 
+
+Figure 7: Direct solution of the three LCP benchmarks. 19 residuals for every method are evaluated with w := M z − b recomputed from the returned z. The stopping parameters are set to maxIter = 4000, tolRes = 10 −8, and tolStep = 10 −10 . We report CPU time, the natural residual res nat := ∥ min {z, w }∥ 2
+
+max {1, ∥b∥2} ,
+
+and the LCP residual res LCP := max 
+
+(
+
+∥ min {z, 0}∥ 2
+
+max {1, ∥z∥2} , ∥ min {w, 0}∥ 2
+
+max {1, ∥w∥2} , |z⊤w|
+
+max {1, ∥z∥2∥w∥2}
+
+)
+
+.
+
+The results are shown in Figures 7a–7c. The results depend strongly on the benchmark structure. On LCP1, PGDN needs only 7–9 outer iterations and attains LCP residuals between 6 .3 × 10 −15 and 2 .1 × 10 −13 . FB-Newton converges in five iterations, while PGS, PSOR, AMAP+, and APS+ also satisfy the prescribed LCP residual tolerance. In contrast, PG-BT stops at the affine-residual tolerance but not at the stricter LCP criterion, and EGA reaches the iteration limit. The triangular LCP2 strongly favors coordinate methods: PGS obtains zero reported residual in two sweeps, and PSOR takes only 10–11 sweeps. PGDN and AMAP+ also solve every tested in-stance, with zero reported residual. The performance of the two projection metrics differs markedly on this problem: APS+ solves the cases n = 64 and 128, but reaches the iteration limit for n = 256 and 512, whereas AMAP+ remains successful. FB-Newton solves all four instances but its iteration count grows from 92 to 773. PG-BT fails to reach the requested accuracy within 4000 iterations, and EGA does so for the two larger dimensions. On the random LCP3 instances, PGDN, AMAP+, and APS+ have a 100% success rate and median LCP residuals near machine precision at every dimension. AMAP+ and APS+ are substan-tially faster than PGDN here: at n = 512, their median CPU times are 0 .024 and 0 .041 seconds, compared with 3 .16 seconds for PGDN. PGS, PSOR, FB-Newton, and EGA also solve all instances, although at larger median residuals of approximately 10 −9–10 −10 . PG-BT reaches the tolerance on only 20% and 10% of the instances for n = 64 and 128, respectively, and on none of the larger instances. Thus, the active-set refinement in PGDN is effective in recovering highly accurate so-lutions, but its linear algebra is not competitive with the specialized projection and coordinate methods on these random LCPs. 
+
+## 6 Concluding Remarks 
+
+We proposed a safeguarded projected-gradient framework for GAVEs and LCPs that combines a common first-order iteration with problem-dependent algebraic refinements. We established con-ditions ensuring stationary exactness and global convergence, together with stronger convergence and finite-recovery results for selected problem classes. The numerical experiments demonstrate high final accuracy across the tested problems, although computational performance depends on the problem structure and the specialized comparison method. Future work includes inconsistent GAVEs and extensions to nonlinear complementarity-constrained problems. 
+
+## References 
+
+[1] L. Abdallah, M. Haddou, and T. Migot. Solving absolute value equation using complementarity and smoothing functions. Journal of Computational and Applied Mathematics , 327:196–207, 2018. 20 [2] J. H. Alcantara, J.-S. Chen, and M. K. Tam. Method of alternating projections for the general absolute value equation. Journal of Fixed Point Theory and Applications , 25(1):39, 2023. [3] J. H. Alcantara and C.-P. Lee. Global convergence and acceleration of projection methods for feasibility problems involving union convex sets. Journal of Optimization Theory and Applica-tions , 204(2):19, 2025. [4] J. Barzilai and J. M. Borwein. Two-point step size gradient methods. IMA Journal of Numerical Analysis , 8(1):141–148, 1988. [5] A. Beck and M. Teboulle. A linearly convergent algorithm for solving a class of nonconvex/affine feasibility problems. In H. H. Bauschke, R. S. Burachik, P. L. Combettes, V. Elser, D. R. Luke, and H. Wolkowicz, editors, Fixed-Point Algorithms for Inverse Problems in Science and Engineering , pages 33–48. Springer, New York, 2011. [6] J. Y. Bello Cruz, O. P. Ferreira, and L. F. Prudente. On the global convergence of the inexact semi-smooth Newton method for absolute value equation. Computational Optimization and Applications , 65(1):93–108, 2016. [7] C. Chen, D. Yu, D. Han, and C. Ma. A non-monotone smoothing Newton algorithm for solving the system of generalized absolute value equations. Journal of Computational Mathematics ,43(2):438–460, 2025. [8] R. W. Cottle, J.-S. Pang, and R. E. Stone. The linear complementarity problem . Academic Press, Boston, 1992. [9] C. W. Cryer. The solution of a quadratic programming problem using systematic overrelax-ation. SIAM Journal on Control , 9(3):385–392, 1971. [10] F. Facchinei and J.-S. Pang. Finite-dimensional variational inequalities and complementarity problems . Springer, New York, 2003. [11] A. Fischer. A special Newton-type optimization method. Optimization , 24(3–4):269–284, 1992. [12] M. Hlad´ ık, H. Moosaei, F. Hashemi, S. Ketabchi, and P. M. Pardalos. An overview of absolute value equations: From theory to solution methods and challenges. Computational Optimization and Applications , 93:435–488, 2026. [13] S.-L. Hu, Z.-H. Huang, and Q. Zhang. A generalized Newton method for absolute value equa-tions associated with second order cones. Journal of Computational and Applied Mathematics ,235(5):1490–1501, 2011. [14] C. Kanzow. Global convergence properties of some iterative methods for linear complementarity problems. SIAM Journal on Optimization , 6(2):326–341, 1996. [15] C. Kanzow. Some noninterior continuation methods for linear complementarity problems. 
+
+SIAM Journal on Matrix Analysis and Applications , 17(4):851–868, 1996. [16] C. Kanzow and H. Pieper. Jacobian smoothing methods for nonlinear complementarity prob-lems. SIAM Journal on Optimization , 9(2):342–373, 1999. [17] O. L. Mangasarian. Absolute value programming. Computational Optimization and Applica-tions , 36(1):43–53, 2007. 21 [18] O. L. Mangasarian. A generalized Newton method for absolute value equations. Optimization Letters , 3(1):101–108, 2009. [19] O. L. Mangasarian and R. R. Meyer. Absolute value equations. Linear Algebra and its Appli-cations , 419(2–3):359–367, 2006. [20] A. Nurkanovi´ c. Local convergence results for sequential quadratic programming with comple-mentarity constraints. arXiv preprint arXiv:2604.18192, 2026. [21] L. Qi, D. Sun, and G. Zhou. A new look at smoothing Newton methods for nonlinear comple-mentarity problems and box constrained variational inequalities. Mathematical Programming, Series B , 87(1):1–35, 2000. [22] J. Rohn, V. Hooshyarbakhsh, and R. Farhadsefat. An iterative method for solving absolute value equations and sufficient conditions for unique solvability. Optimization Letters , 8(1):35– 44, 2014. [23] J. Xie, H.-D. Qi, and D. Han. Randomized iterative methods for generalized absolute value equations: Solvability and error bounds. SIAM Journal on Optimization , 35(3):1731–1760, 2025. [24] S. Yang and S.-L. Wu. A modified Barzilai–Borwein algorithm for the generalized absolute value equation. Operations Research Letters , 51(1):21–25, 2023. [25] H.-Y. Zhou, S.-L. Wu, and C.-X. Li. Newton-based matrix splitting method for generalized absolute value equation. Journal of Computational and Applied Mathematics , 394:113578, 2021. 22
