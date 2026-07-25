@@ -1,0 +1,132 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-25T21:09:57.764861+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 3,
+    "quick_skim_target": 11,
+    "quick_selected": 3
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2607.16973v1",
+      "source": "arxiv",
+      "title": "TurboVec: A Case Study in Cost-Efficient Private Retrieval for Enterprise RAG via Codebook-Oblivious Quantization",
+      "abstract": "Retrieval-Augmented Generation (RAG) systems increasingly power enterprise LLM applications, yet the vector retrieval layer introduces two underexplored challenges: (1) trained codebook quantizers may expose corpus statistics during index construction, creating a leakage channel in multi-tenant deployments, and (2) post-hoc filtering for tenant isolation degrades recall on selective queries. We study TurboVec, an open-source vector index built on TurboQuant - a codebook-oblivious scalar quantizer requiring no corpus-dependent training. On the DBpedia OpenAI embeddings benchmark (d=1536, 100K-999K vectors), TurboQuant 4-bit outperforms trained FAISS Product Quantization at the same memory budget by 8.5-8.9 percentage points in Recall@5 across all scales. Compared to HNSW (R@5=0.991) and IVF-PQ (R@5=0.840), TurboQuant occupies a distinct design point: higher recall than IVF-PQ without training, at 4-8x less memory than HNSW. Deployed on Snowpark Container Services, TurboVec achieves 11ms median query latency at 100K vectors versus 707ms for warehouse brute-force scan. Kernel-level allowlist filtering maintains 0.86-0.93 Recall@10 across 10-1000 tenant workloads versus 0.09-0.19 for post-filter baselines. Codebook-oblivious design reduces membership inference accuracy to near-random (50.0%) versus 57.3% for PQ codebooks. Limitations include single dataset evaluation, uncompressed HNSW comparison, and privacy evaluation on synthetic data only.",
+      "authors": [
+        "Navnit Shukla",
+        "Kamal Pandey",
+        "Omsankar Tiwari"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.IR"
+      ],
+      "published": "2026-07-18T21:43:40+00:00",
+      "link": "https://arxiv.org/pdf/2607.16973v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "improves RAG retrieval efficiency and privacy, supporting LLM post-training",
+      "llm_evidence_cn": "提升RAG检索效率与隐私，支持LLM后训练",
+      "llm_evidence": "提升RAG检索效率与隐私，支持LLM后训练",
+      "canonical_evidence": "提升RAG检索效率与隐私，支持LLM后训练",
+      "llm_tldr_en": "TurboVec introduces a codebook-oblivious scalar quantizer for vector retrieval in RAG systems, achieving better recall than FAISS PQ at the same memory budget, enabling cost-efficient private retrieval for enterprise LLM applications.",
+      "llm_tldr_cn": "TurboVec提出了一种码本无关的标量量化器TurboQuant，用于RAG系统的向量检索。该方法无需依赖语料库训练，在DBpedia基准上，4位量化在同等内存预算下比FAISS乘积量化召回率提升8.5-8.9%。该工作解决了企业RAG部署中索引泄露和租户隔离导致召回下降的问题，为LLM后训练中的高效检索提供了实用方案。",
+      "llm_tldr": "TurboVec提出了一种码本无关的标量量化器TurboQuant，用于RAG系统的向量检索。该方法无需依赖语料库训练，在DBpedia基准上，4位量化在同等内存预算下比FAISS乘积量化召回率提升8.5-8.9%。该工作解决了企业RAG部署中索引泄露和租户隔离导致召回下降的问题，为LLM后训练中的高效检索提供了实用方案。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.18821v2",
+      "source": "arxiv",
+      "title": "VirtualSet: Typed Ontology Worlds as an LLM Generation Target for Grounded Queries and Guarded Decisions",
+      "abstract": "Large language models increasingly read and act on enterprise data, but SQL gives a late error signal: hallucinated fields or relations can execute and return plausible wrong answers, while incorrect writes cannot be safely assessed after execution. We present VirtualSet, a live, receiver-typed ontology-world interface and generation target for LLMs. Instead of SQL, the model emits set expressions over entity-edge worlds. Generic Constraint Projection (GCP) checks expressions before execution, while future this preserves concrete receiver types through collection chains, turning invalid fields, edges, receivers, and actions into token-anchored type errors. Type-clean reads use a SQL fast path or bounded stream interpretation, with a parity oracle checking both paths over the exercised operator space. The same substrate supports guarded decisions: actions run first in a simulated world, and world-change events require external approval before actualization. On BIRD, we lift relational schemas into typed worlds and compare VirtualSet with direct SQL while holding the model, evidence, values, zero-shot setting, timeout, glossary, repair/voting, and grader constant where possible. On a frozen 1,072-question split, VirtualSet achieves 67.5% accuracy versus 63.5% for glossary-matched direct SQL with repair and voting (+4.0 points; McNemar exact p = 0.00117) using deepseek-reasoner. Full-corpus analysis finds no engine mis-computation of a type-clean expression; remaining errors arise from model semantics or gold defects. In a 30-body guard corpus, the write chain intercepts 20/20 hallucinated action bodies with zero false positives. VirtualSet thus remains competitive on SQL's home benchmark while providing pre-execution semantics for guarded decisions.",
+      "authors": [
+        "Qunhui Zhang"
+      ],
+      "primary_category": "cs.PL",
+      "categories": [
+        "cs.PL"
+      ],
+      "published": "2026-07-21T07:57:17+00:00",
+      "link": "https://arxiv.org/pdf/2607.18821v2",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "prevents hallucinated fields via typed ontology and constraint projection",
+      "llm_evidence_cn": "通过类型化本体和约束投影防止幻觉字段",
+      "llm_evidence": "通过类型化本体和约束投影防止幻觉字段",
+      "canonical_evidence": "通过类型化本体和约束投影防止幻觉字段",
+      "llm_tldr_en": "VirtualSet uses typed ontology worlds and Generic Constraint Projection to prevent hallucinated fields/relations in LLM-generated set expressions, ensuring grounded queries.",
+      "llm_tldr_cn": "大语言模型处理企业数据时，SQL会因幻觉字段产生错误结果而难以发现。VirtualSet提出一种接收器类型化的本体世界接口，让LLM生成集合表达式而非SQL。通过通用约束投影（GCP）在执行前检查表达式有效性，将无效字段、边、接收器转化为token级别的类型错误。类型正确的读取可通过SQL快速路径或流式解释器执行。该方法有效抑制了由幻觉引起的数据库错误。",
+      "llm_tldr": "大语言模型处理企业数据时，SQL会因幻觉字段产生错误结果而难以发现。VirtualSet提出一种接收器类型化的本体世界接口，让LLM生成集合表达式而非SQL。通过通用约束投影（GCP）在执行前检查表达式有效性，将无效字段、边、接收器转化为token级别的类型错误。类型正确的读取可通过SQL快速路径或流式解释器执行。该方法有效抑制了由幻觉引起的数据库错误。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.21556v1",
+      "source": "arxiv",
+      "title": "Visual Contrastive Self-Distillation",
+      "abstract": "On-policy self-distillation (OPSD) is promising as it removes the external teacher required by on-policy distillation (OPD), yet it still needs asymmetric information between teacher and student to ensure that the self-teacher provides a stronger learning signal than the student. Existing methods create this asymmetry either through privileged answers or visual evidence. We ask whether both can be removed, yielding a simpler form of OPSD driven purely by input conditioning. For this purpose, we propose Visual Contrastive Self-Distillation, namely VCSD, which converts image-content removal into an on-policy self-distillation signal. At each student-generated response prefix, the EMA teacher produces two next-token distributions under the same prompt and prefix -- one conditioned on the original image and the other on a content-erased control. Their token-wise log-probability difference highlights candidates whose likelihood is specifically increased by the instance-level visual content. We use this contrast to sharpen the teacher's original-image distribution within its plausible support, and distill the resulting full-distribution target into the student. Using ViRL39K dataset, VCSD consistently outperforms matched OPSD across Qwen3-VL and Qwen3.5 models. For example, on Qwen3-VL, it improves the seven-benchmark aggregate from $62.27\\% \\rightarrow 67.04\\%$ at 2B, $71.30\\% \\rightarrow 73.16\\%$ at 4B, and $72.51\\% \\rightarrow 76.26\\%$ at 8B. Furthermore, VCSD requires no external teacher, privileged answers, visual evidence signals, reasoning traces, or additional inference-time cost.",
+      "authors": [
+        "Yijun Liang",
+        "Yunjie Tian",
+        "Yijiang Li",
+        "Yuqi Jia",
+        "Furong Huang",
+        "Tianyi Zhou",
+        "Di Fu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-07-23T17:37:37+00:00",
+      "link": "https://arxiv.org/pdf/2607.21556v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "novel self-distillation method for autoregressive models removes need for asymmetric information",
+      "llm_evidence_cn": "提出无需非对称信息的自蒸馏方法，适用于自回归模型训练",
+      "llm_evidence": "提出无需非对称信息的自蒸馏方法，适用于自回归模型训练",
+      "canonical_evidence": "提出无需非对称信息的自蒸馏方法，适用于自回归模型训练",
+      "llm_tldr_en": "Proposes Visual Contrastive Self-Distillation (VCSD) that uses input conditioning alone to create asymmetry in on-policy self-distillation, simplifying training of autoregressive models.",
+      "llm_tldr_cn": "该论文针对on-policy自蒸馏需要非对称信息的问题，提出视觉对比自蒸馏（VCSD）。VCSD通过将图像内容移除转化为自蒸馏信号，仅利用输入条件化来生成更强的学习信号。实验表明VCSD简化了自蒸馏流程并提升了学生模型性能，为语言模型训练提供了一种创新的算法改进，可应用于大语言模型的后训练。",
+      "llm_tldr": "该论文针对on-policy自蒸馏需要非对称信息的问题，提出视觉对比自蒸馏（VCSD）。VCSD通过将图像内容移除转化为自蒸馏信号，仅利用输入条件化来生成更强的学习信号。实验表明VCSD简化了自蒸馏流程并提升了学生模型性能，为语言模型训练提供了一种创新的算法改进，可应用于大语言模型的后训练。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

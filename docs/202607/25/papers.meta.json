@@ -1,0 +1,54 @@
+{
+  "label": "2026-07-25",
+  "date": "2026-07-25",
+  "generated_at": "2026-07-25T21:11:40",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202607/25/2607.16973v1-turbovec-a-case-study-in-cost-efficient-private-retrieval-for-enterprise-rag-via-codebook-oblivious-quantization",
+      "section": "quick",
+      "title_en": "TurboVec: A Case Study in Cost-Efficient Private Retrieval for Enterprise RAG via Codebook-Oblivious Quantization",
+      "authors": "Navnit Shukla, Kamal Pandey, Omsankar Tiwari",
+      "date": "2026-07-18",
+      "pdf": "https://arxiv.org/pdf/2607.16973v1",
+      "score": "7.0",
+      "evidence": "提升RAG检索效率与隐私，支持LLM后训练",
+      "tldr": "企业RAG系统向量检索面临训练码本量化泄露语料统计及后置过滤降低召回的问题。提出TurboVec，采用codebook-oblivious标量量化TurboQuant，无需语料训练。4-bit量化在Recall@5上比FAISS PQ高8.5-8.9pp，延迟仅11ms，内核级过滤保持0.86-0.93召回。成员推理准确率降至50%，实现内存高效、高召回与隐私保护。",
+      "tags": "query:lpt",
+      "abstract_en": "Retrieval-Augmented Generation (RAG) systems increasingly power enterprise LLM applications, yet the vector retrieval layer introduces two underexplored challenges: (1) trained codebook quantizers may expose corpus statistics during index construction, creating a leakage channel in multi-tenant deployments, and (2) post-hoc filtering for tenant isolation degrades recall on selective queries. We study TurboVec, an open-source vector index built on TurboQuant - a codebook-oblivious scalar quantizer requiring no corpus-dependent training. On the DBpedia OpenAI embeddings benchmark (d=1536, 100K-999K vectors), TurboQuant 4-bit outperforms trained FAISS Product Quantization at the same memory budget by 8.5-8.9 percentage points in Recall@5 across all scales. Compared to HNSW (R@5=0.991) and IVF-PQ (R@5=0.840), TurboQuant occupies a distinct design point: higher recall than IVF-PQ without training, at 4-8x less memory than HNSW. Deployed on Snowpark Container Services, TurboVec achieves 11ms median query latency at 100K vectors versus 707ms for warehouse brute-force scan. Kernel-level allowlist filtering maintains 0.86-0.93 Recall@10 across 10-1000 tenant workloads versus 0.09-0.19 for post-filter baselines. Codebook-oblivious design reduces membership inference accuracy to near-random (50.0%) versus 57.3% for PQ codebooks. Limitations include single dataset evaluation, uncompressed HNSW comparison, and privacy evaluation on synthetic data only.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/25/2607.18821v2-virtualset-typed-ontology-worlds-as-an-llm-generation-target-for-grounded-queries-and-guarded-decisions",
+      "section": "quick",
+      "title_en": "VirtualSet: Typed Ontology Worlds as an LLM Generation Target for Grounded Queries and Guarded Decisions",
+      "authors": "Qunhui Zhang",
+      "date": "2026-07-21",
+      "pdf": "https://arxiv.org/pdf/2607.18821v2",
+      "score": "7.0",
+      "evidence": "通过类型化本体和约束投影防止幻觉字段",
+      "tldr": "LLM使用SQL时因幻觉字段导致错误返回，且写操作无法安全评估。VirtualSet用类型化的本体世界表达式代替SQL，通过Generic Constraint Projection预检查类型错误，干净类型读取经SQL快速路径或流解释。在BIRD基准测试中，VirtualSet准确率67.5%优于SQL的63.5%，写操作拦截20/20幻觉无假阳性。该方法提供预执行语义，支持安全决策，在SQL主基准上保持竞争力。",
+      "tags": "query:lpt",
+      "abstract_en": "Large language models increasingly read and act on enterprise data, but SQL gives a late error signal: hallucinated fields or relations can execute and return plausible wrong answers, while incorrect writes cannot be safely assessed after execution. We present VirtualSet, a live, receiver-typed ontology-world interface and generation target for LLMs. Instead of SQL, the model emits set expressions over entity-edge worlds. Generic Constraint Projection (GCP) checks expressions before execution, while future this preserves concrete receiver types through collection chains, turning invalid fields, edges, receivers, and actions into token-anchored type errors. Type-clean reads use a SQL fast path or bounded stream interpretation, with a parity oracle checking both paths over the exercised operator space. The same substrate supports guarded decisions: actions run first in a simulated world, and world-change events require external approval before actualization. On BIRD, we lift relational schemas into typed worlds and compare VirtualSet with direct SQL while holding the model, evidence, values, zero-shot setting, timeout, glossary, repair/voting, and grader constant where possible. On a frozen 1,072-question split, VirtualSet achieves 67.5% accuracy versus 63.5% for glossary-matched direct SQL with repair and voting (+4.0 points; McNemar exact p = 0.00117) using deepseek-reasoner. Full-corpus analysis finds no engine mis-computation of a type-clean expression; remaining errors arise from model semantics or gold defects. In a 30-body guard corpus, the write chain intercepts 20/20 hallucinated action bodies with zero false positives. VirtualSet thus remains competitive on SQL's home benchmark while providing pre-execution semantics for guarded decisions.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/25/2607.21556v1-visual-contrastive-self-distillation",
+      "section": "quick",
+      "title_en": "Visual Contrastive Self-Distillation",
+      "authors": "Yijun Liang, Yunjie Tian, Yijiang Li, Yuqi Jia, Furong Huang, Tianyi Zhou, Di Fu",
+      "date": "2026-07-23",
+      "pdf": "https://arxiv.org/pdf/2607.21556v1",
+      "score": "7.0",
+      "evidence": "提出无需非对称信息的自蒸馏方法，适用于自回归模型训练",
+      "tldr": "现有在线自蒸馏方法需不对称信息，如特权答案或视觉证据。本文提出视觉对比自蒸馏（VCSD），通过图像内容擦除实现纯输入条件驱动的自蒸馏。教师模型对同一输入生成原始图像和内容擦除后的分布，利用两者对数概率差突出视觉内容贡献的候选词，从而锐化教师分布并蒸馏给学生。在ViRL39K数据集上，VCSD在Qwen3-VL和Qwen3.5上均显著优于匹配基线，且无需外部教师、额外推理成本。",
+      "tags": "query:lpt",
+      "abstract_en": "On-policy self-distillation (OPSD) is promising as it removes the external teacher required by on-policy distillation (OPD), yet it still needs asymmetric information between teacher and student to ensure that the self-teacher provides a stronger learning signal than the student. Existing methods create this asymmetry either through privileged answers or visual evidence. We ask whether both can be removed, yielding a simpler form of OPSD driven purely by input conditioning. For this purpose, we propose Visual Contrastive Self-Distillation, namely VCSD, which converts image-content removal into an on-policy self-distillation signal. At each student-generated response prefix, the EMA teacher produces two next-token distributions under the same prompt and prefix -- one conditioned on the original image and the other on a content-erased control. Their token-wise log-probability difference highlights candidates whose likelihood is specifically increased by the instance-level visual content. We use this contrast to sharpen the teacher's original-image distribution within its plausible support, and distill the resulting full-distribution target into the student. Using ViRL39K dataset, VCSD consistently outperforms matched OPSD across Qwen3-VL and Qwen3.5 models. For example, on Qwen3-VL, it improves the seven-benchmark aggregate from $62.27\\% \\rightarrow 67.04\\%$ at 2B, $71.30\\% \\rightarrow 73.16\\%$ at 4B, and $72.51\\% \\rightarrow 76.26\\%$ at 8B. Furthermore, VCSD requires no external teacher, privileged answers, visual evidence signals, reasoning traces, or additional inference-time cost.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
