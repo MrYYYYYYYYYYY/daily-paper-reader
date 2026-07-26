@@ -1,0 +1,69 @@
+{
+  "label": "2026-07-26",
+  "date": "2026-07-26",
+  "generated_at": "2026-07-26T21:13:33",
+  "count": 4,
+  "papers": [
+    {
+      "paper_id": "202607/26/2607.16903v1-a-method-for-learning-value-systems-in-generative-ai",
+      "section": "deep",
+      "title_en": "A Method for Learning Value Systems in Generative AI",
+      "authors": "Andrés Holgado-Sánchez, Holger Billhardt, Sascha Ossowski",
+      "date": "2026-07-18",
+      "pdf": "https://arxiv.org/pdf/2607.16903v1",
+      "score": "10.0",
+      "evidence": "从偏好数据中学习价值系统以对齐生成式AI",
+      "tldr": "价值感知AI需要显式计算人类价值基础与聚合系统，但当前生成式AI缺乏基础价值学习方法。本文调整已有价值系统学习方法，基于成对偏好数据同时学习多目标奖励模型（价值基础）和加权线性标量化（价值系统），并通过动态优先学习保证一致性。实验显示性能与基线相当，同时提升可解释性。",
+      "tags": "query:lpt",
+      "abstract_en": "Value-aware AI systems require explicit computational representations of human values (groundings) and their aggregation into value systems in order to align their decisions with ours. As such representations are difficult to elicit, value learning seeks to infer them by observing human behaviour. This work addresses the lack of grounded value learning methods in generative AI: existing approaches typically replicate human preferences without awareness of the multidimensional structure of value alignment, or lack principled value system elicitation methods. To address these gaps, we adapt a previously validated value system learning method to the generative AI setting, which, based on pairwise prompt-response preference data, simultaneously learns: i) an implementation of a grounding for a set of values given by a multi-objective reward model, and ii) a value system representation in the form of a weighted linear scalarization of the previous grounding model. To ensure that the learned value systems are based on coherent value representations, our algorithm dynamically prioritizes the grounding learning process. We evaluate the method against baselines and a contemporary method on prompt-response preference datasets. Results show competitive performance and minimal trade-offs against the baselines, while improving explainability.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/26/2607.19939v1-analysis-on-spaces-of-measures",
+      "section": "deep",
+      "title_en": "Analysis on spaces of measures",
+      "authors": "Charles Bertucci",
+      "date": "2026-07-22",
+      "pdf": "https://arxiv.org/pdf/2607.19939v1",
+      "score": "8.0",
+      "evidence": "测度空间上的分析的数学公式化",
+      "tldr": "测度空间上的函数分析缺乏系统工具。本文提出垂直/水平导数和次可微性等概念，并建立凸性单调性刻画。在平均场博弈中证明了主方程单调解的唯一性、稳定性和存在性；在最优控制中证明值函数是HJB方程唯一粘性解。工作为测度空间上的变分和PDE理论提供了统一框架，降低了读者入门门槛。",
+      "tags": "query:lpt",
+      "abstract_en": "This work presents analytical tools for studying functions defined on spaces of measures, together with two applications: mean field game master equations and first order Hamilton-Jacobi-Bellman equations on the set of probability measures. The first part introduces several notions of differentiability for such functions - vertical (or flat) and horizontal derivatives - as well as associated notions of convexity, monotonicity and sub-differentiability. The second part is concerned with master equations, for which uniqueness and stability of monotone solutions are established, and existence is discussed. The third part studies mean field optimal control problems and characterizes their value functions as the unique viscosity solutions of the associated Hamilton-Jacobi-Bellman equations. This work is intended to be accessible to readers unfamiliar with spaces of measures.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/26/2607.21327v1-from-static-bibliometrics-to-dynamic-knowledge-graphs-an-llm-powered-framework-for-modernizing-science-technology-and-innovation-sti-analytics",
+      "section": "deep",
+      "title_en": "From Static Bibliometrics to Dynamic Knowledge Graphs: An LLM-Powered Framework for Modernizing Science, Technology, and Innovation (STI) Analytics",
+      "authors": "Muhsen Hammoud",
+      "date": "2026-07-23",
+      "pdf": "https://arxiv.org/pdf/2607.21327v1",
+      "score": "8.0",
+      "evidence": "通过结构化基础抑制LLM幻觉的混合框架",
+      "tldr": "传统文献计量指标存在时间滞后、语义浅薄等问题，动态知识图谱和LLM单独使用各有局限。本文提出一个五层混合框架，将LLM严格限定为生成候选语义增强的角色，经过结构、证据、比较和专家多级验证后方可纳入知识图谱。该框架支持趋势检测、科技路径映射和政策缺口分析，在提升语义丰富性和时间响应性的同时，通过验证机制确保符合科学证据标准。核心贡献是以验证作为语义灵活性与认知准则之间的中介原则。",
+      "tags": "query:lpt",
+      "abstract_en": "Bibliometric indicators - citation counts, h-indexes, co-authorship networks - have long anchored science, technology, and innovation (STI) analytics, yet suffer from temporal lag, semantic shallowness, and an inability to capture the non-linear dynamics of contemporary knowledge ecosystems. Dynamic knowledge graphs and large language models (LLMs) have each been proposed as remedies, but neither is sufficient alone: existing scholarly knowledge graphs remain largely static, while LLM-driven pipelines are prone to hallucination, opacity, and corpus bias without structured grounding. This paper proposes a hybrid, symbolic-first framework integrating all three traditions under explicit methodological constraint. Organized across five layers - an open scholarly data backbone, a dynamic versioned knowledge graph, a constrained LLM-assisted semantic augmentation layer, a multi-layer validation pipeline, and an analytics layer - the framework positions LLMs strictly as generators of provisional candidate enrichments. Candidates become analytically admissible only after passing structural, evidentiary, comparative, and selective expert validation, with full provenance recorded at every stage. The analytics layer supports both established bibliometric indicators and extended graph-based analyses, including trend emergence detection, science-to-technology pathway mapping, and policy-oriented gap analysis. The framework's central theoretical contribution is treating validation as the mediating principle between semantic flexibility and epistemic discipline, enabling STI analytics that is semantically richer and temporally more responsive than static bibliometrics while remaining aligned with the evidentiary standards of science-of-science research. Governance considerations addressing reproducibility, bias, and auditability are also discussed.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/26/2607.18481v1-search-on-graph-r1-training-large-language-models-to-search-knowledge-graphs-with-reinforcement-learning",
+      "section": "quick",
+      "title_en": "Search-on-Graph-R1: Training Large Language Models to Search Knowledge Graphs with Reinforcement Learning",
+      "authors": "Jia Ao Sun, Hao Yu, Fengran Mo, Zhan Su, Yuchen Hui, Bang Liu, Jian-Yun Nie",
+      "date": "2026-07-20",
+      "pdf": "https://arxiv.org/pdf/2607.18481v1",
+      "score": "6.0",
+      "evidence": "使用强化学习训练紧凑模型进行知识图谱搜索，属于算法改进",
+      "tldr": "知识图谱问答需要从实体出发沿关系路径导航到答案。现有方法依赖前沿LLM调用检索工具，部署成本高。本文提出Search-on-Graph-R1，通过监督微调让8B模型学习教师模型基于SPARQL生成的路径，再经强化学习优化搜索步数。在WebQSP、CWQ和GrailQA上，8B模型超越所有对比的前沿LLM系统，且无需辅助模块或LLM裁判。",
+      "tags": "query:lpt",
+      "abstract_en": "Knowledge graph question answering (KGQA) requires navigating from topic entities to an answer several relations away. Recent methods prompt a frontier LLM to explore the graph through a retrieval tool, but their reliance on frontier-scale inference makes them costly to deploy. We present Search-on-Graph-R1 (\\sogrone{}), which internalizes this navigation into a compact 8B model through supervised fine-tuning (SFT) followed by reinforcement learning (RL). Our central idea is to scaffold a frontier teacher with each question's gold SPARQL query, so the teacher traverses a known answer-bearing path with a live \\texttt{Search} tool rather than having to discover the path itself. Since every call executes against a live Freebase server, the resulting trajectories are grounded in the knowledge graph by construction. On WebQSP, CWQ, and GrailQA, \\sogrone{} at 8B surpasses every frozen frontier-LLM system in our comparison and posts the strongest results on CWQ of any system we compare against. It does so using no auxiliary module at inference and no LLM judge during training. Isolating each training stage shows that SFT and RL contribute complementary gains, our approach transfers across model families, and RL learns to reach answers in fewer \\texttt{Search} calls than its SFT initialization.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
