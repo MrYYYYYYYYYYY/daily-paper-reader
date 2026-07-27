@@ -6,34 +6,41 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-26
-- 运行时间：2026-07-26 21:13:26 UTC
+- 最新运行日期：2026-07-27
+- 运行时间：2026-07-27 21:42:29 UTC
 - 运行状态：成功
-- 本次总论文数：4
+- 本次总论文数：7
 - 精读区：3
-- 速读区：1
+- 速读区：4
 
 ### 今日简报（AI）
-今日精读2篇高价值论文，速读1篇。
-重点推荐满分论文《A Method for Learning Value Systems in Generative AI》，探讨生成式AI价值系统学习；次选8分《Analysis on spaces of measures》。
-建议普通读者优先阅读满分论文，了解价值对齐前沿方法。
-- 详情：[/202607/26/README](/202607/26/README)
+今日共阅读7篇论文，精读聚焦LLM在硬件描述语言问答中的质量问题和强化学习培养元技能。最值得关注的方向是LLM过度回答的量化与缓解，以及利用强化学习使模型自我进化。建议优先精读这两篇，并速读差分隐私统计查询和跨分词器蒸馏的进展。
+- 详情：[/202607/27/README](/202607/27/README)
 
 ### 精读区论文标签
-1. [A Method for Learning Value Systems in Generative AI](/202607/26/2607.16903v1-a-method-for-learning-value-systems-in-generative-ai)  
-   标签：评分：10.0/10、query:lpt
-   evidence：从偏好数据中学习价值系统以对齐生成式AI
-2. [Analysis on spaces of measures](/202607/26/2607.19939v1-analysis-on-spaces-of-measures)  
+1. [When LLMs Over-Answer: Measuring and Mitigating Quality Issues in LLM-Based Hardware Description Language Question Answering](/202607/27/2607.17063v2-when-llms-over-answer-measuring-and-mitigating-quality-issues-in-llm-based-hardware-description-language-question-answering)  
+   标签：评分：9.0/10、query:lpt
+   evidence：衡量并缓解LLM过度回答的质量问题，直接针对幻觉抑制
+2. [Teaching LLMs to Self-Evolve: Cultivating Core Meta-Skills with Reinforcement Learning](/202607/27/2607.21971v1-teaching-llms-to-self-evolve-cultivating-core-meta-skills-with-reinforcement-learning)  
    标签：评分：8.0/10、query:lpt
-   evidence：测度空间上的分析的数学公式化
-3. [From Static Bibliometrics to Dynamic Knowledge Graphs: An LLM-Powered Framework for Modernizing Science, Technology, and Innovation (STI) Analytics](/202607/26/2607.21327v1-from-static-bibliometrics-to-dynamic-knowledge-graphs-an-llm-powered-framework-for-modernizing-science-technology-and-innovation-sti-analytics)  
+   evidence：利用奖励信号的强化学习进行大语言模型后训练中的自我进化
+3. [Skill Self-Play: Pushing the Frontier of LLM Capability with Co-Evolving Skills](/202607/27/2607.22529v1-skill-self-play-pushing-the-frontier-of-llm-capability-with-co-evolving-skills)  
    标签：评分：8.0/10、query:lpt
-   evidence：通过结构化基础抑制LLM幻觉的混合框架
+   evidence：LLM自我进化与协同进化技能，解决训练多样性和验证可靠性
 
 ### 速读区论文标签
-1. [Search-on-Graph-R1: Training Large Language Models to Search Knowledge Graphs with Reinforcement Learning](/202607/26/2607.18481v1-search-on-graph-r1-training-large-language-models-to-search-knowledge-graphs-with-reinforcement-learning)  
+1. [Pure-DP Statistical Query Release at the Conjectured Square-Root Rate](/202607/27/2607.20418v1-pure-dp-statistical-query-release-at-the-conjectured-square-root-rate)  
+   标签：评分：7.0/10、query:lpt
+   evidence：统计查询释放的平方根误差率理论界
+2. [Cross-Tokenizer On-Policy Distillation via Byte-Prefix Marginalization](/202607/27/2607.22334v1-cross-tokenizer-on-policy-distillation-via-byte-prefix-marginalization)  
+   标签：评分：7.0/10、query:lpt
+   evidence：跨分词器在策略蒸馏算法改进方法
+3. [VDAR-Router: Adaptive LLMs Routing via Verbalized Query Difficulty Analysis Retrieval](/202607/27/2607.18098v1-vdar-router-adaptive-llms-routing-via-verbalized-query-difficulty-analysis-retrieval)  
    标签：评分：6.0/10、query:lpt
-   evidence：使用强化学习训练紧凑模型进行知识图谱搜索，属于算法改进
+   evidence：自适应LLM路由算法改进成本-性能平衡
+4. [Beyond Relevance-Centric Retrieval: Rubric-Oriented Document Set Selection and Ranking](/202607/27/2607.19747v1-beyond-relevance-centric-retrieval-rubric-oriented-document-set-selection-and-ranking)  
+   标签：评分：6.0/10、query:lpt
+   evidence：文档集选择与排序的算法改进
 
 
 <div class="dpr-home-promo-card">

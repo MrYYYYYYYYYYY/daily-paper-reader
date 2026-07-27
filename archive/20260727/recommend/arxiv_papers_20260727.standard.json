@@ -1,0 +1,303 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-27T21:36:45.741188+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 3,
+    "deep_cap": 6,
+    "deep_selected": 3,
+    "quick_candidates": 4,
+    "quick_skim_target": 11,
+    "quick_selected": 4
+  },
+  "deep_dive": [
+    {
+      "id": "2607.17063v2",
+      "source": "arxiv",
+      "title": "When LLMs Over-Answer: Measuring and Mitigating Quality Issues in LLM-Based Hardware Description Language Question Answering",
+      "abstract": "The rapid advancement of large language models (LLMs) has led practitioners to increasingly rely on them for answering questions about hardware description languages (HDLs). Because HDL is ultimately synthesized into physical hardware, an imprecise or redundant answer can propagate into timing violations or non-synthesizable logic that surface only late in the design flow, making the quality of HDL answers especially consequential. However, the quality of LLM-generated responses, particularly in comparison with answers provided by human experts, remains unclear. To investigate this question, we collect 6,246 HDL Q&A posts with accepted answers from Stack Overflow and curate them into a dataset, organized into a taxonomy of four main categories (Conceptual, Debugging, Generation, and Optimization) and ten subcategories. Using this dataset, we design a user study conducted with 19 HDL engineers with one to three years of experience. Our findings reveal a pervasive over answering tendency: LLMs supply correct content but bury it under redundant alternatives (65.7%) and verbose padding (69.1%), while nearly half of answers (49.0%) fail to fully align with expert answers yet participants still preferred LLM responses for readability (58.3%). Motivated by these findings, we propose a multi-agent framework for improving LLM-based HDL question answering. We evaluate answer quality using an LLM-as-Judge and two structural metrics: the number of core answers, which reflects redundancy since LLMs often provide multiple alternative solutions, and the length of non-core content, which reflects verbosity. Evaluated on the four mainstream LLMs, our framework increases the average core-answer quality score from 3.71 to 4.67 (+0.96) and the non-core content quality from 3.72 to 4.23 (+0.51), on a five-point scale.",
+      "authors": [
+        "Ziteng Hu",
+        "Jiachi Chen",
+        "Wenhao Lv",
+        "Huan Zhang",
+        "Yingjie Xia"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-19T04:12:38+00:00",
+      "link": "https://arxiv.org/pdf/2607.17063v2",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Measures and mitigates LLM over-answering quality issues, directly addressing hallucination suppression",
+      "llm_evidence_cn": "衡量并缓解LLM过度回答的质量问题，直接针对幻觉抑制",
+      "llm_evidence": "衡量并缓解LLM过度回答的质量问题，直接针对幻觉抑制",
+      "canonical_evidence": "衡量并缓解LLM过度回答的质量问题，直接针对幻觉抑制",
+      "llm_tldr_en": "Investigates LLM over-answering in HDL QA, proposes a dataset and metrics to measure answer quality, and identifies strategies to mitigate quality issues.",
+      "llm_tldr_cn": "该工作关注大型语言模型在硬件描述语言问答中的过度回答现象。通过收集6246条Stack Overflow问答构建数据集，系统比较了LLM与人类专家回答的质量差异，发现LLM存在冗余和不精确问题。论文提出了衡量回答质量的指标并探索缓解策略，对提升LLM在专业领域的可靠性具有重要意义。",
+      "llm_tldr": "该工作关注大型语言模型在硬件描述语言问答中的过度回答现象。通过收集6246条Stack Overflow问答构建数据集，系统比较了LLM与人类专家回答的质量差异，发现LLM存在冗余和不精确问题。论文提出了衡量回答质量的指标并探索缓解策略，对提升LLM在专业领域的可靠性具有重要意义。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.21971v1",
+      "source": "arxiv",
+      "title": "Teaching LLMs to Self-Evolve: Cultivating Core Meta-Skills with Reinforcement Learning",
+      "abstract": "Test-time scaling through iterative self-evolution with environment feedback, as demonstrated by AlphaEvolve, shows remarkable performance gains. We hypothesize that the success of such evolution frameworks hinges on meta-skills, such as self-reflection with environment feedback, that enable effective multi-round refinement, yet are largely neglected by traditional post-training. To bridge this gap, we present MetaEvolve, a framework designed to develop these meta-skills via a data synthesis pipeline, evolution-aware reinforcement learning (RL), and inference-time evolutionary search. Concretely, we ground MetaEvolve in coding, where program execution provides natural, continuous reward signals beyond binary correctness. Building on these signals, we synthesize evolution trajectories as training data, each containing a current program, its fitness score (combining correctness and efficiency), and a history of prior attempts, and train the model via RL with verifiable rewards derived from test case execution. By training on large-scale code data, we aim to inspire generalizable domain-agnostic meta-skills that can transfer broadly to open-ended problems where such rich training signals are scarce. Across seven coding benchmarks, MetaEvolve outperforms the strongest baseline by 10.01% absolute on in-distribution tasks and 24.12% on out-of-distribution tasks. On open-ended algorithm optimization problems entirely outside the training domain, it further achieves a 46.9% relative improvement. These results demonstrate that explicitly cultivating self-evolution meta-skills offers a principled path toward more capable and autonomously self-evolving AI.",
+      "authors": [
+        "Shujin Wu",
+        "Cheng Qian",
+        "Xiusi Chen",
+        "Heng Ji"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-07-24T04:35:29+00:00",
+      "link": "https://arxiv.org/pdf/2607.21971v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Reinforcement learning with reward signals for LLM self-evolution post-training",
+      "llm_evidence_cn": "利用奖励信号的强化学习进行大语言模型后训练中的自我进化",
+      "llm_evidence": "利用奖励信号的强化学习进行大语言模型后训练中的自我进化",
+      "canonical_evidence": "利用奖励信号的强化学习进行大语言模型后训练中的自我进化",
+      "llm_tldr_en": "Proposes MetaEvolve, a framework that uses reinforcement learning with program execution rewards to cultivate meta-skills like self-reflection in LLMs for iterative self-evolution, achieving performance gains.",
+      "llm_tldr_cn": "当前大语言模型后训练方法忽略了对自我反思等元技能的培养，限制了模型的多轮自我进化能力。本文提出MetaEvolve框架，通过数据合成流水线和进化感知的强化学习（RL），利用程序执行提供连续奖励信号，训练LLM的元技能。实验表明，该框架在代码任务上显著提升了模型的自我进化性能，为后训练中的能力泛化提供了新方向。",
+      "llm_tldr": "当前大语言模型后训练方法忽略了对自我反思等元技能的培养，限制了模型的多轮自我进化能力。本文提出MetaEvolve框架，通过数据合成流水线和进化感知的强化学习（RL），利用程序执行提供连续奖励信号，训练LLM的元技能。实验表明，该框架在代码任务上显著提升了模型的自我进化性能，为后训练中的能力泛化提供了新方向。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.22529v1",
+      "source": "arxiv",
+      "title": "Skill Self-Play: Pushing the Frontier of LLM Capability with Co-Evolving Skills",
+      "abstract": "LLM training is shifting from manual design and annotation to interaction-driven self-evolution. However, existing self-evolutionary methods face a fundamental dilemma between task diversity and verification reliability: environment-bound methods obtain precise feedback but confine learning to narrow domains, while open-ended self-generation broadens the task space but lacks reliable verification, allowing misleading rewards to pollute the training loop. We identify agent skills as a powerful middle ground to reconcile this tension: each skill ensures deep, verifiable execution in a specific scenario, while dynamic routing across skills maintains open-ended task variety. Leveraging this insight, we introduce Skill Self-Play (Skill-SP), a co-evolutionary framework comprising a proposer, a solver, and a dynamic skill controller. Orchestrated via a reinforcement learning loop, these components co-evolve in a continuous self-play loop: the proposer generates challenging tasks conditioned on dynamically sampled skills; the solver explores candidate solutions to push its capability boundaries; and the skill controller collects execution feedback to update and expand the skill library. This interactive co-evolution effectively bridges the gap between structured verification and open-ended exploration. Empirical evaluations on tool-use and reasoning benchmarks demonstrate that Skill-SP, serving as a robust evolution engine, consistently pushes the performance ceiling of competent backbones while catalyzing striking turnarounds for initially misaligned models. Our code is available at https://github.com/Qwen-Applications/skill-self-play.",
+      "authors": [
+        "Siyuan Huang",
+        "Pengyu Cheng",
+        "Haotian Liu",
+        "Tao Chen",
+        "Yihao Liu",
+        "Jingwei Ni",
+        "Shijie Zhou",
+        "Ziyi Yang",
+        "Gangwei Jiang",
+        "Mengyu Zhou",
+        "Yu Cheng",
+        "Xiaoxi Jiang",
+        "Guanjun Jiang"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-24T17:59:22+00:00",
+      "link": "https://arxiv.org/pdf/2607.22529v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "LLM self-evolution with co-evolving skills, addresses training diversity and verification",
+      "llm_evidence_cn": "LLM自我进化与协同进化技能，解决训练多样性和验证可靠性",
+      "llm_evidence": "LLM自我进化与协同进化技能，解决训练多样性和验证可靠性",
+      "canonical_evidence": "LLM自我进化与协同进化技能，解决训练多样性和验证可靠性",
+      "llm_tldr_en": "Skill Self-Play (Skill-SP) introduces co-evolving skills for LLM self-evolution, reconciling task diversity and reliable verification via dynamic routing and deep skill execution.",
+      "llm_tldr_cn": "现有LLM自我进化方法在任务多样性和验证可靠性之间存在矛盾：环境受限方法反馈精确但领域狭窄，开放自生成方法任务广泛但验证不可靠。本文提出Skill Self-Play (Skill-SP)，利用智能体技能作为中间层：每个技能确保场景内的深度可验证执行，动态路由保持任务开放性。实验表明该方法有效提升了模型能力和泛化性，为LLM后训练提供了新范式。",
+      "llm_tldr": "现有LLM自我进化方法在任务多样性和验证可靠性之间存在矛盾：环境受限方法反馈精确但领域狭窄，开放自生成方法任务广泛但验证不可靠。本文提出Skill Self-Play (Skill-SP)，利用智能体技能作为中间层：每个技能确保场景内的深度可验证执行，动态路由保持任务开放性。实验表明该方法有效提升了模型能力和泛化性，为LLM后训练提供了新范式。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.20418v1",
+      "source": "arxiv",
+      "title": "Pure-DP Statistical Query Release at the Conjectured Square-Root Rate",
+      "abstract": "Nikolov and Ullman asked whether k statistical queries on a universe of size T can be released under pure differential privacy with expected worst-coordinate error at the square-root rate suggested by known lower bounds. We prove their conjectured upper bound. For every database size n and privacy parameter $\\varepsilon>0$, there is an $\\varepsilon$-differentially private mechanism with expected error $O(\\min\\{1,\\sqrt{\\log(2T)\\log(2k)/(\\varepsilon n)}\\})$. This matches the lower-bound dependence in the standard high-dimensional regimes where those bounds apply; the shifted logarithms and outer minimum make the upper bound valid without additional parameter assumptions. The construction starts from a selection-only private multiplicative weights transcript, then replaces its probability mass function by a distance-penalized likelihood envelope. To prove that the modification preserves accuracy, a likelihood-level Maurey argument upper-bounds each Hamming-ball maximum by a small family of auxiliary PMW laws. Renyi moment bounds control nearby balls, a direct mixture bound controls distant balls, and grouping radii at the privacy scale prevents an additional $1/\\varepsilon$ factor in the error. The mechanism is information-theoretic. A companion Lean 4 development machine-checks the finite construction, pure privacy after deterministic decoding, and the displayed all-regimes upper bound.",
+      "authors": [
+        "Jack Fitzsimons"
+      ],
+      "primary_category": "cs.DS",
+      "categories": [
+        "cs.DS",
+        "cs.CR"
+      ],
+      "published": "2026-07-22T17:54:46+00:00",
+      "link": "https://arxiv.org/pdf/2607.20418v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Theoretical bounds on statistical query release with square-root error rate",
+      "llm_evidence_cn": "统计查询释放的平方根误差率理论界",
+      "llm_evidence": "统计查询释放的平方根误差率理论界",
+      "canonical_evidence": "统计查询释放的平方根误差率理论界",
+      "llm_tldr_en": "Proves the conjectured square-root rate for private statistical query release, providing a tight upper bound with rigorous mathematical formulation.",
+      "llm_tldr_cn": "该论文证明了差分隐私下统计查询释放的平方根率猜想上界。作者构造了一种纯差分隐私机制，在最坏坐标误差上达到与理论下界匹配的O(min{1, sqrt(log(2T)log(2k)/(epsilon n))})。该结果回答了Nikolov和Ullman的开放问题，提供了高维场景下的最优误差保证，其推导依赖于纯数学公式和算法创新，对隐私保护理论有重要意义。",
+      "llm_tldr": "该论文证明了差分隐私下统计查询释放的平方根率猜想上界。作者构造了一种纯差分隐私机制，在最坏坐标误差上达到与理论下界匹配的O(min{1, sqrt(log(2T)log(2k)/(epsilon n))})。该结果回答了Nikolov和Ullman的开放问题，提供了高维场景下的最优误差保证，其推导依赖于纯数学公式和算法创新，对隐私保护理论有重要意义。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "math formulation",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.18098v1",
+      "source": "arxiv",
+      "title": "VDAR-Router: Adaptive LLMs Routing via Verbalized Query Difficulty Analysis Retrieval",
+      "abstract": "Large language models are increasingly used in practical systems, making efficient model selection important for reducing deployment cost. LLM routing has emerged as a practical solution for allocating each input query to an appropriate model under a desired cost-performance trade-off. Existing routing methods often estimate model suitability from the surface semantics or embedding similarity of the input query. However, such methods may ignore the underlying difficulty of a query, leading to suboptimal routing decisions. To address the challenge, we propose VDAR-Router, a difficulty-aware retrieval-based routing framework. For each input query, VDAR-Router first generates an explicit difficulty analysis. It then retrieves historical examples with similar difficulty profiles. Based on the retrieved records, it estimates candidate model suitability and selects the model using a reward function that considers both performance and cost. Experiments on three datasets show that VDAR-Router consistently achieves better cost-performance trade-offs than existing baselines. These results demonstrate the effectiveness of difficulty-aware retrieval for training-free LLM routing. Case studies further show that explicit query analysis helps retrieve more relevant examples and supports more reliable routing decisions.",
+      "authors": [
+        "Yu-Chien Tang",
+        "Jun-Chen Hung",
+        "Wen-Chih Peng",
+        "An-Zi Yen"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-20T16:00:45+00:00",
+      "link": "https://arxiv.org/pdf/2607.18098v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "adaptive LLM routing algorithm improves cost-performance trade-off",
+      "llm_evidence_cn": "自适应LLM路由算法改进成本-性能平衡",
+      "llm_evidence": "自适应LLM路由算法改进成本-性能平衡",
+      "canonical_evidence": "自适应LLM路由算法改进成本-性能平衡",
+      "llm_tldr_en": "Proposes VDAR-Router, a difficulty-aware retrieval-based routing framework that analyzes query difficulty to select the optimal LLM, improving cost-performance.",
+      "llm_tldr_cn": "现有LLM路由方法仅基于语义或嵌入相似性，忽略查询难度。本文提出VDAR-Router，首先生成显式难度分析，然后检索历史示例，最后选择合适模型。实验表明该方法在多个基准上优于现有路由策略，实现更好的成本-性能平衡。该工作属于LLM系统级算法改进。",
+      "llm_tldr": "现有LLM路由方法仅基于语义或嵌入相似性，忽略查询难度。本文提出VDAR-Router，首先生成显式难度分析，然后检索历史示例，最后选择合适模型。实验表明该方法在多个基准上优于现有路由策略，实现更好的成本-性能平衡。该工作属于LLM系统级算法改进。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.22334v1",
+      "source": "arxiv",
+      "title": "Cross-Tokenizer On-Policy Distillation via Byte-Prefix Marginalization",
+      "abstract": "Open-weight language models from different families exhibit complementary capabilities, motivating their consolidation into a compact student through on-policy distillation (OPD). However, full-vocabulary OPD typically assumes a shared tokenizer, while existing cross-tokenizer methods may discard teacher probability mass or assign it to student tokens with unrelated content. We introduce Byte-Prefix Marginalization (BPM), which re-expresses the teacher's next-token distribution over the student vocabulary in a shared byte space. Specifically, BPM assigns each teacher token's probability to the longest student token whose byte representation is a prefix of the teacher token's bytes, aggregates mass mapped to the same student token, and places otherwise unmatched mass in an explicit residual category. This produces a vocabulary-complete, byte-aligned, and mass-preserving target for dense OPD. The target exactly recovers the teacher-induced byte-prefix marginal when the relevant prefix does not span multiple teacher tokens (a condition satisfied at more than 99% of training positions) and uses a mass-preserving, chain-factorized lower bound otherwise. Across Qwen3-32B, GLM-Z1-9B-0414, and MiniMax-M2.7 as teachers, BPM consistently outperforms current cross-tokenizer methods on six mathematics and programming benchmarks, improving six-benchmark avg@8 by 3.7-6.6 points over the strongest baselines.",
+      "authors": [
+        "Hao Wang",
+        "Kun Yuan",
+        "Wenlin Zhong",
+        "Minglei Zhang",
+        "Han Xiao",
+        "Ming Sun",
+        "Honggang Qi"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-07-24T14:12:54+00:00",
+      "link": "https://arxiv.org/pdf/2607.22334v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Cross-tokenizer on-policy distillation method for algorithm improvement",
+      "llm_evidence_cn": "跨分词器在策略蒸馏算法改进方法",
+      "llm_evidence": "跨分词器在策略蒸馏算法改进方法",
+      "canonical_evidence": "跨分词器在策略蒸馏算法改进方法",
+      "llm_tldr_en": "Proposes Byte-Prefix Marginalization for on-policy distillation across different tokenizers, enabling efficient consolidation of language model capabilities.",
+      "llm_tldr_cn": "该工作针对不同分词器语言模型间的知识蒸馏问题，提出了一种基于字节前缀边际化的在策略蒸馏方法。该方法在共享字节空间重新表达教师模型的下一词分布，有效保留教师概率质量并避免学生无关标记的干扰，实验证明其能够高效整合多种模型能力，促进模型压缩与性能提升。",
+      "llm_tldr": "该工作针对不同分词器语言模型间的知识蒸馏问题，提出了一种基于字节前缀边际化的在策略蒸馏方法。该方法在共享字节空间重新表达教师模型的下一词分布，有效保留教师概率质量并避免学生无关标记的干扰，实验证明其能够高效整合多种模型能力，促进模型压缩与性能提升。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.19747v1",
+      "source": "arxiv",
+      "title": "Beyond Relevance-Centric Retrieval: Rubric-Oriented Document Set Selection and Ranking",
+      "abstract": "As large language models and AI agents become the primary consumers of search results, document set quality determines the upper bound of downstream generation. Yet existing evaluation systems remain confined to scoring documents independently and aggregating via nDCG, ignoring inter-document interactions (redundancy, conflict, complementarity) and unable to answer what makes one document set better than another. To address these issues, we propose a complete evaluate-diagnose-optimize framework. We design SetwiseEvalKit, a three-level, nine-dimension document set evaluation benchmark covering both short-form and long-form scenarios, comprising approximately 28K high-quality evaluation rubrics. We systematically evaluate 12 rerankers: even the best method achieves no more than 45% coverage, cross-document coordination dimensions are universally weak, and no single method maintains top performance across both settings. Building on this, we propose Rubric4Setwise, a training-free method that converts rubric-based evaluation criteria into document set selection signals, achieving the best downstream generation performance with fewer documents and search rounds. It is the only method that maintains state-of-the-art results across both scenarios, validating the effectiveness of closing the loop from evaluation to optimization.",
+      "authors": [
+        "Kailin Jiang",
+        "Lei Liu",
+        "Jian Xi",
+        "Hui Xu",
+        "Junlin Liu",
+        "Baochen Fu",
+        "Shaoqing Ren",
+        "Bin Li",
+        "Vichwang",
+        "Yu Lu",
+        "Haibo Shi"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-22T04:45:10+00:00",
+      "link": "https://arxiv.org/pdf/2607.19747v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "algorithm improvement for document set selection and ranking",
+      "llm_evidence_cn": "文档集选择与排序的算法改进",
+      "llm_evidence": "文档集选择与排序的算法改进",
+      "canonical_evidence": "文档集选择与排序的算法改进",
+      "llm_tldr_en": "Proposes a rubric-oriented evaluate-diagnose-optimize framework for document set selection and ranking, moving beyond single-document relevance.",
+      "llm_tldr_cn": "现有检索评估只独立评分单个文档，忽略文档间冗余、冲突等交互信息。本文提出面向评分标准的文档集评估框架SetwiseEvalKit，包含三级九维度基准，并系统评估12种重排序器，为文档集质量优化提供了新算法。",
+      "llm_tldr": "现有检索评估只独立评分单个文档，忽略文档间冗余、冲突等交互信息。本文提出面向评分标准的文档集评估框架SetwiseEvalKit，包含三级九维度基准，并系统评估12种重排序器，为文档集质量优化提供了新算法。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
