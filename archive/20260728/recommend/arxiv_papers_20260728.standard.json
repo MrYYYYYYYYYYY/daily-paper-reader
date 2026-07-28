@@ -1,0 +1,513 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-28T21:00:08.605380+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 4,
+    "deep_cap": 6,
+    "deep_selected": 4,
+    "quick_candidates": 8,
+    "quick_skim_target": 11,
+    "quick_selected": 8
+  },
+  "deep_dive": [
+    {
+      "id": "2607.23771v1",
+      "source": "arxiv",
+      "title": "Training Language Models to Cooperate with Inference-Time Controllers",
+      "abstract": "Large language model (LLM) performance increasingly depends not only on the base model, but also on the inference-time controller used to organize reasoning. Existing post-training methods, however, typically optimize for a single fixed interaction pattern, despite real deployments relying on diverse controllers such as Chain-of-Thought, self-consistency, debate, planning, and verification pipelines. This creates a training--deployment mismatch and limits transfer to new workflows. We introduce CALM (Controller-Aware Language Models), a post-training framework that explicitly places controllers in the training loop. We formulate controller-aware post-training as multi-task reinforcement learning over controller-induced interaction protocols, where controllers are compositions of reusable local reasoning modules. This structure also induces a module-level decomposition of mixed-controller training under a turn-level GRPO objective, enabling a systematic study of controller and module-aware training strategies. We evaluate CALM on held-out controller compositions and broader controller shifts, showing that controller-aware post-training improves generalization across inference-time workflows beyond single-controller optimization.",
+      "authors": [
+        "Moumita Choudhury",
+        "Vanshaj Khattar",
+        "Jing Liu",
+        "Toshiaki Koike-Akino",
+        "Ankush Chakrabarty",
+        "Shlomo Zilberstein",
+        "Ye Wang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-26T17:44:33+00:00",
+      "link": "https://arxiv.org/pdf/2607.23771v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "post-training framework; multi-task reinforcement learning; aligns with composite theme",
+      "llm_evidence_cn": "后训练框架；多任务强化学习；符合复合主题",
+      "llm_evidence": "后训练框架；多任务强化学习；符合复合主题",
+      "canonical_evidence": "后训练框架；多任务强化学习；符合复合主题",
+      "llm_tldr_en": "CALM: A post-training framework that trains LLMs to cooperate with diverse inference-time controllers via multi-task RL, improving transfer to new workflows.",
+      "llm_tldr_cn": "现有后训练方法固定单一推理模式，而实际应用需要多种推理控制器。CALM通过将控制器显式纳入训练循环，利用多任务强化学习训练模型适应多样化交互协议。实验证明该方法增强了模型在不同推理工作流间的迁移能力，为后训练提供了更通用的范式。",
+      "llm_tldr": "现有后训练方法固定单一推理模式，而实际应用需要多种推理控制器。CALM通过将控制器显式纳入训练循环，利用多任务强化学习训练模型适应多样化交互协议。实验证明该方法增强了模型在不同推理工作流间的迁移能力，为后训练提供了更通用的范式。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.23802v1",
+      "source": "arxiv",
+      "title": "From RLVR to RLSVR: Task Transformation Induces Self-Verifiable Rewards for Open-Ended LLM Self-Improvement",
+      "abstract": "Reinforcement Learning with Verifiable Rewards (RLVR) has driven recent progress in reasoning-oriented large language models (LLMs) by enabling large-scale optimization. However, its applicability remains largely limited to domains such as mathematics and coding, where correctness can be deterministically verified. Open-ended tasks instead often rely on human preferences, reward models, or LLM-based judges, introducing evaluation bias, judge capability bottlenecks, and additional inference costs.Drawing on the principle of self-supervised learning, which constructs pretext tasks to derive supervision from the data itself, we propose Reinforcement Learning with Self-Verifiable Rewards (RLSVR), a task-transformation-based training paradigm for extending RLVR to open-ended tasks. RLSVR transforms open-ended tasks into verifiable proxy environments whose internal rules and interaction outcomes automatically generate reward signals. We instantiate RLSVR with SpyRL, a multi-agent self-play environment inspired by Who Is the Spy?. Agents receive asymmetric information, complete the same target task, and vote to identify a designated spy. Because the spy identity is predetermined, voting outcomes provide fully verifiable rewards, while successful identification remains closely related to output quality. Experiments on text summarization, creative writing, and mathematical reasoning show that SpyRL outperforms existing self-improvement methods on non-verifiable tasks and yields consistent gains on verifiable reasoning tasks. These results demonstrate that task transformation can extend scalable RLVR-based self-improvement beyond inherently verifiable domains. Models and code have been released at https://github.com/wangqinsi1/SpyRL.",
+      "authors": [
+        "Qinsi Wang",
+        "Jing Shi",
+        "Huazheng Wang",
+        "Kun Wan",
+        "Yiran Wu",
+        "Bo Liu",
+        "Qingyun Wu",
+        "Hai Helen Li",
+        "Yiran Chen",
+        "Handong Zhao",
+        "Wentian Zhao"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-26T19:04:33+00:00",
+      "link": "https://arxiv.org/pdf/2607.23802v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Proposes self-verifiable rewards for open-ended LLM self-improvement, addressing reward modeling limitations",
+      "llm_evidence_cn": "提出可自我验证奖励机制用于开放式大语言模型自我改进，解决奖励建模局限",
+      "llm_evidence": "提出可自我验证奖励机制用于开放式大语言模型自我改进，解决奖励建模局限",
+      "canonical_evidence": "提出可自我验证奖励机制用于开放式大语言模型自我改进，解决奖励建模局限",
+      "llm_tldr_en": "Proposes RLSVR, a method to transform open-ended tasks into self-verifiable formats, enabling RL without external reward models or human judges, improving LLM self-improvement.",
+      "llm_tldr_cn": "针对开放式任务中奖励模型存在评估偏差和瓶颈的问题，论文提出从RLVR到RLSVR的转换方法，通过任务转换将开放式任务变为可自我验证的形式，使得强化学习无需外部奖励模型或人类评判。实验表明该方法在多个开放式任务上提升了模型性能，为LLM自我改进提供了新范式。",
+      "llm_tldr": "针对开放式任务中奖励模型存在评估偏差和瓶颈的问题，论文提出从RLVR到RLSVR的转换方法，通过任务转换将开放式任务变为可自我验证的形式，使得强化学习无需外部奖励模型或人类评判。实验表明该方法在多个开放式任务上提升了模型性能，为LLM自我改进提供了新范式。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.24484v1",
+      "source": "arxiv",
+      "title": "What do Reward Models Memorize?",
+      "abstract": "This paper studies what discriminatively trained reward models (RMs) memorize by measuring counterfactual memorization on two human preference datasets. We show that RMs 1) misallocate memorization to easy, high margin preference pairs, 2) memorize dataset-specific shortcuts (e.g., model identity, user sampling strategy), and 3) overgeneralize simple heuristic correlates of human preference (e.g., length, compliance) when confronted with unseen preference pairs. Overall, our findings indicate that discriminative training of RMs from human preference data results in biased RMs not yet capable of judging response quality in context-dependent scenarios.",
+      "authors": [
+        "Ivo Verhoeven",
+        "Pushkar Mishra",
+        "Ekaterina Shutova"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-07-27T14:20:59+00:00",
+      "link": "https://arxiv.org/pdf/2607.24484v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Studies memorization bias in discriminatively trained reward models, revealing misallocation and shortcuts",
+      "llm_evidence_cn": "研究判别训练奖励模型的记忆偏差，揭示错误分配和捷径",
+      "llm_evidence": "研究判别训练奖励模型的记忆偏差，揭示错误分配和捷径",
+      "canonical_evidence": "研究判别训练奖励模型的记忆偏差，揭示错误分配和捷径",
+      "llm_tldr_en": "Investigates counterfactual memorization in reward models trained on human preference data, finding that RMs memorize easy pairs, dataset shortcuts, and length heuristics, leading to biased judgments.",
+      "llm_tldr_cn": "该论文通过反事实记忆测量，研究判别训练奖励模型的记忆行为。发现奖励模型将记忆错误分配给容易、高边际的偏好对，记忆数据集特有捷径（如模型身份），并过度泛化长度等简单启发式。这些记忆偏差导致奖励模型无法在上下文依赖场景中正确判断响应质量，揭示了当前奖励模型训练的局限性，为改进RLHF提供了重要启示。",
+      "llm_tldr": "该论文通过反事实记忆测量，研究判别训练奖励模型的记忆行为。发现奖励模型将记忆错误分配给容易、高边际的偏好对，记忆数据集特有捷径（如模型身份），并过度泛化长度等简单启发式。这些记忆偏差导致奖励模型无法在上下文依赖场景中正确判断响应质量，揭示了当前奖励模型训练的局限性，为改进RLHF提供了重要启示。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.24589v1",
+      "source": "arxiv",
+      "title": "Artificial Intelligence and Innovation Ecosystem: Evolutionary Developments, Challenges, and Future Directions",
+      "abstract": "The development of the Innovative Ecosystem (IE) presents a new paradigm for economic integration, collaborative advancement, and shared achievements. The rise of Artificial Intelligence (AI) has significantly accelerated the global processes of digitization, informatization, and intelligence. Exploring how AI can leverage inherent characteristics to influence the development trajectory of IE is a topic that warrants further investigation. Given AI's increasing prominence and role within IE, the paper analyzes this new form, examining both AI's unique contributions to IE and its potential challenges. Firstly, the paper synthesizes the conceptual frameworks surrounding IE, decomposing them into manifestations in physical, social, and thinking spaces. Furthermore, the concept of Artificial Intelligence IE (AIIE) is introduced from a spatial perspective, with an exploration of the characteristics AI contributes to IE. Subsequently, the paper employs an evolutionary perspective to analyze the roles provided by AI during different development periods of AIIE. The paper then verifies the feasibility, effectiveness, and rationality of the AIIE's definition and analyzes AIIE development from an evolutionary perspective using enterprise development examples. Finally, acknowledging AI's inherent limitations, the paper examines potential challenges facing AIIE in the future from four perspectives, aiming to identify new research avenues for the further development of AIIE.",
+      "authors": [
+        "Zhimin Zhang",
+        "Chengzhen Ma",
+        "Jia Chai",
+        "Rongxin Zhan",
+        "Huansheng Ning",
+        "Lingfeng Mao",
+        "Dan Zhang",
+        "Suiping Jiang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-27T15:54:23+00:00",
+      "link": "https://arxiv.org/pdf/2607.24589v1",
+      "tags": [
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Directly discusses AI and innovation ecosystem, evolution and challenges",
+      "llm_evidence_cn": "直接讨论人工智能与创新生态系统的演化、挑战与未来方向",
+      "llm_evidence": "直接讨论人工智能与创新生态系统的演化、挑战与未来方向",
+      "canonical_evidence": "直接讨论人工智能与创新生态系统的演化、挑战与未来方向",
+      "llm_tldr_en": "This paper analyzes the role of AI within innovation ecosystems, synthesizes conceptual frameworks, and discusses challenges and future directions.",
+      "llm_tldr_cn": "论文探讨了人工智能如何利用其固有特性影响创新生态系统的发展轨迹。首先梳理了创新生态系统的概念框架，将其分解为多个表现维度；然后分析了AI对创新生态系统的独特贡献以及潜在挑战。最后展望了未来研究方向。对于理解AI与创新生态系统的相互作用具有参考价值。",
+      "llm_tldr": "论文探讨了人工智能如何利用其固有特性影响创新生态系统的发展轨迹。首先梳理了创新生态系统的概念框架，将其分解为多个表现维度；然后分析了AI对创新生态系统的独特贡献以及潜在挑战。最后展望了未来研究方向。对于理解AI与创新生态系统的相互作用具有参考价值。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "innovation",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.23006v1",
+      "source": "arxiv",
+      "title": "VecTree-RAG: An Agentic Retrieval-Augmented Generation Framework Combining Vector and Tree Retrieval for Efficiency and Accuracy",
+      "abstract": "Scientific question answering requires a retrieval system to solve two distinct problems: identifying which papers are relevant and locating the supporting evidence within those papers. Conventional retrieval-augmented generation typically addresses both through similarity search over fixed-length passages, flattening document structure and separating scientific claims from their methodological and argumentative context. We present VecTree-RAG, an agentic framework that assigns these tasks to complementary retrieval mechanisms. Vector search ranks compact document and section representations across the corpus, whereas reasoning-guided traversal of source-verified section trees localizes evidence within shortlisted papers. Full text is retained in a page store and exposed progressively only after structural localization. We evaluate VecTree-RAG on 300 QASPER questions, an open-access subset of 54 LitQA2 questions, and 49 multi-document MOSAIC questions. Compared with Dense RAG, reranked Dense RAG, RAPTOR, and Search-o1, VecTree-RAG obtained the highest observed answer score on all three benchmarks, reaching 0.800 LLM-judge correctness on QASPER, 0.925 accuracy on LitQA2, and a 0.547 composite score on MOSAIC. On QASPER, its evidence-page precision was 0.274, compared with 0.046--0.071 for the baselines. LitQA2 ablations further showed that the complete vector--tree architecture required fewer inference tokens than variants without tree navigation or corpus-level vector routing. These results indicate that vector retrieval narrows the corpus-level search space and tree navigation concentrates reading on structurally relevant evidence. Although multi-turn inference remains more expensive than single-call retrieval, VecTree-RAG provides a structure-aware and traceable architecture for scientific literature question answering.",
+      "authors": [
+        "Xinyan Zhong",
+        "Yuwei Shi",
+        "Yuqi Wei",
+        "Chen Shen",
+        "Tianhang Zhou",
+        "Zhenghao Wu"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR",
+        "cond-mat.mtrl-sci",
+        "cs.AI"
+      ],
+      "published": "2026-07-25T02:50:05+00:00",
+      "link": "https://arxiv.org/pdf/2607.23006v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "retrieval-augmented generation framework; algorithm improvement",
+      "llm_evidence_cn": "检索增强生成框架；算法改进",
+      "llm_evidence": "检索增强生成框架；算法改进",
+      "canonical_evidence": "检索增强生成框架；算法改进",
+      "llm_tldr_en": "VecTree-RAG: An agentic RAG framework combining vector search and tree traversal for efficient and accurate scientific Q&A.",
+      "llm_tldr_cn": "科学问答面临两大挑战：寻找相关论文和定位证据。传统RAG将其混为一谈。VecTree-RAG智能地分配任务：向量搜索快速筛选相关文档，而推理引导的树遍历精确找到证据片段。实验证明该方法在效率与准确性上均优于基线，为RAG系统设计提供了新思路。",
+      "llm_tldr": "科学问答面临两大挑战：寻找相关论文和定位证据。传统RAG将其混为一谈。VecTree-RAG智能地分配任务：向量搜索快速筛选相关文档，而推理引导的树遍历精确找到证据片段。实验证明该方法在效率与准确性上均优于基线，为RAG系统设计提供了新思路。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.23075v1",
+      "source": "arxiv",
+      "title": "Traceable LLM Reasoning for Fake-Order Fraud Detection",
+      "abstract": "Detecting fake-order fraud at scale remains a critical challenge for large online-to-offline (O2O) service platforms, as existing approaches often rely on expert-designed features, produce black-box decisions, and provide limited interpretability. To address these limitations, we propose DeepScrub, a reinforcement learning framework built upon large language models (LLMs) for fake-order fraud detection with traceable reasoning. DeepScrub introduces three innovations. First, a semantic unification module converts heterogeneous risk signals into textual descriptions that LLMs can understand. Second, continued pre-training on risk-control corpora injects domain knowledge, and task rewards jointly evaluate prediction correctness and reasoning quality. Third, the SUggest-REflect (SURE) mechanism incorporates expert feedback and model self-checking to iteratively refine reasoning paths. On a real-world fake-order fraud detection dataset, DeepScrub achieves a macro-F1 score of 85.3%, outperforming the best baseline by 2.7 percentage points. Our task-optimized 8B model further surpasses a 32B model, showing that domain adaptation can matter more than model scale in this setting. In a four-week live pilot, DeepScrub achieved 91.8% precision and 88.5% recall, improving over first-stage human reviewers by 16.6 and 38.8 percentage points. It reduced first-stage manual review workload by 94% and saved nearly one million RMB annually. These results show that DeepScrub improves fraud review accuracy, reduces first-stage review workload, and provides traceable evidence for production risk-review workflows.",
+      "authors": [
+        "Siqi You",
+        "Bingsong Xu",
+        "Zhixian Zheng",
+        "Xinjian Peng",
+        "Yang Xie",
+        "Ying Wang",
+        "Jiarong Xu"
+      ],
+      "primary_category": "cs.CR",
+      "categories": [
+        "cs.CR",
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-07-25T06:51:02+00:00",
+      "link": "https://arxiv.org/pdf/2607.23075v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "reinforcement learning framework with task rewards for LLM reasoning, akin to reward modeling for preferences",
+      "llm_evidence_cn": "使用任务奖励强化学习LLM推理，类似于偏好学习的奖励建模",
+      "llm_evidence": "使用任务奖励强化学习LLM推理，类似于偏好学习的奖励建模",
+      "canonical_evidence": "使用任务奖励强化学习LLM推理，类似于偏好学习的奖励建模",
+      "llm_tldr_en": "DeepScrub uses a reinforcement learning framework with LLMs for fake-order fraud detection, introducing semantic unification, continued pre-training, and task rewards that jointly evaluate prediction and reasoning quality, enabling traceable reasoning.",
+      "llm_tldr_cn": "现有虚假订单检测方法依赖人工特征且缺乏可解释性。本文提出DeepScrub，一种基于大语言模型的强化学习框架，通过语义统一模块、领域持续预训练以及联合评估预测正确性和推理质量的任务奖励，实现了可追溯推理。实验表明该方法在检测性能与可解释性上均优于基线。",
+      "llm_tldr": "现有虚假订单检测方法依赖人工特征且缺乏可解释性。本文提出DeepScrub，一种基于大语言模型的强化学习框架，通过语义统一模块、领域持续预训练以及联合评估预测正确性和推理质量的任务奖励，实现了可追溯推理。实验表明该方法在检测性能与可解释性上均优于基线。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.23731v1",
+      "source": "arxiv",
+      "title": "Outcome-Confounded Local Supervision in On-Policy Distillation",
+      "abstract": "On-policy distillation (OPD) trains a student on its own trajectories while a teacher supplies dense token-level likelihoods at student-visited prefixes. These likelihoods are often read locally: agreement appears safe to imitate, whereas disagreement appears to identify an error. We show that both readings are confounded by the outcome of the completed trajectory. We introduce an outcome-resolved diagnostic that crosses pointwise teacher-student divergence with final-answer correctness, separating safe imitation, productive divergence, harmful divergence, and agreement-on-failure. In an eight-seed mathematical-reasoning study with a Qwen3-8B student and Qwen3-32B teacher, agreement-on-failure constitutes 67.84% of pooled response-token mass; with a Qwen2.5-7B/32B pair it remains 67.68%. The result persists across threshold, sequence-level, format, and truncation audits. Even on prompts that the Qwen3 teacher solves in all four independent attempts, student accuracy rises to 86.91% but agreement-on-failure remains 14.76%. We then run three matched training probes that use the available signals to imitate, mask, or contrast whole trajectories; none consistently reduces agreement-on-failure. The result points to a localization limitation: local divergence paired with a trajectory-level outcome does not identify where a failed trajectory became unrecoverable. Addressing this limitation requires additional positional information, such as process labels, teacher continuations from student prefixes, or token-level alignment across rollouts. Our contribution is therefore diagnostic rather than a new training method.",
+      "authors": [
+        "Guoqing Ma"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-26T16:03:33+00:00",
+      "link": "https://arxiv.org/pdf/2607.23731v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Identifies outcome confounding in on-policy distillation, proposes diagnostic to separate safe and harmful imitation",
+      "llm_evidence_cn": "识别在线策略蒸馏中的结果混淆问题，提出诊断方法区分安全与有害模仿",
+      "llm_evidence": "识别在线策略蒸馏中的结果混淆问题，提出诊断方法区分安全与有害模仿",
+      "canonical_evidence": "识别在线策略蒸馏中的结果混淆问题，提出诊断方法区分安全与有害模仿",
+      "llm_tldr_en": "Shows that local teacher-student agreement in on-policy distillation is confounded by trajectory outcome; introduces a diagnostic that separates safe imitation from agreement-on-failure, with 67.84% of tokens being agreement-on-failure in a math reasoning study.",
+      "llm_tldr_cn": "针对在线策略蒸馏中教师-学生局部似然度被轨迹结果混淆的问题，论文引入结果分辨诊断方法，将点式分歧与最终答案正确性交叉，分离出安全模仿、生产性分歧、有害分歧和失败一致。在数学推理实验中发现，失败一致占响应token质量的67.84%，突显了现有蒸馏方法的隐患，为改进蒸馏策略提供了重要洞察。",
+      "llm_tldr": "针对在线策略蒸馏中教师-学生局部似然度被轨迹结果混淆的问题，论文引入结果分辨诊断方法，将点式分歧与最终答案正确性交叉，分离出安全模仿、生产性分歧、有害分歧和失败一致。在数学推理实验中发现，失败一致占响应token质量的67.84%，突显了现有蒸馏方法的隐患，为改进蒸馏策略提供了重要洞察。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.23121v1",
+      "source": "arxiv",
+      "title": "SMART: LLM-Augmented Hybrid Retrieval for Dynamic Product Ads",
+      "abstract": "Dynamic Product Ads (DPA) require retrieving relevant items from multi-million product catalogs, balancing two competing objectives: retargeting (re-surfacing known interests) and prospecting (discovering new categories). While Large Language Models (LLMs) capture semantic intent better than traditional embedding models, deploying them at scale introduces prohibitive inference costs and lexical mismatch issues. Through controlled experiments on millions of users, we demonstrate a critical retrieval decomposition: rule-generated queries excel at retargeting on a lexical BM25 index, while LLM-generated queries excel at prospecting on a dense ANN index. Building on this, we propose SMART (SeMantic-aware Adaptive ReTrieval). To manage costs, a lightweight quality gate identifies coverage gaps in initial keyword results, adaptively routing only the ~10% of users who benefit from semantic prospecting to the LLM path. Offline evaluation demonstrates that this gated approach captures the bulk of semantic prospecting gains in Relevance Score while maintaining competitive re-targeting performance at a 90% reduction in LLM costs. Finally, in a 2-week online A/B test at Snap, SMART improved the ad conversion rate by +27.6% over a strong embedding-based baseline.",
+      "authors": [
+        "Congfei Zhang",
+        "Jingxiao Ma",
+        "Xiaodong Liu",
+        "Hsiang-wei Chao",
+        "Siman Wang",
+        "Ge Liu",
+        "Shantanu Aggarwal",
+        "Vincent Zhang",
+        "Meghana Missula",
+        "Rachel Liao",
+        "Zichu Li",
+        "Xiao Bai",
+        "Yunzhi Zhou",
+        "Yajun Wang",
+        "Zhe Liu",
+        "Jinchao Li",
+        "Yu Zhang"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR",
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-07-25T09:41:21+00:00",
+      "link": "https://arxiv.org/pdf/2607.23121v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "LLM-augmented hybrid retrieval algorithm for dynamic product ads",
+      "llm_evidence_cn": "基于LLM的混合检索算法改进",
+      "llm_evidence": "基于LLM的混合检索算法改进",
+      "canonical_evidence": "基于LLM的混合检索算法改进",
+      "llm_tldr_en": "Proposes SMART, a hybrid retrieval method combining rule-based and LLM-generated queries to optimize retargeting and prospecting in dynamic product ads, reducing inference costs.",
+      "llm_tldr_cn": "针对动态产品广告中的检索任务，提出SMART方法，通过规则查询与LLM生成查询的混合策略，在降低推理成本的同时提升新类别发现能力。实验证明LLM查询在稠密索引上的优势。",
+      "llm_tldr": "针对动态产品广告中的检索任务，提出SMART方法，通过规则查询与LLM生成查询的混合策略，在降低推理成本的同时提升新类别发现能力。实验证明LLM查询在稠密索引上的优势。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.23963v1",
+      "source": "arxiv",
+      "title": "RESTOR: Automated Test Oracle Generation for RESTful APIs via Reinforcement Learning",
+      "abstract": "Modern REST API testing faces a critical challenge in defining reliable test oracles, particularly in agile industrial environments where formal specifications (e.g., OpenAPI) are frequently missing or outdated, and historical execution logs are unavailable for newly deployed endpoints. In this paper, we present Restor (Reinforcement Enhanced Single-Traffic Oracle generator for REST APIs), a framework that generates executable test assertions from a single observed request-response pair in a black-box setting. Unlike existing approaches that rely on rule-based templates or massive training logs, Restor utilizes a novel data augmentation pipeline to fine-tune a lightweight Large Language Model (LLM) via Group Relative Policy Optimization (GRPO). This training process enables the model to internalize testing \"common sense\" by optimizing a reward function that jointly encourages: (i) the selection of stable, semantically meaningful fields for validation and the avoidance of dynamic noise (e.g., timestamps or trace IDs); (ii) the generation of robust assertions that withstand logic variations. We evaluate Restor on an industrial dataset comprising over 2,300 API traces across 246 real-world services. Comprehensive experiments demonstrate that Restor significantly outperforms prompt-engineered baselines and generalist models, achieving a superior $F_1$ score of 85.42% in key field identification and increasing the proportion of semantically accurate assertions. Furthermore, deployment in a production CI/CD workflow at ByteDance confirms its practical value: the system raised the adoption rate of automatically generated test cases from 74.1% to over 96%, substantially reducing manual Quality Assurance (QA) effort while ensuring high execution stability.",
+      "authors": [
+        "Xun Zhou",
+        "Zhen Dong",
+        "Mingyu Ren",
+        "Qiang Li",
+        "JunJie Li",
+        "Sifan Wang",
+        "Xiaolong Yu",
+        "Chaofeng Sha",
+        "Xin Peng"
+      ],
+      "primary_category": "cs.SE",
+      "categories": [
+        "cs.SE"
+      ],
+      "published": "2026-07-27T03:20:28+00:00",
+      "link": "https://arxiv.org/pdf/2607.23963v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Reinforcement learning for LLM fine-tuning",
+      "llm_evidence_cn": "使用强化学习微调语言模型",
+      "llm_evidence": "使用强化学习微调语言模型",
+      "canonical_evidence": "使用强化学习微调语言模型",
+      "llm_tldr_en": "RESTOR uses Group Relative Policy Optimization (a reinforcement learning algorithm) to fine-tune a lightweight LLM for automated test oracle generation, demonstrating algorithmic improvement in RL for LLMs.",
+      "llm_tldr_cn": "RESTOR框架针对REST API测试中测试预言自动生成的问题，提出了一种新颖的强化学习方法。它利用Group Relative Policy Optimization算法，通过数据增强流水线微调轻量级大语言模型，从单个请求-响应对生成可执行的测试断言。该方法无需历史日志和形式规约，适用于敏捷工业环境。实验表明，该算法相比传统模板方法显著提升了断言质量，为强化学习在语言模型微调中的应用提供了算法改进思路。",
+      "llm_tldr": "RESTOR框架针对REST API测试中测试预言自动生成的问题，提出了一种新颖的强化学习方法。它利用Group Relative Policy Optimization算法，通过数据增强流水线微调轻量级大语言模型，从单个请求-响应对生成可执行的测试断言。该方法无需历史日志和形式规约，适用于敏捷工业环境。实验表明，该算法相比传统模板方法显著提升了断言质量，为强化学习在语言模型微调中的应用提供了算法改进思路。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.24097v1",
+      "source": "arxiv",
+      "title": "MemChain: Learning Interpretable Memory Traces for Memory-Augmented LLM Agents",
+      "abstract": "Memory-augmented LLM agents typically answer queries by retrieving relevant memories and feeding them directly to an answer model. This retrieval-as-evidence paradigm assumes retrieved memories are already suitable for reasoning, leaving the answer model to resolve redundancy, conflicts, and weak relevance while incurring substantial context overhead in long-term memory tasks. We propose MemChain, a trainable post-retrieval memory policy that transforms retrieved candidates into answer-facing active memory, represented as a compact and grounded evidence context. Given a user query and retrieved candidates, MemChain first generates a question-conditioned evidence plan, then constructs an ordered grounded evidence trace that organizes retrieved memories according to their semantic roles and dependencies, and finally executes explicit memory actions to produce a concise evidence context for answer generation. To train the mediator, we introduce a two-stage learning framework. Supervised trace learning first teaches the policy to generate structurally valid plans, traces, actions, and evidence contexts. We then propose Trace-Guided Memory Policy Optimization (TMPO), a reinforcement learning objective that optimizes the memory policy using downstream answer quality while jointly encouraging trace grounding, evidence support, structural validity, and answer stability across multiple rollouts. Experiments on LoCoMo and LongMemEval-S demonstrate that MemChain consistently achieves state-of-the-art performance across both closed-source and open-weight frozen answer models while substantially reducing the memory context passed to the answer model.",
+      "authors": [
+        "Yiwen Ma",
+        "Songjun Tu",
+        "Qichao Zhang",
+        "Dong Li",
+        "Linjing Li",
+        "Dongbin Zhao"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-27T07:37:43+00:00",
+      "link": "https://arxiv.org/pdf/2607.24097v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Post-retrieval memory policy for LLM agents, improves reasoning and reduces context overhead, relevant to post-training and hallucination suppression",
+      "llm_evidence_cn": "面向LLM代理的后检索记忆策略，改进推理并减少上下文开销，与后训练和幻觉抑制相关",
+      "llm_evidence": "面向LLM代理的后检索记忆策略，改进推理并减少上下文开销，与后训练和幻觉抑制相关",
+      "canonical_evidence": "面向LLM代理的后检索记忆策略，改进推理并减少上下文开销，与后训练和幻觉抑制相关",
+      "llm_tldr_en": "MemChain proposes a trainable post-retrieval memory policy that transforms retrieved candidates into compact grounded evidence, reducing redundancy and improving reasoning in long-term memory tasks for LLM agents.",
+      "llm_tldr_cn": "针对记忆增强型LLM代理在长时记忆任务中检索证据冗余、冲突和弱相关性的问题，论文提出MemChain，一种可训练的后检索记忆策略。该方法先生成问题条件化的证据计划，然后构建有序的证据轨迹，将检索到的候选信息转换为紧凑且可解释的主动记忆。实验表明，该方法显著减少了上下文开销并提升了推理质量，为改进LLM代理的记忆管理提供了新思路。",
+      "llm_tldr": "针对记忆增强型LLM代理在长时记忆任务中检索证据冗余、冲突和弱相关性的问题，论文提出MemChain，一种可训练的后检索记忆策略。该方法先生成问题条件化的证据计划，然后构建有序的证据轨迹，将检索到的候选信息转换为紧凑且可解释的主动记忆。实验表明，该方法显著减少了上下文开销并提升了推理质量，为改进LLM代理的记忆管理提供了新思路。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.24449v1",
+      "source": "arxiv",
+      "title": "Evaluating RAG for French immigration law: a benchmark and baseline study",
+      "abstract": "International recruitment in France requires navigating a layered legal framework absent from existing legal AI benchmarks. We present a publicly available benchmark and first comparative evaluation for this domain, covering permit-type recommendation, required-document retrieval, and legal citation coverage. Comparing a parametric LLM baseline against dense retrieval augmentation at two model scales (Qwen3.5-9B and -27B) on 52 annotated synthetic profiles, we find that retrieval improves administrative guidance at both scales, most notably permit-type accuracy. Our results confirm that retrieval grounding is important for more reliable administrative guidance in this domain, and motivate further investigation of hybrid retrieval strategies.",
+      "authors": [
+        "Annia Abtout",
+        "Julien Delaunay",
+        "Monika Ewa Rakoczy"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR",
+        "cs.AI"
+      ],
+      "published": "2026-07-27T13:55:35+00:00",
+      "link": "https://arxiv.org/pdf/2607.24449v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Evaluates RAG for reducing hallucination in legal guidance",
+      "llm_evidence_cn": "评估RAG在法律指导中减少幻觉的效果",
+      "llm_evidence": "评估RAG在法律指导中减少幻觉的效果",
+      "canonical_evidence": "评估RAG在法律指导中减少幻觉的效果",
+      "llm_tldr_en": "Constructs a benchmark for French immigration law and compares parametric LLM vs RAG. RAG improves permit-type accuracy, confirming retrieval grounding reduces hallucination in administrative guidance.",
+      "llm_tldr_cn": "目前缺少针对法国移民法的AI评估基准，本文构建了包含三种任务的公开基准。对比纯LLM与RAG在不同规模模型上的表现，发现检索增强显著提升了许可证类型推荐的准确性，验证了检索在减少法律指导幻觉中的重要作用，为混合检索策略提供依据。",
+      "llm_tldr": "目前缺少针对法国移民法的AI评估基准，本文构建了包含三种任务的公开基准。对比纯LLM与RAG在不同规模模型上的表现，发现检索增强显著提升了许可证类型推荐的准确性，验证了检索在减少法律指导幻觉中的重要作用，为混合检索策略提供依据。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.24663v1",
+      "source": "arxiv",
+      "title": "A corrective agentic hybrid RAG and an operations-grounded evaluation for a scientific facility",
+      "abstract": "Scientific user facilities accumulate decades of operational knowledge that no single search index covers: electronic logbooks, technical documents, internal wikis, operations chat messages, maintenance records, and live control-system data. We present APS-RAG, Advanced Photon Source Retrieval Augmented Generation, a deployed platform that makes the institutional knowledge at the Advanced Photon Source (APS) accessible to staff through natural-language queries, along with an operations-grounded evaluation. The retrieval engine fuses dense, sparse, and knowledge-graph (KG) channels with query-type-adaptive reciprocal-rank fusion, adds a corrective agentic loop, and runs a native-tool ReAct executor over a Model Context Protocol (MCP) tooling layer. We construct APS-Bench, a 50-question, question-answering (QA) dataset with auditable gold answers. Every retrieval-augmented variant numerically improves strict vital-nugget recall over a naive BM25 baseline (63.8%), with the full corrective Agentic GraphRAG scoring (70.3%). The cross-encoder reranker contributes significantly to answer quality: removing it and allowing the LLM to score relevance drastically reduces strict vital recall by 32.8%. The graph channel and corrective loop contribute positively as expected, but the performance gains are marginal. Additionally, we also compare the performance of open-source and closed-source LLMs in final answer synthesis. We release the APS-Bench construction methodology, the six-layer evaluation harness, and the underlying codebase, along with the '/aps-rag' retrieval agent skill framework, to support reproduction and adoption at other facilities. Together, the deployed platform and its operations-grounded evaluation present a promising workflow for trustworthy, statistically grounded AI assistance in facility operations, transferable to other large scientific instruments.",
+      "authors": [
+        "Rajat Sainju",
+        "Dariusz Jarosz",
+        "Hairong Shang",
+        "Michael Prince",
+        "Ryan M. Aydelott",
+        "Mathew J. Cherukara",
+        "Yine Sun",
+        "Michael D. Borland"
+      ],
+      "primary_category": "physics.acc-ph",
+      "categories": [
+        "physics.acc-ph",
+        "cs.AI",
+        "cs.IR"
+      ],
+      "published": "2026-07-27T17:01:30+00:00",
+      "link": "https://arxiv.org/pdf/2607.24663v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "corrective agentic loop in RAG to suppress hallucinations",
+      "llm_evidence_cn": "纠正性智能体循环减少幻觉",
+      "llm_evidence": "纠正性智能体循环减少幻觉",
+      "canonical_evidence": "纠正性智能体循环减少幻觉",
+      "llm_tldr_en": "APS-RAG is a hybrid RAG platform for scientific facilities that uses a corrective agentic loop to reduce hallucinations by fusing dense, sparse, and knowledge-graph retrieval with adaptive fusion and a ReAct executor.",
+      "llm_tldr_cn": "面向科学设施的操作知识分散难以统一检索的问题，本文提出APS-RAG混合检索增强生成平台。该方法融合密集、稀疏和知识图谱检索，并通过查询类型自适应融合与纠正性智能体循环来减少幻觉。部署评估表明其能有效提升知识获取的准确性和可靠性。",
+      "llm_tldr": "面向科学设施的操作知识分散难以统一检索的问题，本文提出APS-RAG混合检索增强生成平台。该方法融合密集、稀疏和知识图谱检索，并通过查询类型自适应融合与纠正性智能体循环来减少幻觉。部署评估表明其能有效提升知识获取的准确性和可靠性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

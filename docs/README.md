@@ -6,41 +6,56 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-27
-- 运行时间：2026-07-27 21:42:29 UTC
+- 最新运行日期：2026-07-28
+- 运行时间：2026-07-28 21:09:00 UTC
 - 运行状态：成功
-- 本次总论文数：7
-- 精读区：3
-- 速读区：4
+- 本次总论文数：12
+- 精读区：4
+- 速读区：8
 
 ### 今日简报（AI）
-今日共阅读7篇论文，精读聚焦LLM在硬件描述语言问答中的质量问题和强化学习培养元技能。最值得关注的方向是LLM过度回答的量化与缓解，以及利用强化学习使模型自我进化。建议优先精读这两篇，并速读差分隐私统计查询和跨分词器蒸馏的进展。
-- 详情：[/202607/27/README](/202607/27/README)
+今日精读两篇9分论文：训练模型与推理控制器协作、任务转换实现开放端自我验证奖励；速读聚焦RAG蒸馏与RL测试用例生成。最值得关注RLVR→RLSVR方法推动LLM自我改进，以及推理时控制器的协作范式。建议读者优先精读这两篇，侧重其设计思想在开放任务中的迁移潜力。
+- 详情：[/202607/28/README](/202607/28/README)
 
 ### 精读区论文标签
-1. [When LLMs Over-Answer: Measuring and Mitigating Quality Issues in LLM-Based Hardware Description Language Question Answering](/202607/27/2607.17063v2-when-llms-over-answer-measuring-and-mitigating-quality-issues-in-llm-based-hardware-description-language-question-answering)  
+1. [Training Language Models to Cooperate with Inference-Time Controllers](/202607/28/2607.23771v1-training-language-models-to-cooperate-with-inference-time-controllers)  
    标签：评分：9.0/10、query:lpt
-   evidence：衡量并缓解LLM过度回答的质量问题，直接针对幻觉抑制
-2. [Teaching LLMs to Self-Evolve: Cultivating Core Meta-Skills with Reinforcement Learning](/202607/27/2607.21971v1-teaching-llms-to-self-evolve-cultivating-core-meta-skills-with-reinforcement-learning)  
-   标签：评分：8.0/10、query:lpt
-   evidence：利用奖励信号的强化学习进行大语言模型后训练中的自我进化
-3. [Skill Self-Play: Pushing the Frontier of LLM Capability with Co-Evolving Skills](/202607/27/2607.22529v1-skill-self-play-pushing-the-frontier-of-llm-capability-with-co-evolving-skills)  
-   标签：评分：8.0/10、query:lpt
-   evidence：LLM自我进化与协同进化技能，解决训练多样性和验证可靠性
+   evidence：后训练框架；多任务强化学习；符合复合主题
+2. [From RLVR to RLSVR: Task Transformation Induces Self-Verifiable Rewards for Open-Ended LLM Self-Improvement](/202607/28/2607.23802v1-from-rlvr-to-rlsvr-task-transformation-induces-self-verifiable-rewards-for-open-ended-llm-self-improvement)  
+   标签：评分：9.0/10、query:lpt
+   evidence：提出可自我验证奖励机制用于开放式大语言模型自我改进，解决奖励建模局限
+3. [What do Reward Models Memorize?](/202607/28/2607.24484v1-what-do-reward-models-memorize)  
+   标签：评分：9.0/10、query:lpt
+   evidence：研究判别训练奖励模型的记忆偏差，揭示错误分配和捷径
+4. [Artificial Intelligence and Innovation Ecosystem: Evolutionary Developments, Challenges, and Future Directions](/202607/28/2607.24589v1-artificial-intelligence-and-innovation-ecosystem-evolutionary-developments-challenges-and-future-directions)  
+   标签：评分：9.0/10、query:lpt
+   evidence：直接讨论人工智能与创新生态系统的演化、挑战与未来方向
 
 ### 速读区论文标签
-1. [Pure-DP Statistical Query Release at the Conjectured Square-Root Rate](/202607/27/2607.20418v1-pure-dp-statistical-query-release-at-the-conjectured-square-root-rate)  
+1. [VecTree-RAG: An Agentic Retrieval-Augmented Generation Framework Combining Vector and Tree Retrieval for Efficiency and Accuracy](/202607/28/2607.23006v1-vectree-rag-an-agentic-retrieval-augmented-generation-framework-combining-vector-and-tree-retrieval-for-efficiency-and-accuracy)  
    标签：评分：7.0/10、query:lpt
-   evidence：统计查询释放的平方根误差率理论界
-2. [Cross-Tokenizer On-Policy Distillation via Byte-Prefix Marginalization](/202607/27/2607.22334v1-cross-tokenizer-on-policy-distillation-via-byte-prefix-marginalization)  
+   evidence：检索增强生成框架；算法改进
+2. [Outcome-Confounded Local Supervision in On-Policy Distillation](/202607/28/2607.23731v1-outcome-confounded-local-supervision-in-on-policy-distillation)  
    标签：评分：7.0/10、query:lpt
-   evidence：跨分词器在策略蒸馏算法改进方法
-3. [VDAR-Router: Adaptive LLMs Routing via Verbalized Query Difficulty Analysis Retrieval](/202607/27/2607.18098v1-vdar-router-adaptive-llms-routing-via-verbalized-query-difficulty-analysis-retrieval)  
+   evidence：识别在线策略蒸馏中的结果混淆问题，提出诊断方法区分安全与有害模仿
+3. [RESTOR: Automated Test Oracle Generation for RESTful APIs via Reinforcement Learning](/202607/28/2607.23963v1-restor-automated-test-oracle-generation-for-restful-apis-via-reinforcement-learning)  
+   标签：评分：7.0/10、query:lpt
+   evidence：使用强化学习微调语言模型
+4. [MemChain: Learning Interpretable Memory Traces for Memory-Augmented LLM Agents](/202607/28/2607.24097v1-memchain-learning-interpretable-memory-traces-for-memory-augmented-llm-agents)  
+   标签：评分：7.0/10、query:lpt
+   evidence：面向LLM代理的后检索记忆策略，改进推理并减少上下文开销，与后训练和幻觉抑制相关
+5. [Evaluating RAG for French immigration law: a benchmark and baseline study](/202607/28/2607.24449v1-evaluating-rag-for-french-immigration-law-a-benchmark-and-baseline-study)  
+   标签：评分：7.0/10、query:lpt
+   evidence：评估RAG在法律指导中减少幻觉的效果
+6. [A corrective agentic hybrid RAG and an operations-grounded evaluation for a scientific facility](/202607/28/2607.24663v1-a-corrective-agentic-hybrid-rag-and-an-operations-grounded-evaluation-for-a-scientific-facility)  
+   标签：评分：7.0/10、query:lpt
+   evidence：纠正性智能体循环减少幻觉
+7. [Traceable LLM Reasoning for Fake-Order Fraud Detection](/202607/28/2607.23075v1-traceable-llm-reasoning-for-fake-order-fraud-detection)  
    标签：评分：6.0/10、query:lpt
-   evidence：自适应LLM路由算法改进成本-性能平衡
-4. [Beyond Relevance-Centric Retrieval: Rubric-Oriented Document Set Selection and Ranking](/202607/27/2607.19747v1-beyond-relevance-centric-retrieval-rubric-oriented-document-set-selection-and-ranking)  
+   evidence：使用任务奖励强化学习LLM推理，类似于偏好学习的奖励建模
+8. [SMART: LLM-Augmented Hybrid Retrieval for Dynamic Product Ads](/202607/28/2607.23121v1-smart-llm-augmented-hybrid-retrieval-for-dynamic-product-ads)  
    标签：评分：6.0/10、query:lpt
-   evidence：文档集选择与排序的算法改进
+   evidence：基于LLM的混合检索算法改进
 
 
 <div class="dpr-home-promo-card">

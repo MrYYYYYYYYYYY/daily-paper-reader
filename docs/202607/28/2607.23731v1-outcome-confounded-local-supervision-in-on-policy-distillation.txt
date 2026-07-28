@@ -1,0 +1,269 @@
+Title: Outcome-Confounded Local Supervision in On-Policy Distillation
+
+URL Source: https://arxiv.org/pdf/2607.23731v1
+
+Published Time: Tue, 28 Jul 2026 01:12:33 GMT
+
+Number of Pages: 12
+
+Markdown Content:
+Preprint 
+
+# OUTCOME -C ONFOUNDED LOCAL SUPERVISION IN ON-POLICY DISTILLATION 
+
+Guoqing Ma 
+
+The Chinese University of Hong Kong, Shenzhen 
+
+magq9807@gmail.com 
+
+## ABSTRACT 
+
+On-policy distillation (OPD) trains a student on its own trajectories while a teacher supplies dense token-level likelihoods at student-visited prefixes. These likeli-hoods are often read locally: agreement appears safe to imitate, whereas disagree-ment appears to identify an error. We show that both readings are confounded by the outcome of the completed trajectory. We introduce an outcome-resolved diagnostic that crosses pointwise teacher–student divergence with final-answer correctness, separating safe imitation, productive divergence, harmful divergence, and agreement-on-failure. In an eight-seed mathematical-reasoning study with a Qwen3-8B student and Qwen3-32B teacher, agreement-on-failure constitutes 
+
+67 .84% of pooled response-token mass; with a Qwen2.5-7B/32B pair it remains 
+
+67 .68% . The result persists across threshold, sequence-level, format, and truncation audits. Even on prompts that the Qwen3 teacher solves in all four independent at-tempts, student accuracy rises to 86 .91% but agreement-on-failure remains 14 .76% .We then run three matched training probes that use the available signals to imitate, mask, or contrast whole trajectories; none consistently reduces agreement-on-failure. The result points to a localization limitation: local divergence paired with a trajectory-level outcome does not identify where a failed trajectory became unre-coverable. Addressing this limitation requires additional positional information, such as process labels, teacher continuations from student prefixes, or token-level alignment across rollouts. Our contribution is therefore diagnostic rather than a new training method. 
+
+## 1 INTRODUCTION 
+
+On-policy distillation (OPD) combines two appealing properties for reasoning post-training. The student generates the trajectories on which it is trained, reducing the prefix mismatch induced by distillation on fixed teacher traces, while a larger teacher provides dense token-level supervision at the states the student actually visits (Agarwal et al., 2024). Relative to a sparse final-answer reward, this appears to offer substantially richer feedback: teacher and student probabilities can be compared at every response token. The meaning of that comparison is often inferred locally. A sampled token that receives high teacher likelihood appears safe to imitate; a token on which teacher and student differ appears to identify a mistake or correction opportunity. Reasoning success, however, is defined over the completed trajectory. After an early mistake, many continuations can remain locally plausible while the response still ends incorrectly. Conversely, a correct response can depart from the teacher through an alternative derivation, notation, or intermediate choice. Local agreement is therefore not process correctness, and local disagreement is not automatically error. We call this mismatch outcome-confounded local supervision . As illustrated in fig. 1, our diagnostic crosses the local teacher–student relation with the final outcome of the same student trajectory. Low divergence on a correct response is safe imitation ; high divergence on a correct response is productive divergence ; high divergence on a wrong response is harmful divergence ; and low divergence on a wrong response is agreement-on-failure . The four cells separate two questions that a single local divergence score conflates: whether the student locally follows the teacher and whether the complete trajectory succeeds. 1arXiv:2607.23731v1 [cs.LG] 26 Jul 2026 Preprint In controlled mathematical-reasoning studies, this decomposition exposes a large residual failure regime. Across eight discovery seeds with a Qwen3-8B student and Qwen3-32B teacher, agreement-on-failure accounts for 67 .84% of pooled valid response-token mass at the default threshold. Re-peating the same diagnostic with a Qwen2.5-7B-Instruct student and Qwen2.5-32B-Instruct teacher gives the same qualitative pattern, with agreement-on-failure at 67 .68% of token mass. The dominant region is therefore not conspicuous disagreement, but low pointwise divergence on responses that ultimately fail. Productive and harmful divergence are both present, so uniformly suppressing or encouraging divergence would also merge training cases with opposite outcomes. We test several alternative explanations. Agreement-on-failure remains large over a five-point threshold sweep. It is not produced solely by a few long wrong responses: in three-seed sequence-level reruns, 89 .15% –100% of wrong trajectories contain more than 80% low-divergence tokens. Clipping and missing-answer-marker rates are small. Most importantly, we separate standalone teacher capability from teacher behavior on student prefixes. Qwen3-32B solves 1,033 of 4,997 eligible prompts in all four independent attempts. Repeating the eight-seed diagnostic on this selected teacher-4/4 subset raises student sequence accuracy to 86 .91% , yet agreement-on-failure remains 
+
+14 .76% of response-token mass. A teacher that reliably solves a prompt from scratch can still assign locally compatible likelihoods along a student trajectory that fails. Finally, we compare pure OPD, correct-only OPD, and a same-prompt contrastive variant as controlled probes. They use the available signals in three simple ways: retain failed trajectories, mask them, or contrast them at the sequence level. None consistently reduces agreement-on-failure; their validation ordering is checkpoint-sensitive, and transfer beyond the near-domain distribution is mixed. We relate this result to an indistinguishability limitation: a tokenwise rule based only on local teacher divergence dt and the trajectory outcome z(y) treats tokens with the same observed pair (dt, z (y)) 
+
+identically, even when they play different roles in the reasoning process. Section 6 discusses the positional information needed to break this ambiguity. We therefore present the work as a diagnostic rather than a new training method. Our contributions are: 1. We formulate outcome-confounded local supervision and introduce a four-regime diagnostic that resolves pointwise OPD signals by the outcome of the trajectory on which they were observed. 2. We provide eight-seed measurements on two student–teacher pairs, plus threshold, sequence, format, length, and teacher-capability controls showing that agreement-on-failure is a substantial and persistent regime in our setting. 3. We use three training probes—imitate, filter, and coarse contrast—to test simple fixes. Together with an indistinguishability argument, the results identify three sources of additional localization information beyond local divergence and a trajectory-level outcome scalar. 
+
+## 2 SETTING : D ENSE SUPERVISION ON STUDENT PREFIXES 
+
+On-policy distillation. Let πθ denote the student and πT the teacher. Given a prompt x, the student samples a response y = ( y1, . . . , y L). OPD then evaluates the teacher on each student-visited prefix 
+
+st = ( x, y <t ), producing πT (· | st) without replacing the student’s trajectory by a teacher solution. The implementation used here records the sampled-token log-ratio 
+
+rt = log πθ (yt | st) − log πT (yt | st),
+
+whose expectation under yt ∼ πθ (· | st) is the local reverse KL. This setup reduces the exposure mismatch of sequence distillation on fixed teacher traces (Kim & Rush, 2016; Gu et al., 2023), but it does not ensure that a student-visited prefix is recoverable or on a correct reasoning path. 
+
+Reasoning outcomes. For mathematical reasoning, a rule-based verifier assigns a trajectory label 
+
+z(y) ∈ { 0, 1} from the final answer. The dense OPD signal and this outcome operate at different granularities. The teacher can agree with a locally plausible continuation after the student has already entered a failing path; it can also disagree with a token on a correct alternative derivation. Our goal is to measure this local/global mismatch without treating either signal as a direct token-level correctness label. 2Preprint 
+
+Figure 1: Outcome-resolved view of local OPD supervision. A: The teacher scores tokens at student-visited prefixes, while a final-answer verifier labels the same trajectory. B: Teacher–student divergence determines the rows and verifier outcome determines the columns, yielding four distinct regimes. 
+
+Experimental setting. The primary study uses Qwen3-8B as the student and Qwen3-32B as the teacher on a 5,000-prompt math_dapo discovery split. For each of eight independent data seeds, we sample 32 prompts and four student responses per prompt, yielding 128 rollouts per seed and 1,024 in total. Sampling uses temperature 1.0, top-p = 1 , repetition penalty 1.05 , no thinking mode, and a maximum of 4,096 response tokens. Teacher likelihoods are computed on the sampled student tokens. The one-step jobs reuse the training infrastructure, but all discovery statistics are measured on the pre-update rollout batch. We report pooled token counts for the primary estimate and per-seed variation as a descriptive stability check. Additional protocol and implementation details appear in section A.1. 
+
+## 3 OUTCOME -R ESOLVED LOCAL SUPERVISION 
+
+A pointwise divergence score. Individual samples of rt can be negative, so we use the non-negative 
+
+k3 estimator 
+
+dt = exp( −rt) − 1 + rt
+
+for diagnostic binning. Under student sampling, dt and rt have the same reverse-KL expectation because Eπθ [exp( −rt)] = 1 , while dt ≥ 0 pointwise. A token is high-divergence when dt > τ and low-divergence otherwise; the default is τ = 0 .15 . This is a pointwise diagnostic on the sampled token, used only for binning; it does not identify the causal error in the trajectory. 
+
+Four regimes. Broadcasting the final outcome z(y) to the valid response tokens gives 
+
+z(y) = 1 z(y) = 0 
+
+dt ≤ τ safe imitation agreement-on-failure 
+
+dt > τ productive divergence harmful divergence .
+
+The labels are descriptive, not normative token annotations. Productive divergence means only that a high-divergence token occurred on a successful trajectory; it need not be the cause of success. Likewise, agreement-on-failure identifies low local divergence on a failed trajectory without claiming that every such token is individually erroneous. 
+
+Aggregation. Our primary statistic is response-token mass because the OPD objective applies a dense update over response tokens. For example, 
+
+MAoF =
+
+P 
+
+> y,t
+
+1[z(y) = 0] 1[dt ≤ τ ]
+
+P 
+
+> y,t
+
+1[t is a valid response token ] .
+
+We pool exact token numerators and denominators across seeds and separately report seed variation and sequence-level checks. This distinction is important: wrong responses are longer on average, so token mass and sequence counts answer related but non-identical questions. 3Preprint 0% 25% 50% 75% 100%       
+
+> Response-token mass
+> 24.6%
+> 1.6%
+> 67.8%
+> 6.0%
+> Qwen3 all prompts acc.
+> 36.2%
+> 26.7%
+> 1.2%
+> 67.7%
+> 4.4%
+> Qwen2.5 all prompts acc.
+> 32.1%
+> 79.4%
+> 4.7%
+> 14.8%
+> 1.2%
+> Qwen3 teacher-4/4 acc.
+> 86.9%
+> Safe imitation Productive divergence Agreement-on-failure Harmful divergence
+
+Figure 2: Outcome-resolved response-token mass at τ = 0 .15 . Each horizontal bar partitions pooled token mass into the four regimes. Agreement-on-failure dominates the full eight-seed discovery distribution (top). The second row repeats the same diagnostic on a Qwen2.5-7B/32B pair. On the selected Qwen3 teacher-4/4 subset (bottom), student accuracy is much higher, yet all four regimes remain. Cross-row shifts are descriptive because the teacher-4/4 subset is easier and selected by teacher performance. 
+
+## 4 DISCOVERY : A GREEMENT CAN ACCOMPANY FAILURE 
+
+Agreement-on-failure dominates token mass. The top row of fig. 2 reports the eight-seed aggre-gate. Safe imitation accounts for 24 .58% of valid response tokens, productive divergence for 1.61% ,agreement-on-failure for 67 .84% , and harmful divergence for 5.96% . The largest cell therefore contains locally low-divergence tokens from responses that end incorrectly, not tokens marked by conspicuous student–teacher disagreement. The pattern is stable across seeds: the unweighted seed mean for agreement-on-failure is 67 .90% , with a standard deviation of 4.83 percentage points. 
+
+Disagreement is outcome-confounded as well. High-divergence tokens occupy 7.58% of pooled token mass, but they split between successful and failed trajectories. Harmful divergence is larger than productive divergence ( 5.96% versus 1.61% ), so uniformly rewarding divergence would mix successful and failed cases. Productive divergence is nevertheless nonzero in ev-ery seed, so treating every local departure as an error is also unsupported. At the token level, 
+
+P (correct | high divergence ) = 21 .28% , compared with P (correct | low divergence ) = 26 .60% . In this dataset, pointwise divergence alone is therefore a weak classifier of trajectory success. 
+
+External validity: a second student–teacher pair. To test whether agreement-on-failure is specific to the Qwen3-8B/Qwen3-32B pair, we repeat the eight-seed discovery diagnostic without modification on a second pair—a Qwen2.5-7B-Instruct student and a Qwen2.5-32B-Instruct teacher—reusing the same prompts, protocol, verifier, and threshold τ = 0 .15 ; only the models change. The qualitative pattern persists. Safe imitation accounts for 26.71% of valid response tokens, productive divergence for 1.19%, agreement-on-failure for 67.68%, and harmful divergence for 4.43%, at a student sequence accuracy of 32.13%. Agreement-on-failure again occupies the largest cell, with an unweighted seed mean of 67.81% (standard deviation 3.38 points). The regime is therefore not specific to the original model pair. 
+
+Scope of the claim. The four cells partition dense OPD signals; they do not localize the causal reasoning error. The empirical claim is that the same local relation occurs under opposite trajectory outcomes at nontrivial scale. Consequently, a rule that consumes local agreement or disagreement without outcome context merges qualitatively different training cases. 4Preprint 
+
+Figure 3: Threshold robustness in matched three-seed reruns. Varying τ from 0.05 to 0.25 changes the absolute partition as expected, but agreement-on-failure remains large and both high-divergence regimes remain nonzero. Points pool exact token counts over three seeds at each threshold. 
+
+## 5 STRESS TESTS AND TEACHER -C APABILITY CONTROL 
+
+Threshold sensitivity. Figure 3 sweeps τ ∈ { 0.05 , 0.10 , 0.15 , 0.20 , 0.25 }. Agreement-on-failure remains between 68 .54% and 74 .82% of response-token mass. Productive divergence remains nonzero ( 0.90% –2.09% ), as does harmful divergence ( 4.02% –10 .70% ). These reruns use three matched data seeds per threshold; their purpose is qualitative sensitivity analysis rather than a second estimate of the eight-seed default partition. 
+
+Token versus sequence accounting. In the default eight-seed discovery run, sequence accuracy is 
+
+36 .23% , but correct trajectories contribute only 26 .20% of token mass. Correct responses contain 
+
+793 .2 valid tokens on average, compared with 1,269 .7 for wrong responses. Token mass is the quantity directly exposed to a dense OPD objective, but this 1.60 × length ratio motivates an explicit sequence-level check. Across the threshold reruns, 89 .15% –100% of wrong trajectories contain more than 80% low-divergence tokens (fig. 4A). Thus the effect is visible within individual wrong trajectories and is not solely an aggregate length-weighting artifact. 
+
+Format and truncation. Only 1.76% of default discovery responses reach the response limit, and 
+
+0.68% of dumped samples lack a final-answer marker. No closing-think markers are missing under the no-thinking protocol. These rates are too small to explain the reported quadrant masses, although the rule-based outcome scorer remains an explicit limitation. 5Preprint 
+
+Figure 4: Sequence-level and token-level accounting. A: In the three-seed threshold reruns, most wrong trajectories are themselves dominated by low-divergence tokens. B: In the default eight-seed discovery run, longer wrong responses receive more weight under token-mass accounting than under sequence accounting. The two panels address complementary, not identical, audits. 
+
+Does the teacher simply not know the answer? We independently sample Qwen3-32B four times on 4,997 eligible discovery prompts with the same decoding protocol and outcome scorer. Per-generation accuracy is 38 .15% , pass@4 is 56 .15% , and 1,033 prompts are solved in all four attempts. We then repeat the eight-seed diagnostic using only this teacher-4/4 subset. As table 1 and the lower row of fig. 2 show, the selected subset is substantially easier: student sequence accuracy rises from 36 .23% to 86 .91% . Nevertheless, agreement-on-failure remains 14 .76% of response-token mass ( 14 .47% ± 4.25% across seeds), and every logged wrong sequence in the pooled subset is dominated by low-divergence tokens. Table 1: Teacher-capability control at τ = 0 .15 . Values are percentages. The teacher-4/4 subset is selected and easier, so cross-column differences are descriptive rather than causal.              
+
+> Statistic All prompts Teacher 4/4
+> Safe imitation 24 .58 79 .43
+> Productive divergence 1.61 4.66
+> Agreement-on-failure 67 .84 14 .76
+> Harmful divergence 5.96 1.16
+> Sequence accuracy 36 .23 86 .91
+
+This control separates prompt-level teacher competence from the usefulness of teacher likelihoods on arbitrary student prefixes. Reliable standalone solvability therefore does not guarantee a corrective local signal after the student enters a failing trajectory. 
+
+## 6 CONTROLLED TRAINING PROBES 
+
+The diagnostic suggests that neither unconditional imitation nor simple local filtering should be expected to repair wrong trajectories. We test this implication with three matched 150-step probes on a teacher-filtered training set: pure OPD; correct-only OPD, which masks the distillation loss on wrong responses; and correct-only OPD with a same-prompt contrastive regularizer (SPC, β = 0 .01 ). SPC raises the mean student log-likelihood of correct rollouts relative to wrong rollouts for prompts that produce both outcomes. The three probes cover three simple uses of the available signals: retaining failed trajectories, masking them, or contrasting them at the sequence level. They are diagnostic interventions rather than proposed final methods. 6Preprint 
+
+Figure 5: Two-seed controlled probes at step 150. Within each method, the two labeled bars are the matched seeds. A: SPC has a small final-validation advantage. B: That advantage does not coincide with lower agreement-on-failure. With only two seeds, the figure is diagnostic rather than a method-ranking result. 
+
+Small performance differences, persistent confounding. Across two seeds, final validation accuracy averages 76 .17% for pure OPD, 75 .20% for correct-only, and 76 .95% for SPC (fig. 5A). Best-checkpoint means are 78 .91% , 76 .76% , and 78 .22% , respectively, so the ordering changes under checkpoint selection. More importantly, final agreement-on-failure averages 28 .29% for pure OPD, 
+
+27 .48% for correct-only, and 33 .36% for SPC (fig. 5B). SPC improves final validation by 0.59 and 
+
+0.98 percentage points relative to pure OPD on the two seeds, while increasing agreement-on-failure on both. A separate signed wrong-trajectory weighting pilot also degrades by its final checkpoint. These observations do not support a claim that any probe solves the diagnosed failure mode. 
+
+Why the available signals cannot localize. The three probes share a localization limitation. Consider a tokenwise intervention of the form 
+
+wt = f (dt, z (y)) ,
+
+where dt is the local teacher–student divergence and z(y) is the trajectory outcome. If two tokens share the same pair (dt, z (y)) , then every such intervention must assign them the same treatment, even if one token precedes the first reasoning error and the other lies after the trajectory has become unrecoverable. Thus f cannot localize a corrective target inside a failed trajectory unless some additional signal breaks this equivalence class. The measurements show that this ambiguity occurs frequently. First, dt is outcome-blind : P (correct |
+
+low divergence ) = 26 .60% is close to P (correct | high divergence ) = 21 .28% , and 89 .15% –100% 
+
+of wrong trajectories are themselves dominated by low-divergence tokens, so dt does not indicate which token turned the trajectory wrong. Second, z(y) is position-blind : it is one scalar broadcast identically to every response token. Consequently, a locally valid token before the first error and a token observed after the trajectory is already lost can carry the identical signature (dt low , z = 0) .Imitation keeps both, filtering removes both while supplying no corrective target, and coarse contrast repels both; the persistent agreement-on-failure across the three probes is consistent with this limitation. 
+
+Benchmark context. All six trained checkpoints improve the near-domain math_dapo/test 
+
+set by 3.64 –5.28 percentage points relative to the base model. MATH-500 changes range from 
+
++0 .20 to −1.00 points, and all MATH-L5 changes are non-positive. AIME2025 contains only 30 prompts and produces mixed greedy and pass@16 differences. These results are too limited to support broad-transfer or state-of-the-art claims. 7Preprint 
+
+Additional information required for localization. Repairing wrong trajectories requires positional information that dt and z(y) do not provide. Three classes of additional signal could supply it: a per-step correctness label (process supervision); a per-prefix recoverability signal obtained by continuing the teacher from the student prefix st (counterfactual teacher rollouts); or an alignment between correct and wrong rollouts of the same prompt that marks their divergence point (token-level cross-rollout localization). Our SPC probe is a sequence-level version of the third route: it compares whole-trajectory log-likelihoods without identifying where the trajectories diverge, consistent with its failure to reduce agreement-on-failure. Section 8 relates existing remedies, including early rollout termination and process rewards, to these three sources of localization information. 
+
+## 7 DISCUSSION : W HAT THE DIAGNOSTIC CHANGES 
+
+Agreement and disagreement alone do not determine credit assignment. Outcome-resolved measure-ment changes how several common OPD operations should be interpreted. 
+
+Filtering. Removing all wrong trajectories prevents imitation of agreement-on-failure, but also discards information about where the student fails and provides no replacement target. Our correct-only probe is therefore a useful baseline, not evidence that outcome filtering is sufficient. 
+
+Divergence weighting. Uniformly emphasizing high-divergence tokens mixes productive and harmful divergence. Uniformly suppressing them can penalize correct alternative derivations. A divergence threshold is therefore useful for measurement but is not, by itself, a target policy. 
+
+Teacher strength. Standalone teacher accuracy and local teacher usefulness are different properties. Teacher filtering improves the prompt distribution, yet cannot guarantee a corrective likelihood signal at every student-visited prefix. 
+
+Evaluation. Reporting only downstream accuracy hides whether an OPD objective improves by expanding safe imitation, preserving productive divergence, reducing harmful divergence, or merely changing response length. The four-regime decomposition provides a compact internal measurement layer to accompany performance curves. It should not replace downstream evaluation, but it can reveal when similar accuracy is reached through different supervision regimes. 
+
+Sources of localization information. The diagnostic identifies missing information rather than a single remedy. Each route provides localization but requires additional supervision or computation. Process supervision provides per-step labels but presumes a step verifier that the final-answer scorer does not; counterfactual teacher rollouts from st give a per-prefix recoverability signal at the cost of additional teacher generations; and token-level cross-rollout localization requires both a correct and a wrong rollout for the same prompt plus an alignment between them. All three introduce information absent from purely local OPD. Dense teacher likelihoods alone do not provide positional, outcome-aware supervision. This also limits the scope of our negative training result: we do not claim that agreement-on-failure is unfixable, only that rules using local divergence and a trajectory outcome cannot localize the error without an additional signal that breaks this ambiguity. 
+
+## 8 RELATED WORK 
+
+Distillation on generated sequences. Classical knowledge distillation matches a student to a teacher distribution (Hinton et al., 2015); sequence-level distillation extends the idea to autoregressive outputs (Kim & Rush, 2016). MiniLLM studies reverse-KL distillation for generative language models (Gu et al., 2023). GKD/OPD instead samples from the student and evaluates the teacher on student-generated sequences, reducing train–inference prefix mismatch (Agarwal et al., 2024). We analyze a different mismatch that remains after this move: a local teacher likelihood on a student prefix need not identify the outcome of the complete student trajectory. 
+
+OPD analyses and structured supervision. Recent surveys and empirical analyses organize OPD mechanisms, pathologies, and practical design choices (Song & Zheng, 2026; Li et al., 2026; Wang 8Preprint Table 2: Positioning relative to OPD-adjacent work. The table marks which ingredient is explicit in each line of work. “Outcome-resolved” means that local teacher–student relations are split by the final outcome of the same student trajectory; “native-budget boundary” means analyzing what can and cannot be localized from dt and z(y) alone.                         
+
+> Line of work Student prefixes Dense teacher signal Outcome-resolved Native-budget boundary GKD / OPD ✓✓––KAT / prefix termination ✓✓partial –Multi-rollout OPD ✓mixed ✓–Process / verifier signals mixed –✓–Ours ✓✓✓✓
+
+et al., 2026). Closest to us, KAT identifies a low-KL agreement failure after the student enters a degraded prefix and remedies it with early rollout termination (Xin et al., 2026). We differ in claim and in scope. First, KAT’s termination is one instance of the counterfactual-recoverability route in our taxonomy: it imports information about whether a prefix is still on a good path. We characterize the broader sources of localization information and explain why local reweighting alone cannot substitute for them. Second, our teacher-4/4 control shows that the regime persists ( 14 .76% 
+
+of token mass) after filtering by prompt-level teacher competence. This control does not establish the recoverability of individual student prefixes, which KAT targets. Third, we supply outcome-resolved accounting that quantifies both agreement and disagreement split by outcome across seeds. Multi-teacher OPD allocates student rollouts across specialized teachers (Ma et al., 2026), while multi-rollout OPD constructs supervision from peer successes and failures sampled for the same prompt (Yu et al., 2026)—an instance of the cross-rollout localization route, of which our SPC probe is the non-localizing, sequence-level degenerate case. 
+
+Reasoning with verifiable outcomes. RL with verifiable rewards optimizes trajectory-level out-comes for mathematical reasoning, including GRPO-based systems such as DeepSeekMath and large-scale open implementations such as DAPO (Shao et al., 2024; Yu et al., 2025). DeepSeek-R1 further demonstrates that rule-based outcomes can drive reasoning behavior at scale (DeepSeek-AI, 2025). Process-oriented approaches such as PRIME seek denser credit assignment from outcome labels (Cui et al., 2025), an instance of the process-supervision route in our taxonomy. OPD already supplies dense teacher information; our results show that density does not by itself resolve whether a local update belongs to a successful or failed trajectory, and that closing this gap requires the same positional, outcome-aware information these methods add rather than a finer local weighting. 
+
+## 9 LIMITATIONS AND CONCLUSION 
+
+Limitations. The primary evidence uses one mathematical-reasoning pipeline and a rule-based final-answer scorer. Although we include a second student–teacher pair as an external-validity check, the reported masses should not be transferred numerically to other model families, tasks, decoding regimes, or process verifiers. The primary Qwen3 discovery sample contains 1,024 rollouts from a larger prompt pool, and seed variation is descriptive rather than a population-level confidence interval. Thresholding compresses a continuous pointwise score, although the qualitative partition is stable over the tested range. More fundamentally, broadcasting a final outcome to every response token does not identify the causal error or certify every token on a successful trajectory. The teacher-4/4 control is selected and easier; it isolates standalone prompt solvability but not teacher reliability on arbitrary corrupted prefixes. Finally, the training comparison uses two seeds and a small set of hand-designed probes, so it should not be read as a mature method benchmark; and our insufficiency argument is an indistinguishability boundary supported by these probes and by the outcome-blindness of dt, not a formal impossibility theorem. The three probes cover broad uses of the available signals but not all possible objectives or hyperparameters, and we have not empirically evaluated the three sources of localization information we identify. 
+
+Conclusion. Token-level teacher likelihoods do not by themselves identify which parts of a trajec-tory should be reinforced or corrected. Local teacher–student agreement occurs on both correct and failed trajectories, and local disagreement can be productive or harmful. In our setting, agreement-on-failure dominates the original discovery distribution and remains measurable even on prompts the 9Preprint teacher solves in all four standalone attempts. Threshold, sequence, length, and format audits show that the pattern is not explained by bookkeeping choices alone. The three interventions tested here —imitation, filtering, and coarse contrast—do not consistently reduce it. Together, the results identify a localization limitation for rules based only on local divergence and a trajectory outcome. Overcom-ing this limitation requires positional, outcome-aware information, such as process labels, teacher continuations from student prefixes, or token-level alignment across rollouts. Outcome-resolved diagnostics can then test whether the added signal reduces this ambiguity. 
+
+## REFERENCES 
+
+Rishabh Agarwal, Nino Vieillard, Yongchao Zhou, Piotr Stanczyk, Sabela Ramos Garea, Matthieu Geist, and Olivier Bachem. On-policy distillation of language models: Learning from self-generated mistakes. In International Conference on Learning Representations , 2024. Ganqu Cui, Lifan Yuan, Zefan Wang, Yuchen Zhang, Jiacheng Chen, Wendi Li, Bingxiang He, Yuchen Fan, Tianyu Yu, Qixin Xu, et al. PRIME: Process reinforcement through implicit rewards. 
+
+arXiv preprint arXiv:2502.01456 , 2025. DeepSeek-AI. DeepSeek-R1: Incentivizing reasoning capability in LLMs via reinforcement learning. 
+
+arXiv preprint arXiv:2501.12948 , 2025. Yuxian Gu, Li Dong, Furu Wei, and Minlie Huang. MiniLLM: Knowledge distillation of large language models. arXiv preprint arXiv:2306.08543 , 2023. Geoffrey Hinton, Oriol Vinyals, and Jeff Dean. Distilling the knowledge in a neural network. In 
+
+NeurIPS Deep Learning and Representation Learning Workshop , 2015. Yoon Kim and Alexander M. Rush. Sequence-level knowledge distillation. In Proceedings of EMNLP ,2016. Yaxuan Li, Yuxin Zuo, Bingxiang He, Jinqian Zhang, Chaojun Xiao, Cheng Qian, Tianyu Yu, Huan-ang Gao, Wenkai Yang, Zhiyuan Liu, and Ning Ding. Rethinking on-policy distillation of large language models: Phenomenology, mechanism, and recipe. arXiv preprint arXiv:2604.13016 ,2026. Wenhan Ma, Jianyu Wei, Liang Zhao, Hailin Zhang, Bangjun Xiao, Lei Li, Qibin Yang, Bofei Gao, Yudong Wang, Rang Li, Jinhao Dong, Zhifang Sui, and Fuli Luo. MOPD: Multi-teacher on-policy distillation for capability integration in LLM post-training. arXiv preprint arXiv:2606.30406 , 2026. Zhihong Shao, Peiyi Wang, Qihao Zhu, Runxin Xu, Junxiao Song, Xiao Bi, Haowei Zhang, Mingchuan Zhang, Y. K. Li, Y. Wu, and Daya Guo. DeepSeekMath: Pushing the limits of mathematical reasoning in open language models. arXiv preprint arXiv:2402.03300 , 2024. Mingyang Song and Mao Zheng. A survey of on-policy distillation for large language models. arXiv preprint arXiv:2604.00626 , 2026. Rui Wang, Hongru Wang, Yi Chen, Boyang Xue, Tianqing Fang, Wenhao Yu, and Kam-Fai Wong. Demystifying on-policy distillation: Roles, pathologies, and regulations. arXiv preprint arXiv:2607.13399 , 2026. Haoran Xin, Anhao Zhao, Ying Sun, Jin Li, Xiaoyu Shen, and Hui Xiong. Escaping the KL agreement trap in on-policy distillation. arXiv preprint arXiv:2606.09471 , 2026. Qiying Yu, Zheng Zhang, Ruofei Zhu, Yufeng Yuan, Xiaochen Zuo, Yu Yue, Tiantian Fan, Xin Liu, Haibin Lin, Guangming Sheng, et al. DAPO: An open-source LLM reinforcement learning system at scale. arXiv preprint arXiv:2503.14476 , 2025. Weichen Yu, Xiaomin Li, Yizhou Zhao, Xiaoze Liu, Ruowang Zhang, Haixin Wang, Yinyi Luo, Chen Henry Wu, Gaurav Mittal, Matt Fredrikson, and Yu Hu. Multi-rollout on-policy distillation via peer successes and failures. arXiv preprint arXiv:2605.12652 , 2026. 10 Preprint 
+
+## A ADDITIONAL EXPERIMENTAL DETAILS AND TABLES 
+
+A.1 DISCOVERY PROTOCOL 
+
+The primary discovery pool contains 5,000 math_dapo prompts. Each of eight jobs starts from the same Qwen3-8B checkpoint, uses an independent data seed, samples 32 prompts, and generates four responses per prompt. Sampling uses temperature 1.0, top-p = 1 , top-k = −1, repetition penalty 
+
+1.05 , no thinking mode, a maximum prompt length of 1,024 tokens, and a maximum response length of 4,096 tokens. Teacher likelihoods come from Qwen3-32B evaluated on the student-generated prompt and response tokens. The outcome scorer is the rule-based math_dapo final-answer scorer used during training. The jobs perform one update step for infrastructure reuse, but all reported discovery statistics are computed on the rollout generated before that update. The default estimate pools exact token numerators and denominators over the eight seeds. Per-seed means and standard deviations are unweighted descriptive summaries. The threshold sweep uses three matched data seeds at each value of τ , with exact per-sequence divergence fractions logged for the sequence-level audit. A.2 TEACHER -CAPABILITY CONTROL 
+
+The capability control independently generates four Qwen3-32B responses for every eligible discovery prompt with the same decoding parameters. Three prompts exceed the shared prompt limit, leaving 4,997 completely scored prompt groups. The selected subset contains the 1,033 prompts for which all four teacher responses are correct. The matched diagnostic repeats the original eight-seed protocol on this subset. A prompt-concurrency cap is used only to avoid inference-engine timeouts on long generations; it does not alter the prompts, sampling parameters, or number of responses. A.3 EXACT COUNTS AND SEED -BOOTSTRAP INTERVALS 
+
+For the paper-facing ratios we also retain the exact logged numerators and denominators. Table 3 reports a compact subset of these counts together with descriptive seed-bootstrap intervals. Each bootstrap sample resamples the eight independent discovery jobs with replacement and recomputes the pooled count ratio; it is therefore a seed-level uncertainty summary rather than a token-i.i.d. confidence interval. Table 3: Exact logged counts and seed-bootstrap intervals for the core discovery statistics. Percentages are pooled count ratios. Intervals resample independent seed jobs, not individual tokens.                                                                                         
+
+> Setting Statistic Numerator Denominator Pooled % 95% CI Qwen3 all prompts Safe imitation 34,520.4 140,422.9 24.58 [21.46, 28.64] Qwen3 all prompts Productive divergence 2,263.6 140,422.9 1.61 [1.34, 1.89] Qwen3 all prompts Agreement-on-failure 95,265.0 140,422.9 67.84 [64.05, 70.91] Qwen3 all prompts Harmful divergence 8,373.9 140,422.9 5.96 [5.35, 6.43] Qwen3 all prompts Sequence accuracy 46.4 128.0 36.23 [33.11, 39.26] Qwen3 all prompts P(correct |dt> τ )2,263.6 10,637.5 21.28 [17.60, 25.51] Qwen3 all prompts P(correct |dt≤τ)34,520.4 129,785.4 26.60 [23.23, 30.90] Qwen3 teacher 4/4Agreement-on-failure 12,600.5 85,360.0 14.76 [11.80, 17.75] Qwen3 teacher 4/4Sequence accuracy 111.3 128.0 86.91 [84.77, 88.57] Qwen2.5 pair Safe imitation 45,369.3 169,874.8 26.71 [24.21, 29.11] Qwen2.5 pair Productive divergence 2,025.0 169,874.8 1.19 [1.08, 1.30] Qwen2.5 pair Agreement-on-failure 114,963.5 169,874.8 67.68 [65.31, 70.06] Qwen2.5 pair Harmful divergence 7,517.0 169,874.8 4.43 [4.11, 4.77] Qwen2.5 pair Sequence accuracy 82.3 256.0 32.13 [29.59, 34.38]
+
+A.4 LENGTH , FORMAT , AND SEQUENCE AUDITS 
+
+The default discovery audit covers 1,024 decoded responses. Sequence accuracy is 36 .23% , whereas correct responses account for 26 .20% of token mass. Correct responses contain 793 .19 valid tokens on average and wrong responses contain 1,269 .70 , a 1.601 × ratio. Response clipping is 1.76% ;
+
+0.68% of dumped responses lack a final-answer marker, and no closing-think markers are missing 11 Preprint under the no-thinking protocol. In the threshold reruns, 89 .15% –100% of wrong trajectories contain more than 80% low-divergence tokens. A.5 ILLUSTRATIVE AGREEMENT -ON -FAILURE TRACE 
+
+Figure 6 shows one traced wrong response from the primary Qwen3 discovery run. The student ultimately answers 16 while the gold answer is 14 . We re-score the sampled response tokens with the Qwen3-8B student and Qwen3-32B teacher and compute the same pointwise dt diagnostic used in the aggregate analysis. The example is illustrative rather than a causal token annotation: it shows that a failed trajectory can be locally compatible with the teacher over most of its length. In this response, 
+
+93 .7% of response tokens are low-divergence at τ = 0 .15 .0.0  
+
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> pointwise  dt
+> τ= 0.15
+> response token index
+
+Figure 6: Illustrative agreement-on-failure trace. A wrong response from the Qwen3 discovery run has final answer 16 while the gold answer is 14 ; 93 .7% of its 2,666 response tokens are low-divergence at τ = 0 .15 . The top panel plots pointwise dt, clipped at 1.0 for readability; red markers indicate tokens above the threshold. The bottom strip marks low-divergence tokens in orange and high-divergence tokens in red. A.6 CONTROLLED -PROBE PROTOCOL 
+
+The two-seed comparison uses matched 150-step runs for pure OPD, correct-only OPD, and correct-only OPD with SPC. Each step samples eight responses for each of 64 prompts at temperature 1.2,top-p = 1 , and top-k = −1, with no thinking mode and a maximum response length of 8,192 tokens. The actor learning rate is 5 × 10 −7; validation and checkpointing occur every 30 steps on a fixed 512-prompt development split. Correct-only OPD sets the distillation weight to zero for failed trajectories. For every prompt that has both correct and wrong on-policy rollouts in the current batch, SPC computes the mean length-normalized response log-probability s+ over correct rollouts and s− over wrong rollouts, then adds 
+
+LSPC = − log σ(s+ − s−)
+
+with coefficient β = 0 .01 to the correct-only OPD objective. It uses no teacher-repaired or off-policy response. We report the final checkpoint for the diagnostic comparison and separately retain the best development checkpoint to expose checkpoint sensitivity. 12
