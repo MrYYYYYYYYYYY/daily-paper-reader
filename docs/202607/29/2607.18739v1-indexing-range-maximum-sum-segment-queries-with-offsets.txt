@@ -1,0 +1,1314 @@
+Title: Indexing Range Maximum-Sum Segment Queries with Offsets
+
+URL Source: https://arxiv.org/pdf/2607.18739v1
+
+Published Time: Wed, 22 Jul 2026 00:32:17 GMT
+
+Number of Pages: 31
+
+Markdown Content:
+# Indexing Range Maximum-Sum Segment Queries with Offsets 
+
+# Seungbum Jo #
+
+Chungnam National University, South Korea 
+
+# Dominik Köppl #
+
+University of Yamanashi, Japan 
+
+Abstract 
+
+Given an array of n real numbers, the maximum segment sum (MSS) problem is to find a contiguous subarray that has the largest sum. While the MSS problem can be solved optimally with Kadane’s algorithm in O(n) time, the study of its indexing version spawned new extensions such as (a) retrieving the MSS after subtracting a query offset parameter for all array entries or (b) retrieving the MSS for arbitrary query ranges. We here study the combination of both problems (a) and (b), which requires retrieving the MSS for arbitrary query ranges after subtracting a query offset parameter for all array entries. For that, we present an index whose query time is only slower than the best known for (a) by a factor of O(log n). In detail, our index uses O(n log n) space, supports queries in O(log 2 n) time, and can be constructed in O(n log 3 n) time. More generally, for every integer d with 1 ≤ d ≤ ⌈ log 2 n⌉, we give an O(dn )-space index with O(dn 1/d log n) query time; in particular, for every fixed ε > 0, we obtain linear space and O(nε log n) query time. As side results, we obtain the same time–space trade-off in terms of the number of runs of a run-length encoded input, deduce a solution for (a) that works in run-length compressed space and time, and prove a tight Θ( n2/3) bound on the number of non-compatible offsets for binary arrays. Finally we give supportive lower bounds for our query problem, showing that there is only a polylogarithmic gap of improvement left. 
+
+2012 ACM Subject Classification Theory of computation → Data structures design and analysis 
+
+Keywords and phrases maximum segment sum, data structure, range query 
+
+Funding Seungbum Jo was supported by the National Research Foundation of Korea(NRF) grant funded by the Korea government(MSIT) (RS-202523963814) 
+
+Dominik Köppl : This work was supported by JSPS KAKENHI Grant Number 25K21150. 
+
+Acknowledgements A preliminary version containing some of these results has appeared in the proceedings of the 20th Scandinavian Symposium on Algorithm Theory (SWAT 2026) [19]. The present article adds the time-space trade-off of Section 4, the enumeration result of Corollary 9, the tight binary-alphabet bound of Theorem 21, and refined lower bounds. It also replaces the RLE reduction of the conference version by the weighted construction of Section 5.3. The earlier reduction used the unweighted run-value sequence and did not account for run lengths; Example 22 demonstrates why that reduction does not hold in general. 
+
+# 1 Introduction 
+
+Given an array X of real numbers, the maximum-sum segment (MSS) problem is to find an interval [i, j ] within X that maximizes the sum of its elements, which we call an MSS of the sequence. This problem found applications, among others, in image processing [13], pattern recognition [25], and biological sequence analysis [32]. The textbook algorithm for solving the MSS problem is Kadane’s algorithm, cf. [12, 4.4 Maximum Subarray Sum]. Since the various applications often require adaptations to specific problem variations, it is not surprising that the MSS problem has been studied in various settings, cf. [8] for an encyclopedic survey of MSS and its variations. Chen and Chao [9] arXiv:2607.18739v1 [cs.DS] 21 Jul 2026 2 Indexing Range Maximum-Sum Segment Queries with Offsets 
+
+considered an indexing problem, where it is allowed to preprocess X and then answer queries on intervals of X. For that task, they devised a linear-time constructible data structure that supports constant-time queries of an MSS for any query interval. They also showed that this problem is linearly equivalent to the range-minimum query (RMQ) problem, meaning that a data structure with construction time tc(n) and query time tq (n) solving the MSS problem can be transformed into a data structure solving RMQs with the time complexities tc(cn ) and 
+
+tq (cn ) for some constant c, respectively. Gawrychowski and Nicholson [15] gave a Θ( n)-bit data structure that also achieves constant query time when only the answer interval, rather than its sum, is returned. They also showed that 1.89113 n − Θ( log n) bits are necessary for supporting this query type. A maximal local MSS is a local MSS that is not a segment of any local MSS other than it, where a local MSS is a segment that has itself as its only MSS. Ruzzo and Tompa [27] gave an algorithm that finds all distinct maximal local MSSs in O(n) time, and Sakai [28] designed a linear-time constructible data structure supporting constant-time queries of the maximal local MSS of any given segment that contains any given position. Bengtsson and Chen [4] showed that an arbitrarily given number of non-overlapping segments that maximize the sum of all their elements can be found in linear time. Yu et al. [34] considered the MSS problem where each element of the input sequence is uncertain within a specific interval and proposed a linear-time algorithm for this problem. The density of a segment is defined as the mean of all elements in the segment. Cheng et al. [10] considered the MSS problem with the condition that the density of the segment to be found is between given lower and upper bounds. Bae [1] and Liu and Chao [22] considered returning 
+
+k non-overlapping segments that maximize the sum of all their elements. Another variant is the maximum-density segment query [16, 20, 21] that asks to find a segment of length between a given lower and upper bound that maximizes the density. Chung and Lu [11] showed that this query is solvable in linear time. Another natural extension of the one-dimensional maximum segment sum problem is the maximum subarray problem, where the input is a two-dimensional array with length n in each dimension, and the goal is to find a contiguous rectangular subarray that has the largest sum. This problem has been addressed by Bentley [5], who gave an O(n3)-time algorithm for the problem. Subsequently, the time complexity was improved to O(n3√log log n/ log n) by Takaoka [30] and further to O(n3 log log n/ log n) by Tamaki and Tokuyama [31]. They showed that the problem can be reduced to ( min , +) -matrix multiplication. Using this reduction, Chan and Williams [7] obtained the current fastest algorithm, running in n3/2Ω((log n)1/2)
+
+time; their result also applies to higher-dimensional arrays. In addition, Fukuda et al. [13] introduced the maximum convex sum problem, which is a variant of the maximum subarray problem where the retrieved subarray must be convex (i.e., the intersection of the subarray with any row or column is connected). Here, Bae and Takaoka [2] gave an O(n)-time parallel algorithm solving the maximum convex sum problem for n2 processors. 
+
+Our Contribution Among the aforementioned variations, we focus on two indexing versions of the MSS problem, where we are allowed to preprocess the input array and then answer queries (a) on intervals of the input array, or (b) after subtracting a query offset parameter from all array entries. In particular, we are interested in the combinations of both problems (a) and (b), where we want to answer queries on intervals of the input array after subtracting a query offset parameter from all array entries. We present an indexing data structure solving this combined problem in Theorem 7. The main tool is to answer this problem for the special case that the output interval has to be a prefix or a suffix of the input array, and S. Jo and D. Köppl 3                             
+
+> Query type Space Query time Reference MSS O(1) O(n)Kadane’s algorithm OMSS O(n)O(log n)Sakai [29] R-OMSS without offset O(n)O(1) Chen et al. [9] Suffix R-OMSS O(n)O(log 2n)Theorem 5 R-OMSS O(nlog n)O(log 2n)Theorem 7 R-OMSS O(dn )O(dn 1/d log n)Theorem 13
+> Table 1 Summary of best known complexities for the MSS query and its variants.
+
+1 2 3 4 5 6 7 8 9 10 11 12 
+
+X0 4 -9 15 -22 7 -31 18 -5 27 -14 33 -26 
+
+C0 4 -5 10 -12 -5 -36 -18 -23 4 -10 23 -3 Query type Query Range Offset Answer Range Answer MSS - - [7 , 11] 59 SMSS - - [7 , 12] 33 OMSS - 10 [11 , 11] 23 Suffix R-OMSS [1 , 5] 1 [5 , 5] 6R-OMSS [1 , 5] 1 [3 , 3] 14  
+
+> Figure 1 Examples for the MSS query and its variants.
+
+to reuse known results for the problem (b) to solve the general case on O(log n) segments. We further generalize the canonical-range decomposition to a multiary hierarchy and obtain an O(τ n )-space versus O(τ n 1/τ log n)-query-time trade-off in Theorem 13; this yields linear space and O(nε log n) query time for every fixed ε > 0. The results are summarized in Table 1. Subsequently, we focus on run-length compressed input. For an input with z runs, Corollary 28 gives the same O(τ z )-space versus O(τ z 1/τ log z)-query-time trade-off. We also obtain an O(z)-space OMSS structure in Lemma 26. Integer offsets can be handled with integer predecessor structures as described in Remark 29. For binary arrays, we show that the maximum number of pairwise non-compatible offsets is Θ( n2/3), which gives a tight bound on the size of the explicit OMSS breakpoint list (Theorem 21). Finally, the predecessor reduction of Theorem 30 transfers predecessor lower bounds to OMSS and R-OMSS. For arbitrary real keys, it gives an Ω( log n) query lower bound in the comparison model. For integer keys, it transfers the parameter-dependent cell-probe trade-off for predecessor search. In the encoding model, suffix R-OMSS and R-OMSS require 
+
+Ω( n log n) bits on permutations and Ω( n log σ) bits over an alphabet of size σ (Theorem 32 and Corollary 33). 
+
+# 2 Preliminaries and Query Definitions 
+
+Our computation model is the RAM model. Let R denote the set of all real numbers. For integers i ≤ j, we write [i..j ] := {i, i + 1 , . . . , j } and |[i..j ]| := j − i + 1 . Closed intervals of real numbers retain the standard notation [x, y ]. We assume that all real numbers can be stored in a single word and that basic arithmetic operations on these numbers can be performed in constant time. (We also assume that there are no errors in computational precision due to rounding or overflow.) 4 Indexing Range Maximum-Sum Segment Queries with Offsets 
+
+Let X0[1 ..n ] be the input array of real numbers. X0 is subject to the following queries, for which we present examples in Figure 1. While the queries are initially stated to return the value of a specific subarray of X0, it is beneficial to also return the interval of the subarray that gives the answer, which we call the answer range . Since we here mostly focus on data structures using Ω( n) space, it suffices to focus on finding answer ranges — we will shortly later see that the actual value can be obtained from an answer range with an O(n)-space array of prefix sums. For an offset α ∈ R and a nonempty range I := [ ℓ..r ], define the score Sα(I) := Sα(ℓ, r ) := 
+
+∑ri=ℓ(X0[i] − α). Whenever several candidate ranges attain the same maximum value, we prefer one of minimum length. In other words, an answer range is selected by maximizing 
+
+(Sα(ℓ, r ), −(r − ℓ + 1) ) (1) lexicographically. If several maximum ranges have the same minimum length, any one of them may be returned. We call every such range a shortest answer range . The same tie-break can be applied to restricted versions such as the MSS problem by setting α = 0 . For prefix and suffix queries, the same rule is applied after restricting the candidate ranges to prefixes or suffixes, respectively. In particular, a shortest optimum prefix or suffix is unique because one endpoint is fixed. The minimum-length condition has the useful consequence that a shortest answer range contains neither a zero-sum proper prefix nor a zero-sum proper suffix: deleting such a prefix or suffix would preserve the value and produce a shorter range. We state our base problem as follows. 
+
+Maximum-Segment-Sum (MSS) 
+
+Input: array of real numbers X0[1 ..n ].
+
+Output: value and a shortest answer range [ℓ..r ] achieving max [ℓ..r ]⊆[1 ..n ]
+
+∑ri=ℓ X0[i].We also study the special case that the answer range of the MSS problem is constrained to be a suffix of X0.
+
+Suffix Maximum-Segment-Sum (SMSS) 
+
+Input: array of real numbers X0[1 ..n ]
+
+Output: value and the starting position ℓ of a shortest suffix answer achieving 
+
+max ℓ∈[1 ..n ]
+
+∑ni=ℓ X0[i].Sakai [29] introduced the following indexing problem that generalizes the MSS problem by allowing a query offset parameter α to be subtracted from all array entries before answering the query. 
+
+Offset Maximum-Segment-Sum (OMSS) 
+
+Construction Input: array of real numbers X0[1 ..n ]
+
+Query Input: real-value offset α ≥ 0.
+
+Query Output: value and a shortest answer range [ℓ..r ] achieving 
+
+max [ℓ..r ]⊆[1 ..n ]
+
+∑ri=ℓ(X0[i] − α).Defining the array Xα[1 ..n ] with Xα[i] := X0[i] − α, the OMSS query on X0 with offset 
+
+α is the MSS query on Xα. Hence, OMSS is a generalization of MSS, since the answer to an MSS query on X0 is the same as the answer to an OMSS query on Xα with offset α = 0 .Sakai [29] presented an approach answering an OMSS query as follows. 
+
+▶ Lemma 1 ([29]) . Given an array X0[1 ..n ] of n real numbers, we can compute a list L of at most n (offset, interval)-pairs in O(n log 2 n) time using O(n) space such that the solution S. Jo and D. Köppl 5
+
+to an OMSS query for a given offset α is the interval of the predecessor offset of α in L. By sorting L descendingly by the offsets, a binary search for the predecessor of α in L can return an answer range of an OMSS query in O(log n) time. 
+
+Four observations are in order regarding Lemma 1. First, while the list of Lemma 1 does not explicitly return the MSS for a query offset α, we can compute the sum ∑bi=a(X0[i] − α) for an entry (α, [a..b ]) in L in constant time if we have the array of prefix sums C0[0 ..n ] of X0, where C0[0] := 0 and C0[i] := ∑ik=1 X0[k]
+
+for each i ∈ [1 ..n ]. To see that, define the prefix sum of Xα for each i ∈ [1 ..n ] as Cα[i] := 
+
+∑ik=1 Xα[k] = C0[i]−αi. Then, for 1 ≤ i ≤ j ≤ n, Sα(i, j ) = C0[j]−C0[i−1] −α(j −i+1) ,
+
+and hence the value of an answer range is obtained in constant time. Second, the upper bound |L| ≤ n is tight since L can reach the size n for the input 
+
+X0 = [1 , 2, 3, . . . , n ], where the OMSS query for α = k + ϵ gives the range [k + 1 ..n ] for every ϵ ∈ (0 , 1) and k ∈ [0 ..n − 1] .Third, there can be several optimum ranges for one offset. The list of Lemma 1 stores one of minimum length. By Eq. (1), the stored range contains neither a zero-sum proper prefix nor a zero-sum proper suffix. However, Sakai’s statement does not prescribe which optimum range is returned exactly at a breakpoint, which we here enforce by a modification that has no impact on the complexity of Lemma 1. Finally, Sakai allows returning the empty interval whenever no nonempty interval has positive score. In that case every entry of Xα is nonpositive, and a shortest nonempty optimum is the singleton [i..i ], where i ∈ arg max j∈[1 ..n ] X0[j]. We therefore replace the empty interval by this singleton. For a range I, its score fI (α) := Sα(I) is an affine function. Then the answer to the OMSS query with offset α is max I fI (α). The graph of α → max I fI (α), obtained by taking the pointwise maximum of all interval lines, is called the upper envelope . We further say that 
+
+fI is active at α if fI (α) = max J fJ (α).Suppose that the lines of two scores meet at an offset β in the upper envelope, with fI
+
+active immediately to the left of β and fJ active immediately to its right. Then |J| < |I|
+
+(otherwise, the negative slope of fJ would be at least that of fI , and fI would be active immediately to the right of β as well). Also, J is a shortest answer at β: if another optimum range K at β satisfied |K| < |J|, then fK would dominate fJ immediately to the right of β.Accordingly, we can associate every breakpoint with the envelope range active immediately to its right. Thus, an entry (β, I ) represents a shortest answer from β up to, but excluding, the next breakpoint. If several ranges define the same affine function, they have the same value and length for every offset, and any one of them may be retained. We call that the 
+
+right-active convention , and impose the right-active convention by a linear scan once we have constructed the list of Lemma 1. Doing so does not change the time and space bounds of Lemma 1. We formalize the list L of Lemma 1 to reuse the same concepts afterwards, which we term as a catalog . For a fixed interval I and a family F(I) of candidate subranges of I, a catalog 
+
+is a sequence CF (I) = ((β0, J 0), . . . , (βk, J k)), where 0 = β0 < · · · < β k, such that Jj ∈ F (I)
+
+is the selected shortest optimum for every offset α ∈ [βj , β j+1 ), with βk+1 := + ∞. As aforementioned, at a breakpoint, we select the range immediately to its right. Consequently, a predecessor search among the breakpoints returns the answer for any given offset α. A 
+
+predecessor of α is the largest offset in L that is smaller than or equal to α. With the right-active convention, predecessor search returns a shortest answer also when α is exactly a breakpoint. 6 Indexing Range Maximum-Sum Segment Queries with Offsets 
+
+Now we present our main problem of interest, which combines the OMSS and MSS queries on subarrays of X0.
+
+Range Offset Maximum-Segment-Sum (R-OMSS) 
+
+Construction Input: array of real numbers X0[1 ..n ]
+
+Query Input: real-value offset α ≥ 0 and a range [a..b ] ⊆ [1 ..n ].
+
+Query Output: value and a shortest answer range [ℓ..r ] achieving 
+
+max [ℓ..r ]⊆[a..b ]
+
+∑ri=ℓ(X0[i] − α).Using the notation of Sα(i, j ), the answer to an R-OMSS query on X0 with query range [a..b ]
+
+and offset α can be computed as max [ℓ..r ]⊆[a..b ] Sα(ℓ, r ). The R-OMSS is a generalization of the OMSS problem (with the query range [1 ..n ]) and the range MSS problem introduced by Chen et al. [9], which asks for the MSS of a query range [a..b ] without the offset parameter (i.e., α = 0 ). Like for MSS and its restriction SMSS, we can also define the suffix and prefix versions of R-OMSS queries, where the answer range is constrained to be a suffix or a prefix of the query range, respectively. 
+
+Suffix Range Offset Maximum-Segment-Sum (Suffix R-OMSS) 
+
+Construction Input: array of real numbers X0[1 ..n ]
+
+Query Input: real-value offset α ≥ 0 and a range [a..b ] ⊆ [1 ..n ].
+
+Query Output: value and the starting position ℓ of a shortest suffix answer achieving 
+
+max ℓ∈[a..b ]
+
+∑bi=ℓ(X0[i] − α).A symmetric definition can be given for prefix R-OMSS queries, where the answer range is constrained to be a prefix of the query range. 
+
+# 3 Data structure for R-OMSS Queries 
+
+Our main goal of this paper is to devise data structures for answering R-OMSS queries on 
+
+X0, where a non-negative offset α ≥ 0 and a query range [a..b ] are given at query time. There are two naive approaches prioritizing either (1) space or (2) time. 
+
+(1) We can apply Kadane’s algorithm on Xα[a..b ]. Since any value in Xα can be computed in O(1) time from X0, Kadane’s algorithm answers R-OMSS in O(n) time using O(1) 
+
+space additional to X0.
+
+(2) Alternatively, we can maintain the data structure of Lemma 1 for all Θ( n2) possible query ranges. This results in an O(n3)-space data structure with O(log n) query time. In what follows, we present two non-trivial data structures for R-OMSS queries whose complexities lie between those of solutions (1) and (2). We start with an O(n)-space data structure answering suffix R-OMSS queries on X0 in O( log 2 n) time. By symmetry, the same data structure results can be obtained for prefix R-OMSS queries. Next, in Section 3.2, we consider a data structure for (general) R-OMSS queries. By combining the data structure of Lemma 1 with the suffix R-OMSS data structures, we obtain an O(n log n)-space data structure that can answer an R-OMSS query in O(log 2 n) time. Finally, note that all our data structure results can also handle the case α < 0 within the same asymptotic space bounds, by maintaining the negated input array and answering the corresponding minimum segment-sum query with offset −α. All the data structures for the minimum segment sum variants are analogous to those for the maximum segment sum variants. S. Jo and D. Köppl 7[1 .. 6]                    
+
+> αp= 3 .5
+> [1 .. 3]
+> αp= 2 .5
+> [4 .. 6]
+> αp= 8
+> [1 .. 2]
+> αp= 4 [3 .. 3] [4 .. 5]
+> αp= 1 [6 .. 6]
+> [1 .. 1] [2 .. 2] [4 .. 4] [5 .. 5]
+> Figure 2 SBST on X0= [4 ,1,6,1,8,0] . Each node is labeled with its corresponding canonical range. Each internal node is additionally labeled with its threshold offset.
+
+# 3.1 Data Structure for Suffix R-OMSS Queries 
+
+We start with devising a data structure for range suffix OMSS queries. The main idea is to maintain the canonical ranges (defined below) of X0 using a suffix binary search tree (SBST) .Each internal node in the tree stores a threshold offset . By comparing α with the offsets stored along a root-to-leaf path in the tree, as in a standard binary search tree, we can track the endpoint of the range corresponding to the query answer when the query range is canonical. To map this logic to arbitrary query intervals, we define a canonical cover of a range [a..b ] as a set of canonical ranges that are pairwise disjoint and whose union is [a..b ].Finally, we show that we can partition the query range [a..b ] into a canonical cover of size 
+
+O(log n), and answer the query using a dynamic programming approach. The canonical ranges of X0 are the elements of a recursive binary partition of [1 ..n ] into 
+
+O(n) ranges, which can be represented by a binary tree. The canonical ranges of X0 are defined as follows: 
+
+(1) [1 ..n ] is a canonical range, and 
+
+(2) for every canonical range [g..h ] with g < h , both [g..g +⌊(h − g)/2⌋] and [g +⌊(h − g)/2⌋+1..h ] are also canonical ranges. Under this definition, there are O(n) canonical ranges in total. We then define the SBST on 
+
+X0[g..h ] as follows: The root of the SBST on X0[g..h ] is the canonical range [g..h ].If g < h , then the SBSTs on X0[g..g + ⌊(h − g)/2⌋] and X0[g + ⌊(h − g)/2⌋ + 1 ..h ] are the left and right child subtrees of the root, respectively. Otherwise, for g = h, the SBST root itself is a leaf with canonical range [g..g ].See Figure 2 for an example. (The reader familiar with segment trees may notice that the SBST is a specialization of a segment tree indexing all integers in [1 ..n ].) Let T denote the SBST on X0[1 ..n ]. From the definition, each canonical range of X0 is a node in T , and vice versa. The leaves of T are all canonical ranges of size 1, i.e., [i..i ] = {i}
+
+for each i ∈ [1 ..n ]. By construction, T is a binary tree with O(n) nodes and height O( log n).Finally, we augment each node p of T with a threshold offset αp. Before defining the threshold offsets, we introduce the following key property for answering SMSS queries. 
+
+▶ Proposition 2. For any non-negative offsets α < β , the shortest answer range of the SMSS query on Xβ is a subrange of the shortest answer range of the SMSS query on Xα.
+
+Proof. Let [x..n ] and [x′..n ] be the shortest answer ranges for offsets α and β, respectively. Suppose that x′ < x . The range [x..n ] is shorter than [x′..n ]. Since [x′..n ] is the shortest 8 Indexing Range Maximum-Sum Segment Queries with Offsets 
+
+answer at offset β, while [x..n ] is shorter than [x′..n ], we must have Sβ (x′, n ) > S β (x, n ) —in case of equality, we would already favor the shorter range [x..n ] by Eq. (1). It follows that 
+
+Sβ (x′, x − 1) > 0, and hence 
+
+Sα(x′, x − 1) = Sβ (x′, x − 1) + ( β − α)( x − x′) > 0.
+
+Consequently, Sα(x′, n ) > S α(x, n ), contradicting the optimality of [x..n ]. Therefore x′ ≥
+
+x. ◀
+
+Let [xp..y p] be the range corresponding to an internal node p, and set zp := xp +
+
+⌊(yp − xp)/2⌋ . For an offset α ≥ 0, let [xα..y p] be the shortest SMSS answer on Xα[xp..y p].We define the threshold offset of p by αp := inf {α ≥ 0 | xα ∈ [zp + 1 ..y p]}. The set in this definition is nonempty, since for sufficiently large α the shortest SMSS answer is the singleton 
+
+[yp..y p]. By Proposition 2, xα is non-decreasing as a function of α. At the breakpoint at which a suffix from the left child and a suffix from the right child have equal value, the latter suffix is shorter and is therefore the unique shortest SMSS answer. Consequently, 
+
+xα ∈ [xp..z p] ⇐⇒ α < α p, (2) and xα ∈ [zp + 1 ..y p] if and only if α ≥ αp. Leaves store no threshold. The data structure for suffix R-OMSS queries is composed of 
+
+(a) the array C0, and 
+
+(b) the SBST T on X0.Each node of the SBST stores its threshold offset and its canonical range. (a) and (b) together use O(n) space in total. We now describe how to answer a query using this data structure. We first consider the case where the query range is a canonical range [xp..y p] corresponding to a node p in T . In this case, it suffices to find the position x such that [x..y p] is the answer range. To find x,we start from the node p and compare α with αp. As in a standard binary search tree, we recursively perform the same comparison: we proceed to the left child if α < α p, and to the right child otherwise, until we reach a leaf node corresponding to the canonical range [x′..x ′].Then x′ = x from the following proposition. 
+
+▶ Proposition 3. Let p be an internal node with range [xp..y p] and midpoint zp. If α < α p,then the shortest SMSS answers on Xα[xp..y p] and Xα[xp..z p] have the same starting position. If α ≥ αp, then the shortest SMSS answers on Xα[xp..y p] and Xα[zp + 1 ..y p] have the same starting position. 
+
+Proof. We prove the first case; the second one is symmetric. By Eq. (2), the shortest SMSS answer [x..y p] on Xα[xp..y p] starts in the left child. Let [x′..z p] be the shortest SMSS answer on Xα[xp..z p].Suppose first that x < x ′. If Sα(x, y p) = Sα(x′, y p), then the shorter range [x′..y p] would be the shortest answer for the parent interval. Therefore Sα(x, y p) > S α(x′, y p), which implies Sα(x, x ′ − 1) > 0. Hence 
+
+Sα(x, z p) = Sα(x′, z p) + Sα(x, x ′ − 1) > S α(x′, z p),
+
+contradicting the optimality of [x′..z p].Suppose now that x > x ′. If Sα(x′, z p) = Sα(x, z p), then the shorter range [x..z p] would be the shortest answer for the left child. Thus Sα(x′, z p) > S α(x, z p), and adding the common suffix [zp + 1 ..y p] yields Sα(x′, y p) > S α(x, y p), contradicting the optimality of the parent suffix. Therefore x = x′. ◀S. Jo and D. Köppl 9a1 x′ bk−1 ak z bk
+
+Xα[a1..b k−1] Xα[ak ..b k ]
+
+Xα[a1..b k ]
+
+[x′..b k−1] [z..b k ]
+
+[x..b k ]
+
+Xα =    
+
+> Figure 3 A sketch of the setting in Lemma 4 with the setting x=x′.
+
+Since the height of T is O( log n), we can answer a suffix R-OMSS query on X0 in O( log n)
+
+time when the query range is canonical. Finally, we consider how to answer a suffix R-OMSS query on X0 for a general query range [a..b ] using the data structure. We first partition [a..b ] into c = O( log n) distinct canonical ranges [a1..b 1], . . . , [ac..b c], ordered from left to right (i.e., a1 = a, bc = b, and 
+
+bk + 1 = ak+1 for all k ∈ [1 ..c − 1] ). This partition can be computed by starting from the root of T and traversing the tree downwards in two directions for finding the leaves of the canonical ranges [a..a ] and [b..b ], respectively. We then collect O( log n) canonical ranges corresponding to children on the two root-to-leaf paths. At each level of T , there are at most two nodes whose canonical ranges [x..y ] satisfy [x..y ] ∩ [a..b ]̸ = ∅ but [x..y ]̸ ⊆ [a..b ]; only these nodes require recursion to the next level, while any other intersecting node is fully contained in [a..b ] and can be reported as a canonical range immediately. Therefore, we can compute these canonical ranges in O(log n) time. If c = 1 (i.e., [a..b ] is a canonical range), we can answer the R-OMSS query in O(log n)
+
+time using T . Otherwise, we apply a dynamic programming approach as follows. Define an array A[1 ..c ] of size c, where for each k ∈ [1 ..c ], A[k] stores the answer range of the SMSS query on Xα[a1..b k]. Then A[c] stores the answer of the suffix R-OMSS query. To compute A[c], we first handle the base case by computing A[1] in O( log n) time using 
+
+T . Next, for k > 1, we compute A[k] from A[k − 1] as follows. To compute A[k], it suffices to determine the answer range [x..b k] of the SMSS query on Xα[a1..b k]. Now we introduce the following lemma, which is used to compute A[k].
+
+▶ Lemma 4. Let [x..b k] be the shortest SMSS answer on Xα[a1..b k], let [x′..b k−1] be the shortest SMSS answer on Xα[a1..b k−1], and let [z..b k] be the shortest SMSS answer on 
+
+Xα[ak..b k]. Then x ∈ { x′, z }.
+
+Proof. See Figure 3 for a sketch of the setting. If x ≤ bk−1, every suffix of Xα[a1..b k] starting at or before bk−1 consists of a suffix of Xα[a1..b k−1] followed by the fixed block Xα[ak..b k].Adding the same block preserves both the value order and the length order among ties. Hence, the shortest SMSS answer among these candidates starts at x′.If x ≥ ak, the candidate lies completely inside Xα[ak..b k], and by definition its shortest SMSS answer starts at z. These are the only two cases because ak = bk−1 + 1 . ◀
+
+The answer ranges of the SMSS queries on Xα[a1..b k−1] and Xα[ak..b k] can be obtained from A[k − 1] and from T , respectively, in O( log n) time. Thus, by Lemma 4, given A[k − 1] ,10 Indexing Range Maximum-Sum Segment Queries with Offsets tS0(6 − t + 1 , 6) (1 , 0) (2 , 8) (3 , 9) (4 , 15) (5 , 16) (6 , 20) L(6 ,20) L(4 ,15) L(2 ,8) αp = 3 .5αy − αx αp = 3 .5(a) (b) 
+
+Figure 4 Example illustrating the computation of the threshold offset at the root of T in Figure 2. (a) The point set P with its convex hull. (b) The dual lines corresponding to the convex hull of P .The red segments represent the upper envelope of these lines. 
+
+the value A[k] can be computed in O( log n) time, which implies that A[c] can be computed in O(log 2 n) time. 
+
+Construction time. As C0 can be constructed in O(n) time, it suffices to analyze the construction time of T . To construct T , for each node p whose corresponding range is [xp..y p]
+
+with ℓp = yp − xp + 1 , we compute its threshold offset αp as follows. Consider the point set P = {(t, S 0(yp − t + 1 , y p)) | 1 ≤ t ≤ ℓp}, that is, each point corresponds to a suffix of 
+
+[xp..y p], where the x-coordinate t is the suffix length and the y-coordinate is its sum. We keep the vertices of the upper convex hull of P , since only hull vertices can maximize y − αx 
+
+for some α ≥ 0. The convex hull can be constructed in O(ℓp) time, since the points in P are already sorted by their first coordinates [17]. For any suffix represented by a point (x, y ) ∈ P , we have Sα(yp − x + 1 , y p) = y − αx .Thus, given an offset α, answering the SMSS query on X0[xp..y p] reduces to finding the point 
+
+(x, y ) ∈ P that maximizes y − αx . By point-line duality, each point (x, y ) corresponds to the line L(x,y )(w) = y − wx , and max (x,y )∈P (y − αx ) equals the value of the upper envelope at 
+
+w = α. The upper envelope is piecewise linear and changes only at intersection points of consecutive envelope lines. We first determine the shortest optimal suffix at offset α = 0 . It is represented by a point of maximum second coordinate, choosing the one of minimum first coordinate in case of a tie; this point can be identified during the hull construction. If this suffix starts in the right half of [xp..y p], then the definition of the threshold gives αp = 0 . Otherwise, the shortest optimal suffix at offset 0 starts in the left half. Since it eventually becomes the singleton 
+
+[yp..y p], Proposition 2 implies that αp > 0 is the first positive envelope breakpoint at which the right-active shortest optimum starts in the right half. At that breakpoint, the right-half suffix is selected because it is shorter. Since the envelope breakpoints are sorted by slope, this breakpoint can be found by binary search over the hull in O(log ℓp) time. See Figure 4 for an example. Thus, the nodes at each level of T can be constructed in O(n) time, implying that the entire tree T can be constructed in O(n log n) time overall. We summarize the results of this section in the following theorem. 
+
+▶ Theorem 5. Given an array X0 of size n, there exists an O(n)-space data structure that can answer a prefix/suffix R-OMSS query on X0 in O( log 2 n) time for any non-negative S. Jo and D. Köppl 11 
+
+offset α ≥ 0. When the query range is a canonical range of X0, the data structure can answer a prefix/suffix R-OMSS query in O(log n) time. We can construct this data structure in 
+
+O(n log n) time. 
+
+# 3.2 Data Structure for General R-OMSS Queries 
+
+For a nonempty interval I = [ g..h ] and an offset α, define the summary of I by Sα(I) := (Sα(g, h ), pre α(I), suf α(I), best α(I)), where pre α(I) and suf α(I) are the maximum values of a prefix and a suffix of Xα[g..h ], respectively, and best α(I) is the maximum value of a nonempty segment of Xα[g..h ]. Together with each of these three values, we store a shortest answer range attaining it according to Eq. (1). Given two adjacent nonempty intervals I = [ g..h ] and J = [ h + 1 ..k ], we can compute the summary of I ∪ J in constant time by the following equations. 
+
+Sα(g, k ) = Sα(g, h ) + Sα(h + 1 , k ), (3) 
+
+pre α(I ∪ J) = max (pre α(I), S α(g, h ) + pre α(J)), (4) 
+
+suf α(I ∪ J) = max (suf α(J), suf α(I) + Sα(h + 1 , k )), (5) 
+
+best α(I ∪ J) = max (best α(I), best α(J), suf α(I) + pre α(J)). (6) Each maximum in Eqs. (4)–(6) is resolved by the lexicographic order defined by Eq. (1). For example, the range corresponding to suf α(I) + pre α(J) is obtained by concatenating the suffix range stored with suf α(I) and the prefix range stored with pre α(J). We prove correctness of Eqs. (3)–(6) together with the following claim. 
+
+▶ Lemma 6. Given Sα(I) and Sα(J) for two adjacent nonempty intervals I and J, we can compute Sα(I ∪ J) in constant time. 
+
+Proof. Every prefix of I ∪ J is either contained in I, or consists of all of I followed by a prefix of J. Within the second class, using the shortest prefix-MSS answer on J first maximizes the value and then minimizes the resulting length. Comparing minimum-length representatives of the two classes according to Eq. (1) proves Eq. (4). The argument for Eq. (5) is symmetric. Every segment of I ∪ J is either contained in I, contained in J, or crosses their common boundary. Among the crossing segments, the value is maximized by combining a maximum suffix of I with a maximum prefix of J. Choosing minimum-length representatives also minimizes the length of the concatenation. If several candidates have the same value and length, any one of them may be retained. Comparing this crossing candidate with the two minimum-length internal candidates proves Eq. (6). Finally, Eq. (3) follows from additivity of the score Sα. ◀
+
+We now construct the data structure for general R-OMSS queries. It consists of the following three parts: 
+
+(1) the prefix-sum array C0,
+
+(2) the data structures of Theorem 5, which answer prefix and suffix R-OMSS queries in 
+
+O(log n) time when the query range is canonical, and 
+
+(3) for every canonical range [g..h ], the O(h − g + 1) -space OMSS data structure of Lemma 1 on X0[g..h ].The total length of all canonical ranges is O(n log n). Consequently, (3) uses O(n log n) space, while (1) and (2) use O(n) space. Given a query range [a..b ], we partition it in O( log n) time into c = O( log n) pairwise disjoint canonical ranges I1 = [ a1..b 1], . . . , I c = [ ac..b c] ordered from left to right. For every 
+
+k ∈ [1 ..c ], we obtain the summary Sα(Ik) as follows. 12 Indexing Range Maximum-Sum Segment Queries with Offsets 
+
+We compute its total value Sα(ak, b k) = C0[bk] − C0[ak − 1] − α(bk − ak + 1) in constant time. We obtain its prefix and suffix fields pre and suf in O( log n) time from the data structures of Theorem 5, since Ik is canonical. We obtain its best field best in O(log n) time from the OMSS structure stored for Ik.We merge the c summaries from left to right using Lemma 6. After processing I1, . . . , I k,the maintained summary is 
+
+Sα(I1 ∪ · · · ∪ Ik).
+
+Complexity Analysis After all summaries have been merged, its best field is an answer to the R-OMSS query on [a..b ]. The O( log n) summaries each require O( log n) query time, while all merge operations together require only O( log n) time. The total query time is therefore 
+
+O(log 2 n).The construction time of the data structure in Lemma 1 on an interval of length ℓ is 
+
+O(ℓ log 2 ℓ). Since the total length of all canonical ranges is O(n log n), all structures in (3) can be constructed in O(n log 3 n) time [29]. The remaining components require O(n log n)
+
+construction time. We summarize the result in the following theorem. 
+
+▶ Theorem 7. Given an array X0 of size n, there exists an O(n log n)-space data structure that can answer an R-OMSS query on X0 in O( log 2 n) time for any non-negative offset 
+
+α ≥ 0. We can construct this data structure in O(n log 3 n) time. 
+
+Returning Multiple Solutions. Although a query returns a shortest answer range, we can also report all optimum ranges that contain neither a zero-sum proper prefix nor a zero-sum proper suffix. We call such an optimum range irreducible . While a shortest answer is irreducible, an irreducible optimum range need not be a globally shortest answer. 
+
+▶ Proposition 8. Any two distinct irreducible answer ranges of an R-OMSS query are disjoint. 
+
+Proof. Let I = [ ℓ1..r 1] and J = [ ℓ2..r 2] be two distinct overlapping answer ranges. If ℓ1 = ℓ2, then r1̸ = r2 because I̸ = J. After swapping I and J if necessary, assume 
+
+r1 < r 2. Since I and J have the same value, Sα(r1 + 1 , r 2) = Sα(J) − Sα(I) = 0 . Thus, 
+
+[r1 + 1 ..r 2] is a zero-sum proper suffix of J, contradicting irreducibility. This contradiction shows that ℓ1̸ = ℓ2.After swapping I and J if necessary, assume ℓ1 < ℓ 2. Let the common maximum score be Sα(J) = Sα(I) = M , and consider the following two cases. First suppose that r1 < r 2. Write A := [ ℓ1..ℓ 2 − 1] , B := [ ℓ2..r 1], and C := [ r1 + 1 ..r 2],
+
+and let a := Sα(A), b := Sα(B), and c := Sα(C) be their scores. Since a + b = M = b + c,we have a = c. If a > 0, then the union A ∪ B ∪ C has value M + a > M . If a < 0,then the intersection B has value M − a > M . Both cases contradict maximality. Hence, 
+
+a = c = 0 , so A is a zero-sum proper prefix of I and C is a zero-sum proper suffix of J.Now suppose that r2 ≤ r1; this includes both nested ranges and the case of equal right endpoints. Write A := [ ℓ1..ℓ 2 − 1] , B := [ ℓ2..r 2], and C := [ r2 + 1 ..r 1], where C may be empty. Set c := 0 if C is empty, and c := Sα(C) otherwise. Further, set a := Sα(A) and 
+
+b := Sα(B). Since b = M and a + b + c = M , we have a + c = 0 . If a > 0, then A ∪ B
+
+has value M + a > M . If a < 0, then B ∪ C has value M − a > M . Thus, a = 0 , and A
+
+is a zero-sum proper prefix of I. This contradicts the assumption in all cases. S. Jo and D. Köppl 13 
+
+◀
+
+Let M be the value of an initial R-OMSS query on [a..b ]. After reporting an answer range 
+
+[ℓ..r ], recursively query the two remaining ranges [a..ℓ − 1] and [r + 1 ..b ], omitting empty ranges. A recursive branch is stopped as soon as its answer value is smaller than M . By Proposition 8, every other answer range is disjoint from [ℓ..r ] and is therefore fully contained in one of the two remaining ranges. Conversely, every range reported by the recursion has value M and is an answer to the original query. The recursion performs only a constant number of queries per reported range. 
+
+▶ Corollary 9. Given an array X0 of size n, we can enumerate all distinct irreducible answer ranges of an R-OMSS query on X0 with the data structure of Theorem 7. The delay is 
+
+O( log 2 n) per reported range. We can report up to g distinct answer ranges in O(g log 2 n)
+
+time. 
+
+Proof. We eagerly query both residual ranges and recurse only on those whose value is 
+
+M . ◀
+
+# 4 A Time–Space Trade-Off 
+
+The data structure of Theorem 7 stores an OMSS data structure for every canonical range of the binary partition of [1 ..n ]. Since the total length of the canonical ranges on each level is n,the O( log n) levels account for the O(n log n) space usage. In this section, we parameterize the number of levels by a trade-off parameter τ to lower the number of levels while increasing the degree of the underlying interval hierarchy. This gives a continuous trade-off between Kadane’s linear-space scanning solution and the polylogarithmic-query data structure of Theorem 7. Let τ be an integer with 1 ≤ τ ≤ ⌈ log 2 n⌉, and define ∆ := ⌈n1/τ ⌉ . We first introduce a rooted ordered interval tree Tτ . The root corresponds to the range [1 ..n ]. For every node v
+
+whose range Iv = [ gv ..h v ] has length ℓv := hv − gv + 1 ≥ 2, we partition Iv into min (∆ , ℓ v )
+
+consecutive ranges whose lengths differ by at most one, and make these ranges the children of v. We stop after depth τ or when a range has length one. 
+
+▶ Lemma 10. The tree Tτ has depth at most τ . At every depth, its node ranges are pairwise disjoint and their total length is at most n.
+
+Proof. The children of every node form a partition of the range of their parent. Consequently, the node ranges at every depth are pairwise disjoint and have total length at most n.After q subdivision steps, the length of every non-singleton node range is at most ⌈n/ ∆q ⌉.Since ∆τ ≥ n, every range has length at most one after τ subdivision steps. Hence, the depth of Tτ is at most τ . ◀
+
+# 4.1 Node Summaries 
+
+For every node v of Tτ , we store a data structure that returns the MSS summary Sα(Iv )
+
+defined in Section 3.2. For Iv = [ gv ..h v ], let ℓv := hv − gv + 1 . We store: 
+
+(1) the length ℓv and the sum S0(gv , h v ),
+
+(2) a data structure for prefix OMSS queries on X0[gv ..h v ],
+
+(3) a data structure for suffix OMSS queries on X0[gv ..h v ], and 
+
+(4) the OMSS data structure of Lemma 1 on X0[gv ..h v ].14 Indexing Range Maximum-Sum Segment Queries with Offsets 
+
+We describe (2); the construction of (3) is symmetric. For every prefix length t ∈ [1 ..ℓ v ],let pv (t) := S0(gv , g v + t − 1) . After subtracting the offset α, the value of this prefix is 
+
+pv (t) − αt . Therefore, answering a prefix OMSS query is equivalent to finding a point maximizing (x, y ) 7 → y − αx among Pv := {(t, p v (t)) | t ∈ [1 ..ℓ v ]}, i.e. max t∈[1 ..ℓ v ]{pv (t) − αt }.As in the construction in Section 3.1, we retain the vertices of the upper convex hull of Pv .Since the points are sorted by their first coordinate, the hull can be constructed in O(ℓv )
+
+time and occupies O(ℓv ) space. The breakpoints between consecutive hull vertices are sorted, and hence a binary search returns the optimal prefix length in O( log ℓv ) time. We obtain the suffix structure analogously from the points {(t, S 0(hv − t + 1 , h v )) | t ∈ [1 ..ℓ v ]}.
+
+▶ Lemma 11. For every node v of Tτ , we can construct an O(ℓv )-space data structure in 
+
+O(ℓv log 2 ℓv ) time such that we can obtain Sα(Iv ) in O(log ℓv ) time for every non-negative offset α ≥ 0.
+
+Proof. We can compute the total score Sα(gv , h v ) = S0(gv , h v ) − αℓ v in constant time. The prefix and suffix structures described above each use O(ℓv ) space, can be constructed in 
+
+O(ℓv ) time, and can be queried in O( log ℓv ) time. Finally, Lemma 1 gives an O(ℓv )-space OMSS data structure that can be constructed in O(ℓv log 2 ℓv ) time and queried in O( log ℓv )
+
+time. Combining the four fields gives the stated bounds. ◀
+
+# 4.2 Range Decomposition and Queries 
+
+Given a query range [a..b ], we compute a canonical cover with respect to Tτ as follows. Starting at the root, we discard a node whose range is disjoint from [a..b ], report a node whose range is contained in [a..b ], and recurse into all children of every remaining node. The reported ranges are pairwise disjoint, occur in left-to-right order, and form a partition of 
+
+[a..b ].
+
+▶ Lemma 12. We can partition every range [a..b ] ⊆ [1 ..n ] into O(∆ τ ) = O(τ n 1/τ ) node ranges of Tτ . We can compute the partition in O(∆ τ ) time. 
+
+Proof. At every depth, at most two node ranges intersect [a..b ] without being contained in [a..b ]: the node containing a and the node containing b. Every such node has at most 
+
+∆ children. Apart from at most two children that remain only partially covered, every intersecting child can be reported immediately. Thus, we report at most 2∆ node on each level. Since Tτ has depth at most τ by Lemma 10, the canonical cover contains O(∆ τ ) ranges. The same traversal computes the cover in O(∆ τ ) time. Since ⌈x⌉ ≤ 2x for every x ≥ 1, we have ∆ = O(n1/τ ). ◀
+
+Let I1, . . . , I c be the canonical cover of [a..b ], ordered from left to right. For every 
+
+k ∈ [1 ..c ], we query the data structure of Lemma 11 at the node representing Ik and obtain 
+
+Sα(Ik). We then merge these summaries from left to right using Lemma 6. After processing 
+
+I1, . . . , I k, the maintained summary is exactly Sα(I1 ∪ · · · ∪ Ik). Consequently, the best 
+
+component after processing all c ranges is an answer to the R-OMSS query on [a..b ].
+
+▶ Theorem 13. Let τ be an integer with 1 ≤ τ ≤ ⌈ log 2 n⌉. Given an array X0 of size n,there exists an O(τ n )-space data structure that can answer an R-OMSS query on X0 in 
+
+O(τ n 1/τ log n) time for every non-negative offset α ≥ 0. We can construct this data structure in O(τ n log 2 n) time. 
+
+Proof. By Lemma 10, the total length of the node ranges at every depth is at most n. By Lemma 11, the data structures at one depth therefore use O(n) space and can be constructed S. Jo and D. Köppl 15 
+
+in O(n log 2 n) time. There are at most τ + 1 = O(τ ) depths, yielding O(τ n ) space and 
+
+O(τ n log 2 n) construction time. By Lemma 12, the query range has a canonical cover of size c = O(τ n 1/τ ). Obtaining one node summary takes O( log n) time by Lemma 11, and merging two summaries takes constant time by Lemma 6. The total query time is therefore O(c log n) = O(τ n 1/τ log n). ◀
+
+For constant τ , Theorem 13 uses linear space and gives a sublinear query time. In particular, we obtain the following consequence. 
+
+▶ Corollary 14. For every fixed constant ε > 0, there exists an O(n)-space data structure that can answer an R-OMSS query on X0 in O(nε log n) time. The data structure can be constructed in O(n log 2 n) time, where the constants hidden in the asymptotic notation depend on ε.
+
+Proof. Set τ = ⌈1/ε ⌉ in Theorem 13. Then τ is a constant and n1/τ ≤ nε. ◀
+
+The parameter τ continuously trades space for query time. For example, setting τ =⌈ log n 
+
+> log log n
+
+⌉
+
+gives O
+
+( n log n 
+
+> log log n
+
+)
+
+space and O
+
+( log 3 n 
+
+> log log n
+
+)
+
+query time. At the other endpoint, 
+
+τ = ⌈log 2 n⌉ yields a binary hierarchy and recovers the O(n log n)-space and O( log 2 n)-query bounds of Theorem 7. 
+
+# 5 Special Types of Inputs 
+
+Based on the results of the previous section, we analyze and devise specializations of our data structures for R-OMSS queries on X0 under special input types. Specifically, we consider the following three scenarios: (1) the offset α is restricted to positive integers, (2) X0 is an array over an alphabet of size σ, and (3) X0 is given in run-length encoded (RLE) form. 
+
+# 5.1 Integer Offsets 
+
+When the offset α is restricted to positive integers, the data structure of Theorem 7 can be improved by the following modifications. First, we introduce a lemma that states the data structure of Lemma 1 can be improved under this restriction. 
+
+▶ Lemma 15. When the offset α is restricted to positive integers, there exists an s(n, U )-space data structure that answers an OMSS query on X0 in t(n, U ) time, where s(n, U ) and t(n, U )
+
+denote the space and query-time complexities, respectively, of a predecessor data structure storing n integers from a universe of size U .
+
+Proof. We modify the data structure of Lemma 1 as follows. For each (offset, interval) pair 
+
+(α, I ) in L (the list defined in the statement of Lemma 1), we replace it with the integer pair 
+
+(⌈α⌉ , I ). If there exist two distinct pairs (α1, I 1) and (α2, I 2) in L such that α1 < α 2 and 
+
+⌈α1⌉ = ⌈α2⌉, we discard the pair (α1, I 1) and maintain only (⌈α2⌉ , I 2) in L. We also discard all pairs (α, I ) with ⌈α⌉ > U . We then answer the query by performing the binary search over the offsets by maintaining a predecessor data structure on L. ◀
+
+For example, if we use a y-fast trie [33] as the predecessor data structure, for which 
+
+s(n, U ) = O(n) and t(n, U ) = O(log log U ), then an OMSS query on X0 can be answered in 
+
+O(log log U ) time using O(n) space; this is O(log log n) when U = nO(1) .Next, for each canonical range [g..h ] of X0, let T[g..h ] be the rooted subtree of the SBST 
+
+T on X0 (defined in Section 3.1) whose root corresponds to [g..h ]. Let I0[g..h ] be the shortest 16 Indexing Range Maximum-Sum Segment Queries with Offsets 
+
+suffix R-OMSS answer on [g..h ] at offset 0. We define a catalog L[g..h ] containing the sentinel pair (0 , I 0[g..h ]) and, for every distinct positive threshold offset β stored at a node of T[g..h ],the pair (β, I β [g..h ]) , where Iβ [g..h ] is the shortest suffix R-OMSS answer on the root range 
+
+[g..h ] at offset β. If the same positive threshold occurs at several nodes, we store only one pair for that key. In particular, for g = h, the catalog consists only of (0 , [g..g ]) .The catalog has size O(h − g + 1) . To prove its correctness, write its distinct keys as 
+
+0 = β0 < β 1 < · · · < β k and set βk+1 := + ∞. For every j ∈ [0 ..k ] and every α ∈ [βj , β j+1 ),every comparison with a node threshold made during the SBST descent has the same outcome as at offset βj : there is no stored node threshold strictly between βj and α, and equality is routed to the right child. Consequently, the descent reaches the same leaf, so the answer is Iβj [g..h ]. This also proves correctness when α = βj , since routing equality to the right implements the right-active convention. A descendant threshold that does not change the answer on the root range merely creates a redundant entry carrying the same root answer as an adjacent entry; keeping such thresholds therefore does not affect correctness. The sentinel at offset 0 ensures that every non-negative query offset has a predecessor. Therefore, L[g..h ] plays the same role as the data structure of Lemma 1 for suffix R-OMSS queries restricted to [g..h ]. By maintaining these catalogs for all canonical ranges of X0 and applying the rounding and duplicate-removal modification from the proof of Lemma 15, we obtain the following lemma, since the total length of all canonical ranges of X0 is O(n log n).
+
+▶ Lemma 16. When the offset α is restricted to positive integers and the query range is restricted to a canonical range of X0, there exists a data structure that can answer a suffix R-OMSS query on X0 in t(n log n, U ) time using ∑ 
+
+> I
+
+s(|LI |, U ) space, where the sum is taken over all canonical ranges I of X0. Here, s(n, U ) and t(n, U ) denote the space and query-time complexities, respectively, of a predecessor data structure storing n integers from a universe of size U .
+
+Finally, by combining the data structures of Lemma 15 and Lemma 16, together with C0,we obtain the following corollary. 
+
+▶ Corollary 17. Assume a word-RAM model with word size w = Ω( log U ). When the offset α
+
+is restricted to positive integers from the universe [1 ..U ], there exists an O(n log n)-space data structure that answers an R-OMSS query on X0 in O( log n log log U ) time. If U = nO(1) ,the query time is O(log n log log n).
+
+Proof. We use y-fast tries as the predecessor structures of Lemmas 15 and 16 (and the symmetric prefix counterpart of Lemma 16). Each y-fast trie is static, uses linear space in the size of its catalog, and answers a predecessor query in O( log log U ) worst-case time. The total number of entries in all catalogs is O(n log n) because a catalog associated with a canonical range I has O(|I|) entries, and the total length of all canonical ranges is O(n log n).Hence, the total space is O(n log n). An R-OMSS query uses a canonical cover of size O( log n)
+
+and performs a constant number of predecessor queries for each range in the cover. The resulting summaries are merged in constant time per range. Thus, the total query time is 
+
+O(log n log log U ). ◀
+
+# 5.2 Bounded Alphabet Size 
+
+While the number of distinct answers represented by the breakpoint list of Lemma 1 can be 
+
+Θ( n), this number can be less if X0 is an array over an alphabet Σ ⊂ R of bounded size σ.In particular, if σ = 2 , we show that the size of this list is Θ( n2/3) in the worst case. S. Jo and D. Köppl 17 
+
+In this subsection, an answer range means any range attaining the maximum value, before selecting a shortest answer. We call two ranges I and J compatible if (|I|, S 0(I)) = ( |J|, S 0(J)) .
+
+Equivalently, Sα(I) = Sα(J) for every offset α. For a binary array, this is equivalent to saying that the two corresponding subarrays are permutations of each other. Two offsets 
+
+α and β are called non-compatible if no answer range of the OMSS query with offset α is compatible with an answer range of the OMSS query with offset β.
+
+Roadmap The basic idea is study inputs with a high number of non-compatible offsets. Geometrically speaking, such non-compatible offsets emerge when the edges of the upper convex hull of the points have pairwise distinct slopes. Such slope changes naturally occur in a strictly monotonically decreasing order when drawing a quarter of a circle from its leftmost to topmost point. The main challenge is thus to find the correct discretization of the circle quarter to be expressible with binary alphabets. In the setting of binary alphabets, Christoffel words are used in literature to express horizontal and vertical moves by 0 and 1, respectively. In what follows, we combine some geometric discretization ideas with the strictly monotonically decreasing slopes expressible by a family of Christoffel words. For that, we start with some definitions. For every length ℓ ∈ [1 ..n ], define 
+
+fX0 (ℓ) := max 
+
+> 1≤i≤n−ℓ+1
+> i+ℓ−1
+
+∑
+
+> j=i
+
+X0[j].
+
+Thus, fX0 (ℓ) is the maximum number of ones in a length-ℓ subarray of X0. The value of an OMSS query with offset α is 
+
+max 
+
+> ℓ∈[1 ..n ]
+
+(fX0 (ℓ) − αℓ ). (7) Consequently, the compatible answer types that can occur for some offset are represented by exposed points of the upper convex hull of PX0 := {(ℓ, f X0 (ℓ)) | ℓ ∈ [1 ..n ]}.
+
+We first bound the number of vertices of this hull. A convex chain is a list p0, . . . , p h
+
+of integer points in [0 ..n ]2 with increasing first coordinates and non-decreasing second coordinates with the property that for the edges ei := pi − pi−1 = ( ai, b i), i ∈ [1 ..h ], the slopes bi 
+
+> ai
+
+of the edges are strictly decreasing. The primitive direction vector of an edge ei
+
+is defined as 
+
+( a 
+
+> gcd( |a|,|b|)
+
+, b
+
+> gcd( |a|,|b|)
+
+)
+
+. Edges have the same primitive direction vector if and only if they have the same slope. On a strictly convex chain, two different edges cannot have the same slope. This allows us to count edges by counting possible primitive directions: 
+
+▶ Lemma 18. Let p0, . . . , p h be a convex chain. Then h = O(n2/3).
+
+Proof. For every i ∈ [1 ..h ], write ei := pi − pi−1 := ( ai, b i). By the definition of a convex chain, we have ai ≥ 1 and bi ≥ 0 for every i ∈ [1 ..h ], and thus ∑hi=1 ai ≤ n and ∑hi=1 bi ≤ n. 
+
+Since consecutive edges of the chain have distinct slopes, their primitive direction vectors are pairwise distinct. Fix an integer R ≥ 1. There are only O(R2) primitive integer vectors (a, b )
+
+with a ≥ 1, b ≥ 0, and a + b ≤ R. Hence, the chain has at most O(R2) edges with ai + bi ≤ R.On the other hand, the number of edges with ai +bi > R is at most 1
+
+> R
+
+∑hi=1 (ai +bi) ≤ 2nR since each of them contributes more than R to the sum ∑hi=1 (ai + bi). Therefore, h = O (R2 + nR
+
+),for every R ≥ 1. Choosing R = ⌈n1/3⌉ proves the claim. ◀
+
+Alternatively, we can show Lemma 18 by Jarník’s theorem ([18, Satz 1] or [3]) that states that the perimeter of a convex lattice polygon with h vertices is Ω( h3/2) under every 18 Indexing Range Maximum-Sum Segment Queries with Offsets 
+
+fixed norm such as the Manhattan distance we used in the proof. Since the perimeter in 
+
+[1 ..n ] × [1 ..n ] is at most 4n, ch 3/2 ≤ 4n for some constant c, and thus h = O(n2/3).
+
+▶ Corollary 19. The maximum number of pairwise non-compatible offsets of a binary array of size n is O(n2/3).
+
+Proof. The function fX0 is non-decreasing: a length-ℓ subarray attaining fX0 (ℓ) can be extended by one position to a length-(ℓ + 1) subarray without decreasing its number of ones. Hence, the vertices of the upper convex hull of PX0 form a convex lattice chain whose two coordinates are non-decreasing. By Lemma 18, this chain has O(n2/3) vertices. Let A be a set of pairwise non-compatible offsets. For every α ∈ A, the linear function 
+
+(x, y ) 7 → y − αx exposes a face of the upper hull of PX0 : this face is a single vertex except at a breakpoint, where it is the edge joining two consecutive hull vertices. Choose one vertex vα of this face. The point vα represents an answer type of the OMSS query with offset α by Eq. (7). If α, β ∈ A are distinct, then vα̸ = vβ , since otherwise the two offsets would have compatible answer ranges. Thus, α 7 → vα is injective, and 
+
+|A| = O(n2/3). ◀
+
+For the lower bound, we use the following definitions. A lattice point (q, p ) ∈ Z2 is called 
+
+primitive if gcd (|q|, |p|) = 1 . Let P := {(q, p ) ∈ Z2 ∣∣ gcd( p, q ) = 1 } denote the set of primitive lattice points. A polygon is called rational if all its vertices have rational coordinates. Further, a polygon A is called star-shaped (with respect to the origin) if, for every (x, y ) ∈ A and every λ ∈ [0 , 1] , we have λ(x, y ) = ( λx, λy ) ∈ A . We use the following lemma. 
+
+▶ Lemma 20 ([6, Eq.(1.2)]) . For a bounded rational polygon A that is star-shaped with respect to the origin, 
+
+|tA ∩ P| = 6
+
+π2 area( A)t2 + o(t2) as t → ∞ ,
+
+where π is the ratio of the circumference of a circle to its diameter. 
+
+The main idea of proving the following theorem is to build a binary string by concatenating binary strings of decreasing densities of ones and appending a sufficiently long run of ones. These binary strings follow the spirit of lower Christoffel words for approximating line segments [23]. We choose the densities to be rational numbers and pairwise distinct, which we obtain from the primitive lattice points in a trapezoidal region, cf. Figure 5. 
+
+▶ Theorem 21. The maximum number of pairwise non-compatible offsets of a binary array of size n is Θ( n2/3).
+
+Proof. We give a matching lower bound. Fix an integer m ≥ 1, and let 
+
+R := 
+
+{
+
+(x, y ) ∈ R2
+
+∣∣∣∣ x ∈
+
+[ 12 , 1
+
+]
+
+∧ y ∈
+
+[ x
+
+3 , 2x
+
+3
+
+]} 
+
+.
+
+Define 
+
+Vm := mR ∩ P =
+
+{
+
+(x, y ) ∈ N2
+
+∣∣∣ x ∈
+
+[⌈ m
+
+2
+
+⌉
+
+, m 
+
+]
+
+∧ y ∈ [⌈x/ 3⌉ , ⌊2x/ 3⌋] ∧ gcd( x, y ) = 1 
+
+}
+
+.
+
+Let K := {(x, y ) ∈ R2 ∣∣ x ∈ [0 , 1] ∧ y ∈ [ x 
+
+> 3
+
+, 2x 
+
+> 3
+
+]} . be the triangle with vertices (0 , 0) ,(1, 13
+
+) , and (1, 23
+
+). In particular K is a rational star-shaped polygon. See Figure 5 for an illustration of K and R.S. Jo and D. Köppl 19 x
+
+y 
+
+> 12
+
+1
+
+y = x
+
+> 3
+
+y = 2x
+
+> 3
+
+K \ R 
+
+R
+
+(0 , 0) 
+
+(1, 13
+
+)
+
+(1, 23
+
+)
+
+( 12 , 16
+
+)
+
+( 12 , 13
+
+)
+
+Figure 5 The triangular region K and the trapezoidal region R used in the proof of Theorem 21. 
+
+K covers the region K \ R and R.
+
+Let P (t) denote the number of primitive lattice points in tK, i.e., P = |P ∩ tK| . Since 
+
+area( K) = 
+
+∫ 10
+
+( 2x
+
+3 − x
+
+3
+
+)
+
+dx = 16 ,
+
+Lemma 20 gives 
+
+P (t) = 1
+
+π2 t2 + o(t2). (8) The set Vm consists of the primitive points in mK whose first coordinate is at least m/ 2.Consequently, |V m| = P (m) − P (m/ 2) + O(m). The additive O(m) term accounts for lattice points on the vertical boundary line with x-coordinate m/ 2, and for the rounding in the inequalities defining Vm. Using Eq. (8), we obtain 
+
+|V m| = 1
+
+π2 m2 − 1
+
+π2
+
+( m
+
+2
+
+)2
+
++ o(m2) + O(m) = 34π2 m2 + o(m2) = Θ( m2). (9) Since every (q, p ) ∈ V m satisfies m 
+
+> 2
+
+≤ q ≤ m, we obtain 
+
+N := ∑
+
+> (q,p )∈V m
+
+q = Θ( m3), (10) since m 
+
+> 2
+
+|V m| ≤ N ≤ m|V m| and due to Eq. (9). For every (q, p ) ∈ V m, define the binary string Wq,p [1 ..q ] by 
+
+Wq,p [s] := 
+
+⌊ sp q
+
+⌋
+
+−
+
+⌊ (s − 1) pq
+
+⌋
+
+for each s ∈ [1 ..q ]. (11) In the following, we call Wq,p a block . The block Wq,p contains exactly p ones. Also, every prefix of length s contains ∑sj=1 Wq,p [j] = 
+
+⌊ sp q
+
+⌋
+
+≤ sp q ones. 20 Indexing Range Maximum-Sum Segment Queries with Offsets 
+
+Let us write Vm = {(q1, p 1), . . . , (qM , p M )} such that δ1 > δ 2 > · · · > δ M , with densities 
+
+δi := pi 
+
+> qi
+
+for some M ∈ Θ( m2). The densities δi are pairwise distinct because all fractions pi/q i
+
+are reduced. Let W := Wq1,p 1 Wq2,p 2 · · · WqM ,p M and define our input array X(m) := 1 2N W
+
+for the OMSS problem. By Eq. (10), the length of X(m) is |X(m)| = 3 N = Θ( m3).
+
+For every t ∈ [1 ..M − 1] , choose an offset αt ∈ (δt+1 , δ t). We claim that the unique OMSS answer on X(m) for αt is the prefix 
+
+It := 
+
+[
+
+1.. 2N +
+
+> t
+
+∑
+
+> i=1
+
+qi
+
+]
+
+. (12) Since δ ∈ [ 13 , 23 ], we have αt ∈ (0 , 23 ). Every nonempty prefix of X(m) 
+
+> αt
+
+has positive sum. Because αt < 1, this is immediate for prefixes contained in the leading run of ones. A prefix ending after s ≤ N positions of W has sum at least 2N (1 − αt) − αts ≥ N (2 − 3αt) > 0.
+
+Therefore, every maximum-sum segment starts at the first position: we can extend a non-prefix substring to the left by the preceding nonempty prefix to strictly increase its sum. Consider a prefix of length s of the block Wqi,p i . Its score is Wqi,p i .S α(1 , s ) := 
+
+⌊ sp i
+
+> qi
+
+⌋
+
+−
+
+αts ≤ (δi − αt)s. We consider two cases. 
+
+Case 1: i ≤ t Then δi > α t. For every proper prefix s < q i,
+
+Wqi,p i .S α(1 , s ) = 
+
+⌊ sp i
+
+qi
+
+⌋
+
+− αts ≤ (δi − αt)s < (δi − αt)qi = pi − αtqi = Wqi,p i .S α(1 , q i)
+
+Hence, within each of the first t blocks, the prefix sum is uniquely maximized at the end of each block. 
+
+Case 2: i > t Then δi < α t, and every nonempty prefix of Wqi,p i has score 
+
+Wqi,p i .S α(1 , s ) = 
+
+⌊ sp i
+
+qi
+
+⌋
+
+− αts ≤ (δi − αt)s < 0.
+
+Thus, the prefix sums of X(m) 
+
+> αt
+
+attain their unique maximum at the boundary following the first t blocks. This proves Eq. (12). The ranges I1, I 2, . . . , I M −1 have pairwise distinct lengths, and each is the unique answer for its respective offset. Therefore, the offsets α1, α 2, . . . , α M −1 are pairwise non-compatible. By Eqs. (9) and (10), M − 1 = Θ( m2) = Θ (|X(m)|2/3).
+
+For an arbitrary target length n, choose m := ⌊(n/ 3) 1/3⌋ . Since N ≤ m3, the constructed array has length 3N ≤ n. Append zeros until its length is exactly n. Every selected offset is positive, so the appended zeros have negative adjusted value and do not change any of the unique answer ranges above. Hence, there exists a binary array of length n with Ω( n2/3)
+
+pairwise non-compatible offsets. 
+
+◀
+
+# 5.3 Run-Length Encoded (RLE) Input 
+
+Let X0 := xℓ1 
+
+> 1
+
+xℓ2 
+
+> 2
+
+· · · xℓz 
+
+> z
+
+be the run-length encoding of X0, where xi̸ = xi+1 for every 
+
+i ∈ [1 ..z − 1] and ℓi ≥ 1 for every i ∈ [1 ..z ]. We define L[i] := ∑it=1 ℓt and V [i] := ∑it=1 ℓtxt
+
+for i ∈ [1 ..z ], and stipulate that L[0] = V [0] = 0 . Thus, the i-th run occupies the range 
+
+[L[i − 1] + 1 ..L [i]] . The run-value array [x1, . . . , x z ], the run-exponent array [ℓ1, . . . , ℓ z ], L,and V use O(z) space. Given a position p ∈ [1 ..n ], its run can be found by a predecessor S. Jo and D. Köppl 21 
+
+search in L in O(log z) time, while a run boundary can be translated back to a position of 
+
+X0 in constant time. 
+
+▶ Example 22. For X0 = [2 1, (−1) 3, 22] and α = 0 , the MSS of the run-value array [2 , −1, 2] 
+
+is the entire array, whereas the MSS of X0 is its last run. In what follows, we want to obtain the space and time complexities in terms of z for answering R-OMSS queries on the O(z)-space representation of X0. We therefore introduce a weighted version of the OMSS problem. We call ̂ X := (( x1, ℓ 1), . . . , (xz , ℓ z )) , the weighted array of X0 and define ̂ Sα(i, j ) := 
+
+∑jt=i ℓt(xt − α).
+
+A weighted positive OMSS (WPOMSS) query returns an interval maximizing ̂ Sα(i, j )
+
+if the maximum value is positive, and returns the empty interval otherwise. Among all intervals attaining the maximum value, it returns one with the shortest expanded length 
+
+λ(i, j ) = L[j] − L[i − 1] . While implicit, the data structure of [29] allows us to compute WPOMSS queries as follows. We give proof details in Section A. 
+
+▶ Theorem 23. Given a weighted array ̂ X of size z, there exists an O(z)-space data structure that supports WPOMSS queries in O( log z) time. We can construct the data structure in 
+
+O(z log 2 z) time. 
+
+Similarly, we can extend our suffix R-OMSS data structure of Section 3.1 to weighted arrays. For that, we replace the identity Sα(i, j ) = Sβ (i, j )+( β −α)( j −i+1) in Proposition 2, by ̂ Sα(i, j ) = ̂ Sβ (i, j )+( β −α)(L[j]−L[i−1] ). Since L[j]−L[i−1] > 0, the same monotonicity argument applies. Moreover, the points used for constructing a threshold offset for suffixes ending at run h become (L[h] − L[h − t], V [h] − V [h − t]), whose first coordinates are strictly increasing in t. Therefore, we can construct their upper hull in linear time, and obtain the following claim. 
+
+▶ Lemma 24. Given a weighted array of size m, there exists an O(m)-space data structure supporting weighted prefix and suffix R-OMSS queries in O( log 2 m) time. We can construct the data structure in O(m log 2 m) time. For a canonical query range, the query time is 
+
+O(log m).
+
+Proof. Apply the construction and proof of Theorem 5 with the weighted sum ̂ Sα. Our aforementioned observations give the weighted counterparts of Propositions 2 and 3 and of the threshold-offset construction. All remaining arguments use only additivity of interval sums and are unchanged. ◀
+
+We next relate weighted run intervals to segments of the expanded array. All answers obey the shortest-answer rule of Eq. (1). 
+
+▶ Lemma 25. Let p ≤ q, and consider the run-aligned range I = [ L[p − 1] + 1 ..L [q]] of X0.Its MSS summary for an offset α can be obtained from the following information: 
+
+(1) the total weighted sum ̂ Sα(p, q ) = ∑qi=p ℓi(xi − α); 
+
+(2) a maximum nonempty weighted prefix pre α(I) and suffix suf α(I) of the run range [p..q ];
+
+(3) a WPOMSS answer on [p..q ], if one exists; and 
+
+(4) a position h ∈ [p..q ] maximizing xh = max r∈[p..q ] xr .More precisely, the best prefix is the better of the maximum weighted full-run prefix and the singleton [L[p − 1] + 1 ..L [p − 1] + 1] . The best suffix is the better of the maximum weighted full-run suffix and the singleton [L[q]..L [q]] . If a WPOMSS answer exists, it is an MSS of 
+
+Xα[I]; otherwise, [L[h − 1] + 1 ..L [h − 1] + 1] is an MSS of Xα[I].22 Indexing Range Maximum-Sum Segment Queries with Offsets 
+
+Proof. Write yi := xi − α. Consider first an answer range of positive value. Assume that its left endpoint lies strictly inside the i-th run, and consider the following cases: If yi > 0, extending the range to the left boundary of the run increases its value. If yi < 0, deleting the covered part of that run increases its value. If yi = 0 , deleting that part preserves the value and gives a shorter range. Thus, under the shortest-answer rule (Eq. (1)), the left endpoint lies on a run boundary. The argument for the right endpoint is symmetric. Consequently, every positive MSS is a concatenation of complete runs and is returned by the WPOMSS data structure. If no complete-run interval has positive value, then yi ≤ 0 for every i ∈ [p..q ], since otherwise the complete i-th run would have positive value. In this case, every segment has non-positive value, and a shortest maximum segment consists of a single X0-entry, namely one occurrence of a run value maximizing yi, equivalently maximizing xi. This proves the statement for the unrestricted MSS. For a prefix, suppose that its right endpoint lies strictly inside the i-th run. If i > p ,then extending to the right run boundary improves the value when yi > 0, while deleting the covered part of the run improves the value when yi < 0 and preserves the value with a shorter range when yi = 0 . Hence, an optimal prefix either ends on a run boundary or is contained in the first run. The latter case is represented by the first singleton; if yp > 0,the complete first run is at least as good. This proves the prefix statement, and the suffix statement is symmetric. ◀
+
+For computing (4) in Lemma 25, we maintain a standard O(z)-space range-maximum-query data structure RMQ on x1, . . . , x z that returns an arbitrary maximum in constant time [14]. Together with Theorem 23 and Lemma 24, this gives an O(m)-space parametric MSS summary for every range of m complete runs. The summary consists of the same four fields as in Section 3.2, and two adjacent summaries are combined by Eqs. (3)–(6). For a subrange of consecutive positions inside one run of value x, we can compute its summary in constant time since all entries are equal. If x − α > 0, its best prefix, suffix, and unrestricted segment are the entire range. Otherwise, they are respectively its first position, its last position, and its first position. 
+
+▶ Lemma 26. There exists an O(z)-space data structure that supports OMSS queries on X0
+
+in O(log z) time. It can be constructed in O(z log 2 z) time. 
+
+Proof. Apply Theorem 23 to the weighted run array ̂ X = (( x1, ℓ 1), . . . , (xz , ℓ z )) . If the query returns a nonempty run range [p..q ], then [L[p − 1] + 1 ..L [q]] is an OMSS answer by Lemma 25. If the WPOMSS query returns the empty range, we return one single X0-entry of a run whose value xi is maximum. This run is obtained from RMQ . ◀▶ Corollary 27. There exists an O(z)-space data structure that supports suffix R-OMSS queries on X0 in O(log 2 z) time. It can be constructed in O(z log 2 z) time. 
+
+Proof. Use the weighted suffix R-OMSS data structure of Lemma 24 on the run array. Given a query range [a..b ], let p and q be the runs containing a and b, respectively. If p = q, the answer is obtained directly from the constant run X0[a..b ]. Otherwise, write the query range as the concatenation of [a..L [p]] , [L[p] + 1 ..L [q − 1]] , and [L[q − 1] + 1 ..b ], omitting the middle range when q = p + 1 . The first and last ranges are subranges of single runs and have summaries computable in constant time. For the middle range, its total is obtained from V
+
+and L, and its suffix is obtained from the weighted suffix R-OMSS query on the run range 
+
+[p + 1 ..q − 1] , together with the singleton correction of Lemma 25. Merging the at most three S. Jo and D. Köppl 23 
+
+summaries from left to right yields the suffix of Xα[a..b ]. Locating p and q takes O( log z)
+
+time, and the weighted suffix R-OMSS query takes O(log 2 z) time. ◀
+
+The time–space trade-off of Section 4 can be applied to the sequence of runs. At a node containing m runs, we store weighted prefix and suffix R-OMSS catalogs and the WPOMSS data structure of Theorem 23. By Lemma 25, RMQ supplies the possible singleton answer, so the node stores an exact MSS summary of the corresponding expanded run-aligned range in O(m) space. The proof of Theorem 13 then applies without further changes. For a query in the original array X0, we additionally merge the two boundary subranges described in the proof of Corollary 27. 
+
+▶ Corollary 28. Let τ be an integer with 1 ≤ τ ≤ ⌈ log 2 z⌉. There exists an O(τ z )-space data structure that supports R-OMSS queries on X0 in O(τ z 1/τ log z) time. It can be constructed in O(τ z log 2 z) time. In particular, for every fixed ε > 0, R-OMSS queries can be supported in O(zε log z) time using O(z) space. 
+
+▶ Remark 29. When the offset is restricted to an integer universe [0 ..U − 1] , the breakpoints in the (weighted) catalogs can be rounded and stored in integer predecessor structures exactly as in Lemma 15. The run containing a query position is found by a predecessor query in 
+
+L ⊆ [1 ..n ]. Thus, the corresponding bounds are obtained by substituting the query time of the chosen predecessor structure for the binary searches on offset catalogs and adding the predecessor time for L. For example, a y-fast trie gives O( log log U ) time for an offset lookup and O( log log n) time for locating a run, while using linear space in the number of stored keys. 
+
+# 6 Lower Bounds 
+
+Finally, we present lower bound results for data structures that answer R-OMSS queries on X0. We first show a reduction from the predecessor query to the OMSS query, and subsequently show that any encoding data structure that answers suffix R-OMSS queries requires at least Ω( n log n) bits. 
+
+Time-Space Trade-Offs Lower Bound. The following theorem gives a reduction from predecessor queries to OMSS queries. 
+
+▶ Theorem 30. For any set S of n values from a universe U ⊂ R, given a value α ∈ U , the predecessor of α in S can be determined by an OMSS query and at most two accesses to an array of size n.
+
+Proof. Suppose we want to answer a predecessor query for a value α ∈ U in S. For that, we have constructed, in a precomputation step, an OMSS data structure on X0, where X0
+
+stores the values of S in increasing order, and compute the OMSS query with offset α. If the answer range for α is [n..n ], then the predecessor of α is either X0[n] (if X0[n] ≤ α) or 
+
+X0[n − 1] (if X0[n] > α ). If the answer range is [1 ..n ], then there is no predecessor of α in 
+
+S. Otherwise, the answer range is [i..n ] with i ∈ [2 ..n − 1] . Then the predecessor of α is 
+
+X0[i − 1] since (a) Xα[k] < 0 for all k ≤ i − 2, (b) Xα[i − 1] ≤ 0, and (c) Xα[k] > 0 for all 
+
+k ≥ i. By Eq. (1), zero-valued entries adjacent to the positive suffix are omitted, so the returned range starts at the first position whose value is strictly larger than α. ◀
+
+The conclusion inherited from Theorem 30 depends on the predecessor model. In the comparison model over arbitrary real keys, a predecessor query has n + 1 possible answers. 24 Indexing Range Maximum-Sum Segment Queries with Offsets 
+
+Hence, its comparison decision tree has at least n + 1 leaves and depth at least ⌈log 2(n + 1) ⌉.Since the reduction uses one OMSS query followed by only O(1) additional comparisons and array accesses, every comparison-based OMSS index requires Ω( log n) query time. The same lower bound applies to suffix R-OMSS because, on the sorted instances used in Theorem 30, every OMSS answer is a suffix of [1 ..n ]. It applies also to R-OMSS because OMSS is a special case of R-OMSS. For integer keys from [0 .. 2ℓ − 1] , let the cell size be w ≥ ℓ bits. If an OMSS index uses S
+
+cells and answers a query in t cell probes, then the reduction of Theorem 30, together with the sorted input array, yields a predecessor structure using S + O(n) cells and t + O(1) probes. Thus, writing Tpred (n, ℓ, w, S ) for the Pătraşcu and Thorup’s predecessor lower bound [24], we obtain t + O(1) ≥ Tpred (n, ℓ, w, S + O(n)) . This is a parameter-dependent trade-off and does not imply an unconditional Ω( log n) lower bound in the word-RAM or cell-probe model. For example, for polynomial universes, where ℓ = Θ( log n), and near-linear space, predecessor search can be supported in Θ(log ℓ) = Θ(log log n) time. 
+
+Space Lower Bounds in the Encoding Model. One may also study the R-OMSS query in the variant where only the answer range in X0 is returned. In this setting, the problem is considered under the encoding model : after preprocessing X0, we maintain only the information necessary to answer queries, without storing X0 explicitly. For many range queries, encoding data structures use less space than explicitly storing X0; see [26] for an overview. For example, there exists an O(n)-bit encoding for range MSS queries under a word-RAM model with word size Θ( log n) bits [15], whereas explicitly storing an array over a universe of size n requires Θ( n log n) bits. The following elementary observation shows that suffix R-OMSS queries can simulate access to the input array. 
+
+▶ Lemma 31. Let i ∈ [1 ..n − 1] and let α ≥ 0. For a suffix R-OMSS query on the range 
+
+[i..i + 1] , the shortest answer range is [i..i + 1] if and only if X0[i] > α. Otherwise, the shortest answer range is [i + 1 ..i + 1] .
+
+Proof. The only two suffixes of [i..i + 1] are [i..i + 1] and [i + 1 ..i + 1] . Their scores are 
+
+Sα([ i..i + 1]) = X0[i] + X0[i + 1] − 2α and Sα([ i + 1 ..i + 1]) = X0[i + 1] − α, respectively. The first value exceeds the second one if and only if X0[i] > α . If X0[i] = α, the two values are equal, and Eq. (1) selects the shorter range [i + 1 ..i + 1] . ◀
+
+We now prove that an encoding for suffix R-OMSS queries contains enough information to reconstruct every permutation. 
+
+▶ Theorem 32. Any permutation X0 of [1 ..n ] can be reconstructed from an encoding that supports suffix R-OMSS queries. Consequently, every such encoding requires at least lg (n!) = Ω( n log n) bits. 
+
+Proof. Fix a position i ∈ [1 ..n − 1] . By Lemma 31, a query on [i..i + 1] with offset α = k + 12
+
+determines whether X0[i] ≥ k + 1 . A binary search over k ∈ [0 ..n − 1] therefore determines 
+
+X0[i] using O(log n) suffix R-OMSS queries. Applying this procedure to every i ∈ [1 ..n − 1] reconstructs X0[1 ..n − 1] . Since X0 is a permutation of [1 ..n ], its last entry is the unique value of [1 ..n ] that has not appeared among the first n − 1 entries. Hence, the complete permutation can be reconstructed from the encoding. There are n! permutations of [1 ..n ]. Two distinct permutations must therefore have distinct encodings, and any encoding requires at least lg (n!) = Ω( n log n) bits in the worst case. ◀S. Jo and D. Köppl 25 
+
+Since suffix R-OMSS is a special case of R-OMSS, the same lower bound applies to encod-ings for general R-OMSS queries. In particular, the O(n)-word space bound of Theorem 5 is optimal up to a constant factor in the word-RAM model with word size Θ(log n).The same access argument gives the corresponding lower bound for bounded alphabets. 
+
+▶ Corollary 33. For every σ ≥ 2, any encoding data structure that supports suffix R-OMSS queries on arrays of length n over an alphabet of size σ requires Ω( n log σ) bits. The lower bound also applies to R-OMSS queries. 
+
+Proof. Lemma 31 allows us to reconstruct an input up to the last letter. For full recon-struction, it therefore suffices to fix the last letter. So given an alphabet Σ := [1 ..σ ], let 
+
+X := [1 ..σ ]n−1 ×{ 1} be the set of all strings of length n build on Σ and ending with the letter 1.For every X0 ∈ X and every i ∈ [1 ..n − 1] , Lemma 31 and a binary search with half-integer offsets reconstruct X0[i] using O( log σ) queries. Therefore, we can reconstruct X0 from its en-coding. Since |X | = σn−1, the encoding must use at least log |X | = ( n − 1) log σ = Ω( n log σ)
+
+bits. ◀
+
+Corollary 33 shows that, also for bounded alphabets, suffix R-OMSS and R-OMSS encodings require asymptotically as much space as the input itself. 
+
+# 7 Open Problems 
+
+There are many gaps left open regarding time and space complexities. It is puzzling to us whether we can construct the data structure of Lemma 1 in optimal O(n) time. This would improve the construction time of our R-OMSS data structures in Theorem 7. Here, we additionally want to improve the space to O(n), which would be optimal by Theorem 32. Improving the query time to O( log n) is also an interesting open problem. Such a bound would match the lower bound transferred by Theorem 30 in the comparison model over arbitrary real offsets. For bounded integer universes in the word-RAM or cell-probe model, the inherited target instead depends on the universe size, word size, and space usage. In case that the number of distinct values in X0 is bounded, Theorem 21 settles the maximum number of pairwise non-compatible offsets. Determining the corresponding tight bound for larger fixed alphabets over arbitrary real values remains open. For future directions, we want to study the variations of the MSS problem described in the introduction as query problems with offset and/or query range parameters. 
+
+References            
+
+> 1Sung Eun Bae. Sequential and Parallel Algorithms for the Generalized Maximum Subarray Problem . PhD thesis, University of Canterbury, 2007.
+> 2Sung Eun Bae, Tong-Wook Shinn, and Tadao Takaoka. Efficient algorithms for the maximum sum problems. Algorithms , 10(1), 2017. URL: https://www.mdpi.com/1999-4893/10/1/5 ,
+> doi:10.3390/a10010005 .
+> 3Imre Bárány and Nathanaël Enriquez. Jarník’s convex lattice n-gon for non-symmetric norms.
+> Mathematische Zeitschrift , 270(3):627–643, 2012. doi:10.1007/s00209-010-0816-0 .
+> 4Fredrik Bengtsson and Jingsen Chen. Computing Maximum-Scoring segments optimally. Research Report 2007:03, Luleå University of Technology, Department of Computer Science and Electrical Engineering, 2007.
+> 5Jon Louis Bentley. Perspective on performance. Commun. ACM , 27(11):1087–1092, 1984.
+> doi:10.1145/1968.381154 .
+
+26 Indexing Range Maximum-Sum Segment Queries with Offsets 
+
+6 Imre Bárány, Greg Martin, Eric Naslund, and Sinai Robins. Primitive points in rational polygons. Canadian Mathematical Bulletin , 63(4):850–870, 2020. arXiv:1509.02201 , doi: 10.4153/S0008439520000090 .
+
+7 Timothy M. Chan and R. Ryan Williams. Deterministic apsp, orthogonal vectors, and more: Quickly derandomizing razborov-smolensky. ACM Trans. Algorithms , 17(1):2:1–2:14, 2021. 
+
+8 Kun-Mao Chao. Maximum-sum segments. In Ming-Yang Kao, editor, Encyclopedia of Algorithms , pages 1242–1244. Springer New York, New York, NY, 2016. doi:10.1007/ 978-1-4939-2864-4_226 .
+
+9 Kuan-Yu Chen and Kun-Mao Chao. On the range maximum-sum segment query problem. 
+
+Discrete Applied Mathematics , 155(16):2043–2052, 2007. 
+
+10 Chih-Huai Cheng, Hsiao-Fei Liu, and Kun-Mao Chao. Optimal algorithms for the average-constrained maximum-sum segment problem. Inf. Process. Lett. , 109(3):171–174, 2009. URL: 
+
+https://doi.org/10.1016/j.ipl.2008.09.024 , doi:10.1016/J.IPL.2008.09.024 .
+
+11 Kai-Min Chung and Hsueh-I Lu. An optimal algorithm for the maximum-density segment problem. SIAM J. Comput. , 34(2):373–387, 2004. doi:10.1137/S0097539704440430 .
+
+12 Christoph Dürr and Jill-Jênn Vie. Competitive Programming in Python: 128 Algorithms to Develop your Coding Skills . Cambridge University Press, 2020. URL: https://books.google. de/books?id=JA0FEAAAQBAJ .
+
+13 Takeshi Fukuda, Yasuhiko Morimoto, Shinichi Morishita, and Takeshi Tokuyama. Data mining with optimized two-dimensional association rules. ACM Trans. Database Syst. , 26(2):179–213, 2001. doi:10.1145/383891.383893 .
+
+14 Harold N. Gabow, Jon Louis Bentley, and Robert Endre Tarjan. Scaling and related techniques for geometry problems. In Proc. STOC , pages 135–143, 1984. doi:10.1145/800057.808675 .
+
+15 Paweł Gawrychowski and Patrick K Nicholson. Encodings of range maximum-sum segment queries and applications. In Annual Symposium on Combinatorial Pattern Matching , pages 196–206. Springer, 2015. 
+
+16 Michael H. Goldwasser, Ming-Yang Kao, and Hsueh-I Lu. Fast algorithms for finding maximum-density segments of a sequence with applications to bioinformatics. In Proc. WABI , volume 2452 of LNCS , pages 157–171, 2002. doi:10.1007/3-540-45784-4\_12 .
+
+17 Ronald L. Graham. An efficient algorith for determining the convex hull of a finite planar set. 
+
+Information processing letters , 1(4):132–133, 1972. 
+
+18 Vojtěch Jarník. Über die gitterpunkte auf konvexen kurven. Mathematische Zeitschrift ,24(1):500–518, 1926. URL: https://eudml.org/doc/174999 , doi:10.1007/BF01216790 .
+
+19 Seungbum Jo and Dominik Köppl. Indexing range maximum-sum segment queries with offsets. In Pierre Fraigniaud, editor, 20th Scandinavian Symposium on Algorithm Theory, SWAT 2026, Copenhagen, Denmark, June 17-19, 2026 , volume 370 of LIPIcs , pages 23:1–23:16. Schloss Dagstuhl - Leibniz-Zentrum für Informatik, 2026. 
+
+20 Sung Kwon Kim. Linear-time algorithm for finding a maximum-density segment of a sequence. 
+
+Information Processing Letters , 86(6):339–342, 2003. doi:10.1016/S0020-0190(03)00225-4 .
+
+21 Yaw-Ling Lin, Tao Jiang, and Kun-Mao Chao. Efficient algorithms for locating the length-constrained heaviest segments with applications to biomolecular sequence analysis. J. Comput. Syst. Sci. , 65(3):570–586, 2002. doi:10.1016/S0022-0000(02)00010-7 .
+
+22 Hsiao-Fei Liu and Kun-Mao Chao. Algorithms for finding the weight-constrained k longest paths in a tree and the length-constrained k maximum-sum segments of a sequence. Theor. Comput. Sci. , 407(1-3):349–358, 2008. doi:10.1016/J.TCS.2008.06.052 .
+
+23 Alessandro De Luca, Gabriele Fici, and Andrea Frosini. Digital convexity and combinatorics on words. In Guilhem Gamard and Julien Leroy, editors, Combinatorics on Words - 15th International Conference, WORDS 2025, Nancy, France, June 30 - July 4, 2025, Proceedings ,volume 15729 of Lecture Notes in Computer Science , pages 91–103. Springer, 2025. doi: 10.1007/978-3-031-97548-6\_9 .
+
+24 Mihai Pătraşcu and Mikkel Thorup. Time-space trade-offs for predecessor search. In Proceedings of the thirty-eighth annual ACM symposium on Theory of computing , pages 232–240, 2006. S. Jo and D. Köppl 27 
+
+25 Kalyan S. Perumalla and Narsingh Deo. Parallel algorithms for maximum subsequence and max-imum subarray. Parallel Process. Lett. , 5:367–373, 1995. doi:10.1142/S0129626495000345 .
+
+26 Rajeev Raman. Encoding data structures. In International Workshop on Algorithms and Computation , pages 1–7. Springer, 2015. 
+
+27 Walter L. Ruzzo and Martin Tompa. A linear time algorithm for finding all maximal scoring subsequences. In Proc. ISMB , pages 234–241, 1999. 
+
+28 Yoshifumi Sakai. A maximal local maximum-sum segment data structure. IEICE Trans. Fundam. Electron. Commun. Comput. Sci. , 101-A(9):1541–1542, 2018. URL: https://doi. org/10.1587/transfun.E101.A.1541 , doi:10.1587/TRANSFUN.E101.A.1541 .
+
+29 Yoshifumi Sakai. A data structure for the maximum-sum segment problem with offsets. In 
+
+35th Annual Symposium on Combinatorial Pattern Matching (CPM 2024) , pages 26–1. Schloss Dagstuhl–Leibniz-Zentrum für Informatik, 2024. 
+
+30 Tadao Takaoka. Efficient algorithms for the maximum subarray problem by distance matrix multiplication. Electronic Notes in Theoretical Computer Science , 61:191–200, 2002. CATS’02, Computing: the Australasian Theory Symposium. URL: https://www.sciencedirect.com/ science/article/pii/S1571066104003135 , doi:10.1016/S1571-0661(04)00313-5 .
+
+31 Hisao Tamaki and Takeshi Tokuyama. Algorithms for the maximum subarray problem based on matrix multiplication. Interdisciplinary Information Sciences , 6(2):99–104, 2000. 
+
+doi:10.4036/iis.2000.99 .
+
+32 Lusheng Wang and Ying Xu. SEGID: identifying interesting segments in (multiple) se-quence alignments. Bioinform. , 19(2):297–298, 2003. URL: https://doi.org/10.1093/ bioinformatics/19.2.297 , doi:10.1093/BIOINFORMATICS/19.2.297 .
+
+33 Dan E Willard. Log-logarithmic worst-case range queries are possible in space θ(n). Information Processing Letters , 17(2):81–84, 1983. 
+
+34 Hung-I Yu, Tien-Ching Lin, and D. T. Lee. Finding maximum sum segments in sequences with uncertainty. Theor. Comput. Sci. , 850:221–235, 2021. URL: https://doi.org/10.1016/ j.tcs.2020.11.005 , doi:10.1016/J.TCS.2020.11.005 .28 Indexing Range Maximum-Sum Segment Queries with Offsets 
+
+# A Proof of Theorem 23 
+
+We here prove Theorem 23 of Section 5.3 by following Sakai’s construction [29] statement by statement. Recall the prefix sums L and V defined as in Section 5.3. For a run interval 
+
+I = [ i..j ], write λ(I) := L[j] − L[i − 1] for its total expanded length and abbreviate ̂
+
+Sα(I) := ̂ Sα(i, j ) = V [j] − V [i − 1] − αλ (I). Since all run lengths are positive, the prefix-sums of the lengths L[0] < L [1] < · · · < L [z] are strictly monotonically increasing. 
+
+# A.1 Weighted splitting lemma 
+
+We first establish the weighted counterpart of Sakai’s Lemma 1 [29, Lemma 1]. Call a run interval [i..j ] boundary-positive at offset α if all its nonempty prefixes and suffixes have positive score. For a nonempty run interval [i..j ], let ̂α (i, j ) be the smallest offset at which 
+
+[i..j ] is not boundary-positive, and let ̂κ (i, j ) be an index k ∈ [i..j ] such that, at offset ̂α (i, j ),at least one of the prefix [i..k ] and the suffix [k..j ] has score zero. 
+
+▶ Lemma 34 ([29, Lemma 1]) . For every offset α and every nonempty run interval [i..j ],if [i..j ] is boundary-positive at offset α, then [i..j ] is its unique maximum-score interval. Otherwise, if the maximum score of a nonempty interval is positive, at least one of an arbitrary maximum-score interval of [i.. ̂κ (i, j ) − 1] and [̂κ (i, j ) + 1 ..j ] is a maximum-score interval of [i..j ].
+
+Proof. If [i..j ] is boundary-positive, every proper subinterval omits a nonempty prefix, a nonempty suffix, or both, each having positive score. Hence, the score of every proper subinterval is strictly smaller than that of [i..j ].Now suppose that [i..j ] is not boundary-positive at offset α. Set β := ̂α (i, j ) and 
+
+k := ̂κ (i, j ). Then α ≥ β. Suppose first that the prefix [i..k ] has score zero at offset β;the suffix case is symmetric. By the minimality of β, every prefix of [i..j ] has nonnegative score at offset β. Consequently, for every g ∈ [i..k ],̂ Sβ (g, k ) = −̂ Sβ (i, g − 1) ≤ 0. Since 
+
+L[k] − L[g − 1] > 0, for every α ≥ β,̂ Sα(g, k ) = ̂ Sβ (g, k ) − (α − β)(L[k] − L[g − 1] ) ≤ 0.
+
+Thus, for every interval [g..h ] containing k, deleting [g..k ] produces the interval [k + 1 ..h ],possibly empty, without decreasing its score. Hence, we can choose a maximum-score interval of [i..j ] that is a subrange of [i..k − 1] or [k + 1 ..j ]. Consequently, a maximum-score interval of the corresponding side then has the same score as a maximum-score interval of [i..j ]. ◀
+
+# A.2 Weighted split data structure 
+
+Sakai defines the density δ(i, j ) := S0(i,j ) 
+
+> j−i+1
+
+and uses it to determine the offset and position at which an interval first ceases to be boundary-positive. We replace it by the weighted density ̂
+
+δ(i, j ) := ̂ S0(i,j ) 
+
+> L[j]−L[i−1]
+
+= V [j]−V [i−1]  
+
+> L[j]−L[i−1]
+
+. This is the slope of the line joining (L[i − 1] , V [i − 1] )
+
+with (L[j], V [j]).
+
+For indices g ≤ h, let ̂ H(g, h ) be the lower convex hull of the point set {( L[k], V [k]) : k ∈
+
+[g..h ]}, and let ̂ K′(g, h ) be the sequence, in increasing order, of the indices whose points are vertices of ̂ H(g, h ).
+
+▶ Lemma 35 ([29, Lemma 2]) . For all indices i, g, h satisfying 1 ≤ i ≤ g ≤ h ≤ z, a binary search of ̂ K′(g, h ) finds an index k ∈ [g..h ] minimizing ̂ δ(i, k ).
+
+Proof. The value ̂ δ(i, k ) is the slope of the line joining (L[i − 1] , V [i − 1] ) and (L[k], V [k]).
+
+Because the first coordinates L[k] are strictly increasing, the tangent argument in the proof S. Jo and D. Köppl 29 
+
+of Sakai’s Lemma 2 applies verbatim to ̂ H(g, h ), and a binary search of its vertices finds a minimizing index. ◀
+
+The same replacement is made in Sakai’s hull-construction algorithm: the two density comparisons in Lines 8 and 10 of Algorithm 1 use ̂ δ instead of δ. The proof of Sakai’s Lemma 3 uses only the correctness of these hull tests and the fact that every point is deleted at most once. It therefore gives an O(z)-time construction of the weighted hull forest. Likewise, the comparisons in Lines 13 and 17–18 of Sakai’s Algorithm 2 are performed with ̂ δ. The path-tracing argument of Sakai’s Lemma 4 is otherwise unchanged, and gives 
+
+O( log 2 z)-time queries for the minimizing weighted prefix density. Applying the symmetric construction to the reversed weighted array gives the corresponding suffix queries. 
+
+▶ Lemma 36 ([29, Theorem 5]) . The weighted run sequence can be preprocessed in O(z) time and O(z) space such that, for every nonempty run interval [i..j ], the split offset ̂α (i, j ) and a corresponding split position ̂κ(i, j ) can be found in O(log 2 z) time. 
+
+Proof. By Lemma 35, the lower-hull search used for prefixes remains valid after replacing every prefix-sum point (k, S 0(1 , k )) by (L[k], V [k]) and every density δ by ̂ δ. With these replacements, Sakai’s Algorithms 1 and 2 and the analyses of Lemmas 3 and 4 are unchanged. The symmetric construction on the reversed weighted sequence supplies the suffix queries. Sakai’s combination of the prefix and suffix structures therefore yields the stated split query and the same time and space bounds. ◀
+
+The split representation of Lemma 36 computes offsets at which the score of one particular prefix or suffix I becomes zero. Since ̂ Sα(I) = ̂ S0(I) − αλ (I), every such split offset has the form α =̂ S0(I) 
+
+> λ(I)
+
+.
+
+By contrast, a breakpoint (up to border cases) of the final answer catalog emerges when two distinct candidate intervals I and J have equal scores, and therefore has the form 
+
+α =̂ S0(I)−̂S0(J) 
+
+> λ(I)−λ(J)
+
+. A transition to the empty answer is the special case in which one of the two score functions is identically zero. 
+
+# A.3 Candidate intervals 
+
+Sakai’s candidate tree T is a binary tree defined by recursively splitting a run inter-val at the pair returned by the split representation of Lemma 36. A candidate inter-val is a nonempty run interval I = [ g..h ] that labels a vertex of T . Let C := {I :
+
+I is a nonempty vertex interval of T } . For a fixed offset α, a non-root candidate interval I
+
+with parent P is called active if ̂α (P ) ≤ α < ̂α (I). The root is active when α < ̂α ([1 ..z ]) . By the following claim, some active candidate interval is a maximum-score interval: 
+
+▶ Lemma 37 ([29, Lemma 6]) . For every offset α with a nonempty answer interval, some active vertex of T is a maximum-score interval. 
+
+Proof. Use Lemma 34 at every internal vertex of T . If the interval represented by that vertex is boundary-positive, it is itself the unique maximum-score interval. Otherwise, the lemma guarantees that one of the two recursively considered sides contains a maximum-score interval. Following such a side inductively reaches an active vertex representing a maximum-score interval. This is the induction used in Sakai’s proof of Lemma 6. ◀
+
+The enumeration in Lines 2–13 of Sakai’s Algorithm 3 is unchanged, except that it calls the data structure of Lemma 36. Sakai’s charging argument associates every internal 30 Indexing Range Maximum-Sum Segment Queries with Offsets 
+
+split generated during this enumeration with a distinct array index, so only O(z) candidate intervals are generated. We restate Sakai’s Algorithm 3 by Algorithm 1 for completeness. 
+
+# A.4 Grouping candidates 
+
+Sakai’s Lemma 7 shows that, among candidate intervals of the same length, it suffices to retain one having maximum zero-offset score. For our weighted problem, the coefficient of the offset is the total expanded length λ(I) rather than the length of I. We therefore use the following weighted counterpart. Let M := {λ(I) : I ∈ C} be the set of their distinct expanded lengths. For every μ ∈ M ,choose a candidate interval Iμ such that λ(Iμ) = μ and ̂ S0(Iμ) is maximum among all candidate intervals of expanded length μ.
+
+▶ Lemma 38 ([29, Lemma 7]) . For every offset α and every candidate interval J ∈ C , there is an Iμ with ̂ Sα(J) ≤̂ Sα(Iμ). Consequently, whenever the WPOMSS answer is nonempty, some maximum-score candidate belongs to {Iμ : μ ∈ M }.
+
+Proof. Let J ∈ C and set μ := λ(J). By the choice of Iμ,̂ S0(J) ≤̂ S0(Iμ). Since J and 
+
+Iμ have the same expanded length, their score functions have the same coefficient of α.Therefore, for every offset α,̂ Sα(J) = ̂ S0(J) − αμ ≤̂ S0(Iμ) − αμ =̂ Sα(Iμ). Thus, replacing 
+
+J by Iμ never decreases the score, which proves both claims. ◀
+
+Sakai stores one representative for each possible interval length |I| ∈ [1 ..z ] in an array indexed by |I|. In our weighted setting, candidates are instead grouped by their expanded length λ(I) = ∑hi=g ℓi, which can be as large as n. Since only O(z) candidate intervals are generated, we store representatives only for the expanded lengths that occur, using a balanced dictionary keyed by λ(I).
+
+# A.5 Final answer catalog 
+
+Let P := {(0 , 0) } ∪ 
+
+{(μ, ̂ S0(Iμ)) : μ ∈ M 
+
+}
+
+.
+
+▶ Lemma 39 ([29, Theorem 8]) . The upper convex hull of P, together with the candidate interval associated with each nonzero hull vertex, represents the WPOMSS answer catalog. 
+
+Proof. For every μ ∈ M and every offset α,̂ Sα(Iμ) = ̂ S0(Iμ) − αμ, which is the value of the linear function (x, y ) 7 → y − αx at the point (μ, ̂ S0(Iμ)). By Lemmas 37 and 38, maximizing this function over P therefore returns a maximum-score candidate interval, or (0 , 0) when no nonempty candidate has positive score. The maximizers of a linear function over a finite point set lie on its upper convex hull. Let (μ1, s 1) and (μ2, s 2) be consecutive hull vertices with μ1̸ = μ2. Their scores agree precisely when s1 − αμ 1 = s2 − αμ 2. This happens for α = s2−s1 
+
+> μ2−μ1
+
+.These intersection offsets, sorted increasingly, are the breakpoints of the answer catalog. At a breakpoint, assign the breakpoint to the interval active immediately to its right. Since increasing α penalizes larger expanded lengths more strongly, this interval has the smaller expanded length and is therefore a shortest optimum at the breakpoint. If several intervals define the same score function, they have the same expanded length and zero-offset score, and any one of them may be retained. The point (0 , 0) represents the empty interval and its score is identically zero. Hence, it is selected exactly when no nonempty candidate has positive score. This gives precisely the catalog constructed from the upper hull in Lines 14–22 of Sakai’s Algorithm 3. ◀S. Jo and D. Köppl 31  
+
+> Algorithm 1 Construction of the WPOMSS answer catalog [29, Algorithm 3]
+
+Require: Weighted run sequence (ℓ1, x 1), . . . , (ℓz , x z )
+
+Ensure: WPOMSS answer catalog  
+
+> 1:
+
+Construct the weighted split data structure of Lemma 36  
+
+> 2:
+
+C ← the candidate intervals obtained by traversing T as in Lemma 37  
+
+> 3:
+
+rep ← an empty balanced dictionary, keys : expanded lengths, values : candidate intervals  
+
+> 4:
+
+for all I ∈ C do  
+
+> 5:
+
+μ ← λ(I) 
+
+> 6:
+
+if μ / ∈ rep .keys or ̂ S0(I) >̂ S0(rep [μ]) then  
+
+> 7:
+
+rep [μ] ← I 
+
+> 8:
+
+P ← { ((0 , 0) , ∅)} ∪ 
+
+{( (μ, ̂ S0(rep [μ]) ), rep [μ]
+
+)
+
+: μ ∈ dom( rep )
+
+} 
+
+> 9:
+
+H ← UpperHull (P) ▷ Hull vertices retain their interval labels  
+
+> 10:
+
+return RightActiveCatalog (H)
+
+We can finally prove the main result of this section. 
+
+▶ Theorem 23. Given a weighted array ̂ X of size z, there exists an O(z)-space data structure that supports WPOMSS queries in O( log z) time. We can construct the data structure in 
+
+O(z log 2 z) time. 
+
+Proof. There are O(z) candidate intervals. By Lemma 36, their enumeration performs 
+
+O(z) weighted split queries, each taking O(log 2 z) time. The dictionary and sorting require 
+
+O(z log z) time, and the final upper hull is constructed in O(z) time. Thus, the total construction time is O(z log 2 z), and the space consumption is O(z). By Lemma 39, the resulting answer catalog has O(z) entries, so a predecessor search in the catalog answers a WPOMSS query in O(log z) time. ◀

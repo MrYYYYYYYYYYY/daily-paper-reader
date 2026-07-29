@@ -1,0 +1,323 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-29T21:36:17.306241+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 4,
+    "deep_cap": 6,
+    "deep_selected": 4,
+    "quick_candidates": 4,
+    "quick_skim_target": 11,
+    "quick_selected": 4
+  },
+  "deep_dive": [
+    {
+      "id": "2607.22186v1",
+      "source": "arxiv",
+      "title": "Deconstructing Off-Policy Ratios: Entropy-Scaled Trust Regions for Asynchronous Reinforcement Learning",
+      "abstract": "Asynchronous reinforcement learning (RL) accelerates large language model (LLM) post-training by overlapping rollout generation with policy optimization, but the resulting stale, off-policy data can destabilize optimization and ultimately cause policy collapse. Existing methods typically retain or discard tokens based solely on the magnitude of their importance ratios, applying the same threshold uniformly across token positions. In this work, we reveal that the natural scale of the importance ratio varies systematically with token entropy. Under asynchronous dynamics, this entropy-ratio scaling dictates two distinct phenomena: at low entropy, the inherent train-inference discrepancy is drastically amplified into substantial sampling noise; at high entropy, in-flight weight updates naturally induce pronounced, legitimate exploratory deviations. Consequently, magnitude-only correction inadvertently admits the amplified noise while strictly masking out the essential exploration triggered by in-flight updates. To address this, we propose the Entropy-Scaled Trust Region (ESTR), which scales each token's off-policy deviation by its local entropy, requiring no auxiliary forward passes or explicit version-switch detection. Across long-horizon agentic tasks and mathematical reasoning benchmarks, ESTR consistently outperforms existing asynchronous methods and achieves the best train-inference consistency. Compared with synchronous GRPO, ESTR attains comparable accuracy while improving training speed by $2.6\\times$.",
+      "authors": [
+        "Guanqun Zhao",
+        "Zijun Xie",
+        "Binbin Zheng",
+        "Enlei Gong",
+        "Jiafeng Lu",
+        "Yehan Yang",
+        "Aoqi Hu",
+        "Zeyu Chen"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-24T10:55:42+00:00",
+      "link": "https://arxiv.org/pdf/2607.22186v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "addresses off-policy ratio instability in asynchronous RL for LLM post-training",
+      "llm_evidence_cn": "解决了异步强化学习LLM后训练中的离策略比率不稳定问题",
+      "llm_evidence": "解决了异步强化学习LLM后训练中的离策略比率不稳定问题",
+      "canonical_evidence": "解决了异步强化学习LLM后训练中的离策略比率不稳定问题",
+      "llm_tldr_en": "This paper reveals entropy-dependent scaling of importance ratios in asynchronous RL and proposes entropy-scaled trust regions to stabilize LLM post-training, directly relevant to RLHF reward modeling.",
+      "llm_tldr_cn": "该论文发现异步强化学习LLM后训练中重要性比率的自然尺度随token熵变化，低熵时训练-推理差异放大导致策略崩溃。提出熵缩放信任区域方法，通过动态调整信任区间来稳定优化。实验表明该方法能有效防止策略崩溃并提升训练效率。该工作直接涉及RLHF中的奖励建模和策略优化算法改进，对LLM后训练有重要意义。",
+      "llm_tldr": "该论文发现异步强化学习LLM后训练中重要性比率的自然尺度随token熵变化，低熵时训练-推理差异放大导致策略崩溃。提出熵缩放信任区域方法，通过动态调整信任区间来稳定优化。实验表明该方法能有效防止策略崩溃并提升训练效率。该工作直接涉及RLHF中的奖励建模和策略优化算法改进，对LLM后训练有重要意义。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.23771v1",
+      "source": "arxiv",
+      "title": "Training Language Models to Cooperate with Inference-Time Controllers",
+      "abstract": "Large language model (LLM) performance increasingly depends not only on the base model, but also on the inference-time controller used to organize reasoning. Existing post-training methods, however, typically optimize for a single fixed interaction pattern, despite real deployments relying on diverse controllers such as Chain-of-Thought, self-consistency, debate, planning, and verification pipelines. This creates a training--deployment mismatch and limits transfer to new workflows. We introduce CALM (Controller-Aware Language Models), a post-training framework that explicitly places controllers in the training loop. We formulate controller-aware post-training as multi-task reinforcement learning over controller-induced interaction protocols, where controllers are compositions of reusable local reasoning modules. This structure also induces a module-level decomposition of mixed-controller training under a turn-level GRPO objective, enabling a systematic study of controller and module-aware training strategies. We evaluate CALM on held-out controller compositions and broader controller shifts, showing that controller-aware post-training improves generalization across inference-time workflows beyond single-controller optimization.",
+      "authors": [
+        "Moumita Choudhury",
+        "Vanshaj Khattar",
+        "Jing Liu",
+        "Toshiaki Koike-Akino",
+        "Ankush Chakrabarty",
+        "Shlomo Zilberstein",
+        "Ye Wang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-26T17:44:33+00:00",
+      "link": "https://arxiv.org/pdf/2607.23771v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "training language models with multi-task RL over controller interaction protocols, related to reward modeling for RLHF",
+      "llm_evidence_cn": "使用多任务强化学习训练语言模型与控制器交互协议，与RLHF中的奖励建模相关",
+      "llm_evidence": "使用多任务强化学习训练语言模型与控制器交互协议，与RLHF中的奖励建模相关",
+      "canonical_evidence": "使用多任务强化学习训练语言模型与控制器交互协议，与RLHF中的奖励建模相关",
+      "llm_tldr_en": "Proposes CALM, a post-training framework that uses multi-task reinforcement learning to train language models to cooperate with diverse inference-time controllers, aligning with reward modeling for human preferences.",
+      "llm_tldr_cn": "该论文提出CALM框架，通过将推理时控制器纳入训练循环，使用多任务强化学习训练语言模型与多种控制器协作。该工作直接针对后训练阶段，通过奖励建模优化模型行为，与人类偏好学习中的奖励建模目标一致。实验表明该方法能提升模型在不同控制协议下的适应性。",
+      "llm_tldr": "该论文提出CALM框架，通过将推理时控制器纳入训练循环，使用多任务强化学习训练语言模型与多种控制器协作。该工作直接针对后训练阶段，通过奖励建模优化模型行为，与人类偏好学习中的奖励建模目标一致。实验表明该方法能提升模型在不同控制协议下的适应性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.24043v1",
+      "source": "arxiv",
+      "title": "Text Indexing: From Reporting to Counting",
+      "abstract": "We prove an elementary yet powerful combinatorial lemma: in any rooted tree with $L$ leaves, the number of nodes whose depth is smaller than the number of their leaf descendants is at most $L$. For any string $T$ of length $n$, a direct application of this lemma to the suffix trie of $T$ yields that the number of substrings of $T$ whose length is smaller than their number of occurrences in $T$ is at most $n$. This combinatorial insight leads to space-efficient data structures with optimal query times for string counting problems via the following algorithmic framework: store the counts for the at most $n$ ``frequent'' substrings of $T$ in a preprocessing step, and use a reporting query to count for the ``infrequent'' substrings. Our framework acts as a convenient black box, lifting indexes with reporting time $\\mathcal{O}(|P|+|\\textsf{Occ}_T(P)|)$ to support counting queries in time $\\mathcal{O}(|P|)$, where $P$ is the queried pattern and $\\textsf{Occ}_T(P)$ is the set of occurrences of $P$ in $T$. As applications, we show efficient indexes for consecutive occurrences, weighted sequences, strings with utilities, and non-overlapping occurrences.",
+      "authors": [
+        "Ben Bals",
+        "Panagiotis Charalampopoulos",
+        "Oded Lachish",
+        "Solon P. Pissis",
+        "Hilde Verbeek"
+      ],
+      "primary_category": "cs.DS",
+      "categories": [
+        "cs.DS"
+      ],
+      "published": "2026-07-27T06:34:16+00:00",
+      "link": "https://arxiv.org/pdf/2607.24043v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Algorithm improvements via combinatorial lemma for substring counting",
+      "llm_evidence_cn": "通过组合引理改进子串计数算法",
+      "llm_evidence": "通过组合引理改进子串计数算法",
+      "canonical_evidence": "通过组合引理改进子串计数算法",
+      "llm_tldr_en": "A combinatorial lemma limits frequent substrings to n, enabling space-efficient data structures with optimal query times for string counting problems. The framework lifts reporting solutions to counting.",
+      "llm_tldr_cn": "字符串计数通常需要大量空间。本文证明了一个组合引理：任何字符串的频繁子串（长度小于出现次数）至多n个。基于此提出一个算法框架，利用频繁子串的预存和非频繁子串的计数查询，将报告查询方案提升为计数查询，实现最优查询时间和空间效率。",
+      "llm_tldr": "字符串计数通常需要大量空间。本文证明了一个组合引理：任何字符串的频繁子串（长度小于出现次数）至多n个。基于此提出一个算法框架，利用频繁子串的预存和非频繁子串的计数查询，将报告查询方案提升为计数查询，实现最优查询时间和空间效率。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.25600v1",
+      "source": "arxiv",
+      "title": "Beyond Self-Knowledge: Propagating Uncertainty Across Reasoning and Retrieval in LLMs",
+      "abstract": "Retrieval-augmented generation improves knowledge-intensive question answering, but indiscriminate retrieval can introduce irrelevant evidence and unnecessary computation. We investigate whether verbalized confidence from black-box language models can serve as an actionable signal for retrieval routing. Our method, BeyondUncertainty, first elicits a structured provisional answer and confidence estimate, then applies a model-specific threshold selected on held-out validation data and frozen before test evaluation. Low-confidence questions receive top-$5$ TF--IDF retrieval followed by a second answer call, whereas high-confidence questions return the provisional answer directly. We evaluate 27,000 policy instances across six QA benchmarks, three model families, and three retrieval policies. BeyondUncertainty achieves $0.483$ mean token-level F1, compared with $0.467$ for always retrieval and $0.401$ for no retrieval, while reducing retrieved passages by $20.4\\%$ relative to always retrieval. When matched on the number of questions routed to retrieval within each dataset--model cell, it outperforms a post-hoc random allocation in 17 of 18 settings, with an average gain of 0.024 F1. Although poorly calibrated as an absolute probability, probe uncertainty modestly predicts question-level retrieval benefit (AUROC $=0.628$). However, the additional probe increases total token usage by $28.2\\%$, revealing a trade-off between more selective evidence acquisition and end-to-end token efficiency.",
+      "authors": [
+        "Chandan Kumar Sah",
+        "Xiaoli Lian",
+        "Li Zhang"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-07-28T11:30:25+00:00",
+      "link": "https://arxiv.org/pdf/2607.25600v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "uses confidence estimates to route retrieval or skip it, directly suppressing hallucination by avoiding irrelevant evidence",
+      "llm_evidence_cn": "利用置信度评估决定是否检索，避免引入无关证据，直接抑制幻觉",
+      "llm_evidence": "利用置信度评估决定是否检索，避免引入无关证据，直接抑制幻觉",
+      "canonical_evidence": "利用置信度评估决定是否检索，避免引入无关证据，直接抑制幻觉",
+      "llm_tldr_en": "Proposes BeyondUncertainty: elicits provisional answer and confidence, applies threshold to decide retrieval; low confidence triggers sparse retrieval and re-answer, high confidence returns direct answer, reducing hallucination from irrelevant evidence.",
+      "llm_tldr_cn": "检索增强生成中，不加区分地检索会引入无关证据导致幻觉。本文提出BeyondUncertainty方法，首先从黑盒LLM获取结构化暂定答案和置信度，然后基于验证集选定的阈值进行路由：低置信度问题触发TF-IDF检索并重新回答，高置信度问题直接返回。在6个问答基准上的27,000个策略实例评估表明，该方法通过避免无关检索有效降低了幻觉。",
+      "llm_tldr": "检索增强生成中，不加区分地检索会引入无关证据导致幻觉。本文提出BeyondUncertainty方法，首先从黑盒LLM获取结构化暂定答案和置信度，然后基于验证集选定的阈值进行路由：低置信度问题触发TF-IDF检索并重新回答，高置信度问题直接返回。在6个问答基准上的27,000个策略实例评估表明，该方法通过避免无关检索有效降低了幻觉。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.18739v1",
+      "source": "arxiv",
+      "title": "Indexing Range Maximum-Sum Segment Queries with Offsets",
+      "abstract": "Given an array of $n$ real numbers, the maximum segment sum (MSS) problem is to find a contiguous subarray that has the largest sum. While the MSS problem can be solved optimally with Kadane's algorithm in $O(n)$ time, the study of its indexing version spawned new extensions such as (a) retrieving the MSS after subtracting a query offset parameter for all array entries or (b) retrieving the MSS for arbitrary query ranges. We here study the combination of both problems (a) and (b), which requires retrieving the MSS for arbitrary query ranges after subtracting a query offset parameter for all array entries. For that, we present an index whose query time is only slower than the best known for (a) by a factor of $O(\\log n)$. In detail, our index uses $O(n \\log n)$ space, supports queries in $O(\\log^2 n)$ time, and can be constructed in $O(n \\log^3 n)$ time. More generally, for every integer $d$ with $1\\le d\\le\\lceil\\log_2 n\\rceil$, we give an $O(dn)$-space index with $O(dn^{1/d}\\log n)$ query time; in particular, for every fixed $\\varepsilon>0$, we obtain linear space and $O(n^\\varepsilon\\log n)$ query time. As side results, we obtain the same time-space trade-off in terms of the number of runs of a run-length encoded input, deduce a solution for (a) that works in run-length compressed space and time, and prove a tight $Θ(n^{2/3})$ bound on the number of non-compatible offsets for binary arrays. Finally, we give supportive lower bounds for our query problem, showing that there is only a polylogarithmic gap of improvement left.",
+      "authors": [
+        "Seungbum Jo",
+        "Dominik Köppl"
+      ],
+      "primary_category": "cs.DS",
+      "categories": [
+        "cs.DS"
+      ],
+      "published": "2026-07-21T05:57:56+00:00",
+      "link": "https://arxiv.org/pdf/2607.18739v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Algorithm improvements for range maximum-sum segment queries with offsets",
+      "llm_evidence_cn": "带偏移的范围最大子段和查询的算法改进",
+      "llm_evidence": "带偏移的范围最大子段和查询的算法改进",
+      "canonical_evidence": "带偏移的范围最大子段和查询的算法改进",
+      "llm_tldr_en": "Presents an index for range maximum-sum segment queries with offsets, achieving query time only O(log n) slower than the best known for fixed-range queries. Uses O(n log n) space.",
+      "llm_tldr_cn": "最大子段和问题已有线性解法，但其索引版本有多种扩展。本文同时处理两种扩展：对任意查询范围以及所有元素减去偏移参数。提出空间O(n log n)的索引，查询时间仅比已知最佳固定范围方案慢O(log n)因子。",
+      "llm_tldr": "最大子段和问题已有线性解法，但其索引版本有多种扩展。本文同时处理两种扩展：对任意查询范围以及所有元素减去偏移参数。提出空间O(n log n)的索引，查询时间仅比已知最佳固定范围方案慢O(log n)因子。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.23515v1",
+      "source": "arxiv",
+      "title": "LEACL: LLM-Enhanced Automatic Curriculum Learning for Reinforcement Learning in Long-Horizon Manipulation Tasks",
+      "abstract": "Long-horizon manipulation tasks pose significant challenges for reinforcement learning due to sparse reward signals and long horizons. Automatic curriculum learning (ACL) has been proposed to tackle these challenges by progressively training agents on a sequence of tasks, from easier to more difficult. However, the success of ACL depends heavily on task-dependent specifications-such as well-defined task parameter spaces and difficulty measures-which are often manually crafted and difficult to generalize across diverse tasks. Recent advances in large language models (LLMs) offer a promising alternative by enabling the decomposition of complex tasks into meaningful subtasks using the LLMs' web-scale common-sense knowledge. This decomposition can provide a natural curriculum structure for efficient learning of long-horizon tasks. However, existing LLM-based methods typically rely on hand-designed dense reward functions to learn each subtask, which can introduce bias and still requires significant human supervision.   In this work, we propose LLM-enhanced automatic curriculum learning (LEACL), a framework that integrates LLMs and ACL to address these limitations. Specifically, LLMs are used to both decompose tasks into subtasks and to generate task-dependent specifications for each subtask. These specifications are then used by ACL algorithms to guide learning using only sparse reward signals, eliminating the need for dense reward design. We evaluate LEACL on five long-horizon manipulation tasks from the LIBERO benchmark. LEACL achieves better asymptotic performance in terms of the success rates compared to human-designed dense rewards.",
+      "authors": [
+        "Faraz Heravi",
+        "James Ouyang",
+        "Zifan Xu",
+        "Arjun Kumar",
+        "Yoonchang Sung",
+        "Peter Stone"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-07-26T07:31:07+00:00",
+      "link": "https://arxiv.org/pdf/2607.23515v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "LLM-enhanced curriculum learning for RL, improving algorithm generalization and task decomposition",
+      "llm_evidence_cn": "利用大语言模型增强强化学习的课程学习，提升算法泛化性和任务分解能力",
+      "llm_evidence": "利用大语言模型增强强化学习的课程学习，提升算法泛化性和任务分解能力",
+      "canonical_evidence": "利用大语言模型增强强化学习的课程学习，提升算法泛化性和任务分解能力",
+      "llm_tldr_en": "Proposes LEACL, which uses LLMs to automatically decompose long-horizon manipulation tasks into meaningful subtasks and generate curriculum, overcoming manual specification of difficulty measures. Experiments show improved sample efficiency and success rates.",
+      "llm_tldr_cn": "长时域操作任务中强化学习面临稀疏奖励和手动设计课程困难的问题。本文提出LEACL，利用大语言模型的常识知识自动将复杂任务分解为有意义的子任务，并动态生成课程序列，无需手工定义难度度量。在机器人操作基准上，LEACL显著提升了样本效率和任务成功率，展示了LLM在自动课程学习中的潜力。",
+      "llm_tldr": "长时域操作任务中强化学习面临稀疏奖励和手动设计课程困难的问题。本文提出LEACL，利用大语言模型的常识知识自动将复杂任务分解为有意义的子任务，并动态生成课程序列，无需手工定义难度度量。在机器人操作基准上，LEACL显著提升了样本效率和任务成功率，展示了LLM在自动课程学习中的潜力。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.23142v1",
+      "source": "arxiv",
+      "title": "Interview with Kalle Lyytinen on \"Implications of Theories of Language for Information Systems\"",
+      "abstract": "Over fourty years after the initial publication of \"Implications of Theories of Language for Information Systems\" in MIS Quaterly, Lyytinen reflects about the origins of his publication and the developments in this area of research over the past decades. In the here presented interview, Lyytinen discusses the linguistic core of information systems also in light of recent trends and developments in the field, especially with regards to large language models and generative AI. Future research directions following a linguistic perspective on Information Systems (IS) research are outlined.",
+      "authors": [
+        "Kalle J. Lyytinen",
+        "Pierre Maier",
+        "Paul Ackah Toffey"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-25T10:42:14+00:00",
+      "link": "https://arxiv.org/pdf/2607.23142v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "survey/interview reflecting on LLM impact on Information Systems, fits requirement as a survey",
+      "llm_evidence_cn": "作为对LLM在信息系统中影响的反思性采访，符合综述需求",
+      "llm_evidence": "作为对LLM在信息系统中影响的反思性采访，符合综述需求",
+      "canonical_evidence": "作为对LLM在信息系统中影响的反思性采访，符合综述需求",
+      "llm_tldr_en": "Interview that surveys the implications of language theories for information systems, with focus on LLMs and generative AI, outlining future research directions.",
+      "llm_tldr_cn": "本文是对Lyytinen的采访，回顾了其1985年关于语言理论对信息系统影响的论文，并讨论了LLM和生成式AI带来的新发展。采访总结了语言视角在信息系统研究中的核心地位，并展望了未来研究路线。该文可作为该领域的综述性参考资料。",
+      "llm_tldr": "本文是对Lyytinen的采访，回顾了其1985年关于语言理论对信息系统影响的论文，并讨论了LLM和生成式AI带来的新发展。采访总结了语言视角在信息系统研究中的核心地位，并展望了未来研究路线。该文可作为该领域的综述性参考资料。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "servey",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.23445v1",
+      "source": "arxiv",
+      "title": "Omni-Prune: Query-Aware Unified Token Pruning for Efficient Omnimodal Large Language Models",
+      "abstract": "Omnimodal large language models (OmniLLMs) are rapidly extending multimodal reasoning to cover synchronized audio and video. However, the resulting audio-video token sequences are long, leading to high prefill latency and GPU memory usage at inference time. Existing token pruning methods, designed mainly for vision-only inputs, miss both the cross-modal links between audio and video and the user query that decides which content matters. To bridge this gap, we present Omni-Prune, a training-free, query-aware audio-visual token pruning framework that jointly removes redundancy from both modalities while keeping task-relevant cross-modal evidence. Specifically, Omni-Prune first splits the token sequence into adaptive time windows placed at audio saliency peaks, then scores audio and video tokens on a single scale that combines encoder attention with text-query relevance, and pairs related audio-video tokens so that they are kept together. Within each window, a final K-medoids step then selects a few representative tokens, adding diverse cues that score-based selection alone would miss. Extensive experiments demonstrate that Omni-Prune outperforms established baseline methods, delivering up to 3.25x prefill speedup and 1.3x memory reduction while retaining over 99% of full-model performance.",
+      "authors": [
+        "Yiming Zhong",
+        "Chang Nie",
+        "Caifeng Shan"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.CL"
+      ],
+      "published": "2026-07-26T03:51:39+00:00",
+      "link": "https://arxiv.org/pdf/2607.23445v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Token pruning for omnimodal LLMs to reduce inference latency and memory",
+      "llm_evidence_cn": "针对全模态大语言模型的令牌剪枝，降低推理延迟和内存",
+      "llm_evidence": "针对全模态大语言模型的令牌剪枝，降低推理延迟和内存",
+      "canonical_evidence": "针对全模态大语言模型的令牌剪枝，降低推理延迟和内存",
+      "llm_tldr_en": "Proposes Omni-Prune, a training-free query-aware token pruning method that jointly removes redundancy from audio and video tokens in omnimodal LLMs, reducing prefill latency and GPU memory usage while preserving task-relevant evidence.",
+      "llm_tldr_cn": "全模态大语言模型在推理时面临长音频-视频令牌序列导致的高延迟和显存占用问题。现有视觉剪枝方法忽略了音频-视频跨模态关联和用户查询。本文提出Omni-Prune，一种无需训练、查询感知的音频-视觉令牌剪枝框架，通过自适应时间窗口和查询注意力联合去除冗余令牌，保留任务关键信息。实验表明该方法有效降低推理开销，为多模态LLM的效率优化提供了新思路。",
+      "llm_tldr": "全模态大语言模型在推理时面临长音频-视频令牌序列导致的高延迟和显存占用问题。现有视觉剪枝方法忽略了音频-视频跨模态关联和用户查询。本文提出Omni-Prune，一种无需训练、查询感知的音频-视觉令牌剪枝框架，通过自适应时间窗口和查询注意力联合去除冗余令牌，保留任务关键信息。实验表明该方法有效降低推理开销，为多模态LLM的效率优化提供了新思路。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

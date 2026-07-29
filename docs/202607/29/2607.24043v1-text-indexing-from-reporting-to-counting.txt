@@ -1,0 +1,729 @@
+Title: Text Indexing: From Reporting to Counting
+
+URL Source: https://arxiv.org/pdf/2607.24043v1
+
+Published Time: Tue, 28 Jul 2026 01:34:47 GMT
+
+Number of Pages: 20
+
+Markdown Content:
+# Text Indexing: From Reporting to Counting 
+
+Ben Bals 1,2 , Panagiotis Charalampopoulos 3, Oded Lachish 4, Solon P. Pissis 5, and Hilde Verbeek 11CWI, Amsterdam, The Netherlands 
+
+2Vrije Universiteit, Amsterdam, The Netherlands 
+
+3King’s College London, UK 
+
+4Birkbeck, University of London, UK 
+
+5The Cyprus Institute, Nicosia, Cyprus 
+
+Abstract 
+
+We prove an elementary yet powerful combinatorial lemma: in any rooted tree with 𝐿 leaves, the number of nodes whose depth is smaller than the number of their leaf descendants is at most 𝐿 . For any string 𝑇 of length 𝑛 , a direct application of this lemma to the suffix trie of 𝑇 yields that the number of substrings of 𝑇 whose length is smaller than their number of occurrences in 𝑇 is at most 𝑛 . This combinatorial insight leads to space-efficient data structures with optimal query times for string counting 
+
+problems via the following algorithmic framework: store the counts for the at most 𝑛 “frequent” substrings of 𝑇 in a preprocessing step, and use a reporting query to count for the “infrequent” substrings. Our framework acts as a convenient black box, lifting indexes with reporting time O(| 𝑃 | + | Occ 𝑇 (𝑃 )|) to support counting queries in time O(| 𝑃 |) , where 𝑃 is the queried pattern and Occ 𝑇 (𝑃 ) is the set of occurrences of 𝑃 in 𝑇 . As applications, we show efficient indexes for consecutive occurrences, weighted sequences, strings with utilities, and non-overlapping occurrences. arXiv:2607.24043v1 [cs.DS] 27 Jul 2026 1 Introduction 
+
+Text indexing is a classical problem in computer science with many applications, especially in bioinformat-ics [Gus97] and information retrieval [BR11]. The goal of text indexing is to preprocess a string 𝑇 = 𝑇 [1 . . 𝑛 ]
+
+of length 𝑛 , called the text , into a data structure, called the index , supporting queries for a string 𝑃 = 𝑃 [1 . . 𝑚 ]
+
+of length 𝑚 ≤ 𝑛 , called the pattern . The most typical query types in text indexes are reporting and counting :the former asks for the set Occ 𝑇 (𝑃 ) of all starting positions (occurrences) of 𝑃 in 𝑇 , while the latter asks for 
+
+|Occ 𝑇 (𝑃 )| .The study of text indexing dates back to the early 1970s, when Weiner [Wei73] introduced suffix trees. This foundational data structure occupies O( 𝑛 ) space, can be constructed in O( 𝑛 ) time [Far97], and answers reporting queries in O( 𝑚 + | Occ 𝑇 (𝑃 )|) time and counting queries in O( 𝑚 ) time. Subsequent work on text indexing focused mainly on reducing the space complexity—the main bottleneck in practice—often at the cost of increased query time. Key milestones in this direction include the suffix array [GBS92, MM93], the compressed suffix array [GV05], the FM-index [FM05], as well as the 𝑟 -index [GNP18] and other indexes for highly repetitive texts [Nav21]. The suffix tree of 𝑇 is the compacted trie of all the suffixes of 𝑇 . Starting from the (uncompacted) suffix trie of 𝑇 , the suffix tree is obtained by suppressing all internal nodes with exactly one child: these nodes become implicit , corresponding to points on edges of the suffix tree rather than explicit nodes. The remaining nodes—the root, all branching internal nodes, and all leaves—are called explicit . This compactification leads to O( 𝑛 ) explicit nodes, for a text 𝑇 of length 𝑛 , and therefore to an O( 𝑛 )-space index. Despite the considerable attention given to suffix trees, the following intuition appears to have gone unnoticed. The structural property that allows suffix tries to be compacted from up to Θ(𝑛 2) to Θ(𝑛 ) nodes— namely, that many nodes of the trie share the exact same set of leaf descendants along unary paths—also bounds the number of nodes whose depth is smaller than their number of leaf descendants. Our central contribution is an elementary yet powerful combinatorial lemma formalizing this intuition: in any rooted tree on 𝐿 leaves, the number of nodes whose depth is smaller than the number of their leaf descendants is at most 𝐿 . Applied to the suffix trie of a given string, this yields the following interpretation. 
+
+Theorem 1.1. In any string 𝑇 of length 𝑛 , the number of non-empty substrings of 𝑇 whose length is smaller than their number of occurrences in 𝑇 is at most 𝑛 .
+
+We prove that this bound is asymptotically tight for 𝑇 = (𝑎 1𝑎 2 . . . 𝑎 𝑟 )𝑟 over alphabet Σ = {𝑎 1, 𝑎 2, . . . , 𝑎 𝑟 }.The algorithmic implications of Theorem 1.1 are far-reaching. Theorem 1.1 leads to space-efficient data structures with optimal query times for string counting problems via the following framework: store the counts for the at most 𝑛 “frequent” substrings of 𝑇 in a preprocessing step, and use a reporting query to count for the “infrequent” substrings. Our framework acts as a convenient black box, lifting indexes with reporting time O( 𝑚 + | Occ 𝑇 (𝑃 )|) to counting indexes with query time O( 𝑚 ). More formally, we prove the following theorem. 
+
+Theorem 1.2 (Algorithmic Framework) . Let 𝐷 be a data structure constructed over a text 𝑇 of length 𝑛 , so that, when queried for a pattern 𝑃 of length 𝑚 , it returns an answer of total size 𝑤 in O( 𝑚 + | Occ 𝑇 (𝑃 )| + 𝑤 )
+
+time. Then, there is a data structure ˆ𝐷 of size O(| 𝐷 | + 𝑤 · 𝑛 ) that answers the same queries for 𝑃 in time 
+
+O( 𝑚 + 𝑤 ).
+
+Our framework can be easily extended for efficiently addressing the problem where each occurrence of a pattern has some associated value, and we wish to aggregate these values for all sought occurrences under an associative operator. See Corollary 3.2 for a formal statement. As a first application, we consider the consecutive occurrences indexing problem [BG14, BGP +22, BGPS23, BGVV14, GGSS26, IR09, NT16, Rad23]. In its most basic variant, we are asked to preprocess 𝑇 
+
+and an interval [𝛼, 𝛽 ] into an index, such that, for any pattern 𝑃 , we can report the consecutive occurrences of 1𝑃 in 𝑇 with a distance in [𝛼, 𝛽 ]. While a more general O( 𝑛 log 𝑛 )-space index (that also gets the interval [𝛼, 𝛽 ]
+
+at query time) with optimal reporting queries exists due to Navarro and Thankachan [NT16], the counting version with fixed bounded-gap constraints has no known O( 𝑛 · polylog (𝑛 )) -space solution with O( 𝑚 )-time queries. A black-box application of Theorem 1.2 to the main result of [NT16] yields an O( 𝑛 log 𝑛 )-space index with optimal O( 𝑚 )-time counting queries. We improve the space complexity to O( 𝑛 ). We also present other implications of Theorem 1.2 in data structures for indexing problems, including problems involving weighted sequences [BKL +20, CILP20, GLL +24] and strings with utilities [BCC +24, BCC +25]. For a class of indexing problems in the framework of Corollary 3.2, including indexing strings with utilities, we further show that we can construct an O( 𝑛 )-space index in eO( 𝑛 √𝑛 ) time by using Theorem 1.1 and exploiting the periodic structure of 𝑇 . Our data structure improves over the state-of-the-art index for strings with utilities [BCC +25] polynomially in both the preprocessing time (from O( 𝑛 2) to eO( 𝑛 √𝑛 )) as well as the space–query time trade-off (from O( 𝑛 2/𝜏 ) space and O( 𝑚 + 𝜏 ) query time to O( 𝑛 ) space and O( 𝑚 )
+
+query time). As a bonus, we unify the treatment of several indexing problems, recovering known results for their counting variants by applying our algorithmic framework to their reporting variants; we do so for indexing strings with properties [ACI +08, BKL +20], for indexing for overlapping or non-overlapping occurrences, and for covers [BL ¨ OP02, CP09, Rad23]. Notably, our combinatorial lemma on trees can be generalized to yield the following two corollaries on strings, which have further consequences. 
+
+Corollary 1.3. In any string 𝑇 of length 𝑛 , for any integer 𝜏 ∈ [ 1, 𝑛 ], the number of non-empty substrings 𝑈 
+
+of 𝑇 for which |𝑈 | · 𝜏 < |Occ 𝑇 (𝑈 )| is at most 𝑛 /𝜏 .
+
+Corollary 1.4. In any string 𝑇 of length 𝑛 , for any integer 𝜏 ∈ [ 1, 𝑛 ], the number of non-empty substrings 𝑈 
+
+of 𝑇 for which |𝑈 | < 𝜏 · | Occ 𝑇 (𝑈 )| is at most 𝑛𝜏 .
+
+Corollary 1.3 enables us to transform state-of-the-art reporting data structures (e.g., [GST20, GMT25]) that occupy less than O( 𝑛 ) space (say, they use 𝑜 (𝑛 log 𝑛 ) bits) to support counting queries. Roughly speaking, given an 𝑠 -space data structure, we set 𝜏 = 𝑛 /𝑠 , precompute and store the answers for at most 
+
+𝑛 /𝜏 = 𝑠 substrings 𝑈 of 𝑇 (the ones for which |𝑈 | · 𝜏 < |Occ 𝑇 (𝑈 )| ), and spend O( 𝑚 · 𝑛 /𝑠 ) time at query time for any given length-𝑚 pattern. We use this idea to construct a compact data structure for counting non-overlapping occurrences in near-optimal time, which was mentioned in the literature (cf. [GMT25]) as a “challenging” open problem. Furthermore, Corollary 1.4 enables us to extend the application of our framework to the internal pattern matching (IPM) model [CKM +21, KRRW24], where the pattern is specified as a fragment of 𝑇 . We use this idea to construct an IPM data structure for indexing strings with utilities. 
+
+Paper organization. In Section 2, we prove the combinatorial lemma and Theorem 1.1. In Section 3, we prove Theorem 1.2 and present the algorithmic framework. In Section 4, we present the headline applications of our framework and demonstrate the versatility of our approach by recovering several known results under our framework. In Section 5, we prove Corollary 1.3 and showcase an application. In Section 6, we prove Corollary 1.4 and showcase the IPM index for strings with utilities as an application. In Section 7, we present a construction algorithm for a class of indexing problems, including indexing strings with utilities. 
+
+# 2 The Combinatorial Lemma 
+
+Lemma 2.1. For any rooted tree T with 𝐿 leaves over a set V of nodes, we have 
+
+|{ 𝑣 ∈ V | depth (𝑣 ) < |L( 𝑣 )|}| ≤ 𝐿, 
+
+2where depth (𝑣 ) is the depth of node 𝑣 and L( 𝑣 ) is the set of leaf descendants of 𝑣 .Proof. Let L(T ) be the set of leaves of T . Further, let S = {𝑣 ∈ V | depth (𝑣 ) < |L( 𝑣 )|} . We show that 
+
+|S| ≤ 𝐿 by constructing an injective mapping 𝜙 : S → L(T ) .For any node 𝑣 ∈ S , the condition depth (𝑣 ) < |L( 𝑣 )| means that the number of leaf descendants of 𝑣 is strictly greater than the depth of 𝑣 . We say that a node 𝑣 has in-order rank 𝑖 if it is the 𝑖 th node visited in an in-order traversal of T . Let the leaf descendants of 𝑣 be ℓ𝑣, 1, ℓ 𝑣, 2, . . . , ℓ 𝑣, | L ( 𝑣 ) | , in increasing order with respect to their in-order ranks. The function 𝜙 : S → L(T ) maps each node 𝑣 ∈ S to its 
+
+(depth (𝑣 ) + 1)th leaf descendant according to the above order; i.e., 𝜙 (𝑣 ) = ℓ𝑣, depth (𝑣 )+ 1. Since 𝑣 ∈ S , we have |L( 𝑣 )| ≥ depth (𝑣 ) + 1, ensuring that ℓ𝑣, depth (𝑣 )+ 1 exists within the subtree rooted at 𝑣 . We must show that for any 𝑢, 𝑣 ∈ S with 𝑢 ≠ 𝑣 , we have 𝜙 (𝑢 ) ≠ 𝜙 (𝑣 ). We consider the following two cases: 
+
+Case 1: Neither 𝒖 nor 𝒗 is an ancestor of the other. In this case, the subtrees rooted at 𝑢 and 𝑣 are disjoint. Consequently, their sets of leaf descendants L( 𝑢 ) and L( 𝑣 ) are disjoint. Since 𝜙 (𝑢 ) ∈ L( 𝑢 ) and 
+
+𝜙 (𝑣 ) ∈ L( 𝑣 ), it immediately follows that 𝜙 (𝑢 ) ≠ 𝜙 (𝑣 ).
+
+Case 2: 𝒖 is an ancestor of 𝒗 or vice versa. We assume, without loss of generality, that 𝑢 is an ancestor of 𝑣 —the other case is symmetric. Let 𝑑 𝑢 := depth (𝑢 ) and 𝑑 𝑣 := depth (𝑣 ). Since 𝑢 is a strict ancestor of 𝑣 ,we have 𝑑 𝑢 < 𝑑 𝑣 . The leaf 𝜙 (𝑢 ) is the (𝑑 𝑢 + 1)th leaf descendant of 𝑢 . The leaf 𝜙 (𝑣 ) is the (𝑑 𝑣 + 1)th leaf descendant of 𝑣 . Because 𝑣 is in the subtree of 𝑢 , the leaf descendants of 𝑣 form a contiguous segment within the leaf descendants of 𝑢 (ordered by in-order ranks). Let 𝑘 ≥ 0 be the number of leaf descendants of 𝑢 with smaller in-order rank than 𝑣 . The index of 𝜙 (𝑣 ) among the leaf descendants of 𝑢 is 𝑘 + 𝑑 𝑣 + 1. Since 𝑘 ≥ 0and 𝑑 𝑢 < 𝑑 𝑣 , we must have 𝑑 𝑢 + 1 < 𝑑 𝑣 + 1 ≤ 𝑘 + 𝑑 𝑣 + 1 ⇒ 𝜙 (𝑢 ) ≠ 𝜙 (𝑣 ).Since the mapping 𝜙 : S → L(T ) is injective, the cardinality of the set S must be less than or equal to the cardinality of the set L(T ) , and hence |S| ≤ |L(T )| = 𝐿 . □
+
+The following consequence of the above lemma for strings is immediate. 
+
+Theorem 1.1. In any string 𝑇 of length 𝑛 , the number of non-empty substrings of 𝑇 whose length is smaller than their number of occurrences in 𝑇 is at most 𝑛 .Proof. Apply Lemma 2.1 to the trie of {𝑇 [1 . . 𝑛 ]$, 𝑇 [2 . . 𝑛 ]$, . . . , 𝑇 [𝑛 ]$}, for a unique letter $ that does not occur in 𝑇 . Since, by construction, there is a bijective mapping between the internal nodes of the trie and the substrings of 𝑇 , the claim follows. □
+
+We next show that the bounds in both Lemma 2.1 and Theorem 1.1 are asymptotically tight. 
+
+Proposition 2.2. For every integer 𝑟 ≥ 2, there exists a string 𝑇 of length 𝑛 = 𝑟 2 over an alphabet of size 𝑟 
+
+that has 𝑛 − 2√𝑛 + 2 non-empty substrings 𝑈 satisfying |𝑈 | < |Occ 𝑇 (𝑈 )| .Proof. Let 𝑇 = 𝑋 𝑟 , with 𝑋 = 𝑎 1𝑎 2 . . . 𝑎 𝑟 over Σ = {𝑎 1, 𝑎 2, . . . , 𝑎 𝑟 }. Any substring 𝑈 of 𝑇 of length ℓ ≤ 𝑟 
+
+is uniquely determined by its length and its starting position 𝑖 modulo 𝑟 ; such a substring 𝑈 occurs 𝑟 times if (𝑖 − 1) mod 𝑟 + ℓ − 1 ≤ 𝑟 , and 𝑟 − 1 times otherwise. For any ℓ ≤ 𝑟 − 2, all 𝑟 length-ℓ substrings of 
+
+𝑋 𝑋 [1 . . ℓ − 1] are distinct and have at least 𝑟 − 1 > ℓ occurrences in 𝑇 . The number of these substrings is 
+
+𝑟 (𝑟 − 2). Further, both 𝑋 [1 . . |𝑋 | − 1] and 𝑋 [2 . . |𝑋 |] have 𝑟 occurrences and length 𝑟 − 1, while all other substrings of 𝑇 of length 𝑟 − 1 have 𝑟 − 1 occurrences. Finally, note that any substring 𝑈 of length ℓ ≥ 𝑟 has at most 𝑟 occurrences, and thus ℓ ≥ | Occ 𝑇 (𝑈 )| . We conclude that the total number of substrings 𝑈 of 𝑇 that satisfy |𝑈 | < |Occ 𝑇 (𝑈 )| is 𝑟 (𝑟 − 2) + 2 = 𝑛 − 2√𝑛 + 2. □
+
+33 Algorithmic Framework 
+
+Theorem 1.1 enables efficient solutions for a number of interesting data structure problems on strings. Theorem 1.2 captures a wide class of such data structure problems where we obtain improvements in a black-box manner. Below, we use perfect hashing to efficiently navigate the suffix tree. 
+
+Lemma 3.1 ([Ruz08]) . A static O( 𝑛 )-space dictionary on a set of 𝑛 keys can be deterministically constructed in time O( 𝑛 log 2 log 𝑛 ), so that look-up queries to the dictionary take time O( 1).
+
+Theorem 1.2 (Algorithmic Framework) . Let 𝐷 be a data structure constructed over a text 𝑇 of length 𝑛 , so that, when queried for a pattern 𝑃 of length 𝑚 , it returns an answer of total size 𝑤 in O( 𝑚 + | Occ 𝑇 (𝑃 )| + 𝑤 )
+
+time. Then, there is a data structure ˆ𝐷 of size O(| 𝐷 | + 𝑤 · 𝑛 ) that answers the same queries for 𝑃 in time 
+
+O( 𝑚 + 𝑤 ).
+
+There are many text indexing problems for which there is a data structure 𝐷 that reports some specific subset of Occ 𝑇 (𝑃 ) in O( 𝑚 + | output |) time. For any such problem, the counting variant (that is, when we want to find the size of this subset) naturally satisfies the requirements of Theorem 1.2. See Sections 4.1, 4.3 and 4.4 for applications. 
+
+Proof. We construct ˆ 𝐷 as follows. We first perform the preprocessing of 𝐷 and then construct the suffix tree of 𝑇 . The suffix tree takes O( 𝑛 ) space [Wei73]. Each branching node of the suffix tree is augmented with a dictionary that supports O( 1)-time access of the edges based on the first letter (key) of their label using Lemma 3.1. The total size of the dictionaries is O( 𝑛 ).In the suffix tree, we find the implicit or explicit nodes that correspond to “frequent” substrings (i.e., those that occur more often than they are long) as follows. The length of a substring is the string-depth of its associated node. The number of occurrences is the number of leaf descendants. Both quantities can be computed simultaneously for every node using a bottom-up traversal. For every node corresponding to a frequent substring, we proceed as follows. If the node is implicit, we make it explicit. By Theorem 1.1, this adds only O( 𝑛 ) extra nodes to the tree. Then, we query 𝐷 using this substring to compute the 𝑤 -size answer and store it with the corresponding node in the suffix tree. This requires O(| 𝐷 | + 𝑤 · 𝑛 ) space. Upon a query 𝑃 , we first locate the corresponding node in our suffix tree in O( 𝑚 ) time [Wei73]. If the node is annotated with a precomputed answer, we output the answer in O( 𝑤 ) time. If not, we offload the query to 𝐷 , which outputs the answer in O( 𝑚 + | Occ 𝑇 (𝑃 )| + 𝑤 ) time (by the hypothesis). As 𝑃 was not frequent (otherwise, there would have been a precomputed answer), we know that 𝑚 ≥ | Occ 𝑇 (𝑃 )| and thus this case also takes O( 𝑚 + 𝑤 ) time. □
+
+Another large category of problems where Theorem 1.2 can be applied is where the desired output of the query is a summary statistic over some or all of the occurrences of the pattern 𝑃 in 𝑇 . The following corollary shows that for many of these cases, we can achieve optimal query time, given that a few mild conditions are met. Yet, it does not exhaustively characterize these use cases. In some cases, a more careful, specialized application can yield good results, even if the meta statement below is not applicable (we discuss some such cases in Section 4.4). 
+
+Corollary 3.2 (Summary Statistics) . Let 𝑇 be a text of length 𝑛 and Stat be an O( 1)-size statistic computable, for any fragment 𝑇 [𝑖 . . 𝑗 ], in O( 1) time after preprocessing using space 𝑠 Stat . Let Ç be an associative and commutative aggregation function for the output of Stat that can combine two values in O( 1) time. There is an O( 𝑛 + 𝑠 Stat )-space data structure that, given a pattern 𝑃 of length 𝑚 , computes Ç   
+
+> 𝑖 ∈Occ 𝑇 (𝑃 )Stat
+
+(𝑇 [𝑖 . . 𝑖 +|𝑃 | − 1]) in O( 𝑚 ) time. 
+
+4We see an application of this corollary in Section 4.2 and many more in Section 4.4. Furthermore, in Section 7, we show how to construct the data structure in eO( 𝑛 √𝑛 ) time for a class of problems in this framework. 
+
+Proof. We will construct a data structure 𝐷 that fulfills the requirements from Theorem 1.2. The result then follows from Theorem 1.2. As preprocessing, we construct the suffix tree of 𝑇 (exactly as we do in Theorem 1.2) and, in addition, do the preprocessing for Stat . The data structure has size |𝐷 | = O( 𝑛 + 𝑠 Stat ).Upon a query 𝑃 , we find all occurrences of 𝑃 in 𝑇 in O( 𝑚 + | Occ 𝑇 (𝑃 )|) time using the suffix tree of 𝑇 ,and, for each occurrence 𝑖 ∈ Occ 𝑇 (𝑃 ), we compute Stat (𝑇 [𝑖 . . 𝑖 + 𝑚 − 1]) in O( 1) time each. We next combine these |Occ 𝑇 (𝑃 )| values in O(| Occ 𝑇 (𝑃 )|) time using repeated applications of Ç, obtaining the desired output in total query time O( 𝑚 + | Occ 𝑇 (𝑃 )|) . □
+
+Remark 3.3. If the querying algorithm of 𝐷 from Theorem 1.2 or the functions Stat or Ç from Corollary 3.2 have worse running times, the resulting data structure after applying our results degrades gracefully. In particular, if they require logarithmic time, then we only get an extra logarithmic factor in our query time as well. This is easy enough to verify by adding this overhead to the calculations in the proofs of Theorem 1.2 and Corollary 3.2. We omitted this to simplify the presentation (most importantly, to avoid overly complex statements). 
+
+# 4 Applications 
+
+We first present three applications of our framework, where it either yields a novel counting structure for a widely-studied reporting problem, improves upon the best known data structure for a problem, or enriches an existing index with natural non-trivial query types. Then, we recover several known results, thus unifying the treatment of a number of problems. 
+
+4.1 Counting Consecutive Occurrences 
+
+Given a string 𝑇 , an integer interval [𝛼, 𝛽 ], and a pattern 𝑃 , a pair (𝑖, 𝑗 ) is called an (𝛼, 𝛽 )-consecutive occurrence of 𝑃 in 𝑇 if 𝑖, 𝑗 ∈ Occ 𝑇 (𝑃 ), there is no other occurrence of 𝑃 between 𝑖 and 𝑗 , and 𝛼 ≤ 𝑗 − 𝑖 ≤ 𝛽 .We denote this set of pairs by Occ 𝛼𝛽 𝑇 (𝑃 ). Many variants of consecutive occurrences have been studied in the literature [BG14, BGL +24, BGP +22, BGPS23, BGVV14, BLPS99, GGSS26, IR09, KKL07, Mut02, NT16, Rad23]. Here, we consider the counting version of the most basic variant. 
+
+Consecutive Occurrences Counting (COC) 
+
+Preprocess: A text 𝑇 of length 𝑛 and an integer interval [𝛼, 𝛽 ].
+
+Query: Given a pattern 𝑃 of length 𝑚 , return |Occ 𝛼𝛽 𝑇 (𝑃 )| .Applying Theorem 1.2 to the O( 𝑛 log 𝑛 )-space data structure of Navarro and Thankachan [NT16] for optimal reporting of Occ 𝛼𝛽 𝑇 (𝑃 ) yields an O( 𝑛 log 𝑛 )-space data structure with O( 𝑚 )-time queries. However, we can do better. We rely on the following auxiliary data structure. 
+
+Lemma 4.1 ([BFGL09]) . Given an array 𝐴 of 𝑛 elements, there exists an O( 𝑛 )-space data structure, so that given integers 𝑖, 𝑘 > 0, it reports the elements of 𝐴 [𝑖 . . 𝑖 + 𝑘 − 1] in sorted order in the optimal O( 𝑘 ) time. 
+
+Theorem 4.2. There exists an O( 𝑛 )-space data structure for COC with O( 𝑚 ) query time. Proof. We construct the suffix tree of 𝑇 , storing the labels of outgoing edges at each node using Lemma 3.1, and its suffix array preprocessed using Lemma 4.1. We store the answers for the at most 𝑛 substrings 𝑈 of 𝑇 
+
+5with |Occ 𝑇 (𝑈 )| > |𝑈 | (Theorem 1.1) in the suffix tree. The total space is O( 𝑛 ). Upon a query 𝑃 , if the answer is stored, we return it in O( 𝑚 ) time by spelling 𝑃 in the suffix tree, thus reaching the node where it is stored. Otherwise, by using Lemma 4.1, we obtain the sorted array 𝐴 of the at most 𝑚 occurrences of 𝑃 in 𝑇 using the corresponding suffix array range in O(| 𝐴 |) time. Consecutive occurrences of 𝑃 in 𝑇 
+
+correspond to adjacent elements in 𝐴 ; we iterate over 𝐴 in O(| 𝐴 |) time, incrementing our count whenever 
+
+𝛼 ≤ 𝐴 [𝑘 + 1] − 𝐴 [𝑘 ] ≤ 𝛽 . Since | 𝐴 | ≤ 𝑚 , the query time is O( 𝑚 ). □
+
+Interestingly, we can lift the restriction that there is no in-between occurrence , and count all pairs (𝑖, 𝑗 ),such that 𝑖, 𝑗 ∈ Occ 𝑇 (𝑃 ) and 𝛼 ≤ 𝑗 − 𝑖 ≤ 𝛽 . These are known as (𝛼, 𝛽 )-gapped occurrences [BGL +24]. For a fixed 𝑗 , the value ( 𝐴 [ 𝑗 ] − 𝐴 [𝑖 ]) decreases as 𝑖 increases, so the valid indices 𝑖 < 𝑗 form a contiguous block. That lets us maintain two pointers (“fingers”) across the whole scan instead of restarting a search for every 𝑗 . The query time is thus still O( 𝑚 ).
+
+4.2 Strings with Utilities 
+
+A string with utilities (u-string, in short) is a pair (𝑇, 𝑤 ), consisting of a string 𝑇 ∈ Σ𝑛 and a function 𝑤 
+
+mapping each 𝑖 ∈ [ 1, 𝑛 ] to a real number called the utility of 𝑇 [𝑖 ]. The local utility of a fragment 𝑇 [𝑖 . . 𝑗 ] of 𝑇 
+
+is defined as Í 𝑗 𝑘 =𝑖 𝑤 [𝑘 ]. The global utility of a pattern 𝑃 ∈ Σ𝑚 in 𝑇 is defined as Í𝑖 ∈Occ 𝑇 ( 𝑃 )
+
+Í𝑖 +𝑚 −1 
+
+> 𝑗 =𝑖
+
+𝑤 [ 𝑗 ].See [GLF +21] for a survey. The following problem of indexing u-strings was introduced and studied by Bernardini et al. [BCC +25]. 
+
+Useful String Indexing (USI) 
+
+Preprocess: A u-string (𝑇, 𝑤 ) of length 𝑛 .
+
+Query: Given a pattern 𝑃 of length 𝑚 , return its global utility in 𝑇 .Bernardini et al. [BCC +25] presented an O( 𝑛 2/𝜏 )-space data structure with O( 𝑚 + 𝜏 )-time queries. We present a substantial improvement: 
+
+Theorem 4.3. There exists an O( 𝑛 )-space data structure for USI with O( 𝑚 ) query time. Proof. We use Corollary 3.2 setting Stat (𝑇 [𝑖 . . 𝑗 ]) := Í 𝑗 𝑘 =𝑖 𝑤 [𝑘 ] and Ç := Í. As adding two numbers takes constant time, it suffices to show how to preprocess 𝑇 and 𝑤 to enable O( 1)-time access to Stat . This is possible using the prefix sums of 𝑤 . That is, in preprocessing, we construct Π𝑤 [𝑖 ] := Í 𝑗 ≤𝑖 𝑤 [ 𝑗 ], for all 
+
+𝑖 ∈ [ 1, 𝑛 ]. Then, for an occurrence 𝑃 = 𝑇 [𝑖 . . 𝑗 ], we can compute Í 𝑗 𝑘 =𝑖 𝑤 [𝑘 ] = Π 𝑤 [ 𝑗 ] − Π𝑤 [𝑖 − 1] in O( 1)
+
+time. □
+
+For simplicity of presentation, we have used the addition operator for both the local and the global utility in the above definitions. We will generalize Theorem 4.3 in Section 7. 
+
+4.3 Weighted Sequences 
+
+In a weighted sequence 𝑇 of length 𝑛 over an alphabet Σ, in every position 𝑖 ∈ [ 1, 𝑛 ], every letter of the alphabet is associated with a probability of occurrence such that the sum of probabilities at each position equals 1. We denote by 𝑝 (𝑇 ) 
+
+> 𝑖
+
+(𝑐 ) the occurrence probability of letter 𝑐 at position 𝑖 of 𝑇 . The classical pattern matching problem extends naturally to weighted sequences. Given a string 𝑃 called a pattern, a weighted sequence 𝑇 called a text, both over an alphabet Σ, and a threshold probability 1 
+
+> 𝑧
+
+, the task is to find all positions 𝑖 in 𝑇 where Prob (𝑃, 𝑖 ) := Î| 𝑃 | − 1 
+
+> 𝑗 =0
+
+𝑝 (𝑇 )  
+
+> 𝑖 +𝑗
+
+(𝑃 [ 𝑗 ]) ≥ 1 
+
+> 𝑧
+
+; Prob (𝑃, 𝑖 ) is called the occurrence probability of 𝑃 at position 𝑖 of 𝑇 . Barton et al. [BKL +20] showed that we can construct an index of O( 𝑛𝑧 ) words of space supporting pattern matching queries in the optimal time O( 𝑚 + | Occ 𝑧 𝑇 (𝑃 )|) , where Occ 𝑧 𝑇 (𝑃 ) is the set of occurrences of 𝑃 in 𝑇 . To the best of our knowledge, there is no known index that can find the heaviest 6occurrence of 𝑃 in 𝑇 among the ones in Occ 𝑧 𝑇 (𝑃 ) or the average probability of the occurrences in Occ 𝑧 𝑇 (𝑃 )
+
+in optimal time. The two corresponding problems are formally defined as follows. 
+
+Heaviest 𝑧 -Occurrence ( H𝑧 O)
+
+Preprocess: A weighted sequence 𝑇 of length 𝑛 and a threshold 1 
+
+> 𝑧
+
+.
+
+Query: Given a pattern 𝑃 of length 𝑚 , return max {Prob (𝑃, 𝑖 ) | 𝑖 ∈ Occ 𝑧 𝑇 (𝑃 )} .
+
+Average 𝑧 -Occurrence Probability ( A𝑧 OP )
+
+Preprocess: A weighted sequence 𝑇 of length 𝑛 and a threshold 1 
+
+> 𝑧
+
+.
+
+Query: Given a pattern 𝑃 of length 𝑚 , return Í𝑖 ∈Occ 𝑧 𝑇 ( 𝑃 ) Prob (𝑃, 𝑖 )/| Occ 𝑧 𝑇 (𝑃 )| .
+
+Theorem 4.4. There exists an O( 𝑛𝑧 )-space data structure that can answer H𝑧 O or A𝑧 OP queries in O( 𝑚 )
+
+time. Proof. Barton et al. [BKL +20] showed the following: for every weighted sequence 𝑇 of length 𝑛 and every 1 
+
+> 𝑧
+
+, we can construct a family F ( 𝑇 ) = (𝑆 𝑗 , 𝑤 𝑗 )⌊𝑧 ⌋ 
+
+> 𝑗 =1
+
+of ⌊𝑧 ⌋ u-strings, each of length 𝑛 , that carries all the information about the strings occurring in 𝑇 with probability 𝑝 ≥ 1 
+
+> 𝑧
+
+. Formally, 𝑃 occurs at position 𝑖 of 𝑇 with occurrence probability 𝑝 ≥ 1 
+
+> 𝑧
+
+if and only if there exists a string 𝑆 𝑗 ∈ F ( 𝑇 ) such that 𝑃 = 𝑆 𝑗 [𝑖 . . 𝑖 + 𝑚 − 1],
+
+Î𝑖 +𝑚 −1 
+
+> 𝑘 =𝑖
+
+𝑤 𝑗 [𝑘 ] = 𝑝 , and 𝑝 ≥ 1 
+
+> 𝑧
+
+.We first construct the suffix tree of 𝑌 = 𝑆 1$ . . . $𝑆 ⌊𝑧 ⌋ $, where $ is a unique letter that does not occur in 
+
+𝑆 1, . . . , 𝑆 ⌊𝑧 ⌋ . We also store the labels of outgoing edges at each node using Lemma 3.1. This takes O( 𝑛𝑧 )
+
+space. Using this, upon a query, we can compute Occ 𝑌 (𝑃 ) in O( 𝑚 + | Occ 𝑌 (𝑃 )|) time. Similarly to the proof of Theorem 4.3, we can also, after preprocessing, access the probability of each of these occurrences in O( 1) time. From this, we directly get an O( 𝑛𝑧 )-space data structure to answer H𝑧 O or A𝑧 OP queries in 
+
+O( 𝑚 + | Occ 𝑌 (𝑃 )|) time. Applying Theorem 1.2 to this yields the claimed trade-off. □
+
+4.4 More Applications 
+
+Beyond the three headline applications described above, the combinatorial insight (Theorem 1.1) leads to efficient data structures for a wide range of summary statistics queries. Many of them have a known efficient data structure, so our main contribution here is that Theorem 1.2 and Corollary 3.2 provide a simple and 
+
+unified framework for this set of problems. For instance, for Stat (𝑇 [𝑖 . . 𝑗 ]) := 1 and Ç := Í, we get the classical counting of occurrences of 𝑃 
+
+in 𝑇 ; for Stat (𝑇 [𝑖 . . 𝑗 ]) := Í 𝑗 𝑘 =𝑖 𝑤 [𝑘 ] (for a weight array 𝑤 of length 𝑛 = |𝑇 |) and Ç := Í, we solve the USI problem. This directly extends to combinations of these statistics (e.g., the average weight of the occurrences of the pattern). Let us give a few more examples. Assume that 𝑤 is a length-𝑛 weight array given at preprocessing time and denote by 𝑚 the length of 𝑃 .
+
+Example 4.5 (Heaviest Occurrence) . Set Stat (𝑇 [𝑖 . . 𝑗 ]) := Í 𝑗 𝑘 =𝑖 𝑤 [𝑘 ] and Ç := max . Corollary 3.2 yields an O( 𝑛 )-space data structure answering such queries in O( 𝑚 ) time. This is a natural follow-up to the USI problem where the heaviest occurrence might then be a particularly important one for a given application. Also note that the data structure can be straightforwardly extended to output the position of the heaviest occurrence instead of only the weight. Other statistics that can be obtained in a similar fashion include the classical problems of finding the first (leftmost) or (rightmost) last occurrence of a given pattern. 
+
+Example 4.6 (Higher Moments) . Let 𝑟 ≥ 0. Set Stat (𝑇 [𝑖 . . 𝑗 ]) := (Í 𝑗 𝑘 =𝑖 𝑤 [𝑘 ]) 𝑟 and Ç := Í. Corollary 3.2 yields an O( 𝑛 )-space data structure answering such queries in O( 𝑚 ) time. Observe that for 𝑟 = 0, we recover counting of occurrences; for 𝑟 = 1, we recover USI. For 𝑟 = 2, we get the sum of squares of occurrence 
+
+7weights. Since the variance of a random variable 𝑋 is E[𝑋 2] − E[𝑋 ]2, we can use the data structure for 𝑟 = 1
+
+and 𝑟 = 2 to deduce the variance of the occurrence weights of a pattern. This is particularly well-motivated within the framework of strings with utilities [BCC +24, BCC +25], where 𝑤 quantifies the profit, risk, or confidence score of each position in 𝑇 . Higher moments 𝑟 ≥ 3 serve as fundamental building blocks for more complex statistics [R´ eg00] and we thus note that they are supported by the framework. 
+
+Example 4.7 (Pattern Matching with Properties) . In this problem, in addition to 𝑇 we are given a hereditary property Π, which is a family of integer intervals contained in [1, 𝑛 ] (hereditary means that it is closed under subintervals). Our goal is to preprocess 𝑇 so that, for a pattern 𝑃 , we can report all occurrences of 𝑃 
+
+in 𝑇 which, interpreted as intervals, belong to Π. The property Π can be represented in O( 𝑛 ) space using an array 𝐿 such that the longest interval in Π starting at position 𝑖 is [𝑖, 𝑖 + 𝐿 [𝑖 ] − 1]. The problem was studied in [ACI +08, BKL +20, CILP20, IR08, JLW09]; it is closely related to indexing weighted sequences. We obtain a general analogue to Corollary 3.2 by wrapping any Stat function in a check to only consider occurrences that obey the property restriction (e.g., [BKL +20] shows how to perform this check optimally). 
+
+Example 4.8 (Non-Overlapping Occurrences) . Given a string 𝑆 and two fragments of 𝑆 , 𝑆 [𝑖 . . 𝑖 ′] and 
+
+𝑆 [ 𝑗 . . 𝑗 ′] with 𝑖 ≤ 𝑗 , we say that the fragments are non-overlapping if 𝑗 > 𝑖 ′. The set of non-overlapping occurrences of a string 𝑃 in a string 𝑇 is a largest set of occurrences of 𝑃 in 𝑇 that are pairwise non-overlapping. We denote this set by Occ NO  
+
+> 𝑇
+
+(𝑃 ). There exists a well-known O( 𝑛 )-space data structure with optimal O( 𝑚 + | Occ NO  
+
+> 𝑇
+
+(𝑃 )|) query time for the reporting version [CP09]. Thus, applying Theorem 1.2 to the reporting data structure directly yields an O( 𝑛 )-space data structure with O( 𝑚 )-time queries for the counting version. The counting version can alternatively be solved via the minimal augmented suffix tree (MAST) [AP96, BL ¨ OP02]. Note that the solution of [CP09] is not based on MAST, so together with Theorem 1.2 this yields an alternative construction for the counting version. 
+
+Example 4.9 (Covered Positions) . Given a pattern 𝑃 , we want to count the positions in 𝑇 that are in some occurrence of 𝑃 . We cannot deduce this from the number of occurrences, as we do not want to double-count positions that are in more than one occurrence. It is easy to obtain an O( 𝑛 )-space data structure with 
+
+O( 𝑚 + | Occ 𝑇 (𝑃 )|) -time queries using the suffix tree and the suffix array preprocessed using Lemma 4.1: on a query 𝑃 , we iterate over all sorted occurrences and for two consecutive occurrences 𝑖 < 𝑗 , we add 
+
+min (𝑚, 𝑗 − 𝑖 ) to the count. Applying Theorem 1.2 yields an O( 𝑛 )-space data structure with O( 𝑚 )-time queries. Note that for this task, an O( 𝑛 )-space data structure with optimal query time is known based on the cover suffix tree [KKR +20, Rad23]. This data structure is more intricate (and has other uses, too), so we think this is a cute simplification for this task. 
+
+Example 4.10 (Overlapping Occurrences) . It is also natural to ask for the maximum number of occurrences that do overlap. Two ways to make this precise are to ask for the size of a largest set of occurrences such that either: (a) they all mutually overlap; or (b) they all transitively overlap (i.e., two occurrences do not need to overlap if they are connected by some sequence of overlaps with other occurrences from the set). For both of these flavors, we obtain O( 𝑛 )-space data structures with optimal query times using Theorem 1.2. For O( 𝑚 + | Occ 𝑇 (𝑃 )|) query time, simply find the sorted set of occurrences of 𝑃 as in Example 4.9. Then perform a scanline algorithm, incrementing a counter every time an occurrence starts and decrementing it when one ends. The maximum value of this counter yields (a), and the maximum number of occurrences processed between two consecutive points where the counter is zero yields (b), both of which are simple enough to track in O(| Occ 𝑇 (𝑃 )|) time. 
+
+85 Generalized Combinatorial Lemma and Applications 
+
+Lemma 5.1. For any rooted tree T with 𝐿 leaves over a set V of nodes, and 𝜏 ∈ [ 1, 𝐿 ], we have 
+
+|{ 𝑣 ∈ V | 𝜏 · depth (𝑣 ) < |L( 𝑣 )| , depth (𝑣 ) > 0}| ≤ 𝐿 /𝜏, 
+
+where depth (𝑣 ) is the depth of node 𝑣 and L( 𝑣 ) is the set of leaf descendants of 𝑣 .Proof. Let S = {𝑣 ∈ V | 𝜏 · depth (𝑣 ) < |L( 𝑣 )| , depth (𝑣 ) > 0}. By definition, we have |L( 𝑣 )| ≥ 𝜏 for every 𝑣 ∈ S . We will define a function 𝜙 that maps each node in S to a set of exactly 𝜏 of its leaf descendants such that 𝜙 (𝑢 ) ∩ 𝜙 (𝑣 ) = ∅ for every distinct 𝑢, 𝑣 ∈ S . Since there are only 𝐿 leaves in total, this immediately leads to a bound of |S| ≤ 𝐿 /𝜏 .For each node 𝑣 , let ℓ𝑣, 1, ℓ 𝑣, 2, . . . , ℓ 𝑣, | L ( 𝑣 ) | be the leaves in L( 𝑣 ) ordered by their rank in an in-order traversal of T . For each node 𝑣 ∈ S , we set 
+
+𝜙 (𝑣 ) := {ℓ𝑣,𝑖 | 𝑖 = (depth (𝑣 ) − 1) · 𝜏 + 𝑗, for 𝑗 ∈ [ 1, 𝜏 ]} .
+
+We consider the following two cases: 
+
+Case 1: Neither 𝒖 nor 𝒗 is an ancestor of the other. Because the subtrees rooted in 𝑢 and 𝑣 are disjoint, we have L( 𝑢 ) ∩ L( 𝑣 ) = ∅. Since 𝜙 (𝑢 ) ⊆ L( 𝑢 ) and 𝜙 (𝑣 ) ⊆ L( 𝑣 ), it immediately follows that 𝜙 (𝑢 ) ∩ 𝜙 (𝑣 ) = ∅.
+
+Case 2: 𝒖 is an ancestor of 𝒗 or vice versa. Assume without loss of generality that 𝑢 is an ancestor of 𝑣 .In this case, the leaves ℓ𝑣, 1, . . . , ℓ 𝑣, | L ( 𝑣 ) | appear as some contiguous interval within ℓ𝑢, 1, . . . , ℓ 𝑢, | L ( 𝑢 ) | . In other words, there exists some 𝑘 ≥ 0 such that ℓ𝑣,𝑖 = ℓ𝑢,𝑖 +𝑘 for all 𝑖 ∈ [ 1, |L( 𝑣 )|] . Suppose that there exists some leaf 𝑤 ∈ 𝜙 (𝑢 ) ∩ 𝜙 (𝑣 ). By the definition of 𝜙 , this means ℓ𝑣, (depth (𝑣 ) − 1) · 𝜏 + 𝑗 1 = ℓ𝑢, (depth (𝑢 ) − 1) · 𝜏 + 𝑗 2
+
+for some 𝑗 1, 𝑗 2 ∈ [ 1, 𝜏 ]. From this, we get 𝑘 = (( depth (𝑢 ) − 1) · 𝜏 + 𝑗 2) − (( depth (𝑣 ) − 1) · 𝜏 + 𝑗 1) =
+
+𝜏 · ( depth (𝑢 ) − depth (𝑣 )) + 𝑗 2 − 𝑗 1. Because depth (𝑣 ) > depth (𝑢 ) and 𝑗 2 − 𝑗 1 < 𝜏 , this leads to 𝑘 < 0, a contradiction. As a consequence, the leaf 𝑤 cannot exist. This means 𝜙 (𝑢 ) ∩ 𝜙 (𝑣 ) = ∅.Because 𝜙 (𝑢 ) ∩ 𝜙 (𝑣 ) = ∅ for all distinct 𝑢, 𝑣 ∈ S , we have that | Ð𝑣 ∈ S 𝜙 (𝑣 )| = Í𝑣 ∈ S |𝜙 (𝑣 )| = |S| · 𝜏 .Moreover, since there are 𝐿 leaves in total, we have | Ð𝑣 ∈ S 𝜙 (𝑣 )| ≤ 𝐿 which leads to the bound |S| · 𝜏 ≤ 𝐿 
+
+and thus |S| ≤ 𝐿 /𝜏 . □
+
+Corollary 1.3. In any string 𝑇 of length 𝑛 , for any integer 𝜏 ∈ [ 1, 𝑛 ], the number of non-empty substrings 𝑈 
+
+of 𝑇 for which |𝑈 | · 𝜏 < |Occ 𝑇 (𝑈 )| is at most 𝑛 /𝜏 .Proof. In the trie {𝑇 [1 . . 𝑛 ]$, 𝑇 [2 . . 𝑛 ]$, . . . , 𝑇 [𝑛 ]$}, for a unique letter $ that does not occur in 𝑇 , each internal node 𝑣 corresponds one-to-one to a substring 𝑈 of 𝑇 , with |𝑈 | = depth (𝑣 ). Moreover, the leaves 
+
+L( 𝑣 ) correspond to occurrences of 𝑈 . As there are 𝑛 leaves in total, the statement follows directly by applying Lemma 5.1 to the trie. □
+
+Analogously to the applications of Theorem 1.1, Corollary 1.3 can be applied for designing space-efficient data structures for counting queries. We next showcase how we can obtain a compact data structure for counting non-overlapping occurrences in near-optimal time, which was mentioned as a “challenging” open problem by Gibney et al. [GMT25]. Ganguly et al. [GST20] showed that all we need for reporting non-overlapping occurrences is a suffix tree (or any of its space-efficient counterparts) of text 𝑇 . The time complexity of their query algorithm is 
+
+O( search (𝑃 ) + 𝑡 SA |Occ NO  
+
+> 𝑇
+
+(𝑃 )| + sort 𝑛 (| Occ NO  
+
+> 𝑇
+
+(𝑃 )|)) , where search (𝑃 ) denotes the time for computing the suffix array range of pattern 𝑃 , 𝑡 SA denotes the time for accessing a given entry in the suffix array (or inverse suffix array), and sort 𝑛 (𝑥 ) denotes the time for sorting a subset of {1, 2, . . . , 𝑛 } of size O( 𝑥 ).
+
+Theorem 5.2. Given a text 𝑇 of length 𝑛 over an integer alphabet [0, 𝜎 ), we can construct a data structure of O( 𝑛 log 𝜎 ) bits so that, given a pattern 𝑃 of length 𝑚 , it outputs |Occ NO  
+
+> 𝑇
+
+(𝑃 )| in O( 𝑚 log 𝑛 log 𝜖 𝜎 𝑛 ) time for an arbitrarily small constant 𝜖 > 0.
+
+9Proof. Let us set 𝜏 := ⌈log 𝜎 𝑛 ⌉. By Corollary 1.3, the number of substrings 𝑈 of 𝑇 that satisfy |𝑈 | · 𝜏 < 
+
+|Occ 𝑇 (𝑈 )| is at most ⌊𝑛 /𝜏 ⌋. We store the answer for each such substring using the deterministic static dictionary from Lemma 3.1, keyed by the pattern’s suffix array range start index and its length. Since each key-value pair requires O( log 𝑛 ) bits, the dictionary takes O( 𝑛 log 𝜎 ) bits of space. Then, for any pattern 𝑃 
+
+of length 𝑚 , either the answer is stored or we have at most 𝑚 ⌈log 𝜎 𝑛 ⌉ occurrences of 𝑃 in 𝑇 . Using the reporting data structure of Ganguly et al. [GST20], we achieve a query time of O( search (𝑃 ) + 𝑡 SA 𝑚 log 𝜎 𝑛 +
+
+sort 𝑛 (𝑚 log 𝜎 𝑛 )) . Using the compressed suffix array [GV05, Sad07], we attain 𝑡 SA = O( log 𝜖 𝜎 𝑛 ) using 
+
+O( 𝑛 log 𝜎 ) extra bits of space. Using binary search as in [MM93] over the suffix array [GV05] with the help of the LCP array [Sad07], we get search (𝑃 ) = O( 𝑚 + log 𝑛 log 𝜖 𝜎 𝑛 ) ∈ O( 𝑚 log 𝑛 log 𝜖 𝜎 𝑛 ). Finally, using fast integer sorting [Han02], we get sort 𝑛 (𝑚 log 𝜎 𝑛 ) = O( 𝑚 log 𝜎 𝑛 log log 𝑛 ). The total space usage is O( 𝑛 log 𝜎 ) bits and the query time is O( 𝑚 log 𝑛 log 𝜖 𝜎 𝑛 ). □
+
+# 6 Another Generalization of the Combinatorial Lemma with Applications in the IPM Model 
+
+Corollary 1.4. In any string 𝑇 of length 𝑛 , for any integer 𝜏 ∈ [ 1, 𝑛 ], the number of non-empty substrings 𝑈 
+
+of 𝑇 for which |𝑈 | < 𝜏 · | Occ 𝑇 (𝑈 )| is at most 𝑛𝜏 .Proof. Consider the string 𝑆 formed by concatenating 𝜏 copies of 𝑇 separated by a unique letter $ that does not occur in 𝑇 . In particular, consider the string: 
+
+𝑆 := (𝑇 $)𝜏 = 𝑇 $𝑇 $ . . . $𝑇 $
+
+| {z }  
+
+> 𝜏 copies of 𝑇 $
+
+.
+
+The total length of 𝑆 is |𝑆 | = 𝜏 (𝑛 + 1).Let 𝑈 be a non-empty substring of 𝑇 that satisfies the condition in the statement, namely |𝑈 | <𝜏 · | Occ 𝑇 (𝑈 )| . Because the string 𝑈 does not contain $, it cannot overlap the boundaries between the concatenated copies of 𝑇 in 𝑆 . Therefore, every occurrence of 𝑈 in 𝑆 must be fully contained within exactly one of the 𝜏 individual copies of 𝑇 . This yields: 
+
+|Occ 𝑆 (𝑈 )| = 𝜏 · | Occ 𝑇 (𝑈 )| .
+
+Substituting this relation into our inequality, we conclude that 𝑈 must satisfy: 
+
+|𝑈 | < |Occ 𝑆 (𝑈 )| .
+
+Consider the suffix trie of 𝑆 (excluding the 𝜏 suffixes of 𝑆 starting with $). This trie has exactly 𝑛𝜏 leaves. By applying Lemma 2.1 to this trie, we conclude that the number of non-empty substrings 𝑈 satisfying the statement’s condition is at most 𝑛𝜏 . □
+
+We apply Corollary 1.4 to USI in the IPM model. Namely, the pattern 𝑃 is now specified in O( 1)
+
+time and space using two integers 𝑖 and 𝑗 such that 𝑃 = 𝑇 [𝑖 . . 𝑗 ] and 𝑚 = |𝑃 | = 𝑗 − 𝑖 + 1. We term the corresponding queries internal USI queries, and show the following result. 
+
+Theorem 6.1. For every string 𝑇 of length 𝑛 and every integer 𝜏 ∈ [ 1, 𝑛 ], there exists an O( 𝑛𝜏 )-space data structure for USI that can answer internal USI queries in time O  1 + 𝑚 /𝜏 .Proof. We construct the suffix tree and the suffix array of 𝑇 . We also preprocess the suffix tree for answering weighted ancestor queries in O( 1) time using O( 𝑛 ) space [BKPR21, GLN14]. A weighted ancestor query 
+
+(WAQ) locates the locus of a substring 𝑇 [ 𝑝 . . 𝑞 ] in the suffix tree of 𝑇 : given the node 𝑢 of the tree 10 corresponding to 𝑇 [ 𝑝 . . 𝑛 ], the query locates the highest ancestor 𝑣 of 𝑢 , such that the string written on the root-to-𝑣 path has length at least 𝑞 − 𝑝 + 1. For every substring 𝑈 with |𝑈 | < 𝜏 · | Occ 𝑇 (𝑈 )| , we also store the answer using the deterministic static dictionary from Lemma 3.1, keyed by the pattern’s suffix array range start index and its length. By Corollary 1.4, there are O( 𝑛𝜏 ) such patterns; thus these answers take O( 𝑛𝜏 ) space. Finally, we compute 
+
+Π𝑤 [𝑖 ] := Í 𝑗 ≤𝑖 𝑤 [ 𝑗 ], for all 𝑖 ∈ [ 1, 𝑛 ], taking O( 𝑛 ) space. Given a query (𝑖, 𝑗 ), with 𝑚 = 𝑗 − 𝑖 + 1, we find the locus of 𝑃 = 𝑇 [𝑖 . . 𝑖 + 𝑚 − 1] in the suffix tree of 𝑇 
+
+in O( 1) time using a WAQ, and distinguish two cases: (1) If |Occ 𝑇 (𝑃 )| > 𝑚 /𝜏 , the pattern’s exact answer is explicitly stored in the dictionary. We return it in 
+
+O( 1) additional time. (2) If |Occ 𝑇 (𝑃 )| ≤ 𝑚 /𝜏 , we traverse the subtree of its locus to locate all |Occ 𝑇 (𝑃 )| occurrences. For each occurrence, we compute the required local utility using prefix sums in O( 1) time. The additional time spent is O(| Occ 𝑇 (𝑃 )|) = O( 𝑚 /𝜏 ).In both cases, the extra work is bounded by O( 1 + 𝑚 /𝜏 ). Thus, the total query time is O( 1 + 𝑚 /𝜏 ) using an index of O( 𝑛𝜏 ) space as claimed. □
+
+# 7 Efficient Construction Algorithm 
+
+In this section, we show how to efficiently construct the indexing data structure for a class of problems in the framework of Corollary 3.2. Let us fix a text 𝑇 of length 𝑛 . The challenge is to compute statistics for every substring 𝑈 of 𝑇 with |𝑈 | < |Occ 𝑇 (𝑈 )| . We have at most 𝑛 such strings 𝑈 by Theorem 1.1. Na¨ ıvely querying each of these strings may take Θ(𝑛 2) time, given that each may have Θ(𝑛 ) occurrences. We show how the associated statistics Ç  
+
+> 𝑖 ∈Occ 𝑇 (𝑈 )Stat
+
+(𝑇 [𝑖 . . 𝑖 + | 𝑈 | − 1]) can be computed in total eO( 𝑛 √𝑛 ) time using O( 𝑛 ) space by bounding the total number of occurrences of short substrings with many occurrences and exploiting the implied periodicity of long ones. We decompose the problem based on the quantities |𝑈 | and |Occ 𝑇 (𝑈 )| , by considering: 
+
+• short substrings with many occurrences, satisfying |𝑈 | ≤ 5⌈√𝑛 ⌉ and |𝑈 | < |Occ 𝑇 (𝑈 )| ;
+
+• long substrings with many occurrences, satisfying |𝑈 | > 5⌈√𝑛 ⌉ and |𝑈 | < |Occ 𝑇 (𝑈 )| .We next describe the class of problems in the framework of Corollary 3.2. 
+
+The class of problems. We follow the framework of Corollary 3.2, with the following additional properties required to make the construction work: 
+
+• Stat (𝑇 [𝑖 . . 𝑗 ]) can be queried in O( 1) time after O( 𝑛 )-time (and thus O( 𝑛 )-space) preprocessing, for all 𝑖 , 𝑗 (e.g., using prefix sums as in Theorem 4.3 if the operator is addition, or using range minimum queries [BF00] if the operator is the minimum); 
+
+• Stat (𝑇 [𝑖 . . 𝑗 ]) = Ç 𝑗 𝑘 =𝑖 Stat (𝑇 [𝑘 ]) , for all 𝑖 , 𝑗 .Additionally, let us denote by ⊗ the repeated application of ⊙ using a single operand; i.e., 𝑘 ⊗ 𝑥 = 𝑥 ⊙ · · · ⊙ 𝑥 
+
+| {z }
+
+> 𝑘
+
+,for some integer 𝑘 > 0. For some operators, such as addition or the minimum, this can be trivially evaluated in O( 1) time. In general, it can be evaluated in O( log 𝑘 ) time by repeatedly “squaring” smaller values. Thus, our bounds generally carry logarithmic factors, which can be shaved if the operator is addition or the minimum. 11 Preprocessing. We construct the suffix tree of 𝑇 in O( 𝑛 log 𝑛 ) time [Wei73] using O( 𝑛 ) space. Dictionaries storing the labels of outgoing edges to support efficient navigation can be constructed within the same complexities using Lemma 3.1. The short substrings are handled using Lemma 7.1. 
+
+Lemma 7.1. Given Stat , the suffix tree of 𝑇 , and an integer 𝛼 > 0, we can compute the associated statistic of each substring 𝑈 of 𝑇 , with |𝑈 | ≤ 𝛼 and |𝑈 | < |Occ 𝑇 (𝑈 )| , in O( 𝑛𝛼 ) total time using O( 𝑛 ) space. Proof. We start with a straightforward claim. 
+
+Claim 7.2. The total number of occurrences of substrings 𝑈 of 𝑇 , with |𝑈 | ≤ 𝛼 , is O( 𝑛𝛼 ).
+
+Proof. The number of possible starting positions for a substring of length 𝑚 in 𝑇 is 𝑛 − 𝑚 + 1. 
+
+> 𝛼
+
+∑︁ 
+
+> 𝑚 =1
+
+(𝑛 − 𝑚 + 1) =
+
+> 𝛼
+
+∑︁ 
+
+> 𝑚 =1
+
+(𝑛 + 1) − 
+
+> 𝛼
+
+∑︁ 
+
+> 𝑚 =1
+
+𝑚 < (𝑛 + 1)𝛼 = O( 𝑛𝛼 ). □
+
+For every node 𝑣 in a suffix tree, we denote by str (𝑣 ) the concatenation of the edge labels from the root to 𝑣 . Using a DFS traversal of the suffix tree of 𝑇 , we store |Occ 𝑇 (𝑈 )| , for every explicit node 𝑣 , with 
+
+𝑈 := str (𝑣 ). This takes O( 𝑛 ) time. Then, for every explicit or implicit node 𝑣 of the suffix tree, such that 
+
+|𝑈 | ≤ 𝛼 and |𝑈 | < |Occ 𝑇 (𝑈 )| , with 𝑈 := str (𝑣 ), we compute the statistic Ç  
+
+> 𝑖 ∈Occ 𝑇 (𝑈 )Stat
+
+(𝑇 [𝑖 . . 𝑖 + | 𝑈 | − 1]) 
+
+as follows. For every occurrence 𝑈 = 𝑇 [𝑖 . . 𝑗 ] in 𝑇 , we compute its value in O( 1) time by the assumption of the framework. (If 𝑣 is implicit, we have Occ 𝑇 (𝑈 ) = Occ 𝑇 (𝑈 ′), with 𝑈 ′ := str (𝑣 ′) and 𝑣 ′ the closest explicit descendant of 𝑣 .) The construction time is bounded by O( 𝑛𝛼 ) by Claim 7.2. By Theorem 1.1, we consider at most 𝑛 nodes, and so we store O( 𝑛 ) values. □
+
+For long substrings, we will exploit the underlying periodic structure. 
+
+Definition 7.3 (Period) . The period of a string 𝑆 = 𝑆 [1]𝑆 [2] . . . 𝑆 [| 𝑆 |] , denoted by per (𝑆 ), is the smallest positive integer 𝑝 such that 𝑆 [𝑖 ] = 𝑆 [𝑖 + 𝑝 ] for all 𝑖 ∈ [ 1, |𝑆 | − 𝑝 ].
+
+A string 𝑆 is called periodic if per (𝑆 ) ≤ | 𝑆 |/ 2. Lemma 7.4 shows that long substrings with many occurrences are in fact highly-periodic. As a consequence, given a long frequent substring, it suffices to query its Stat value only within similar periodic fragments of the text. 
+
+Lemma 7.4. Let 𝛽 ∈ Z>0. For any string 𝑈 with |𝑈 | · | Occ 𝑇 (𝑈 )| > 𝛽 · 𝑛 , we have per (𝑈 ) ≤ 1 
+
+> 𝛽
+
+|𝑈 |.Proof. Let 𝑘 := |Occ 𝑇 (𝑈 )| and 𝑚 := |𝑈 |. We have 𝑘 · 𝑚 > 𝛽 · 𝑛 . By the hypothesis ( 𝑘 > 𝛽 · 𝑛 /𝑚 ) and the pigeonhole principle, there exists an index 𝑖 such that |Occ 𝑇 (𝑈 ) ∩ [ 𝑖, 𝑖 + 𝑚 − 1]| ≥ 𝛽 + 1. Thus, there exist two occurrences 𝑗 1 < 𝑗 2 of 𝑈 in 𝑇 , with 𝑗 1, 𝑗 2 ∈ [ 𝑖, 𝑖 + 𝑚 − 1] and 𝑑 = 𝑗 2 − 𝑗 1 ≤ 𝑚 𝛽 . These two occurrences of 𝑈 at distance 𝑑 have an overlap of length 𝑚 − 𝑑 . Thus, per (𝑈 ) ≤ 𝑑 ≤ 𝑚 𝛽 = 1 
+
+> 𝛽
+
+|𝑈 |. □
+
+We make use of the following standard definitions. 
+
+Definition 7.5 (Lyndon root) . Given a periodic string 𝑅 with period per (𝑅 ), the Lyndon root of 𝑅 is the lexicographically smallest rotation of 𝑅 [1 . . per (𝑅 )] .
+
+Definition 7.6 (Lyndon representation) . Given a periodic string 𝑅 with Lyndon root 𝐿 , the Lyndon repre-sentation of 𝑅 is the concatenation 𝐿 1 𝐿 𝑘 𝐿 2, where 𝐿 1 is a proper suffix of 𝐿 , 𝐿 2 is a proper prefix of 𝐿 , and 
+
+𝑘 is an integer referred to as the exponent . Further, we refer to 𝐿 𝑘 as the body of 𝑅 , and 𝐿 1 and 𝐿 2 as the front and back extensions of 𝑅 , respectively. 
+
+12 Definition 7.7 (Run) . A fragment 𝑅 = 𝑆 [𝑖 . . 𝑗 ] of a string 𝑆 is called a run of 𝑆 if per (𝑅 ) ≤ | 𝑅 |/ 2 (i.e., 𝑅 is a periodic string) and extending 𝑅 either to the left or to the right (if possible) would result in an increase of its period, that is, 𝑆 [𝑖 − 1] ≠ 𝑆 [𝑖 − 1 + per (𝑅 )] (or 𝑖 = 1) and 𝑆 [ 𝑗 + 1] ≠ 𝑆 [ 𝑗 + 1 − per (𝑅 )] (or 𝑗 = |𝑆 |). 
+
+We denote by R𝐿 (𝑇 ) the set of all runs in a string 𝑇 that have Lyndon root 𝐿 and length at least 5 ⌈√𝑛 ⌉.By Lemma 7.4, every occurrence of a long frequent substring 𝑈 must be a fragment of a run from R𝐿 (𝑇 ),where 𝐿 is the Lyndon root of 𝑈 .4 41 12 23 34 40 1 2 3 4 5 6 7 8 9 10 11 
+
+𝑘 − 𝑘 ′ + 1alignments of 𝑃 
+
+𝑅 :
+
+𝜇 𝑖 :Figure 1: Occurrences of a pattern 𝑃 with a run 𝑅 , where 𝑘 = 12 is the exponent of 𝑅 and 𝑘 ′ = 4 is the exponent of 𝑃 . The first occurrence and the last occurrence, both colored red, exist conditionally depending on the extensions of the two runs; the inner occurrences always exist. The bodies of the inner occurrences (yellow) are computed separately from the extensions (blue). In this example, we have 𝜇 ★ = 4. 
+
+Lemma 7.8. We are given a periodic fragment 𝑅 of 𝑇 by its Lyndon representation. Let 𝐿 and 𝑘 denote the Lyndon root and exponent of 𝑅 , respectively. We can preprocess 𝑅 in O(| 𝑅 | log 𝑘 ) time using O(| 𝑅 |) space so that, given any periodic pattern 𝑃 with Lyndon root 𝐿 by its Lyndon representation, we can return 𝑃 ’s statistic within 𝑅 in O( log 𝑘 ) time. Proof. Let 𝑅 = 𝐿 1 𝐿 𝑘 𝐿 2 and 𝑃 = 𝐿 ′ 
+
+> 1
+
+𝐿 𝑘 ′
+
+𝐿 ′ 
+
+> 2
+
+be the Lyndon representations of 𝑅 and 𝑃 . We hence assume that 𝑘 ≥ 𝑘 ′, since otherwise 𝑃 does not have any occurrences within 𝑅 .Every occurrence of 𝑃 in 𝑅 starts at a position aligning the occurrences of 𝐿 in 𝑃 with occurrences of 
+
+𝐿 in 𝑅 . Note that 𝐿 is a primitive string (that is, if 𝐿 = 𝑈 𝑘 for a string 𝑈 and an integer 𝑘 , then 𝑈 = 𝐿 
+
+and 𝑘 = 1) and hence it has exactly two occurrences in string 𝐿𝐿 [CHL07]. An illustration is provided in Figure 1. It then follows that 𝑃 occurs in 𝑅 at least 𝑘 − 𝑘 ′ − 1 times and at most 𝑘 − 𝑘 ′ + 1 times. Note that we can align the first occurrence of 𝐿 in 𝑃 with the first (resp. the (𝑘 − 𝑘 ′ + 1)th) occurrence of 𝐿 in 𝑅 to get a valid occurrence only if |𝐿 ′ 
+
+> 1
+
+| ≤ | 𝐿 1 | (resp. |𝐿 ′ 
+
+> 2
+
+| ≤ | 𝐿 2 |). The other occurrences, obtained by aligning the first occurrence of 𝐿 in 𝑃 with the 𝑗 th occurrence of 𝐿 in 𝑅 for 𝑗 ∈ [ 2, 𝑘 − 𝑘 ′], which we call inner occurrences ,exist unconditionally. We compute the statistic of 𝑃 in 𝑅 in three steps: (1) the statistic of the bodies (i.e., 𝐿 𝑘 ′
+
+) of 𝑃 ’s inner occurrences; (2) the statistic of the extensions (i.e., 𝐿 ′ 
+
+> 1
+
+and 𝐿 ′
+
+> 2
+
+) of 𝑃 ’s inner occurrences; (3) the statistic of the at most two occurrences of 𝑃 that are not inner, if they exist. 
+
+Inner occurrences body. We assume that 𝑘 ≥ 𝑘 ′ +2, as otherwise there are no inner occurrences. We denote by 𝑋 0, . . . , 𝑋 𝑘 −1 the Stat values of the 𝑘 occurrences of 𝐿 in 𝑅 . Moreover, we denote by 𝑈 1, . . . , 𝑈 𝑘 −𝑘 ′ −1
+
+the Stat values of the bodies of 𝑃 ’s inner occurrences, where 𝑈 𝑖 = 𝑋 𝑖 ⊙ · · · ⊙ 𝑋 𝑖 +𝑘 ′ −1. Combining the values of the inner occurrences, we get: 
+
+𝑈 1 ⊙ · · · ⊙ 𝑈 𝑘 −𝑘 ′ −1 = (𝑋 1 ⊙ · · · ⊙ 𝑋 𝑘 ′ ) ⊙ · · · ⊙ ( 𝑋 𝑘 −𝑘 ′ −1 ⊙ · · · ⊙ 𝑋 𝑘 −2) = 
+
+> 𝑘 −𝑘 ′−1
+
+È 
+
+> 𝑖 =1
+> 𝑘 ′−1
+
+È
+
+> 𝑗 =0
+
+𝑋 𝑖 + 𝑗 .
+
+13 We denote by 𝜇 𝑖 the multiplicity of 𝑋 𝑖 in the above aggregation. As illustrated in Figure 1, 𝜇 𝑖 depends on 𝑘 , 𝑘 ′, and how close the 𝑖 th occurrence of 𝐿 in 𝑅 is to an endpoint of the run. In particular, we have 
+
+𝜇 1 = 𝜇 𝑘 −2 = 1. Then, as we move toward the middle of 𝑅 (from either direction), the multiplicity might increase, by at most one per occurrence of 𝐿 , but as each occurrence of 𝐿 in 𝑅 belongs to at most 𝑘 ′ inner occurrences of 𝑃 and we have a total of 𝑘 −𝑘 ′ −1 inner occurrences, we have 𝜇 𝑖 = min {𝑘 −𝑘 ′ −1, 𝑘 ′, 𝑖, 𝑘 −𝑖 −1}.Let 𝜇 ★ := 𝜇 ⌊ ( 𝑘 −1)/ 2⌋ , 𝑦 := arg min 𝑗 { 𝑗 ∈ [ 1, 𝑘 − 2] | 𝜇 𝑗 = 𝜇 ★} and 𝑧 := arg max 𝑗 { 𝑗 ∈ [ 1, 𝑘 − 2] | 𝜇 𝑗 = 𝜇 ★}.Note that 𝑦 = min {𝑘 − 𝑘 ′ − 1, 𝑘 ′}, as for 𝑖 ≥ 𝑦 , 𝜇 𝑖 = 𝜇 ★, while for 𝑖 < 𝑦 , 𝜇 𝑖 = 𝑖 . By symmetry, 
+
+𝑧 = 𝑘 − 1 − min {𝑘 − 𝑘 ′ − 1, 𝑘 ′}. Using the above formula for the multiplicities, we obtain: 
+
+> 𝑘 −2
+
+È
+
+> 𝑖 =1
+
+(𝜇 𝑖 ⊗ 𝑋 𝑖 ) =
+
+> 𝑦 −1
+
+È
+
+> 𝑖 =1
+
+(𝑖 ⊗ 𝑋 𝑖 ) + ( 𝜇 ★ ⊗
+
+> 𝑧
+
+È
+
+> 𝑖 =𝑦
+
+𝑋 𝑖 ) + 
+
+> 𝑘 −2
+
+È
+
+> 𝑖 =𝑧 +1
+
+(( 𝑘 − 𝑖 − 1) ⊗ 𝑋 𝑖 ).
+
+The values of the first and the last aggregations can be precomputed for all possible values of 𝑦 and 𝑧 ,respectively, in O( 𝑘 log 𝑘 ) time and stored in O( 𝑘 ) space. For the middle aggregation, we can also precompute and store all O( 𝑘 ) relevant values since 𝑧 = 𝑘 − 1 − 𝑦 . We can then evaluate 𝜇 ★ ⊗ Ç𝑧 𝑖 =𝑦 𝑋 𝑖 at query time in O( log 𝑘 ) time obtaining the desired value. Thus, the values can be computed in O( log 𝑘 ) time after O(| 𝑅 | log 𝑘 )-time preprocessing using O(| 𝑅 |) space. 
+
+Extensions of inner occurrences. We describe how to compute the values of the front extensions (i.e., 𝐿 ′
+
+> 1
+
+)of inner occurrences; the back extensions ( 𝐿 ′
+
+> 2
+
+) can be handled symmetrically. There are exactly 𝑘 − 𝑘 ′ − 1inner occurrences, whose front extensions are the length-|𝐿 ′ 
+
+> 1
+
+| suffixes of the first 𝑘 − 𝑘 ′ − 1 occurrences of 
+
+𝐿 in 𝑅 . We denote by 𝑋 𝐹 𝑖 the value of the length-|𝐿 ′ 
+
+> 1
+
+| suffix of the 𝑖 th occurrence of 𝐿 . We have  
+
+> 𝑘 −𝑘 ′−2
+
+È
+
+> 𝑖 =0
+
+𝑋 𝐹 𝑖 = 
+
+> 𝑘 −𝑘 ′−1
+
+È
+
+> 𝑖 =1
+
+Stat (𝑅 [𝑠 + 𝑝𝑖 − | 𝐿 ′ 
+
+> 1
+
+| . . 𝑠 + 𝑝𝑖 − 1]) ,
+
+where 𝑝 = per (𝑅 ) = |𝐿 | and 𝑠 is the starting position of the first occurrence of 𝐿 in 𝑅 (meaning that 
+
+𝑠 + 𝑝𝑖 is the starting position of the 𝑖 th occurrence of 𝐿 ). We precompute the values for all relevant 𝑘 ′ and 
+
+|𝐿 ′ 
+
+> 1
+
+| using a recurrence on 𝑘 ′. There are 𝑘 · 𝑝 values to compute in total, so this pre-processing step takes 
+
+O( 𝑘 𝑝 ) = O(| 𝑅 |) time. 
+
+Non-inner occurrences. The at most two non-inner occurrences of 𝑃 can either align 𝑃 ’s first occurrence of 𝐿 with 𝑅 ’s first occurrence of 𝐿 or align 𝑃 ’s last occurrence of 𝐿 with 𝑅 ’s last occurrence of 𝐿 . This entails aligning the front (resp. back) extensions of the two runs, meaning that they only exist conditionally depending on the lengths of the extensions and the exponents 𝑘 and 𝑘 ′:
+
+• if 𝑘 = 𝑘 ′, then we only have a single non-inner occurrence, which exists if and only if |𝐿 ′ 
+
+> 1
+
+| ≤ | 𝐿 1 | and 
+
+|𝐿 ′ 
+
+> 2
+
+| ≤ | 𝐿 2 |;
+
+• if 𝑘 > 𝑘 ′, a non-inner occurrence aligning the front extensions exists if and only if |𝐿 ′ 
+
+> 1
+
+| ≤ | 𝐿 1 | and a non-inner occurrence aligning the back extensions exists if and only if |𝐿 ′ 
+
+> 2
+
+| ≤ | 𝐿 2 |.These conditions can be tested in constant time. If the occurrences exist, their values can be retrieved in constant time as well from Stat .
+
+Wrap-up. After performing the described precomputations in O(| 𝑅 | log 𝑘 ) time using O(| 𝑅 |) space, the statistic of any periodic pattern 𝑃 can be queried in O( log 𝑘 ) time. □
+
+We make use of the following variant of runs. 
+
+Definition 7.9 (𝜏 -Run) . A 𝜏 -run is a run of length at least 3𝜏 − 1 with period at most 13 𝜏 .
+
+Lemma 7.10 ([CKPR21]) . For any 𝜏 ∈ Z>0, the number of 𝜏 -runs in 𝑇 ∈ Σ𝑛 is O( 𝑛 /𝜏 ).
+
+14 The following result can be used to bound the total length of all highly-periodic runs. 
+
+Lemma 7.11 ([CRR +20]) . For any 𝑇 ∈ Σ𝑛 , 𝜌 (𝑇 ) := Í𝑅 ∈ R ( 𝑇 ) (| 𝑅 | − 2 · per (𝑅 ) + 1) = O( 𝑛 log 𝑛 ).
+
+We are now ready to describe the algorithm for long substrings. 
+
+Lemma 7.12. Given Stat , the suffix tree of 𝑇 , and an integer 𝛼 ≥ 5⌈√𝑛 ⌉, we can compute the statistic of each substring 𝑈 of 𝑇 with |𝑈 | > 𝛼 and |𝑈 | < |Occ 𝑇 (𝑈 )| , in eO( 𝑛 2/𝛼 ) total time using O( 𝑛 ) space. Proof. For any 𝑈 with |Occ 𝑇 (𝑈 )| > |𝑈 | > 𝛼 , we have |𝑈 | · | Occ 𝑇 (𝑈 )| > 𝛼 2. By Lemma 7.4 and the fact that 𝛼 ≥ 5⌈√𝑛 ⌉, we know that per (𝑈 ) ≤ 125 |𝑈 |. Let us consider the set R of runs 𝑅 with per (𝑅 ) ≤ 125 |𝑅 |
+
+and |𝑅 | ≥ 𝛼 . For each run 𝑅 ∈ R , there exists some non-negative integer 𝑖 such that |𝑅 | ≥ 3 · 2𝑖 ⌊𝛼 /3⌋ and 
+
+> per
+
+(𝑅 ) ≤ 2𝑖 ⌊𝛼 /3⌋/ 3. By Lemma 7.10, the total number of such runs is O( 𝑛 /𝛼 · Í∞ 
+
+> 𝑖 =0
+
+1/2𝑖 ) = O( 𝑛 /𝛼 ).Furthermore, by Lemma 7.11, the total length of all runs 𝑅 ∈ R is in O( 𝑛 log 𝑛 ). We henceforth consider only runs in R. We preprocess the suffix tree of 𝑇 in O( 𝑛 ) time for answering WAQs in O( 1) time [BKPR21]. We compute all runs in R in O( 𝑛 ) time [EF21]. This algorithm outputs a canonical representation of every run that includes a constant-size representation of its Lyndon root 𝐿 . Using a DFS traversal of the suffix tree of 𝑇 , we compute |Occ 𝑇 (𝑈 )| , for every explicit node 𝑣 of the suffix tree with 𝑈 := str (𝑣 ). This takes O( 𝑛 ) time. Then, during another traversal, we find each explicit or implicit node 𝑣 of the suffix tree with path-label 𝑈 such that |𝑈 | > 𝛼 and |𝑈 | < |Occ 𝑇 (𝑈 )| , and insert 𝑈 to an initially empty set U; we have at most 𝑛 such nodes by Theorem 1.1. Note that we can compute the Lyndon representation of a periodic substring 𝑈 of 𝑇 in O( 1) time after an O( 𝑛 )-time preprocessing of 𝑇 using a so-called 2-period query [KRRW24] that returns the period of 𝑈 , followed by a minimum rotation query [Koc16] that returns the lexicographically smallest rotation of 𝑈 [1 . . per (𝑈 )] .We group all elements of the multiset R ∪ U in O( 𝑛 ) time using WAQs to compute the loci of their Lyndon roots in the suffix tree (we process the Lyndon roots in the order of increasing length after an 
+
+O( 𝑛 )-time sorting); then two elements are in the same group if their Lyndon roots have the same locus (and the same length). We preprocess each 𝑅 ∈ R according to Lemma 7.8 and then query the obtained data structure with every 𝑈 ∈ U that has the same Lyndon root as 𝑅 . Over all invocations of Lemma 7.8, we have: (i) eO( 𝑛 )
+
+total construction time due to the total length of the runs; (ii) O( 𝑛 ) space if we process every run separately; and (iii) eO( 𝑛 2/𝛼 ) total query time since |U| ≤ 𝑛 and |R| = O( 𝑛 /𝛼 ). □
+
+Theorem 7.13. There exists an O( 𝑛 )-space data structure for problems in the framework of Corollary 3.2 with O( 𝑚 ) query time, given that: 
+
+• Stat (𝑇 [𝑖 . . 𝑗 ]) can be queried in O( 1) time, for all 𝑖 , 𝑗 , after O( 𝑛 )-time preprocessing; 
+
+• Stat (𝑇 [𝑖 . . 𝑗 ]) = Ç 𝑗 𝑘 =𝑖 Stat (𝑇 [𝑘 ]) , for all 𝑖 , 𝑗 .We can construct this data structure in eO( 𝑛 √𝑛 ) time using O( 𝑛 ) space. Proof. For the first part, we simply follow the proof of Theorem 4.3, plugging in the more general operators. For the second part, preprocessing (i.e., constructing the suffix tree of 𝑇 ) takes O( 𝑛 log 𝑛 ) time using O( 𝑛 )
+
+space. By setting 𝛼 := 5⌈√𝑛 ⌉, Lemma 7.1 takes O( 𝑛 √𝑛 ) time and O( 𝑛 ) space, and Lemma 7.12 takes 
+
+eO( 𝑛 √𝑛 ) time and O( 𝑛 ) space. □
+
+One can now easily verify that by applying Theorem 7.13 we can construct the data structure underlying Theorem 4.3 within the claimed bounds. 15 References 
+
+[ACI +08] Amihood Amir, Eran Chencinski, Costas S. Iliopoulos, Tsvi Kopelowitz, and Hui Zhang. Property matching and weighted matching. Theor. Comput. Sci. , 395(2-3):298–310, 2008. 
+
+doi:10.1016/J.TCS.2008.01.006 .[AP96] Alberto Apostolico and Franco P. Preparata. Data structures and algorithms for the string statistics problem. Algorithmica , 15(5):481–494, 1996. doi:10.1007/BF01955046 .[BCC +24] Giulia Bernardini, Huiping Chen, Alessio Conte, Roberto Grossi, Veronica Guerrini, Grigorios Loukides, Nadia Pisanti, and Solon P. Pissis. Utility-oriented string mining. In Proceedings of the 2024 SIAM International Conference on Data Mining, SDM 2024 , pages 190–198. SIAM, 2024. doi:10.1137/1.9781611978032.22 .[BCC +25] Giulia Bernardini, Huiping Chen, Alessio Conte, Roberto Grossi, Veronica Guerrini, Grigorios Loukides, Nadia Pisanti, and Solon P. Pissis. Indexing strings with utilities. In 41st IEEE International Conference on Data Engineering, ICDE 2025 , pages 2782–2795. IEEE, 2025. 
+
+doi:10.1109/ICDE65448.2025.00209 .[BF00] Michael A. Bender and Martin Farach-Colton. The LCA problem revisited. In LATIN 2000: Theoretical Informatics, 4th Latin American Symposium , volume 1776 of Lecture Notes in Computer Science , pages 88–94. Springer, 2000. doi:10.1007/10719839\_9 .[BFGL09] Gerth Stølting Brodal, Rolf Fagerberg, Mark Greve, and Alejandro L´ opez-Ortiz. Online sorted range reporting. In Algorithms and Computation, 20th International Symposium, ISAAC 2009 ,volume 5878 of Lecture Notes in Computer Science , pages 173–182. Springer, 2009. doi: 10.1007/978-3-642-10631-6\_19 .[BG14] Philip Bille and Inge Li Gørtz. Substring range reporting. Algorithmica , 69(2):384–396, 2014. 
+
+doi:10.1007/s00453-012-9733-4 .[BGL +24] Philip Bille, Inge Li Gørtz, Moshe Lewenstein, Solon P. Pissis, Eva Rotenberg, and Teresa Anna Steiner. Gapped string indexing in subquadratic space and sublinear query time. In 41st International Symposium on Theoretical Aspects of Computer Science, STACS 2024 , LIPIcs, pages 16:1–16:21. Schloss Dagstuhl - Leibniz-Zentrum f¨ ur Informatik, 2024. doi:10.4230/ LIPICS.STACS.2024.16 .[BGP +22] Philip Bille, Inge Li Gørtz, Max Rishøj Pedersen, Eva Rotenberg, and Teresa Anna Steiner. String indexing for top-k close consecutive occurrences. Theor. Comput. Sci. , 927:133–147, 2022. doi:10.1016/J.TCS.2022.06.004 .[BGPS23] Philip Bille, Inge Li Gørtz, Max Rishøj Pedersen, and Teresa Anna Steiner. Gapped in-dexing for consecutive occurrences. Algorithmica , 85(4):879–901, 2023. doi:10.1007/ S00453-022-01051-6 .[BGVV14] Philip Bille, Inge Li Gørtz, Hjalte Wedel Vildhøj, and Søren Vind. String indexing for patterns with wildcards. Theory Comput. Syst. , 55(1):41–60, 2014. doi:10.1007/ S00224-013-9498-4 .[BKL +20] Carl Barton, Tomasz Kociumaka, Chang Liu, Solon P. Pissis, and Jakub Radoszewski. Indexing weighted sequences: Neat and efficient. Inf. Comput. , 270, 2020. doi:10.1016/J.IC.2019. 104462 .16 [BKPR21] Djamal Belazzougui, Dmitry Kosolobov, Simon J. Puglisi, and Rajeev Raman. Weighted ances-tors in suffix trees revisited. In 32nd Annual Symposium on Combinatorial Pattern Matching, CPM 2021 , volume 191 of LIPIcs , pages 8:1–8:15. Schloss Dagstuhl - Leibniz-Zentrum f¨ ur Informatik, 2021. doi:10.4230/LIPICS.CPM.2021.8 .[BL ¨ OP02] Gerth Stølting Brodal, Rune B. Lyngsø, Anna ¨ Ostlin, and Christian N. S. Pedersen. Solving the string statistics problem in time 𝑂 (𝑛 log 𝑛 ). In Automata, Languages and Programming, 29th International Colloquium, ICALP 2002 , Lecture Notes in Computer Science, pages 728–739. Springer, 2002. doi:10.1007/3-540-45465-9\_62 .[BLPS99] Gerth Stølting Brodal, Rune B. Lyngsø, Christian N. S. Pedersen, and Jens Stoye. Finding maximal pairs with bounded gap. In Combinatorial Pattern Matching, 10th Annual Symposium, CPM 99 , Lecture Notes in Computer Science, pages 134–149. Springer, 1999. doi:10.1007/ 3-540-48452-3\_11 .[BR11] Ricardo Baeza-Yates and Berthier A. Ribeiro-Neto. Modern Information Retrieval - the concepts and technology behind search, Second edition . Pearson Education Ltd., Harlow, England, 2011. URL: http://www.mir2ed.org/ .[CHL07] Maxime Crochemore, Christophe Hancart, and Thierry Lecroq. Algorithms on strings . Cam-bridge University Press, 2007. [CILP20] Panagiotis Charalampopoulos, Costas S. Iliopoulos, Chang Liu, and Solon P. Pissis. Property suffix array with applications in indexing weighted sequences. ACM J. Exp. Algorithmics ,25:1–16, 2020. doi:10.1145/3385898 .[CKM +21] Panagiotis Charalampopoulos, Tomasz Kociumaka, Manal Mohamed, Jakub Radoszewski, Wojciech Rytter, and Tomasz Walen. Internal dictionary matching. Algorithmica , 83(7):2142– 2169, 2021. doi:10.1007/S00453-021-00821-Y .[CKPR21] Panagiotis Charalampopoulos, Tomasz Kociumaka, Solon P. Pissis, and Jakub Radoszewski. Faster algorithms for longest common substring. In 29th Annual European Symposium on Algorithms, ESA 2021 , volume 204 of LIPIcs , pages 30:1–30:17. Schloss Dagstuhl - Leibniz-Zentrum f¨ ur Informatik, 2021. doi:10.4230/LIPICS.ESA.2021.30 .[CP09] Hagai Cohen and Ely Porat. Range non-overlapping indexing. In Algorithms and Computation, 20th International Symposium, ISAAC 2009 , volume 5878 of Lecture Notes in Computer Science ,pages 1044–1053. Springer, 2009. doi:10.1007/978-3-642-10631-6\_105 .[CRR +20] Panagiotis Charalampopoulos, Jakub Radoszewski, Wojciech Rytter, Tomasz Walen, and Wiktor Zuba. The number of repetitions in 2D-strings. In 28th Annual European Symposium on Algorithms, ESA 2020 , volume 173 of LIPIcs , pages 32:1–32:18. Schloss Dagstuhl - Leibniz-Zentrum f¨ ur Informatik, 2020. doi:10.4230/LIPICS.ESA.2020.32 .[EF21] Jonas Ellert and Johannes Fischer. Linear time runs over general ordered alphabets. In 48th International Colloquium on Automata, Languages, and Programming, ICALP 2021 , volume 198 of LIPIcs , pages 63:1–63:16. Schloss Dagstuhl - Leibniz-Zentrum f¨ ur Informatik, 2021. 
+
+doi:10.4230/LIPICS.ICALP.2021.63 .[Far97] Martin Farach. Optimal suffix tree construction with large alphabets. In 38th Annual Symposium on Foundations of Computer Science, FOCS 1997 , pages 137–143. IEEE Computer Society, 1997. doi:10.1109/SFCS.1997.646102 .17 [FM05] Paolo Ferragina and Giovanni Manzini. Indexing compressed text. J. ACM , 52(4):552–581, 2005. doi:10.1145/1082036.1082039 .[GBS92] Gaston H. Gonnet, Ricardo A. Baeza-Yates, and Tim Snider. New indices for text: Pat trees and Pat arrays. In Information Retrieval: Data Structures and Algorithms , pages 66–82. Prentice-Hall, 1992. [GGSS26] Pawel Gawrychowski, Garance Gourdel, Tatiana Starikovskaya, and Teresa Anna Steiner. Com-pressed consecutive pattern matching. Inf. Syst. , 136:102607, 2026. doi:10.1016/J.IS. 2025.102607 .[GLF +21] Wensheng Gan, Jerry Chun-Wei Lin, Philippe Fournier-Viger, Han-Chieh Chao, Vincent S. Tseng, and Philip S. Yu. A survey of utility-oriented pattern mining. IEEE Trans. Knowl. Data Eng. , 33(4):1306–1327, 2021. doi:10.1109/TKDE.2019.2942594 .[GLL +24] Est´ eban Gabory, Chang Liu, Grigorios Loukides, Solon P. Pissis, and Wiktor Zuba. Space-efficient indexes for uncertain strings. In 40th IEEE International Conference on Data Engineer-ing, ICDE 2024 , pages 4828–4842. IEEE, 2024. doi:10.1109/ICDE60146.2024.00367 .[GLN14] Pawel Gawrychowski, Moshe Lewenstein, and Patrick K. Nicholson. Weighted ances-tors in suffix trees. In Algorithms - ESA 2014 - 22th Annual European Symposium , vol-ume 8737 of Lecture Notes in Computer Science , pages 455–466. Springer, 2014. doi: 10.1007/978-3-662-44777-2\_38 .[GMT25] Daniel Gibney, Paul Macnichol, and Sharma V. Thankachan. Non-overlapping indexing in BWT-runs bounded space. Theor. Comput. Sci. , 1056:115512, 2025. doi:10.1016/J.TCS. 2025.115512 .[GNP18] Travis Gagie, Gonzalo Navarro, and Nicola Prezza. Optimal-time text indexing in BWT-runs bounded space. In Proceedings of the Twenty-Ninth Annual ACM-SIAM Symposium on Discrete Algorithms (SODA) , pages 1459–1477. SIAM, 2018. doi:10.1137/1.9781611975031.96 .[GST20] Arnab Ganguly, Rahul Shah, and Sharma V. Thankachan. Succinct non-overlapping indexing. 
+
+Algorithmica , 82(1):107–117, 2020. doi:10.1007/S00453-019-00605-5 .[Gus97] Dan Gusfield. Algorithms on Strings, Trees, and Sequences - Computer Science and Computa-tional Biology . Cambridge University Press, 1997. doi:10.1017/CBO9780511574931 .[GV05] Roberto Grossi and Jeffrey Scott Vitter. Compressed suffix arrays and suffix trees with ap-plications to text indexing and string matching. SIAM J. Comput. , 35(2):378–407, 2005. 
+
+doi:10.1137/S0097539702402354 .[Han02] Yijie Han. Deterministic sorting in 𝑂 (𝑛 log log 𝑛 ) time and linear space. In Proceedings on 34th Annual ACM Symposium on Theory of Computing, , pages 602–608. ACM, 2002. 
+
+doi:10.1145/509907.509993 .[IR08] Costas S. Iliopoulos and M. Sohel Rahman. Faster index for property matching. Inf. Process. Lett. , 105(6):218–223, 2008. doi:10.1016/j.ipl.2007.09.004 .[IR09] Costas S. Iliopoulos and M. Sohel Rahman. Indexing factors with gaps. Algorithmica , 55(1):60– 70, 2009. doi:10.1007/S00453-007-9141-3 .18 [JLW09] M. T. Juan, Jia Jie Liu, and Yue-Li Wang. Errata for ”faster index for property matching”. Inf. Process. Lett. , 109(18):1027–1029, 2009. doi:10.1016/J.IPL.2009.06.009 .[KKL07] Orgad Keller, Tsvi Kopelowitz, and Moshe Lewenstein. Range non-overlapping indexing and successive list indexing. In Algorithms and Data Structures, 10th International Workshop, WADS 2007 , Lecture Notes in Computer Science, pages 625–636. Springer, 2007. doi: 10.1007/978-3-540-73951-7\_54 .[KKR +20] Tomasz Kociumaka, Marcin Kubica, Jakub Radoszewski, Wojciech Rytter, and Tomasz Walen. A linear-time algorithm for seeds computation. ACM Trans. Algorithms , 16(2):27:1–27:23, 2020. doi:10.1145/3386369 .[Koc16] Tomasz Kociumaka. Minimal suffix and rotation of a substring in optimal time. In 27th Annual Symposium on Combinatorial Pattern Matching, CPM 2016 , LIPIcs, pages 28:1–28:12. Schloss Dagstuhl - Leibniz-Zentrum f¨ ur Informatik, 2016. doi:10.4230/LIPICS.CPM.2016.28 .[KRRW24] Tomasz Kociumaka, Jakub Radoszewski, Wojciech Rytter, and Tomasz Walen. Internal pattern matching queries in a text and applications. SIAM J. Comput. , 53(5):1524–1577, 2024. doi: 10.1137/23M1567618 .[MM93] Udi Manber and Gene Myers. Suffix arrays: A new method for on-line string searches. SIAM J. Comput. , 22(5):935–948, 1993. doi:10.1137/0222058 .[Mut02] S. Muthukrishnan. Efficient algorithms for document retrieval problems. In Proceedings of the Thirteenth Annual ACM-SIAM Symposium on Discrete Algorithms, SODA 2002 , pages 657–666. ACM/SIAM, 2002. URL: http://dl.acm.org/citation.cfm?id=545381.545469 .[Nav21] Gonzalo Navarro. Indexing highly repetitive string collections, part I: Repetitiveness measures. 
+
+ACM Comput. Surv. , 54(2):29:1–29:31, 2021. doi:10.1145/3434399 .[NT16] Gonzalo Navarro and Sharma V. Thankachan. Reporting consecutive substring occurrences under bounded gap constraints. Theor. Comput. Sci. , 638:108–111, 2016. doi:10.1016/J. TCS.2016.02.005 .[Rad23] Jakub Radoszewski. Linear time construction of cover suffix tree and applications. In 31st Annual European Symposium on Algorithms, ESA 2023 , volume 274 of LIPIcs , pages 89:1– 89:17. Schloss Dagstuhl - Leibniz-Zentrum f¨ ur Informatik, 2023. doi:10.4230/LIPICS. ESA.2023.89 .[R´ eg00] Mireille R´ egnier. A unified approach to word occurrence probabilities. Discret. Appl. Math. ,104(1-3):259–280, 2000. doi:10.1016/S0166-218X(00)00195-5 .[Ruz08] Milan Ruzic. Constructing efficient dictionaries in close to sorting time. In Automata, Languages and Programming, 35th International Colloquium, ICALP 2008 , volume 5125 of Lecture Notes in Computer Science , pages 84–95. Springer, 2008. doi:10.1007/978-3-540-70575-8\_8 .[Sad07] Kunihiko Sadakane. Compressed suffix trees with full functionality. Theory Comput. Syst. ,41(4):589–607, 2007. doi:10.1007/S00224-006-1198-X .[Wei73] Peter Weiner. Linear pattern matching algorithms. In 14th Annual Symposium on Switching and Automata Theory (SWAT 1973) , pages 1–11. IEEE Computer Society, 1973. doi:10.1109/ SWAT.1973.13 .19
