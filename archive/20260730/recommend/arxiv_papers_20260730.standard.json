@@ -1,0 +1,483 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-30T21:50:10.276013+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 7,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 6,
+    "quick_skim_target": 11,
+    "quick_selected": 6
+  },
+  "deep_dive": [
+    {
+      "id": "2607.23364v1",
+      "source": "arxiv",
+      "title": "On the Impossibility of Unbiased and Length-Invariant Policy Optimization with Outcome Rewards",
+      "abstract": "Group Relative Policy Optimization (GRPO) is the dominant reinforcement learning algorithm for training reasoning capabilities in large language models, notably adopted by DeepSeek-R1. The recent improvement Dr. GRPO (COLM 2025) identifies the response-level length bias caused by per-trajectory length normalization in GRPO and proposes removing this normalization, claiming the resulting optimizer is \"unbiased.\" We show that this claim is incomplete. Specifically, we establish an impossibility theorem: under the standard outcome reward + GRPO setting, no length-based weighting scheme can simultaneously achieve the following two properties. (P1) Gradient unbiasedness: the gradient estimator is an unbiased estimate of the true policy gradient. (P2) Length invariance: each trajectory's effective contribution to the gradient is independent of its token length. GRPO approximately satisfies P2 but violates P1; Dr. GRPO satisfies P1 but violates P2. We characterize the complete tradeoff spectrum via the parametric family f_alpha(L) = L^{alpha - 1}, where alpha = 0 recovers GRPO, alpha = 1 recovers Dr. GRPO, and provide quantitative analysis showing that Dr. GRPO's length bias can cause longer trajectories to dominate gradient updates by a factor proportional to the length ratio. Our results reveal that neither algorithm is universally \"done right\"; they occupy opposite ends of a fundamental and unavoidable tradeoff.",
+      "authors": [
+        "Fei Ding",
+        "Yongkang Zhang",
+        "Yuhao Liao",
+        "Zijian Zeng",
+        "Huiming Yang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-25T21:12:51+00:00",
+      "link": "https://arxiv.org/pdf/2607.23364v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "analysis of length bias in GRPO for RLHF",
+      "llm_evidence_cn": "GRPO中长度偏差的分析与RLHF奖励建模",
+      "llm_evidence": "GRPO中长度偏差的分析与RLHF奖励建模",
+      "canonical_evidence": "GRPO中长度偏差的分析与RLHF奖励建模",
+      "llm_tldr_en": "This paper proves an impossibility theorem showing that no length-based weighting scheme can simultaneously achieve gradient unbiasedness and length-invariance in GRPO for LLM reasoning, challenging claims of Dr. GRPO.",
+      "llm_tldr_cn": "当前GRPO算法在训练大语言模型推理能力时存在长度偏差问题，Dr. GRPO声称通过移除长度归一化可得到无偏优化器。本文发现该声称不完整，并证明了一个不可能定理：在标准结果奖励加GRPO设置下，任何基于长度的加权方案都无法同时实现梯度无偏性和长度不变性。该结果揭示了奖励建模中固有 trade-off，对 RLHF 的算法设计具有重要理论指导意义。",
+      "llm_tldr": "当前GRPO算法在训练大语言模型推理能力时存在长度偏差问题，Dr. GRPO声称通过移除长度归一化可得到无偏优化器。本文发现该声称不完整，并证明了一个不可能定理：在标准结果奖励加GRPO设置下，任何基于长度的加权方案都无法同时实现梯度无偏性和长度不变性。该结果揭示了奖励建模中固有 trade-off，对 RLHF 的算法设计具有重要理论指导意义。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.26094v1",
+      "source": "arxiv",
+      "title": "Meta-Learned Reward Shaping for Reinforcement Learning from Human Feedback",
+      "abstract": "Reinforcement Learning from Human Feedback (RLHF) is the standard approach for aligning large language models with human preferences, but its quality is limited by static, task-agnostic reward models. This mismatch leads to sparse learning signals and suboptimal alignment. We introduce MeRLa (Meta-Learned Reward Shaping), a principled framework that meta-learns a task-aware shaping function $Φ(x,y;φ)$ across auxiliary tasks before RLHF training. The learned shaping produces a composite reward that preserves policy optimality while providing task-specific learning signals. Our meta-objective combines task discrimination, entropy regularization, and potential-based conservation for stable convergence. We provide theoretical guarantees for policy invariance, analyze representation drift sensitivity, and formally address incentive misalignment from entropy maximization. Experiments on LLaMA-3-8B across four benchmarks show consistent improvements over PPO, DPO, GRPO, and DAPO, achieving a 90.8% length-controlled win rate on AlpacaEval 2.0 and a score of 9.14 on MT-Bench, with 41% less training instability. MeRLa retains its benefits when combined with process-based and rubric-based enhanced rewards.",
+      "authors": [
+        "Yunpeng Chu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-07-28T02:09:26+00:00",
+      "link": "https://arxiv.org/pdf/2607.26094v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "meta-learned reward shaping for RLHF, directly addresses reward modeling for human preferences",
+      "llm_evidence_cn": "针对RLHF的元学习奖励塑造，直接处理人类偏好的奖励建模",
+      "llm_evidence": "针对RLHF的元学习奖励塑造，直接处理人类偏好的奖励建模",
+      "canonical_evidence": "针对RLHF的元学习奖励塑造，直接处理人类偏好的奖励建模",
+      "llm_tldr_en": "Proposes MeRLa, a meta-learned reward shaping framework that learns task-aware shaping functions for RLHF, improving alignment with human preferences.",
+      "llm_tldr_cn": "强化学习从人类反馈中学习偏好（RLHF）是主流对齐方法，但静态奖励模型导致稀疏信号。本文提出MeRLa，通过元学习在辅助任务上训练任务感知的奖励塑形函数，生成复合奖励，并保持策略最优性。理论保证策略不变性，实验证明对齐质量显著提升。",
+      "llm_tldr": "强化学习从人类反馈中学习偏好（RLHF）是主流对齐方法，但静态奖励模型导致稀疏信号。本文提出MeRLa，通过元学习在辅助任务上训练任务感知的奖励塑形函数，生成复合奖励，并保持策略最优性。理论保证策略不变性，实验证明对齐质量显著提升。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.24165v2",
+      "source": "arxiv",
+      "title": "Do Current Retrievers Cover All the Evidence? A Controlled Study of Conjunctive Cross-Page Retrieval",
+      "abstract": "Finding a long document relevant to a multi-part request is not the same as establishing that it contains every requested piece of evidence. We study this gap for conjunctive document retrieval, where two or three explicit conditions must be supported on different pages of one document. We use n-Clue as a controlled measurement instrument: 1{,}000 queries over 2{,}021 documents pair all-condition golds with naturally occurring documents that satisfy only a subset, and a complete-first success requires a top-10 gold to precede every released subset qrel. Across 70 configurations, condition-wise decomposition improves two dense backbones by 6.8--7.3 points and lexical--visual fusion adds 8.7, while four generic rerankers all reduce Gold-NDCG; these directions replicate on a four-source stress set. Scaling one dense family from 0.6B to 8B changes complete-first success by 0.0 points. The strongest displayed hybrid illustrates the resulting gap: it finds a gold for 81.1\\% of queries but succeeds complete-first on only 35.8\\%, and the gap persists across condition count, target length, candidate density, query rendering, and the four-source stress set. Finally, page-aware visual systems surface stored support for every condition on only 5.1--5.3\\% of queries. These results identify condition coverage, rather than gold discovery alone, as the central bottleneck.",
+      "authors": [
+        "Sungguk Cha",
+        "DongWook Kim",
+        "Mintae Kim",
+        "Youngsub Han",
+        "Byoung-Ki Jeon",
+        "Sangyeob Lee"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.CL",
+        "cs.IR"
+      ],
+      "published": "2026-07-27T08:46:27+00:00",
+      "link": "https://arxiv.org/pdf/2607.24165v2",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "conjunctive cross-page retrieval ensures complete evidence, reducing hallucination",
+      "llm_evidence_cn": "合取跨页检索确保完整证据，减少幻觉",
+      "llm_evidence": "合取跨页检索确保完整证据，减少幻觉",
+      "canonical_evidence": "合取跨页检索确保完整证据，减少幻觉",
+      "llm_tldr_en": "This study reveals that current retrievers fail to cover all requested evidence in conjunctive queries, and proposes condition-wise decomposition to improve coverage, reducing hallucination.",
+      "llm_tldr_cn": "针对合取文档检索中证据覆盖不足的问题，通过控制实验揭示检索器短板，并提出按条件分解检索策略。实验表明该方法在多个配置下显著提升了证据完整性。",
+      "llm_tldr": "针对合取文档检索中证据覆盖不足的问题，通过控制实验揭示检索器短板，并提出按条件分解检索策略。实验表明该方法在多个配置下显著提升了证据完整性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.25600v2",
+      "source": "arxiv",
+      "title": "Beyond Self-Knowledge: Propagating Uncertainty Across Reasoning and Retrieval in LLMs",
+      "abstract": "Retrieval-augmented generation improves knowledge-intensive question answering, but indiscriminate retrieval can introduce irrelevant evidence and unnecessary computation. We investigate whether verbalized confidence from black-box language models can serve as an actionable signal for retrieval routing. Our method, BeyondUncertainty, first elicits a structured provisional answer and confidence estimate, then applies a model-specific threshold selected on held-out validation data and frozen before test evaluation. Low-confidence questions receive top-5 TF-IDF retrieval followed by a second answer call, whereas high-confidence questions return the provisional answer directly. We evaluate 27,000 policy instances across six QA benchmarks, three model families, and three retrieval policies. BeyondUncertainty achieves 0.483 mean token-level F1, compared with 0.467 for always retrieval and 0.401 for no retrieval, while reducing retrieved passages by 20.4\\% relative to always retrieval. When matched on the number of questions routed to retrieval within each dataset-model cell, it outperforms a post-hoc random allocation in 17 of 18 settings, with an average gain of 0.024 F1. Although poorly calibrated as an absolute probability, probe uncertainty modestly predicts question-level retrieval benefit (AUROC = 0.628). However, the additional probe increases total token usage by 28.2\\%, revealing a trade-off between more selective evidence acquisition and end-to-end token efficiency.",
+      "authors": [
+        "Chandan Kumar Sah",
+        "Li Zhang",
+        "Xiaoli Lian"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-07-28T11:30:25+00:00",
+      "link": "https://arxiv.org/pdf/2607.25600v2",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "uses confidence for retrieval routing to reduce irrelevant evidence in RAG",
+      "llm_evidence_cn": "利用置信度进行检索路由以减少RAG中的无关证据",
+      "llm_evidence": "利用置信度进行检索路由以减少RAG中的无关证据",
+      "canonical_evidence": "利用置信度进行检索路由以减少RAG中的无关证据",
+      "llm_tldr_en": "Proposes BeyondUncertainty that uses LLM confidence to route retrieval, reducing irrelevant evidence and potentially hallucination.",
+      "llm_tldr_cn": "本文针对检索增强生成中过度检索引入无关证据的问题，提出BeyondUncertainty方法。通过语言模型的置信度判断是否检索，低置信度时触发检索，高置信度直接回答。在六个QA基准上评估了27000个策略实例，表明该方法在不损失准确率的前提下减少计算开销。该工作为减轻LLM幻觉提供了实用路由策略。",
+      "llm_tldr": "本文针对检索增强生成中过度检索引入无关证据的问题，提出BeyondUncertainty方法。通过语言模型的置信度判断是否检索，低置信度时触发检索，高置信度直接回答。在六个QA基准上评估了27000个策略实例，表明该方法在不损失准确率的前提下减少计算开销。该工作为减轻LLM幻觉提供了实用路由策略。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.26670v1",
+      "source": "arxiv",
+      "title": "Scientific Knowledge Discovery in the Age of Large Language Models",
+      "abstract": "The rapid growth of scholarly literature has made identifying relevant publications increasingly difficult, and conventional search systems still depend heavily on manually formulated queries and effortful manual inspection. Generative large language models (LLMs) offer a more flexible alternative, supporting literature retrieval and the screening of candidate studies against eligibility criteria. This chapter surveys 34 peer-reviewed papers applying generative LLMs to these two tasks, identified via a Boolean search over the OpenAIRE Graph (1,589 records screened to 34 inclusions). Reviewed studies are characterised by LLMs employed, model access and adaptation, prompting and architectural techniques, ground-truth sources, and evaluation metrics.",
+      "authors": [
+        "Eleni Adamidi",
+        "Serafeim Chatzopoulos",
+        "Thanasis Vergoulis"
+      ],
+      "primary_category": "cs.DL",
+      "categories": [
+        "cs.DL",
+        "cs.AI",
+        "cs.CL",
+        "cs.IR"
+      ],
+      "published": "2026-07-29T09:25:55+00:00",
+      "link": "https://arxiv.org/pdf/2607.26670v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "survey of 34 papers applying generative LLMs to literature retrieval and screening",
+      "llm_evidence_cn": "综述了34篇将生成式LLM应用于文献检索和筛选的论文",
+      "llm_evidence": "综述了34篇将生成式LLM应用于文献检索和筛选的论文",
+      "canonical_evidence": "综述了34篇将生成式LLM应用于文献检索和筛选的论文",
+      "llm_tldr_en": "Surveys 34 peer-reviewed papers on using generative LLMs for scientific literature retrieval and screening, characterizing models, techniques, and evaluation.",
+      "llm_tldr_cn": "学术文献快速增长使得检索和筛选越来越困难。本文系统综述了34篇应用生成式LLM进行文献检索和资格筛选的论文，总结了所用模型、访问方式、提示技术和评价指标，为后续研究提供了全面的分类和趋势分析。",
+      "llm_tldr": "学术文献快速增长使得检索和筛选越来越困难。本文系统综述了34篇应用生成式LLM进行文献检索和资格筛选的论文，总结了所用模型、访问方式、提示技术和评价指标，为后续研究提供了全面的分类和趋势分析。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "servey",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.26784v1",
+      "source": "arxiv",
+      "title": "SkillRise: Agentic Reinforcement Learning for Cross-Task Skill Evolution",
+      "abstract": "Large language model agents often encounter related yet distinct tasks that share reusable solution patterns. Yet standard agentic reinforcement learning treats tasks as independent episodes, while existing approaches to skill learning either focus on repeated attempts of one task or use pipelines with multiple stages that entangle extraction, retrieval, and execution. We introduce SkillRise, a unified reinforcement learning framework for learning skills across tasks. SkillRise organizes related instances into progressively challenging sequences and uses a single policy to alternate between task solving and curating an evolving skill document passed directly to the next task. Decoupled credit assignment across tasks supervises solving with the current task outcome and curation with discounted downstream outcomes. Experiments on ALFWorld, WebShop, and ScienceWorld show that SkillRise achieves the strongest Pass@1 performance among the compared methods, with gains over the strongest baseline ranging from 2.3 to 8.5 percentage points. Although trained across distinct tasks, its learned curation policy remains effective for repeated attempts on the same task. Further analysis reveals scaling at test time across tasks: performance improves with longer sequences of related tasks even when each task is attempted only once. This trend suggests that SkillRise reuses transferable skills across tasks rather than benefiting from repeated sampling of the same task. SkillRise further retains strong performance while substantially reducing the runtime overhead of skill learning pipelines with multiple stages. Together, these results provide a simple and efficient training paradigm for LLM agents to extract, refine, and reuse transferable skills across tasks.",
+      "authors": [
+        "Zhiyuan Yao",
+        "Yuxin Chen",
+        "Zhengxi Lu",
+        "Zishan Xu",
+        "Yueqing Sun",
+        "Yifu Guo",
+        "Yuquan Lu",
+        "Zhengzhou Cai",
+        "Kangning Zhang",
+        "Zhuowen Han",
+        "Zi-Han Wang",
+        "Ziang Ye",
+        "Qi Gu",
+        "Xunliang Cai",
+        "Weiwen Liu",
+        "Yongliang Shen"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-29T11:26:33+00:00",
+      "link": "https://arxiv.org/pdf/2607.26784v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "unified RL framework for cross-task skill evolution with decoupled credit assignment",
+      "llm_evidence_cn": "跨任务技能演化的统一RL框架，解耦信用分配",
+      "llm_evidence": "跨任务技能演化的统一RL框架，解耦信用分配",
+      "canonical_evidence": "跨任务技能演化的统一RL框架，解耦信用分配",
+      "llm_tldr_en": "SkillRise introduces a unified agentic RL framework that learns reusable skills across related tasks by organizing instances into progressive sequences and using a single policy to solve and curate skills.",
+      "llm_tldr_cn": "针对标准代理强化学习将任务独立处理导致技能难以复用的问题，提出了SkillRise框架。该框架将相关实例组织成渐进序列，使用单一策略交替进行任务求解和维护演化技能文档，并通过解耦跨任务信用分配来训练。实验表明，SkillRise能有效提取可复用技能，提升后续任务表现。该工作推动了强化学习在跨任务技能学习中的算法改进。",
+      "llm_tldr": "针对标准代理强化学习将任务独立处理导致技能难以复用的问题，提出了SkillRise框架。该框架将相关实例组织成渐进序列，使用单一策略交替进行任务求解和维护演化技能文档，并通过解耦跨任务信用分配来训练。实验表明，SkillRise能有效提取可复用技能，提升后续任务表现。该工作推动了强化学习在跨任务技能学习中的算法改进。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.27136v1",
+      "source": "arxiv",
+      "title": "KAMR: Grounding Generation via Knowledge-Aligned Multi-hop Retrieval",
+      "abstract": "Graph-based retrieval-augmented generation increasingly relies on multi-hop retrieval, where answering a query requires composing multiple connected knowledge-graph triplets. However, existing retrievers often rank triplets independently via global semantic matching. Moreover, many multi-hop benchmarks provide only final answers, which limits supervision for query--triplet alignment and causes structurally necessary but weakly aligned facts to be missed. To address these issues, we propose a knowledge-aligned multi-hop retriever, KAMR, which distinguishes anchor triplets that are strongly constrained by the query from connected triplets that are weakly aligned yet structurally linked to the anchors. To mitigate the lack of query-triplet alignment supervision, we build a partial alignment dataset by masking triplet elements and prompting an LLM to generate corresponding queries, and optimize two contrastive objectives for pair-level and element-level matching. At inference time, KAMR retrieves anchors globally and then expands locally to collect connected evidence. Across four benchmarks, three LLM backbones, and fourteen baselines, KAMR consistently improves multi-hop retrieval and downstream question answering performance.",
+      "authors": [
+        "Xiaochen Wang",
+        "Yuan Zhong",
+        "Haoyu Wang",
+        "Ting Wang",
+        "Fenglong Ma"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR"
+      ],
+      "published": "2026-07-29T17:07:37+00:00",
+      "link": "https://arxiv.org/pdf/2607.27136v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "multi-hop retrieval for grounding generation",
+      "llm_evidence_cn": "多跳检索用于生成接地",
+      "llm_evidence": "多跳检索用于生成接地",
+      "canonical_evidence": "多跳检索用于生成接地",
+      "llm_tldr_en": "KAMR improves multi-hop retrieval by aligning query-triplet alignment, reducing hallucination in RAG.",
+      "llm_tldr_cn": "针对多跳检索中查询-三元组对齐不足导致事实遗漏的问题，提出KAMR，通过区分锚定三元组与连接三元组来增强对齐。实验表明该方法显著提升了检索质量，有助于减少生成中的幻觉。",
+      "llm_tldr": "针对多跳检索中查询-三元组对齐不足导致事实遗漏的问题，提出KAMR，通过区分锚定三元组与连接三元组来增强对齐。实验表明该方法显著提升了检索质量，有助于减少生成中的幻觉。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.23125v1",
+      "source": "arxiv",
+      "title": "Self-Boosting Vision-Language Models with Noisy Student On-Policy Self-Distillation",
+      "abstract": "Post-training enables vision-language models (VLMs) to understand human instructions and perform various downstream tasks. Current post-training methods usually rely on human-annotated data, distillation from external models, reinforcement learning with human feedback, or verifiable answers. This limits their ability to improve without external supervision. To tackle this, we propose NOPD (Noisy Student On-Policy Self-Distillation), a simple yet effective self-distillation approach that improves VLMs without any external models or ground-truth answers. Our key insight is that prediction discrepancies between clean and corrupted inputs naturally induce a self-supervision signal. In NOPD, the model learns from corrupted inputs while using its own predictions under clean inputs as token-level supervision. We show the effectiveness of NOPD on five visual reasoning tasks; it can match and even outperform reinforcement learning approaches or distillation from external models. Notably, when trained with 2.1K samples from Geometry3K, NOPD improves Qwen2.5-VL-7B by 20 points on its validation set. It also shows generalization on out-of-distribution test sets and achieves 7.4 point gains on MathVista. Furthermore, we demonstrate that NOPD is a general approach to enhance VLMs, achieving improvements across three models on 12 benchmarks.",
+      "authors": [
+        "Shuai Wang",
+        "Daoan Zhang",
+        "Zhe Tang",
+        "Hao Cheng",
+        "Jiaheng Wei"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-25T10:00:33+00:00",
+      "link": "https://arxiv.org/pdf/2607.23125v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Post-training self-distillation for VLM without external supervision",
+      "llm_evidence_cn": "无外部监督的VLM后训练自蒸馏方法",
+      "llm_evidence": "无外部监督的VLM后训练自蒸馏方法",
+      "canonical_evidence": "无外部监督的VLM后训练自蒸馏方法",
+      "llm_tldr_en": "Proposes NOPD self-distillation method for VLMs to improve post-training without external data or models using prediction discrepancies.",
+      "llm_tldr_cn": "该论文提出NOPD方法，利用干净与噪声输入之间的预测差异作为自监督信号，实现视觉语言模型的后训练自我提升，无需人工标注或外部模型。实验表明该方法能在不依赖外部监督的情况下有效提高模型性能，为后训练提供了一种轻量级自增强范式。",
+      "llm_tldr": "该论文提出NOPD方法，利用干净与噪声输入之间的预测差异作为自监督信号，实现视觉语言模型的后训练自我提升，无需人工标注或外部模型。实验表明该方法能在不依赖外部监督的情况下有效提高模型性能，为后训练提供了一种轻量级自增强范式。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.23488v1",
+      "source": "arxiv",
+      "title": "Learning Sampling Parameters for Diffusion Models",
+      "abstract": "Text-to-image diffusion models expose many inference-time sampling parameters, including prompts, negative prompts, classifier-free guidance scales, and noise schedules. These parameters are typically manually chosen once and then held fixed across prompts and denoising timesteps, even though different prompts and stages of generation can benefit from different parameter values. We introduce LeSAMP, a framework for learning prompt-conditioned, timestep-varying sampling parameters. We formulate parameter selection as a reinforcement learning problem: Given a user prompt, a large language model is trained to emit schedules for the chosen sampling parameters. We optimize our model using rewards from human preference models and VLM-as-a-judge. We evaluate our model on Flux.1 [dev] and Stable Diffusion 3.5, and find that compared to baselines, LeSAMP has a win rate of up to 68.12% using human preference scores and 73.37% using VLM-as-a-judge. These gains are validated in a user study where we achieve win rates of up to 59.46% over previous baselines. Our results suggest that learned sampling-parameter policies provide a complementary approach to existing post-training methods for improving diffusion model outputs.",
+      "authors": [
+        "Arisrei Lim",
+        "Yossi Gandelsman"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CV"
+      ],
+      "published": "2026-07-26T06:29:48+00:00",
+      "link": "https://arxiv.org/pdf/2607.23488v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "uses RL to learn sampling parameters with human preference rewards",
+      "llm_evidence_cn": "使用强化学习和人类偏好奖励学习采样参数",
+      "llm_evidence": "使用强化学习和人类偏好奖励学习采样参数",
+      "canonical_evidence": "使用强化学习和人类偏好奖励学习采样参数",
+      "llm_tldr_en": "Proposes LeSAMP, learning prompt-conditioned timestep-varying sampling parameters via RL with human preference rewards, improving diffusion model generation.",
+      "llm_tldr_cn": "文本到图像扩散模型中，手工固定采样参数无法适应不同提示和生成阶段。该论文提出LeSAMP框架，将参数选择建模为强化学习问题，利用大型语言模型输出时序变化的采样参数，并通过人类偏好模型和VLM评判器进行优化。在Flux.1上的实验证明了该方法能有效提升生成质量。",
+      "llm_tldr": "文本到图像扩散模型中，手工固定采样参数无法适应不同提示和生成阶段。该论文提出LeSAMP框架，将参数选择建模为强化学习问题，利用大型语言模型输出时序变化的采样参数，并通过人类偏好模型和VLM评判器进行优化。在Flux.1上的实验证明了该方法能有效提升生成质量。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.23278v1",
+      "source": "arxiv",
+      "title": "Co-Evolving Graph and Text Memory for Training-Free Multi-Hop Question Answering",
+      "abstract": "Multi-hop question answering requires coordinating relational and textual evidence across reasoning steps, a combination neither a text corpus nor a knowledge graph can supply alone. Prior work often emphasizes only part of this loop: graph-augmented RAG retrieves from a pre-built or query-updated graph, KGQA systems search within topic-centered subgraphs, and memory-augmented agents maintain evolving memories without continuously reconciling graph memory with textual context. We propose Co-E, a training-free system built around synchronized bidirectional graph-text working memory. A synchronization cycle consolidates textual memory, extracts relational triples into graph memory, and injects graph facts back into the generation context. Because both memories are maintained, they shape subsequent retrieval and generation. Evaluated on six multi-hop QA benchmarks, Co-E improves over comparable training-free open-backbone baselines and is competitive with larger or trained systems.",
+      "authors": [
+        "Hieu Man",
+        "Thien Huu Nguyen"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.MA"
+      ],
+      "published": "2026-07-25T16:29:38+00:00",
+      "link": "https://arxiv.org/pdf/2607.23278v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "training-free multi-hop QA with graph-text memory reduces hallucination",
+      "llm_evidence_cn": "无训练多跳问答中的图-文本记忆减少幻觉",
+      "llm_evidence": "无训练多跳问答中的图-文本记忆减少幻觉",
+      "canonical_evidence": "无训练多跳问答中的图-文本记忆减少幻觉",
+      "llm_tldr_en": "Co-E synchronizes graph and text memory for multi-hop QA, improving evidence coverage without training, reducing hallucination.",
+      "llm_tldr_cn": "针对多跳问答中图记忆与文本记忆缺乏同步的问题，提出Co-E系统，通过双向同步循环整合文本记忆和图关系事实。实验表明该方法有效提升了多跳推理的准确性和证据完整性。",
+      "llm_tldr": "针对多跳问答中图记忆与文本记忆缺乏同步的问题，提出Co-E系统，通过双向同步循环整合文本记忆和图关系事实。实验表明该方法有效提升了多跳推理的准确性和证据完整性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.23420v1",
+      "source": "arxiv",
+      "title": "LA-RL: Label-Aware Self-Reflection for Reinforcement Learning in Information Extraction",
+      "abstract": "Large language models show strong promise for information extraction (IE), but existing reflection-based correction methods are often misaligned with structured extraction outputs. Free-form self-reflection can flag an error, yet it rarely identifies whether the failure is a missing span, wrong label, boundary mismatch, invalid relation type, or reversed argument order. We introduce LA-RL (Label-Aware Reflective Reinforcement Learning), an outcome-supervised framework that guides IE self-correction with task-grounded diagnostic labels. A single backbone first predicts an extraction, diagnoses task-specific error labels, and then revises its output conditioned on the diagnosis. Training starts from diagnostic data labeled by an annotation model for cold-start supervised fine-tuning and proceeds through two GRPO stages that reward final extraction quality, format validity, and first-pass correctness, without a process reward model. Experiments on named entity recognition, relation extraction, and event extraction show consistent same-backbone gains over SFT, including 6.83 average F1 on SciER relation extraction, about 20 F1 on out-of-distribution relation extraction, and 14.80 trigger F1 plus 17.50 argument F1 on DuEE1.0. Ablations show that reflection structure is task-sensitive: stronger constraints benefit relation extraction, whereas named entity recognition needs less restrictive correction under domain shift.",
+      "authors": [
+        "Xiao You",
+        "Tianwei Yan",
+        "Zixu Shan",
+        "Longyu Du",
+        "Shan Zhao"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-26T02:35:47+00:00",
+      "link": "https://arxiv.org/pdf/2607.23420v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "label-aware diagnostic self-correction for extraction errors",
+      "llm_evidence_cn": "标签感知的诊断自纠正用于提取错误",
+      "llm_evidence": "标签感知的诊断自纠正用于提取错误",
+      "canonical_evidence": "标签感知的诊断自纠正用于提取错误",
+      "llm_tldr_en": "Proposes LA-RL, a label-aware reflective RL framework that diagnoses specific error types in IE outputs and revises them, effectively suppressing extraction errors akin to hallucination.",
+      "llm_tldr_cn": "针对大语言模型在信息抽取中自我纠正不准确的问题，提出了LA-RL（标签感知反思强化学习）框架。该方法通过一个统一骨干网络先预测抽取结果，再诊断任务特定的错误标签，最后根据诊断进行修正。实验表明，该框架能精准定位缺失跨度、错误标签等具体错误类型，有效提升抽取质量。该工作为信息抽取中的错误抑制（类似幻觉抑制）提供了新思路。",
+      "llm_tldr": "针对大语言模型在信息抽取中自我纠正不准确的问题，提出了LA-RL（标签感知反思强化学习）框架。该方法通过一个统一骨干网络先预测抽取结果，再诊断任务特定的错误标签，最后根据诊断进行修正。实验表明，该框架能精准定位缺失跨度、错误标签等具体错误类型，有效提升抽取质量。该工作为信息抽取中的错误抑制（类似幻觉抑制）提供了新思路。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.23445v1",
+      "source": "arxiv",
+      "title": "Omni-Prune: Query-Aware Unified Token Pruning for Efficient Omnimodal Large Language Models",
+      "abstract": "Omnimodal large language models (OmniLLMs) are rapidly extending multimodal reasoning to cover synchronized audio and video. However, the resulting audio-video token sequences are long, leading to high prefill latency and GPU memory usage at inference time. Existing token pruning methods, designed mainly for vision-only inputs, miss both the cross-modal links between audio and video and the user query that decides which content matters. To bridge this gap, we present Omni-Prune, a training-free, query-aware audio-visual token pruning framework that jointly removes redundancy from both modalities while keeping task-relevant cross-modal evidence. Specifically, Omni-Prune first splits the token sequence into adaptive time windows placed at audio saliency peaks, then scores audio and video tokens on a single scale that combines encoder attention with text-query relevance, and pairs related audio-video tokens so that they are kept together. Within each window, a final K-medoids step then selects a few representative tokens, adding diverse cues that score-based selection alone would miss. Extensive experiments demonstrate that Omni-Prune outperforms established baseline methods, delivering up to 3.25x prefill speedup and 1.3x memory reduction while retaining over 99% of full-model performance.",
+      "authors": [
+        "Yiming Zhong",
+        "Chang Nie",
+        "Caifeng Shan"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.CL"
+      ],
+      "published": "2026-07-26T03:51:39+00:00",
+      "link": "https://arxiv.org/pdf/2607.23445v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "training-free query-aware token pruning for LLM inference efficiency, algorithm improvement",
+      "llm_evidence_cn": "面向大模型推理效率的无训练、查询感知的Token剪枝，属于算法改进",
+      "llm_evidence": "面向大模型推理效率的无训练、查询感知的Token剪枝，属于算法改进",
+      "canonical_evidence": "面向大模型推理效率的无训练、查询感知的Token剪枝，属于算法改进",
+      "llm_tldr_en": "Proposes Omni-Prune, a training-free query-aware token pruning framework for omnimodal LLMs, reducing latency and memory while preserving task-relevant information.",
+      "llm_tldr_cn": "全模态大模型处理同步音频视频时Token序列过长导致推理延迟高。现有剪枝方法忽略跨模态关联和用户查询。本文提出Omni-Prune，无训练、查询感知的剪枝框架，将序列分割为自适应时间窗口，并利用查询重要性选择保留多模态证据。实验表明在保持性能的同时显著降低计算开销。",
+      "llm_tldr": "全模态大模型处理同步音频视频时Token序列过长导致推理延迟高。现有剪枝方法忽略跨模态关联和用户查询。本文提出Omni-Prune，无训练、查询感知的剪枝框架，将序列分割为自适应时间窗口，并利用查询重要性选择保留多模态证据。实验表明在保持性能的同时显著降低计算开销。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
