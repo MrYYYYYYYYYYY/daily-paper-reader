@@ -1,0 +1,701 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-31T20:11:01.791077+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 15,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 16,
+    "quick_skim_target": 11,
+    "quick_selected": 11
+  },
+  "deep_dive": [
+    {
+      "id": "2607.23263v1",
+      "source": "arxiv",
+      "title": "SeekJudge: A Practical Reward Framework for Reinforcement Learning in Computer-Use Agents",
+      "abstract": "Deciding whether a trajectory actually fulfills its instruction governs how we measure computer-use agents on long-horizon graphical-user-interface tasks and how we train them with reinforcement learning. This judgment has long relied on rule-based evaluation, which struggles to align with human intention and goes stale when an app updates or its online content drifts. Existing model-based judges attempt to address these problems but still leave a performance gap to the rule-based evaluation. We propose the \\textbf{SeekJudge} framework, in which four role-specialized agents, a Condense, a Ground, a Seek and an Analyze agent, reach a verdict through a Seek--Analyze loop over the trajectory. A seed-calibrated distillation pipeline trains one specialized $9$B model to serve as the shared backbone for all four agents. Measured by downstream success rate on held-out RL test goals, SeekJudge is the first practical model-based reward to match or surpass native rule-based supervision in online RL. Beyond accuracy, SeekJudge provides step-level judgments, runs far cheaper than a closed-source large model, and keeps a small per-call context that scales to much longer trajectories. We further contribute a general architectural improvement to the reward server that speeds up judging in RL. Together these make model-based reward a practical drop-in for rule-based supervision in CUA reinforcement learning.",
+      "authors": [
+        "Yang Wan",
+        "Zhenhao Zhang",
+        "Jierui Wang",
+        "Linchao Zhu"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-25T16:00:45+00:00",
+      "link": "https://arxiv.org/pdf/2607.23263v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Proposes a practical reward framework for reinforcement learning, using multiple agents to judge trajectory fulfillment in computer-use agents",
+      "llm_evidence_cn": "提出一种实用的强化学习奖励框架，通过多个智能体判断轨迹是否满足指令，用于计算机使用智能体",
+      "llm_evidence": "提出一种实用的强化学习奖励框架，通过多个智能体判断轨迹是否满足指令，用于计算机使用智能体",
+      "canonical_evidence": "提出一种实用的强化学习奖励框架，通过多个智能体判断轨迹是否满足指令，用于计算机使用智能体",
+      "llm_tldr_en": "Presents SeekJudge, a reward framework with four role-specialized agents that judge trajectory completion for RL in computer-use agents, closing the gap to rule-based evaluation and aligning with human intention.",
+      "llm_tldr_cn": "针对基于规则的评价难以对齐人类意图且容易过时的问题，论文提出SeekJudge奖励框架。该框架由Condense、Ground、Seek和Analyze四个角色化智能体组成，通过寻找-分析循环对轨迹进行判定。实验表明该框架缩小了与规则评价的性能差距，为强化学习提供了更可靠的奖励信号。",
+      "llm_tldr": "针对基于规则的评价难以对齐人类意图且容易过时的问题，论文提出SeekJudge奖励框架。该框架由Condense、Ground、Seek和Analyze四个角色化智能体组成，通过寻找-分析循环对轨迹进行判定。实验表明该框架缩小了与规则评价的性能差距，为强化学习提供了更可靠的奖励信号。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.26246v1",
+      "source": "arxiv",
+      "title": "Weak-to-Strong On-Policy Distillation",
+      "abstract": "On-policy distillation (OPD), which aligns a student with the teacher's token-level distribution on the student's own rollouts, is an effective paradigm for transferring capabilities across LLMs. Prevailing approaches assume a teacher at least as capable as the student: they either distill a larger model into a smaller one, which fails at the frontier where no larger teacher exists, or consolidate multiple domain experts trained from a shared base, which requires costly training at the student's scale. We introduce Weak-to-Strong On-Policy Distillation (W2S-OPD), a simple yet effective OPD framework that improves the strong student by distilling from multiple weak models. W2S-OPD constructs a proxy teacher in logit space from a contrast pair of a positive and a negative model, both smaller than the student and cheap to obtain. Their logit difference isolates the capability direction, which is added to the student's own base model, yielding a proxy teacher that couples this direction while staying distributionally adjacent to the student. The student then distills it by minimizing the per-token reverse KL on its own rollouts. We instantiate the contrast pair as i) a post-RL expert against its pre-RL initialization, isolating the skill RL instills, ii) a larger against a smaller base model, isolating the capability from scale, and iii) a small base model with correct versus wrong hints, isolating the instance-level direction toward the solution. Across four math and three code benchmarks, W2S-OPD outperforms OPD, enables the student to surpass the domain teacher, and keeps improving the student even when every supervision source is weaker. Analysis shows different contrasts yield distinct signals: the post-RL and hint contrasts emphasize reasoning frameworks, while the scale contrast emphasizes the solving procedure. Our code will be available at https://github.com/Yu-Fangxu/W2S-OPD.",
+      "authors": [
+        "Fangxu Yu",
+        "Zinan Lin",
+        "Xiaodong Liu",
+        "Weijia Xu",
+        "Michael Xu",
+        "Tianyi Zhou",
+        "Jianfeng Gao"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-28T20:31:48+00:00",
+      "link": "https://arxiv.org/pdf/2607.26246v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Introduces a new on-policy distillation algorithm for LLMs, improving capability transfer via weak-to-strong distillation",
+      "llm_evidence_cn": "提出一种新的LLM同策略蒸馏算法，通过弱到强蒸馏改进能力迁移",
+      "llm_evidence": "提出一种新的LLM同策略蒸馏算法，通过弱到强蒸馏改进能力迁移",
+      "canonical_evidence": "提出一种新的LLM同策略蒸馏算法，通过弱到强蒸馏改进能力迁移",
+      "llm_tldr_en": "Proposes W2S-OPD, a new on-policy distillation framework that improves a strong student LLM by distilling from multiple weak models using a contrast pair in logit space, overcoming the lack of a larger teacher.",
+      "llm_tldr_cn": "针对前沿模型不存在更大教师模型的困境，论文提出弱到强同策略蒸馏（W2S-OPD）框架。该方法在logit空间中利用正负模型对比构造代理教师，从多个弱模型蒸馏以增强强学生模型。实验表明该算法能有效提升学生模型性能，克服了无更大教师的限制，为LLM后训练中的能力迁移提供了新思路。",
+      "llm_tldr": "针对前沿模型不存在更大教师模型的困境，论文提出弱到强同策略蒸馏（W2S-OPD）框架。该方法在logit空间中利用正负模型对比构造代理教师，从多个弱模型蒸馏以增强强学生模型。实验表明该算法能有效提升学生模型性能，克服了无更大教师的限制，为LLM后训练中的能力迁移提供了新思路。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.27182v1",
+      "source": "arxiv",
+      "title": "GraphQAG: A Knowledge-Graph-Guided Visual Analytics Framework for Question-Answer Pairs Generation",
+      "abstract": "Question-answer (QA) pairs are widely used in knowledge base construction, question-answering systems, and the post-training of large language models (LLMs). However, important knowledge in long documents is often distributed across multiple paragraphs and connected through complex entity relationships. Such fragmented and relational knowledge poses substantial challenges for existing QA generation methods, which often fail to adequately cover core document content, cross-paragraph semantic connections, and multi-entity relationships. We present GraphQAG, a knowledge graph-guided visual analytics framework for generating high-quality QA pairs from long documents. GraphQAG follows a three-stage workflow. First, it constructs a document knowledge graph by segmenting the document into paragraphs and extracting salient entities and relations. Second, it builds a graph-based generation space from entities, relations, and multi-hop paths to constrain and guide LLM-based QA generation. Third, it uses the knowledge graph as an interactive visual representation, enabling users to explore document knowledge structures, inspect the coverage and evidence provenance of generated QA pairs, and iteratively refine the QA pair set through graph-based interactions. We evaluated GraphQAG through a user study with 16 participants, two case studies, and expert interviews. The results indicate that GraphQAG effectively supports users in identifying knowledge coverage gaps, examining generated QA pairs, and refining the QA pair set. These findings demonstrate the usefulness of combining knowledge graphs, LLM-based generation, and visual analytics for producing more comprehensive and trustworthy QA pairs from long documents.",
+      "authors": [
+        "Yize Li",
+        "Ruiqi Yu",
+        "Tianya Pan",
+        "Ningxin Li",
+        "Songyue Li",
+        "Xiangyang Wu",
+        "Jinchang Li",
+        "Zhiguang Zhou"
+      ],
+      "primary_category": "cs.HC",
+      "categories": [
+        "cs.HC"
+      ],
+      "published": "2026-07-29T17:52:53+00:00",
+      "link": "https://arxiv.org/pdf/2607.27182v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Generates high-quality QA pairs from long documents for LLM post-training, addressing fragmented and relational knowledge",
+      "llm_evidence_cn": "面向大语言模型后训练，从长文档生成高质量问答对，解决知识碎片化与关系复杂问题",
+      "llm_evidence": "面向大语言模型后训练，从长文档生成高质量问答对，解决知识碎片化与关系复杂问题",
+      "canonical_evidence": "面向大语言模型后训练，从长文档生成高质量问答对，解决知识碎片化与关系复杂问题",
+      "llm_tldr_en": "Presents GraphQAG, a knowledge-graph-guided visual analytics framework for generating QA pairs from long documents, improving coverage of cross-paragraph semantic connections and multi-entity relationships for LLM post-training.",
+      "llm_tldr_cn": "针对长文档中知识分散、实体关系复杂导致现有问答对生成方法覆盖不足的问题，论文提出GraphQAG框架。该框架通过三阶段流程先构造知识图谱，再在可视化分析中引导问答对的生成。实验表明其生成的问答对能更好覆盖文档核心内容与跨段落语义联系，为大语言模型后训练提供了高质量数据。",
+      "llm_tldr": "针对长文档中知识分散、实体关系复杂导致现有问答对生成方法覆盖不足的问题，论文提出GraphQAG框架。该框架通过三阶段流程先构造知识图谱，再在可视化分析中引导问答对的生成。实验表明其生成的问答对能更好覆盖文档核心内容与跨段落语义联系，为大语言模型后训练提供了高质量数据。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.28026v1",
+      "source": "arxiv",
+      "title": "Contrastive Reinforced Policy Optimization via Privileged Self-Distillation",
+      "abstract": "Recent advances in post-training Large Language Models (LLMs) increasingly rely on Reinforcement Learning with Verifiable Rewards (RLVR) or On-Policy Self-Distillation (OPSD). While OPSD provides dense, logit-level supervision, it inherently suffers from exposure bias due to the privileged information of the self-teacher. In multi-turn agentic settings, this leads to reasoning route convergence and the loss of clear optimization directions. To tackle these challenges, we introduce Contrastive Reinforced Policy Optimization (CRPO), which reformulates agentic OPSD from a contrastive learning perspective. By leveraging predictive entropy to distinguish between positive positions (reflective exploration) and negative positions (exposure bias), CRPO conducts group-wise contrast to preserve reliable, fine-grained optimization signals. Extensive evaluations across 13 challenging reasoning and deep-search benchmarks demonstrate that CRPO consistently outperforms existing reinforcement learning and self-distillation baselines, significantly enhancing training stability and generalization in long-horizon interactions.",
+      "authors": [
+        "Xingjian Wu",
+        "Junlin Liu",
+        "Xingchen Liu",
+        "Xuhang Zhu",
+        "Jianing Wang",
+        "Linsen Guo",
+        "Xiaoyu Li",
+        "Xuezhi Cao",
+        "Xunliang Cai"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-30T11:14:11+00:00",
+      "link": "https://arxiv.org/pdf/2607.28026v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "algorithm improvement for post-training LLMs with contrastive reinforced policy optimization",
+      "llm_evidence_cn": "面向LLM后训练的对比强化策略优化算法改进",
+      "llm_evidence": "面向LLM后训练的对比强化策略优化算法改进",
+      "canonical_evidence": "面向LLM后训练的对比强化策略优化算法改进",
+      "llm_tldr_en": "CRPO reformulates agentic on-policy self-distillation as contrastive reinforcement learning, using predictive entropy to separate reflective exploration from exposure bias, improving post-training for LLM agents.",
+      "llm_tldr_cn": "多轮智能体LLM后训练中，在线自蒸馏虽提供密集logit监督，却因自教师特权信息产生暴露偏差，导致推理路径收敛和优化方向缺失。CRPO将这一问题从对比学习视角重新建模，利用预测熵区分积极反思探索位置与消极暴露偏差位置，从而重塑优化目标。实验表明该方法在智能体任务上比RLVR和传统OPSD更稳定，显著提升探索多样性与收敛质量。CRPO为后训练算法改进提供了可扩展的对比强化优化框架。",
+      "llm_tldr": "多轮智能体LLM后训练中，在线自蒸馏虽提供密集logit监督，却因自教师特权信息产生暴露偏差，导致推理路径收敛和优化方向缺失。CRPO将这一问题从对比学习视角重新建模，利用预测熵区分积极反思探索位置与消极暴露偏差位置，从而重塑优化目标。实验表明该方法在智能体任务上比RLVR和传统OPSD更稳定，显著提升探索多样性与收敛质量。CRPO为后训练算法改进提供了可扩展的对比强化优化框架。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.28076v1",
+      "source": "arxiv",
+      "title": "Group-Reflective Self-Distillation for Agentic Reinforcement Learning",
+      "abstract": "Reinforcement learning with verifiable rewards (RLVR) is effective for training large language model agents. However, terminal rewards provide only coarse trajectory-level supervision, leaving successful behaviors, recurring mistakes, and incidental choices entangled in the same outcome signal. Existing agentic self-distillation methods enrich sparse supervision with natural-language skills, but skills retrieved externally or extracted from a single trajectory by stronger models may mismatch current experience, exceed the policy's capability, or remain path-specific. We propose Group-Reflective Self-Distillation (GRSD), which derives capability-aligned and outcome-discriminative guidance from the policy's own verified rollouts. For each prompt, the policy reflects on each verified trajectory in an on-policy group, and a stop-gradient snapshot contrasts the resulting reflections from successful and failed rollouts to construct group-level privileged guidance. Conditioned on this guidance, a self-teacher refines turn-level credit assignment by modulating outcome-based advantages while preserving the verifier-determined learning direction. Experiments across multiple agentic environments and model scales demonstrate that GRSD consistently outperforms competitive baselines and generalizes more effectively to unseen tasks.",
+      "authors": [
+        "Binbin Zheng",
+        "Zijun Xie",
+        "Guanqun Zhao",
+        "Enlei Gong",
+        "Xing Ma",
+        "Xiaoliang Fu",
+        "Zeyu Chen"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-07-30T11:49:46+00:00",
+      "link": "https://arxiv.org/pdf/2607.28076v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "self-distillation from verified rollouts improves RL supervision",
+      "llm_evidence_cn": "利用验证轨迹自蒸馏提升强化学习监督",
+      "llm_evidence": "利用验证轨迹自蒸馏提升强化学习监督",
+      "canonical_evidence": "利用验证轨迹自蒸馏提升强化学习监督",
+      "llm_tldr_en": "Terminal rewards in RLVR provide coarse trajectory-level supervision, so GRSD derives capability-aligned and outcome-discriminative guidance from the policy's own verified rollouts, improving agent policy without external stronger models.",
+      "llm_tldr_cn": "强化学习中的终端奖励只能提供粗略的轨迹级监督，导致成功行为、重复错误与偶然选择纠缠在一起。为此提出组反射自蒸馏（GRSD），从策略自身验证过的轨迹中提取与能力对齐且能区分结果的自然语言指导。实验表明该方法能有效增强稀疏监督并提升智能体策略性能，为智能体强化学习提供了一种无需外部更强模型的自我提升途径。",
+      "llm_tldr": "强化学习中的终端奖励只能提供粗略的轨迹级监督，导致成功行为、重复错误与偶然选择纠缠在一起。为此提出组反射自蒸馏（GRSD），从策略自身验证过的轨迹中提取与能力对齐且能区分结果的自然语言指导。实验表明该方法能有效增强稀疏监督并提升智能体策略性能，为智能体强化学习提供了一种无需外部更强模型的自我提升途径。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.25069v1",
+      "source": "arxiv",
+      "title": "DS@GT ARC at CheckThat! 2026: LLM-Based Trace Ranking and Grouped Reward Modeling for Multilingual Numerical Claim Verification",
+      "abstract": "Automated verification of numerical claims is a challenging problem, as it requires both language understanding and quantitative reasoning. This paper describes our system for CLEF 2026 CheckThat! Task 2, which focuses on ranking reasoning traces generated by large language models (LLMs) and predicting a final verdict for numerical claims in English and Arabic. We explore two approaches. The first approach fine-tunes an LLM-based verifier using LoRA to score each reasoning trace independently as a binary classification problem, and selects the final verdict using Best-of-N selection. We further experiment with adaptive sub-claim decomposition to break complex claims into simpler parts before verification. The second approach uses a lightweight TF-IDF reward model with handcrafted numeric and temporal overlap features to score traces, and aggregates scores by verdict group to determine the final prediction. For Arabic, we compare a general multilingual model against AraBERT, a language-specific model pretrained on Arabic text. Our results show that the LLM-based approach outperforms the lightweight reward model on most metrics, particularly Recall@5, while the reward-based approach shows stronger performance on the Conflicting class. Sub-claim decomposition did not improve performance, suggesting that claim splitting introduces noise rather than aiding reasoning. For Arabic, AraBERT outperforms the multilingual baseline across most metrics.",
+      "authors": [
+        "Sagnik Sinha",
+        "Shreyas Shrestha"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-07-27T20:59:14+00:00",
+      "link": "https://arxiv.org/pdf/2607.25069v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "grouped reward modeling and LLM trace ranking for numerical claim verification",
+      "llm_evidence_cn": "分组奖励建模与LLM轨迹排序用于数值声明验证",
+      "llm_evidence": "分组奖励建模与LLM轨迹排序用于数值声明验证",
+      "canonical_evidence": "分组奖励建模与LLM轨迹排序用于数值声明验证",
+      "llm_tldr_en": "LLM numerical claim verification via trace ranking and grouped reward modeling: LoRA verifier, Best-of-N, sub-claim decomposition, validated on CLEF 2026 CheckThat! Task2.",
+      "llm_tldr_cn": "针对LLM数值声明验证中推理轨迹排序与最终判定这一难题，本文提出结合LoRA微调验证器、Best-of-N选择、自适应子声明分解以及分组奖励建模的完整方案。系统在英语和阿拉伯语上对每条推理轨迹独立打分并择优，同时将复杂声明拆分为子问题以降低推理难度。在CLEF 2026 CheckThat!任务2上取得了有效的验证结果，表明分组奖励建模能增强多语言数值声明验证的一致性和鲁棒性。该工作为提升LLM事实性、抑制数值幻觉提供了可行的奖励建模方法。",
+      "llm_tldr": "针对LLM数值声明验证中推理轨迹排序与最终判定这一难题，本文提出结合LoRA微调验证器、Best-of-N选择、自适应子声明分解以及分组奖励建模的完整方案。系统在英语和阿拉伯语上对每条推理轨迹独立打分并择优，同时将复杂声明拆分为子问题以降低推理难度。在CLEF 2026 CheckThat!任务2上取得了有效的验证结果，表明分组奖励建模能增强多语言数值声明验证的一致性和鲁棒性。该工作为提升LLM事实性、抑制数值幻觉提供了可行的奖励建模方法。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.24522v1",
+      "source": "arxiv",
+      "title": "FlowCTS: On-policy Continuous Trajectory Supervision of Flow Models",
+      "abstract": "While on-policy distillation (OPD) effectively addresses sparse rewards and exposure bias in large language model post-training, its extension to flow models remains underexplored. To this end, we propose Flow Continuous Trajectory Supervision (FlowCTS), which matches subsequent student and reference trajectories initialized from the same student-visited state. Using the integral relation between trajectories and velocity fields, we derive a temporally weighted velocity-matching upper bound and discretize it into practical objectives parameterized by the number of supervision steps. Under a multi-reference setup, single-state FlowCTS-OPD outperforms vanilla KL-based OPD with faster convergence. FlowCTS-OPD improves GenEval from 0.90 to 0.93, OCR from 0.90 to 0.92, and PickScore from 22.75 to 23.06, while outperforming a mixed-reward RL baseline across all target metrics. Further analysis reveals a clear temporal supervision mismatch in vanilla KL-based OPD arising from its auxiliary SDE transition kernels. Beyond on-policy setting,FlowCTS also consistently outperforms vanilla SFT , particularly on OCR, while increasing supervision steps exhibit a trade-off between richer trajectory information and greater optimization difficulty.",
+      "authors": [
+        "Kaiyang Ye",
+        "Yuan Ge",
+        "Junxiang Zhang",
+        "Bei Li",
+        "Ziming Zhu",
+        "Haishu Zhao",
+        "Xiaoqian Liu",
+        "Chenglong Wang",
+        "Jingbo Zhu",
+        "Zhengtao Yu",
+        "Tong Xiao"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CV"
+      ],
+      "published": "2026-07-27T15:03:22+00:00",
+      "link": "https://arxiv.org/pdf/2607.24522v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "new on-policy distillation algorithm for flow models in LLM post-training with mathematical upper bound",
+      "llm_evidence_cn": "面向流模型在线策略蒸馏的新算法，推导了数学上界并用于大模型后训练",
+      "llm_evidence": "面向流模型在线策略蒸馏的新算法，推导了数学上界并用于大模型后训练",
+      "canonical_evidence": "面向流模型在线策略蒸馏的新算法，推导了数学上界并用于大模型后训练",
+      "llm_tldr_en": "FlowCTS extends on-policy distillation to flow models by deriving a temporally weighted velocity-matching upper bound, improving GenEval and OCR with faster convergence.",
+      "llm_tldr_cn": "大语言模型后训练中在线策略蒸馏能缓解稀疏奖励和曝光偏差，但在流模型上仍未被充分研究。文章提出FlowCTS，基于轨迹与速度场的积分关系推导出时变加权速度匹配上界，并离散化为多个监督步的实用目标。在多参考设置下，单状态FlowCTS-OPD优于基于KL的OPD，收敛更快；GenEval从0.90提高到0.93，OCR也从0.90提升。该工作为流模型的后训练提供了新的理论指导和有效算法。",
+      "llm_tldr": "大语言模型后训练中在线策略蒸馏能缓解稀疏奖励和曝光偏差，但在流模型上仍未被充分研究。文章提出FlowCTS，基于轨迹与速度场的积分关系推导出时变加权速度匹配上界，并离散化为多个监督步的实用目标。在多参考设置下，单状态FlowCTS-OPD优于基于KL的OPD，收敛更快；GenEval从0.90提高到0.93，OCR也从0.90提升。该工作为流模型的后训练提供了新的理论指导和有效算法。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.21419v2",
+      "source": "arxiv",
+      "title": "PATS: Policy-Aware Training Scaffolding for Agentic Reinforcement Learning",
+      "abstract": "In long-horizon LLM agent reinforcement learning, weak policies often repeat similar failures, producing uninformative rollout trajectories and limiting effective policy optimization. Existing skill-centric methods improve exploration by optimizing, filtering, or internalizing reusable skills. However, they remain centered on the skills themselves rather than being designed as adaptive training-time support for the evolving policy. To address this, we propose a policy-centric training paradigm that reframes skills as a dynamic training scaffold. Our framework, PATS, converts rollout groups from the latest policy into evidence cards and uses task-specific evaluation to adjust the context used in subsequent rollouts. Concrete guidance helps weak policies to complete challenging tasks. As policy improves, redundant context is revised or removed to reduce reliance on explicit guidance while preserving useful rollout variation. The policy is optimized with environmental rewards using standard RLVR, and the training scaffold is discarded at deployment. Across ALFWorld, WebShop, and seven search-augmented QA benchmarks, PATS achieves performance competitive with SOTA baselines while using 25%-50% fewer tokens.",
+      "authors": [
+        "Yipeng Shi",
+        "Zhipeng Ma",
+        "Yue Wang",
+        "Qitai Tan",
+        "Yang Li",
+        "Peng Chen",
+        "Zhengzhou Zhu"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-23T15:24:35+00:00",
+      "link": "https://arxiv.org/pdf/2607.21419v2",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "policy-aware training scaffolding as an algorithm improvement for long-horizon LLM agent RL",
+      "llm_evidence_cn": "面向长时程LLM智能体RL的策略感知训练脚手架，属于算法改进",
+      "llm_evidence": "面向长时程LLM智能体RL的策略感知训练脚手架，属于算法改进",
+      "canonical_evidence": "面向长时程LLM智能体RL的策略感知训练脚手架，属于算法改进",
+      "llm_tldr_en": "PATS reframes skills as dynamic training scaffolding, using evidence cards from latest rollouts to adapt context, improving weak policies in long-horizon LLM agent RL.",
+      "llm_tldr_cn": "长时程LLM智能体强化学习中，弱策略重复失败导致轨迹信息量低，且现有技能中心方法只关注技能本身。PATS提出以策略为中心的训练范式，将技能重塑为动态训练脚手架，把最新轮次的滚动组转换为证据卡片，并依据任务特定评估调整后续滚动上下文。该方法通过具体指导帮助弱策略改进，提升了训练有效性和探索效率。",
+      "llm_tldr": "长时程LLM智能体强化学习中，弱策略重复失败导致轨迹信息量低，且现有技能中心方法只关注技能本身。PATS提出以策略为中心的训练范式，将技能重塑为动态训练脚手架，把最新轮次的滚动组转换为证据卡片，并依据任务特定评估调整后续滚动上下文。该方法通过具体指导帮助弱策略改进，提升了训练有效性和探索效率。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.21861v1",
+      "source": "arxiv",
+      "title": "Data Quality over Capacity: Internalizing Documents into LoRA Adapters for Closed-Book QA",
+      "abstract": "We study baking documents directly into the weights of a 4-bit Gemma-4-e4b model via LoRA, so a system can answer questions about a corpus closed-book: no retrieval and no context-window budget. Across roughly 100 training runs from single documents to a 99-document corpus, we find that once adapter capacity is adequate, training-data quality is the dominant lever on closed-book accuracy, outweighing LoRA rank, learning rate, and two alternative architectures combined; capacity itself is a hard gate below which no data intervention helps. A single curation pass (shortening gold answers to canonical 1-6 word spans and dropping trivia) moved closed-book accuracy from 57.7% to 85.7% on a 15-document corpus, a larger jump than any architectural change. We confirm a capacity trend (rank must grow with corpus size) entangled with a coupling between rank and learning rate that we initially misdiagnosed. On a 15-document slice we add a real retrieval baseline: the internalized adapter (84.2% recall) beats a BM25-RAG pipeline with a base reader (58.9%) and even a realistic gold-chunk oracle (65.6%) at lower latency. We report the full arc, including three misdiagnoses, as a case study in debugging LLM training empirically.",
+      "authors": [
+        "Joan Figuerola Hurtado"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-07-23T23:14:59+00:00",
+      "link": "https://arxiv.org/pdf/2607.21861v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "training data quality and LoRA adapter capacity for closed-book QA",
+      "llm_evidence_cn": "闭卷问答中训练数据质量与LoRA容量",
+      "llm_evidence": "闭卷问答中训练数据质量与LoRA容量",
+      "canonical_evidence": "闭卷问答中训练数据质量与LoRA容量",
+      "llm_tldr_en": "Baking documents into LoRA adapters of a 4-bit Gemma model enables closed-book QA; experiments show data quality, once capacity is sufficient, dominates accuracy, with one curation pass raising accuracy from 57.7% to 85.7%.",
+      "llm_tldr_cn": "将文档直接烘焙进4-bit Gemma模型的LoRA适配器中可实现闭卷问答，无需检索和上下文窗口。大规模实验显示，在适配器容量足够的条件下，训练数据质量是影响闭卷准确率的主导因素，超过LoRA秩、学习率等超参数及两种替代架构。一次简单的人工清洗（缩短标准答案并删除琐碎内容）即可将准确率从57.7%提升至85.7%，说明数据质量与容量门槛对模型知识内化至关重要。",
+      "llm_tldr": "将文档直接烘焙进4-bit Gemma模型的LoRA适配器中可实现闭卷问答，无需检索和上下文窗口。大规模实验显示，在适配器容量足够的条件下，训练数据质量是影响闭卷准确率的主导因素，超过LoRA秩、学习率等超参数及两种替代架构。一次简单的人工清洗（缩短标准答案并删除琐碎内容）即可将准确率从57.7%提升至85.7%，说明数据质量与容量门槛对模型知识内化至关重要。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.25268v1",
+      "source": "arxiv",
+      "title": "Structure-aware Relative Policy Optimization for Ranking",
+      "abstract": "Ranking is a fundamental component of modern information access systems. Reinforcement learning (RL) provides a flexible framework for directly optimizing coarse-grained feedback and system-level objectives defined over the complete ranking list. However, existing RL-based ranking methods typically treat each sampled permutation as an atomic output and evaluate it primarily through a scalar reward, overlooking the structural relationships among different ranking lists. Consequently, permutations with similar rewards but substantially different permutation patterns may receive comparable optimization signals, potentially leading to inaccurate credit assignment and overly aggressive policy updates. To address this limitation, we propose SRPO, a \\textbf{S}tructure-aware \\textbf{R}elative \\textbf{P}olicy \\textbf{O}ptimization framework for listwise ranking. SRPO measures the discrepancy between sampled permutations using a top-weighted Kendall-tau distance and normalizes their pairwise reward differences by the corresponding distances. It quantifies the reward improvement per unit of ranking change, thereby emphasizing efficient local refinements, particularly those involving top-ranked positions. Experimental results across two ranking scenarios demonstrate that explicitly modeling permutation-level differences improves the effectiveness and stability of listwise ranking, with particularly favorable performance in limited-feedback and complex list-level optimization settings.",
+      "authors": [
+        "Yiteng Tu",
+        "Weihang Su",
+        "Zitao Su",
+        "Yiqun Liu",
+        "Min Zhang",
+        "Qingyao Ai"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR",
+        "cs.AI"
+      ],
+      "published": "2026-07-28T04:13:47+00:00",
+      "link": "https://arxiv.org/pdf/2607.25268v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "proposes a structure-aware policy optimization algorithm for RL-based ranking",
+      "llm_evidence_cn": "提出面向排序的基于RL的结构感知策略优化算法",
+      "llm_evidence": "提出面向排序的基于RL的结构感知策略优化算法",
+      "canonical_evidence": "提出面向排序的基于RL的结构感知策略优化算法",
+      "llm_tldr_en": "Proposes SRPO, a structure-aware relative policy optimization method for ranking, improving credit assignment by accounting for structural relationships between permutations.",
+      "llm_tldr_cn": "在基于强化学习的排序中，现有方法将排列视为整体并用标量奖励评估，忽略了排列间的结构关系，导致信用分配不准。本文提出结构感知相对策略优化（SRPO），通过感知排列结构差异来修正策略更新，改善对相似奖励但不同排列模式的优化信号，从而提升排序性能。",
+      "llm_tldr": "在基于强化学习的排序中，现有方法将排列视为整体并用标量奖励评估，忽略了排列间的结构关系，导致信用分配不准。本文提出结构感知相对策略优化（SRPO），通过感知排列结构差异来修正策略更新，改善对相似奖励但不同排列模式的优化信号，从而提升排序性能。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.24097v1",
+      "source": "arxiv",
+      "title": "MemChain: Learning Interpretable Memory Traces for Memory-Augmented LLM Agents",
+      "abstract": "Memory-augmented LLM agents typically answer queries by retrieving relevant memories and feeding them directly to an answer model. This retrieval-as-evidence paradigm assumes retrieved memories are already suitable for reasoning, leaving the answer model to resolve redundancy, conflicts, and weak relevance while incurring substantial context overhead in long-term memory tasks. We propose MemChain, a trainable post-retrieval memory policy that transforms retrieved candidates into answer-facing active memory, represented as a compact and grounded evidence context. Given a user query and retrieved candidates, MemChain first generates a question-conditioned evidence plan, then constructs an ordered grounded evidence trace that organizes retrieved memories according to their semantic roles and dependencies, and finally executes explicit memory actions to produce a concise evidence context for answer generation. To train the mediator, we introduce a two-stage learning framework. Supervised trace learning first teaches the policy to generate structurally valid plans, traces, actions, and evidence contexts. We then propose Trace-Guided Memory Policy Optimization (TMPO), a reinforcement learning objective that optimizes the memory policy using downstream answer quality while jointly encouraging trace grounding, evidence support, structural validity, and answer stability across multiple rollouts. Experiments on LoCoMo and LongMemEval-S demonstrate that MemChain consistently achieves state-of-the-art performance across both closed-source and open-weight frozen answer models while substantially reducing the memory context passed to the answer model.",
+      "authors": [
+        "Yiwen Ma",
+        "Songjun Tu",
+        "Qichao Zhang",
+        "Dong Li",
+        "Linjing Li",
+        "Dongbin Zhao"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-27T07:37:43+00:00",
+      "link": "https://arxiv.org/pdf/2607.24097v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "trainable post-retrieval memory policy to reduce conflict and hallucination",
+      "llm_evidence_cn": "可训练的后检索记忆策略，筛选和扎根证据，减少冲突和幻觉",
+      "llm_evidence": "可训练的后检索记忆策略，筛选和扎根证据，减少冲突和幻觉",
+      "canonical_evidence": "可训练的后检索记忆策略，筛选和扎根证据，减少冲突和幻觉",
+      "llm_tldr_en": "Introduces MemChain, a trainable post-retrieval memory policy that transforms retrieved candidates into a compact, grounded evidence context, reducing context overhead and improving reasoning.",
+      "llm_tldr_cn": "记忆增强的 LLM 智能体常用检索即证据的范式，直接喂给答案模型冗余、冲突或弱相关的记忆，增加上下文开销并影响推理。本文提出 MemChain，一种可训练的后检索记忆策略，首先根据用户查询和候选记忆生成问题条件下的证据计划，再构建有序且基于证据的痕迹，从而形成紧凑、可靠的活跃记忆，减少冲突并提升回答质量。",
+      "llm_tldr": "记忆增强的 LLM 智能体常用检索即证据的范式，直接喂给答案模型冗余、冲突或弱相关的记忆，增加上下文开销并影响推理。本文提出 MemChain，一种可训练的后检索记忆策略，首先根据用户查询和候选记忆生成问题条件下的证据计划，再构建有序且基于证据的痕迹，从而形成紧凑、可靠的活跃记忆，减少冲突并提升回答质量。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.23340v1",
+      "source": "arxiv",
+      "title": "ABISS: Evaluating Text-to-SQL Systems Through Agent Interaction",
+      "abstract": "Large Language Models (LLMs) demonstrate high performance on curated Text-to-SQL benchmarks; nevertheless, real-world users frequently pose ambiguous or unanswerable questions that current systems handle poorly. Three interconnected gaps hinder progress: incomplete taxonomies, realistic benchmark generation for real-world settings, and static user interaction. We address all of the above issues through three contributions: (1) a unified taxonomy of 8 categories covering ambiguous and unanswerable questions; (2) a multi-agent generation pipeline with a two-stage process (NLQ generation followed by SQL grounding) and an explicit Category Conformance validation stage, producing questions from arbitrary databases validated by a council of local open-source models; and (3) ABISS (Ambiguity Benchmark using Interaction-Simulated Sessions), a dynamic simulation environment where Text-to-SQL agents interact with style-aware simulated users across multi-turn dialogues. Experiments with eight open-source models on ABISS-BIRD and ABISS-Spider reveal two fundamental bottlenecks. The first is subcategory classification: models detect that a question is problematic yet struggle to pinpoint the specific subcategory. The second is clarification-conditioned SQL generation: even after receiving useful user information, models often still fail in the final resolution step. Providing the ground truth category yields large gains in both execution and feedback across both datasets, yet ambiguous-question execution remains low even under oracle category labels. We release our code for data generation and benchmark on GitHub (https://github.com/giosullutrone/ABISS-Evaluating-Text-to-SQL-Systems-Through-Agent-Interaction).",
+      "authors": [
+        "Giovanni Sullutrone",
+        "Luca Sala",
+        "Sania Aftar",
+        "Georgia Koutrika",
+        "Sonia Bergamaschi"
+      ],
+      "primary_category": "cs.DB",
+      "categories": [
+        "cs.DB"
+      ],
+      "published": "2026-07-25T19:36:35+00:00",
+      "link": "https://arxiv.org/pdf/2607.23340v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "taxonomy and benchmark for ambiguous/unanswerable questions, a hallucination source",
+      "llm_evidence_cn": "针对模糊/不可答问题的分类法与评测基准，与幻觉源头相关",
+      "llm_evidence": "针对模糊/不可答问题的分类法与评测基准，与幻觉源头相关",
+      "canonical_evidence": "针对模糊/不可答问题的分类法与评测基准，与幻觉源头相关",
+      "llm_tldr_en": "ABISS presents a unified taxonomy of eight ambiguity categories and a multi-agent pipeline to generate text-to-SQL evaluation questions, targeting real-world failure modes.",
+      "llm_tldr_cn": "真实用户常提出模糊或无法回答的问题，现有Text-to-SQL系统难以应对，而现有评测又缺乏这类数据。文章提出统一分类法，覆盖8类模糊与不可答问题，并构建了一个两阶段的多智能体生成流水线，包括自然语言问题生成和SQL落地验证。额外使用本地开源模型联盟进行类别符合性校验，可从任意数据库生成高质量问题。该工作为评估和改进LLM在真实场景中的幻觉式错误提供了基准支撑。",
+      "llm_tldr": "真实用户常提出模糊或无法回答的问题，现有Text-to-SQL系统难以应对，而现有评测又缺乏这类数据。文章提出统一分类法，覆盖8类模糊与不可答问题，并构建了一个两阶段的多智能体生成流水线，包括自然语言问题生成和SQL落地验证。额外使用本地开源模型联盟进行类别符合性校验，可从任意数据库生成高质量问题。该工作为评估和改进LLM在真实场景中的幻觉式错误提供了基准支撑。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.26057v1",
+      "source": "arxiv",
+      "title": "Pass the Baton: Trajectory-Relayed On-Policy Distillation",
+      "abstract": "On-policy distillation (OPD) grounds token-level supervision in the student's own trajectory, yet suffers from prefix failure: once the student commits to a wrong reasoning direction, all subsequent generation builds on this deviation, producing misdirected continuations that elicit unreliable supervision and waste compute. We identify a teacher-student continuation asymmetry on failed prefixes, where the teacher tends to redirect while the student continues along the original direction, and convert it into a label-free handoff trigger in Relay On-Policy Distillation (Relay-OPD). During training, Relay-OPD constructs relay trajectories by letting the teacher briefly take over at detected trigger points to produce a teacher leg, after which the student resumes and is optimized on the resulting trajectory. A limited relay budget concentrates intervention on critical early positions while limiting departure from the student policy. With a Qwen3-4B-Instruct-2507 teacher and Qwen3-0.6B/1.7B-Non-Thinking students on eight mathematical reasoning benchmarks, Relay-OPD achieves the best or second-best results on every benchmark, outperforming standard OPD by +5.73% and the strongest baseline FastOPD by +1.49% on average for 1.7B, with consistent gains at 0.6B. Training trajectory length is reduced by over 50%.",
+      "authors": [
+        "Haolei Xu",
+        "Xiaowen Xu",
+        "Haiwen Hong",
+        "Zixuan Ni",
+        "Hongxing Li",
+        "Yiwen Qiu",
+        "Weiming Lu",
+        "Yongliang Shen"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-07-28T17:59:46+00:00",
+      "link": "https://arxiv.org/pdf/2607.26057v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "trajectory-relayed on-policy distillation improves LLM training",
+      "llm_evidence_cn": "轨迹中继在线蒸馏改进大模型训练",
+      "llm_evidence": "轨迹中继在线蒸馏改进大模型训练",
+      "canonical_evidence": "轨迹中继在线蒸馏改进大模型训练",
+      "llm_tldr_en": "On-policy distillation suffers from prefix failure; Relay-OPD detects teacher-student continuation asymmetry and lets the teacher briefly take over to construct relay trajectories, stabilizing distillation for LLM reasoning training.",
+      "llm_tldr_cn": "在线蒸馏中，学生一旦在错误前缀上走偏，后续生成就会累积偏差，导致监督不可靠且浪费算力。作者识别出师生在失败前缀上的延续不对称性，并据此设计无标签切换触发点，提出接力在线蒸馏（Relay-OPD）。训练时教师短暂接管产生教师段，学生再继续生成，从而修正错误轨迹并稳定蒸馏效果。该方法为LLM推理训练提供了更高效的在线蒸馏方案。",
+      "llm_tldr": "在线蒸馏中，学生一旦在错误前缀上走偏，后续生成就会累积偏差，导致监督不可靠且浪费算力。作者识别出师生在失败前缀上的延续不对称性，并据此设计无标签切换触发点，提出接力在线蒸馏（Relay-OPD）。训练时教师短暂接管产生教师段，学生再继续生成，从而修正错误轨迹并稳定蒸馏效果。该方法为LLM推理训练提供了更高效的在线蒸馏方案。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.25135v1",
+      "source": "arxiv",
+      "title": "ScalableRAG: High-Quality RAG at Zero Ingestion Cost",
+      "abstract": "Recent advances in RAG aim to optimize for performance by paying high ingestion costs for knowledge ingestion: building knowledge graphs or extracting SQL tables. In this work we show that the operations that such knowledge bases allow can be replicated with zero ingestion costs (not even a vector database); in fact our solution, Zero-Ingestion ScalableRAG, handily out-performs all baselines (including knowledge graph approaches) in three out of the six corpora considered here, and only marginally missing maximum performance on the other three, with average accuracy across all six datasets 7.36% above the next most competitive baseline. It achieves this by keeping a workspace of document sets and values sets that it can write into and read from, allowing for on-the-fly aggregative reasoning in all situations where grouping is required on a primary key that is in one to one correspondence with a subset of the total document set.   Capping the number of LLM calls by a constant independent of the corpus size, we also introduce Limited-Ingestion ScalableRAG, which does use a minimal vector database as well as an automated pattern discovery from a sample of documents, to further improve accuracy at scale. Our code is available at https://github.com/cohesity/ScalableRAG .",
+      "authors": [
+        "Hilaf Hasson",
+        "Aditya Chakravarty",
+        "Jayant Thomas",
+        "Krishna Gogineni"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-07-27T23:03:30+00:00",
+      "link": "https://arxiv.org/pdf/2607.25135v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "RAG method that grounds LLM answers, a key approach to hallucination suppression",
+      "llm_evidence_cn": "通过检索增强生成来支撑答案，有助于抑制幻觉",
+      "llm_evidence": "通过检索增强生成来支撑答案，有助于抑制幻觉",
+      "canonical_evidence": "通过检索增强生成来支撑答案，有助于抑制幻觉",
+      "llm_tldr_en": "Presents ScalableRAG, a zero-ingestion retrieval-augmented generation approach that outperforms knowledge-graph baselines on multiple corpora without needing vector databases or ingestion.",
+      "llm_tldr_cn": "高质量RAG通常需要构建知识图谱或SQL表等高摄取成本。本文提出零摄取ScalableRAG，利用文档集与值集的工作区实现即席读写，无需向量数据库即可完成知识库式操作。在六个语料库中，该方法在三者上超过所有基线，平均准确率比次优基线高7.36%。这为低成本、高可扩展的RAG提供了新路径，也对抑制生成幻觉有积极意义。",
+      "llm_tldr": "高质量RAG通常需要构建知识图谱或SQL表等高摄取成本。本文提出零摄取ScalableRAG，利用文档集与值集的工作区实现即席读写，无需向量数据库即可完成知识库式操作。在六个语料库中，该方法在三者上超过所有基线，平均准确率比次优基线高7.36%。这为低成本、高可扩展的RAG提供了新路径，也对抑制生成幻觉有积极意义。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.27273v1",
+      "source": "arxiv",
+      "title": "SDO: Structure-Aware Data Organization for Efficient LLM Post-Training",
+      "abstract": "Post-training of large language models is expensive, and existing efficiency improvements mainly focus on selecting informative samples or designing training schedules. However, data organization itself is usually treated as a static preprocessing step: embedding-based grouping methods construct fixed partitions before training and cannot adapt to the evolving sample exposure during optimization. As a result, all samples receive similar exposure despite their different optimization needs, leading to redundant updates for some samples while leaving others under-optimized. To address this problem, we propose SDO (Structure-Aware Data Organization), a plug-and-play data organization framework with an exposure-driven feedback mechanism that organizes mini-batch composition and sample exposure according to representation-space structure. SDO operates epoch by epoch on frozen external embeddings, avoiding model warm-up training overhead: within each epoch, locality-aware batching forms coherent mini-batches via KNN neighborhood traversal; across epochs, exposure-balanced scheduling records per-sample participation and reduces the sampling probability of over-exposed samples to preserve long-term coverage. Across SFT, DPO, and GRPO, SDO accelerates convergence, with the largest gains observed in the early-to-mid phase, producing more coherent gradients and more balanced accuracy across question types without permanently excluding training samples.",
+      "authors": [
+        "Jinliang Gao",
+        "Ning Yang",
+        "Hai Wang",
+        "Baili Xiao",
+        "Pin Lyu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-29T12:17:18+00:00",
+      "link": "https://arxiv.org/pdf/2607.27273v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "LLM post-training efficiency with adaptive data organization",
+      "llm_evidence_cn": "面向大语言模型后训练的高效数据组织方法",
+      "llm_evidence": "面向大语言模型后训练的高效数据组织方法",
+      "canonical_evidence": "面向大语言模型后训练的高效数据组织方法",
+      "llm_tldr_en": "Proposes SDO, a plug-and-play data organization framework with exposure-driven feedback that adapts data organization during LLM post-training, reducing redundant updates and improving efficiency.",
+      "llm_tldr_cn": "大语言模型后训练成本高昂，现有方法聚焦于样本选择与训练调度，却忽视数据组织这一静态预处理环节，导致不同样本的优化需求无法被自适应满足。为此提出SDO，一种带暴露驱动反馈机制的结构感知数据组织框架，在训练过程中动态调整数据组成，使样本暴露与优化需求匹配。实验表明该方法能减少冗余更新并改善欠优化样本的学习效果。该框架即插即用，为后训练效率提升提供了新思路。",
+      "llm_tldr": "大语言模型后训练成本高昂，现有方法聚焦于样本选择与训练调度，却忽视数据组织这一静态预处理环节，导致不同样本的优化需求无法被自适应满足。为此提出SDO，一种带暴露驱动反馈机制的结构感知数据组织框架，在训练过程中动态调整数据组成，使样本暴露与优化需求匹配。实验表明该方法能减少冗余更新并改善欠优化样本的学习效果。该框架即插即用，为后训练效率提升提供了新思路。",
+      "llm_tags": [
+        "query:lpt:composite"
+      ],
+      "matched_query_tag": "query:lpt:composite",
+      "matched_query_text": "Papers central to 大语言模型后训练, especially work that connects or combines: hallucination suppression; l; p; r; o; reward modeling for learning human preferences in reinforcement learning from human feedback; innovation; math formulation; Algorithm improvements; servey.",
+      "matched_requirement_id": "req-composite-lpt",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.25308v1",
+      "source": "arxiv",
+      "title": "CAST: Game Solvers as Turn-Level Teachers for LLM Agents",
+      "abstract": "Training large language models (LLMs) to act in long-horizon games is a promising step toward generalist decision-making, yet reinforcement learning with verifiable rewards (RLVR) relies on sparse final rewards that reveal little about which decisions determine success. Denser process signals could supply this missing turn-level credit, but existing sources are hard to keep both cheap and accurate. We observe that changes in a game solver's state value reveal whether an action advances the state toward success. Building on this insight, we propose CAST (Credit Assignment from Solver Teachers), which converts these value changes into solver advantages and injects them into RLVR as turn-level signals. We further show that, under a soft-optimal solver assumption, maximizing the solver advantage is equivalent to on-policy distillation from the solver, requiring only scalar values rather than teacher logits. Across Sokoban, Minesweeper, and Rush Hour, CAST outperforms all trained baselines on every game under both in-domain and unseen-difficulty evaluation and achieves the highest average zero-shot performance on ALFWorld and WebShop. Our code is available at https://github.com/Wloner0809/CAST.",
+      "authors": [
+        "Yu Wang",
+        "Yi-Kai Zhang",
+        "Wentao Shi",
+        "Ziang Ye",
+        "Yuchun Miao",
+        "Yueqing Sun",
+        "Qi Gu",
+        "Xunliang Cai",
+        "Lan-Zhe Guo",
+        "Han-Jia Ye",
+        "Fuli Feng"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-07-28T05:39:01+00:00",
+      "link": "https://arxiv.org/pdf/2607.25308v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "injects solver-derived turn-level advantage signals into RLVR as dense reward, relevant to reward modeling",
+      "llm_evidence_cn": "将求解器导出的回合级优势信号注入RLVR作为稠密奖励，与奖励建模相关",
+      "llm_evidence": "将求解器导出的回合级优势信号注入RLVR作为稠密奖励，与奖励建模相关",
+      "canonical_evidence": "将求解器导出的回合级优势信号注入RLVR作为稠密奖励，与奖励建模相关",
+      "llm_tldr_en": "CAST uses game solver state value changes as turn-level credit signals for LLM agents, improving credit assignment in sparse-reward RLVR.",
+      "llm_tldr_cn": "长时程游戏的LLM智能体训练中，强化学习仅依赖稀疏最终奖励，难以判断哪些决策导致成功。本文提出CAST，利用博弈求解器状态价值变化生成逐步信用信号，并在满足软最优求解器假设时将最大化转为最小化目标。该方法将稠密过程信号注入RLVR，显著改善信用分配，是奖励建模的一种创新形式。",
+      "llm_tldr": "长时程游戏的LLM智能体训练中，强化学习仅依赖稀疏最终奖励，难以判断哪些决策导致成功。本文提出CAST，利用博弈求解器状态价值变化生成逐步信用信号，并在满足软最优求解器假设时将最大化转为最小化目标。该方法将稠密过程信号注入RLVR，显著改善信用分配，是奖励建模的一种创新形式。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.27652v1",
+      "source": "arxiv",
+      "title": "Harness-G: A Graph-Structured Harness for Search Agents",
+      "abstract": "Reinforcement learning (RL) search agents commonly model retrieval as free-form natural-language query generation and optimize multi-turn interactions using final-answer rewards. Current studies mainly improve training with denser or more structured credit signals, but rarely examine whether retrieval is properly formulated at the policy-environment interface. We observe pronounced retrieval aliasing during Search-R1 training: rollouts for the same question continue to generate distinct query strings, yet their accumulated evidence sets increasingly overlap. We call this phenomenon retrieval-equivalence collapse; in this regime, trajectories approach utility equivalence with respect to retrieval decisions, leaving within-group returns with little effective retrieval contrast. To address this problem, we propose Harness-G, a graph-structured retrieval framework that redesigns this interface. It reformulates free-form query generation as finite action selection: the policy selects an evidence sentence or entity, or chooses to answer, while the environment constructs the menu, tracks retrieval state, and validates and executes each choice. This interface reduces linguistic aliasing and makes same-state alternatives directly comparable. Building on this interface, we introduce Structured Non-myopic Credit (SNC), which uses a frozen answer scorer to compare the selected action with its alternatives and assigns downstream gains to the earlier actions that enabled them. Across six QA benchmarks, Harness-G achieves the highest average F1 at both evaluated model scales, outperforming the strongest baseline, Graph-R1, by 10.74 points at 1.5B and 3.98 points at 3B.",
+      "authors": [
+        "Yanning Hou",
+        "Haoyuan Chen",
+        "Sihang Zhou",
+        "Xiaoshu Chen",
+        "Xirui Liu",
+        "Duanyang Yuan",
+        "Lingyuan Meng",
+        "Quan Liu",
+        "Jian Huang"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-30T04:05:05+00:00",
+      "link": "https://arxiv.org/pdf/2607.27652v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "introduces graph-structured harness to solve retrieval-equivalence collapse in RL search agents, an algorithm improvement for post-training",
+      "llm_evidence_cn": "提出图结构控制框架解决RL搜索智能体的检索等价塌缩，属于后训练算法改进",
+      "llm_evidence": "提出图结构控制框架解决RL搜索智能体的检索等价塌缩，属于后训练算法改进",
+      "canonical_evidence": "提出图结构控制框架解决RL搜索智能体的检索等价塌缩，属于后训练算法改进",
+      "llm_tldr_en": "Harness-G addresses retrieval aliasing and retrieval-equivalence collapse in RL search agents by introducing a graph-structured policy-environment interface. Observed during Search-R1 training, the method restructures retrieval state and actions to improve credit signals and effective retrieval, advancing RL-based LLM post-training.",
+      "llm_tldr_cn": "现有RL搜索智能体通常将检索建模为自由形式的自然语言查询生成，并只用最终答案奖励进行优化，很少检查检索在策略-环境接口上的定义。作者在Search-R1训练中发现检索别名现象：同一问题生成不同查询串但证据集高度重叠，轨迹趋于效用等价，有效奖励信号不足。为此提出Harness-G，用图结构来组织检索状态和动作，重新设计agent与环境的交互界面。实验显示该方法能缓解检索等价塌缩，为RL搜索智能体提供了更稳定的训练信号和更好的检索设计思路。",
+      "llm_tldr": "现有RL搜索智能体通常将检索建模为自由形式的自然语言查询生成，并只用最终答案奖励进行优化，很少检查检索在策略-环境接口上的定义。作者在Search-R1训练中发现检索别名现象：同一问题生成不同查询串但证据集高度重叠，轨迹趋于效用等价，有效奖励信号不足。为此提出Harness-G，用图结构来组织检索状态和动作，重新设计agent与环境的交互界面。实验显示该方法能缓解检索等价塌缩，为RL搜索智能体提供了更稳定的训练信号和更好的检索设计思路。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    }
+  ]
+}
