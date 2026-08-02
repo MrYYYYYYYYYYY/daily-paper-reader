@@ -1,0 +1,190 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-02T21:05:29.344850+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 4,
+    "deep_cap": 6,
+    "deep_selected": 4,
+    "quick_candidates": 0,
+    "quick_skim_target": 11,
+    "quick_selected": 0
+  },
+  "deep_dive": [
+    {
+      "id": "2607.27937v1",
+      "source": "arxiv",
+      "title": "From Scoring to Acting: Outcome-Verified Comparative Self-Distillation for LLM Agents",
+      "abstract": "Recent work on LLM agents is shifting from external capability elicitation to capability internalization, enabling agents to retain useful skills without retrieval at inference time. On-policy self-distillation (OPSD) offers a promising direction, but many existing methods typically supervise students by scoring actions along student-generated trajectories. Such supervision has two limitations: teacher preferences are not validated by environment outcomes, and action-level scores underuse information from student rollouts, teacher rollouts, and their behavioral relationship. We therefore advocate outcome-verified teacher supervision and comparative learning over teacher-student trajectories. Based on this view, we propose Outcome-Verified Comparative Self-Distillation (OVCSD). OVCSD organizes failed student rollouts into a prefix tree, adaptively invokes a skill-conditioned teacher from student-reached states, and retains only outcome-verified successful continuations. It then applies localized comparative learning at the first state-aligned divergence and distills the post-divergence teacher suffix to transfer completion behavior. Experiments on ALFWorld and WebShop across three model scales show that OVCSD consistently outperforms skill-free RL and existing self-distillation baselines, achieving up to 29.7 and 5.4 absolute success-rate gains over the strongest baselines on ALFWorld and WebShop, respectively, while adding less than 3% privileged interaction during training.",
+      "authors": [
+        "Xu Xia",
+        "Jinghua Piao",
+        "Min Yang",
+        "Xiaochong Lan",
+        "Jiaju Chen",
+        "Yong Li"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-30T09:47:58+00:00",
+      "link": "https://arxiv.org/pdf/2607.27937v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "outcome-verified teacher supervision and comparative learning align with reward modeling for preference learning",
+      "llm_evidence_cn": "基于结果验证的教师监督与对比学习，契合偏好学习中的奖励建模",
+      "llm_evidence": "基于结果验证的教师监督与对比学习，契合偏好学习中的奖励建模",
+      "canonical_evidence": "基于结果验证的教师监督与对比学习，契合偏好学习中的奖励建模",
+      "llm_tldr_en": "Proposes outcome-verified comparative self-distillation for LLM agents, replacing unvalidated action scoring with environment-verified teacher preferences and comparative trajectory learning.",
+      "llm_tldr_cn": "现有LLM智能体自我蒸馏以动作级评分作为监督，存在教师偏好未经环境验证、且未充分利用教师/学生轨迹信息的问题。本文提出结果验证的对比自蒸馏方法，用环境结果验证教师偏好，并在教师与学生轨迹间进行对比学习，从而将外部能力内化为智能体固有技能，提升推理时无需检索的任务表现。",
+      "llm_tldr": "现有LLM智能体自我蒸馏以动作级评分作为监督，存在教师偏好未经环境验证、且未充分利用教师/学生轨迹信息的问题。本文提出结果验证的对比自蒸馏方法，用环境结果验证教师偏好，并在教师与学生轨迹间进行对比学习，从而将外部能力内化为智能体固有技能，提升推理时无需检索的任务表现。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "carryover_cache",
+      "paper_id": "2607.27937v1"
+    },
+    {
+      "id": "2607.28077v1",
+      "source": "arxiv",
+      "title": "LEEPS: Latent-Guided Explore-Exploit Prompt Sampling for Efficient RLVR in Large Language Models",
+      "abstract": "Reinforcement learning with verifiable rewards (RLVR) improves the reasoning capabilities of large language models, but prompt groups with identical rollout rewards consume generation budget without effective learning signals. Pre-rollout prompt selection can reduce this waste by screening prompts before rollout generation. However, existing pre-rollout methods struggle to balance exploitation and exploration: repeatedly exploiting historically informative prompts can narrow training coverage, whereas broader exploration can lower the fraction of informative prompts. To address these limitations, we introduce LEEPS, a Latent-Guided Explore--Exploit Prompt Sampler that adaptively balances the reuse of previously observed informative prompts with continued exploration of uncertain ones. LEEPS partitions candidates into exploit and explore portfolios and adaptively allocates rollout budget according to their recent non-trivial ratios. It further uses representation-space neighbors and historical rollout outcomes to prioritize uncertain prompts likely to yield non-zero reward variance, thereby making exploration more targeted without additional rollouts. Across six mathematical reasoning benchmarks, LEEPS achieves the highest average score at both model scales, with relative gains of 2.6\\% and 3.7\\% over the strongest baseline for Qwen2.5-Math-1.5B and 7B, respectively, and generally improves faster during the training process. It also achieves the highest average score across the three evaluated OOD general-reasoning benchmarks at both model scales and adds only about 2 seconds of online sampling overhead per training step. Code is available at https://github.com/ShuangLiangX/LEEPS.",
+      "authors": [
+        "Shuang Liang",
+        "Haoyang Zhou",
+        "Yifan Gong",
+        "Guowei Wang",
+        "Xiting Wang"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-30T11:50:10+00:00",
+      "link": "https://arxiv.org/pdf/2607.28077v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "improves RLVR prompt selection via latent-guided explore-exploit sampling",
+      "llm_evidence_cn": "通过潜在引导的探索-利用提示采样改进RLVR效率",
+      "llm_evidence": "通过潜在引导的探索-利用提示采样改进RLVR效率",
+      "canonical_evidence": "通过潜在引导的探索-利用提示采样改进RLVR效率",
+      "llm_tldr_en": "Proposes LEEPS, a latent-guided prompt sampler that balances exploration and exploitation to select informative prompts before rollout, improving the efficiency of RLVR for LLM reasoning.",
+      "llm_tldr_cn": "强化学习与可验证奖励（RLVR）能够提升大语言模型的推理能力，但相同奖励的提示组会浪费生成预算。现有预采样方法难以平衡探索与利用。本文提出LEEPS，一个潜在引导的探索-利用提示采样器，在rollout前自适应筛选信息量高的提示，从而在保持训练覆盖的同时提高采样效率，促进RLVR训练的有效性。",
+      "llm_tldr": "强化学习与可验证奖励（RLVR）能够提升大语言模型的推理能力，但相同奖励的提示组会浪费生成预算。现有预采样方法难以平衡探索与利用。本文提出LEEPS，一个潜在引导的探索-利用提示采样器，在rollout前自适应筛选信息量高的提示，从而在保持训练覆盖的同时提高采样效率，促进RLVR训练的有效性。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "Algorithm improvements",
+      "matched_requirement_id": "req-9",
+      "selection_source": "carryover_cache",
+      "paper_id": "2607.28077v1"
+    },
+    {
+      "id": "2607.28082v1",
+      "source": "arxiv",
+      "title": "GGC: Selective Query Correction for Reliable Text-to-SPARQL Generation",
+      "abstract": "Large language models (LLMs) have demonstrated strong capabilities in structured query generation, making them a natural choice for Text-to-SPARQL, which translates natural language questions into executable SPARQL queries over knowledge graphs. However, their initial outputs remain unreliable: generated queries may be executable yet semantically misaligned with input questions, leading to incorrect retrieval. To address this issue, we propose Generator-Gate-Corrector (GGC), a framework for reliable LLM-based Text-to-SPARQL generation. GGC first uses a Generator to produce an initial query, then applies a Gate to predict whether correction is needed, and finally invokes a Corrector only for selected high-risk queries. This selective correction mechanism avoids unnecessary modifications and reduces the risk of degrading originally correct queries. Experiments on MCQA show that GGC improves query-level accuracy from 90.23\\% to 98.33\\% while reducing inference overhead by 45\\% compared with correcting all generated queries. Ablation studies show that the Gate is robust across thresholds and that Corrector training data composition affects correction effectiveness and stability. Overall, the results demonstrate that selective correction enhances the accuracy, reliability, and efficiency of LLM-based text-to-SPARQL generation.",
+      "authors": [
+        "Ziyi Yang",
+        "Thanh-Son Nguyen",
+        "Tuan Anh Nguyen",
+        "Lihui Chen"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-30T11:52:09+00:00",
+      "link": "https://arxiv.org/pdf/2607.28082v1",
+      "tags": [
+        "keyword:lpt",
+        "query:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "corrects unreliable LLM-generated queries to prevent semantic misalignment, akin to hallucination suppression",
+      "llm_evidence_cn": "纠正不可靠的LLM生成查询以避免语义偏差，类似幻觉抑制",
+      "llm_evidence": "纠正不可靠的LLM生成查询以避免语义偏差，类似幻觉抑制",
+      "canonical_evidence": "纠正不可靠的LLM生成查询以避免语义偏差，类似幻觉抑制",
+      "llm_tldr_en": "GGC proposes a Generator-Gate-Corrector framework that predicts which LLM-generated SPARQL queries need correction and only corrects high-risk ones, yielding more reliable text-to-SPARQL generation.",
+      "llm_tldr_cn": "文本到SPARQL生成中，LLM的初始输出往往不可靠，查询虽可执行却可能语义错位，导致检索结果错误。为此提出GGC框架：生成器先输出初始查询，门控预测该查询是否需要修正，仅对高风险查询调用修正器进行选择性纠错。实验表明，这种选择式修正机制能显著提升查询生成的可靠性，为LLM结构化查询生成提供了一种可依赖的纠错方案。",
+      "llm_tldr": "文本到SPARQL生成中，LLM的初始输出往往不可靠，查询虽可执行却可能语义错位，导致检索结果错误。为此提出GGC框架：生成器先输出初始查询，门控预测该查询是否需要修正，仅对高风险查询调用修正器进行选择性纠错。实验表明，这种选择式修正机制能显著提升查询生成的可靠性，为LLM结构化查询生成提供了一种可依赖的纠错方案。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "hallucination suppression",
+      "matched_requirement_id": "req-1",
+      "selection_source": "carryover_cache",
+      "paper_id": "2607.28082v1"
+    },
+    {
+      "id": "2607.28609v1",
+      "source": "arxiv",
+      "title": "OSReward: Instituting Standardized Evaluation for Cross-Platform Computer-Use Reward Models",
+      "abstract": "Computer-using agents (CUAs) are advancing rapidly across the digital world. A CUA trajectory records the agent's actions, states, and reasoning. Verifying whether it fulfilled the task instruction is central to CUA evaluation, data curation, and reinforcement learning. Neither human-written verifiers nor human annotators can provide such verification at scale, so the field increasingly turns to vision-language models (VLMs) as judges of CUA trajectories. But a fundamental question has long gone unexamined: are these VLM judges reliable enough? To study it systematically, we introduce OSReward, a realistic, high-quality benchmark that evaluates VLM judges on CUA trajectories. The trajectories come from diverse agent backbones executing human-verified instructions across platforms, then rigorously labeled with ground-truth verdicts through multi-stage human annotation. Building on it, we derive OSReward-Hard, a challenge set concentrating genuinely hard cases, and OSReward-Multi for fine-grained efficiency and alignment scoring. The most comprehensive evaluation of VLM judges to date finds even state-of-the-art models fall short of an ideal judge, sharing a systematic leniency bias that mislabels failed runs as successes. The few reliable enough to trust are too expensive to run at scale, while affordable open models trail far behind. To close this gap, we construct and release OS-Shepherd-100K, an open corpus of reasoning-annotated trajectory judgments for the CUA community. On it, we train OS-Shepherd (9B and 35B), open reward models that supply low-cost, stable, and reliable reward signals, matching commercial judges at 30-60% lower cost than the frontier. Extensive analyses further inform the design of reliable CUA reward at scale. Our code, benchmark, dataset, and model checkpoints are available at https://os-copilot.github.io/OSReward-Home/.",
+      "authors": [
+        "Qiushi Sun",
+        "Kanzhi Cheng",
+        "Yian Wang",
+        "Bowen Yang",
+        "Hang Yan",
+        "Liheng Chen",
+        "Fangzhi Xu",
+        "Zichen Ding",
+        "Nuo Chen",
+        "Jialin Cao",
+        "Xingdong Gong",
+        "Zehao Li",
+        "Kaiming Jin",
+        "Xinfeng Yuan",
+        "Zhoumianze Liu",
+        "Jingyang Gong",
+        "Zhangyue Yin",
+        "Jiahui Gao",
+        "Zhiyong Wu",
+        "Tianbao Xie",
+        "Jianbing Zhang",
+        "Ben Kao",
+        "Lingpeng Kong"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CL",
+        "cs.CV"
+      ],
+      "published": "2026-07-30T17:57:41+00:00",
+      "link": "https://arxiv.org/pdf/2607.28609v1",
+      "tags": [
+        "keyword:lpt"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "standardized benchmark for evaluating reward models of computer-use agents, directly supporting reward modeling research",
+      "llm_evidence_cn": "面向计算机使用智能体的奖励模型标准化评测基准，直接支持奖励建模研究",
+      "llm_evidence": "面向计算机使用智能体的奖励模型标准化评测基准，直接支持奖励建模研究",
+      "canonical_evidence": "面向计算机使用智能体的奖励模型标准化评测基准，直接支持奖励建模研究",
+      "llm_tldr_en": "OSReward provides a realistic benchmark to assess whether VLM judges reliably verify CUA trajectories, central to reward model evaluation.",
+      "llm_tldr_cn": "计算机使用智能体依赖VLMs作为轨迹奖励判断，但其可靠性未受系统性检验。OSReward构建包含多智能体骨干生成轨迹的高质量基准，用于评测VLM法官对CUA轨迹的验证能力。该基准为奖励模型的标准化评估提供了基础设施，对智能体的评估、数据筛选和强化学习训练具有广泛意义。",
+      "llm_tldr": "计算机使用智能体依赖VLMs作为轨迹奖励判断，但其可靠性未受系统性检验。OSReward构建包含多智能体骨干生成轨迹的高质量基准，用于评测VLM法官对CUA轨迹的验证能力。该基准为奖励模型的标准化评估提供了基础设施，对智能体的评估、数据筛选和强化学习训练具有广泛意义。",
+      "llm_tags": [
+        "query:lpt"
+      ],
+      "matched_query_tag": "query:lpt",
+      "matched_query_text": "reward modeling for learning human preferences in reinforcement learning from human feedback",
+      "matched_requirement_id": "req-6",
+      "selection_source": "carryover_cache",
+      "paper_id": "2607.28609v1"
+    }
+  ],
+  "quick_skim": []
+}
